@@ -1,8 +1,8 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable n/no-unsupported-features/node-builtins -- using node above 24.0.0 so URL.revokeObjectURL is supported */
 /**
- * File backup utility for handling file download operations.
- * Provides utilities for browser-based file downloads.
+ * File backup utility for handling file download operations. Provides utilities
+ * for browser-based file downloads.
  */
 
 import logger from "../../../services/logger";
@@ -28,12 +28,13 @@ export interface FileDownloadOptions {
  *
  * @remarks
  * Creates a Blob from the buffer and uses an anchor element to initiate the
- * download. Falls back to direct click if DOM manipulation fails. Object URL
- * is properly managed to avoid memory leaks.
+ * download. Falls back to direct click if DOM manipulation fails. Object URL is
+ * properly managed to avoid memory leaks.
  *
  * @param buffer - File data as ArrayBuffer
  * @param fileName - Name for the downloaded file
  * @param mimeType - MIME type for the file
+ *
  * @throws Error if browser APIs are unavailable or download cannot be triggered
  */
 function createAndTriggerDownload(
@@ -87,6 +88,7 @@ function createAndTriggerDownload(
  * Determines if an error should be re-thrown without retry.
  *
  * @param error - The error to check.
+ *
  * @returns True if the error should be re-thrown, false otherwise.
  */
 function shouldRethrowError(error: Error): boolean {
@@ -110,6 +112,7 @@ function shouldRethrowError(error: Error): boolean {
  * @param buffer - The file buffer.
  * @param fileName - The filename.
  * @param mimeType - The MIME type.
+ *
  * @throws {@link Error} If both primary and fallback methods fail.
  */
 function tryFallbackDownload(
@@ -140,6 +143,7 @@ function tryFallbackDownload(
  * @param buffer - The file buffer.
  * @param fileName - The filename.
  * @param mimeType - The MIME type.
+ *
  * @throws {@link Error} Always throws after logging and attempting fallback.
  */
 function handleDownloadError(
@@ -176,16 +180,21 @@ function handleDownloadError(
  * download using an anchor element. If the primary method fails, a fallback
  * strategy is attempted.
  *
- * @param options - The file download options including buffer, fileName, and optional mimeType.
- * @throws {@link Error} If the download fails due to browser API issues or DOM manipulation errors.
  * @example
+ *
  * ```typescript
  * downloadFile({
- *   buffer: myArrayBuffer,
- *   fileName: "report.txt",
- *   mimeType: "text/plain"
+ *     buffer: myArrayBuffer,
+ *     fileName: "report.txt",
+ *     mimeType: "text/plain",
  * });
  * ```
+ *
+ * @param options - The file download options including buffer, fileName, and
+ *   optional mimeType.
+ *
+ * @throws {@link Error} If the download fails due to browser API issues or DOM
+ *   manipulation errors.
  */
 export function downloadFile(options: FileDownloadOptions): void {
     const { buffer, fileName, mimeType = "application/octet-stream" } = options;
@@ -203,14 +212,17 @@ export function downloadFile(options: FileDownloadOptions): void {
  * @remarks
  * The filename is formatted as `${prefix}-${YYYY-MM-DD}.${extension}`.
  *
- * @param prefix - The prefix for the filename (default: "backup").
- * @param extension - The file extension (default: "sqlite").
- * @returns The generated filename string.
  * @example
+ *
  * ```typescript
  * const fileName = generateBackupFileName("db", "sqlite3");
  * // "db-2024-06-01.sqlite3"
  * ```
+ *
+ * @param prefix - The prefix for the filename (default: "backup").
+ * @param extension - The file extension (default: "sqlite").
+ *
+ * @returns The generated filename string.
  */
 export function generateBackupFileName(
     prefix = "backup",
@@ -228,13 +240,17 @@ export function generateBackupFileName(
  * it, and triggers a browser download. The download is performed using a Blob
  * and anchor element with proper object URL lifecycle management.
  *
- * @param downloadFunction - An async function that returns the backup data as a Uint8Array
- * @throws TypeError if the backup data is not a Uint8Array
- * @throws Error if the download fails due to browser API or DOM errors
  * @example
+ *
  * ```typescript
  * await handleSQLiteBackupDownload(() => fetchBackupData());
  * ```
+ *
+ * @param downloadFunction - An async function that returns the backup data as a
+ *   Uint8Array
+ *
+ * @throws TypeError if the backup data is not a Uint8Array
+ * @throws Error if the download fails due to browser API or DOM errors
  */
 export async function handleSQLiteBackupDownload(
     downloadFunction: () => Promise<Uint8Array>

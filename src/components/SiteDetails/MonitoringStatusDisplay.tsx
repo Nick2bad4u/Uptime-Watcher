@@ -1,6 +1,6 @@
 /**
- * Monitoring status display component for the site details header.
- * Shows monitor status indicators with type and connection information.
+ * Monitoring status display component for the site details header. Shows
+ * monitor status indicators with type and connection information.
  *
  * @remarks
  * Enhanced monitoring status display component for the site details header.
@@ -33,6 +33,7 @@ export interface MonitoringStatusDisplayProperties {
  * handling for URL parsing.
  *
  * @param props - Component props containing monitors array
+ *
  * @returns JSX element with enhanced monitoring status indicators
  */
 const MonitoringStatusDisplay = ({

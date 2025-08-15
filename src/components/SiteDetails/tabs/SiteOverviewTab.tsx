@@ -74,6 +74,7 @@ function getMonitorStatusText(monitor: Monitor): string {
  * Site Overview tab component that displays comprehensive site information.
  *
  * Features:
+ *
  * - Site metadata (name, creation date, identifier)
  * - Monitor summary with individual statuses
  * - Aggregate statistics across all monitors
@@ -81,6 +82,7 @@ function getMonitorStatusText(monitor: Monitor): string {
  * - Quick actions for site management
  *
  * @param props - Component props
+ *
  * @returns JSX element containing the site overview
  */
 export const SiteOverviewTab = ({

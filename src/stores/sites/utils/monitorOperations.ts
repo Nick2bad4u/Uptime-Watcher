@@ -44,13 +44,15 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
 /**
  * Creates a default monitor for a site
  *
- * @param overrides - Partial monitor object to override defaults
- * @returns Complete monitor object with defaults applied
- *
  * @example
+ *
  * ```typescript
  * const monitor = createDefaultMonitor({ url: "https://example.com" });
  * ```
+ *
+ * @param overrides - Partial monitor object to override defaults
+ *
+ * @returns Complete monitor object with defaults applied
  */
 export function createDefaultMonitor(
     overrides: Partial<Monitor> = {}
@@ -83,13 +85,18 @@ export function findMonitorInSite(
 /**
  * Normalizes monitor data ensuring all required fields are present
  *
- * @param monitor - Partial monitor object to normalize
- * @returns Complete monitor object with validated and normalized fields
- *
  * @example
+ *
  * ```typescript
- * const normalized = normalizeMonitor({ id: "123", url: "https://example.com" });
+ * const normalized = normalizeMonitor({
+ *     id: "123",
+ *     url: "https://example.com",
+ * });
  * ```
+ *
+ * @param monitor - Partial monitor object to normalize
+ *
+ * @returns Complete monitor object with validated and normalized fields
  */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     return {
@@ -125,14 +132,16 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
 /**
  * Removes a monitor from a site
  *
- * @param site - The site to remove the monitor from
- * @param monitorId - The ID of the monitor to remove
- * @returns Updated site without the specified monitor
- *
  * @example
+ *
  * ```typescript
  * const updatedSite = removeMonitorFromSite(site, "monitor-123");
  * ```
+ *
+ * @param site - The site to remove the monitor from
+ * @param monitorId - The ID of the monitor to remove
+ *
+ * @returns Updated site without the specified monitor
  */
 export function removeMonitorFromSite(site: Site, monitorId: string): Site {
     const updatedMonitors = site.monitors.filter(
@@ -144,16 +153,21 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
 /**
  * Updates a monitor in a site
  *
+ * @example
+ *
+ * ```typescript
+ * const updatedSite = updateMonitorInSite(site, "monitor-123", {
+ *     timeout: 10000,
+ * });
+ * ```
+ *
  * @param site - The site containing the monitor
  * @param monitorId - The ID of the monitor to update
  * @param updates - Partial monitor updates to apply
- * @returns Updated site with modified monitor
- * @throws Error if monitor is not found
  *
- * @example
- * ```typescript
- * const updatedSite = updateMonitorInSite(site, "monitor-123", { timeout: 10000 });
- * ```
+ * @returns Updated site with modified monitor
+ *
+ * @throws Error if monitor is not found
  */
 export function updateMonitorInSite(
     site: Site,
@@ -185,14 +199,16 @@ export function updateMonitorInSite(
 /**
  * Validates that a monitor exists in a site
  *
- * @param site - The site to check for the monitor
- * @param monitorId - The ID of the monitor to validate
- * @throws Error if site is not found or monitor does not exist
- *
  * @example
+ *
  * ```typescript
  * validateMonitorExists(site, "monitor-123");
  * ```
+ *
+ * @param site - The site to check for the monitor
+ * @param monitorId - The ID of the monitor to validate
+ *
+ * @throws Error if site is not found or monitor does not exist
  */
 export function validateMonitorExists(
     site: Site | undefined,
@@ -241,7 +257,9 @@ export const monitorOperations = {
      *
      * @param monitor - The monitor to update
      * @param status - The new status to set
+     *
      * @returns Updated monitor with validated status
+     *
      * @throws Error if status is not valid
      */
     updateStatus: (monitor: Monitor, status: Monitor["status"]): Monitor => {

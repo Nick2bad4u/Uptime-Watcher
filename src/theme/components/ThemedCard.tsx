@@ -6,49 +6,49 @@
  * This component provides a styled container with configurable theming,
  * optional header section, and interactive features like click and hover
  * states. The card integrates with the theme system for consistent styling
- * across the application. It supports various visual variants, padding,
- * shadow, and border radius configurations.
+ * across the application. It supports various visual variants, padding, shadow,
+ * and border radius configurations.
  *
- * @example
- * Basic card with title and content:
+ * @example Basic card with title and content:
+ *
  * ```tsx
  * <ThemedCard
- *   title="Site Status"
- *   subtitle="Current monitoring status"
- *   variant="primary"
- *   shadow="md"
+ *     title="Site Status"
+ *     subtitle="Current monitoring status"
+ *     variant="primary"
+ *     shadow="md"
  * >
- *   <p>Your site is online and responding normally.</p>
- * </ThemedCard>
+ *     <p>Your site is online and responding normally.</p>
+ * </ThemedCard>;
  * ```
  *
- * @example
- * Interactive card with icon and click handler:
+ * @example Interactive card with icon and click handler:
+ *
  * ```tsx
  * <ThemedCard
- *   title="Add New Site"
- *   icon={<PlusIcon />}
- *   iconColor="primary"
- *   clickable={true}
- *   onClick={handleAddSite}
- *   hoverable={true}
+ *     title="Add New Site"
+ *     icon={<PlusIcon />}
+ *     iconColor="primary"
+ *     clickable={true}
+ *     onClick={handleAddSite}
+ *     hoverable={true}
  * >
- *   <p>Click to add a new monitoring site</p>
- * </ThemedCard>
+ *     <p>Click to add a new monitoring site</p>
+ * </ThemedCard>;
  * ```
  *
- * @example
- * Card with custom styling:
+ * @example Card with custom styling:
+ *
  * ```tsx
  * <ThemedCard
- *   padding="lg"
- *   rounded="xl"
- *   shadow="lg"
- *   variant="secondary"
- *   className="border-2 border-blue-500"
+ *     padding="lg"
+ *     rounded="xl"
+ *     shadow="lg"
+ *     variant="secondary"
+ *     className="border-2 border-blue-500"
  * >
- *   <CustomContent />
- * </ThemedCard>
+ *     <CustomContent />
+ * </ThemedCard>;
  * ```
  *
  * @public
@@ -112,21 +112,22 @@ export interface ThemedCardProperties {
  * the theme system for consistent styling. When title or subtitle is provided,
  * renders a header section with optional icon.
  *
- * @param props - The component properties
- * @returns The themed card JSX element
+ * @example Status card with interactive features:
  *
- * @example
- * Status card with interactive features:
  * ```tsx
  * <ThemedCard
- *   title="Monitor Status"
- *   icon={<StatusIcon />}
- *   clickable={true}
- *   onClick={viewDetails}
+ *     title="Monitor Status"
+ *     icon={<StatusIcon />}
+ *     clickable={true}
+ *     onClick={viewDetails}
  * >
- *   <StatusContent />
- * </ThemedCard>
+ *     <StatusContent />
+ * </ThemedCard>;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The themed card JSX element
  *
  * @public
  */

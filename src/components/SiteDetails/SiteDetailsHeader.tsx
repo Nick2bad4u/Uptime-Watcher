@@ -1,8 +1,8 @@
 /**
  * Site details header component
  *
- * Displays the site title, URL, status indicator, and screenshot thumbnail
- * in a visually appealing header with gradient background and accent styling.
+ * Displays the site title, URL, status indicator, and screenshot thumbnail in a
+ * visually appealing header with gradient background and accent styling.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -40,10 +40,11 @@ export interface SiteDetailsHeaderProperties {
  * Site details header component displaying site information and controls.
  *
  * Displays site name, URL (for HTTP monitors), status indicator with loading
- * spinner, and a screenshot thumbnail. Handles external URL opening with
- * proper fallbacks and validates URLs before processing.
+ * spinner, and a screenshot thumbnail. Handles external URL opening with proper
+ * fallbacks and validates URLs before processing.
  *
  * @param props - Component props containing site data and control handlers
+ *
  * @returns JSX element containing the site details header
  */
 const SiteDetailsHeader = ({

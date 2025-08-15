@@ -8,6 +8,7 @@
  * concerns.
  *
  * The component integrates multiple advanced features:
+ *
  * - Real-time status monitoring and visualization
  * - Historical data charts with Chart.js integration
  * - Analytics and performance metrics
@@ -17,19 +18,20 @@
  * Uses custom hooks for state management and Chart.js for data visualization
  * with zoom, pan, and time-based charting capabilities.
  *
- * @param site - Site object containing monitoring data and configuration
- *
  * @example
+ *
  * ```tsx
  * <SiteDetails
- *   site={{
- *     identifier: "site-123",
- *     name: "My Website",
- *     monitors: [],
- *     monitoring: true
- *   }}
- * />
+ *     site={{
+ *         identifier: "site-123",
+ *         name: "My Website",
+ *         monitors: [],
+ *         monitoring: true,
+ *     }}
+ * />;
  * ```
+ *
+ * @param site - Site object containing monitoring data and configuration
  *
  * @public
  */
@@ -80,19 +82,21 @@ export interface SiteDetailsProperties {
  * monitoring. Provides overview, history, analytics, and settings views for a
  * monitored site.
  *
- * Uses composition pattern with specialized tab components and custom hooks
- * for state management and data fetching.
- *
- * @param props - Component props
- * @returns JSX element containing the site details interface
+ * Uses composition pattern with specialized tab components and custom hooks for
+ * state management and data fetching.
  *
  * @example
+ *
  * ```tsx
  * <SiteDetails
- *   site={selectedSite}
- *   onClose={() => setSelectedSite(null)}
- * />
+ *     site={selectedSite}
+ *     onClose={() => setSelectedSite(null)}
+ * />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX element containing the site details interface
  */
 export const SiteDetails = ({
     onClose,

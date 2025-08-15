@@ -1,6 +1,6 @@
 /**
- * Action button group component for site monitoring operations.
- * Provides a unified interface for site check, start/stop monitoring actions.
+ * Action button group component for site monitoring operations. Provides a
+ * unified interface for site check, start/stop monitoring actions.
  */
 
 import React, { useCallback } from "react";
@@ -11,8 +11,9 @@ import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteM
 /**
  * Props for the ActionButtonGroup component.
  *
- * @see ActionButtonGroup
  * @public
+ *
+ * @see ActionButtonGroup
  */
 export interface ActionButtonGroupProperties {
     /** Whether all monitors are currently running */
@@ -39,29 +40,32 @@ export interface ActionButtonGroupProperties {
  * Reusable action button group component for site monitoring operations.
  *
  * Features:
+ *
  * - Unified interface for check now, start/stop monitoring actions
- * - Proper event handling with stopPropagation on individual buttons to
- * prevent card click conflicts - Optimized with React.memo and useCallback to
- * prevent unnecessary re-renders - Accessibility support with proper ARIA
- * labels and native button elements
+ * - Proper event handling with stopPropagation on individual buttons to prevent
+ *   card click conflicts - Optimized with React.memo and useCallback to prevent
+ *   unnecessary re-renders - Accessibility support with proper ARIA labels and
+ *   native button elements
  * - Visual feedback for loading and disabled states
  *
- * @param props - Component props
- * @returns JSX element containing action buttons
- *
  * @example
+ *
  * ```tsx
- * import { ActionButtonGroup } from './components/ActionButtonGroup';
+ * import { ActionButtonGroup } from "./components/ActionButtonGroup";
  *
  * <ActionButtonGroup
- *   onCheckNow={handleCheckNow}
- *   onStartMonitoring={handleStart}
- *   onStopMonitoring={handleStop}
- *   isLoading={false}
- *   isMonitoring={true}
- *   disabled={false}
- * />
+ *     onCheckNow={handleCheckNow}
+ *     onStartMonitoring={handleStart}
+ *     onStopMonitoring={handleStop}
+ *     isLoading={false}
+ *     isMonitoring={true}
+ *     disabled={false}
+ * />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX element containing action buttons
  */
 export const ActionButtonGroup: React.NamedExoticComponent<ActionButtonGroupProperties> =
     React.memo(function ActionButtonGroup({

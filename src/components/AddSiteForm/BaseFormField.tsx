@@ -2,30 +2,30 @@
  * Base form field component that wraps common form field functionality.
  *
  * @remarks
- * This component provides the common FormField wrapper and ARIA attribute
- * logic that is shared across all form field components (TextField,
- * SelectField, RadioGroup, etc.). It eliminates code duplication by
- * centralizing the common patterns.
+ * This component provides the common FormField wrapper and ARIA attribute logic
+ * that is shared across all form field components (TextField, SelectField,
+ * RadioGroup, etc.). It eliminates code duplication by centralizing the common
+ * patterns.
  *
- * @example
- * Basic usage with a custom input component:
+ * @example Basic usage with a custom input component:
+ *
  * ```tsx
  * <BaseFormField
- *   id="myField"
- *   label="My Field"
- *   required={true}
- *   error={error}
- *   helpText="Some help text"
+ *     id="myField"
+ *     label="My Field"
+ *     required={true}
+ *     error={error}
+ *     helpText="Some help text"
  * >
- *   {(ariaProps) => (
- *     <input
- *       {...ariaProps}
- *       type="text"
- *       value={value}
- *       onChange={handleChange}
- *     />
- *   )}
- * </BaseFormField>
+ *     {(ariaProps) => (
+ *         <input
+ *             {...ariaProps}
+ *             type="text"
+ *             value={value}
+ *             onChange={handleChange}
+ *         />
+ *     )}
+ * </BaseFormField>;
  * ```
  */
 
@@ -70,6 +70,7 @@ export interface BaseFormFieldProperties {
  * Base form field component with common FormField wrapper and ARIA logic.
  *
  * @param properties - The component properties
+ *
  * @returns The rendered form field component
  *
  * @public

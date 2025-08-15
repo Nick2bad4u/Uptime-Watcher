@@ -63,8 +63,8 @@ export interface ErrorState {
  * Combined error store interface with state and actions.
  *
  * @remarks
- * Merges error state and actions into a single interface for the Zustand
- * store. Provides complete error management functionality for the application.
+ * Merges error state and actions into a single interface for the Zustand store.
+ * Provides complete error management functionality for the application.
  *
  * @public
  */

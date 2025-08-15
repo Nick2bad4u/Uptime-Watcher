@@ -29,22 +29,23 @@ import {
  *
  * @remarks
  * Contains only serializable properties from monitor type configurations,
- * excluding functions and Zod schemas that cannot be transmitted via IPC.
- * This interface ensures type safety when transmitting monitor configuration
- * data between the main process and renderer processes.
+ * excluding functions and Zod schemas that cannot be transmitted via IPC. This
+ * interface ensures type safety when transmitting monitor configuration data
+ * between the main process and renderer processes.
  *
  * @example
+ *
  * ```typescript
  * const serializedConfig: SerializedMonitorTypeConfig = {
- *   description: "HTTP endpoint monitoring",
- *   displayName: "HTTP Monitor",
- *   fields: [{ name: "url", required: true }],
- *   type: "http",
- *   uiConfig: {
- *     supportsAdvancedAnalytics: true,
- *     supportsResponseTime: true
- *   },
- *   version: "1.0.0"
+ *     description: "HTTP endpoint monitoring",
+ *     displayName: "HTTP Monitor",
+ *     fields: [{ name: "url", required: true }],
+ *     type: "http",
+ *     uiConfig: {
+ *         supportsAdvancedAnalytics: true,
+ *         supportsResponseTime: true,
+ *     },
+ *     version: "1.0.0",
  * };
  * ```
  *
@@ -90,7 +91,9 @@ const ConfigPropertyValidator = {
      * properties.
      *
      * @param config - The monitor configuration object to process
-     * @returns Object containing validated base properties and any unexpected properties found
+     *
+     * @returns Object containing validated base properties and any unexpected
+     *   properties found
      *
      * @internal
      */
@@ -145,11 +148,12 @@ const ConfigPropertyValidator = {
      *
      * @remarks
      * Checks for properties that are not part of the expected monitor
-     * configuration schema and logs warnings for debugging purposes. This
-     * helps identify when monitor configurations contain unexpected data that
-     * might not be serialized.
+     * configuration schema and logs warnings for debugging purposes. This helps
+     * identify when monitor configurations contain unexpected data that might
+     * not be serialized.
      *
-     * @param unexpectedProperties - Record of unexpected properties found during validation
+     * @param unexpectedProperties - Record of unexpected properties found
+     *   during validation
      * @param monitorType - The monitor type identifier for logging context
      *
      * @internal
@@ -189,7 +193,9 @@ const UiConfigSerializer = {
      * properties and excluding non-serializable functions like historyDetail,
      * formatDetail, and formatTitleSuffix.
      *
-     * @param detailFormats - The detail formats configuration object to serialize
+     * @param detailFormats - The detail formats configuration object to
+     *   serialize
+     *
      * @returns Serialized detail formats object or undefined if input is empty
      *
      * @internal
@@ -216,11 +222,13 @@ const UiConfigSerializer = {
      *
      * @remarks
      * Converts optional boolean display preferences to required boolean values
-     * using safe defaults (false). This ensures consistent behavior across
-     * the renderer process.
+     * using safe defaults (false). This ensures consistent behavior across the
+     * renderer process.
      *
      * @param display - The display configuration object to serialize
-     * @returns Serialized display preferences with default values or undefined if input is empty
+     *
+     * @returns Serialized display preferences with default values or undefined
+     *   if input is empty
      *
      * @internal
      */
@@ -244,7 +252,9 @@ const UiConfigSerializer = {
      * undefined values. Returns undefined if no help text content is present.
      *
      * @param helpTexts - The help texts configuration object to serialize
-     * @returns Serialized help texts object or undefined if no content is present
+     *
+     * @returns Serialized help texts object or undefined if no content is
+     *   present
      *
      * @internal
      */
@@ -279,7 +289,9 @@ const UiConfigSerializer = {
      * content to avoid sending empty objects over IPC.
      *
      * @param uiConfig - The complete UI configuration object to serialize
-     * @returns Serialized UI configuration object or undefined if input is empty
+     *
+     * @returns Serialized UI configuration object or undefined if input is
+     *   empty
      *
      * @internal
      */
@@ -346,14 +358,14 @@ const UiConfigSerializer = {
  *
  * @remarks
  * Manages all IPC handlers between the main process and renderer processes,
- * organized by functional domains including sites, monitoring, data
- * management, system operations, and state synchronization. Provides a secure
- * interface for the frontend to interact with backend services through
- * Electron's contextBridge API. All handler registration and cleanup is
- * centrally managed through this service to prevent memory leaks and ensure
- * proper teardown.
+ * organized by functional domains including sites, monitoring, data management,
+ * system operations, and state synchronization. Provides a secure interface for
+ * the frontend to interact with backend services through Electron's
+ * contextBridge API. All handler registration and cleanup is centrally managed
+ * through this service to prevent memory leaks and ensure proper teardown.
  *
  * The service organizes handlers into logical groups:
+ *
  * - Site management: CRUD operations for monitoring sites
  * - Monitoring control: Start/stop/status operations for monitors
  * - Monitor types: Configuration and metadata for different monitor types
@@ -361,33 +373,39 @@ const UiConfigSerializer = {
  * - System operations: Application updates, settings, logging
  * - State synchronization: Real-time updates between processes
  *
- * @example
- * Basic usage during application startup:
+ * @example Basic usage during application startup:
+ *
  * ```typescript
- * const ipcService = new IpcService(uptimeOrchestrator, autoUpdaterService);
+ * const ipcService = new IpcService(
+ *     uptimeOrchestrator,
+ *     autoUpdaterService
+ * );
  * ipcService.setupHandlers();
  *
  * // Later during shutdown:
  * ipcService.cleanup();
  * ```
  *
- * @example
- * Using with dependency injection:
+ * @example Using with dependency injection:
+ *
  * ```typescript
  * class MainProcess {
- *   private ipcService: IpcService;
+ *     private ipcService: IpcService;
  *
- *   constructor(orchestrator: UptimeOrchestrator, updater: AutoUpdaterService) {
- *     this.ipcService = new IpcService(orchestrator, updater);
- *   }
+ *     constructor(
+ *         orchestrator: UptimeOrchestrator,
+ *         updater: AutoUpdaterService
+ *     ) {
+ *         this.ipcService = new IpcService(orchestrator, updater);
+ *     }
  *
- *   async start(): Promise<void> {
- *     this.ipcService.setupHandlers();
- *   }
+ *     async start(): Promise<void> {
+ *         this.ipcService.setupHandlers();
+ *     }
  *
- *   async stop(): Promise<void> {
- *     this.ipcService.cleanup();
- *   }
+ *     async stop(): Promise<void> {
+ *         this.ipcService.cleanup();
+ *     }
  * }
  * ```
  *
@@ -396,18 +414,21 @@ const UiConfigSerializer = {
 export class IpcService {
     /**
      * Service for handling application updates.
+     *
      * @internal
      */
     private readonly autoUpdaterService: AutoUpdaterService;
 
     /**
      * Set of registered IPC handler channel names.
+     *
      * @internal
      */
     private readonly registeredIpcHandlers = new Set<string>();
 
     /**
      * Core orchestrator for monitoring operations.
+     *
      * @internal
      */
     private readonly uptimeOrchestrator: UptimeOrchestrator;
@@ -417,19 +438,23 @@ export class IpcService {
      *
      * @remarks
      * Initializes the IPC service with required orchestrator and updater
-     * dependencies. The constructor only stores references to dependencies -
-     * no handlers are registered until {@link setupHandlers} is explicitly
-     * called. This allows for proper initialization order during application
-     * startup.
-     *
-     * @param uptimeOrchestrator - The core orchestrator for monitoring operations
-     * @param autoUpdaterService - The service for handling application updates
+     * dependencies. The constructor only stores references to dependencies - no
+     * handlers are registered until {@link setupHandlers} is explicitly called.
+     * This allows for proper initialization order during application startup.
      *
      * @example
+     *
      * ```typescript
-     * const ipcService = new IpcService(uptimeOrchestrator, autoUpdaterService);
+     * const ipcService = new IpcService(
+     *     uptimeOrchestrator,
+     *     autoUpdaterService
+     * );
      * // No handlers registered yet - call setupHandlers() when ready
      * ```
+     *
+     * @param uptimeOrchestrator - The core orchestrator for monitoring
+     *   operations
+     * @param autoUpdaterService - The service for handling application updates
      *
      * @public
      */
@@ -450,6 +475,7 @@ export class IpcService {
      * `ipcMain.on` for all registered channels.
      *
      * @example
+     *
      * ```typescript
      * ipcService.cleanup();
      * ```
@@ -476,6 +502,7 @@ export class IpcService {
      * initialized.
      *
      * The setup process registers handlers in the following order:
+     *
      * 1. Site management handlers
      * 2. Monitoring control handlers
      * 3. Monitor type configuration handlers
@@ -484,13 +511,15 @@ export class IpcService {
      * 6. State synchronization handlers
      *
      * @example
+     *
      * ```typescript
      * // During application startup
      * ipcService.setupHandlers();
-     * logger.info('IPC handlers registered successfully');
+     * logger.info("IPC handlers registered successfully");
      * ```
      *
-     * @throws Error when handlers are already registered or dependencies are not available
+     * @throws Error when handlers are already registered or dependencies are
+     *   not available
      *
      * @public
      */
@@ -508,12 +537,15 @@ export class IpcService {
      *
      * @remarks
      * Excludes non-serializable properties (functions, schemas) and logs
-     * unexpected properties. Preserves all data needed by the renderer
-     * process. Throws if unexpected properties are encountered.
+     * unexpected properties. Preserves all data needed by the renderer process.
+     * Throws if unexpected properties are encountered.
      *
      * @param config - The monitor type configuration to serialize.
+     *
      * @returns Serializable configuration object safe for IPC transmission.
-     * @throws Error If unexpected properties are encountered in the config object.
+     *
+     * @throws Error If unexpected properties are encountered in the config
+     *   object.
      *
      * @internal
      */
@@ -562,9 +594,9 @@ export class IpcService {
      * @remarks
      * Handles export/import of configuration, history limit management, and
      * database backup using standardized IPC patterns. All handlers use
-     * consistent response formatting, parameter validation, and error
-     * handling. All handlers are registered with unique channel names and are
-     * tracked for cleanup.
+     * consistent response formatting, parameter validation, and error handling.
+     * All handlers are registered with unique channel names and are tracked for
+     * cleanup.
      *
      * @internal
      */
@@ -626,9 +658,9 @@ export class IpcService {
      * @remarks
      * Handles starting/stopping monitoring globally or per site/monitor, and
      * manual checks using standardized IPC patterns. All handlers use
-     * consistent response formatting, parameter validation, and error
-     * handling. All handlers are registered with unique channel names and are
-     * tracked for cleanup.
+     * consistent response formatting, parameter validation, and error handling.
+     * All handlers are registered with unique channel names and are tracked for
+     * cleanup.
      *
      * @internal
      */
@@ -706,18 +738,24 @@ export class IpcService {
      *
      * @remarks
      * Handles retrieval of monitor type configs, formatting, and validation.
-     * All handlers are registered with unique channel names and are tracked
-     * for cleanup.
-     *
-     * @returns For `validate-monitor-data`, returns a {@link ValidationResult} object.
+     * All handlers are registered with unique channel names and are tracked for
+     * cleanup.
      *
      * @example
+     *
      * ```typescript
-     * const result = await window.electronAPI.invoke("validate-monitor-data", type, data);
+     * const result = await window.electronAPI.invoke(
+     *     "validate-monitor-data",
+     *     type,
+     *     data
+     * );
      * if (!result.success) {
-     *   // handle errors
+     *     // handle errors
      * }
      * ```
+     *
+     * @returns For `validate-monitor-data`, returns a {@link ValidationResult}
+     *   object.
      *
      * @internal
      */

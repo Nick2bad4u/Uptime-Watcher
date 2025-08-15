@@ -1,6 +1,6 @@
 /**
- * Site card metrics display component.
- * Provides visual representation of key site monitoring statistics.
+ * Site card metrics display component. Provides visual representation of key
+ * site monitoring statistics.
  */
 
 import React, { useMemo } from "react";
@@ -27,24 +27,27 @@ export interface SiteCardMetricsProperties {
  * Metrics grid component displaying key site monitoring statistics.
  *
  * Features:
+ *
  * - Four-column grid layout for status, uptime, response time, and check count
  * - Optimized with React.memo and useMemo to prevent unnecessary re-renders
  * - Consistent metric card formatting
- * - Handles undefined response times gracefully (displays "-" when not
- * available) - Formats uptime to 1 decimal place for consistency
- *
- * @param props - Component props
- * @returns JSX.Element containing the metrics grid
+ * - Handles undefined response times gracefully (displays "-" when not available)
+ *   - Formats uptime to 1 decimal place for consistency
  *
  * @example
+ *
  * ```tsx
  * <SiteCardMetrics
- *   status="up"
- *   uptime={98.5}
- *   responseTime={250}
- *   checkCount={144}
- * />
+ *     status="up"
+ *     uptime={98.5}
+ *     responseTime={250}
+ *     checkCount={144}
+ * />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX.Element containing the metrics grid
  */
 export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperties> =
     React.memo(function SiteCardMetrics({

@@ -471,8 +471,8 @@ export interface ThemeOverride {
  * Theme validation result interface.
  *
  * @remarks
- * Used to return validation results for theme configurations.
- * Import directly from "./validation" for ThemeValidationResult if needed.
+ * Used to return validation results for theme configurations. Import directly
+ * from "./validation" for ThemeValidationResult if needed.
  *
  * @public
  */
@@ -532,6 +532,7 @@ export type ThemeMode = "dark" | "light";
  * Type guard to check if an object is a valid color palette.
  *
  * @param obj - Object to check
+ *
  * @returns True if the object is a valid color palette
  *
  * @public
@@ -561,6 +562,7 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
  * Type guard to check if an object is a valid theme configuration.
  *
  * @param obj - Object to check
+ *
  * @returns True if the object is a valid theme configuration
  *
  * @public

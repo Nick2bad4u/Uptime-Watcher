@@ -12,9 +12,8 @@ import type { Monitor, Site } from "@shared/types";
  * Base interface for all event data payloads.
  *
  * @remarks
- * Provides common timestamp field that all events must include.
- * All event interfaces should extend this base interface to ensure
- * consistency.
+ * Provides common timestamp field that all events must include. All event
+ * interfaces should extend this base interface to ensure consistency.
  */
 export interface BaseEventData {
     /**
@@ -31,33 +30,41 @@ export interface BaseEventData {
  * invalidated for a specific reason. - `identifier`: The specific identifier
  * affected (optional for global invalidation). - `reason`: The reason for
  * invalidation.
+ *
  * - `timestamp`: The time (in ms since epoch) when invalidation occurred.
  * - `type`: The type of cache invalidation.
  *
- * @example
- * // Invalidate all site caches due to manual action
+ * @example // Invalidate all site caches due to manual action
+ *
  * ```typescript
  * const event: CacheInvalidatedEventData = {
- *   type: 'all',
- *   reason: 'manual',
- *   timestamp: Date.now()
+ *     type: "all",
+ *     reason: "manual",
+ *     timestamp: Date.now(),
  * };
  * ```
  */
 export interface CacheInvalidatedEventData extends BaseEventData {
     /**
      * The specific identifier affected (optional for global invalidation).
-     * @remarks If omitted, the invalidation is considered global.
+     *
+     * @remarks
+     * If omitted, the invalidation is considered global.
      */
     identifier?: string;
     /**
      * The reason for invalidation.
-     * @remarks Can be 'delete', 'expiry', 'manual', or 'update'.
+     *
+     * @remarks
+     * Can be 'delete', 'expiry', 'manual', or 'update'.
      */
     reason: "delete" | "expiry" | "manual" | "update";
     /**
      * The type of cache invalidation.
-     * @remarks 'all' for global, 'monitor' for a specific monitor, 'site' for a specific site.
+     *
+     * @remarks
+     * 'all' for global, 'monitor' for a specific monitor, 'site' for a specific
+     * site.
      */
     type: "all" | "monitor" | "site";
 }
@@ -66,14 +73,15 @@ export interface CacheInvalidatedEventData extends BaseEventData {
  * Payload for database connection events.
  *
  * @remarks
- * Used to track database connection state changes.
- * Important for monitoring database availability and connection health.
+ * Used to track database connection state changes. Important for monitoring
+ * database availability and connection health.
  *
  * @example
+ *
  * ```typescript
  * const event: DatabaseConnectionEventData = {
- *   state: "connected",
- *   connectionId: "conn_123"
+ *     state: "connected",
+ *     connectionId: "conn_123",
  * };
  * ```
  */
@@ -90,15 +98,16 @@ export interface DatabaseConnectionEventData extends BaseEventData {
  * Payload for database error events.
  *
  * @remarks
- * Used to communicate database operation errors with detailed context.
- * Provides structured error information for debugging and monitoring.
+ * Used to communicate database operation errors with detailed context. Provides
+ * structured error information for debugging and monitoring.
  *
  * @example
+ *
  * ```typescript
  * const event: DatabaseErrorEventData = {
- *   error: new Error("Connection timeout"),
- *   operation: "query",
- *   table: "monitors"
+ *     error: new Error("Connection timeout"),
+ *     operation: "query",
+ *     table: "monitors",
  * };
  * ```
  */
@@ -117,16 +126,17 @@ export interface DatabaseErrorEventData extends BaseEventData {
  * Payload for database retry events.
  *
  * @remarks
- * Used to track retry attempts for failed database operations.
- * Helps with monitoring and debugging database reliability.
+ * Used to track retry attempts for failed database operations. Helps with
+ * monitoring and debugging database reliability.
  *
  * @example
+ *
  * ```typescript
  * const event: DatabaseRetryEventData = {
- *   attempt: 2,
- *   maxAttempts: 3,
- *   operation: "query",
- *   delay: 1000
+ *     attempt: 2,
+ *     maxAttempts: 3,
+ *     operation: "query",
+ *     delay: 1000,
  * };
  * ```
  */
@@ -150,11 +160,12 @@ export interface DatabaseRetryEventData extends BaseEventData {
  * utilization.
  *
  * @example
+ *
  * ```typescript
  * const event: DatabaseSuccessEventData = {
- *   operation: "query",
- *   duration: 45,
- *   cacheHit: true
+ *     operation: "query",
+ *     duration: 45,
+ *     cacheHit: true,
  * };
  * ```
  */
@@ -174,19 +185,20 @@ export interface DatabaseSuccessEventData extends BaseEventData {
  *
  * @remarks
  * Emitted when a monitored endpoint or service is detected as down.
+ *
  * - `monitor`: The monitor that went down.
  * - `site`: The site containing the monitor.
  * - `siteId`: The unique identifier of the site.
  * - `timestamp`: The time (in ms since epoch) when the event occurred.
  *
- * @example
- * // Example event payload for a monitor down event
+ * @example // Example event payload for a monitor down event
+ *
  * ```typescript
  * const event: MonitorDownEventData = {
- *   monitor,
- *   site,
- *   siteId: site.id,
- *   timestamp: Date.now()
+ *     monitor,
+ *     site,
+ *     siteId: site.id,
+ *     timestamp: Date.now(),
  * };
  * ```
  */
@@ -212,19 +224,20 @@ export interface MonitorDownEventData extends BaseEventData {
  * Used to signal global monitoring state changes, such as starting or stopping
  * all monitors. - `activeMonitors`: Number of active monitors (for stopped
  * events).
+ *
  * - `monitorCount`: Number of monitors involved in the operation.
  * - `reason`: Reason for stopping (for stopped events).
  * - `siteCount`: Number of sites involved in the operation.
  * - `timestamp`: The time (in ms since epoch) when the event occurred.
  *
- * @example
- * // Example: Monitoring stopped by user
+ * @example // Example: Monitoring stopped by user
+ *
  * ```typescript
  * const event: MonitoringControlEventData = {
- *   reason: 'user',
- *   activeMonitors: 0,
- *   siteCount: 3,
- *   timestamp: Date.now()
+ *     reason: "user",
+ *     activeMonitors: 0,
+ *     siteCount: 3,
+ *     timestamp: Date.now(),
  * };
  * ```
  */
@@ -239,7 +252,9 @@ export interface MonitoringControlEventData extends BaseEventData {
     monitorCount?: number;
     /**
      * Reason for stopping (for stopped events).
-     * @remarks Can be 'error', 'shutdown', or 'user'.
+     *
+     * @remarks
+     * Can be 'error', 'shutdown', or 'user'.
      */
     reason?: "error" | "shutdown" | "user";
     /**
@@ -253,19 +268,20 @@ export interface MonitoringControlEventData extends BaseEventData {
  *
  * @remarks
  * Emitted when a previously down monitor is detected as up.
+ *
  * - `monitor`: The monitor that came back up.
  * - `site`: The site containing the monitor.
  * - `siteId`: The unique identifier of the site.
  * - `timestamp`: The time (in ms since epoch) when the event occurred.
  *
- * @example
- * // Example event payload for a monitor up event
+ * @example // Example event payload for a monitor up event
+ *
  * ```typescript
  * const event: MonitorUpEventData = {
- *   monitor,
- *   site,
- *   siteId: site.id,
- *   timestamp: Date.now()
+ *     monitor,
+ *     site,
+ *     siteId: site.id,
+ *     timestamp: Date.now(),
  * };
  * ```
  */
@@ -290,13 +306,14 @@ export interface MonitorUpEventData extends BaseEventData {
  * @remarks
  * Used to communicate the current status of application updates, including
  * errors. - `error`: Error message if status is 'error'.
+ *
  * - `status`: The current update status.
  *
- * @example
- * // Example: Update downloaded
+ * @example // Example: Update downloaded
+ *
  * ```typescript
  * const event: UpdateStatusEventData = {
- *   status: 'downloaded'
+ *     status: "downloaded",
  * };
  * ```
  */
@@ -307,7 +324,10 @@ export interface UpdateStatusEventData {
     error?: string;
     /**
      * The current update status.
-     * @remarks Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or 'idle'.
+     *
+     * @remarks
+     * Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or
+     * 'idle'.
      */
     status:
         | "available"
@@ -337,12 +357,12 @@ export type DatabaseOperation =
  * @remarks
  * Used for development or testing purposes to transmit arbitrary data.
  *
- * @example
- * // Example: Sending a test event with custom data
+ * @example // Example: Sending a test event with custom data
+ *
  * ```typescript
  * const event: TestEventData = {
- *   foo: 'bar',
- *   count: 42
+ *     foo: "bar",
+ *     count: 42,
  * };
  * ```
  */

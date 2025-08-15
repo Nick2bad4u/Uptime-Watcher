@@ -3,40 +3,40 @@
  * styling.
  *
  * @remarks
- * Renders a select dropdown with options, error/help text, and ARIA
- * attributes. The component integrates with FormField wrapper for consistent
- * styling and accessibility. Supports both string and numeric values with
- * proper type handling.
+ * Renders a select dropdown with options, error/help text, and ARIA attributes.
+ * The component integrates with FormField wrapper for consistent styling and
+ * accessibility. Supports both string and numeric values with proper type
+ * handling.
  *
- * @example
- * Basic select field with string options:
+ * @example Basic select field with string options:
+ *
  * ```tsx
  * <SelectField
- *   id="method"
- *   label="HTTP Method"
- *   value={selectedMethod}
- *   onChange={setMethod}
- *   options={[
- *     { label: "GET", value: "GET" },
- *     { label: "POST", value: "POST" },
- *     { label: "PUT", value: "PUT" }
- *   ]}
- *   required={true}
- * />
+ *     id="method"
+ *     label="HTTP Method"
+ *     value={selectedMethod}
+ *     onChange={setMethod}
+ *     options={[
+ *         { label: "GET", value: "GET" },
+ *         { label: "POST", value: "POST" },
+ *         { label: "PUT", value: "PUT" },
+ *     ]}
+ *     required={true}
+ * />;
  * ```
  *
- * @example
- * Select field with numeric values and placeholder:
+ * @example Select field with numeric values and placeholder:
+ *
  * ```tsx
  * <SelectField
- *   id="timeout"
- *   label="Timeout (seconds)"
- *   value={timeout}
- *   onChange={(value) => setTimeout(Number(value))}
- *   options={timeoutOptions}
- *   placeholder="Select timeout..."
- *   helpText="Choose request timeout duration"
- * />
+ *     id="timeout"
+ *     label="Timeout (seconds)"
+ *     value={timeout}
+ *     onChange={(value) => setTimeout(Number(value))}
+ *     options={timeoutOptions}
+ *     placeholder="Select timeout..."
+ *     helpText="Choose request timeout duration"
+ * />;
  * ```
  *
  * @public
@@ -92,29 +92,30 @@ export interface SelectOption {
  * styling.
  *
  * @remarks
- * Renders a select dropdown with options, error/help text, and ARIA
- * attributes. The component is memoized for performance and integrates with
- * FormField for consistent styling. Supports both string and numeric values
- * with proper event handling.
+ * Renders a select dropdown with options, error/help text, and ARIA attributes.
+ * The component is memoized for performance and integrates with FormField for
+ * consistent styling. Supports both string and numeric values with proper event
+ * handling.
  *
- * @param props - The component properties
- * @returns JSX element containing an accessible select dropdown
+ * @example Monitor type selection:
  *
- * @example
- * Monitor type selection:
  * ```tsx
  * <SelectField
- *   id="monitorType"
- *   label="Monitor Type"
- *   options={[
- *     { label: "HTTP", value: "http" },
- *     { label: "HTTPS", value: "https" }
- *   ]}
- *   value={monitorType}
- *   onChange={setMonitorType}
- *   required={true}
- * />
+ *     id="monitorType"
+ *     label="Monitor Type"
+ *     options={[
+ *         { label: "HTTP", value: "http" },
+ *         { label: "HTTPS", value: "https" },
+ *     ]}
+ *     value={monitorType}
+ *     onChange={setMonitorType}
+ *     required={true}
+ * />;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns JSX element containing an accessible select dropdown
  *
  * @public
  */

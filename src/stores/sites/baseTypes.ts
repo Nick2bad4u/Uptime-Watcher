@@ -1,14 +1,13 @@
 /**
- * Base operations types shared across site management functionality.
- * Eliminates code duplication between different store modules.
+ * Base operations types shared across site management functionality. Eliminates
+ * code duplication between different store modules.
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 /**
- * Common site CRUD operations interface.
- * Used by both SiteOperationsActions and SitesActions to eliminate
- * duplication.
+ * Common site CRUD operations interface. Used by both SiteOperationsActions and
+ * SitesActions to eliminate duplication.
  */
 export interface BaseSiteOperations {
     /** Add a monitor to an existing site */
@@ -47,8 +46,8 @@ export interface BaseSiteOperations {
 }
 
 /**
- * Common site monitoring operations interface.
- * Shared between different monitoring-related modules.
+ * Common site monitoring operations interface. Shared between different
+ * monitoring-related modules.
  */
 export interface BaseSiteMonitoring {
     /** Check a site now */
@@ -70,8 +69,8 @@ export interface BaseSiteMonitoring {
 }
 
 /**
- * Common site synchronization operations interface.
- * Shared between different sync-related modules.
+ * Common site synchronization operations interface. Shared between different
+ * sync-related modules.
  */
 export interface BaseSiteSync {
     /** Full sync from backend */
@@ -90,8 +89,8 @@ export interface BaseSiteSync {
 }
 
 /**
- * Common site state management interface.
- * Shared between different state modules.
+ * Common site state management interface. Shared between different state
+ * modules.
  */
 export interface BaseSiteState {
     /** Add a site to the store */
@@ -113,8 +112,8 @@ export interface BaseSiteState {
 }
 
 /**
- * Common site subscription interface.
- * Shared between different subscription modules.
+ * Common site subscription interface. Shared between different subscription
+ * modules.
  */
 export interface BaseSiteSubscriptions {
     /** Subscribe to status updates */

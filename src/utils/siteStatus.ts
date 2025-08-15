@@ -17,6 +17,7 @@ import * as siteStatusUtils from "@shared/utils/siteStatus";
  * Calculates the overall monitoring state for a site based on its monitors.
  *
  * @param site - The site to evaluate.
+ *
  * @returns The monitoring state: "running", "stopped", or "partial".
  */
 export function calculateSiteMonitoringStatus(
@@ -29,6 +30,7 @@ export function calculateSiteMonitoringStatus(
  * Calculates the overall operational status for a site based on its monitors.
  *
  * @param site - The site to evaluate.
+ *
  * @returns The site status.
  */
 export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
@@ -40,6 +42,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
  * monitoring states.
  *
  * @param site - The site to evaluate.
+ *
  * @returns The display status.
  */
 export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
@@ -50,6 +53,7 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
  * Gets a human-readable description for a site's status.
  *
  * @param site - The site to evaluate.
+ *
  * @returns A description of the site's status.
  */
 export function getSiteStatusDescription(site: SiteForStatus): string {
@@ -60,6 +64,7 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * Gets the UI variant for a site's status (for styling purposes).
  *
  * @param status - The site status.
+ *
  * @returns The variant string for UI styling.
  */
 export function getSiteStatusVariant(

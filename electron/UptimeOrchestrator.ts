@@ -2,6 +2,7 @@
  * Core uptime monitoring orchestrator that coordinates specialized managers.
  *
  * This class serves as a lightweight coordinator that delegates operations to:
+ *
  * - SiteManager: Site CRUD operations and cache management
  * - MonitorManager: Monitoring operations and scheduling
  * - DatabaseManager: Database operations and data management
@@ -13,6 +14,7 @@
  *
  * The orchestrator uses an event-driven architecture for inter-manager
  * communication: - Internal events coordinate operations between managers
+ *
  * - Public events provide updates to the frontend renderer
  * - All events are strongly typed for compile-time safety
  * - Event handlers are organized by domain (site, database, monitoring)
@@ -30,35 +32,30 @@
  * ## Error Handling & Transaction Guarantees
  *
  * - **Transactional Operations**: `addSite()`, `removeMonitor()`,
- * `setHistoryLimit()` - **Error Propagation**: All public methods propagate
- * errors to callers
+ *   `setHistoryLimit()` - **Error Propagation**: All public methods propagate
+ *   errors to callers
  * - **Cleanup on Failure**: Failed operations attempt automatic rollback
- * - **Event Error Isolation**: Event handler errors don't affect other
- * handlers - **Logging**: All errors are logged with context before
- * propagation
+ * - **Event Error Isolation**: Event handler errors don't affect other handlers -
+ *   **Logging**: All errors are logged with context before propagation
  *
  * ## Atomicity Guarantees
  *
  * - `addSite()`: Atomic site creation with monitoring setup or full rollback
  * - `removeMonitor()`: Atomic monitor removal with proper cleanup
- * - `setHistoryLimit()`: Atomic limit update with history pruning in
- * transaction - `updateSite()`: Delegated to SiteManager with transaction
- * support
+ * - `setHistoryLimit()`: Atomic limit update with history pruning in transaction
+ *   - `updateSite()`: Delegated to SiteManager with transaction support
  *
  * Events emitted:
- * - monitor:status-changed: When monitor status changes
- * - monitor:down: When a monitor goes down
- * - monitor:up: When a monitor comes back up
- * - system:error: When system operations fail
- * - monitoring:started: When monitoring begins
- * - monitoring:stopped: When monitoring stops
  *
- * @see {@link DatabaseManager} for database operations and repository pattern
- * @see {@link SiteManager} for site management and caching
- * @see {@link MonitorManager} for monitoring operations and scheduling
- * @see {@link TypedEventBus} for event system implementation
+ * - Monitor:status-changed: When monitor status changes
+ * - Monitor:down: When a monitor goes down
+ * - Monitor:up: When a monitor comes back up
+ * - System:error: When system operations fail
+ * - Monitoring:started: When monitoring begins
+ * - Monitoring:stopped: When monitoring stops
  *
  * @example
+ *
  * ```typescript
  * const orchestrator = new UptimeOrchestrator();
  * await orchestrator.initialize();
@@ -74,6 +71,11 @@
  * // Start monitoring
  * await orchestrator.startMonitoring();
  * ```
+ *
+ * @see {@link DatabaseManager} for database operations and repository pattern
+ * @see {@link SiteManager} for site management and caching
+ * @see {@link MonitorManager} for monitoring operations and scheduling
+ * @see {@link TypedEventBus} for event system implementation
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
@@ -93,7 +95,8 @@ import { logger } from "./utils/logger";
 /**
  * Data structure for internal monitoring status check events.
  *
- * @remarks Internal use only for coordinating between managers.
+ * @remarks
+ * Internal use only for coordinating between managers.
  */
 interface IsMonitoringActiveRequestData {
     /** Site identifier for the status check */
@@ -105,7 +108,8 @@ interface IsMonitoringActiveRequestData {
 /**
  * Data structure for internal monitor restart events.
  *
- * @remarks Internal use only for coordinating between managers.
+ * @remarks
+ * Internal use only for coordinating between managers.
  */
 interface RestartMonitoringRequestData {
     /** Site identifier for the restart request */
@@ -124,7 +128,8 @@ interface SiteEventData {
 /**
  * Data structure for internal start monitoring request events.
  *
- * @remarks Internal use only for coordinating between managers.
+ * @remarks
+ * Internal use only for coordinating between managers.
  */
 interface StartMonitoringRequestData {
     /** Site identifier for the monitoring request */
@@ -136,7 +141,8 @@ interface StartMonitoringRequestData {
 /**
  * Data structure for internal stop monitoring request events.
  *
- * @remarks Internal use only for coordinating between managers.
+ * @remarks
+ * Internal use only for coordinating between managers.
  */
 interface StopMonitoringRequestData {
     /** Site identifier for the monitoring request */
@@ -148,7 +154,8 @@ interface StopMonitoringRequestData {
 /**
  * Data structure for internal sites cache update events.
  *
- * @remarks Internal use only for coordinating between managers.
+ * @remarks
+ * Internal use only for coordinating between managers.
  */
 interface UpdateSitesCacheRequestData {
     /** Updated sites array for cache synchronization */
@@ -159,13 +166,13 @@ interface UpdateSitesCacheRequestData {
  * Dependencies for UptimeOrchestrator.
  *
  * @remarks
- * Following the repository pattern and service layer architecture,
- * these managers encapsulate domain-specific operations and provide
- * a clean separation between data access and business logic.
+ * Following the repository pattern and service layer architecture, these
+ * managers encapsulate domain-specific operations and provide a clean
+ * separation between data access and business logic.
  *
- * Each manager implements the service layer pattern with underlying
- * repository pattern for data persistence, ensuring consistent
- * transaction handling and domain boundaries.
+ * Each manager implements the service layer pattern with underlying repository
+ * pattern for data persistence, ensuring consistent transaction handling and
+ * domain boundaries.
  */
 export interface UptimeOrchestratorDependencies {
     databaseManager: DatabaseManager;
@@ -177,8 +184,8 @@ export interface UptimeOrchestratorDependencies {
  * Combined event interface for the orchestrator.
  *
  * @remarks
- * Supports both internal manager events and public frontend events,
- * providing a unified event system for the entire application.
+ * Supports both internal manager events and public frontend events, providing a
+ * unified event system for the entire application.
  */
 type OrchestratorEvents = UptimeEvents;
 
@@ -456,23 +463,25 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Gets the current history retention limit.
      *
-     * @returns The current history limit from DatabaseManager
-     *
      * @remarks
      * This getter provides convenient property-style access for internal use.
      * The corresponding getHistoryLimit() method exists for IPC compatibility
      * since Electron IPC can only serialize method calls, not property access.
+     *
+     * @returns The current history limit from DatabaseManager
      */
     public get historyLimit(): number {
         return this.databaseManager.getHistoryLimit();
     }
 
     /**
-     * Adds a new site and sets up monitoring for it.
-     * Uses transaction-like behavior to ensure consistency.
+     * Adds a new site and sets up monitoring for it. Uses transaction-like
+     * behavior to ensure consistency.
      *
      * @param siteData - The site data to add.
+     *
      * @returns Promise resolving to the added Site object.
+     *
      * @throws When site creation fails due to validation errors
      * @throws When monitoring setup fails critically
      * @throws When site cleanup fails after monitoring setup failure
@@ -517,7 +526,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @param monitorId - Optional monitor identifier.
-     * @returns Promise resolving to a StatusUpdate or undefined if no update available.
+     *
+     * @returns Promise resolving to a StatusUpdate or undefined if no update
+     *   available.
      */
     public async checkSiteManually(
         identifier: string,
@@ -530,8 +541,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Downloads a backup of the SQLite database.
      *
      * @returns Promise resolving to an object with:
-     *   - buffer: Buffer containing the database backup
-     *   - fileName: String with the generated backup filename
+     *
+     *   - Buffer: Buffer containing the database backup
+     *   - FileName: String with the generated backup filename
      */
     public async downloadBackup(): Promise<{
         buffer: Buffer;
@@ -562,6 +574,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Imports application data from a JSON string.
      *
      * @param data - The JSON data string to import.
+     *
      * @returns Promise resolving to true if import succeeded, false otherwise.
      */
     public async importData(data: string): Promise<boolean> {
@@ -569,10 +582,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Initializes the orchestrator and all its managers.
-     * Ensures proper initialization order and error handling.
+     * Initializes the orchestrator and all its managers. Ensures proper
+     * initialization order and error handling.
      *
      * @returns Promise that resolves when initialization is complete.
+     *
      * @throws When any manager initialization fails
      * @throws When validation of initialized managers fails
      */
@@ -601,8 +615,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Shuts down the orchestrator and removes all event listeners.
-     * Ensures proper cleanup to prevent memory leaks.
+     * Shuts down the orchestrator and removes all event listeners. Ensures
+     * proper cleanup to prevent memory leaks.
      *
      * @returns Promise that resolves when shutdown is complete.
      */
@@ -669,12 +683,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Removes a monitor from a site and stops its monitoring.
-     * Uses a two-phase commit pattern to ensure atomicity.
+     * Removes a monitor from a site and stops its monitoring. Uses a two-phase
+     * commit pattern to ensure atomicity.
      *
      * @param siteIdentifier - The site identifier.
      * @param monitorId - The monitor identifier.
+     *
      * @returns Promise resolving to true if removed, false otherwise.
+     *
      * @throws When the removal operation fails critically
      * @throws When database inconsistency occurs and cannot be resolved
      */
@@ -760,14 +776,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Removes a site by its identifier.
      *
-     * @param identifier - The site identifier.
-     * @returns Promise resolving to true if removed, false otherwise.
-     *
      * @remarks
      * This method delegates to SiteManager for the actual removal operation.
-     * Site removal events (site:removed) are emitted by the SiteManager
-     * through the event forwarding system, not directly by this orchestrator
-     * method.
+     * Site removal events (site:removed) are emitted by the SiteManager through
+     * the event forwarding system, not directly by this orchestrator method.
+     *
+     * @param identifier - The site identifier.
+     *
+     * @returns Promise resolving to true if removed, false otherwise.
      */
     public async removeSite(identifier: string): Promise<boolean> {
         return this.siteManager.removeSite(identifier);
@@ -776,17 +792,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Resets all application settings to their default values.
      *
-     * @returns Promise that resolves when settings have been reset.
-     *
      * @remarks
-     * This method delegates to the DatabaseManager to reset all settings
-     * to their default values in the database. The operation is performed
-     * within a database transaction to ensure consistency.
+     * This method delegates to the DatabaseManager to reset all settings to
+     * their default values in the database. The operation is performed within a
+     * database transaction to ensure consistency.
      *
      * This includes:
+     *
      * - History limit reset to default value
      * - Any other persisted settings reset to defaults
      * - Backend cache invalidation
+     *
+     * @returns Promise that resolves when settings have been reset.
      */
     public async resetSettings(): Promise<void> {
         await this.databaseManager.resetSettings();
@@ -802,9 +819,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * The operation is performed within a database transaction to ensure
      * consistency between the setting update and history pruning.
      *
-     * @param limit - The new history limit (number of entries to retain per monitor).
-     *                Values less than or equal to 0 will disable history
-     *                pruning.
+     * @param limit - The new history limit (number of entries to retain per
+     *   monitor). Values less than or equal to 0 will disable history pruning.
+     *
      * @returns Promise that resolves when the limit is set.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
@@ -825,6 +842,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @param monitorId - Optional monitor identifier.
+     *
      * @returns Promise resolving to true if started, false otherwise.
      */
     public async startMonitoringForSite(
@@ -851,6 +869,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @param monitorId - Optional monitor identifier.
+     *
      * @returns Promise resolving to true if stopped, false otherwise.
      */
     public async stopMonitoringForSite(
@@ -865,6 +884,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @param identifier - The site identifier.
      * @param updates - Partial site data to update.
+     *
      * @returns Promise resolving to the updated Site object.
      */
     public async updateSite(
@@ -908,19 +928,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Handles the update sites cache request asynchronously.
      *
-     * @param data - The sites cache update request data
-     * @returns Promise that resolves when the cache update is complete
-     *
      * @remarks
-     * Extracted from event handler to enable proper async handling and
-     * testing. Updates the site cache and sets up monitoring for all loaded
-     * sites.
+     * Extracted from event handler to enable proper async handling and testing.
+     * Updates the site cache and sets up monitoring for all loaded sites.
      *
      * Uses Promise.allSettled to handle monitoring setup failures gracefully.
      * Critical failures include both rejected promises and fulfilled promises
      * where the operation reported failure. The logic correctly identifies
-     * failures by checking either rejected status or successful completion
-     * with failure result.
+     * failures by checking either rejected status or successful completion with
+     * failure result.
+     *
+     * @param data - The sites cache update request data
+     *
+     * @returns Promise that resolves when the cache update is complete
      */
     private async handleUpdateSitesCacheRequest(
         data: UpdateSitesCacheRequestData
@@ -982,26 +1002,28 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Constructs a new UptimeOrchestrator with injected dependencies.
      *
-     * @param dependencies - The manager dependencies required for orchestration
-     * @throws When dependencies are not provided or invalid
-     *
      * @remarks
      * Sets up event bus middleware and assigns provided managers.
      * Initialization is performed separately via the initialize() method.
      *
-     * Dependencies must be injected through the ServiceContainer pattern
-     * rather than creating managers directly. This ensures proper
-     * initialization order and dependency management.
+     * Dependencies must be injected through the ServiceContainer pattern rather
+     * than creating managers directly. This ensures proper initialization order
+     * and dependency management.
      *
      * @example
+     *
      * ```typescript
      * const orchestrator = new UptimeOrchestrator({
-     *   databaseManager,
-     *   monitorManager,
-     *   siteManager
+     *     databaseManager,
+     *     monitorManager,
+     *     siteManager,
      * });
      * await orchestrator.initialize();
      * ```
+     *
+     * @param dependencies - The manager dependencies required for orchestration
+     *
+     * @throws When dependencies are not provided or invalid
      */
     public constructor(dependencies?: UptimeOrchestratorDependencies) {
         super("UptimeOrchestrator");
@@ -1027,12 +1049,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Gets the current history retention limit (method version for IPC
      * compatibility).
      *
-     * @returns The current history limit.
-     *
      * @remarks
-     * This method provides the same value as the historyLimit getter but
-     * as a callable method. This is required for Electron IPC compatibility
-     * since IPC can serialize method calls but not property access.
+     * This method provides the same value as the historyLimit getter but as a
+     * callable method. This is required for Electron IPC compatibility since
+     * IPC can serialize method calls but not property access.
+     *
+     * @returns The current history limit.
      */
     public getHistoryLimit(): number {
         return this.databaseManager.getHistoryLimit();
@@ -1149,8 +1171,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Validates that all managers are properly initialized.
      *
-     * @throws Error if validation fails, with specific context about which manager failed
-     *
      * @remarks
      * Performs basic validation that each manager has the expected interface
      * methods. This ensures managers were properly constructed and their
@@ -1160,6 +1180,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * A "properly initialized" manager must have its core interface methods
      * available as functions, indicating successful construction and readiness
      * for orchestrated operations.
+     *
+     * @throws Error if validation fails, with specific context about which
+     *   manager failed
      */
     private validateInitialization(): void {
         // Basic validation that we can access manager methods

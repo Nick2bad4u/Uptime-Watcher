@@ -1,7 +1,6 @@
 /**
- * Site database row mapping utilities.
- * Provides consistent data transformation between database rows and Site
- * objects.
+ * Site database row mapping utilities. Provides consistent data transformation
+ * between database rows and Site objects.
  */
 
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
@@ -15,28 +14,28 @@ import { logger } from "../../../utils/logger";
  * Site type for basic operations (without monitors).
  *
  * @remarks
- * Represents a simplified site object used for database operations and
- * mapping. This interface excludes the monitors array to avoid circular
- * dependencies and focuses on core site properties.
+ * Represents a simplified site object used for database operations and mapping.
+ * This interface excludes the monitors array to avoid circular dependencies and
+ * focuses on core site properties.
  *
  * @public
  */
 export interface SiteRow {
     /**
-     * Unique identifier for the site (required).
-     * Must be a non-empty string that serves as the primary key.
+     * Unique identifier for the site (required). Must be a non-empty string
+     * that serves as the primary key.
      */
     identifier: string;
 
     /**
-     * Optional monitoring state for the site.
-     * When true, indicates the site is actively being monitored.
+     * Optional monitoring state for the site. When true, indicates the site is
+     * actively being monitored.
      */
     monitoring?: boolean;
 
     /**
-     * Optional human-readable name for the site.
-     * Used for display purposes in the UI.
+     * Optional human-readable name for the site. Used for display purposes in
+     * the UI.
      */
     name?: string;
 }
@@ -44,13 +43,14 @@ export interface SiteRow {
 /**
  * Validate that a row contains the minimum required fields for a site.
  *
- * @param row - Database row to validate
- * @returns True if row is valid
- *
  * @remarks
- * Validates that the row has a valid identifier that is not null, undefined,
- * or empty string. This ensures database integrity and prevents invalid site
+ * Validates that the row has a valid identifier that is not null, undefined, or
+ * empty string. This ensures database integrity and prevents invalid site
  * creation.
+ *
+ * @param row - Database row to validate
+ *
+ * @returns True if row is valid
  *
  * @public
  */
@@ -65,13 +65,14 @@ export function isValidSiteRow(row: DatabaseSiteRow): boolean {
 /**
  * Convert a database row to a Site object (without monitors).
  *
- * @param row - Raw database row to convert
- * @returns Site object with validated fields
- *
  * @remarks
- * Handles type conversion and ensures consistent data transformation
- * across all site-related database operations. Validates that the identifier
- * is present and valid before creating the site object.
+ * Handles type conversion and ensures consistent data transformation across all
+ * site-related database operations. Validates that the identifier is present
+ * and valid before creating the site object.
+ *
+ * @param row - Raw database row to convert
+ *
+ * @returns Site object with validated fields
  *
  * @throws When the database row lacks a valid identifier
  *
@@ -119,13 +120,14 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
 /**
  * Convert multiple database rows to Site objects.
  *
- * @param rows - Array of raw database rows
- * @returns Array of mapped Site objects
- *
  * @remarks
- * Processes multiple database rows using the {@link rowToSite} function.
- * Each row is validated and converted independently. If any row fails
- * validation, the entire operation will fail.
+ * Processes multiple database rows using the {@link rowToSite} function. Each
+ * row is validated and converted independently. If any row fails validation,
+ * the entire operation will fail.
+ *
+ * @param rows - Array of raw database rows
+ *
+ * @returns Array of mapped Site objects
  *
  * @throws When any database row lacks a valid identifier
  *

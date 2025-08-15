@@ -190,8 +190,7 @@ export interface PortFormData extends BaseFormData {
 }
 
 /**
- * Complete site form data including site information and monitor
- * configuration.
+ * Complete site form data including site information and monitor configuration.
  *
  * @remarks
  * Used when creating a new site with an initial monitor or adding a monitor to
@@ -245,6 +244,7 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
  * Type guard to check if form data is for HTTP monitors.
  *
  * @param formData - The form data to check
+ *
  * @returns True if the form data is for an HTTP monitor
  *
  * @public
@@ -259,6 +259,7 @@ export function isHttpFormData(
  * Type guard to check if form data is for ping monitors.
  *
  * @param formData - The form data to check
+ *
  * @returns True if the form data is for a ping monitor
  *
  * @public
@@ -273,6 +274,7 @@ export function isPingFormData(
  * Type guard to check if form data is for port monitors.
  *
  * @param formData - The form data to check
+ *
  * @returns True if the form data is for a port monitor
  *
  * @public

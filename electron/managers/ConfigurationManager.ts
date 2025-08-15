@@ -72,10 +72,11 @@ export class ConfigurationManager {
      * Cache for configuration values.
      *
      * @remarks
-     * Used to store and retrieve configuration values for improved
-     * performance. Now uses ConfigValue type for better type safety.
+     * Used to store and retrieve configuration values for improved performance.
+     * Now uses ConfigValue type for better type safety.
      *
      * @readonly
+     *
      * @internal
      */
     private readonly configCache: StandardizedCache<ConfigValue>;
@@ -87,6 +88,7 @@ export class ConfigurationManager {
      * Used internally to delegate monitor validation logic.
      *
      * @readonly
+     *
      * @internal
      */
     private readonly monitorValidator: MonitorValidator;
@@ -98,6 +100,7 @@ export class ConfigurationManager {
      * Used internally to delegate site validation logic.
      *
      * @readonly
+     *
      * @internal
      */
     private readonly siteValidator: SiteValidator;
@@ -109,6 +112,7 @@ export class ConfigurationManager {
      * Used to cache validation results for both monitors and sites.
      *
      * @readonly
+     *
      * @internal
      */
     private readonly validationCache: StandardizedCache<ValidationResult>;
@@ -117,12 +121,15 @@ export class ConfigurationManager {
      * Validates a monitor configuration according to business rules, with
      * caching.
      *
-     * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
-     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
-     *
      * @remarks
      * Delegates to {@link MonitorValidator.validateMonitorConfiguration} and
      * caches results for performance.
+     *
+     * @param monitor - The monitor configuration to validate. Must be a member
+     *   of {@link Site.monitors}.
+     *
+     * @returns A promise resolving to a {@link ValidationResult} with errors and
+     *   validity status.
      */
     public async validateMonitorConfiguration(
         monitor: Site["monitors"][0]
@@ -166,15 +173,16 @@ export class ConfigurationManager {
     }
 
     /**
-     * Validates a site configuration according to business rules, with
-     * caching.
-     *
-     * @param site - The {@link Site} configuration to validate.
-     * @returns A promise resolving to a {@link ValidationResult} with errors and validity status.
+     * Validates a site configuration according to business rules, with caching.
      *
      * @remarks
      * Delegates to {@link SiteValidator.validateSiteConfiguration} and caches
      * results for performance.
+     *
+     * @param site - The {@link Site} configuration to validate.
+     *
+     * @returns A promise resolving to a {@link ValidationResult} with errors and
+     *   validity status.
      */
     public async validateSiteConfiguration(
         site: Site
@@ -250,13 +258,15 @@ export class ConfigurationManager {
     /**
      * Gets cache statistics for configuration and validation caches.
      *
-     * @returns An object containing statistics for both configuration and validation caches.
-     *
      * @example
+     *
      * ```typescript
      * const stats = configManager.getCacheStats();
      * console.log(stats);
      * ```
+     *
+     * @returns An object containing statistics for both configuration and
+     *   validation caches.
      */
     public getCacheStats(): {
         configuration: ReturnType<StandardizedCache<ConfigValue>["getStats"]>;
@@ -271,10 +281,10 @@ export class ConfigurationManager {
     /**
      * Gets the default monitor check interval according to business rules.
      *
-     * @returns The default check interval in milliseconds.
-     *
      * @remarks
      * This value is used when a monitor does not specify a custom interval.
+     *
+     * @returns The default check interval in milliseconds.
      */
     public getDefaultMonitorInterval(): number {
         return DEFAULT_CHECK_INTERVAL;
@@ -283,10 +293,11 @@ export class ConfigurationManager {
     /**
      * Gets history retention configuration according to business rules.
      *
-     * @returns The {@link HistoryRetentionConfig} object specifying default, minimum, and maximum history limits.
-     *
      * @remarks
      * These limits align with the history limit options available in the UI.
+     *
+     * @returns The {@link HistoryRetentionConfig} object specifying default,
+     *   minimum, and maximum history limits.
      */
     public getHistoryRetentionRules(): HistoryRetentionConfig {
         return {
@@ -326,11 +337,14 @@ export class ConfigurationManager {
     /**
      * Determines if a monitor should receive a default check interval.
      *
-     * @param monitor - The monitor configuration to evaluate. Must be a member of {@link Site.monitors}.
-     * @returns `true` if the monitor should receive a default check interval; otherwise, `false`.
-     *
      * @remarks
      * Delegates to {@link MonitorValidator.shouldApplyDefaultInterval}.
+     *
+     * @param monitor - The monitor configuration to evaluate. Must be a member
+     *   of {@link Site.monitors}.
+     *
+     * @returns `true` if the monitor should receive a default check interval;
+     *   otherwise, `false`.
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return this.monitorValidator.shouldApplyDefaultInterval(monitor);
@@ -340,12 +354,14 @@ export class ConfigurationManager {
      * Determines if monitoring should be auto-started for a site according to
      * business rules.
      *
-     * @param site - The {@link Site} configuration to evaluate.
-     * @returns `true` if monitoring should be auto-started for the site; otherwise, `false`.
-     *
      * @remarks
      * Monitoring is not auto-started in development mode or for sites without
      * monitors. The site's `monitoring` property takes precedence.
+     *
+     * @param site - The {@link Site} configuration to evaluate.
+     *
+     * @returns `true` if monitoring should be auto-started for the site;
+     *   otherwise, `false`.
      */
     public shouldAutoStartMonitoring(site: Site): boolean {
         // Business rule: Don't auto-start in development mode
@@ -366,12 +382,13 @@ export class ConfigurationManager {
      * Determines if a site should be included in exports according to business
      * rules.
      *
-     * @param site - The {@link Site} configuration to evaluate.
-     * @returns `true` if the site should be included in exports; otherwise, `false`.
-     *
      * @remarks
-     * Delegates to {@link SiteValidator.shouldIncludeInExport} for
-     * consistency.
+     * Delegates to {@link SiteValidator.shouldIncludeInExport} for consistency.
+     *
+     * @param site - The {@link Site} configuration to evaluate.
+     *
+     * @returns `true` if the site should be included in exports; otherwise,
+     *   `false`.
      */
     public shouldIncludeInExport(site: Site): boolean {
         return this.siteValidator.shouldIncludeInExport(site);

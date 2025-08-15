@@ -25,22 +25,24 @@ export interface SettingItemProps {
 /**
  * Standardized setting item layout with title, description, and control
  *
- * @param props - SettingItem props
- * @returns Setting item component with consistent layout
- *
  * @example
+ *
  * ```tsx
  * <SettingItem
- *   title="Auto Start"
- *   description="Launch the application on system startup"
- *   control={
- *     <ThemedCheckbox
- *       checked={settings.autoStart}
- *       onChange={handleChange}
- *     />
- *   }
- * />
+ *     title="Auto Start"
+ *     description="Launch the application on system startup"
+ *     control={
+ *         <ThemedCheckbox
+ *             checked={settings.autoStart}
+ *             onChange={handleChange}
+ *         />
+ *     }
+ * />;
  * ```
+ *
+ * @param props - SettingItem props
+ *
+ * @returns Setting item component with consistent layout
  */
 export const SettingItem: React.FC<SettingItemProps> = ({
     className = "",

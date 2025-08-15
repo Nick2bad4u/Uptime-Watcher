@@ -1,6 +1,6 @@
 /**
- * Enhanced monitor validation utilities with shared schemas.
- * Provides both client-side and server-side validation support.
+ * Enhanced monitor validation utilities with shared schemas. Provides both
+ * client-side and server-side validation support.
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -25,8 +25,8 @@ import { withUtilityErrorHandling } from "./errorHandling";
 // @shared/types/validation
 
 /**
- * Required fields for monitor creation, ensuring type safety.
- * Prevents runtime errors by guaranteeing essential properties are present.
+ * Required fields for monitor creation, ensuring type safety. Prevents runtime
+ * errors by guaranteeing essential properties are present.
  */
 export interface MonitorCreationData
     extends Pick<
@@ -46,7 +46,9 @@ export interface MonitorCreationData
  *
  * @param type - Monitor type
  * @param fields - Field values to merge with defaults
- * @returns Monitor creation data with type-specific fields and guaranteed required fields
+ *
+ * @returns Monitor creation data with type-specific fields and guaranteed
+ *   required fields
  */
 export function createMonitorObject(
     type: MonitorType,
@@ -69,6 +71,7 @@ export function createMonitorObject(
  *
  * @param type - Monitor type
  * @param data - Monitor data to validate
+ *
  * @returns Promise resolving to validation result
  */
 export async function validateMonitorData(
@@ -92,11 +95,12 @@ export async function validateMonitorData(
 }
 
 /**
- * Perform client-side validation using shared Zod schemas.
- * Provides immediate feedback without IPC round-trip.
+ * Perform client-side validation using shared Zod schemas. Provides immediate
+ * feedback without IPC round-trip.
  *
  * @param type - Monitor type
  * @param data - Monitor data to validate
+ *
  * @returns Promise resolving to validation result
  */
 export async function validateMonitorDataClientSide(
@@ -129,6 +133,7 @@ export async function validateMonitorDataClientSide(
  * @param type - Monitor type
  * @param fieldName - Field name to validate
  * @param value - Field value
+ *
  * @returns Promise resolving to validation errors (empty if valid)
  */
 export async function validateMonitorField(
@@ -182,6 +187,7 @@ export async function validateMonitorField(
  * @param type - Monitor type
  * @param fieldName - Field name to validate
  * @param value - Field value to validate
+ *
  * @returns Promise resolving to validation result
  */
 export async function validateMonitorFieldClientSide(
@@ -260,13 +266,14 @@ const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => {
 /**
  * Validates ping monitor form data by checking required host field.
  *
- * @param data - Form data to validate
- * @returns Array of validation error messages
- *
  * @remarks
- * Ping monitors require a host field that must be a valid hostname, IP
- * address, or localhost. Uses shared validation to ensure consistency with
- * backend validation rules.
+ * Ping monitors require a host field that must be a valid hostname, IP address,
+ * or localhost. Uses shared validation to ensure consistency with backend
+ * validation rules.
+ *
+ * @param data - Form data to validate
+ *
+ * @returns Array of validation error messages
  */
 const validatePingMonitorFormData = (data: Partial<PingFormData>): string[] => {
     const errors: string[] = [];
@@ -322,11 +329,12 @@ const validateMonitorFormDataByType = (
 };
 
 /**
- * Validate monitor form data with only the fields that are provided.
- * Used for form validation where not all monitor fields are available yet.
+ * Validate monitor form data with only the fields that are provided. Used for
+ * form validation where not all monitor fields are available yet.
  *
  * @param type - Monitor type
  * @param data - Partial monitor data from form
+ *
  * @returns Promise resolving to validation result
  */
 export async function validateMonitorFormData(

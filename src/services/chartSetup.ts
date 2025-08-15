@@ -59,12 +59,12 @@ ChartJS.register(
  * Chart.js type exports for centralized type management.
  *
  * @remarks
- * Re-exports essential Chart.js types to provide a single source of truth
- * for chart-related TypeScript definitions. This enables proper type checking
- * and IntelliSense support across the application while maintaining
- * consistency.
+ * Re-exports essential Chart.js types to provide a single source of truth for
+ * chart-related TypeScript definitions. This enables proper type checking and
+ * IntelliSense support across the application while maintaining consistency.
  *
  * Types included:
+ *
  * - ChartData: Defines the data structure for charts
  * - ChartJS: Main Chart.js class for direct usage
  * - ChartOptions: Configuration options for chart behavior and styling
@@ -75,8 +75,9 @@ ChartJS.register(
  * Chart.js setup and configuration.
  *
  * @remarks
- * This module registers all required Chart.js components centrally.
- * Import Chart.js and react-chartjs-2 components directly from their packages:
+ * This module registers all required Chart.js components centrally. Import
+ * Chart.js and react-chartjs-2 components directly from their packages:
+ *
  * - Chart: Import from "chart.js"
  * - Bar, Doughnut, Line: Import from "react-chartjs-2"
  * - ChartData, ChartOptions types: Import from "chart.js"

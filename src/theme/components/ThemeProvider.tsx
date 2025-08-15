@@ -15,7 +15,9 @@ export interface ThemeProviderProperties {
  * A theme provider component that initializes the theme system
  *
  * @param props - The theme provider properties
+ *
  * @returns The children wrapped with theme context
+ *
  * @public
  */
 

@@ -8,8 +8,12 @@
  * consistency and maintainability.
  *
  * @example
+ *
  * ```typescript
- * import { TRANSITION_ALL, FALLBACK_MONITOR_TYPE_OPTIONS } from './constants';
+ * import {
+ *     TRANSITION_ALL,
+ *     FALLBACK_MONITOR_TYPE_OPTIONS,
+ * } from "./constants";
  *
  * // Use transition timing for animations
  * const buttonStyle = { transition: TRANSITION_ALL };
@@ -25,9 +29,9 @@
  * CSS transition timing for consistent animations.
  *
  * @remarks
- * Provides consistent transition timing across the application
- * for smooth user interface animations. This value ensures all
- * UI transitions feel cohesive and respond at the same speed.
+ * Provides consistent transition timing across the application for smooth user
+ * interface animations. This value ensures all UI transitions feel cohesive and
+ * respond at the same speed.
  *
  * @defaultValue "all 0.2s ease-in-out"
  *
@@ -39,11 +43,12 @@ export const TRANSITION_ALL = "all 0.2s ease-in-out";
  * Fallback monitor type options when backend loading fails.
  *
  * @remarks
- * Used as a fallback to ensure the UI remains functional even when
- * the backend monitor type registry is unavailable. These should
- * match the BASE_MONITOR_TYPES defined in shared/types.ts.
+ * Used as a fallback to ensure the UI remains functional even when the backend
+ * monitor type registry is unavailable. These should match the
+ * BASE_MONITOR_TYPES defined in shared/types.ts.
  *
  * @example
+ *
  * ```typescript
  * const options = FALLBACK_MONITOR_TYPE_OPTIONS;
  * // Result: [
@@ -65,14 +70,15 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS = [
  * Font family constants for monospace text display.
  *
  * @remarks
- * Monospace fonts prioritize consistent character width for code display,
- * data tables, and other content where alignment is important. The array
- * provides fallback fonts for cross-platform compatibility.
+ * Monospace fonts prioritize consistent character width for code display, data
+ * tables, and other content where alignment is important. The array provides
+ * fallback fonts for cross-platform compatibility.
  *
  * @example
+ *
  * ```typescript
  * const codeStyle = {
- *   fontFamily: FONT_FAMILY_MONO.join(', ')
+ *     fontFamily: FONT_FAMILY_MONO.join(", "),
  * };
  * ```
  *
@@ -90,15 +96,16 @@ export const FONT_FAMILY_MONO: string[] = [
  * Sans-serif font family constants for general UI text.
  *
  * @remarks
- * Provides a modern, readable font stack for body text and UI elements.
- * The fallback chain ensures consistent display across different operating
- * systems and environments. Prioritizes system fonts for optimal performance
- * and native appearance.
+ * Provides a modern, readable font stack for body text and UI elements. The
+ * fallback chain ensures consistent display across different operating systems
+ * and environments. Prioritizes system fonts for optimal performance and native
+ * appearance.
  *
  * @example
+ *
  * ```typescript
  * const textStyle = {
- *   fontFamily: FONT_FAMILY_SANS.join(', ')
+ *     fontFamily: FONT_FAMILY_SANS.join(", "),
  * };
  * ```
  *
@@ -117,9 +124,9 @@ export const FONT_FAMILY_SANS: string[] = [
  * Interface for interval options used in dropdowns.
  *
  * @remarks
- * Provides structured data for time interval selection components.
- * Used by monitoring configuration forms to present user-friendly
- * interval options with corresponding millisecond values.
+ * Provides structured data for time interval selection components. Used by
+ * monitoring configuration forms to present user-friendly interval options with
+ * corresponding millisecond values.
  *
  * @public
  */
@@ -134,15 +141,16 @@ export interface IntervalOption {
  * Available check intervals for site monitoring.
  *
  * @remarks
- * Ranges from 5 seconds to 30 days with sensible progressions.
- * Provides a comprehensive set of monitoring intervals from high-frequency
- * testing to long-term health checks. Values are optimized for different
- * monitoring scenarios and performance requirements.
+ * Ranges from 5 seconds to 30 days with sensible progressions. Provides a
+ * comprehensive set of monitoring intervals from high-frequency testing to
+ * long-term health checks. Values are optimized for different monitoring
+ * scenarios and performance requirements.
  *
  * @example
+ *
  * ```typescript
- * const selectedInterval = CHECK_INTERVALS.find(interval =>
- *   interval.value === 300000
+ * const selectedInterval = CHECK_INTERVALS.find(
+ *     (interval) => interval.value === 300000
  * );
  * console.log(selectedInterval?.label); // "5 minutes"
  * ```
@@ -192,8 +200,8 @@ export const CHECK_INTERVALS: IntervalOption[] = [
  * Default check interval in milliseconds.
  *
  * @remarks
- * Set to 5 minutes (300,000ms) as a reasonable balance between
- * monitoring frequency and system resource usage.
+ * Set to 5 minutes (300,000ms) as a reasonable balance between monitoring
+ * frequency and system resource usage.
  */
 export const DEFAULT_CHECK_INTERVAL = 300_000;
 
@@ -201,8 +209,8 @@ export const DEFAULT_CHECK_INTERVAL = 300_000;
  * Default request timeout in milliseconds.
  *
  * @remarks
- * Set to 10 seconds to balance between allowing slow responses
- * and preventing indefinite hangs.
+ * Set to 10 seconds to balance between allowing slow responses and preventing
+ * indefinite hangs.
  */
 export const DEFAULT_REQUEST_TIMEOUT = 10_000;
 
@@ -210,8 +218,8 @@ export const DEFAULT_REQUEST_TIMEOUT = 10_000;
  * Default request timeout in seconds for UI display.
  *
  * @remarks
- * UI-friendly representation of the timeout value for form fields
- * and user-facing settings.
+ * UI-friendly representation of the timeout value for form fields and
+ * user-facing settings.
  */
 export const DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
 
@@ -219,8 +227,8 @@ export const DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
  * Default history limit for monitoring records.
  *
  * @remarks
- * Set to 500 records as a reasonable default for most use cases,
- * balancing data retention with storage efficiency.
+ * Set to 500 records as a reasonable default for most use cases, balancing data
+ * retention with storage efficiency.
  */
 export const DEFAULT_HISTORY_LIMIT = 500;
 
@@ -228,8 +236,8 @@ export const DEFAULT_HISTORY_LIMIT = 500;
  * History limit options for controlling data retention.
  *
  * @remarks
- * Provides a range of options from 25 to 1,000,000 records
- * to accommodate different monitoring needs and storage constraints.
+ * Provides a range of options from 25 to 1,000,000 records to accommodate
+ * different monitoring needs and storage constraints.
  */
 export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
     { label: "25 records", value: 25 },
@@ -252,8 +260,8 @@ export const HISTORY_LIMIT_OPTIONS: IntervalOption[] = [
  * Request timeout constraints for HTTP monitoring.
  *
  * @remarks
- * Defines the user-facing timeout limits in seconds for form validation
- * and UI display. These values are converted to milliseconds for backend use.
+ * Defines the user-facing timeout limits in seconds for form validation and UI
+ * display. These values are converted to milliseconds for backend use.
  */
 export const TIMEOUT_CONSTRAINTS = {
     /** Maximum timeout in seconds */
@@ -268,8 +276,8 @@ export const TIMEOUT_CONSTRAINTS = {
  * Internal timeout constraints in milliseconds for backend operations.
  *
  * @remarks
- * These values correspond to TIMEOUT_CONSTRAINTS but are converted
- * to milliseconds for actual timeout implementation.
+ * These values correspond to TIMEOUT_CONSTRAINTS but are converted to
+ * milliseconds for actual timeout implementation.
  */
 export const TIMEOUT_CONSTRAINTS_MS = {
     /** Maximum timeout in milliseconds */
@@ -284,8 +292,8 @@ export const TIMEOUT_CONSTRAINTS_MS = {
  * Retry attempt constraints for per-monitor retry configuration.
  *
  * @remarks
- * Defines the limits for retry attempts when monitors fail,
- * balancing between resilience and avoiding excessive load.
+ * Defines the limits for retry attempts when monitors fail, balancing between
+ * resilience and avoiding excessive load.
  */
 export const RETRY_CONSTRAINTS = {
     /** Default number of retry attempts */
@@ -302,8 +310,8 @@ export const RETRY_CONSTRAINTS = {
  * UI delays and timing to prevent flashing and improve UX.
  *
  * @remarks
- * These delays prevent UI flickering for operations that complete quickly
- * while still providing feedback for longer operations.
+ * These delays prevent UI flickering for operations that complete quickly while
+ * still providing feedback for longer operations.
  */
 export const UI_DELAYS = {
     /** Delay before showing loading spinners in milliseconds */
@@ -312,6 +320,7 @@ export const UI_DELAYS = {
     LOADING_OVERLAY: 100, // Delay before showing loading overlay (ms)
     /**
      * Minimal delay to defer state updates in useEffect cleanup.
+     *
      * @remarks
      * Used to comply with React best practices by avoiding direct setState
      * calls in useEffect. The 0ms delay defers execution to the next tick of
@@ -340,8 +349,8 @@ export interface ChartTimePeriods {
  * Chart time periods for analytics components.
  *
  * @remarks
- * Defines standard time periods in milliseconds for data visualization
- * and historical analysis components.
+ * Defines standard time periods in milliseconds for data visualization and
+ * historical analysis components.
  */
 export const CHART_TIME_PERIODS: ChartTimePeriods = {
     /** 1 hour in milliseconds */
@@ -360,8 +369,8 @@ export const CHART_TIME_PERIODS: ChartTimePeriods = {
  * Chart time range options for analytics and data visualization.
  *
  * @remarks
- * Standardized time ranges used across chart components for consistent
- * data filtering and display. Ranges progress from short-term to long-term
+ * Standardized time ranges used across chart components for consistent data
+ * filtering and display. Ranges progress from short-term to long-term
  * monitoring.
  */
 export const CHART_TIME_RANGES = ["1h", "24h", "7d", "30d"] as const;

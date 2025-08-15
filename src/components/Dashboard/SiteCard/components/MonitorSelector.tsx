@@ -1,6 +1,6 @@
 /**
- * Monitor selection dropdown component.
- * Provides interface for selecting between multiple monitors for a site.
+ * Monitor selection dropdown component. Provides interface for selecting
+ * between multiple monitors for a site.
  */
 
 import type { Monitor } from "@shared/types";
@@ -29,24 +29,27 @@ export interface MonitorSelectorProperties {
  * Monitor selection dropdown component for switching between site monitors.
  *
  * Features:
+ *
  * - Dynamic option formatting based on monitor type and configuration
  * - Event propagation control to prevent card click conflicts
  * - Optimized with React.memo and useCallback for performance
  * - Themed select component integration
  * - Supports HTTP and port monitor types with descriptive labels
  *
- * @param props - Component props
- * @returns JSX.Element containing the monitor selector dropdown
- *
  * @example
+ *
  * ```tsx
  * <MonitorSelector
- *   monitors={site.monitors}
- *   selectedMonitorId="monitor-1"
- *   onChange={handleMonitorChange}
- *   className="w-32"
- * />
+ *     monitors={site.monitors}
+ *     selectedMonitorId="monitor-1"
+ *     onChange={handleMonitorChange}
+ *     className="w-32"
+ * />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX.Element containing the monitor selector dropdown
  */
 export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperties> =
     React.memo(function MonitorSelector({

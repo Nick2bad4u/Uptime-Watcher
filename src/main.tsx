@@ -3,10 +3,11 @@
  *
  * @remarks
  * This module initializes the React root and renders the main {@link App}
- * component. React StrictMode is enabled for highlighting potential problems
- * in development. The root element is located by its DOM ID ("root").
+ * component. React StrictMode is enabled for highlighting potential problems in
+ * development. The root element is located by its DOM ID ("root").
  *
- * @throws {@link Error} If the root element with ID "root" is not found in the DOM.
+ * @throws {@link Error} If the root element with ID "root" is not found in the
+ *   DOM.
  */
 
 import React from "react";
@@ -21,16 +22,17 @@ import "./index.css";
  * @remarks
  * - Locates the root DOM element by ID ("root").
  * - Throws an error if the root element is missing.
- * - Creates a React root and renders the {@link App} component inside {@link
- * React.StrictMode}.
- *
- * @throws {@link Error} If the root element with ID "root" is not found.
+ * - Creates a React root and renders the {@link App} component inside
+ *   {@link React.StrictMode}.
  *
  * @example
+ *
  * ```typescript
  * // This function is called automatically when the module loads.
  * initializeApp();
  * ```
+ *
+ * @throws {@link Error} If the root element with ID "root" is not found.
  */
 function initializeApp(): void {
     // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is measurably faster for single ID lookups and this is the critical app initialization path

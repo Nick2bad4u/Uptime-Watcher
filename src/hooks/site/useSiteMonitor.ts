@@ -1,6 +1,6 @@
 /**
- * Custom hook for managing site monitor selection and data.
- * Provides monitor state, statistics, and selection handling for sites.
+ * Custom hook for managing site monitor selection and data. Provides monitor
+ * state, statistics, and selection handling for sites.
  */
 
 import type {
@@ -44,28 +44,33 @@ export interface SiteMonitorResult {
     /** ID of the currently selected monitor */
     selectedMonitorId: string;
 
-    /** Current status of the selected monitor
-     * @remarks Falls back to DEFAULT_MONITOR_STATUS ("pending") when no monitor is selected */
+    /**
+     * Current status of the selected monitor
+     *
+     * @remarks
+     * Falls back to DEFAULT_MONITOR_STATUS ("pending") when no monitor is
+     * selected
+     */
     status: MonitorStatus;
 }
 
 /**
  * Hook to manage monitor selection and state for a specific site
  *
- * @param site - The site object to monitor
- * @returns Monitor data and helper functions
- * @see {@link SiteMonitorResult} for the complete interface specification
- *
  * @remarks
  * This hook manages monitor selection and provides current state for site
  * monitoring. It handles edge cases including:
+ *
  * - Sites with no monitors (returns empty data with safe defaults)
  * - Invalid monitor selections (falls back to first available monitor)
  * - Undefined monitor references (provides safe fallback values)
  *
- * The hook automatically selects the most recent site data from the store to ensure
- * UI consistency when site data is updated elsewhere in the application.
+ * The hook automatically selects the most recent site data from the store to
+ * ensure UI consistency when site data is updated elsewhere in the
+ * application.
+ *
  * @example
+ *
  * ```tsx
  * function SiteMonitorCard({ site }) {
  *   const {
@@ -90,6 +95,12 @@ export interface SiteMonitorResult {
  *   );
  * }
  * ```
+ *
+ * @param site - The site object to monitor
+ *
+ * @returns Monitor data and helper functions
+ *
+ * @see {@link SiteMonitorResult} for the complete interface specification
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
     const { getSelectedMonitorId, setSelectedMonitorId, sites } =

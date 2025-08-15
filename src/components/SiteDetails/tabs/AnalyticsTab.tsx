@@ -48,8 +48,8 @@ const getIncidentsColor = (incidentCount: number, theme: Theme): string =>
     incidentCount === 0 ? theme.colors.success : theme.colors.error;
 
 /**
- * Props for the AnalyticsTab component.
- * Contains comprehensive metrics, chart data, and formatting functions.
+ * Props for the AnalyticsTab component. Contains comprehensive metrics, chart
+ * data, and formatting functions.
  *
  * @public
  */
@@ -111,6 +111,7 @@ export interface AnalyticsTabProperties {
  * visualizations.
  *
  * Features:
+ *
  * - Multiple chart types (line, bar, doughnut) for different metrics
  * - Key performance indicators (uptime, response time, availability)
  * - Advanced metrics (percentiles, MTTR, downtime analysis)
@@ -119,6 +120,7 @@ export interface AnalyticsTabProperties {
  * - Export capabilities for chart data
  *
  * @param props - Component props containing metrics and chart configurations
+ *
  * @returns JSX element displaying analytics interface
  */
 export const AnalyticsTab = ({

@@ -10,11 +10,12 @@
  * setState calls in useEffect hooks.
  *
  * The hook manages two distinct operation modes:
+ *
  * - "new": Creates a new site with the first monitor
  * - "existing": Adds a monitor to an existing site
  *
- * @example
- * Basic usage in a form component:
+ * @example Basic usage in a form component:
+ *
  * ```typescript
  * function AddSiteForm() {
  *   const {
@@ -174,6 +175,7 @@ const resetFieldsForModeChange = (
  * @param monitorType - Type of monitor being configured
  * @param fieldValues - Current field values from the form
  * @param getFields - Function to get required fields for monitor type
+ *
  * @returns True if form data is valid, false otherwise
  *
  * @internal
@@ -214,12 +216,13 @@ const validateFormFields = (
  *
  * @remarks
  * Provides comprehensive form state management with real-time validation,
- * support for both new sites and adding monitors to existing sites.
- * Handles dynamic field validation based on monitor type and maintains
- * proper form state throughout the user interaction lifecycle.
+ * support for both new sites and adding monitors to existing sites. Handles
+ * dynamic field validation based on monitor type and maintains proper form
+ * state throughout the user interaction lifecycle.
  *
  * @returns Combined form state and action handlers containing all form fields,
- * validation state, and manipulation functions for managing the add site form
+ *   validation state, and manipulation functions for managing the add site
+ *   form
  */
 export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     // Form field state

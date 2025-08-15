@@ -1,6 +1,6 @@
 /**
- * Type-safe Chart.js configuration utilities.
- * Provides type guards and safe access to Chart.js configuration properties.
+ * Type-safe Chart.js configuration utilities. Provides type guards and safe
+ * access to Chart.js configuration properties.
  *
  * @packageDocumentation
  */
@@ -14,6 +14,7 @@ import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
  *
  * @param config - Chart configuration
  * @param axis - Axis name ("x" or "y")
+ *
  * @returns Scale configuration or undefined
  */
 export function getScaleConfig(
@@ -41,6 +42,7 @@ export function getScaleConfig(
  * @param config - Chart configuration
  * @param axis - Axis name ("x" or "y")
  * @param path - Property path (e.g., "title.text")
+ *
  * @returns Property value or undefined
  */
 export function getNestedScaleProperty(
@@ -77,6 +79,7 @@ export function getNestedScaleProperty(
  * @param config - Chart configuration
  * @param axis - Axis name ("x" or "y")
  * @param property - Property name to access
+ *
  * @returns Property value or undefined
  */
 export function getScaleProperty(

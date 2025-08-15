@@ -16,6 +16,7 @@
  * the codebase more maintainable and easier to understand.
  *
  * @example
+ *
  * ```typescript
  * import { useSitesStore } from './stores';
  *
@@ -49,12 +50,13 @@ import { createSiteSyncActions } from "./useSiteSync";
  * Main sites store combining all site-related functionality.
  *
  * @remarks
- * Creates a Zustand store that composes multiple action modules to provide
- * a complete interface for site management. The store uses dependency
- * injection to share common functions between modules while maintaining clear
+ * Creates a Zustand store that composes multiple action modules to provide a
+ * complete interface for site management. The store uses dependency injection
+ * to share common functions between modules while maintaining clear
  * boundaries.
  *
  * @returns Complete sites store with all actions and state
+ *
  * @public
  */
 export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =

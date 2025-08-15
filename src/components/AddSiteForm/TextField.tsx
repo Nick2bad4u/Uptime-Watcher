@@ -4,51 +4,51 @@
  *
  * @remarks
  * Supports "text", "url", and "number" input types with proper validation and
- * error display. The component integrates with FormField wrapper for
- * consistent styling and accessibility. Provides ARIA attributes and handles
- * various input scenarios including min/max for numbers.
+ * error display. The component integrates with FormField wrapper for consistent
+ * styling and accessibility. Provides ARIA attributes and handles various input
+ * scenarios including min/max for numbers.
  *
- * @example
- * Basic text input field:
+ * @example Basic text input field:
+ *
  * ```tsx
  * <TextField
- *   id="hostname"
- *   label="Hostname"
- *   type="text"
- *   value={hostname}
- *   onChange={setHostname}
- *   placeholder="Enter hostname"
- *   required={true}
- * />
+ *     id="hostname"
+ *     label="Hostname"
+ *     type="text"
+ *     value={hostname}
+ *     onChange={setHostname}
+ *     placeholder="Enter hostname"
+ *     required={true}
+ * />;
  * ```
  *
- * @example
- * Number input with validation:
+ * @example Number input with validation:
+ *
  * ```tsx
  * <TextField
- *   id="port"
- *   label="Port Number"
- *   type="number"
- *   value={port.toString()}
- *   onChange={(value) => setPort(Number(value))}
- *   min={1}
- *   max={65535}
- *   helpText="Enter port number (1-65535)"
- * />
+ *     id="port"
+ *     label="Port Number"
+ *     type="number"
+ *     value={port.toString()}
+ *     onChange={(value) => setPort(Number(value))}
+ *     min={1}
+ *     max={65535}
+ *     helpText="Enter port number (1-65535)"
+ * />;
  * ```
  *
- * @example
- * URL input with error state:
+ * @example URL input with error state:
+ *
  * ```tsx
  * <TextField
- *   id="url"
- *   label="Website URL"
- *   type="url"
- *   value={url}
- *   onChange={setUrl}
- *   error={urlError}
- *   placeholder="https://example.com"
- * />
+ *     id="url"
+ *     label="Website URL"
+ *     type="url"
+ *     value={url}
+ *     onChange={setUrl}
+ *     error={urlError}
+ *     placeholder="https://example.com"
+ * />;
  * ```
  *
  * @public
@@ -101,21 +101,22 @@ export interface TextFieldProperties {
  * FormField for consistent styling. Provides ARIA attributes and handles
  * various input scenarios including min/max for numbers.
  *
- * @param props - The component properties
- * @returns JSX element containing an accessible text input field
+ * @example Simple text input with validation:
  *
- * @example
- * Simple text input with validation:
  * ```tsx
  * <TextField
- *   id="siteName"
- *   label="Site Name"
- *   value={siteName}
- *   onChange={setSiteName}
- *   required={true}
- *   placeholder="Enter site name"
- * />
+ *     id="siteName"
+ *     label="Site Name"
+ *     value={siteName}
+ *     onChange={setSiteName}
+ *     required={true}
+ *     placeholder="Enter site name"
+ * />;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns JSX element containing an accessible text input field
  *
  * @public
  */

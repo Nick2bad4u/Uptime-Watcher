@@ -22,7 +22,9 @@ export interface ThemedProgressProperties {
  * A themed progress bar component for showing completion status
  *
  * @param props - The progress properties
+ *
  * @returns The themed progress JSX element
+ *
  * @public
  */
 const ThemedProgress = ({

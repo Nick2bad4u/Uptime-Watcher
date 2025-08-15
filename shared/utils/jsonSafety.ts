@@ -1,7 +1,6 @@
 /**
- * Type-safe JSON parsing utilities.
- * Provides safe alternatives to JSON.parse with proper error handling and
- * validation.
+ * Type-safe JSON parsing utilities. Provides safe alternatives to JSON.parse
+ * with proper error handling and validation.
  */
 
 /**
@@ -16,9 +15,11 @@ export interface SafeJsonResult<T> {
 /**
  * Ensures an error object is properly typed and formatted.
  *
- * @internal
  * @param error - Unknown error value to convert to Error instance
+ *
  * @returns Properly typed Error object
+ *
+ * @internal
  */
 function ensureError(error: unknown): Error {
     return error instanceof Error ? error : new Error(String(error));
@@ -30,9 +31,11 @@ function ensureError(error: unknown): Error {
  *
  * @param operation - Function to execute safely
  * @param errorPrefix - Prefix for error messages
+ *
  * @returns Safe result object with data or error
  *
- * @throws Never throws - all errors are captured and returned in the result object
+ * @throws Never throws - all errors are captured and returned in the result
+ *   object
  *
  * @internal Helper function to eliminate error handling duplication
  */
@@ -66,17 +69,16 @@ function safeOperation<T>(
 /**
  * Safely parse JSON string with type validation.
  *
- * @param json - JSON string to parse
- * @param validator - Type guard function to validate the parsed data
- * @returns Safe result object with parsed data or error
- *
- * @throws Never throws - all errors are captured and returned in the result object
- *
  * @example
+ *
  * ```typescript
  * const result = safeJsonParse(jsonString, (data): data is User => {
- *     return typeof data === "object" && data !== null &&
- *            typeof data.id === "string" && typeof data.name === "string";
+ *     return (
+ *         typeof data === "object" &&
+ *         data !== null &&
+ *         typeof data.id === "string" &&
+ *         typeof data.name === "string"
+ *     );
  * });
  *
  * if (result.success) {
@@ -85,6 +87,14 @@ function safeOperation<T>(
  *     console.error(result.error);
  * }
  * ```
+ *
+ * @param json - JSON string to parse
+ * @param validator - Type guard function to validate the parsed data
+ *
+ * @returns Safe result object with parsed data or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result
+ *   object
  */
 export function safeJsonParse<T>(
     json: string,
@@ -104,19 +114,22 @@ export function safeJsonParse<T>(
 /**
  * Parse JSON array with element validation.
  *
- * @param json - JSON string to parse
- * @param elementValidator - Type guard for array elements
- * @returns Safe result object with validated array or error
- *
- * @throws Never throws - all errors are captured and returned in the result object
- *
  * @example
+ *
  * ```typescript
  * const result = safeJsonParseArray(
  *     jsonString,
  *     (item): item is User => typeof item === "object" && item !== null
  * );
  * ```
+ *
+ * @param json - JSON string to parse
+ * @param elementValidator - Type guard for array elements
+ *
+ * @returns Safe result object with validated array or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result
+ *   object
  */
 export function safeJsonParseArray<T>(
     json: string,
@@ -145,14 +158,8 @@ export function safeJsonParseArray<T>(
 /**
  * Safely parse JSON string with fallback value.
  *
- * @param json - JSON string to parse
- * @param validator - Type guard function to validate the parsed data
- * @param fallback - Fallback value if parsing fails
- * @returns Parsed data if successful, fallback if failed
- *
- * @throws Never throws - parsing errors result in fallback value being returned
- *
  * @example
+ *
  * ```typescript
  * const config = safeJsonParseWithFallback(
  *     configString,
@@ -160,6 +167,14 @@ export function safeJsonParseArray<T>(
  *     { timeout: 5000, retries: 3 }
  * );
  * ```
+ *
+ * @param json - JSON string to parse
+ * @param validator - Type guard function to validate the parsed data
+ * @param fallback - Fallback value if parsing fails
+ *
+ * @returns Parsed data if successful, fallback if failed
+ *
+ * @throws Never throws - parsing errors result in fallback value being returned
  */
 export function safeJsonParseWithFallback<T>(
     json: string,
@@ -173,19 +188,22 @@ export function safeJsonParseWithFallback<T>(
 /**
  * Safely stringify any value to JSON.
  *
- * @param value - Value to stringify
- * @param space - Space parameter for JSON.stringify (for formatting)
- * @returns Safe result object with JSON string or error
- *
- * @throws Never throws - all errors are captured and returned in the result object
- *
  * @example
+ *
  * ```typescript
  * const result = safeJsonStringify({ name: "John", age: 30 });
  * if (result.success) {
  *     console.log(result.data); // {"name":"John","age":30}
  * }
  * ```
+ *
+ * @param value - Value to stringify
+ * @param space - Space parameter for JSON.stringify (for formatting)
+ *
+ * @returns Safe result object with JSON string or error
+ *
+ * @throws Never throws - all errors are captured and returned in the result
+ *   object
  */
 export function safeJsonStringify(
     value: unknown,
@@ -205,17 +223,20 @@ export function safeJsonStringify(
 /**
  * Safely stringify value with fallback.
  *
- * @param value - Value to stringify
- * @param fallback - Fallback string if stringification fails
- * @param space - Space parameter for JSON.stringify (for formatting)
- * @returns JSON string if successful, fallback if failed
- *
- * @throws Never throws - stringification errors result in fallback value being returned
- *
  * @example
+ *
  * ```typescript
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
  * ```
+ *
+ * @param value - Value to stringify
+ * @param fallback - Fallback string if stringification fails
+ * @param space - Space parameter for JSON.stringify (for formatting)
+ *
+ * @returns JSON string if successful, fallback if failed
+ *
+ * @throws Never throws - stringification errors result in fallback value being
+ *   returned
  */
 export function safeJsonStringifyWithFallback(
     value: unknown,

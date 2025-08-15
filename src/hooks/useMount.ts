@@ -5,10 +5,11 @@
  * @remarks
  * This hook provides a clean alternative to useEffect with an empty dependency
  * array for component lifecycle management. It's specifically designed to
- * handle React's StrictMode development behavior where effects can run
- * multiple times.
+ * handle React's StrictMode development behavior where effects can run multiple
+ * times.
  *
  * Key features:
+ *
  * - Prevents duplicate execution in React StrictMode
  * - Supports both synchronous and asynchronous mount callbacks
  * - Provides automatic error handling with logging
@@ -16,39 +17,41 @@
  * - Maintains callback reference stability to prevent stale closures
  *
  * The hook is particularly useful for:
+ *
  * - Initializing data subscriptions
  * - Setting up event listeners
  * - Performing one-time setup operations
  * - Managing component lifecycle in a predictable way
  *
- * @param mountCallback - Function to execute on component mount (can be async)
- * @param unmountCallback - Optional cleanup function for component unmount
- *
  * @example
+ *
  * ```tsx
  * // Basic usage with sync operations
  * useMount(
- *   () => {
- *     console.log('Component mounted');
- *     setupEventListeners();
- *   },
- *   () => {
- *     console.log('Component unmounting');
- *     cleanupEventListeners();
- *   }
+ *     () => {
+ *         console.log("Component mounted");
+ *         setupEventListeners();
+ *     },
+ *     () => {
+ *         console.log("Component unmounting");
+ *         cleanupEventListeners();
+ *     }
  * );
  *
  * // With async operations
  * useMount(
- *   async () => {
- *     const data = await fetchInitialData();
- *     updateState(data);
- *   },
- *   () => {
- *     cancelPendingRequests();
- *   }
+ *     async () => {
+ *         const data = await fetchInitialData();
+ *         updateState(data);
+ *     },
+ *     () => {
+ *         cancelPendingRequests();
+ *     }
  * );
  * ```
+ *
+ * @param mountCallback - Function to execute on component mount (can be async)
+ * @param unmountCallback - Optional cleanup function for component unmount
  *
  * @public
  */

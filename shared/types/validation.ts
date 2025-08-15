@@ -30,8 +30,8 @@ export interface BaseValidationResult {
  * Form-specific validation result.
  *
  * @remarks
- * Extends base validation with field-specific error mapping
- * for UI form validation scenarios.
+ * Extends base validation with field-specific error mapping for UI form
+ * validation scenarios.
  *
  * @public
  */
@@ -98,8 +98,8 @@ export interface ValidationMetadata {
  * Enhanced validation result with metadata and data.
  *
  * @remarks
- * Used for complex validation scenarios that need to return
- * validated data and contextual information.
+ * Used for complex validation scenarios that need to return validated data and
+ * contextual information.
  *
  * @public
  */
@@ -115,6 +115,7 @@ export interface ValidationResult extends BaseValidationResult {
  *
  * @param errors - Array of error messages
  * @param metadata - Optional metadata about the validation
+ *
  * @returns A failed ValidationResult
  *
  * @public
@@ -136,6 +137,7 @@ export function createFailureResult(
  *
  * @param data - Optional validated data
  * @param warnings - Optional warning messages
+ *
  * @returns A successful ValidationResult
  *
  * @public
@@ -162,6 +164,7 @@ export function createSuccessResult(
  * Type guard to check if a result is a valid BaseValidationResult.
  *
  * @param result - The object to check
+ *
  * @returns True if the object matches BaseValidationResult structure
  *
  * @public

@@ -9,14 +9,19 @@ import type { ErrorHandlingFrontendStore } from "@shared/utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
 
 /**
- * Creates a standardized error handling context for store operations.
- * Provides consistent error state management across different store modules.
+ * Creates a standardized error handling context for store operations. Provides
+ * consistent error state management across different store modules.
  *
- * @param storeKey - The key identifying the store for error tracking (e.g., "sites-operations", "sites-monitoring")
- * @param operationName - The name of the specific operation being performed (e.g., "createSite", "deleteSite")
- * @returns Error handling context compatible with `withErrorHandling` function
+ * @remarks
+ * This factory eliminates the need to repeatedly define the same error handling
+ * object structure across different store operations. It provides:
+ *
+ * - Consistent error clearing before operations
+ * - Standardized error state management on failures
+ * - Proper loading state tracking during async operations
  *
  * @example
+ *
  * ```typescript
  * await withErrorHandling(
  *     async () => {
@@ -27,12 +32,12 @@ import { useErrorStore } from "../error/useErrorStore";
  * );
  * ```
  *
- * @remarks
- * This factory eliminates the need to repeatedly define the same error
- * handling object structure across different store operations. It provides:
- * - Consistent error clearing before operations
- * - Standardized error state management on failures
- * - Proper loading state tracking during async operations
+ * @param storeKey - The key identifying the store for error tracking (e.g.,
+ *   "sites-operations", "sites-monitoring")
+ * @param operationName - The name of the specific operation being performed
+ *   (e.g., "createSite", "deleteSite")
+ *
+ * @returns Error handling context compatible with `withErrorHandling` function
  */
 export function createStoreErrorHandler(
     storeKey: string,

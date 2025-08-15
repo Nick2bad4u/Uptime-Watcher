@@ -1,13 +1,14 @@
 /**
- * Utilities for mapping between database history rows and {@link
- * StatusHistory} objects.
+ * Utilities for mapping between database history rows and {@link StatusHistory}
+ * objects.
  *
  * @remarks
  * Provides consistent, type-safe transformation between raw database rows and
  * domain history objects, including validation, conversion, and error logging.
  *
- * @see {@link StatusHistory}
  * @public
+ *
+ * @see {@link StatusHistory}
  */
 
 import type { StatusHistory } from "@shared/types";
@@ -48,11 +49,13 @@ export interface HistoryRow {
  * @remarks
  * Used internally to ensure numeric fields are valid numbers.
  *
+ * @defaultValue 0
+ *
  * @param value - The value to convert to a number.
  * @param fallback - The fallback value to use if conversion fails.
+ *
  * @returns The converted number, or the fallback value if conversion fails.
  *
- * @defaultValue 0
  * @internal
  */
 function safeNumber(value: unknown, fallback: number = 0): number {
@@ -65,13 +68,14 @@ function safeNumber(value: unknown, fallback: number = 0): number {
 }
 
 /**
- * Validates and converts a status value to a valid {@link
- * StatusHistory.status} value.
+ * Validates and converts a status value to a valid {@link StatusHistory.status}
+ * value.
  *
  * @remarks
  * If the value is not "up" or "down", logs a warning and returns "down".
  *
  * @param status - The status value to validate.
+ *
  * @returns The validated status value ("up" or "down").
  *
  * @internal
@@ -88,15 +92,21 @@ function validateStatus(status: unknown): StatusHistory["status"] {
  * @remarks
  * Used when inserting or updating history entries in the database.
  *
+ * @example
+ *
+ * ```typescript
+ * const row = historyEntryToRow("monitor-123", {
+ *     status: "up",
+ *     responseTime: 120,
+ *     timestamp: 1680000000000,
+ * });
+ * ```
+ *
  * @param monitorId - The unique identifier of the monitor.
  * @param entry - The {@link StatusHistory} object to convert.
  * @param details - Optional details string to include in the row.
- * @returns An object representing the database row for the history entry.
  *
- * @example
- * ```typescript
- * const row = historyEntryToRow("monitor-123", { status: "up", responseTime: 120, timestamp: 1680000000000 });
- * ```
+ * @returns An object representing the database row for the history entry.
  *
  * @public
  */
@@ -121,13 +131,15 @@ export function historyEntryToRow(
  * @remarks
  * Ensures that the row has a valid monitor ID, status, and timestamp.
  *
- * @param row - The database row to validate.
- * @returns `true` if the row is valid for a history entry, otherwise `false`.
- *
  * @example
+ *
  * ```typescript
  * if (isValidHistoryRow(row)) { ... }
  * ```
+ *
+ * @param row - The database row to validate.
+ *
+ * @returns `true` if the row is valid for a history entry, otherwise `false`.
  *
  * @public
  */
@@ -146,17 +158,21 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
  * Converts a single database row to a {@link StatusHistory} object.
  *
  * @remarks
- * Performs safe number conversion and status validation. If a value is
- * invalid, it defaults to a safe fallback and logs a warning or error.
- *
- * @param row - The raw database row to convert.
- * @returns The mapped {@link StatusHistory} object.
- * @throws Error If mapping fails due to unexpected data types or missing fields.
+ * Performs safe number conversion and status validation. If a value is invalid,
+ * it defaults to a safe fallback and logs a warning or error.
  *
  * @example
+ *
  * ```typescript
  * const entry = rowToHistoryEntry(dbRow);
  * ```
+ *
+ * @param row - The raw database row to convert.
+ *
+ * @returns The mapped {@link StatusHistory} object.
+ *
+ * @throws Error If mapping fails due to unexpected data types or missing
+ *   fields.
  *
  * @public
  */
@@ -192,13 +208,15 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
  * @remarks
  * Each row is mapped using {@link rowToHistoryEntry}.
  *
- * @param rows - Array of raw database rows.
- * @returns Array of mapped {@link StatusHistory} objects.
- *
  * @example
+ *
  * ```typescript
  * const history = rowsToHistoryEntries(dbRows);
  * ```
+ *
+ * @param rows - Array of raw database rows.
+ *
+ * @returns Array of mapped {@link StatusHistory} objects.
  *
  * @public
  */
@@ -212,8 +230,8 @@ export function rowsToHistoryEntries(
  * Converts a single database row to a {@link StatusHistory} object.
  *
  * @remarks
- * Performs safe number conversion and status validation. If a value is
- * invalid, it defaults to a safe fallback and logs a warning or error.
+ * Performs safe number conversion and status validation. If a value is invalid,
+ * it defaults to a safe fallback and logs a warning or error.
  */
 
 /**
@@ -223,13 +241,16 @@ export function rowsToHistoryEntries(
  * @remarks
  * Useful for optional row lookups where the row may be missing.
  *
- * @param row - The database row to convert, or `undefined`.
- * @returns The mapped {@link StatusHistory} object, or `undefined` if the row is not present.
- *
  * @example
+ *
  * ```typescript
  * const entry = rowToHistoryEntryOrUndefined(optionalRow);
  * ```
+ *
+ * @param row - The database row to convert, or `undefined`.
+ *
+ * @returns The mapped {@link StatusHistory} object, or `undefined` if the row is
+ *   not present.
  *
  * @public
  */

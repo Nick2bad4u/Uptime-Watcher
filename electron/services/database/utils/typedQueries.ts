@@ -28,15 +28,16 @@ export interface IdOnlyResult {
 /**
  * Type-safe wrapper for INSERT queries with RETURNING clause.
  *
+ * @remarks
+ * This function handles INSERT...RETURNING queries which return the inserted
+ * record. Commonly used for getting auto-generated IDs. Callers should cast the
+ * result to the expected type.
+ *
  * @param db - Database instance
  * @param sql - INSERT SQL with RETURNING clause
  * @param params - Query parameters
- * @returns Inserted record with generated fields
  *
- * @remarks
- * This function handles INSERT...RETURNING queries which return the inserted
- * record. Commonly used for getting auto-generated IDs. Callers should cast
- * the result to the expected type.
+ * @returns Inserted record with generated fields
  */
 export function insertWithReturning(
     db: Database,
@@ -53,13 +54,14 @@ export function insertWithReturning(
 /**
  * Type-safe wrapper for count queries.
  *
+ * @remarks
+ * This function handles COUNT() queries which return {count: number}.
+ *
  * @param db - Database instance
  * @param sql - SQL query that returns a count
  * @param params - Query parameters
- * @returns Count result object
  *
- * @remarks
- * This function handles COUNT() queries which return \{count: number\}.
+ * @returns Count result object
  */
 export function queryForCount(
     db: Database,
@@ -73,15 +75,16 @@ export function queryForCount(
  * Type-safe wrapper for database queries that return arrays of records with ID
  * fields.
  *
- * @param db - Database instance
- * @param sql - SQL query string that selects id fields
- * @param params - Query parameters
- * @returns Array of objects with id: number
- *
  * @remarks
  * This function centralizes the type assertion for queries that select ID
  * fields. It's safe because we control the SQL and know it returns numeric
  * IDs.
+ *
+ * @param db - Database instance
+ * @param sql - SQL query string that selects id fields
+ * @param params - Query parameters
+ *
+ * @returns Array of objects with id: number
  */
 export function queryForIds(
     db: Database,
@@ -94,14 +97,15 @@ export function queryForIds(
 /**
  * Type-safe wrapper for database queries that return arrays of records.
  *
+ * @remarks
+ * This function centralizes the type assertion for multi-record queries. Use
+ * this when you know the SQL structure and expected return type.
+ *
  * @param db - Database instance
  * @param sql - SQL query string
  * @param params - Query parameters
- * @returns Array of records
  *
- * @remarks
- * This function centralizes the type assertion for multi-record queries.
- * Use this when you know the SQL structure and expected return type.
+ * @returns Array of records
  */
 export function queryForRecords<
     // eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
@@ -114,14 +118,15 @@ export function queryForRecords<
  * Type-safe wrapper for database queries that return a single record or
  * undefined.
  *
- * @param db - Database instance
- * @param sql - SQL query string
- * @param params - Query parameters
- * @returns Single record or undefined
- *
  * @remarks
  * This function centralizes the type assertion for single-record queries.
  * Callers should cast the result to the expected type.
+ *
+ * @param db - Database instance
+ * @param sql - SQL query string
+ * @param params - Query parameters
+ *
+ * @returns Single record or undefined
  */
 export function queryForSingleRecord(
     db: Database,

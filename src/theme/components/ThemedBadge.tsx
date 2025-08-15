@@ -1,6 +1,6 @@
 /**
- * Themed badge component for status indicators, labels, and small
- * informational elements.
+ * Themed badge component for status indicators, labels, and small informational
+ * elements.
  *
  * @remarks
  * This component provides a compact way to display status information, counts,
@@ -9,36 +9,28 @@
  * optional icons. The badge integrates with the theme system for consistent
  * styling across the application.
  *
- * @example
- * Status badge with icon:
+ * @example Status badge with icon:
+ *
  * ```tsx
- * <ThemedBadge
- *   variant="success"
- *   size="md"
- *   icon={<CheckIcon />}
- * >
- *   Online
- * </ThemedBadge>
+ * <ThemedBadge variant="success" size="md" icon={<CheckIcon />}>
+ *     Online
+ * </ThemedBadge>;
  * ```
  *
- * @example
- * Count badge without icon:
+ * @example Count badge without icon:
+ *
  * ```tsx
  * <ThemedBadge variant="primary" size="sm">
- *   {notificationCount}
- * </ThemedBadge>
+ *     {notificationCount}
+ * </ThemedBadge>;
  * ```
  *
- * @example
- * Warning badge with custom styling:
+ * @example Warning badge with custom styling:
+ *
  * ```tsx
- * <ThemedBadge
- *   variant="warning"
- *   icon={<AlertIcon />}
- *   className="ml-2"
- * >
- *   Needs Attention
- * </ThemedBadge>
+ * <ThemedBadge variant="warning" icon={<AlertIcon />} className="ml-2">
+ *     Needs Attention
+ * </ThemedBadge>;
  * ```
  *
  * @public
@@ -83,19 +75,20 @@ export interface ThemedBadgeProperties {
  * spacing, and typography based on the selected variant and size. Icons are
  * automatically colored to match the theme.
  *
- * @param props - The component properties
- * @returns The themed badge JSX element
+ * @example Monitor status badge:
  *
- * @example
- * Monitor status badge:
  * ```tsx
  * <ThemedBadge
- *   variant={site.isOnline ? "success" : "error"}
- *   icon={<StatusIcon />}
+ *     variant={site.isOnline ? "success" : "error"}
+ *     icon={<StatusIcon />}
  * >
- *   {site.isOnline ? "Online" : "Offline"}
- * </ThemedBadge>
+ *     {site.isOnline ? "Online" : "Offline"}
+ * </ThemedBadge>;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The themed badge JSX element
  *
  * @public
  */

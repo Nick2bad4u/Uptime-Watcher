@@ -27,6 +27,7 @@ export const IpcValidators = {
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
+     *
      * @returns Error message or null if valid
      */
     optionalString: (value: unknown, paramName: string): null | string => {
@@ -41,6 +42,7 @@ export const IpcValidators = {
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
+     *
      * @returns Error message or null if valid
      */
     requiredNumber: (value: unknown, paramName: string): null | string => {
@@ -55,6 +57,7 @@ export const IpcValidators = {
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
+     *
      * @returns Error message or null if valid
      */
     requiredObject: (value: unknown, paramName: string): null | string => {
@@ -73,6 +76,7 @@ export const IpcValidators = {
      *
      * @param value - Value to validate
      * @param paramName - Parameter name for error messages
+     *
      * @returns Error message or null if valid
      */
     requiredString: (value: unknown, paramName: string): null | string => {
@@ -88,6 +92,7 @@ export const IpcValidators = {
  *
  * @param error - Error message
  * @param metadata - Optional metadata
+ *
  * @returns Standardized IPC error response
  *
  * @public
@@ -115,6 +120,7 @@ export function createErrorResponse<T = void>(
  * @param data - The response data
  * @param metadata - Optional metadata
  * @param warnings - Optional warnings
+ *
  * @returns Standardized IPC success response
  *
  * @public
@@ -150,6 +156,7 @@ export function createSuccessResponse<T>(
  * @param errors - Validation errors
  * @param warnings - Validation warnings
  * @param metadata - Additional metadata
+ *
  * @returns Standardized validation response
  *
  * @public
@@ -172,10 +179,6 @@ export function createValidationResponse(
  * Wraps an IPC handler with standardized error handling, logging, and response
  * formatting.
  *
- * @param channelName - Name of the IPC channel
- * @param handler - The handler function to wrap
- * @returns The wrapped handler result
- *
  * @remarks
  * Provides consistent error handling, logging, and response formatting for all
  * IPC handlers. Automatically logs handler execution and errors, validates
@@ -183,12 +186,17 @@ export function createValidationResponse(
  * format.
  *
  * @example
+ *
  * ```typescript
- * const result = await withIpcHandler(
- *   "get-sites",
- *   async () => this.uptimeOrchestrator.getSites()
+ * const result = await withIpcHandler("get-sites", async () =>
+ *     this.uptimeOrchestrator.getSites()
  * );
  * ```
+ *
+ * @param channelName - Name of the IPC channel
+ * @param handler - The handler function to wrap
+ *
+ * @returns The wrapped handler result
  *
  * @public
  */
@@ -242,26 +250,28 @@ export async function withIpcHandler<T>(
  * Wraps an IPC handler with parameter validation, standardized error handling,
  * and response formatting.
  *
+ * @remarks
+ * Extended version of withIpcHandler that includes parameter validation.
+ * Validates parameters before executing the handler and provides detailed error
+ * messages.
+ *
+ * @example
+ *
+ * ```typescript
+ * const result = await withIpcHandlerValidation(
+ *     "add-site",
+ *     async (site: Site) => this.uptimeOrchestrator.addSite(site),
+ *     (params) => IpcValidators.requiredObject(params[0], "site"),
+ *     [siteData]
+ * );
+ * ```
+ *
  * @param channelName - Name of the IPC channel
  * @param handler - The handler function to wrap
  * @param validateParams - Parameter validation function
  * @param params - The parameters to validate and pass to the handler
+ *
  * @returns The wrapped handler result
- *
- * @remarks
- * Extended version of withIpcHandler that includes parameter validation.
- * Validates parameters before executing the handler and provides detailed
- * error messages.
- *
- * @example
- * ```typescript
- * const result = await withIpcHandlerValidation(
- *   "add-site",
- *   async (site: Site) => this.uptimeOrchestrator.addSite(site),
- *   (params) => IpcValidators.requiredObject(params[0], "site"),
- *   [siteData]
- * );
- * ```
  *
  * @public
  */
@@ -332,25 +342,26 @@ export async function withIpcHandlerValidation<T>(
  * Registers a standardized IPC handler with consistent error handling and
  * response formatting.
  *
+ * @remarks
+ * Registers an IPC handler with the electron ipcMain, automatically wrapping it
+ * with standardized error handling, logging, and response formatting. All
+ * responses will follow the IpcResponse interface for consistency.
+ *
+ * @example
+ *
+ * ```typescript
+ * registerStandardizedIpcHandler(
+ *     "get-sites",
+ *     async () => this.uptimeOrchestrator.getSites(),
+ *     null,
+ *     this.registeredIpcHandlers
+ * );
+ * ```
+ *
  * @param channelName - Name of the IPC channel
  * @param handler - The handler function
  * @param validateParams - Optional parameter validation function
  * @param registeredHandlers - Set to track registered handlers for cleanup
- *
- * @remarks
- * Registers an IPC handler with the electron ipcMain, automatically wrapping
- * it with standardized error handling, logging, and response formatting. All
- * responses will follow the IpcResponse interface for consistency.
- *
- * @example
- * ```typescript
- * registerStandardizedIpcHandler(
- *   "get-sites",
- *   async () => this.uptimeOrchestrator.getSites(),
- *   null,
- *   this.registeredIpcHandlers
- * );
- * ```
  *
  * @public
  */

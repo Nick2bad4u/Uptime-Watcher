@@ -1,6 +1,6 @@
 /**
- * ThemeManager class for handling theme selection, system preference
- * detection, and theme switching throughout the application.
+ * ThemeManager class for handling theme selection, system preference detection,
+ * and theme switching throughout the application.
  *
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
@@ -14,17 +14,16 @@ import { themes } from "./themes";
 import { deepMergeTheme } from "./utils/themeMerging";
 
 /**
- * Singleton service for managing application themes.
- * Handles theme selection, system preference detection, and automatic
- * switching.
+ * Singleton service for managing application themes. Handles theme selection,
+ * system preference detection, and automatic switching.
  */
 export class ThemeManager {
     /** Singleton instance */
     private static instance: ThemeManager | undefined;
 
     /**
-     * Get the singleton instance of ThemeManager.
-     * Creates the instance if it doesn't exist.
+     * Get the singleton instance of ThemeManager. Creates the instance if it
+     * doesn't exist.
      *
      * @returns ThemeManager singleton instance
      */
@@ -54,15 +53,16 @@ export class ThemeManager {
     /**
      * Create a custom theme based on an existing theme.
      *
-     * @param baseTheme - The base theme to extend from
-     * @param overrides - Partial theme object with properties to override
-     * @returns New theme with deep-merged properties
-     *
      * @remarks
      * This method performs a deep merge of the override properties into the
      * base theme, ensuring that nested objects are properly merged rather than
      * replaced entirely. This allows for granular customization while
      * preserving unmodified properties.
+     *
+     * @param baseTheme - The base theme to extend from
+     * @param overrides - Partial theme object with properties to override
+     *
+     * @returns New theme with deep-merged properties
      */
     public createCustomTheme(
         baseTheme: Theme,
@@ -89,11 +89,11 @@ export class ThemeManager {
     /**
      * Get all available theme names.
      *
-     * @returns Array of available theme names including system
-     *
      * @remarks
      * Dynamically generates the list from the themes object to ensure
      * consistency. Always includes "system" for automatic theme detection.
+     *
+     * @returns Array of available theme names including system
      */
     public getAvailableThemes(): ThemeName[] {
         const themeNames = Object.keys(themes) as ThemeName[];
@@ -101,15 +101,15 @@ export class ThemeManager {
     }
 
     /**
-     * Get system theme preference from OS/browser settings.
-     * Uses CSS media query to detect dark mode preference.
-     *
-     * @returns "dark" if user prefers dark mode, "light" otherwise
+     * Get system theme preference from OS/browser settings. Uses CSS media
+     * query to detect dark mode preference.
      *
      * @remarks
-     * In SSR or non-browser environments where window is undefined,
-     * this method will fallback to "light" theme as the default.
-     * This ensures safe operation across all deployment environments.
+     * In SSR or non-browser environments where window is undefined, this method
+     * will fallback to "light" theme as the default. This ensures safe
+     * operation across all deployment environments.
+     *
+     * @returns Dark if user prefers dark mode, "light" otherwise
      */
     public getSystemThemePreference(): "dark" | "light" {
         if (typeof window !== "undefined" && window.matchMedia) {
@@ -121,10 +121,11 @@ export class ThemeManager {
     }
 
     /**
-     * Get theme by name, with automatic system theme detection.
-     * Handles "system" theme by detecting user's OS preference.
+     * Get theme by name, with automatic system theme detection. Handles
+     * "system" theme by detecting user's OS preference.
      *
      * @param name - Theme name to retrieve
+     *
      * @returns Theme object containing colors, typography, and spacing
      */
     public getTheme(name: ThemeName): Theme {
@@ -145,10 +146,11 @@ export class ThemeManager {
     }
 
     /**
-     * Listen for system theme changes and call callback when detected.
-     * Useful for automatic theme switching when user changes OS settings.
+     * Listen for system theme changes and call callback when detected. Useful
+     * for automatic theme switching when user changes OS settings.
      *
      * @param callback - Function to call when system theme changes
+     *
      * @returns Cleanup function to remove the event listener
      */
     public onSystemThemeChange(
@@ -368,11 +370,11 @@ export class ThemeManager {
     /**
      * Apply theme classes to document elements.
      *
-     * @param theme - Theme to apply classes for
-     *
      * @remarks
-     * Safely removes old theme classes and applies new ones.
-     * Includes safety checks for SSR and non-browser environments.
+     * Safely removes old theme classes and applies new ones. Includes safety
+     * checks for SSR and non-browser environments.
+     *
+     * @param theme - Theme to apply classes for
      */
     private applyThemeClasses(theme: Theme): void {
         if (typeof document === "undefined") {
@@ -472,21 +474,22 @@ export class ThemeManager {
  * Global theme manager singleton instance.
  *
  * @remarks
- * Provides convenient access to theme management functionality throughout
- * the application. This singleton ensures consistent theme state and
- * provides a centralized API for theme operations.
+ * Provides convenient access to theme management functionality throughout the
+ * application. This singleton ensures consistent theme state and provides a
+ * centralized API for theme operations.
  *
  * @example
+ *
  * ```typescript
- * import { themeManager } from './ThemeManager';
+ * import { themeManager } from "./ThemeManager";
  *
  * // Apply a theme
- * const theme = themeManager.getTheme('dark');
+ * const theme = themeManager.getTheme("dark");
  * themeManager.applyTheme(theme);
  *
  * // Listen for system theme changes
  * const cleanup = themeManager.onSystemThemeChange((isDark) => {
- *   console.log('System theme changed:', isDark ? 'dark' : 'light');
+ *     console.log("System theme changed:", isDark ? "dark" : "light");
  * });
  * ```
  *

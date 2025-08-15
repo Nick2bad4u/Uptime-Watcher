@@ -1,6 +1,6 @@
 /**
- * Themed text component with comprehensive typography styling options and
- * theme integration.
+ * Themed text component with comprehensive typography styling options and theme
+ * integration.
  *
  * @remarks
  * This component provides a flexible text element with full control over
@@ -9,41 +9,28 @@
  * styling across the application. The component supports various semantic
  * styling variants for different contexts (primary, secondary, error, etc.).
  *
- * @example
- * Heading text with custom styling:
+ * @example Heading text with custom styling:
+ *
  * ```tsx
- * <ThemedText
- *   size="xl"
- *   weight="bold"
- *   variant="primary"
- *   align="center"
- * >
- *   Site Status Dashboard
- * </ThemedText>
+ * <ThemedText size="xl" weight="bold" variant="primary" align="center">
+ *     Site Status Dashboard
+ * </ThemedText>;
  * ```
  *
- * @example
- * Error message text:
+ * @example Error message text:
+ *
  * ```tsx
- * <ThemedText
- *   variant="error"
- *   size="sm"
- *   weight="medium"
- * >
- *   Unable to connect to server
- * </ThemedText>
+ * <ThemedText variant="error" size="sm" weight="medium">
+ *     Unable to connect to server
+ * </ThemedText>;
  * ```
  *
- * @example
- * Subtitle with secondary styling:
+ * @example Subtitle with secondary styling:
+ *
  * ```tsx
- * <ThemedText
- *   variant="secondary"
- *   size="base"
- *   className="mt-2"
- * >
- *   Last updated: {lastUpdatedTime}
- * </ThemedText>
+ * <ThemedText variant="secondary" size="base" className="mt-2">
+ *     Last updated: {lastUpdatedTime}
+ * </ThemedText>;
  * ```
  *
  * @public
@@ -83,23 +70,21 @@ const DEFAULT_THEMED_BOX_STYLE = {};
  *
  * @remarks
  * This component provides a flexible text element with CSS class-based styling
- * that integrates with the theme system. It automatically generates
- * appropriate class names based on the provided variant, size, weight, and
- * alignment options.
+ * that integrates with the theme system. It automatically generates appropriate
+ * class names based on the provided variant, size, weight, and alignment
+ * options.
+ *
+ * @example Status text with dynamic variant:
+ *
+ * ```tsx
+ * <ThemedText variant={isOnline ? "success" : "error"} weight="medium">
+ *     {isOnline ? "Online" : "Offline"}
+ * </ThemedText>;
+ * ```
  *
  * @param props - The component properties
- * @returns The themed text JSX element
  *
- * @example
- * Status text with dynamic variant:
- * ```tsx
- * <ThemedText
- *   variant={isOnline ? "success" : "error"}
- *   weight="medium"
- * >
- *   {isOnline ? "Online" : "Offline"}
- * </ThemedText>
- * ```
+ * @returns The themed text JSX element
  *
  * @public
  */

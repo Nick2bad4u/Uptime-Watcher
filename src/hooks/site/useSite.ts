@@ -8,8 +8,8 @@ import { type SiteMonitorResult, useSiteMonitor } from "./useSiteMonitor";
 import { type SiteStats, useSiteStats } from "./useSiteStats";
 
 /**
- * Combined result interface for the useSite hook.
- * Merges data and functionality from all site-related hooks.
+ * Combined result interface for the useSite hook. Merges data and functionality
+ * from all site-related hooks.
  *
  * @public
  */
@@ -25,21 +25,19 @@ export interface UseSiteResult
  * A comprehensive hook that combines site monitoring, actions, statistics, and
  * UI state
  *
- * @param site - The site to work with
- * @returns Combined data and functionality from all site-related hooks
- * @see {@link UseSiteResult} for the complete interface specification
- *
  * @remarks
  * This hook serves as a composition layer that combines:
+ *
  * - Monitor data and selection (from useSiteMonitor)
  * - Site statistics and analytics (from useSiteStats)
  * - Action handlers for site operations (from useSiteActions)
  * - UI loading state (from useErrorStore)
  *
- * Property precedence: Actions → Monitor → Stats → Loading state.
- * The isLoading property is added last and will not be overwritten.
+ * Property precedence: Actions → Monitor → Stats → Loading state. The isLoading
+ * property is added last and will not be overwritten.
  *
  * @example
+ *
  * ```tsx
  * function SiteCard({ site }) {
  *   const {
@@ -63,6 +61,12 @@ export interface UseSiteResult
  *   );
  * }
  * ```
+ *
+ * @param site - The site to work with
+ *
+ * @returns Combined data and functionality from all site-related hooks
+ *
+ * @see {@link UseSiteResult} for the complete interface specification
  */
 export function useSite(site: Site): UseSiteResult {
     // Get monitor data

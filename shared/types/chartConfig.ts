@@ -337,8 +337,8 @@ export interface CompleteChartConfig {
  * Interface for default chart themes configuration.
  *
  * @remarks
- * Defines the structure for the DEFAULT_CHART_THEMES constant,
- * supporting both dark and light theme configurations.
+ * Defines the structure for the DEFAULT_CHART_THEMES constant, supporting both
+ * dark and light theme configurations.
  *
  * @public
  */
@@ -367,6 +367,7 @@ export interface DefaultChartThemes {
  * Type guard to check if an object has plugins configuration.
  *
  * @param config - Object to check
+ *
  * @returns True if the object has plugins configuration
  *
  * @public
@@ -386,6 +387,7 @@ export function hasPlugins(
  * Type guard to check if an object has scales configuration.
  *
  * @param config - Object to check
+ *
  * @returns True if the object has scales configuration
  *
  * @public

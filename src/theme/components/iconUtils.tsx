@@ -4,7 +4,9 @@ import type React from "react";
  * Get the CSS class for an icon color
  *
  * @param color - The color name
+ *
  * @returns The CSS class or undefined if no class exists
+ *
  * @internal
  */
 export function getIconColorClass(color?: string): string | undefined {
@@ -44,6 +46,7 @@ export function getIconColorClass(color?: string): string | undefined {
  *
  * @param icon - React icon element
  * @param color - Color name or custom color value
+ *
  * @returns Colored icon wrapped in span
  *
  * @internal

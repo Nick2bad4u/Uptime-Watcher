@@ -18,13 +18,13 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  *
  * @remarks
  * This function provides comprehensive string conversion logic:
+ *
  * - Returns an empty string for `null` or `undefined`.
  * - Returns the value as-is if it is already a string.
  * - Converts numbers and booleans using `String()`.
  * - For objects, attempts to use {@link safeJsonStringifyWithFallback} for
- * serialization.
- *   If serialization fails (e.g., circular references), returns a descriptive
- *   placeholder.
+ *   serialization. If serialization fails (e.g., circular references), returns
+ *   a descriptive placeholder.
  * - For functions, returns the string `"[Function]"`.
  * - For symbols, returns the result of `Symbol.prototype.toString()`.
  * - For all other types, returns `"[Unknown Type]"`.
@@ -34,6 +34,7 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * database storage where type safety and clarity are required.
  *
  * @example
+ *
  * ```typescript
  * safeStringify(null); // ""
  * safeStringify("hello"); // "hello"
@@ -41,11 +42,13 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * safeStringify({ a: 1 }); // '{"a":1}'
  * safeStringify(() => {}); // "[Function]"
  * safeStringify(Symbol("test")); // "Symbol(test)"
- * const circular: any = {}; circular.self = circular;
+ * const circular: any = {};
+ * circular.self = circular;
  * safeStringify(circular); // "[Complex Object]"
  * ```
  *
  * @param value - The value to convert to a string. Can be any JavaScript type.
+ *
  * @returns The string representation of the input value.
  *
  * @see {@link safeJsonStringifyWithFallback}

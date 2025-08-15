@@ -9,6 +9,7 @@
  * while improving maintainability and preventing typos.
  *
  * The error messages are categorized by functional domain:
+ *
  * - **Site Operations**: Site CRUD and management operations
  * - **Monitor Operations**: Monitor configuration and management
  * - **Validation Errors**: Data validation and constraint violations
@@ -17,6 +18,7 @@
  * - **Database Errors**: Data persistence and retrieval errors
  *
  * @example
+ *
  * ```typescript
  * import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
  *
@@ -32,8 +34,8 @@
  * Site-related error messages.
  *
  * @remarks
- * Error messages for site CRUD operations, configuration management,
- * and site-level monitoring operations.
+ * Error messages for site CRUD operations, configuration management, and
+ * site-level monitoring operations.
  *
  * @public
  */
@@ -67,8 +69,8 @@ export const SITE_ERRORS = {
  * Monitor-related error messages.
  *
  * @remarks
- * Error messages for monitor operations, configuration validation,
- * and monitor lifecycle management.
+ * Error messages for monitor operations, configuration validation, and monitor
+ * lifecycle management.
  *
  * @public
  */
@@ -115,8 +117,8 @@ export const MONITOR_ERRORS = {
  * Validation-related error messages.
  *
  * @remarks
- * Error messages for data validation, constraint violations,
- * and input validation errors.
+ * Error messages for data validation, constraint violations, and input
+ * validation errors.
  *
  * @public
  */
@@ -156,8 +158,8 @@ export const VALIDATION_ERRORS = {
  * System-related error messages.
  *
  * @remarks
- * Error messages for general system operations, infrastructure issues,
- * and application-level errors.
+ * Error messages for general system operations, infrastructure issues, and
+ * application-level errors.
  *
  * @public
  */
@@ -195,8 +197,8 @@ export const SYSTEM_ERRORS = {
  * Network-related error messages.
  *
  * @remarks
- * Error messages for network operations, connectivity issues,
- * and communication errors.
+ * Error messages for network operations, connectivity issues, and communication
+ * errors.
  *
  * @public
  */
@@ -236,8 +238,8 @@ export const NETWORK_ERRORS = {
  * Database-related error messages.
  *
  * @remarks
- * Error messages for database operations, data persistence issues,
- * and data integrity errors.
+ * Error messages for database operations, data persistence issues, and data
+ * integrity errors.
  *
  * @public
  */
@@ -280,8 +282,8 @@ export const DATABASE_ERRORS = {
  * IPC (Inter-Process Communication) error messages.
  *
  * @remarks
- * Error messages for IPC operations, validation, and communication between
- * main and renderer processes.
+ * Error messages for IPC operations, validation, and communication between main
+ * and renderer processes.
  *
  * @public
  */
@@ -315,9 +317,9 @@ export interface ErrorCatalogInterface {
  * Comprehensive error message catalog organized by domain.
  *
  * @remarks
- * This catalog provides all error messages organized by functional domain
- * for easy access and consistent usage across the application. Each domain
- * contains related error messages that can be used throughout the codebase.
+ * This catalog provides all error messages organized by functional domain for
+ * easy access and consistent usage across the application. Each domain contains
+ * related error messages that can be used throughout the codebase.
  *
  * @public
  */
@@ -335,8 +337,8 @@ export const ERROR_CATALOG: ErrorCatalogInterface = {
  * Type representing all possible error message values.
  *
  * @remarks
- * Union type of all error message strings from the catalog,
- * useful for type-safe error handling and message validation.
+ * Union type of all error message strings from the catalog, useful for
+ * type-safe error handling and message validation.
  *
  * @public
  */
@@ -352,21 +354,28 @@ export type ErrorMessage =
 /**
  * Helper function to create parameterized error messages.
  *
- * @param template - Error message template with placeholders
- * @param params - Parameters to substitute in the template
- * @returns Formatted error message string
- *
  * @example
+ *
  * ```typescript
- * const message = formatErrorMessage("Invalid monitor status: {status}", { status: "invalid" });
+ * const message = formatErrorMessage("Invalid monitor status: {status}", {
+ *     status: "invalid",
+ * });
  * // Returns: "Invalid monitor status: invalid"
  *
- * const message = formatErrorMessage("Validator error for event '{event}': {error}", {
- *   event: "user:login",
- *   error: "User ID required"
- * });
+ * const message = formatErrorMessage(
+ *     "Validator error for event '{event}': {error}",
+ *     {
+ *         event: "user:login",
+ *         error: "User ID required",
+ *     }
+ * );
  * // Returns: "Validator error for event 'user:login': User ID required"
  * ```
+ *
+ * @param template - Error message template with placeholders
+ * @param params - Parameters to substitute in the template
+ *
+ * @returns Formatted error message string
  *
  * @public
  */
@@ -385,15 +394,17 @@ export function formatErrorMessage(
 /**
  * Helper function to get error message by category and key.
  *
- * @param category - Error category (e.g., "sites", "monitors")
- * @param key - Error key within the category
- * @returns Error message string
- *
  * @example
+ *
  * ```typescript
  * const message = getErrorMessage("sites", "NOT_FOUND");
  * // Returns: "Site not found"
  * ```
+ *
+ * @param category - Error category (e.g., "sites", "monitors")
+ * @param key - Error key within the category
+ *
+ * @returns Error message string
  *
  * @public
  */
@@ -402,6 +413,7 @@ export function formatErrorMessage(
  * Helper function to check if a string is a valid error message.
  *
  * @param message - String to check
+ *
  * @returns True if the string matches a known error message
  *
  * @public

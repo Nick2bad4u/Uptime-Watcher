@@ -28,17 +28,15 @@ export interface SaveButtonProps {
 /**
  * Standardized save button with consistent styling and behavior
  *
- * @param props - SaveButton props
- * @returns Themed save button component
- *
  * @example
+ *
  * ```tsx
- * <SaveButton
- *   disabled={!hasChanges}
- *   onClick={handleSave}
- *   size="sm"
- * />
+ * <SaveButton disabled={!hasChanges} onClick={handleSave} size="sm" />;
  * ```
+ *
+ * @param props - SaveButton props
+ *
+ * @returns Themed save button component
  */
 export const SaveButton: React.FC<SaveButtonProps> = ({
     "aria-label": ariaLabel = "Save changes",

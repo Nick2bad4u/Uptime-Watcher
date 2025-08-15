@@ -28,17 +28,20 @@ export interface HistoryChartProps {
 }
 
 /**
- * Reusable history chart component for visualizing status history.
- * Can be used anywhere we need to show historical data.
+ * Reusable history chart component for visualizing status history. Can be used
+ * anywhere we need to show historical data.
  *
  * Features:
+ *
  * - Responsive layout using CSS
  * - Memoized to prevent unnecessary re-renders
  * - Configurable item limit
  * - Graceful handling of empty data
  *
  * @param props - HistoryChart component props
- * @returns JSX element containing the history chart, or null if no data (following React conventions for conditional rendering)
+ *
+ * @returns JSX element containing the history chart, or null if no data
+ *   (following React conventions for conditional rendering)
  */
 export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
     React.memo(function HistoryChart({

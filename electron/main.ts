@@ -2,9 +2,9 @@
  * Main entry point for the Electron application.
  *
  * @remarks
- * Sets up logging, initializes the application service, and configures
- * shutdown handlers for graceful cleanup. Uses context isolation and preload
- * scripts for secure logging.
+ * Sets up logging, initializes the application service, and configures shutdown
+ * handlers for graceful cleanup. Uses context isolation and preload scripts for
+ * secure logging.
  *
  * @packageDocumentation
  */
@@ -108,6 +108,7 @@ log.transports.console.format = LOG_CONSOLE_FORMAT;
 if (isDev()) {
     /**
      * Handle hot reload messages from vite-plugin-electron
+     *
      * @param msg - Message from the plugin
      */
     const handleHotReload = (msg: unknown): void => {
@@ -133,13 +134,12 @@ if (isDev()) {
  * Main application class that initializes and manages the Electron app.
  *
  * @remarks
- * Uses a modular {@link ApplicationService} for clean separation of concerns
- * and follows the single responsibility principle. Handles application
- * lifecycle management, including initialization, cleanup, and graceful
- * shutdown.
+ * Uses a modular {@link ApplicationService} for clean separation of concerns and
+ * follows the single responsibility principle. Handles application lifecycle
+ * management, including initialization, cleanup, and graceful shutdown.
  *
- * Ensures that cleanup is performed only once, even if multiple shutdown
- * events are triggered, to prevent resource leaks and errors.
+ * Ensures that cleanup is performed only once, even if multiple shutdown events
+ * are triggered, to prevent resource leaks and errors.
  */
 class Main {
     /** Application service instance for managing app lifecycle and features */
@@ -189,14 +189,14 @@ class Main {
      *
      * @remarks
      * Sets up logging, creates the application service, and configures cleanup
-     * handlers. Establishes event listeners for both Node.js process events
-     * and Electron app events to ensure proper cleanup in all shutdown
-     * scenarios.
+     * handlers. Establishes event listeners for both Node.js process events and
+     * Electron app events to ensure proper cleanup in all shutdown scenarios.
      *
      * The cleanup is designed to be idempotent—safe to call multiple times
      * without side effects or errors.
      *
-     * @throws {@link Error} If cleanup fails, the error is logged and re-thrown.
+     * @throws {@link Error} If cleanup fails, the error is logged and
+     *   re-thrown.
      */
     public constructor() {
         logger.info("Starting Uptime Watcher application");
@@ -213,8 +213,8 @@ class Main {
     }
 
     /**
-     * Removes event listeners to prevent memory leaks.
-     * Called during application shutdown.
+     * Removes event listeners to prevent memory leaks. Called during
+     * application shutdown.
      */
     public removeEventListeners(): void {
         process.off("beforeExit", this.handleProcessExit);
@@ -225,9 +225,9 @@ class Main {
 // Start the application
 /**
  * @remarks
- * Intentionally not assigning the Main instance to a variable.
- * This ensures the instance persists for the application's lifetime,
- * preventing premature garbage collection and maintaining lifecycle handlers.
+ * Intentionally not assigning the Main instance to a variable. This ensures the
+ * instance persists for the application's lifetime, preventing premature
+ * garbage collection and maintaining lifecycle handlers.
  */
 if (process.versions.electron) {
     // eslint-disable-next-line sonarjs/constructor-for-side-effects, no-new -- Main instance needed for lifecycle management
@@ -243,12 +243,14 @@ if (process.versions.electron) {
      * requires the app to be ready. In development, these extensions enhance
      * debugging capabilities.
      *
-     * @returns Promise\<Array\<\{id: string; name: string\}\>\> The installed extension references, or an empty array in production or on failure.
-     *
      * @example
+     *
      * ```typescript
      * // Extensions are installed automatically in development mode.
      * ```
+     *
+     * @returns Promise<Array<{id: string; name: string}>> The installed
+     *   extension references, or an empty array in production or on failure.
      */
     void (async (): Promise<void> => {
         await app.whenReady();

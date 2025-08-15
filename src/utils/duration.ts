@@ -1,9 +1,10 @@
 /**
- * Utility function to calculate the maximum duration for monitoring checks
- * with retry attempts and exponential backoff.
+ * Utility function to calculate the maximum duration for monitoring checks with
+ * retry attempts and exponential backoff.
  *
  * @param timeout - Timeout value per attempt in seconds
  * @param retryAttempts - Number of retry attempts
+ *
  * @returns Formatted duration string (e.g., "30s", "2m")
  */
 export function calculateMaxDuration(

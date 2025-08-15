@@ -17,8 +17,8 @@ import {
  * application settings persistence.
  *
  * @remarks
- * Provides the required DatabaseService for all settings operations.
- * This interface is used for dependency injection to ensure proper service
+ * Provides the required DatabaseService for all settings operations. This
+ * interface is used for dependency injection to ensure proper service
  * coupling.
  *
  * @public
@@ -37,7 +37,9 @@ export interface SettingsRepositoryDependencies {
  * Common SQL queries for settings persistence operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * Centralizes query strings for maintainability and consistency. This constant
+ * is internal to the repository and not exported.
+ *
  * @internal
  */
 const SETTINGS_QUERIES = {
@@ -56,7 +58,10 @@ const SETTINGS_QUERIES = {
  * repository pattern.
  *
  * @remarks
- * All operations are wrapped in transactions and use the repository pattern for consistency, error handling, and maintainability. This class should be used as the sole interface for settings data access and mutation.
+ * All operations are wrapped in transactions and use the repository pattern for
+ * consistency, error handling, and maintainability. This class should be used
+ * as the sole interface for settings data access and mutation.
+ *
  * @public
  */
 export class SettingsRepository {
@@ -66,15 +71,20 @@ export class SettingsRepository {
     /**
      * Bulk inserts settings (for import functionality).
      *
-     * @param settings - Key-value pairs to insert.
-     * @returns A promise that resolves when all settings are inserted.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a prepared statement and transaction for better performance.
+     *
      * @example
+     *
      * ```typescript
      * await repo.bulkInsert({ theme: "dark", language: "en" });
      * ```
+     *
+     * @param settings - Key-value pairs to insert.
+     *
+     * @returns A promise that resolves when all settings are inserted.
+     *
+     * @throws Error if the database operation fails.
      */
     public async bulkInsert(settings: Record<string, string>): Promise<void> {
         const entries = Object.entries(settings);
@@ -97,13 +107,17 @@ export class SettingsRepository {
     /**
      * Deletes a setting by key.
      *
-     * @param key - The setting key to delete.
-     * @returns A promise that resolves when the setting is deleted.
-     * @throws Error if the database operation fails.
      * @example
+     *
      * ```typescript
      * await repo.delete("theme");
      * ```
+     *
+     * @param key - The setting key to delete.
+     *
+     * @returns A promise that resolves when the setting is deleted.
+     *
+     * @throws Error if the database operation fails.
      */
     public async delete(key: string): Promise<void> {
         return withDatabaseOperation(
@@ -121,12 +135,15 @@ export class SettingsRepository {
     /**
      * Clears all settings from the database.
      *
-     * @returns A promise that resolves when all settings are deleted.
-     * @throws Error if the database operation fails.
      * @example
+     *
      * ```typescript
      * await repo.deleteAll();
      * ```
+     *
+     * @returns A promise that resolves when all settings are deleted.
+     *
+     * @throws Error if the database operation fails.
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
@@ -142,13 +159,18 @@ export class SettingsRepository {
     /**
      * Gets a setting by key.
      *
-     * @param key - The setting key to retrieve.
-     * @returns A promise resolving to the setting value or `undefined` if not found.
-     * @throws Error if the database operation fails.
      * @example
+     *
      * ```typescript
      * const theme = await repo.get("theme");
      * ```
+     *
+     * @param key - The setting key to retrieve.
+     *
+     * @returns A promise resolving to the setting value or `undefined` if not
+     *   found.
+     *
+     * @throws Error if the database operation fails.
      */
     public async get(key: string): Promise<string | undefined> {
         return withDatabaseOperation(() => {
@@ -163,14 +185,21 @@ export class SettingsRepository {
     /**
      * Gets all settings.
      *
-     * @returns A promise resolving to all settings as key-value pairs.
-     * @throws Error if the database operation fails.
      * @remarks
-     * **Performance Note**: Settings tables are typically small (under 100 entries) by design. No pagination is needed as settings are configuration data, not user-generated content. If settings grow beyond expected size, consider splitting into separate configuration domains.
+     * **Performance Note**: Settings tables are typically small (under 100
+     * entries) by design. No pagination is needed as settings are configuration
+     * data, not user-generated content. If settings grow beyond expected size,
+     * consider splitting into separate configuration domains.
+     *
      * @example
+     *
      * ```typescript
      * const allSettings = await repo.getAll();
      * ```
+     *
+     * @returns A promise resolving to all settings as key-value pairs.
+     *
+     * @throws Error if the database operation fails.
      */
     public async getAll(): Promise<Record<string, string>> {
         return withDatabaseOperation(() => {
@@ -186,14 +215,18 @@ export class SettingsRepository {
     /**
      * Sets a setting value.
      *
-     * @param key - The setting key to set.
-     * @param value - The setting value to store.
-     * @returns A promise that resolves when the setting is saved.
-     * @throws Error if the database operation fails.
      * @example
+     *
      * ```typescript
      * await repo.set("theme", "dark");
      * ```
+     *
+     * @param key - The setting key to set.
+     * @param value - The setting value to store.
+     *
+     * @returns A promise that resolves when the setting is saved.
+     *
+     * @throws Error if the database operation fails.
      */
     public async set(key: string, value: string): Promise<void> {
         return withDatabaseOperation(
@@ -211,11 +244,13 @@ export class SettingsRepository {
     /**
      * Constructs a new SettingsRepository instance.
      *
-     * @param dependencies - The required dependencies for settings operations.
      * @example
+     *
      * ```typescript
      * const repo = new SettingsRepository({ databaseService });
      * ```
+     *
+     * @param dependencies - The required dependencies for settings operations.
      */
     public constructor(dependencies: SettingsRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
@@ -224,9 +259,6 @@ export class SettingsRepository {
     /**
      * Bulk inserts settings within an existing transaction context.
      *
-     * @param db - The database connection (must be within an active transaction).
-     * @param settings - Key-value pairs to insert.
-     * @throws Error when database operations fail.
      * @remarks
      * **IMPORTANT**: This method must be called within an existing transaction
      * context.
@@ -237,6 +269,12 @@ export class SettingsRepository {
      *
      * **Performance**: Uses prepared statements for optimal bulk insert
      * performance.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param settings - Key-value pairs to insert.
+     *
+     * @throws Error when database operations fail.
      */
     public bulkInsertInternal(
         db: Database,
@@ -267,9 +305,11 @@ export class SettingsRepository {
      * Clears all settings from the database within an existing transaction
      * context.
      *
-     * @param db - The database connection (must be within an active transaction).
      * @remarks
      * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
      */
     public deleteAllInternal(db: Database): void {
         db.run(SETTINGS_QUERIES.DELETE_ALL);
@@ -279,10 +319,12 @@ export class SettingsRepository {
     /**
      * Deletes a setting by key within an existing transaction context.
      *
-     * @param db - The database connection (must be within an active transaction).
-     * @param key - The setting key to delete.
      * @remarks
      * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param key - The setting key to delete.
      */
     public deleteInternal(db: Database, key: string): void {
         db.run(SETTINGS_QUERIES.DELETE_BY_KEY, [key]);
@@ -296,11 +338,13 @@ export class SettingsRepository {
     /**
      * Sets a setting value within an existing transaction context.
      *
-     * @param db - The database connection (must be within an active transaction).
-     * @param key - The setting key to set.
-     * @param value - The setting value to store.
      * @remarks
      * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param key - The setting key to set.
+     * @param value - The setting value to store.
      */
     public setInternal(db: Database, key: string, value: string): void {
         db.run(SETTINGS_QUERIES.INSERT_OR_REPLACE, [key, value]);
@@ -314,13 +358,15 @@ export class SettingsRepository {
     /**
      * Gets the database instance for internal repository operations.
      *
-     * @returns The database connection from the {@link DatabaseService}.
-     * @throws Error if the database is not initialized.
      * @remarks
      * **Usage Pattern**: Only used for read operations and internal methods.
      * All mutations must use executeTransaction() for proper transaction
      * management. Caller must ensure DatabaseService.initialize() was called
      * first.
+     *
+     * @returns The database connection from the {@link DatabaseService}.
+     *
+     * @throws Error if the database is not initialized.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();

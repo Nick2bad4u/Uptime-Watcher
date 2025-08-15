@@ -3,9 +3,9 @@
  *
  * @remarks
  * These interfaces provide type-safe configuration structures for different
- * monitor types. Each monitor type has its own specific configuration
- * interface that extends the base configuration. This ensures proper
- * validation and type checking throughout the monitoring system.
+ * monitor types. Each monitor type has its own specific configuration interface
+ * that extends the base configuration. This ensures proper validation and type
+ * checking throughout the monitoring system.
  *
  * @packageDocumentation
  */
@@ -212,9 +212,8 @@ export interface PingMonitorConfig extends BaseMonitorConfig {
  * Monitor configuration validation result.
  *
  * @remarks
- * Used to return validation results for monitor configurations.
- * Import directly from "./validation" for MonitorConfigValidationResult if
- * needed.
+ * Used to return validation results for monitor configurations. Import directly
+ * from "./validation" for MonitorConfigValidationResult if needed.
  *
  * @public
  */
@@ -267,6 +266,7 @@ export type MonitorConfig =
  * Type guard to check if configuration is for HTTP monitors.
  *
  * @param config - The monitor configuration to check
+ *
  * @returns True if the configuration is for an HTTP monitor
  *
  * @public
@@ -281,6 +281,7 @@ export function isHttpMonitorConfig(
  * Type guard to check if configuration is for ping monitors.
  *
  * @param config - The monitor configuration to check
+ *
  * @returns True if the configuration is for a ping monitor
  *
  * @public
@@ -295,6 +296,7 @@ export function isPingMonitorConfig(
  * Type guard to check if configuration is for port monitors.
  *
  * @param config - The monitor configuration to check
+ *
  * @returns True if the configuration is for a port monitor
  *
  * @public

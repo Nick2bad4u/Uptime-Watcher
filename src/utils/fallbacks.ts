@@ -1,6 +1,6 @@
 /**
- * Centralized fallback and default value utilities.
- * Provides type-safe fallback handling across the application.
+ * Centralized fallback and default value utilities. Provides type-safe fallback
+ * handling across the application.
  */
 
 import type { Monitor } from "@shared/types";
@@ -9,10 +9,11 @@ import logger from "../services/logger";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";
 
 /**
- * Enhanced null/undefined check utility.
- * Replaces scattered `value === null || value === undefined` patterns.
+ * Enhanced null/undefined check utility. Replaces scattered `value === null ||
+ * value === undefined` patterns.
  *
  * @param value - Value to check
+ *
  * @returns Whether value is null or undefined
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
@@ -20,11 +21,12 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
 }
 
 /**
- * Type-safe utility for React async event handlers.
- * Prevents void return type issues with async operations.
+ * Type-safe utility for React async event handlers. Prevents void return type
+ * issues with async operations.
  *
  * @param operation - Async operation to execute
  * @param operationName - Name for logging purposes
+ *
  * @returns Sync function suitable for React event handlers
  */
 export function withAsyncErrorHandling(
@@ -42,13 +44,14 @@ export function withAsyncErrorHandling(
 }
 
 /**
- * Synchronous error handling wrapper for operations that don't return
- * promises. Provides consistent error handling and fallback behavior for sync
+ * Synchronous error handling wrapper for operations that don't return promises.
+ * Provides consistent error handling and fallback behavior for sync
  * operations.
  *
  * @param operation - Synchronous operation to execute
  * @param operationName - Name for logging purposes
  * @param fallbackValue - Value to return if operation fails
+ *
  * @returns Result of operation or fallback value
  */
 export function withSyncErrorHandling<T>(
@@ -87,6 +90,7 @@ export const UiDefaults = {
  *
  * @param value - The value to check for null or undefined
  * @param fallback - The fallback value to use if value is null or undefined
+ *
  * @returns The original value if not null/undefined, otherwise the fallback
  */
 export function withFallback<T>(value: null | T | undefined, fallback: T): T {
@@ -105,8 +109,8 @@ export const MonitorDefaults = {
 } as const;
 
 /**
- * Configuration for monitor display identifier generation.
- * Maps monitor types to functions that generate display identifiers.
+ * Configuration for monitor display identifier generation. Maps monitor types
+ * to functions that generate display identifiers.
  */
 const MONITOR_IDENTIFIER_GENERATORS = new Map<
     string,
@@ -116,11 +120,7 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
         "port",
-        (
-            monitor
-        ):
-            | string
-            | undefined =>
+        (monitor): string | undefined =>
             monitor.host && monitor.port
                 ? `${monitor.host}:${monitor.port}`
                 : undefined,
@@ -132,8 +132,8 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 ]);
 
 /**
- * Generate identifier from common monitor fields.
- * Extracted to reduce complexity of main function.
+ * Generate identifier from common monitor fields. Extracted to reduce
+ * complexity of main function.
  */
 function getGenericIdentifier(monitor: Monitor): string | undefined {
     // Check common identifier fields in order of preference
@@ -147,34 +147,42 @@ function getGenericIdentifier(monitor: Monitor): string | undefined {
 }
 
 /**
- * Generate display identifier for a monitor dynamically.
- * Replaces hardcoded backward compatibility patterns.
- *
- * @param monitor - Monitor object
- * @param siteFallback - Fallback site identifier
- * @returns Display identifier string
+ * Generate display identifier for a monitor dynamically. Replaces hardcoded
+ * backward compatibility patterns.
  *
  * @remarks
  * This function uses a configuration-driven approach to support new monitor
  * types without requiring code changes. To add support for a new monitor type:
- * 1. Add an entry to MONITOR_IDENTIFIER_GENERATORS with a function that
- * extracts the identifier 2. The function will automatically use the new
- * generator
+ *
+ * 1. Add an entry to MONITOR_IDENTIFIER_GENERATORS with a function that extracts
+ *    the identifier 2. The function will automatically use the new generator
  *
  * @example
+ *
  * ```typescript
  * // HTTP monitor
- * getMonitorDisplayIdentifier({type: "http", url: "https://example.com"}, "Site");
+ * getMonitorDisplayIdentifier(
+ *     { type: "http", url: "https://example.com" },
+ *     "Site"
+ * );
  * // Returns: "https://example.com"
  *
  * // Port monitor
- * getMonitorDisplayIdentifier({type: "port", host: "example.com", port: 80}, "Site");
+ * getMonitorDisplayIdentifier(
+ *     { type: "port", host: "example.com", port: 80 },
+ *     "Site"
+ * );
  * // Returns: "example.com:80"
  *
  * // Unknown type
- * getMonitorDisplayIdentifier({type: "unknown"}, "My Site");
+ * getMonitorDisplayIdentifier({ type: "unknown" }, "My Site");
  * // Returns: "My Site"
  * ```
+ *
+ * @param monitor - Monitor object
+ * @param siteFallback - Fallback site identifier
+ *
+ * @returns Display identifier string
  */
 export function getMonitorDisplayIdentifier(
     monitor: Monitor,
@@ -200,8 +208,8 @@ export function getMonitorDisplayIdentifier(
 }
 
 /**
- * Configuration for monitor type display labels.
- * This makes it easy to add new monitor types without code changes.
+ * Configuration for monitor type display labels. This makes it easy to add new
+ * monitor types without code changes.
  */
 const MONITOR_TYPE_LABELS = new Map<string, string>([
     ["http", "Website URL"],
@@ -214,24 +222,27 @@ const MONITOR_TYPE_LABELS = new Map<string, string>([
 ]);
 
 /**
- * Generate display label for monitor type dynamically.
- * Replaces hardcoded backward compatibility patterns.
- *
- * @param monitorType - Type of monitor
- * @returns Display label for the monitor type
+ * Generate display label for monitor type dynamically. Replaces hardcoded
+ * backward compatibility patterns.
  *
  * @remarks
  * This function uses a configuration-driven approach to support new monitor
  * types without requiring code changes. To add support for a new monitor type:
+ *
  * 1. Add an entry to MONITOR_TYPE_LABELS
  * 2. The function will automatically use the new label
  *
  * @example
+ *
  * ```typescript
  * getMonitorTypeDisplayLabel("http"); // "Website URL"
  * getMonitorTypeDisplayLabel("port"); // "Host & Port"
  * getMonitorTypeDisplayLabel("unknown"); // "Unknown Monitor"
  * ```
+ *
+ * @param monitorType - Type of monitor
+ *
+ * @returns Display label for the monitor type
  */
 export function getMonitorTypeDisplayLabel(monitorType: string): string {
     return withSyncErrorHandling(
@@ -274,6 +285,7 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
  *
  * @param value - Value to truncate
  * @param maxLength - Maximum length (default: 50)
+ *
  * @returns Truncated string safe for logging
  */
 export function truncateForLogging(value: string, maxLength = 50): string {

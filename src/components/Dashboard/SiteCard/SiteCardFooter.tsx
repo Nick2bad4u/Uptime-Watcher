@@ -1,6 +1,6 @@
 /**
- * Site card footer component.
- * Provides visual hint for card interaction and navigation.
+ * Site card footer component. Provides visual hint for card interaction and
+ * navigation.
  */
 
 import React from "react";
@@ -11,22 +11,25 @@ import ThemedText from "../../../theme/components/ThemedText";
  * Footer section component for site cards with interactive hint text.
  *
  * Features:
+ *
  * - Hover-triggered opacity animation for subtle user guidance
  * - Consistent styling with top border separator
  * - Static content optimized with React.memo
  * - Responsive design with themed text components
  *
- * @returns JSX.Element containing the footer with interaction hint (no props required)
- *
- * @example
- * ```tsx
- * <SiteCardFooter />
- * ```
- *
  * @remarks
  * This component uses group-hover:opacity-100 which requires the parent
  * container to have the Tailwind 'group' class applied. The parent SiteCard
  * component provides this styling context.
+ *
+ * @example
+ *
+ * ```tsx
+ * <SiteCardFooter />;
+ * ```
+ *
+ * @returns JSX.Element containing the footer with interaction hint (no props
+ *   required)
  */
 export const SiteCardFooter: React.NamedExoticComponent<object> = React.memo(
     function SiteCardFooter() {

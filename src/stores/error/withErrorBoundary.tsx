@@ -4,8 +4,8 @@
  * components.
  *
  * @remarks
- * Returns a new component that wraps the given component in an {@link
- * ErrorBoundary}. Supports custom fallback components for error display.
+ * Returns a new component that wraps the given component in an
+ * {@link ErrorBoundary}. Supports custom fallback components for error display.
  * Sets a display name for easier debugging in React DevTools.
  */
 
@@ -30,18 +30,26 @@ interface WrappedErrorBoundaryComponent<P extends object> {
  * protection.
  *
  * @remarks
- * Returns a new component that wraps the given component in an {@link
- * ErrorBoundary}. Supports custom fallback components for error display. Sets
- * a display name for easier debugging in React DevTools.
+ * Returns a new component that wraps the given component in an
+ * {@link ErrorBoundary}. Supports custom fallback components for error display.
+ * Sets a display name for easier debugging in React DevTools.
+ *
+ * @example
+ *
+ * ```tsx
+ * const SafeComponent = withErrorBoundary(
+ *     MyComponent,
+ *     CustomErrorFallback
+ * );
+ * ```
  *
  * @typeParam P - The props type for the wrapped component.
+ *
  * @param Component - The component to wrap with error boundary protection.
  * @param fallback - Optional custom fallback component for error display.
+ *
  * @returns Wrapped component with error boundary functionality.
- * @example
- * ```tsx
- * const SafeComponent = withErrorBoundary(MyComponent, CustomErrorFallback);
- * ```
+ *
  * @public
  */
 const withErrorBoundary = <P extends object>(

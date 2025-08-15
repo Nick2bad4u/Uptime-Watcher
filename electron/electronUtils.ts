@@ -16,26 +16,31 @@ import { app } from "electron";
  *
  * @remarks
  * This function returns `true` only if both:
- * - The `NODE_ENV` environment variable is set to `"development"` (as
- * determined by `isDevelopment()`), and - The Electron app is not packaged
- * (`app.isPackaged` is `false`).
+ *
+ * - The `NODE_ENV` environment variable is set to `"development"` (as determined
+ *   by `isDevelopment()`), and - The Electron app is not packaged
+ *   (`app.isPackaged` is `false`).
  *
  * Use this to distinguish between development and production builds in
  * Electron-specific code, such as enabling hot reload or verbose logging only
  * during development.
  *
- * @returns `true` if running in Electron development mode (unpackaged and `NODE_ENV=development`), otherwise `false`.
- *
  * @example
+ *
  * ```typescript
  * if (isDev()) {
- *   logger.debug("Running in development mode - enabling debug features");
- *   // Enable hot reload, detailed logging, etc.
+ *     logger.debug(
+ *         "Running in development mode - enabling debug features"
+ *     );
+ *     // Enable hot reload, detailed logging, etc.
  * } else {
- *   logger.info("Running in production mode");
- *   // Optimize for performance, reduce logging
+ *     logger.info("Running in production mode");
+ *     // Optimize for performance, reduce logging
  * }
  * ```
+ *
+ * @returns `true` if running in Electron development mode (unpackaged and
+ *   `NODE_ENV=development`), otherwise `false`.
  */
 export function isDev(): boolean {
     return isDevelopment() && !app.isPackaged;

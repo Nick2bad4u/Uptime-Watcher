@@ -9,17 +9,17 @@ import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
 /**
+ * @remarks
+ * Uses dependency injection through ServiceContainer to manage all services and
+ * their dependencies. Provides proper initialization order and cleanup.
+ *
  * @public
  * Main application service that orchestrates all other services.
  * Handles application lifecycle and service coordination.
- *
- * @remarks
- * Uses dependency injection through ServiceContainer to manage all services
- * and their dependencies. Provides proper initialization order and cleanup.
  */
 /**
- * Main application service that orchestrates all other services and
- * coordinates application lifecycle.
+ * Main application service that orchestrates all other services and coordinates
+ * application lifecycle.
  *
  * @remarks
  * Uses dependency injection through {@link ServiceContainer} to manage all
@@ -34,6 +34,7 @@ export class ApplicationService {
      * The container for all application services.
      *
      * @readonly
+     *
      * @internal
      */
     private readonly serviceContainer: ServiceContainer;
@@ -85,12 +86,17 @@ export class ApplicationService {
      * monitoring stoppage, and window closure. Follows project error handling
      * standards by re-throwing errors after logging for upstream handling.
      *
-     * @returns A promise that resolves when cleanup is complete.
-     * @throws Re-throws any errors encountered during cleanup for upstream handling.
      * @example
+     *
      * ```typescript
      * await appService.cleanup();
      * ```
+     *
+     * @returns A promise that resolves when cleanup is complete.
+     *
+     * @throws Re-throws any errors encountered during cleanup for upstream
+     *   handling.
+     *
      * @public
      */
     public async cleanup(): Promise<void> {
@@ -142,13 +148,14 @@ export class ApplicationService {
      * Handles the application ready event and initializes all services.
      *
      * @remarks
-     * Performs ordered initialization of all services through the {@link
-     * ServiceContainer}, creates the main application window, and sets up
-     * event handlers and auto-updater. This method is called automatically
-     * when Electron's 'ready' event fires. Errors are caught and logged by the
+     * Performs ordered initialization of all services through the
+     * {@link ServiceContainer}, creates the main application window, and sets up
+     * event handlers and auto-updater. This method is called automatically when
+     * Electron's 'ready' event fires. Errors are caught and logged by the
      * calling {@link setupApplication} method.
      *
      * @returns A promise that resolves when initialization is complete.
+     *
      * @internal
      */
     private async onAppReady(): Promise<void> {
@@ -179,9 +186,11 @@ export class ApplicationService {
      * should be called once during application startup.
      *
      * @example
+     *
      * ```typescript
      * const appService = new ApplicationService();
      * ```
+     *
      * @public
      */
     public constructor() {
@@ -200,11 +209,14 @@ export class ApplicationService {
      *
      * @remarks
      * Configures handlers for core Electron application lifecycle events:
+     *
      * - 'ready': Triggers service initialization and window creation
      * - 'window-all-closed': Handles application shutdown (platform-specific)
      * - 'activate': Handles application reactivation (macOS dock click)
      *
-     * This method is called during construction to ensure event handlers are registered before Electron's ready event fires.
+     * This method is called during construction to ensure event handlers are
+     * registered before Electron's ready event fires.
+     *
      * @internal
      */
     private setupApplication(): void {
@@ -214,8 +226,9 @@ export class ApplicationService {
     }
 
     /**
-     * Removes application event listeners.
-     * Called during cleanup to prevent memory leaks.
+     * Removes application event listeners. Called during cleanup to prevent
+     * memory leaks.
+     *
      * @internal
      */
     private removeApplicationEventListeners(): void {
@@ -230,11 +243,14 @@ export class ApplicationService {
      *
      * @remarks
      * Configures the auto-updater service to:
+     *
      * - Send update status notifications to the renderer process
      * - Initialize the auto-updater mechanism
      * - Perform initial update check with error handling
      *
-     * Update check errors are logged but not re-thrown to prevent application startup failures due to network issues.
+     * Update check errors are logged but not re-thrown to prevent application
+     * startup failures due to network issues.
+     *
      * @internal
      */
     private setupAutoUpdater(): void {
@@ -262,14 +278,18 @@ export class ApplicationService {
      * Sets up typed event handlers for uptime monitoring system events.
      *
      * @remarks
-     * Establishes communication bridge between the uptime monitoring system
-     * and the renderer process by forwarding typed events including: - Monitor
+     * Establishes communication bridge between the uptime monitoring system and
+     * the renderer process by forwarding typed events including: - Monitor
      * status changes (up/down/status-changed)
+     *
      * - Monitoring lifecycle events (started/stopped)
      * - Cache invalidation events
      * - System errors
      *
-     * Also triggers desktop notifications for monitor state changes. All event forwarding includes error handling to prevent event processing failures from affecting monitoring operations.
+     * Also triggers desktop notifications for monitor state changes. All event
+     * forwarding includes error handling to prevent event processing failures
+     * from affecting monitoring operations.
+     *
      * @internal
      */
     private setupUptimeEventHandlers(): void {

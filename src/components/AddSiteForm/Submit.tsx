@@ -30,9 +30,9 @@ import {
  * Store actions interface for form submission operations.
  *
  * @remarks
- * Defines the required store methods needed for form submission. This
- * interface decouples the submission logic from specific store
- * implementations, making the code more testable and flexible.
+ * Defines the required store methods needed for form submission. This interface
+ * decouples the submission logic from specific store implementations, making
+ * the code more testable and flexible.
  *
  * @public
  */
@@ -74,6 +74,7 @@ export type FormSubmitProperties = AddSiteFormState &
  *
  * @param monitorType - Type of monitor
  * @param formData - Form data containing field values
+ *
  * @returns Monitor data object with type-specific fields
  */
 /**
@@ -81,11 +82,12 @@ export type FormSubmitProperties = AddSiteFormState &
  *
  * @param monitorType - Type of monitor
  * @param formData - Form data containing field values
+ *
  * @returns Monitor data object with type-specific fields
  */
 /**
- * Creates monitor-specific data based on the monitor type.
- * Uses type-safe object construction instead of dynamic property assignment.
+ * Creates monitor-specific data based on the monitor type. Uses type-safe
+ * object construction instead of dynamic property assignment.
  */
 function buildMonitorData(
     monitorType: MonitorType,
@@ -123,8 +125,8 @@ function buildMonitorData(
 }
 
 /**
- * Creates a monitor object based on the form data.
- * Uses type-safe property assignment instead of dynamic field copying.
+ * Creates a monitor object based on the form data. Uses type-safe property
+ * assignment instead of dynamic field copying.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
     const { checkInterval, generateUuid, host, monitorType, port, url } =
@@ -156,6 +158,7 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
  * @param addMode - Mode of adding ("existing" or "new")
  * @param name - Site name for new sites
  * @param selectedExistingSite - Selected existing site identifier
+ *
  * @returns Array of validation error messages
  */
 function validateAddMode(
@@ -246,6 +249,7 @@ async function performSubmission(
  * Validates check interval configuration using shared schema.
  *
  * @param checkInterval - Check interval in milliseconds
+ *
  * @returns Promise resolving to array of validation error messages
  */
 async function validateCheckInterval(checkInterval: number): Promise<string[]> {
@@ -270,6 +274,7 @@ async function validateCheckInterval(checkInterval: number): Promise<string[]> {
  * @param url - URL for HTTP monitors
  * @param host - Hostname for monitors
  * @param port - Port for port monitors
+ *
  * @returns Promise resolving to array of validation error messages
  */
 async function validateMonitorType(
@@ -314,28 +319,31 @@ async function validateMonitorType(
  * Handles form submission for adding sites or monitors.
  *
  * Performs comprehensive validation based on add mode and monitor type:
+ *
  * - For new sites: validates site name and monitor configuration
  * - For existing sites: validates site selection and monitor configuration
  * - For HTTP monitors: validates URL format and protocol
  * - For port monitors: validates host and port number
  *
- * @param event - Form submission event
- * @param properties - Form state, actions, and dependencies
- * @returns Promise that resolves when submission is complete
- *
  * @example
+ *
  * ```tsx
  * const handleFormSubmit = (e: FormEvent) => {
- *   handleSubmit(e, {
- *     ...formState,
- *     ...formActions,
- *     ...storeActions,
- *     generateUuid,
- *     logger,
- *     onSuccess: () => setIsVisible(false)
- *   });
+ *     handleSubmit(e, {
+ *         ...formState,
+ *         ...formActions,
+ *         ...storeActions,
+ *         generateUuid,
+ *         logger,
+ *         onSuccess: () => setIsVisible(false),
+ *     });
  * };
  * ```
+ *
+ * @param event - Form submission event
+ * @param properties - Form state, actions, and dependencies
+ *
+ * @returns Promise that resolves when submission is complete
  */
 export async function handleSubmit(
     event: FormEvent,

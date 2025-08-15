@@ -21,8 +21,8 @@ import { logger } from "../../../utils/logger";
  *
  * @remarks
  * Provides a structured return type for backup operations with comprehensive
- * metadata for tracking and validation. Used as the return value for {@link
- * createDatabaseBackup}.
+ * metadata for tracking and validation. Used as the return value for
+ * {@link createDatabaseBackup}.
  *
  * @public
  */
@@ -46,8 +46,8 @@ export interface DatabaseBackupResult {
      * Metadata about the backup operation.
      *
      * @remarks
-     * Contains details about the backup creation, including timestamp,
-     * original path, and file size.
+     * Contains details about the backup creation, including timestamp, original
+     * path, and file size.
      */
     metadata: {
         /**
@@ -86,17 +86,25 @@ export interface DatabaseBackupResult {
  * database into memory (suitable for typical database sizes). For very large
  * databases, consider streaming approaches.
  *
- * @param dbPath - Absolute path to the SQLite database file to backup.
- * @param fileName - Optional custom filename for the backup (defaults to "uptime-watcher-backup.sqlite").
- * @returns Promise resolving to a {@link DatabaseBackupResult} containing the backup buffer, filename, and metadata.
- * @throws Re-throws file system errors after logging for upstream handling, including dynamic import failures and file read errors.
  * @example
+ *
  * ```typescript
  * const backup = await createDatabaseBackup("/path/to/database.sqlite");
  * // backup.buffer contains the database data
  * // backup.fileName contains "uptime-watcher-backup.sqlite"
  * // backup.metadata contains operation details
  * ```
+ *
+ * @param dbPath - Absolute path to the SQLite database file to backup.
+ * @param fileName - Optional custom filename for the backup (defaults to
+ *   "uptime-watcher-backup.sqlite").
+ *
+ * @returns Promise resolving to a {@link DatabaseBackupResult} containing the
+ *   backup buffer, filename, and metadata.
+ *
+ * @throws Re-throws file system errors after logging for upstream handling,
+ *   including dynamic import failures and file read errors.
+ *
  * @public
  */
 export async function createDatabaseBackup(

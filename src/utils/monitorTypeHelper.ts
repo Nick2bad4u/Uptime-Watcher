@@ -1,6 +1,6 @@
 /**
- * Frontend helper utilities for monitor types.
- * Provides access to monitor type definitions through the IPC bridge.
+ * Frontend helper utilities for monitor types. Provides access to monitor type
+ * definitions through the IPC bridge.
  */
 
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -24,8 +24,8 @@ import { withUtilityErrorHandling } from "./errorHandling";
  *
  * @remarks
  * Useful for forcing a refresh of monitor type data when types have been
- * updated or when testing requires fresh data. This clears all cached
- * monitor type configurations, forcing the next request to fetch from backend.
+ * updated or when testing requires fresh data. This clears all cached monitor
+ * type configurations, forcing the next request to fetch from backend.
  */
 export function clearMonitorTypeCache(): void {
     AppCaches.monitorTypes.clear();
@@ -34,13 +34,13 @@ export function clearMonitorTypeCache(): void {
 /**
  * Get all available monitor types from backend via IPC.
  *
- * @returns Promise resolving to array of monitor type configurations
- *
  * @remarks
  * Results are cached for performance using the AppCaches.monitorTypes cache.
- * The cache key "all-monitor-types" is used to store the complete list.
- * Cache can be cleared using clearMonitorTypeCache() to force refresh.
- * Falls back to empty array on error to prevent UI breakage.
+ * The cache key "all-monitor-types" is used to store the complete list. Cache
+ * can be cleared using clearMonitorTypeCache() to force refresh. Falls back to
+ * empty array on error to prevent UI breakage.
+ *
+ * @returns Promise resolving to array of monitor type configurations
  */
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     const cacheKey = CacheKeys.config.byName("all-monitor-types");
@@ -76,14 +76,16 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
 /**
  * Get configuration for a specific monitor type.
  *
- * @param type - The monitor type identifier to look up
- * @returns Promise resolving to monitor type configuration, or undefined if type is not found
- *
  * @remarks
  * Searches through all available monitor types to find a match for the
  * specified type. Returns undefined if the monitor type is not registered or
  * available from the backend. The search uses the complete cached list from
  * getAvailableMonitorTypes().
+ *
+ * @param type - The monitor type identifier to look up
+ *
+ * @returns Promise resolving to monitor type configuration, or undefined if
+ *   type is not found
  */
 export async function getMonitorTypeConfig(
     type: string
@@ -95,15 +97,14 @@ export async function getMonitorTypeConfig(
 /**
  * Get form options for monitor type selector.
  *
- * @returns Promise resolving to array of option objects for form selectors
- *
  * @remarks
- * Returns an array of objects with the shape:
- * `\{ label: string, value: string\}`
- * where label is the human-readable display name and value is the monitor
- * type identifier. This format is suitable for use with form select components
- * and dropdown menus. The options are derived from all available monitor types
- * from the backend.
+ * Returns an array of objects with the shape: `\{ label: string, value:
+ * string\}` where label is the human-readable display name and value is the
+ * monitor type identifier. This format is suitable for use with form select
+ * components and dropdown menus. The options are derived from all available
+ * monitor types from the backend.
+ *
+ * @returns Promise resolving to array of option objects for form selectors
  */
 export async function getMonitorTypeOptions(): Promise<
     Array<{ label: string; value: string }>

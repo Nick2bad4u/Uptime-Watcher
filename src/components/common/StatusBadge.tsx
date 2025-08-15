@@ -3,9 +3,9 @@
  * customizable styling.
  *
  * @remarks
- * This component provides a standardized way to display monitor and site
- * status throughout the application. It combines visual status indicators with
- * text labels to create an accessible and consistent user experience.
+ * This component provides a standardized way to display monitor and site status
+ * throughout the application. It combines visual status indicators with text
+ * labels to create an accessible and consistent user experience.
  *
  * The component is optimized for performance using React.memo and is designed
  * to be reusable across different contexts while maintaining visual
@@ -13,16 +13,15 @@
  * different formatting functions.
  *
  * Features:
+ *
  * - Consistent status visualization across the application
  * - Accessibility-compliant with proper ARIA attributes
  * - Performance optimized with memoization
  * - Customizable sizing and styling options
  * - Optional custom formatting for different display contexts
  *
- * @param props - Component configuration properties
- * @returns Themed status badge with icon and text
- *
  * @example
+ *
  * ```tsx
  * // Basic usage
  * <StatusBadge label="Monitor Status" status="up" />
@@ -35,6 +34,10 @@
  *   size="lg"
  * />
  * ```
+ *
+ * @param props - Component configuration properties
+ *
+ * @returns Themed status badge with icon and text
  *
  * @public
  */
@@ -58,7 +61,8 @@ export interface StatusBadgeProperties {
     readonly formatter?: (label: string, status: MonitorStatus) => string;
     /**
      * Label text to display (expected to be localized by caller)
-     * @example "Status", "Current State", "Monitor Status"
+     *
+     * @example Status , "Current State", "Monitor Status"
      */
     readonly label: string;
     /** Whether to show the status icon */
@@ -70,16 +74,17 @@ export interface StatusBadgeProperties {
 }
 
 /**
- * Reusable status badge component that combines status indicator with text.
- * Can be used throughout the app for consistent status display.
+ * Reusable status badge component that combines status indicator with text. Can
+ * be used throughout the app for consistent status display.
  *
  * This component is memoized to prevent unnecessary re-renders when parent
  * components update. The memoization is beneficial because status badges are
  * often rendered in lists and don't change frequently. Consumers should ensure
- * that props are stable (especially formatter function) to maximize
- * memoization benefits.
+ * that props are stable (especially formatter function) to maximize memoization
+ * benefits.
  *
  * @param props - StatusBadge component props
+ *
  * @returns JSX element containing status indicator and text
  */
 export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> =
@@ -92,10 +97,11 @@ export const StatusBadge: React.NamedExoticComponent<StatusBadgeProperties> =
         status,
     }: StatusBadgeProperties) {
         /**
-         * Maps text sizes to appropriate indicator sizes.
-         * Ensures visual consistency between text and icon.
+         * Maps text sizes to appropriate indicator sizes. Ensures visual
+         * consistency between text and icon.
          *
          * @param textSize - The text size to map
+         *
          * @returns Corresponding indicator size
          */
         const getIndicatorSize = (

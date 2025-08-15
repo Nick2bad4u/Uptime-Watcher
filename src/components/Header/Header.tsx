@@ -2,6 +2,7 @@
  * Header component providing global status overview and application controls
  *
  * This file exports the main Header component that displays:
+ *
  * - Application title and branding
  * - Global uptime statistics and monitor counts
  * - Status indicators for up/down/pending/paused monitors
@@ -111,6 +112,7 @@ const aggregateMonitorCounts = (
  * Main header component for the application.
  *
  * Features:
+ *
  * - Global uptime statistics across all monitors
  * - Status indicator counts (up/down/pending)
  * - Theme toggle (light/dark mode)

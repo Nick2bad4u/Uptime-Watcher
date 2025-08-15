@@ -2,8 +2,8 @@
  * Custom hook for calculating comprehensive site analytics and metrics
  *
  * Provides detailed analytics for a monitor including uptime percentages,
- * response time statistics, downtime analysis, and reliability metrics.
- * All calculations are memoized for performance optimization.
+ * response time statistics, downtime analysis, and reliability metrics. All
+ * calculations are memoized for performance optimization.
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
@@ -214,8 +214,8 @@ function filterHistoryByTimeRange(
 }
 
 /**
- * Hook for generating chart data
- * Separates data preparation from component logic
+ * Hook for generating chart data Separates data preparation from component
+ * logic
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
@@ -263,12 +263,8 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
  * including uptime statistics, response time analysis, and downtime patterns.
  * All calculations are memoized for optimal performance.
  *
- * @param monitor - The monitor to analyze (can be undefined)
- * @param timeRange - Time period to analyze (defaults to "24h")
- * @returns Comprehensive analytics object with all calculated metrics
- * @see {@link SiteAnalytics} for the complete interface specification
- *
  * @example
+ *
  * ```tsx
  * function AnalyticsView({ monitor }) {
  *   const analytics = useSiteAnalytics(monitor, "7d");
@@ -282,6 +278,13 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
  *   );
  * }
  * ```
+ *
+ * @param monitor - The monitor to analyze (can be undefined)
+ * @param timeRange - Time period to analyze (defaults to "24h")
+ *
+ * @returns Comprehensive analytics object with all calculated metrics
+ *
+ * @see {@link SiteAnalytics} for the complete interface specification
  */
 export function useSiteAnalytics(
     monitor: Monitor | undefined,
@@ -366,12 +369,13 @@ export const SiteAnalyticsUtils = {
     /**
      * Get availability status based on uptime percentage
      *
-     * @param uptime - Uptime percentage (0-100)
-     * @returns Status level based on uptime thresholds
-     *
      * @remarks
-     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, \<95% =
+     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, <95% =
      * critical
+     *
+     * @param uptime - Uptime percentage (0-100)
+     *
+     * @returns Status level based on uptime thresholds
      */
     getAvailabilityStatus(
         uptime: number
@@ -390,12 +394,13 @@ export const SiteAnalyticsUtils = {
     /**
      * Get performance status based on response time
      *
-     * @param responseTime - Average response time in milliseconds
-     * @returns Status level based on response time thresholds
-     *
      * @remarks
-     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning,
-     * \>1000ms = critical
+     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, >1000ms
+     * = critical
+     *
+     * @param responseTime - Average response time in milliseconds
+     *
+     * @returns Status level based on response time thresholds
      */
     getPerformanceStatus(
         responseTime: number

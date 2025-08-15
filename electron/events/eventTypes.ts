@@ -4,12 +4,13 @@
  *
  * @remarks
  * Provides compile-time type safety for event data and event names across the
- * application. Events are organized by domain (site, monitor, database,
- * system, etc.) and include comprehensive metadata for debugging, auditing,
- * and middleware processing.
+ * application. Events are organized by domain (site, monitor, database, system,
+ * etc.) and include comprehensive metadata for debugging, auditing, and
+ * middleware processing.
+ *
+ * @public
  *
  * @see {@link UptimeEvents}
- * @public
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
@@ -23,6 +24,8 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
  * compile-time safety and comprehensive metadata for debugging, auditing, and
  * event-driven workflows.
  *
+ * @public
+ *
  * @see {@link EventCategory}
  * @see {@link EventCheckType}
  * @see {@link EventEnvironment}
@@ -30,7 +33,6 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
  * @see {@link EventSeverity}
  * @see {@link EventSource}
  * @see {@link EventTriggerType}
- * @public
  */
 export interface UptimeEvents extends Record<string, unknown> {
     // Site events
@@ -42,7 +44,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * Used to trigger cache refreshes or notify listeners of data changes.
      *
      * @param identifier - Optional unique identifier for the cache entry.
-     * @param reason - Reason for invalidation ("delete", "expiry", "manual", or "update").
+     * @param reason - Reason for invalidation ("delete", "expiry", "manual", or
+     *   "update").
      * @param timestamp - Unix timestamp (ms) when invalidation occurred.
      * @param type - Type of cache invalidated ("all", "monitor", or "site").
      */
@@ -62,7 +65,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param newValue - The new value of the setting.
      * @param oldValue - The previous value of the setting.
      * @param setting - The name of the setting that changed.
-     * @param source - The origin of the change ("migration", "system", or "user").
+     * @param source - The origin of the change ("migration", "system", or
+     *   "user").
      * @param timestamp - Unix timestamp (ms) when the change occurred.
      */
     "config:changed": {
@@ -82,7 +86,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param fileName - Name of the backup file.
      * @param size - Size of the backup file in bytes.
      * @param timestamp - Unix timestamp (ms) when backup was created.
-     * @param triggerType - What triggered the backup ("manual", "scheduled", or "shutdown").
+     * @param triggerType - What triggered the backup ("manual", "scheduled", or
+     *   "shutdown").
      */
     "database:backup-created": {
         fileName: string;
@@ -96,11 +101,12 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a database error occurs.
      *
+     * @remarks
+     * Additional properties may be present for context.
+     *
      * @param error - The error object.
      * @param operation - The database operation that failed.
      * @param timestamp - Unix timestamp (ms) when the error occurred.
-     * @remarks
-     * Additional properties may be present for context.
      */
     "database:error": {
         [key: string]: unknown;
@@ -112,11 +118,12 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a database operation is retried after failure.
      *
+     * @remarks
+     * Additional properties may be present for context.
+     *
      * @param attempt - The retry attempt number.
      * @param operation - The database operation being retried.
      * @param timestamp - Unix timestamp (ms) when the retry occurred.
-     * @remarks
-     * Additional properties may be present for context.
      */
     "database:retry": {
         [key: string]: unknown;
@@ -128,11 +135,12 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a database operation succeeds.
      *
+     * @remarks
+     * Additional properties may be present for context.
+     *
      * @param duration - Optional duration (ms) of the operation.
      * @param operation - The database operation that succeeded.
      * @param timestamp - Unix timestamp (ms) when the operation succeeded.
-     * @remarks
-     * Additional properties may be present for context.
      */
     "database:success": {
         [key: string]: unknown;
@@ -206,7 +214,8 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a request is made to get sites from the cache.
      *
-     * @param operation - The operation type (always "get-sites-from-cache-requested").
+     * @param operation - The operation type (always
+     *   "get-sites-from-cache-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:database:get-sites-from-cache-requested": {
@@ -217,7 +226,8 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted in response to a get-sites-from-cache request.
      *
-     * @param operation - The operation type (always "get-sites-from-cache-response").
+     * @param operation - The operation type (always
+     *   "get-sites-from-cache-response").
      * @param sites - The list of sites returned from the cache.
      * @param timestamp - Unix timestamp (ms) when the response was sent.
      */
@@ -269,7 +279,8 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a request is made to update the sites cache.
      *
-     * @param operation - The operation type (always "update-sites-cache-requested").
+     * @param operation - The operation type (always
+     *   "update-sites-cache-requested").
      * @param sites - Optional list of sites to update in the cache.
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
@@ -407,7 +418,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      *
      * @param identifier - The unique identifier for the site.
      * @param monitorId - The monitor ID.
-     * @param operation - The operation type (always "is-monitoring-active-requested").
+     * @param operation - The operation type (always
+     *   "is-monitoring-active-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:site:is-monitoring-active-requested": {
@@ -423,7 +435,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param identifier - The unique identifier for the site.
      * @param isActive - Whether monitoring is active.
      * @param monitorId - The monitor ID.
-     * @param operation - The operation type (always "is-monitoring-active-response").
+     * @param operation - The operation type (always
+     *   "is-monitoring-active-response").
      * @param timestamp - Unix timestamp (ms) when the response was sent.
      */
     "internal:site:is-monitoring-active-response": {
@@ -452,7 +465,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      *
      * @param identifier - The unique identifier for the site.
      * @param monitor - The monitor object.
-     * @param operation - The operation type (always "restart-monitoring-requested").
+     * @param operation - The operation type (always
+     *   "restart-monitoring-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:site:restart-monitoring-requested": {
@@ -467,7 +481,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      *
      * @param identifier - The unique identifier for the site.
      * @param monitorId - The monitor ID.
-     * @param operation - The operation type (always "restart-monitoring-response").
+     * @param operation - The operation type (always
+     *   "restart-monitoring-response").
      * @param success - Whether the restart was successful.
      * @param timestamp - Unix timestamp (ms) when the response was sent.
      */
@@ -484,7 +499,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      *
      * @param identifier - The unique identifier for the site.
      * @param monitorId - Optional monitor ID.
-     * @param operation - The operation type (always "start-monitoring-requested").
+     * @param operation - The operation type (always
+     *   "start-monitoring-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:site:start-monitoring-requested": {
@@ -499,7 +515,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      *
      * @param identifier - The unique identifier for the site.
      * @param monitorId - Optional monitor ID.
-     * @param operation - The operation type (always "stop-monitoring-requested").
+     * @param operation - The operation type (always
+     *   "stop-monitoring-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:site:stop-monitoring-requested": {
@@ -649,7 +666,8 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when a performance metric is recorded.
      *
-     * @param category - The metric category ("database", "monitoring", "system", or "ui").
+     * @param category - The metric category ("database", "monitoring",
+     *   "system", or "ui").
      * @param metric - The metric name.
      * @param timestamp - Unix timestamp (ms) when the metric was recorded.
      * @param unit - The unit of the metric.
@@ -684,7 +702,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * Emitted when a site is added.
      *
      * @param site - The site object added.
-     * @param source - The source of the addition ("import", "migration", or "user").
+     * @param source - The source of the addition ("import", "migration", or
+     *   "user").
      * @param timestamp - Unix timestamp (ms) when the site was added.
      */
     "site:added": {
@@ -712,7 +731,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * Emitted when a site's cache is updated.
      *
      * @param identifier - The unique identifier for the site.
-     * @param operation - The operation type ("background-load", "cache-updated", or "manual-refresh").
+     * @param operation - The operation type ("background-load",
+     *   "cache-updated", or "manual-refresh").
      * @param timestamp - Unix timestamp (ms) when the cache was updated.
      */
     "site:cache-updated": {
@@ -754,9 +774,11 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when site state is synchronized.
      *
-     * @param action - The synchronization action ("bulk-sync", "delete", or "update").
+     * @param action - The synchronization action ("bulk-sync", "delete", or
+     *   "update").
      * @param siteIdentifier - Optional site identifier.
-     * @param source - Optional source of the synchronization ("cache", "database", or "frontend").
+     * @param source - Optional source of the synchronization ("cache",
+     *   "database", or "frontend").
      * @param timestamp - Unix timestamp (ms) when synchronization occurred.
      */
     "sites:state-synchronized": {
@@ -772,7 +794,8 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param context - The error context string.
      * @param error - The error object.
      * @param recovery - Optional recovery suggestion.
-     * @param severity - The severity of the error ("critical", "high", "low", or "medium").
+     * @param severity - The severity of the error ("critical", "high", "low",
+     *   or "medium").
      * @param timestamp - Unix timestamp (ms) when the error occurred.
      */
     "system:error": {
@@ -799,7 +822,8 @@ export interface UptimeEvents extends Record<string, unknown> {
     /**
      * Emitted when the system starts up.
      *
-     * @param environment - The runtime environment ("development", "production", or "test").
+     * @param environment - The runtime environment ("development",
+     *   "production", or "test").
      * @param timestamp - Unix timestamp (ms) when startup completed.
      * @param version - The application version string.
      */
@@ -817,9 +841,11 @@ export interface UptimeEvents extends Record<string, unknown> {
  * Used for event filtering, routing, and middleware processing.
  *
  * @example
+ *
  * ```typescript
  * const category: EventCategory = "database";
  * ```
+ *
  * @public
  */
 export type EventCategory = "database" | "monitoring" | "system" | "ui";
@@ -828,13 +854,15 @@ export type EventCategory = "database" | "monitoring" | "system" | "ui";
  * Type of monitoring check that triggered an event.
  *
  * @remarks
- * Indicates whether a monitoring event was triggered manually or by a
- * scheduled process.
+ * Indicates whether a monitoring event was triggered manually or by a scheduled
+ * process.
  *
  * @example
+ *
  * ```typescript
  * const checkType: EventCheckType = "manual";
  * ```
+ *
  * @public
  */
 export type EventCheckType = "manual" | "scheduled";
@@ -847,9 +875,11 @@ export type EventCheckType = "manual" | "scheduled";
  * environments in event payloads.
  *
  * @example
+ *
  * ```typescript
  * const env: EventEnvironment = "production";
  * ```
+ *
  * @public
  */
 export type EventEnvironment = "development" | "production" | "test";
@@ -862,9 +892,11 @@ export type EventEnvironment = "development" | "production" | "test";
  * system error.
  *
  * @example
+ *
  * ```typescript
  * const reason: EventReason = "user";
  * ```
+ *
  * @public
  */
 export type EventReason = "error" | "shutdown" | "user";
@@ -876,9 +908,11 @@ export type EventReason = "error" | "shutdown" | "user";
  * Used to prioritize event handling and alerting in middleware and UI.
  *
  * @example
+ *
  * ```typescript
  * const severity: EventSeverity = "critical";
  * ```
+ *
  * @public
  */
 export type EventSeverity = "critical" | "high" | "low" | "medium";
@@ -891,9 +925,11 @@ export type EventSeverity = "critical" | "high" | "low" | "medium";
  * data migration.
  *
  * @example
+ *
  * ```typescript
  * const source: EventSource = "system";
  * ```
+ *
  * @public
  */
 export type EventSource = "import" | "migration" | "system" | "user";
@@ -906,9 +942,11 @@ export type EventSource = "import" | "migration" | "system" | "user";
  * events.
  *
  * @example
+ *
  * ```typescript
  * const trigger: EventTriggerType = "scheduled";
  * ```
+ *
  * @public
  */
 export type EventTriggerType = "manual" | "scheduled" | "shutdown";
@@ -922,9 +960,11 @@ export type EventTriggerType = "manual" | "scheduled" | "shutdown";
  * manager-to-manager communication.
  *
  * @example
+ *
  * ```typescript
  * const isMonitorEvent = EVENT_CATEGORIES.MONITOR.includes("monitor:up");
  * ```
+ *
  * @public
  */
 export const EVENT_CATEGORIES = {
@@ -1000,9 +1040,11 @@ export const EVENT_CATEGORIES = {
  * processing.
  *
  * @example
+ *
  * ```typescript
  * const isCritical = EVENT_PRIORITIES.CRITICAL.includes("system:error");
  * ```
+ *
  * @public
  */
 export const EVENT_PRIORITIES = {
@@ -1035,16 +1077,22 @@ export const EVENT_PRIORITIES = {
  * categorized default to MEDIUM priority. This ensures all events have a
  * priority assigned for consistent middleware and filtering behavior.
  *
- * @param eventName - The event name to check priority for. Must be a key of {@link UptimeEvents}.
- * @returns The priority level of the event as a key of {@link EVENT_PRIORITIES}. Returns "MEDIUM" for uncategorized events.
- *
  * @example
+ *
  * ```typescript
  * const priority = getEventPriority("system:error"); // Returns "CRITICAL"
  * const defaultPriority = getEventPriority("unknown:event"); // Returns "MEDIUM"
  * ```
- * @see {@link EVENT_PRIORITIES}
+ *
+ * @param eventName - The event name to check priority for. Must be a key of
+ *   {@link UptimeEvents}.
+ *
+ * @returns The priority level of the event as a key of {@link EVENT_PRIORITIES}.
+ *   Returns "MEDIUM" for uncategorized events.
+ *
  * @public
+ *
+ * @see {@link EVENT_PRIORITIES}
  */
 export function getEventPriority(
     eventName: keyof UptimeEvents
@@ -1079,18 +1127,28 @@ export function getEventPriority(
  * events are separated into their own categories (INTERNAL_DATABASE,
  * INTERNAL_MONITOR, INTERNAL_SITE) for manager-to-manager communication.
  *
- * @param eventName - The event name to categorize. Must be a key of {@link UptimeEvents}.
- * @param category - The category to check against. Must be a key of {@link EVENT_CATEGORIES}.
- * @returns True if the event belongs to the specified category, false if the category doesn't exist or event doesn't match.
- *
  * @example
+ *
  * ```typescript
  * const isMonitorEvent = isEventOfCategory("monitor:up", "MONITOR"); // Returns true
- * const isInternalEvent = isEventOfCategory("internal:site:added", "INTERNAL_SITE"); // Returns true
+ * const isInternalEvent = isEventOfCategory(
+ *     "internal:site:added",
+ *     "INTERNAL_SITE"
+ * ); // Returns true
  * const invalidCategory = isEventOfCategory("monitor:up", "NONEXISTENT"); // Returns false
  * ```
- * @see {@link EVENT_CATEGORIES}
+ *
+ * @param eventName - The event name to categorize. Must be a key of
+ *   {@link UptimeEvents}.
+ * @param category - The category to check against. Must be a key of
+ *   {@link EVENT_CATEGORIES}.
+ *
+ * @returns True if the event belongs to the specified category, false if the
+ *   category doesn't exist or event doesn't match.
+ *
  * @public
+ *
+ * @see {@link EVENT_CATEGORIES}
  */
 export function isEventOfCategory(
     eventName: keyof UptimeEvents,

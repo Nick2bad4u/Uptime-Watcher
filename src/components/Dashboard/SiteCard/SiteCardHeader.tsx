@@ -86,8 +86,8 @@ export interface SiteInfo {
 
 /**
  * Header section of the site card containing site name, monitor selection, and
- * action buttons. Provides interactive controls for monitor management and
- * site operations.
+ * action buttons. Provides interactive controls for monitor management and site
+ * operations.
  *
  * This component is memoized to prevent unnecessary re-renders when parent
  * components update. For optimal performance, ensure that all callback props
@@ -99,6 +99,7 @@ export interface SiteInfo {
  * internally by ActionButtonGroup to disable buttons during operations.
  *
  * @param props - SiteCardHeader component props
+ *
  * @returns JSX.Element containing site header with controls
  */
 export const SiteCardHeader: React.NamedExoticComponent<SiteCardHeaderProps> =

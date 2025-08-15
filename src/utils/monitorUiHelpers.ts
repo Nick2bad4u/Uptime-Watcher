@@ -53,14 +53,16 @@ export function clearConfigCache(): void {
 /**
  * Get the default monitor ID from a list of monitor IDs.
  *
- * @param monitorIds - Array of monitor IDs
- * @returns Default monitor ID (first valid ID in array) or empty string if array is empty or contains no valid IDs
- *
  * @remarks
  * This function returns the first element of the array if it exists, otherwise
  * an empty string. It does not validate whether the IDs are actually valid
  * monitor identifiers - that should be done by the caller if needed. Empty
  * arrays return an empty string as a safe fallback.
+ *
+ * @param monitorIds - Array of monitor IDs
+ *
+ * @returns Default monitor ID (first valid ID in array) or empty string if
+ *   array is empty or contains no valid IDs
  */
 export function getDefaultMonitorId(monitorIds: string[]): string {
     return monitorIds[0] ?? "";
@@ -70,6 +72,7 @@ export function getDefaultMonitorId(monitorIds: string[]): string {
  * Check if monitor type supports advanced analytics.
  *
  * @param monitorType - Type of monitor
+ *
  * @returns Whether monitor supports advanced analytics
  */
 export async function supportsAdvancedAnalytics(
@@ -89,6 +92,7 @@ export async function supportsAdvancedAnalytics(
  * Check if monitor type supports response time analytics.
  *
  * @param monitorType - Type of monitor
+ *
  * @returns Whether monitor supports response time analytics
  */
 export async function supportsResponseTime(
@@ -105,10 +109,11 @@ export async function supportsResponseTime(
 }
 
 /**
- * Check if all monitor types in array support advanced analytics.
- * Useful for conditional rendering of advanced analytics components.
+ * Check if all monitor types in array support advanced analytics. Useful for
+ * conditional rendering of advanced analytics components.
  *
  * @param monitorTypes - Array of monitor types to check
+ *
  * @returns Whether all types support advanced analytics
  */
 export async function allSupportsAdvancedAnalytics(
@@ -127,10 +132,11 @@ export async function allSupportsAdvancedAnalytics(
 }
 
 /**
- * Check if all monitor types in array support response time.
- * Useful for conditional rendering of response time charts.
+ * Check if all monitor types in array support response time. Useful for
+ * conditional rendering of response time charts.
  *
  * @param monitorTypes - Array of monitor types to check
+ *
  * @returns Whether all types support response time
  */
 export async function allSupportsResponseTime(
@@ -151,15 +157,17 @@ export async function allSupportsResponseTime(
 /**
  * Format detail label dynamically based on monitor type configuration.
  *
- * @param monitorType - Type of monitor
- * @param details - Detail value to format
- * @returns Formatted detail string
- *
  * @example
+ *
  * ```typescript
  * const label = await formatMonitorDetail("http", "200"); // "Response Code: 200"
- * const label = await formatMonitorDetail("port", "80");  // "Port: 80"
+ * const label = await formatMonitorDetail("port", "80"); // "Port: 80"
  * ```
+ *
+ * @param monitorType - Type of monitor
+ * @param details - Detail value to format
+ *
+ * @returns Formatted detail string
  */
 export async function formatMonitorDetail(
     monitorType: MonitorType,
@@ -180,15 +188,22 @@ export async function formatMonitorDetail(
 /**
  * Format title suffix dynamically based on monitor type configuration.
  *
+ * @example
+ *
+ * ```typescript
+ * const suffix = await formatMonitorTitleSuffix("http", {
+ *     url: "https://example.com",
+ * }); // " (https://example.com)"
+ * const suffix = await formatMonitorTitleSuffix("port", {
+ *     host: "localhost",
+ *     port: 80,
+ * }); // " (localhost:80)"
+ * ```
+ *
  * @param monitorType - Type of monitor
  * @param monitor - Monitor data
- * @returns Formatted title suffix string
  *
- * @example
- * ```typescript
- * const suffix = await formatMonitorTitleSuffix("http", { url: "https://example.com" }); // " (https://example.com)"
- * const suffix = await formatMonitorTitleSuffix("port", { host: "localhost", port: 80 }); // " (localhost:80)"
- * ```
+ * @returns Formatted title suffix string
  */
 export async function formatMonitorTitleSuffix(
     monitorType: MonitorType,
@@ -210,6 +225,7 @@ export async function formatMonitorTitleSuffix(
  * Get analytics label for monitor type.
  *
  * @param monitorType - Type of monitor
+ *
  * @returns Analytics label or fallback
  */
 export async function getAnalyticsLabel(
@@ -232,6 +248,7 @@ export async function getAnalyticsLabel(
  * Get help text for monitor type form fields.
  *
  * @param monitorType - Type of monitor
+ *
  * @returns Object containing primary and secondary help texts
  */
 export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
@@ -252,6 +269,7 @@ export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
  * Get available monitor types that support a specific feature.
  *
  * @param feature - Feature to check for ('responseTime' | 'advancedAnalytics')
+ *
  * @returns Array of monitor types that support the feature
  */
 export async function getTypesWithFeature(
@@ -284,6 +302,7 @@ export async function getTypesWithFeature(
  * Check if monitor type should show URL in display.
  *
  * @param monitorType - Type of monitor
+ *
  * @returns Whether to show URL
  */
 export async function shouldShowUrl(

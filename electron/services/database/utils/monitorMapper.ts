@@ -70,12 +70,13 @@ function copyDynamicFields(
  * Creates base monitor object from dynamic monitor data using safe validation.
  *
  * @remarks
- * Uses centralized validation utilities for safe integer conversion with
- * bounds checking. Replaces manual Number() conversions with validator-based
+ * Uses centralized validation utilities for safe integer conversion with bounds
+ * checking. Replaces manual Number() conversions with validator-based
  * safeInteger() function to prevent invalid data from reaching the application
  * layer.
  *
  * @param dynamicMonitor - Mapped monitor data from database
+ *
  * @returns Base monitor object with validated fields
  *
  * @see {@link safeInteger} - Safe integer conversion utility
@@ -109,6 +110,7 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
  * validator.js functions for improved security and reliability.
  *
  * @param row - Database row
+ *
  * @returns Array of validated operation IDs
  *
  * @see {@link isValidIdentifierArray} - Validation function used
@@ -141,34 +143,38 @@ function parseActiveOperations(row: DatabaseMonitorRow): string[] {
  * Represents a monitor row as stored in the database.
  *
  * @remarks
- * Used for low-level database operations and mapping.
- * Field names use camelCase for consistency with TypeScript conventions.
+ * Used for low-level database operations and mapping. Field names use camelCase
+ * for consistency with TypeScript conventions.
  *
  * @public
  */
 /**
- * Builds a parameter array for inserting or updating a monitor in the
- * database.
+ * Builds a parameter array for inserting or updating a monitor in the database.
  *
  * @remarks
  * Converts a monitor object to a row format using the dynamic schema system,
  * then returns an array of values in the order expected by the SQL statement.
  * All values are type-safe and nulls are used for missing/undefined fields.
  *
- * @param siteIdentifier - The unique identifier of the site this monitor belongs to.
- * @param monitor - The monitor object to convert.
- * @returns An array of values for SQL parameterized queries.
- * @throws Error if mapping or parameter generation fails.
- *
  * @example
+ *
  * ```typescript
  * const params = buildMonitorParameters("site-123", monitorObj);
  * db.run("INSERT INTO monitors (...) VALUES (?, ?, ...)", params);
  * ```
  *
+ * @param siteIdentifier - The unique identifier of the site this monitor
+ *   belongs to.
+ * @param monitor - The monitor object to convert.
+ *
+ * @returns An array of values for SQL parameterized queries.
+ *
+ * @throws Error if mapping or parameter generation fails.
+ *
+ * @public
+ *
  * @see {@link mapMonitorToRow}
  * @see {@link generateSqlParameters}
- * @public
  */
 export function buildMonitorParameters(
     siteIdentifier: string,
@@ -214,13 +220,16 @@ export function buildMonitorParameters(
  * Checks for the presence and type of critical fields in a raw database row.
  * Expects snake_case keys as returned by SQLite.
  *
- * @param row - The raw database row to validate.
- * @returns `true` if the row is valid for monitor mapping, otherwise `false`.
- *
  * @example
+ *
  * ```typescript
  * if (isValidMonitorRow(row)) { ... }
  * ```
+ *
+ * @param row - The raw database row to validate.
+ *
+ * @returns `true` if the row is valid for monitor mapping, otherwise `false`.
+ *
  * @public
  */
 export function isValidMonitorRow(row: Record<string, unknown>): boolean {
@@ -243,16 +252,21 @@ export function isValidMonitorRow(row: Record<string, unknown>): boolean {
  * - Adds security validation for activeOperations JSON.
  * - Performs safe type conversions with fallbacks.
  *
- * @param row - The raw database row to convert.
- * @returns The mapped monitor object.
- * @throws Error if mapping fails or required fields are invalid.
- *
  * @example
+ *
  * ```typescript
  * const monitor = rowToMonitor(dbRow);
  * ```
- * @see {@link mapRowToMonitor}
+ *
+ * @param row - The raw database row to convert.
+ *
+ * @returns The mapped monitor object.
+ *
+ * @throws Error if mapping fails or required fields are invalid.
+ *
  * @public
+ *
+ * @see {@link mapRowToMonitor}
  */
 export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
     try {
@@ -286,15 +300,19 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
  * @remarks
  * Each row is mapped using {@link rowToMonitor}. History is not loaded here.
  *
- * @param rows - Array of raw database rows.
- * @returns Array of mapped monitor objects.
- *
  * @example
+ *
  * ```typescript
  * const monitors = rowsToMonitors(dbRows);
  * ```
- * @see {@link rowToMonitor}
+ *
+ * @param rows - Array of raw database rows.
+ *
+ * @returns Array of mapped monitor objects.
+ *
  * @public
+ *
+ * @see {@link rowToMonitor}
  */
 export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
     return rows.map((row) => rowToMonitor(row));
@@ -321,16 +339,21 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  * - Otherwise, delegates to {@link rowToMonitor}.
  * - Used by repository methods where a missing monitor is not an error.
  *
- * @param row - The raw database row or `undefined`.
- * @returns The mapped monitor object, or `undefined` if the row is missing.
- * @throws Error if mapping fails for a valid row.
- *
  * @example
+ *
  * ```typescript
  * const monitor = rowToMonitorOrUndefined(dbRowOrUndefined);
  * ```
- * @see {@link rowToMonitor}
+ *
+ * @param row - The raw database row or `undefined`.
+ *
+ * @returns The mapped monitor object, or `undefined` if the row is missing.
+ *
+ * @throws Error if mapping fails for a valid row.
+ *
  * @public
+ *
+ * @see {@link rowToMonitor}
  */
 export function rowToMonitorOrUndefined(
     row: DatabaseMonitorRow | undefined

@@ -34,8 +34,8 @@ import { monitorLogger } from "../../utils/logger";
  * service creation.
  *
  * @remarks
- * Includes all repositories, the database service, and the event emitter
- * needed for constructing database-related services.
+ * Includes all repositories, the database service, and the event emitter needed
+ * for constructing database-related services.
  *
  * @public
  */
@@ -86,8 +86,7 @@ export interface IDataImportExportService {
  * Abstract interface for site repository service operations.
  *
  * @remarks
- * Used for type safety and dependency injection for site repository
- * operations.
+ * Used for type safety and dependency injection for site repository operations.
  *
  * @public
  */
@@ -119,7 +118,8 @@ export class DatabaseServiceFactory {
      * Initializes the factory with all required dependencies and sets up a
      * logger adapter for use by created services.
      *
-     * @param dependencies - The {@link DatabaseServiceFactoryDependencies} required for service creation.
+     * @param dependencies - The {@link DatabaseServiceFactoryDependencies}
+     *   required for service creation.
      */
     public constructor(dependencies: DatabaseServiceFactoryDependencies) {
         this.dependencies = dependencies;
@@ -164,8 +164,8 @@ export class DatabaseServiceFactory {
      * Creates a site repository service instance.
      *
      * @remarks
-     * Returns a new {@link SiteRepositoryService} with injected dependencies
-     * for site repository operations.
+     * Returns a new {@link SiteRepositoryService} with injected dependencies for
+     * site repository operations.
      *
      * @returns Site repository service implementation.
      */

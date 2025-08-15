@@ -2,9 +2,9 @@
  * Type-safe utility functions for common type manipulations.
  *
  * @remarks
- * These utilities provide type-safe alternatives to unsafe type assertions
- * for common patterns throughout the codebase. They centralize the necessary
- * type assertions with proper documentation and validation.
+ * These utilities provide type-safe alternatives to unsafe type assertions for
+ * common patterns throughout the codebase. They centralize the necessary type
+ * assertions with proper documentation and validation.
  *
  * @packageDocumentation
  */
@@ -12,13 +12,14 @@
 /**
  * Safely casts IPC response to expected type with basic validation.
  *
- * @param response - IPC response of unknown type
- * @param validator - Optional validation function
- * @returns Response cast to expected type
- *
  * @remarks
  * Use this for IPC responses where we have a contract but can't guarantee
  * types. The validator provides additional runtime safety if provided.
+ *
+ * @param response - IPC response of unknown type
+ * @param validator - Optional validation function
+ *
+ * @returns Response cast to expected type
  */
 export function castIpcResponse<T>(
     response: unknown,
@@ -38,12 +39,13 @@ export function castIpcResponse<T>(
 /**
  * Safely checks if an unknown value is an array.
  *
- * @param value - Value to check
- * @returns True if value is an array, false otherwise
- *
  * @remarks
- * Type guard function for arrays.
- * Use this to validate arrays before accessing array methods.
+ * Type guard function for arrays. Use this to validate arrays before accessing
+ * array methods.
+ *
+ * @param value - Value to check
+ *
+ * @returns True if value is an array, false otherwise
  */
 export function isArray(value: unknown): value is unknown[] {
     return Array.isArray(value);
@@ -52,12 +54,13 @@ export function isArray(value: unknown): value is unknown[] {
 /**
  * Safely checks if an unknown value is a record (object with string keys).
  *
- * @param value - Value to check
- * @returns True if value is a record, false otherwise
- *
  * @remarks
- * Type guard function for Record\<string, unknown\> types.
- * Use this to validate objects before accessing their properties.
+ * Type guard function for Record<string, unknown> types. Use this to validate
+ * objects before accessing their properties.
+ *
+ * @param value - Value to check
+ *
+ * @returns True if value is a record, false otherwise
  */
 export function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -66,13 +69,14 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Safely extracts a property from an unknown object.
  *
- * @param obj - Unknown object to extract from
- * @param key - Property key to extract
- * @returns Property value or undefined
- *
  * @remarks
  * Provides safe property access from unknown objects without type assertions.
  * Returns undefined if object is not an object or property doesn't exist.
+ *
+ * @param obj - Unknown object to extract from
+ * @param key - Property key to extract
+ *
+ * @returns Property value or undefined
  */
 export function safePropertyAccess(obj: unknown, key: string): unknown {
     if (isRecord(obj) && key in obj) {
@@ -84,14 +88,17 @@ export function safePropertyAccess(obj: unknown, key: string): unknown {
 /**
  * Type-safe conversion from unknown to a specific type with validation.
  *
- * @param value - Unknown value to convert
- * @param validator - Validation function that returns true if value is of type T
- * @returns Validated value of type T
- * @throws Error if validation fails
- *
  * @remarks
  * Use this instead of direct type assertions when you can validate the type.
  * Provides runtime safety in addition to compile-time types.
+ *
+ * @param value - Unknown value to convert
+ * @param validator - Validation function that returns true if value is of type
+ *   T
+ *
+ * @returns Validated value of type T
+ *
+ * @throws Error if validation fails
  */
 export function validateAndConvert<T>(
     value: unknown,

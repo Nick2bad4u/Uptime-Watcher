@@ -9,36 +9,36 @@
  * component handles focus states, disabled states, and provides consistent
  * visual appearance across the application.
  *
- * @example
- * Basic select dropdown:
+ * @example Basic select dropdown:
+ *
  * ```tsx
  * <ThemedSelect
- *   id="method"
- *   value={selectedMethod}
- *   onChange={handleMethodChange}
- *   aria-label="HTTP Method"
+ *     id="method"
+ *     value={selectedMethod}
+ *     onChange={handleMethodChange}
+ *     aria-label="HTTP Method"
  * >
- *   <option value="GET">GET</option>
- *   <option value="POST">POST</option>
- *   <option value="PUT">PUT</option>
- * </ThemedSelect>
+ *     <option value="GET">GET</option>
+ *     <option value="POST">POST</option>
+ *     <option value="PUT">PUT</option>
+ * </ThemedSelect>;
  * ```
  *
- * @example
- * Select with validation and accessibility:
+ * @example Select with validation and accessibility:
+ *
  * ```tsx
  * <ThemedSelect
- *   id="protocol"
- *   value={protocol}
- *   onChange={handleProtocolChange}
- *   required={true}
- *   aria-describedby="protocol-error"
- *   disabled={isLoading}
+ *     id="protocol"
+ *     value={protocol}
+ *     onChange={handleProtocolChange}
+ *     required={true}
+ *     aria-describedby="protocol-error"
+ *     disabled={isLoading}
  * >
- *   <option value="">Select protocol...</option>
- *   <option value="http">HTTP</option>
- *   <option value="https">HTTPS</option>
- * </ThemedSelect>
+ *     <option value="">Select protocol...</option>
+ *     <option value="http">HTTP</option>
+ *     <option value="https">HTTPS</option>
+ * </ThemedSelect>;
  * ```
  *
  * @public
@@ -90,25 +90,26 @@ export interface ThemedSelectProperties {
  * @remarks
  * This component provides a styled select dropdown with automatic theme
  * integration, focus states, and accessibility features. The select supports
- * various event handlers and automatically applies appropriate styling based
- * on the current theme and state.
+ * various event handlers and automatically applies appropriate styling based on
+ * the current theme and state.
  *
- * @param props - The component properties
- * @returns The themed select JSX element
+ * @example Timeout selection dropdown:
  *
- * @example
- * Timeout selection dropdown:
  * ```tsx
  * <ThemedSelect
- *   value={timeout}
- *   onChange={handleTimeoutChange}
- *   title="Request timeout in seconds"
+ *     value={timeout}
+ *     onChange={handleTimeoutChange}
+ *     title="Request timeout in seconds"
  * >
- *   <option value={5}>5 seconds</option>
- *   <option value={10}>10 seconds</option>
- *   <option value={30}>30 seconds</option>
- * </ThemedSelect>
+ *     <option value={5}>5 seconds</option>
+ *     <option value={10}>10 seconds</option>
+ *     <option value={30}>30 seconds</option>
+ * </ThemedSelect>;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The themed select JSX element
  *
  * @public
  */

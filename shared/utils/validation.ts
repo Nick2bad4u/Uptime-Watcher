@@ -1,6 +1,6 @@
 /**
- * Shared validation utilities for monitors and sites.
- * Provides consistent validation logic across frontend and backend.
+ * Shared validation utilities for monitors and sites. Provides consistent
+ * validation logic across frontend and backend.
  */
 
 import {
@@ -14,11 +14,12 @@ import {
 /**
  * Validates monitor type.
  *
- * @param type - Value to check as monitor type
- * @returns Type predicate indicating if the value is a valid MonitorType
- *
  * @remarks
  * Supports all monitor types: HTTP, port, and ping monitors.
+ *
+ * @param type - Value to check as monitor type
+ *
+ * @returns Type predicate indicating if the value is a valid MonitorType
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
@@ -31,6 +32,7 @@ export function validateMonitorType(type: unknown): type is MonitorType {
  * Type guard to check if a value is a partial monitor object.
  *
  * @param value - Value to check
+ *
  * @returns Type predicate indicating if the value could be a partial monitor
  */
 function isPartialMonitor(value: unknown): value is Partial<Monitor> {
@@ -47,6 +49,7 @@ function isPartialMonitor(value: unknown): value is Partial<Monitor> {
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
+ *
  * @internal
  */
 function validateBasicMonitorFields(
@@ -104,6 +107,7 @@ function validateBasicMonitorFields(
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
+ *
  * @internal
  */
 function validateHttpMonitorFields(
@@ -124,6 +128,7 @@ function validateHttpMonitorFields(
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
+ *
  * @internal
  */
 function validatePingMonitorFields(
@@ -145,6 +150,7 @@ function validatePingMonitorFields(
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
+ *
  * @internal
  */
 function validatePortMonitorFields(
@@ -166,16 +172,17 @@ function validatePortMonitorFields(
 }
 
 /**
- * Validates type-specific monitor fields by delegating to the appropriate
- * field validator.
+ * Validates type-specific monitor fields by delegating to the appropriate field
+ * validator.
  *
  * @remarks
  * Calls the correct field validation function based on the monitor type
- * ("http", "port", or "ping"). Adds error messages to the provided errors
- * array for any missing or invalid fields.
+ * ("http", "port", or "ping"). Adds error messages to the provided errors array
+ * for any missing or invalid fields.
  *
  * @param monitor - Partial monitor object to validate.
  * @param errors - Array to collect validation error messages.
+ *
  * @internal
  */
 function validateTypeSpecificFields(
@@ -209,12 +216,13 @@ function validateTypeSpecificFields(
 /**
  * Gets validation errors for monitor fields based on monitor type.
  *
- * @param monitor - Partial monitor data to validate
- * @returns Array of validation error messages (empty if valid)
- *
  * @remarks
- * Validates required fields and type-specific constraints for monitors.
- * Returns descriptive error messages for any validation failures.
+ * Validates required fields and type-specific constraints for monitors. Returns
+ * descriptive error messages for any validation failures.
+ *
+ * @param monitor - Partial monitor data to validate
+ *
+ * @returns Array of validation error messages (empty if valid)
  */
 export function getMonitorValidationErrors(
     monitor: Partial<Monitor>
@@ -233,12 +241,13 @@ export function getMonitorValidationErrors(
 /**
  * Validates site data structure.
  *
- * @param site - Partial site data to validate
- * @returns Type predicate indicating if the site is valid
- *
  * @remarks
  * Performs comprehensive validation of site structure including all monitors.
  * Uses proper type guards to ensure runtime safety.
+ *
+ * @param site - Partial site data to validate
+ *
+ * @returns Type predicate indicating if the site is valid
  */
 export function validateSite(site: Partial<Site>): site is Site {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

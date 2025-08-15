@@ -7,24 +7,25 @@
  * Ensures events are properly typed and provides rich debugging information.
  *
  * @example
+ *
  * ```typescript
  * interface MyEvents {
  *   'user:login': { userId: string; timestamp: number };
  *   'data:updated': { table: string; records: nu        // Handle objects with potential _meta conflicts
-        // Since T extends object, we know data is an object
-        const hasExistingMeta = Object.hasOwn(data, "_meta");
-        if (hasExistingMeta) {
-            logger.debug(
-                `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
-            );
-            // Type-safe access to _meta property
-            const existingMeta = (data as { _meta?: unknown })._meta;
-            return {
-                ...data,
-                _meta: metadata,
-                _originalMeta: existingMeta,
-            } as T & { _meta: EventMetadata };
-        } *
+ *         // Since T extends object, we know data is an object
+ *         const hasExistingMeta = Object.hasOwn(data, "_meta");
+ *         if (hasExistingMeta) {
+ *             logger.debug(
+ *                 `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
+ *             );
+ *             // Type-safe access to _meta property
+ *             const existingMeta = (data as { _meta?: unknown })._meta;
+ *             return {
+ *                 ...data,
+ *                 _meta: metadata,
+ *                 _originalMeta: existingMeta,
+ *             } as T & { _meta: EventMetadata };
+ *         } *
  * const bus = new TypedEventBus<MyEvents>('app-events');
  * bus.onTyped('user:login', (data) => {
  *   console.log(`User ${data.userId} logged in at ${data.timestamp}`);
@@ -74,9 +75,8 @@ export interface EventBusDiagnostics {
  * Metadata automatically added to all emitted events.
  *
  * @remarks
- * Provides debugging and tracking information for each event emission.
- * This metadata is available in all event listeners under the `_meta`
- * property.
+ * Provides debugging and tracking information for each event emission. This
+ * metadata is available in all event listeners under the `_meta` property.
  *
  * @public
  */
@@ -103,19 +103,23 @@ export interface EventMetadata {
  * performed before calling {@link TypedEventBus.emitTyped}.
  *
  * @example
+ *
  * ```typescript
  * const loggingMiddleware: EventMiddleware = async (event, data, next) => {
- *   console.log(`Processing event: ${event}`);
- *   await next(); // Continue to next middleware
- *   console.log(`Completed event: ${event}`);
+ *     console.log(`Processing event: ${event}`);
+ *     await next(); // Continue to next middleware
+ *     console.log(`Completed event: ${event}`);
  * };
  * ```
  *
  * @typeParam T - The type of event data payload.
+ *
  * @param event - Name of the event being processed.
  * @param data - Event data payload (read-only for inspection).
  * @param next - Function to call to continue to the next middleware.
+ *
  * @returns A promise that resolves when the middleware chain is complete.
+ *
  * @throws Error if the middleware wishes to abort event processing.
  */
 // eslint-disable-next-line etc/prefer-interface -- Function type is simpler for middleware callbacks
@@ -133,11 +137,11 @@ export type EventMiddleware<T = unknown> = (
  * tracking, middleware processing, and comprehensive debugging capabilities.
  * Events are processed through a middleware chain before emission.
  *
- * **Type Constraints:**
- * EventMap values must be object types (not primitives) to support metadata
- * enhancement.
+ * **Type Constraints:** EventMap values must be object types (not primitives)
+ * to support metadata enhancement.
  *
- * @typeParam EventMap - Map of event names to their data types. Values must be object types.
+ * @typeParam EventMap - Map of event names to their data types. Values must be
+ *   object types.
  *
  * @public
  */
@@ -161,40 +165,48 @@ export class TypedEventBus<
      * timestamp, and bus ID.
      *
      * **Middleware Processing:**
-     * - Middleware is intended for cross-cutting concerns (logging,
-     * validation, rate limiting). - Middleware receives the original event
-     * data for inspection but cannot modify
-     *   the data that gets delivered to listeners.
-     * - Data transformations should be performed before calling {@link
-     * TypedEventBus.emitTyped}. - If middleware throws an error, event
-     * emission is aborted.
+     *
+     * - Middleware is intended for cross-cutting concerns (logging, validation,
+     *   rate limiting). - Middleware receives the original event data for
+     *   inspection but cannot modify the data that gets delivered to
+     *   listeners.
+     * - Data transformations should be performed before calling
+     *   {@link TypedEventBus.emitTyped}. - If middleware throws an error, event
+     *   emission is aborted.
      *
      * **Data Transformation Behavior:**
+     *
      * - **Objects**: Spread with added `_meta` property.
      * - **Arrays**: Preserved with non-enumerable `_meta` property.
-     * - **Primitives**: Wrapped as
-     * `{ value: primitiveData, _meta: metadata }`.
+     * - **Primitives**: Wrapped as `{ value: primitiveData, _meta: metadata }`.
      * - **Objects with _meta**: Original `_meta` preserved as `_originalMeta`.
      *
      * @example
+     *
      * ```typescript
      * // Object event (typical case)
-     * await bus.emitTyped('user:login', { userId: '123', timestamp: Date.now() });
+     * await bus.emitTyped("user:login", {
+     *     userId: "123",
+     *     timestamp: Date.now(),
+     * });
      * // Listener receives: { userId: '123', timestamp: Date.now(), _meta: {...} }
      *
      * // Array event
-     * await bus.emitTyped('data:batch', [1, 2, 3]);
+     * await bus.emitTyped("data:batch", [1, 2, 3]);
      * // Listener receives: [1, 2, 3] with _meta property attached
      *
      * // Primitive event
-     * await bus.emitTyped('count:updated', 42);
+     * await bus.emitTyped("count:updated", 42);
      * // Listener receives: { value: 42, _meta: {...} }
      * ```
      *
      * @typeParam K - The event name (must be a key in EventMap).
+     *
      * @param event - The event name.
      * @param data - The event data (must match the type for this event).
+     *
      * @returns A promise that resolves when the event has been emitted.
+     *
      * @throws Error when middleware processing fails.
      */
     public async emitTyped<K extends keyof EventMap>(
@@ -249,7 +261,9 @@ export class TypedEventBus<
      * @param eventName - Name of the event being processed.
      * @param data - Event data payload.
      * @param correlationId - Unique ID for tracking this event emission.
+     *
      * @returns A promise that resolves when all middleware have completed.
+     *
      * @throws Error if any middleware in the chain throws.
      */
     private async processMiddleware(
@@ -290,22 +304,27 @@ export class TypedEventBus<
      * Create a new typed event bus.
      *
      * @remarks
-     * If no name is provided, a unique correlation ID will be generated.
-     * The bus is configured with a reasonable max listener limit for
-     * development use. A maximum middleware limit prevents memory leaks from
-     * excessive middleware registration.
+     * If no name is provided, a unique correlation ID will be generated. The
+     * bus is configured with a reasonable max listener limit for development
+     * use. A maximum middleware limit prevents memory leaks from excessive
+     * middleware registration.
      *
      * @example
+     *
      * ```typescript
      * // Default configuration
-     * const bus = new TypedEventBus<MyEvents>('my-bus');
+     * const bus = new TypedEventBus<MyEvents>("my-bus");
      *
      * // Custom middleware limit
-     * const bus = new TypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
+     * const bus = new TypedEventBus<MyEvents>("my-bus", {
+     *     maxMiddleware: 30,
+     * });
      * ```
      *
-     * @param name - Optional name for the bus (used in logging and diagnostics).
+     * @param name - Optional name for the bus (used in logging and
+     *   diagnostics).
      * @param options - Optional configuration options.
+     *
      * @throws Error when `maxMiddleware` is not positive.
      */
     public constructor(name?: string, options?: { maxMiddleware?: number }) {
@@ -333,8 +352,8 @@ export class TypedEventBus<
      * Clear all registered middleware.
      *
      * @remarks
-     * Removes all middleware functions from the processing chain.
-     * Events will be emitted directly without middleware processing.
+     * Removes all middleware functions from the processing chain. Events will
+     * be emitted directly without middleware processing.
      */
     public clearMiddleware(): void {
         const count = this.middlewares.length;
@@ -352,7 +371,8 @@ export class TypedEventBus<
      * Provides runtime information useful for debugging and monitoring.
      * Includes listener counts per event, middleware count, and configuration.
      *
-     * @returns Diagnostic data including listener counts and middleware information.
+     * @returns Diagnostic data including listener counts and middleware
+     *   information.
      */
     public getDiagnostics(): EventBusDiagnostics {
         const listenerCounts: Record<string, number> = {};
@@ -382,16 +402,20 @@ export class TypedEventBus<
      * @remarks
      * If no listener is specified, all listeners for the event are removed.
      *
-     * @typeParam K - The event name (must be a key in EventMap).
-     * @param event - The event name to remove listeners for.
-     * @param listener - Specific listener to remove, or `undefined` to remove all listeners for the event.
-     * @returns This event bus instance for chaining.
-     *
      * @example
+     *
      * ```typescript
-     * bus.offTyped('user:login'); // Remove all listeners for 'user:login'
-     * bus.offTyped('user:login', myListener); // Remove specific listener
+     * bus.offTyped("user:login"); // Remove all listeners for 'user:login'
+     * bus.offTyped("user:login", myListener); // Remove specific listener
      * ```
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
+     *
+     * @param event - The event name to remove listeners for.
+     * @param listener - Specific listener to remove, or `undefined` to remove
+     *   all listeners for the event.
+     *
+     * @returns This event bus instance for chaining.
      */
     public offTyped<K extends keyof EventMap>(
         event: K,
@@ -418,17 +442,21 @@ export class TypedEventBus<
      * The listener is automatically removed after the first time the event is
      * emitted.
      *
-     * @typeParam K - The event name (must be a key in EventMap).
-     * @param event - The event name to listen for.
-     * @param listener - Function to call when the event is emitted (called only once).
-     * @returns This event bus instance for chaining.
-     *
      * @example
+     *
      * ```typescript
-     * bus.onceTyped('user:login', (data) => {
-     *   console.log('User logged in:', data.userId);
+     * bus.onceTyped("user:login", (data) => {
+     *     console.log("User logged in:", data.userId);
      * });
      * ```
+     *
+     * @typeParam K - The event name (must be a key in EventMap).
+     *
+     * @param event - The event name to listen for.
+     * @param listener - Function to call when the event is emitted (called only
+     *   once).
+     *
+     * @returns This event bus instance for chaining.
      */
     public onceTyped<K extends keyof EventMap>(
         event: K,
@@ -449,12 +477,14 @@ export class TypedEventBus<
      *
      * @remarks
      * The listener receives the original event data plus automatically added
-     * metadata. TypeScript will enforce that the listener signature matches
-     * the event data type.
+     * metadata. TypeScript will enforce that the listener signature matches the
+     * event data type.
      *
      * @typeParam K - The event name (must be a key in EventMap).
+     *
      * @param event - The event name to listen for.
      * @param listener - Function to call when the event is emitted.
+     *
      * @returns This event bus instance for chaining.
      */
     public onTyped<K extends keyof EventMap>(
@@ -478,6 +508,7 @@ export class TypedEventBus<
      * If the middleware is found, it is removed from the chain.
      *
      * @param middleware - The middleware function to remove.
+     *
      * @returns `true` if middleware was found and removed, `false` otherwise.
      */
     public removeMiddleware(middleware: EventMiddleware): boolean {
@@ -498,13 +529,13 @@ export class TypedEventBus<
      *
      * @remarks
      * Middleware is executed in registration order. Each middleware must call
-     * `next()` to continue the chain or throw an error to abort processing.
-     * A maximum middleware limit prevents memory leaks from excessive
-     * registrations. If you need more middleware, consider increasing the
-     * limit in the constructor or combining multiple middleware functions into
-     * one.
+     * `next()` to continue the chain or throw an error to abort processing. A
+     * maximum middleware limit prevents memory leaks from excessive
+     * registrations. If you need more middleware, consider increasing the limit
+     * in the constructor or combining multiple middleware functions into one.
      *
      * @param middleware - Middleware function to register.
+     *
      * @throws Error when the maximum middleware limit is exceeded.
      */
     // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
@@ -530,28 +561,32 @@ export class TypedEventBus<
      * safely. Preserves original data structure and type safety.
      *
      * **Special Behaviors:**
+     *
      * - **Arrays**: Preserves array structure with non-enumerable `_meta`
-     * property. - **Objects with _meta**: Existing `_meta` preserved as
-     * `_originalMeta` property. - **Primitives**: Wrapped in
-     * `{ value: data, _meta: metadata }` structure. - **Type Safety**:
-     * All transformations maintain compile-time type guarantees.
+     *   property. - **Objects with _meta**: Existing `_meta` preserved as
+     *   `_originalMeta` property. - **Primitives**: Wrapped in `{ value: data,
+     *   _meta: metadata }` structure. - **Type Safety**: All transformations
+     *   maintain compile-time type guarantees.
      *
      * @example
+     *
      * ```typescript
      * // Array handling
-     * createEnhancedData([1, 2, 3], meta) // → [1, 2, 3] with _meta attached
+     * createEnhancedData([1, 2, 3], meta); // → [1, 2, 3] with _meta attached
      *
      * // Object with existing _meta
-     * createEnhancedData({ data: 'test', _meta: 'existing' }, meta)
+     * createEnhancedData({ data: "test", _meta: "existing" }, meta);
      * // → { data: 'test', _meta: newMeta, _originalMeta: 'existing' }
      *
      * // Primitive handling
-     * createEnhancedData(42, meta) // → { value: 42, _meta: meta }
+     * createEnhancedData(42, meta); // → { value: 42, _meta: meta }
      * ```
      *
      * @typeParam T - The type of the original event data.
+     *
      * @param data - Original event data.
      * @param metadata - Metadata to add.
+     *
      * @returns Enhanced data with `_meta` property.
      */
     private createEnhancedData(
@@ -620,13 +655,19 @@ export class TypedEventBus<
  * constructor.
  *
  * @example
+ *
  * ```typescript
- * const bus = createTypedEventBus<MyEvents>('my-bus', { maxMiddleware: 30 });
+ * const bus = createTypedEventBus<MyEvents>("my-bus", {
+ *     maxMiddleware: 30,
+ * });
  * ```
  *
- * @typeParam EventMap - Map of event names to their data types. Values can be any type.
+ * @typeParam EventMap - Map of event names to their data types. Values can be
+ *   any type.
+ *
  * @param name - Optional name for the bus (used in logging and diagnostics).
  * @param options - Optional configuration options for the event bus.
+ *
  * @returns A new {@link TypedEventBus} instance.
  */
 // eslint-disable-next-line etc/no-misused-generics -- EventMap must be explicitly provided for type safety

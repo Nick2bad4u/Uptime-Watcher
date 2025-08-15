@@ -1,6 +1,6 @@
 /**
- * Updates store types and interfaces.
- * Manages application updates and update notifications.
+ * Updates store types and interfaces. Manages application updates and update
+ * notifications.
  */
 
 import type { UpdateStatus } from "../types";
@@ -20,8 +20,7 @@ export interface UpdateInfo {
 }
 
 /**
- * Updates store interface.
- * Manages application update status and operations.
+ * Updates store interface. Manages application update status and operations.
  */
 export interface UpdatesStore {
     /** Apply downloaded update and restart */

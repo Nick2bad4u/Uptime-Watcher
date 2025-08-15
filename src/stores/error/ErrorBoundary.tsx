@@ -9,6 +9,7 @@
  * designed for store-related and critical UI error scenarios.
  *
  * Key features:
+ *
  * - Automatic error logging with contextual information
  * - Customizable fallback UI for different error scenarios
  * - Retry mechanism that remounts failed components
@@ -17,10 +18,11 @@
  *
  * The error boundary follows React's best practices and provides a
  * user-friendly way to handle unexpected errors without crashing the entire
- * application. It's particularly useful around store-connected components
- * where state errors might occur.
+ * application. It's particularly useful around store-connected components where
+ * state errors might occur.
  *
  * @example
+ *
  * ```tsx
  * // Basic usage with default fallback
  * <ErrorBoundary>
@@ -50,8 +52,8 @@ import logger from "../../services/logger";
  * Props for the {@link ErrorBoundary} component.
  *
  * @remarks
- * Accepts children to render, an optional fallback component for error
- * display, and an optional error handler callback.
+ * Accepts children to render, an optional fallback component for error display,
+ * and an optional error handler callback.
  *
  * @public
  */
@@ -68,8 +70,8 @@ export interface ErrorBoundaryProperties {
  * State for the {@link ErrorBoundary} component.
  *
  * @remarks
- * Tracks error state for rendering fallback UI.
- * The retryCount is used to force re-mounting of children on retry.
+ * Tracks error state for rendering fallback UI. The retryCount is used to force
+ * re-mounting of children on retry.
  *
  * @public
  */
@@ -88,10 +90,11 @@ export interface ErrorBoundaryState {
  * wrap store-connected or critical UI components.
  *
  * @example
+ *
  * ```tsx
  * <ErrorBoundary>
- *   <MyComponent />
- * </ErrorBoundary>
+ *     <MyComponent />
+ * </ErrorBoundary>;
  * ```
  *
  * @public

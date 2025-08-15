@@ -1,7 +1,7 @@
 /**
- * Theme management hook providing theme state, controls, and utility
- * functions. Handles theme switching, system theme detection, and provides
- * color/styling utilities.
+ * Theme management hook providing theme state, controls, and utility functions.
+ * Handles theme switching, system theme detection, and provides color/styling
+ * utilities.
  */
 
 import {
@@ -173,13 +173,14 @@ export function useTheme(): UseThemeReturn {
     /**
      * Change the active theme.
      *
-     * @param themeName - Name of the theme to activate
-     *
      * @example
+     *
      * ```typescript
      * setTheme("dark"); // Switch to dark theme
      * setTheme("system"); // Use system preference
      * ```
+     *
+     * @param themeName - Name of the theme to activate
      */
     const setTheme = useCallback(
         (themeName: ThemeName) => {
@@ -192,10 +193,11 @@ export function useTheme(): UseThemeReturn {
      * Toggle between light and dark themes.
      *
      * @remarks
-     * Switches from current theme to its opposite (light ↔ dark).
-     * If current theme is neither light nor dark, defaults to light.
+     * Switches from current theme to its opposite (light ↔ dark). If current
+     * theme is neither light nor dark, defaults to light.
      *
      * @example
+     *
      * ```typescript
      * toggleTheme(); // Dark theme → Light theme
      * ```
@@ -208,14 +210,17 @@ export function useTheme(): UseThemeReturn {
     /**
      * Get theme-aware color from a dot-notation path.
      *
-     * @param path - Dot-notation path to the color (e.g., "colors.status.up")
-     * @returns Color value as string, or theme-aware fallback if path is invalid
-     *
      * @example
+     *
      * ```typescript
      * const upColor = getColor("status.up");
      * const primaryBg = getColor("background.primary");
      * ```
+     *
+     * @param path - Dot-notation path to the color (e.g., "colors.status.up")
+     *
+     * @returns Color value as string, or theme-aware fallback if path is
+     *   invalid
      */
     const getColor = useCallback(
         (path: string) => {
@@ -245,14 +250,16 @@ export function useTheme(): UseThemeReturn {
     /**
      * Get status-specific color from the current theme.
      *
-     * @param status - Site status value
-     * @returns Status color from theme, or theme-aware fallback with warning
-     *
      * @example
+     *
      * ```typescript
      * const upColor = getStatusColor("up");
      * const downColor = getStatusColor("down");
      * ```
+     *
+     * @param status - Site status value
+     *
+     * @returns Status color from theme, or theme-aware fallback with warning
      */
     const getStatusColor = useCallback(
         (status: SiteStatus) => {
@@ -270,8 +277,8 @@ export function useTheme(): UseThemeReturn {
      * Get all available theme names.
      *
      * @remarks
-     * Dynamically retrieved from ThemeManager to ensure consistency
-     * with actual available themes.
+     * Dynamically retrieved from ThemeManager to ensure consistency with actual
+     * available themes.
      */
     const availableThemes = themeManager.getAvailableThemes();
 
@@ -376,6 +383,7 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
 
 /**
  * Hook for accessing theme-aware status colors.
+ *
  * @returns Object containing status colors from the current theme
  */
 export function useStatusColors(): UseStatusColorsReturn {
@@ -393,16 +401,12 @@ export function useStatusColors(): UseStatusColorsReturn {
  * Main theme hook providing comprehensive theme management functionality.
  *
  * @remarks
- * This hook provides a complete theming solution with system integration,
- * color utilities, and automatic updates. It serves as the primary interface
- * for all theme-related operations throughout the application.
- *
- * @public
- *
- * @see {@link ThemeManager} for theme management implementation
- * @see {@link useSettingsStore} for settings integration
+ * This hook provides a complete theming solution with system integration, color
+ * utilities, and automatic updates. It serves as the primary interface for all
+ * theme-related operations throughout the application.
  *
  * @example
+ *
  * ```typescript
  * const { isDark, toggleTheme, getStatusColor } = useTheme();
  *
@@ -410,16 +414,24 @@ export function useStatusColors(): UseStatusColorsReturn {
  * toggleTheme();
  *
  * // Get status-based colors
- * const upColor = getStatusColor('up');
+ * const upColor = getStatusColor("up");
  * ```
  *
  * @returns Object containing theme state, setters, and utility functions
+ *
+ * @public
+ *
+ * @see {@link ThemeManager} for theme management implementation
+ * @see {@link useSettingsStore} for settings integration
  */
 
 /**
- * Hook for theme-aware CSS classes using CSS custom properties.
- * Provides utility functions for generating dynamic CSS classes based on the current theme.
- * @returns Object with methods for generating background, text, and status classes
+ * Hook for theme-aware CSS classes using CSS custom properties. Provides
+ * utility functions for generating dynamic CSS classes based on the current
+ * theme.
+ *
+ * @returns Object with methods for generating background, text, and status
+ *   classes
  */
 export function useThemeClasses(): UseThemeClassesReturn {
     const { getColor } = useTheme();
@@ -477,7 +489,9 @@ export function useThemeClasses(): UseThemeClassesReturn {
 
 /**
  * Utility hook for accessing specific values from the current theme.
+ *
  * @param selector - Function that extracts a value from the theme
+ *
  * @returns The selected value from the current theme
  */
 export function useThemeValue<T>(selector: (theme: Theme) => T): T {

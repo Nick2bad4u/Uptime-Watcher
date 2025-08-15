@@ -27,19 +27,21 @@ export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
  * Formats duration in a human-readable format with appropriate time units.
  *
  * @remarks
- * Automatically selects the most appropriate time units for readability.
- * Shows hours and minutes for longer durations, minutes and seconds for
- * medium durations, and seconds only for short durations.
- *
- * @param ms - Duration in milliseconds
- * @returns Formatted duration string
+ * Automatically selects the most appropriate time units for readability. Shows
+ * hours and minutes for longer durations, minutes and seconds for medium
+ * durations, and seconds only for short durations.
  *
  * @example
+ *
  * ```typescript
  * formatDuration(7200000); // "2h 0m"
- * formatDuration(135000);  // "2m 15s"
- * formatDuration(45000);   // "45s"
+ * formatDuration(135000); // "2m 15s"
+ * formatDuration(45000); // "45s"
  * ```
+ *
+ * @param ms - Duration in milliseconds
+ *
+ * @returns Formatted duration string
  */
 export function formatDuration(ms: number): string {
     const seconds = Math.floor(ms / 1000);
@@ -59,17 +61,19 @@ export function formatDuration(ms: number): string {
  * Formats timestamp as a full localized date/time string.
  *
  * @remarks
- * Uses the user's locale settings to format the timestamp according to
- * their regional preferences. Suitable for displaying detailed timestamp
- * information in logs or detailed views.
- *
- * @param timestamp - Unix timestamp in milliseconds
- * @returns Localized date/time string
+ * Uses the user's locale settings to format the timestamp according to their
+ * regional preferences. Suitable for displaying detailed timestamp information
+ * in logs or detailed views.
  *
  * @example
+ *
  * ```typescript
  * formatFullTimestamp(1640995200000); // "12/31/2021, 4:00:00 PM" (US locale)
  * ```
+ *
+ * @param timestamp - Unix timestamp in milliseconds
+ *
+ * @returns Localized date/time string
  */
 export function formatFullTimestamp(timestamp: number): string {
     return new Date(timestamp).toLocaleString();
@@ -83,15 +87,17 @@ export function formatFullTimestamp(timestamp: number): string {
  * limited. Automatically selects the most appropriate unit (seconds, minutes,
  * or hours) and rounds to whole numbers for simplicity.
  *
- * @param milliseconds - Time duration in milliseconds
- * @returns Concise formatted time string
- *
  * @example
+ *
  * ```typescript
- * formatIntervalDuration(30000);   // "30s"
- * formatIntervalDuration(300000);  // "5m"
+ * formatIntervalDuration(30000); // "30s"
+ * formatIntervalDuration(300000); // "5m"
  * formatIntervalDuration(3600000); // "1h"
  * ```
+ *
+ * @param milliseconds - Time duration in milliseconds
+ *
+ * @returns Concise formatted time string
  */
 export function formatIntervalDuration(milliseconds: number): string {
     if (milliseconds < 60_000) {
@@ -108,19 +114,21 @@ export function formatIntervalDuration(milliseconds: number): string {
  *
  * @remarks
  * Shows how long ago the timestamp occurred relative to the current time.
- * Provides appropriate granularity based on the time difference: days for
- * old events, hours and minutes for recent events, and "Just now" for
- * very recent events.
- *
- * @param timestamp - Unix timestamp in milliseconds
- * @returns Relative time description
+ * Provides appropriate granularity based on the time difference: days for old
+ * events, hours and minutes for recent events, and "Just now" for very recent
+ * events.
  *
  * @example
+ *
  * ```typescript
  * formatRelativeTimestamp(Date.now() - 120000); // "2 minutes ago"
  * formatRelativeTimestamp(Date.now() - 86400000); // "1 day ago"
  * formatRelativeTimestamp(Date.now() - 10000); // "Just now"
  * ```
+ *
+ * @param timestamp - Unix timestamp in milliseconds
+ *
+ * @returns Relative time description
  */
 export function formatRelativeTimestamp(timestamp: number): string {
     const now = Date.now();
@@ -149,7 +157,9 @@ export function formatRelativeTimestamp(timestamp: number): string {
 /**
  * Format time duration with milliseconds for response times (detailed format).
  * Used for displaying response times and performance metrics.
+ *
  * @param milliseconds - Time duration in milliseconds
+ *
  * @returns Formatted time string (e.g., "123ms", "30s", "5m", "1h")
  */
 export function formatResponseDuration(milliseconds: number): string {
@@ -170,21 +180,23 @@ export function formatResponseDuration(milliseconds: number): string {
  * selection.
  *
  * @remarks
- * Automatically chooses between milliseconds and seconds based on the
- * magnitude of the response time. Provides a fallback message for undefined or
- * null values. Optimized for displaying network response times in monitoring
+ * Automatically chooses between milliseconds and seconds based on the magnitude
+ * of the response time. Provides a fallback message for undefined or null
+ * values. Optimized for displaying network response times in monitoring
  * interfaces.
  *
- * @param time - Response time in milliseconds (optional)
- * @returns Formatted time string or fallback message
- *
  * @example
+ *
  * ```typescript
- * formatResponseTime(234);    // "234ms"
- * formatResponseTime(1230);   // "1.23s"
- * formatResponseTime(0);      // "0ms"
- * formatResponseTime(null);   // "N/A" (or configured fallback)
+ * formatResponseTime(234); // "234ms"
+ * formatResponseTime(1230); // "1.23s"
+ * formatResponseTime(0); // "0ms"
+ * formatResponseTime(null); // "N/A" (or configured fallback)
  * ```
+ *
+ * @param time - Response time in milliseconds (optional)
+ *
+ * @returns Formatted time string or fallback message
  */
 export function formatResponseTime(time?: number): string {
     if (!time && time !== 0) {
@@ -197,9 +209,11 @@ export function formatResponseTime(time?: number): string {
 }
 
 /**
- * Get display label for interval value.
- * Handles both numeric intervals and interval objects with custom labels.
+ * Get display label for interval value. Handles both numeric intervals and
+ * interval objects with custom labels.
+ *
  * @param interval - Interval configuration (number or object with value/label)
+ *
  * @returns Human readable label for the interval
  */
 export function getIntervalLabel(
@@ -217,8 +231,8 @@ export function getIntervalLabel(
 }
 
 /**
- * Format time periods for display
- * Maps time period keys to human-readable labels.
+ * Format time periods for display Maps time period keys to human-readable
+ * labels.
  *
  * @public
  */
@@ -234,13 +248,14 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
 /**
  * Format retry attempts with descriptive text.
  *
- * @param attempts - Number of retry attempts (expected range: 0-10)
- * @returns Descriptive text explaining retry behavior
- *
  * @remarks
- * Handles edge cases: 0 attempts means no retries (immediate failure),
- * negative values are not expected but will be formatted as-is.
- * The function provides user-friendly text explaining the retry behavior.
+ * Handles edge cases: 0 attempts means no retries (immediate failure), negative
+ * values are not expected but will be formatted as-is. The function provides
+ * user-friendly text explaining the retry behavior.
+ *
+ * @param attempts - Number of retry attempts (expected range: 0-10)
+ *
+ * @returns Descriptive text explaining retry behavior
  */
 export function formatRetryAttemptsText(attempts: number): string {
     if (attempts === 0) {

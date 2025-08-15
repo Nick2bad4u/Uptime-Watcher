@@ -3,27 +3,35 @@
  *
  * @remarks
  * This component serves as a friendly guide for users who have just installed
- * the application or cleared all their sites. It provides clear visual
- * feedback about the empty state and implicitly suggests the next action.
+ * the application or cleared all their sites. It provides clear visual feedback
+ * about the empty state and implicitly suggests the next action.
  *
  * Features:
+ *
  * - Centered layout with icon and descriptive text
  * - Uses themed components for consistent styling
  * - Responsive design that works across different screen sizes
  * - Clear call-to-action messaging to guide user workflow
  *
- * @returns JSX.Element containing the empty state UI
- *
  * @example
+ *
  * ```tsx
  * function SiteList({ sites }) {
- *   if (sites.length === 0) {
- *     return <EmptyState />;
- *   }
- *   // Render site list items
- *   return <div>{sites.map(site => <SiteCard key={site.id} site={site} />)}</div>;
+ *     if (sites.length === 0) {
+ *         return <EmptyState />;
+ *     }
+ *     // Render site list items
+ *     return (
+ *         <div>
+ *             {sites.map((site) => (
+ *                 <SiteCard key={site.id} site={site} />
+ *             ))}
+ *         </div>
+ *     );
  * }
  * ```
+ *
+ * @returns JSX.Element containing the empty state UI
  *
  * @public
  */

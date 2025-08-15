@@ -3,6 +3,7 @@
  *
  * @remarks
  * Provides comprehensive site synchronization functionality including:
+ *
  * - Full backend synchronization
  * - Real-time status updates via event subscriptions
  * - Sync status monitoring and reporting
@@ -31,8 +32,8 @@ import { StatusUpdateManager } from "./utils/statusUpdateHandler";
  *
  * @remarks
  * Defines all available site synchronization operations that can be performed.
- * These actions are designed to work within the Zustand store architecture
- * and provide consistent error handling and logging.
+ * These actions are designed to work within the Zustand store architecture and
+ * provide consistent error handling and logging.
  *
  * @public
  */
@@ -41,9 +42,9 @@ export interface SiteSyncActions {
      * Performs a complete synchronization from the backend.
      *
      * @remarks
-     * Triggers a full sync operation that updates all local site data
-     * with the latest information from the backend. This is typically
-     * used during application startup or when recovering from errors.
+     * Triggers a full sync operation that updates all local site data with the
+     * latest information from the backend. This is typically used during
+     * application startup or when recovering from errors.
      *
      * @returns Promise that resolves when synchronization is complete
      */
@@ -54,6 +55,7 @@ export interface SiteSyncActions {
      *
      * @remarks
      * Provides detailed information about the sync state including:
+     *
      * - Last synchronization timestamp
      * - Current site count
      * - Overall synchronization status
@@ -78,13 +80,15 @@ export interface SiteSyncActions {
      * Establishes subscription to real-time status updates.
      *
      * @remarks
-     * Sets up event listeners for monitor status changes from the backend.
-     * Uses the shared StatusUpdateManager to handle:
+     * Sets up event listeners for monitor status changes from the backend. Uses
+     * the shared StatusUpdateManager to handle:
+     *
      * - Race condition prevention
      * - Fallback mechanisms
      * - Efficient incremental updates
      *
      * @param callback - Function to call when status updates are received
+     *
      * @returns Subscription result with success indicators
      */
     subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
@@ -101,12 +105,13 @@ export interface SiteSyncActions {
      *
      * @remarks
      * Listens for various sync events including:
+     *
      * - Bulk synchronization events
      * - Individual site updates
      * - Site deletions
      *
-     * Automatically handles different event types and triggers
-     * appropriate local state updates.
+     * Automatically handles different event types and triggers appropriate
+     * local state updates.
      *
      * @returns Cleanup function to remove event listeners
      */
@@ -116,12 +121,11 @@ export interface SiteSyncActions {
      * Synchronizes all sites from the backend.
      *
      * @remarks
-     * Fetches the latest site data from the backend and updates
-     * the local store state. Includes comprehensive error handling
-     * and logging for debugging purposes.
+     * Fetches the latest site data from the backend and updates the local store
+     * state. Includes comprehensive error handling and logging for debugging
+     * purposes.
      *
-     * This is the core synchronization method used by other
-     * sync operations.
+     * This is the core synchronization method used by other sync operations.
      *
      * @returns Promise that resolves when sync is complete
      */
@@ -131,9 +135,9 @@ export interface SiteSyncActions {
      * Removes subscription to status updates.
      *
      * @remarks
-     * Cleanly unsubscribes from status update events and releases
-     * associated resources. Should be called when components unmount
-     * or when status updates are no longer needed.
+     * Cleanly unsubscribes from status update events and releases associated
+     * resources. Should be called when components unmount or when status
+     * updates are no longer needed.
      *
      * @returns Unsubscription result with success indicators
      */
@@ -151,10 +155,9 @@ export interface SiteSyncActions {
  * Dependencies required for site synchronization operations.
  *
  * @remarks
- * These dependencies are injected into the sync actions to maintain
- * separation of concerns and enable easier testing. The dependencies
- * provide access to the site state without direct coupling to the
- * Zustand store implementation.
+ * These dependencies are injected into the sync actions to maintain separation
+ * of concerns and enable easier testing. The dependencies provide access to the
+ * site state without direct coupling to the Zustand store implementation.
  *
  * @public
  */
@@ -180,12 +183,14 @@ const statusUpdateManager: { instance?: StatusUpdateManager } = {};
  * separation of concerns between the sync logic and store state management.
  *
  * The created actions handle:
+ *
  * - Full backend synchronization
  * - Real-time status updates via WebSocket-like events
  * - Sync status monitoring and reporting
  * - Error handling and recovery
  *
  * @param deps - Dependencies required for synchronization operations
+ *
  * @returns Complete set of synchronization actions
  *
  * @public

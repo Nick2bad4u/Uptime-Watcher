@@ -4,42 +4,39 @@
  *
  * @remarks
  * This component displays status distribution (up/down/pending) using a bar
- * chart visualization. It leverages Chart.js through the chartSetup service
- * for rendering and integrates with the ChartConfigService for theming and
+ * chart visualization. It leverages Chart.js through the chartSetup service for
+ * rendering and integrates with the ChartConfigService for theming and
  * configuration. The component is memoized to prevent unnecessary re-renders
  * when parent component updates, optimizing performance for frequent status
  * updates in monitoring scenarios.
  *
- * @example
- * Basic status chart with distribution data:
+ * @example Basic status chart with distribution data:
+ *
  * ```tsx
  * <StatusChart
- *   data={{
- *     labels: ['Up', 'Down', 'Pending'],
- *     datasets: [{
- *       label: 'Status Count',
- *       data: [45, 2, 3],
- *       backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
- *       borderColor: ['#059669', '#DC2626', '#D97706'],
- *       borderWidth: 1
- *     }]
- *   }}
- *   options={barChartOptions}
- * />
+ *     data={{
+ *         labels: ["Up", "Down", "Pending"],
+ *         datasets: [
+ *             {
+ *                 label: "Status Count",
+ *                 data: [45, 2, 3],
+ *                 backgroundColor: ["#10B981", "#EF4444", "#F59E0B"],
+ *                 borderColor: ["#059669", "#DC2626", "#D97706"],
+ *                 borderWidth: 1,
+ *             },
+ *         ],
+ *     }}
+ *     options={barChartOptions}
+ * />;
  * ```
  *
- * @example
- * Usage within monitoring dashboard:
+ * @example Usage within monitoring dashboard:
+ *
  * ```tsx
  * const statusData = chartConfig.getStatusBarChartData(statusCounts);
  * const chartOptions = chartConfig.getBarChartConfig();
  *
- * return (
- *   <StatusChart
- *     data={statusData}
- *     options={chartOptions}
- *   />
- * );
+ * return <StatusChart data={statusData} options={chartOptions} />;
  * ```
  *
  * @public
@@ -63,20 +60,20 @@ import "../../../services/chartSetup";
  *
  * @remarks
  * Displays status distribution (up/down/pending) using a bar chart
- * visualization with Chart.js. The component is memoized to prevent
- * unnecessary re-renders when parent component updates, providing optimal
- * performance for frequent status updates in monitoring contexts.
- *
- * @param props - The component properties containing data and options for the chart
- * @returns Memoized bar chart component
+ * visualization with Chart.js. The component is memoized to prevent unnecessary
+ * re-renders when parent component updates, providing optimal performance for
+ * frequent status updates in monitoring contexts.
  *
  * @example
+ *
  * ```tsx
- * <StatusChart
- *   data={statusDistributionData}
- *   options={barChartOptions}
- * />
+ * <StatusChart data={statusDistributionData} options={barChartOptions} />;
  * ```
+ *
+ * @param props - The component properties containing data and options for the
+ *   chart
+ *
+ * @returns Memoized bar chart component
  *
  * @public
  */

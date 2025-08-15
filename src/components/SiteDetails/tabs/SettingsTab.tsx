@@ -1,7 +1,7 @@
 /**
- * Settings tab component for configuring site monitoring parameters.
- * Provides interface for modifying site settings, intervals, and performing
- * site management actions.
+ * Settings tab component for configuring site monitoring parameters. Provides
+ * interface for modifying site settings, intervals, and performing site
+ * management actions.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -98,12 +98,14 @@ export interface SettingsTabProperties {
 
 /**
  * Helper function to format retry attempts text.
+ *
  * @param attempts - Number of retry attempts
+ *
  * @returns Formatted retry attempts description
  */
 /**
- * Generate a display identifier based on the monitor type.
- * Uses dynamic utility instead of hardcoded backward compatibility patterns.
+ * Generate a display identifier based on the monitor type. Uses dynamic utility
+ * instead of hardcoded backward compatibility patterns.
  */
 function getDisplayIdentifier(
     currentSite: Site,
@@ -179,6 +181,7 @@ function IdentifierLabel({
  * Settings tab component providing site configuration interface.
  *
  * Features:
+ *
  * - Site name editing with validation
  * - Monitor check interval configuration
  * - Monitor status and information display
@@ -187,6 +190,7 @@ function IdentifierLabel({
  * - Real-time settings validation
  *
  * @param props - Component props containing site data and handlers
+ *
  * @returns JSX element displaying settings interface
  */
 export const SettingsTab = ({

@@ -4,48 +4,48 @@
  *
  * @remarks
  * This component provides a comprehensive button implementation with theming
- * support, various visual variants (primary, secondary, danger, etc.),
- * multiple sizes, loading states, and icon positioning. The button follows
- * accessibility best practices with proper ARIA support. It integrates
- * seamlessly with the application's theme system.
+ * support, various visual variants (primary, secondary, danger, etc.), multiple
+ * sizes, loading states, and icon positioning. The button follows accessibility
+ * best practices with proper ARIA support. It integrates seamlessly with the
+ * application's theme system.
  *
- * @example
- * Primary button with icon:
+ * @example Primary button with icon:
+ *
  * ```tsx
  * <ThemedButton
- *   variant="primary"
- *   size="md"
- *   icon={<SaveIcon />}
- *   onClick={handleSave}
+ *     variant="primary"
+ *     size="md"
+ *     icon={<SaveIcon />}
+ *     onClick={handleSave}
  * >
- *   Save Changes
- * </ThemedButton>
+ *     Save Changes
+ * </ThemedButton>;
  * ```
  *
- * @example
- * Loading button with custom styling:
+ * @example Loading button with custom styling:
+ *
  * ```tsx
  * <ThemedButton
- *   variant="secondary"
- *   loading={isSubmitting}
- *   disabled={!isValid}
- *   fullWidth={true}
- *   onClick={handleSubmit}
+ *     variant="secondary"
+ *     loading={isSubmitting}
+ *     disabled={!isValid}
+ *     fullWidth={true}
+ *     onClick={handleSubmit}
  * >
- *   {isSubmitting ? "Submitting..." : "Submit Form"}
- * </ThemedButton>
+ *     {isSubmitting ? "Submitting..." : "Submit Form"}
+ * </ThemedButton>;
  * ```
  *
- * @example
- * Icon-only button with accessibility:
+ * @example Icon-only button with accessibility:
+ *
  * ```tsx
  * <ThemedButton
- *   variant="ghost"
- *   size="sm"
- *   icon={<DeleteIcon />}
- *   aria-label="Delete item"
- *   onClick={handleDelete}
- * />
+ *     variant="ghost"
+ *     size="sm"
+ *     icon={<DeleteIcon />}
+ *     aria-label="Delete item"
+ *     onClick={handleDelete}
+ * />;
  * ```
  *
  * @public
@@ -111,21 +111,22 @@ const DEFAULT_THEMED_BOX_STYLE = {};
  * visual variants. The button automatically handles accessibility features and
  * prevents clicks when disabled or loading.
  *
- * @param props - The component properties
- * @returns The themed button JSX element
+ * @example Action button with loading state:
  *
- * @example
- * Action button with loading state:
  * ```tsx
  * <ThemedButton
- *   variant="primary"
- *   loading={isProcessing}
- *   onClick={handleAction}
- *   disabled={!canSubmit}
+ *     variant="primary"
+ *     loading={isProcessing}
+ *     onClick={handleAction}
+ *     disabled={!canSubmit}
  * >
- *   Process Data
- * </ThemedButton>
+ *     Process Data
+ * </ThemedButton>;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The themed button JSX element
  *
  * @public
  */

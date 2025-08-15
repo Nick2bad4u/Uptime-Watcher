@@ -5,19 +5,21 @@
  * @remarks
  * This store manages all application settings with automatic persistence and
  * backend synchronization. It provides:
+ *
  * - Persistent storage using Zustand persist middleware
  * - Backend synchronization for critical settings
  * - Default value management and reset functionality
  * - Error handling integration with the error store
  *
- * The store uses a partialize function to persist only essential settings
- * data, avoiding persistence of transient state or computed values.
+ * The store uses a partialize function to persist only essential settings data,
+ * avoiding persistence of transient state or computed values.
  *
  * @example
+ *
  * ```typescript
  * // Basic settings usage
  * const { settings, updateSettings } = useSettingsStore();
- * updateSettings({ theme: 'dark', notifications: true });
+ * updateSettings({ theme: "dark", notifications: true });
  *
  * // History limit with backend sync
  * const { updateHistoryLimitValue } = useSettingsStore();

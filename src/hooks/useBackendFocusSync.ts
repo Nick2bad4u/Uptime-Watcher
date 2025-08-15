@@ -1,7 +1,7 @@
 /**
- * Hook for synchronizing data when the application window gains focus.
- * Provides functionality to automatically refresh data from the backend
- * when users return to the application after being away.
+ * Hook for synchronizing data when the application window gains focus. Provides
+ * functionality to automatically refresh data from the backend when users
+ * return to the application after being away.
  */
 
 import { useCallback, useEffect } from "react";
@@ -9,12 +9,9 @@ import { useCallback, useEffect } from "react";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 
 /**
- * Hook for synchronizing data when the application window gains focus.
- * Provides functionality to automatically refresh data from the backend
- * when users return to the application after being away.
- *
- * @param enabled - boolean - Set to true to enable focus-based backend sync (default: false)
- * @returns void - This hook manages side effects only
+ * Hook for synchronizing data when the application window gains focus. Provides
+ * functionality to automatically refresh data from the backend when users
+ * return to the application after being away.
  *
  * @remarks
  * Uses window focus events to trigger full backend synchronization when
@@ -22,6 +19,7 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  * through withErrorHandling, so the fire-and-forget void pattern is safe here.
  *
  * @example
+ *
  * ```tsx
  * function App() {
  *   const [syncOnFocus, setSyncOnFocus] = useState(true);
@@ -32,6 +30,11 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  *   return <div>App content</div>;
  * }
  * ```
+ *
+ * @param enabled - Boolean - Set to true to enable focus-based backend sync
+ *   (default: false)
+ *
+ * @returns Void - This hook manages side effects only
  */
 export function useBackendFocusSync(enabled = false): void {
     // Use selector to avoid unnecessary re-renders when other store state

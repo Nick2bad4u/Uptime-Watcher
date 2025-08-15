@@ -1,6 +1,6 @@
 /**
- * Reusable metric display card component.
- * Provides consistent formatting for displaying key performance metrics.
+ * Reusable metric display card component. Provides consistent formatting for
+ * displaying key performance metrics.
  */
 
 import React from "react";
@@ -25,29 +25,29 @@ export interface MetricCardProperties {
  * Metric display card component for showing labeled values.
  *
  * Features:
+ *
  * - Consistent vertical layout with label above value
  * - Themed text components for unified styling
  * - Flexible value types (string or number)
  * - Optimized with React.memo to prevent unnecessary re-renders
  * - Customizable styling through className prop
  *
- * @param props - Component props
- * @returns JSX element containing the metric display
- *
  * @example
+ *
  * ```tsx
- * <MetricCard
- *   label="Uptime"
- *   value="98.5%"
- *   className="border-r"
- * />
+ * <MetricCard label="Uptime" value="98.5%" className="border-r" />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX element containing the metric display
  */
 
 /**
  * Metric display card component implementation.
  *
  * @param props - MetricCard component props
+ *
  * @returns JSX.Element containing the metric display
  */
 export const MetricCard: React.NamedExoticComponent<MetricCardProperties> =

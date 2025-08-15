@@ -8,12 +8,14 @@
  * these templates support interpolation and contextual information.
  *
  * **Usage Guidelines:**
+ *
  * - Use for repeated log patterns across the codebase
  * - Templates support string interpolation for dynamic content
  * - Keep ERROR_CATALOG for user-facing errors
  * - Keep contextual debug logs as-is for performance
  *
  * @example
+ *
  * ```typescript
  * import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
  *
@@ -394,18 +396,20 @@ export type LogTemplate =
 /**
  * Helper function to interpolate template variables in log messages.
  *
- * @param template - Log template string with variable placeholders
- * @param variables - Object containing variable values for interpolation
- * @returns Interpolated log message
- *
  * @example
+ *
  * ```typescript
  * const message = interpolateLogTemplate(
- *   "Site {identifier} loaded with {count} monitors",
- *   { identifier: "example.com", count: 3 }
+ *     "Site {identifier} loaded with {count} monitors",
+ *     { identifier: "example.com", count: 3 }
  * );
  * // Returns: "Site example.com loaded with 3 monitors"
  * ```
+ *
+ * @param template - Log template string with variable placeholders
+ * @param variables - Object containing variable values for interpolation
+ *
+ * @returns Interpolated log message
  */
 export function interpolateLogTemplate(
     template: string,
@@ -425,13 +429,16 @@ export function interpolateLogTemplate(
  * Enhanced logger wrapper that supports template interpolation.
  *
  * @example
+ *
  * ```typescript
  * import { createTemplateLogger } from "@shared/utils/logTemplates";
  *
  * const logger = createTemplateLogger(baseLogger);
  *
  * // Use with templates
- * logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, { count: 42 });
+ * logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, {
+ *     count: 42,
+ * });
  *
  * // Use normally for dynamic content
  * logger.debug(`Processing site ${siteId} with custom logic`);

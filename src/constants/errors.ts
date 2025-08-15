@@ -2,16 +2,15 @@
  * Error message constants catalog.
  *
  * @remarks
- * Centralized error message definitions organized by domain.
- * All error messages are readonly to ensure consistency across the
- * application.
+ * Centralized error message definitions organized by domain. All error messages
+ * are readonly to ensure consistency across the application.
  *
  * @packageDocumentation
  */
 
 /**
- * Structured error catalog containing all application error messages.
- * Messages are organized by domain for better maintainability.
+ * Structured error catalog containing all application error messages. Messages
+ * are organized by domain for better maintainability.
  */
 export const ERROR_CATALOG = {
     database: {

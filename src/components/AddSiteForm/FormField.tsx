@@ -8,30 +8,30 @@
  * with proper ARIA attributes. The component is memoized for performance
  * optimization.
  *
- * @example
- * Basic form field with text input:
+ * @example Basic form field with text input:
+ *
  * ```tsx
  * <FormField
- *   id="username"
- *   label="Username"
- *   required={true}
- *   helpText="Enter your username"
+ *     id="username"
+ *     label="Username"
+ *     required={true}
+ *     helpText="Enter your username"
  * >
- *   <input type="text" id="username" />
- * </FormField>
+ *     <input type="text" id="username" />
+ * </FormField>;
  * ```
  *
- * @example
- * Form field with error state:
+ * @example Form field with error state:
+ *
  * ```tsx
  * <FormField
- *   id="email"
- *   label="Email Address"
- *   error="Please enter a valid email address"
- *   required={true}
+ *     id="email"
+ *     label="Email Address"
+ *     error="Please enter a valid email address"
+ *     required={true}
  * >
- *   <input type="email" id="email" className="error" />
- * </FormField>
+ *     <input type="email" id="email" className="error" />
+ * </FormField>;
  * ```
  *
  * @public
@@ -71,20 +71,22 @@ export interface FormFieldProperties {
  * text, and wraps the input element. The component uses proper ARIA attributes
  * for accessibility and is memoized for performance.
  *
- * @param props - The component properties
- * @returns JSX element containing labeled form field with error/help text
- *
  * @example
+ *
  * ```tsx
  * <FormField
- *   id="password"
- *   label="Password"
- *   required={true}
- *   error={validationError}
+ *     id="password"
+ *     label="Password"
+ *     required={true}
+ *     error={validationError}
  * >
- *   <input type="password" id="password" />
- * </FormField>
+ *     <input type="password" id="password" />
+ * </FormField>;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns JSX element containing labeled form field with error/help text
  *
  * @public
  */

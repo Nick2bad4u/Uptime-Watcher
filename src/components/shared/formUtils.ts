@@ -11,17 +11,19 @@ import type React from "react";
 /**
  * Creates a standardized handler for input changes with validation
  *
- * @param setValue - State setter function
- * @param validator - Optional validation function
- * @returns Input change handler
- *
  * @example
+ *
  * ```tsx
  * const handleNameChange = createInputChangeHandler(
- *   setName,
- *   (value) => value.length > 0
+ *     setName,
+ *     (value) => value.length > 0
  * );
  * ```
+ *
+ * @param setValue - State setter function
+ * @param validator - Optional validation function
+ *
+ * @returns Input change handler
  */
 export function createInputChangeHandler<T>(
     setValue: (value: T) => void,
@@ -39,17 +41,19 @@ export function createInputChangeHandler<T>(
 /**
  * Creates a standardized handler for select changes
  *
- * @param setValue - State setter function
- * @param converter - Optional value converter function
- * @returns Select change handler
- *
  * @example
+ *
  * ```tsx
  * const handleTimeoutChange = createSelectChangeHandler(
- *   setTimeout,
- *   (value) => parseInt(value, 10)
+ *     setTimeout,
+ *     (value) => parseInt(value, 10)
  * );
  * ```
+ *
+ * @param setValue - State setter function
+ * @param converter - Optional value converter function
+ *
+ * @returns Select change handler
  */
 export function createSelectChangeHandler<T>(
     setValue: (value: T) => void,
@@ -65,13 +69,16 @@ export function createSelectChangeHandler<T>(
 /**
  * Creates a standardized handler for checkbox changes
  *
- * @param setValue - State setter function
- * @returns Checkbox change handler
- *
  * @example
+ *
  * ```tsx
- * const handleNotificationsChange = createCheckboxChangeHandler(setNotifications);
+ * const handleNotificationsChange =
+ *     createCheckboxChangeHandler(setNotifications);
  * ```
+ *
+ * @param setValue - State setter function
+ *
+ * @returns Checkbox change handler
  */
 export function createCheckboxChangeHandler(
     setValue: (value: boolean) => void

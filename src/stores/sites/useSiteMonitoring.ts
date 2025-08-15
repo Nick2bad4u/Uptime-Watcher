@@ -1,6 +1,6 @@
 /**
- * Site monitoring operations module.
- * Handles monitoring start/stop operations and manual checks.
+ * Site monitoring operations module. Handles monitoring start/stop operations
+ * and manual checks.
  *
  * Uses centralized error store for consistent error handling across the
  * application.
@@ -31,8 +31,7 @@ export interface SiteMonitoringActions {
 }
 
 /**
- * Creates site monitoring actions for managing monitoring lifecycle
- * operations.
+ * Creates site monitoring actions for managing monitoring lifecycle operations.
  *
  * @remarks
  * This factory function creates actions for starting, stopping, and manually

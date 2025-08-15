@@ -57,8 +57,8 @@ export interface MonitorTypeConfig {
  * Common display configuration for monitor types.
  *
  * @remarks
- * Provides display-related preferences that can be used to control
- * how monitor types are presented in the UI.
+ * Provides display-related preferences that can be used to control how monitor
+ * types are presented in the UI.
  */
 export interface MonitorTypeDisplayCommons {
     /**
@@ -88,8 +88,8 @@ export interface MonitorTypeDisplayCommons {
  * monitor types.
  *
  * @remarks
- * These properties provide UI hints, help texts, and feature support flags
- * for monitor types, enabling consistent rendering and feature gating.
+ * These properties provide UI hints, help texts, and feature support flags for
+ * monitor types, enabling consistent rendering and feature gating.
  */
 export interface MonitorTypeUICommons {
     /**
@@ -113,6 +113,7 @@ export interface MonitorTypeUICommons {
      *
      * @remarks
      * If true, advanced analytics features may be enabled in the UI.
+     *
      * @defaultValue false
      */
     supportsAdvancedAnalytics?: boolean;
@@ -121,6 +122,7 @@ export interface MonitorTypeUICommons {
      *
      * @remarks
      * If true, response time metrics and charts may be shown in the UI.
+     *
      * @defaultValue false
      */
     supportsResponseTime?: boolean;

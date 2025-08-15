@@ -32,6 +32,7 @@ export interface SiteCardProperties {
  * metrics, and controls.
  *
  * Features:
+ *
  * - Real-time status indicators
  * - Historical uptime data visualization
  * - Monitor management controls
@@ -42,6 +43,7 @@ export interface SiteCardProperties {
  * Memoized to prevent unnecessary re-renders when parent updates.
  *
  * @param props - SiteCard component props
+ *
  * @returns JSX element containing the complete site monitoring card
  */
 
@@ -49,6 +51,7 @@ export interface SiteCardProperties {
  * SiteCard component implementation using composition pattern.
  *
  * @param props - SiteCard component props
+ *
  * @returns JSX.Element containing the complete site monitoring card
  */
 export const SiteCard: React.NamedExoticComponent<SiteCardProperties> =

@@ -1,7 +1,6 @@
 /**
- * Site statistics calculation hook.
- * Provides utilities for computing uptime, response time averages,
- * and check counts from monitor history data.
+ * Site statistics calculation hook. Provides utilities for computing uptime,
+ * response time averages, and check counts from monitor history data.
  */
 
 import type { StatusHistory } from "@shared/types";
@@ -11,12 +10,14 @@ import { useMemo } from "react";
 /**
  * Interface for site statistics data
  *
- * @public
  * @remarks
  * All values are computed from StatusHistory records:
- * - uptime: Integer percentage (0-100) based on status="up" ratio
- * - checkCount: Total number of history records processed
- * - averageResponseTime: Mean response time for successful checks only
+ *
+ * - Uptime: Integer percentage (0-100) based on status="up" ratio
+ * - CheckCount: Total number of history records processed
+ * - AverageResponseTime: Mean response time for successful checks only
+ *
+ * @public
  */
 export interface SiteStats {
     /**
@@ -32,13 +33,10 @@ export interface SiteStats {
 /**
  * Custom hook to calculate statistics based on a monitor's history
  *
- * @param history - StatusHistory[] - Array of status history records for calculation
- * @returns Object containing calculated statistics (uptime, checkCount, averageResponseTime)
- * @see {@link SiteStats} for the complete interface specification
- *
  * @remarks
  * This hook provides memoized statistical calculations for monitor performance
  * analysis. It handles edge cases including:
+ *
  * - Empty history arrays (returns zero values safely)
  * - Records without response times (filters them out of average calculation)
  * - Mixed status records (separates up/down for accurate uptime calculation)
@@ -49,6 +47,7 @@ export interface SiteStats {
  * recalculation on each render.
  *
  * @example
+ *
  * ```tsx
  * function MonitorStats({ monitor }) {
  *   const { uptime, checkCount, averageResponseTime } = useSiteStats(monitor.history);
@@ -61,6 +60,14 @@ export interface SiteStats {
  *   );
  * }
  * ```
+ *
+ * @param history - StatusHistory[] - Array of status history records for
+ *   calculation
+ *
+ * @returns Object containing calculated statistics (uptime, checkCount,
+ *   averageResponseTime)
+ *
+ * @see {@link SiteStats} for the complete interface specification
  */
 export function useSiteStats(history: StatusHistory[]): SiteStats {
     // Memoize the calculations to avoid recalculating on every render

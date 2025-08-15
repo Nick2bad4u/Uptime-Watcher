@@ -2,20 +2,20 @@
  * Custom hook for managing monitor type configurations from the backend.
  * Provides async loading with caching and error handling.
  *
- * @returns Monitor type options and loading state
- *
  * @remarks
- * This hook fetches monitor type configurations from the backend and
- * transforms them into options suitable for form select fields. It includes
- * error handling and fallback options to ensure the UI remains functional even
- * when backend communication fails.
+ * This hook fetches monitor type configurations from the backend and transforms
+ * them into options suitable for form select fields. It includes error handling
+ * and fallback options to ensure the UI remains functional even when backend
+ * communication fails.
  *
  * Error handling strategy:
+ *
  * - Network errors: Logged and fallback options provided
  * - Parse errors: Logged with context for debugging
  * - Fallback behavior: Uses FALLBACK_MONITOR_TYPE_OPTIONS from constants
  *
  * @example
+ *
  * ```tsx
  * function MonitorTypeSelector() {
  *   const { options, isLoading, error, refresh } = useMonitorTypes();
@@ -34,6 +34,8 @@
  *   );
  * }
  * ```
+ *
+ * @returns Monitor type options and loading state
  */
 
 import { useCallback, useState } from "react";

@@ -1,6 +1,6 @@
 /**
- * Reusable site monitoring button component.
- * Provides a unified button for starting/stopping all monitors in a site.
+ * Reusable site monitoring button component. Provides a unified button for
+ * starting/stopping all monitors in a site.
  *
  * @remarks
  * This component encapsulates the logic for site-wide monitoring control,
@@ -8,18 +8,19 @@
  * details). Supports compact mode for space-constrained layouts and includes
  * proper event handling to prevent propagation to parent elements.
  *
- * The button automatically switches between start and stop states based on
- * the `allMonitorsRunning` prop, using appropriate styling and icons for
- * each state.
+ * The button automatically switches between start and stop states based on the
+ * `allMonitorsRunning` prop, using appropriate styling and icons for each
+ * state.
  *
  * @example
+ *
  * ```tsx
  * <SiteMonitoringButton
- *   allMonitorsRunning={false}
- *   isLoading={false}
- *   onStartSiteMonitoring={() => console.log('Starting...')}
- *   onStopSiteMonitoring={() => console.log('Stopping...')}
- * />
+ *     allMonitorsRunning={false}
+ *     isLoading={false}
+ *     onStartSiteMonitoring={() => console.log("Starting...")}
+ *     onStopSiteMonitoring={() => console.log("Stopping...")}
+ * />;
  * ```
  *
  * @public
@@ -33,9 +34,9 @@ import ThemedButton from "../../../theme/components/ThemedButton";
  * Props for the SiteMonitoringButton component.
  *
  * @remarks
- * Defines the interface for configuring the site monitoring button behavior
- * and appearance. The component supports both start and stop operations
- * with loading states and customizable styling.
+ * Defines the interface for configuring the site monitoring button behavior and
+ * appearance. The component supports both start and stop operations with
+ * loading states and customizable styling.
  *
  * @public
  */
@@ -59,11 +60,12 @@ export interface SiteMonitoringButtonProperties {
  *
  * @remarks
  * This component provides a consistent interface for site-wide monitoring
- * controls across different parts of the application. It automatically
- * switches between start and stop states based on whether all monitors are
- * currently running.
+ * controls across different parts of the application. It automatically switches
+ * between start and stop states based on whether all monitors are currently
+ * running.
  *
  * Key features:
+ *
  * - Automatic state switching based on monitor status
  * - Event propagation prevention to avoid parent element interactions
  * - Loading state handling with button disabling
@@ -73,10 +75,8 @@ export interface SiteMonitoringButtonProperties {
  * The component uses the appropriate variant (success for start, error for
  * stop) and includes intuitive emoji icons for visual clarity.
  *
- * @param props - Component configuration and event handlers
- * @returns JSX element containing the themed monitoring button
- *
  * @example
+ *
  * ```tsx
  * // Standard usage
  * <SiteMonitoringButton
@@ -95,6 +95,10 @@ export interface SiteMonitoringButtonProperties {
  *   onStopSiteMonitoring={handleStop}
  * />
  * ```
+ *
+ * @param props - Component configuration and event handlers
+ *
+ * @returns JSX element containing the themed monitoring button
  */
 export const SiteMonitoringButton: React.NamedExoticComponent<SiteMonitoringButtonProperties> =
     React.memo(function SiteMonitoringButton({

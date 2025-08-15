@@ -4,14 +4,15 @@
  * @remarks
  * This store manages the global UI state including modal visibility, selected
  * site, active tabs, and user preferences. It uses Zustand persistence to
- * maintain user preferences across sessions while keeping transient state
- * (like modal visibility) in memory only.
+ * maintain user preferences across sessions while keeping transient state (like
+ * modal visibility) in memory only.
  *
  * The store follows the application's modular architecture by separating UI
  * concerns from business logic, allowing components to focus on presentation
  * while delegating state management to this centralized store.
  *
  * @example
+ *
  * ```typescript
  * import { useUIStore } from './stores/ui/useUiStore';
  *
@@ -151,20 +152,22 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
              * @remarks
              * This function determines which parts of the UI state should be
              * persisted across browser sessions. It includes user preferences
-             * and settings that should be remembered, while excluding
-             * transient state like modal visibility and selected site which
-             * should reset on each session.
+             * and settings that should be remembered, while excluding transient
+             * state like modal visibility and selected site which should reset
+             * on each session.
              *
              * Persisted state:
-             * - activeSiteDetailsTab: Remember which tab was last active
-             * - showAdvancedMetrics: User preference for advanced metrics
-             * visibility - siteDetailsChartTimeRange: User preference for
-             * chart time range
+             *
+             * - ActiveSiteDetailsTab: Remember which tab was last active
+             * - ShowAdvancedMetrics: User preference for advanced metrics
+             *   visibility - siteDetailsChartTimeRange: User preference for
+             *   chart time range
              *
              * Non-persisted state:
+             *
              * - Modal states (showSettings, showSiteDetails): Reset on each
-             * session - selectedSiteId: Reset on each session for
-             * security/privacy
+             *   session - selectedSiteId: Reset on each session for
+             *   security/privacy
              */
             partialize: (state) => ({
                 activeSiteDetailsTab: state.activeSiteDetailsTab,

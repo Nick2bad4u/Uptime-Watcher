@@ -15,23 +15,24 @@ import { EmptyState } from "./EmptyState";
 /**
  * Main site list component that displays all monitored sites.
  *
- * Renders either a list of SiteCard components (one per site) with dividers,
- * or an EmptyState component when no sites are configured. Automatically
- * applies theme-appropriate styling.
- *
- * @returns JSX.Element containing the site list or empty state
+ * Renders either a list of SiteCard components (one per site) with dividers, or
+ * an EmptyState component when no sites are configured. Automatically applies
+ * theme-appropriate styling.
  *
  * @example
+ *
  * ```tsx
  * function Dashboard() {
- *   return (
- *     <div>
- *       <Header />
- *       <SiteList />
- *     </div>
- *   );
+ *     return (
+ *         <div>
+ *             <Header />
+ *             <SiteList />
+ *         </div>
+ *     );
  * }
  * ```
+ *
+ * @returns JSX.Element containing the site list or empty state
  */
 export const SiteList = (): JSX.Element => {
     const { sites } = useSitesStore();

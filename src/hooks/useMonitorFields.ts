@@ -1,8 +1,6 @@
 /**
- * Hook for accessing monitor field definitions from the registry.
- * Provides field configurations for dynamic form handling.
- *
- * @returns Object containing field accessor functions and loading state
+ * Hook for accessing monitor field definitions from the registry. Provides
+ * field configurations for dynamic form handling.
  *
  * @remarks
  * This hook integrates with the monitor types store to provide field
@@ -10,10 +8,11 @@
  * compatibility with existing utility functions while leveraging centralized
  * state management.
  *
- * Field definitions include validation rules, UI hints, and metadata needed
- * for dynamic form generation and validation.
+ * Field definitions include validation rules, UI hints, and metadata needed for
+ * dynamic form generation and validation.
  *
  * @example
+ *
  * ```tsx
  * function MonitorForm({ monitorType }) {
  *   const { getFields, isFieldRequired, isLoaded, error } = useMonitorFields();
@@ -35,6 +34,8 @@
  *   );
  * }
  * ```
+ *
+ * @returns Object containing field accessor functions and loading state
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";

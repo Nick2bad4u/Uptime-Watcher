@@ -14,12 +14,14 @@ import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
 import { updateMonitorInSite } from "./monitorOperations";
 
 /**
- * Gets a site by ID and validates it exists.
- * Common pattern used across multiple site operations.
+ * Gets a site by ID and validates it exists. Common pattern used across
+ * multiple site operations.
  *
  * @param siteId - The site identifier
  * @param deps - Site operation dependencies
+ *
  * @returns The found site
+ *
  * @throws Error if site is not found
  */
 export const getSiteById = (
@@ -34,8 +36,8 @@ export const getSiteById = (
 };
 
 /**
- * Updates a monitor within a site and saves it.
- * Common pattern for monitor update operations.
+ * Updates a monitor within a site and saves it. Common pattern for monitor
+ * update operations.
  *
  * @param siteId - The site identifier
  * @param monitorId - The monitor identifier
@@ -66,6 +68,7 @@ export const updateMonitorAndSave = async (
  * @param params - Parameters passed to the operation for logging
  * @param deps - Site operation dependencies
  * @param syncAfter - Whether to sync from backend after the operation
+ *
  * @returns Promise that resolves when operation and optional sync complete
  */
 export const withSiteOperation = async (
@@ -97,6 +100,7 @@ export const withSiteOperation = async (
  * @param params - Parameters passed to the operation for logging
  * @param deps - Site operation dependencies
  * @param syncAfter - Whether to sync from backend after the operation
+ *
  * @returns Promise that resolves to the operation result
  */
 export const withSiteOperationReturning = async <T>(

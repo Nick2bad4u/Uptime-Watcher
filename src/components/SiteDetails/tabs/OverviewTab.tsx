@@ -1,6 +1,6 @@
 /**
- * Overview tab component for site details page.
- * Displays key metrics, statistics, and actions for a monitored site.
+ * Overview tab component for site details page. Displays key metrics,
+ * statistics, and actions for a monitored site.
  */
 
 import type { Monitor } from "@shared/types";
@@ -79,6 +79,7 @@ export interface OverviewTabProperties {
  * Overview tab component displaying site monitoring statistics and metrics.
  *
  * Features:
+ *
  * - Uptime percentage with visual progress indicator
  * - Response time statistics (average, fastest, slowest)
  * - Total checks counter
@@ -86,6 +87,7 @@ export interface OverviewTabProperties {
  * - Site removal action
  *
  * @param props - Component props containing metrics and handlers
+ *
  * @returns JSX element displaying overview information
  */
 export const OverviewTab = ({

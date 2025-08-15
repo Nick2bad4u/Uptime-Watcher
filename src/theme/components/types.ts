@@ -1,8 +1,8 @@
 /**
  * Shared type definitions for themed UI components.
  *
- * Contains all the common types and interfaces used across the themed
- * component library.
+ * Contains all the common types and interfaces used across the themed component
+ * library.
  */
 
 export type BadgeSize = "lg" | "md" | "sm" | "xs";

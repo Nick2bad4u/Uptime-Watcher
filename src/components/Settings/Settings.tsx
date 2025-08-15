@@ -10,23 +10,26 @@
  *
  * The component handles both local preference updates and backend data
  * synchronization, ensuring settings are properly persisted across application
- * sessions. Error handling is integrated throughout to provide user feedback
- * on any configuration issues.
+ * sessions. Error handling is integrated throughout to provide user feedback on
+ * any configuration issues.
  *
  * Key architectural features:
+ *
  * - Uses Zustand stores for state management with persistence
  * - Implements optimistic updates with error rollback
  * - Provides data export/import capabilities for backup scenarios
  * - Integrates with system theme preferences
  *
- * @param props - Component configuration properties
- * @returns Fully configured settings interface component
- *
  * @example
+ *
  * ```tsx
  * // In a modal or dedicated settings view
- * <Settings onClose={() => setSettingsOpen(false)} />
+ * <Settings onClose={() => setSettingsOpen(false)} />;
  * ```
+ *
+ * @param props - Component configuration properties
+ *
+ * @returns Fully configured settings interface component
  *
  * @public
  */
@@ -91,6 +94,7 @@ export interface SettingsProperties {
  * Settings component providing comprehensive application configuration.
  *
  * Actual features available:
+ *
  * - Theme selection (light/dark/system)
  * - History retention limits (25-unlimited records)
  * - Desktop notifications (on/off)
@@ -102,6 +106,7 @@ export interface SettingsProperties {
  * - Reset all settings to defaults
  *
  * @param props - Component props
+ *
  * @returns JSX element containing the settings interface
  */
 

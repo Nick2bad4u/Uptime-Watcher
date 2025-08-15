@@ -1,7 +1,6 @@
 /**
- * Frontend cache synchronization utilities.
- * Automatically synchronizes frontend caches with backend cache invalidation
- * events.
+ * Frontend cache synchronization utilities. Automatically synchronizes frontend
+ * caches with backend cache invalidation events.
  */
 
 import logger from "../services/logger";
@@ -13,9 +12,10 @@ import { clearMonitorTypeCache } from "./monitorTypeHelper";
  *
  * @remarks
  * Contains information about cache invalidation events:
- * - identifier: Optional specific identifier for targeted invalidation
- * - reason: Human-readable reason for the cache invalidation
- * - type: Type of cache invalidation (all, monitor, or site-specific)
+ *
+ * - Identifier: Optional specific identifier for targeted invalidation
+ * - Reason: Human-readable reason for the cache invalidation
+ * - Type: Type of cache invalidation (all, monitor, or site-specific)
  */
 interface CacheInvalidationData {
     identifier?: string;
@@ -24,8 +24,8 @@ interface CacheInvalidationData {
 }
 
 /**
- * Registry of cache clearing functions for different cache types.
- * This makes it easy to add new cache types without modifying the core logic.
+ * Registry of cache clearing functions for different cache types. This makes it
+ * easy to add new cache types without modifying the core logic.
  */
 const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
     [
@@ -64,11 +64,11 @@ function clearAllFrontendCaches(): void {
 /**
  * Clear monitor-related frontend caches.
  *
- * @param identifier - Optional monitor identifier for targeted clearing
- *
  * @remarks
- * This function can be enhanced to support monitor-specific cache clearing
- * as new monitor-related caches are added to the application.
+ * This function can be enhanced to support monitor-specific cache clearing as
+ * new monitor-related caches are added to the application.
+ *
+ * @param identifier - Optional monitor identifier for targeted clearing
  */
 function clearMonitorRelatedCaches(identifier?: string): void {
     logger.debug("[CacheSync] Clearing monitor-related caches", { identifier });
@@ -91,12 +91,12 @@ function clearMonitorRelatedCaches(identifier?: string): void {
 /**
  * Clear site-related frontend caches.
  *
- * @param identifier - Optional site identifier for targeted clearing
- *
  * @remarks
- * Site-specific cache clearing can be enhanced as new site-related caches
- * are added to the application. Currently, sites are managed through
- * Zustand stores which handle their own cache invalidation.
+ * Site-specific cache clearing can be enhanced as new site-related caches are
+ * added to the application. Currently, sites are managed through Zustand stores
+ * which handle their own cache invalidation.
+ *
+ * @param identifier - Optional site identifier for targeted clearing
  */
 function clearSiteRelatedCaches(identifier?: string): void {
     logger.debug("[CacheSync] Clearing site-related caches", { identifier });
@@ -114,13 +114,12 @@ function clearSiteRelatedCaches(identifier?: string): void {
 }
 
 /**
- * Set up automatic cache synchronization with backend.
- * Listens for cache invalidation events and clears appropriate frontend
- * caches.
+ * Set up automatic cache synchronization with backend. Listens for cache
+ * invalidation events and clears appropriate frontend caches.
  *
- * @returns Cleanup function to remove event listeners. Call this function
- * when the component unmounts or cache sync is no longer needed to prevent
- * memory leaks and avoid processing events after cleanup.
+ * @returns Cleanup function to remove event listeners. Call this function when
+ *   the component unmounts or cache sync is no longer needed to prevent memory
+ *   leaks and avoid processing events after cleanup.
  */
 export function setupCacheSync(): () => void {
     // Check if we're in an Electron environment with cache invalidation events

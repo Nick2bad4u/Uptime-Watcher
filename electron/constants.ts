@@ -72,11 +72,12 @@ export const USER_AGENT = "Uptime-Watcher/1.0";
  * operations, to avoid overwhelming external services or the local system.
  *
  * @example
+ *
  * ```ts
  * let delay = RETRY_BACKOFF.INITIAL_DELAY;
  * while (shouldRetry) {
- *   await wait(delay);
- *   delay = Math.min(delay * 2, RETRY_BACKOFF.MAX_DELAY);
+ *     await wait(delay);
+ *     delay = Math.min(delay * 2, RETRY_BACKOFF.MAX_DELAY);
  * }
  * ```
  */
@@ -102,8 +103,8 @@ export const DEFAULT_HISTORY_LIMIT = 500;
  * Cache TTL values for standardized caching in milliseconds.
  *
  * @remarks
- * Used by ConfigurationManager and other backend services to provide
- * consistent cache expiration behavior.
+ * Used by ConfigurationManager and other backend services to provide consistent
+ * cache expiration behavior.
  */
 export const CACHE_TTL: CacheTtlConfig = Object.freeze({
     /** TTL for configuration values cache (30 minutes). */
@@ -116,8 +117,8 @@ export const CACHE_TTL: CacheTtlConfig = Object.freeze({
  * Cache size limits for standardized caching.
  *
  * @remarks
- * Used by ConfigurationManager and other backend services to provide
- * consistent cache size constraints.
+ * Used by ConfigurationManager and other backend services to provide consistent
+ * cache size constraints.
  */
 export const CACHE_SIZE_LIMITS: CacheSizeLimitsConfig = Object.freeze({
     /** Maximum entries for configuration values cache. */

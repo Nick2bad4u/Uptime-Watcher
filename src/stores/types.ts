@@ -11,8 +11,8 @@
 import type { ThemeName } from "../theme/types";
 
 /**
- * Application settings interface.
- * Manages user preferences and application configuration.
+ * Application settings interface. Manages user preferences and application
+ * configuration.
  */
 export interface AppSettings {
     /** Auto-start monitoring when the application launches */
@@ -34,8 +34,8 @@ export interface AppSettings {
  * functionality.
  *
  * @remarks
- * Standard error handling and loading state pattern used across all stores.
- * All store interfaces should extend this for consistent error handling.
+ * Standard error handling and loading state pattern used across all stores. All
+ * store interfaces should extend this for consistent error handling.
  */
 export interface BaseStore {
     /** Clear the current error message */
@@ -66,12 +66,13 @@ export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
  * actions are needed.
  *
  * @example
+ *
  * ```typescript
  * interface MyStore {
- *   data: string[];
- *   isLoading: boolean;
- *   fetchData: () => Promise<void>;
- *   clearData: () => void;
+ *     data: string[];
+ *     isLoading: boolean;
+ *     fetchData: () => Promise<void>;
+ *     clearData: () => void;
  * }
  *
  * type MyStoreActions = StoreActions<MyStore>;
@@ -95,12 +96,13 @@ export type StoreActions<T> = {
  * be preserved.
  *
  * @example
+ *
  * ```typescript
  * interface MyStore {
- *   data: string[];
- *   isLoading: boolean;
- *   fetchData: () => Promise<void>;
- *   clearData: () => void;
+ *     data: string[];
+ *     isLoading: boolean;
+ *     fetchData: () => Promise<void>;
+ *     clearData: () => void;
  * }
  *
  * type MyStoreState = StoreState<MyStore>;
@@ -117,10 +119,10 @@ export type StoreState<T> = {
  * Application update status enumeration.
  *
  * @remarks
- * Represents the various states of the application update process,
- * from initial idle state through checking, downloading, and completion.
- * Used by the updates store to track update progress and display
- * appropriate UI states to the user.
+ * Represents the various states of the application update process, from initial
+ * idle state through checking, downloading, and completion. Used by the updates
+ * store to track update progress and display appropriate UI states to the
+ * user.
  */
 export type UpdateStatus =
     | "available"
@@ -141,12 +143,14 @@ export type UpdateStatus =
  * components.
  *
  * The re-exported types include:
+ *
  * - Monitor: Individual monitoring configuration interface
  * - MonitorType: Enumeration of supported monitor types
  * - Site: Complete site configuration with monitors
  * - StatusUpdate: Real-time status update interface
  *
  * @example
+ *
  * ```typescript
  * ```typescript
  * import \{ Site, Monitor, StatusUpdate \} from '\@shared/types';

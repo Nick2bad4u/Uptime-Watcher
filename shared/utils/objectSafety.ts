@@ -1,7 +1,6 @@
 /**
- * Type-safe object manipulation utilities.
- * Provides enhanced type safety for Object.keys, Object.values, Object.entries
- * operations.
+ * Type-safe object manipulation utilities. Provides enhanced type safety for
+ * Object.keys, Object.values, Object.entries operations.
  */
 
 import { isObject } from "./typeGuards";
@@ -9,23 +8,26 @@ import { isObject } from "./typeGuards";
 /**
  * Type-safe object property access with fallback.
  *
- * @param obj - Object to access property from
- * @param key - Property key (string or symbol only)
- * @param fallback - Fallback value if property doesn't exist or is wrong type
- * @param validator - Optional type guard function to validate the property value
- * @returns Property value or fallback
- *
  * @remarks
- * Only accepts string and symbol keys as these are the valid property key
- * types in JavaScript. Number keys are automatically converted to strings by
+ * Only accepts string and symbol keys as these are the valid property key types
+ * in JavaScript. Number keys are automatically converted to strings by
  * JavaScript, so use string keys directly to avoid confusion.
  *
  * @example
+ *
  * ```typescript
  * const config: unknown = { timeout: 5000 };
  * const timeout = safeObjectAccess(config, "timeout", 10000);
  * // Returns 5000 if timeout exists and is correct type, otherwise 10000
  * ```
+ *
+ * @param obj - Object to access property from
+ * @param key - Property key (string or symbol only)
+ * @param fallback - Fallback value if property doesn't exist or is wrong type
+ * @param validator - Optional type guard function to validate the property
+ *   value
+ *
+ * @returns Property value or fallback
  */
 export function safeObjectAccess<T>(
     obj: unknown,
@@ -64,7 +66,8 @@ export function safeObjectAccess<T>(
  * @param obj - Object to iterate over (can be unknown)
  * @param callback - Function to call for each entry
  * @param context - Optional context for error logging
- * @returns void
+ *
+ * @returns Void
  */
 export function safeObjectIteration(
     obj: unknown,
@@ -92,16 +95,23 @@ export function safeObjectIteration(
 /**
  * Create a type-safe object with specified keys omitted.
  *
- * @param obj - Source object
- * @param keys - Keys to omit from the object
- * @returns New object without the specified keys
- *
  * @example
+ *
  * ```typescript
- * const user = { id: 1, name: "John", email: "john@example.com", password: "secret" };
+ * const user = {
+ *     id: 1,
+ *     name: "John",
+ *     email: "john@example.com",
+ *     password: "secret",
+ * };
  * const publicUser = safeObjectOmit(user, ["password"]);
  * // Type: { id: number; name: string; email: string; }
  * ```
+ *
+ * @param obj - Source object
+ * @param keys - Keys to omit from the object
+ *
+ * @returns New object without the specified keys
  */
 export function safeObjectOmit<
     T extends Record<PropertyKey, unknown>,
@@ -132,16 +142,23 @@ export function safeObjectOmit<
 /**
  * Create a type-safe subset of an object with only specified keys.
  *
- * @param obj - Source object
- * @param keys - Keys to pick from the object
- * @returns New object with only the specified keys
- *
  * @example
+ *
  * ```typescript
- * const user = { id: 1, name: "John", email: "john@example.com", password: "secret" };
+ * const user = {
+ *     id: 1,
+ *     name: "John",
+ *     email: "john@example.com",
+ *     password: "secret",
+ * };
  * const publicUser = safeObjectPick(user, ["id", "name", "email"]);
  * // Type: { id: number; name: string; email: string; }
  * ```
+ *
+ * @param obj - Source object
+ * @param keys - Keys to pick from the object
+ *
+ * @returns New object with only the specified keys
  */
 export function safeObjectPick<
     T extends Record<PropertyKey, unknown>,
@@ -161,21 +178,23 @@ export function safeObjectPick<
 /**
  * Type-safe Object.entries that preserves key types for known object shapes.
  *
- * @param obj - Object to get entries from
- * @returns Array of [key, value] tuples with proper typing
- *
  * @remarks
  * This function uses type assertion to preserve compile-time type information.
  * The cast is safe for plain objects but should be used carefully with objects
- * that may have prototype pollution, non-enumerable properties, or symbol
- * keys. Object.entries() only returns enumerable string-keyed properties.
+ * that may have prototype pollution, non-enumerable properties, or symbol keys.
+ * Object.entries() only returns enumerable string-keyed properties.
  *
  * @example
+ *
  * ```typescript
  * const config = { timeout: 5000, retries: 3 } as const;
  * const entries = typedObjectEntries(config);
  * // Type: ["timeout" | "retries", number][]
  * ```
+ *
+ * @param obj - Object to get entries from
+ *
+ * @returns Array of [key, value] tuples with proper typing
  */
 export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
     obj: T
@@ -186,22 +205,24 @@ export function typedObjectEntries<T extends Record<PropertyKey, unknown>>(
 /**
  * Type-safe Object.keys that preserves key types for known object shapes.
  *
- * @param obj - Object to get keys from
- * @returns Array of keys with proper typing
- *
  * @remarks
  * This function uses type assertion to preserve compile-time type information.
- * Note that Object.keys() only returns enumerable string-keyed properties,
- * so symbol keys are not included in the result. The cast assumes all keys
- * are of type keyof T, which is safe for plain objects but may not include
- * all possible keys for objects with symbol keys or inherited properties.
+ * Note that Object.keys() only returns enumerable string-keyed properties, so
+ * symbol keys are not included in the result. The cast assumes all keys are of
+ * type keyof T, which is safe for plain objects but may not include all
+ * possible keys for objects with symbol keys or inherited properties.
  *
  * @example
+ *
  * ```typescript
  * const config = { timeout: 5000, retries: 3 } as const;
  * const keys = typedObjectKeys(config);
  * // Type: ("timeout" | "retries")[]
  * ```
+ *
+ * @param obj - Object to get keys from
+ *
+ * @returns Array of keys with proper typing
  */
 export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(
     obj: T
@@ -212,22 +233,24 @@ export function typedObjectKeys<T extends Record<PropertyKey, unknown>>(
 /**
  * Type-safe Object.values that preserves value types for known object shapes.
  *
- * @param obj - Object to get values from
- * @returns Array of values with proper typing
- *
  * @remarks
  * This function uses type assertion to preserve compile-time type information.
  * Object.values() only returns enumerable property values, so non-enumerable
- * properties and symbol-keyed properties are not included. The cast assumes
- * all values are of type T[keyof T], which is accurate for the enumerable
+ * properties and symbol-keyed properties are not included. The cast assumes all
+ * values are of type T[keyof T], which is accurate for the enumerable
  * properties that Object.values() actually returns.
  *
  * @example
+ *
  * ```typescript
  * const config = { timeout: 5000, retries: 3 } as const;
  * const values = typedObjectValues(config);
  * // Type: number[]
  * ```
+ *
+ * @param obj - Object to get values from
+ *
+ * @returns Array of values with proper typing
  */
 export function typedObjectValues<T extends Record<PropertyKey, unknown>>(
     obj: T

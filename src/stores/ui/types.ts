@@ -1,6 +1,6 @@
 /**
- * UI store types and interfaces.
- * Manages UI state, modal visibility, and user interface interactions.
+ * UI store types and interfaces. Manages UI state, modal visibility, and user
+ * interface interactions.
  *
  * @remarks
  * This store is responsible for managing the UI state of the application,
@@ -16,8 +16,8 @@ import type { ChartTimeRange } from "../types";
  * Interface for the UI store.
  *
  * @remarks
- * Provides state and actions for managing user interface interactions and
- * modal visibility.
+ * Provides state and actions for managing user interface interactions and modal
+ * visibility.
  */
 export interface UIStore {
     /**

@@ -3,17 +3,19 @@
  *
  * @remarks
  * Provides centralized Chart.js configuration management with automatic theme
- * integration for consistent styling across all charts in the application.
- * This service ensures that charts maintain visual consistency and respond
- * to theme changes appropriately.
+ * integration for consistent styling across all charts in the application. This
+ * service ensures that charts maintain visual consistency and respond to theme
+ * changes appropriately.
  *
  * The service supports multiple chart types with optimized configurations:
+ *
  * - Line charts for time-series data (response times, uptime trends)
  * - Area charts for filled visualizations
  * - Doughnut charts for status distributions
  * - Responsive design with mobile-friendly defaults
  *
  * @example
+ *
  * ```typescript
  * const chartConfig = new ChartConfigService(currentTheme);
  * const lineConfig = chartConfig.getLineChartConfig();
@@ -99,6 +101,7 @@ export class ChartConfigService {
      * Creates a new chart configuration service.
      *
      * @param theme - Theme instance containing colors, typography, and spacing
+     *
      * @public
      */
     public constructor(theme: Theme) {
@@ -109,6 +112,7 @@ export class ChartConfigService {
      * Status distribution bar chart configuration
      *
      * @returns Chart configuration options for bar charts
+     *
      * @public
      */
     public getBarChartConfig(): ChartOptions<"bar"> {
@@ -134,7 +138,9 @@ export class ChartConfigService {
      * Uptime doughnut chart configuration
      *
      * @param totalChecks - Total number of checks for percentage calculation
+     *
      * @returns Chart configuration options for doughnut charts
+     *
      * @public
      */
     public getDoughnutChartConfig(
@@ -177,7 +183,9 @@ export class ChartConfigService {
     /**
      * Response time line chart configuration
      *
-     * @returns Chart configuration options for line charts with responsive scaling
+     * @returns Chart configuration options for line charts with responsive
+     *   scaling
+     *
      * @public
      */
     public getLineChartConfig(): ChartOptions<"line"> {
@@ -243,14 +251,14 @@ export class ChartConfigService {
     /**
      * Get base configuration shared across all chart types.
      *
-     * @returns Partial chart options with common styling and behavior
-     *
      * @remarks
      * Provides consistent foundation for all charts including responsive
      * behavior, theme-aware colors, typography, and tooltip styling. This
      * configuration is extended by specific chart type methods.
      *
      * This is an internal method used by other configuration methods.
+     *
+     * @returns Partial chart options with common styling and behavior
      */
     private getBaseConfig(): Partial<ChartOptions> {
         return {
@@ -339,14 +347,8 @@ export class ChartConfigService {
 /**
  * React hook for getting theme-aware chart configurations.
  *
- * @param theme - Current theme object for styling charts
- * @param totalChecks - Total number of checks for pie chart configuration
- * @returns Object containing various chart configuration options
- * @returns barChartOptions - Configuration for bar charts with theme-aware styling
- * @returns doughnutOptions - Configuration for doughnut/pie charts with tooltips and legends
- * @returns lineChartOptions - Configuration for line charts with responsive scaling and interactions
- *
  * @example
+ *
  * ```typescript
  * const { barChartOptions, doughnutOptions, lineChartOptions } = createChartConfigs(theme, 100);
  * // Use with Chart.js components
@@ -354,6 +356,17 @@ export class ChartConfigService {
  * <Doughnut data={statusData} options={doughnutOptions} />
  * <Line data={timeSeriesData} options={lineChartOptions} />
  * ```
+ *
+ * @param theme - Current theme object for styling charts
+ * @param totalChecks - Total number of checks for pie chart configuration
+ *
+ * @returns Object containing various chart configuration options
+ * @returns BarChartOptions - Configuration for bar charts with theme-aware
+ *   styling
+ * @returns DoughnutOptions - Configuration for doughnut/pie charts with
+ *   tooltips and legends
+ * @returns LineChartOptions - Configuration for line charts with responsive
+ *   scaling and interactions
  */
 export function createChartConfigs(
     theme: Theme,

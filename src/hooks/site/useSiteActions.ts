@@ -11,9 +11,9 @@ import { ensureError } from "../../utils/errorHandling";
  * Result interface for the useSiteActions hook.
  *
  * @remarks
- * Provides a complete set of action handlers for site operations,
- * including individual monitor control and site-wide monitoring management.
- * All handlers include proper error handling and user action logging.
+ * Provides a complete set of action handlers for site operations, including
+ * individual monitor control and site-wide monitoring management. All handlers
+ * include proper error handling and user action logging.
  *
  * @public
  */
@@ -43,18 +43,15 @@ export interface SiteActionsResult {
  * analytics purposes.
  *
  * The hook integrates with the sites store for state management and includes
- * proper error handling with user-friendly logging. All handlers are wrapped
- * in useCallback for performance optimization.
+ * proper error handling with user-friendly logging. All handlers are wrapped in
+ * useCallback for performance optimization.
  *
  * Monitoring operations support both individual monitor control (start/stop
  * specific monitor) and site-wide control (start/stop all monitors for a
  * site).
  *
- * @param site - The site object to act upon
- * @param monitor - The specific monitor to use for individual monitor actions
- * @returns Object containing all available action handler functions
- *
  * @example
+ *
  * ```tsx
  * function SiteCard({ site }) {
  *   const { monitor } = useSiteMonitor(site);
@@ -73,6 +70,11 @@ export interface SiteActionsResult {
  *   );
  * }
  * ```
+ *
+ * @param site - The site object to act upon
+ * @param monitor - The specific monitor to use for individual monitor actions
+ *
+ * @returns Object containing all available action handler functions
  */
 export function useSiteActions(
     site: Site,

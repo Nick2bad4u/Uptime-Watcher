@@ -1,7 +1,7 @@
 /**
- * React components for dynamic monitor UI behavior.
- * These components handle async loading of monitor configurations and provide
- * consistent UI behavior across different monitor types.
+ * React components for dynamic monitor UI behavior. These components handle
+ * async loading of monitor configurations and provide consistent UI behavior
+ * across different monitor types.
  */
 
 import type { MonitorType } from "@shared/types";
@@ -27,8 +27,8 @@ export interface ConditionalResponseTimeProps {
 }
 
 /**
- * Component that dynamically formats monitor detail labels.
- * Handles async loading of monitor configuration.
+ * Component that dynamically formats monitor detail labels. Handles async
+ * loading of monitor configuration.
  *
  * @public
  */

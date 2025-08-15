@@ -3,8 +3,8 @@
  * backups.
  *
  * @remarks
- * Handles database initialization, import/export, and backup operations.
- * Uses the new service-based architecture for all operations.
+ * Handles database initialization, import/export, and backup operations. Uses
+ * the new service-based architecture for all operations.
  */
 
 import type { Site } from "@shared/types";
@@ -76,13 +76,14 @@ export interface DatabaseManagerDependencies {
  * architecture.
  *
  * Key responsibilities:
+ *
  * - **Database Initialization**: Setup and schema management
  * - **Data Import/Export**: JSON-based data persistence and restoration
  * - **Backup Management**: SQLite database backup creation and download
  * - **Site Loading**: Coordinated loading of sites from database into cache
- * - **History Management**: Configuration and limits for status history
- * retention - **Event Coordination**: Typed event emission for system-wide
- * coordination
+ * - **History Management**: Configuration and limits for status history retention
+ *   - **Event Coordination**: Typed event emission for system-wide
+ *   coordination
  *
  * The manager uses dependency injection for testability and follows the
  * repository pattern for data access. All operations are designed to be atomic
@@ -90,16 +91,17 @@ export interface DatabaseManagerDependencies {
  * standardized error management and logging.
  *
  * @example
+ *
  * ```typescript
  * const databaseManager = new DatabaseManager({
- *   eventEmitter: typedEventBus,
- *   repositories: {
- *     database: databaseService,
- *     history: historyRepository,
- *     monitor: monitorRepository,
- *     settings: settingsRepository,
- *     site: siteRepository
- *   }
+ *     eventEmitter: typedEventBus,
+ *     repositories: {
+ *         database: databaseService,
+ *         history: historyRepository,
+ *         monitor: monitorRepository,
+ *         settings: settingsRepository,
+ *         site: siteRepository,
+ *     },
  * });
  *
  * // Initialize the database and load sites
@@ -113,9 +115,10 @@ export class DatabaseManager {
     /**
      * Executes database commands using the command pattern.
      *
-     * @readonly
      * @privateRemarks
      * Used internally to decouple command logic from the manager.
+     *
+     * @readonly
      */
     private readonly commandExecutor: DatabaseCommandExecutor;
 
@@ -175,14 +178,17 @@ export class DatabaseManager {
      * Uses the command pattern to execute a backup operation and returns the
      * backup buffer and file name.
      *
-     * @returns A promise resolving to an object containing the backup buffer and file name.
-     * @throws Error if backup creation or file system operations fail.
-     *
      * @example
+     *
      * ```typescript
      * const backup = await databaseManager.downloadBackup();
      * // Use backup.buffer and backup.fileName
      * ```
+     *
+     * @returns A promise resolving to an object containing the backup buffer
+     *   and file name.
+     *
+     * @throws Error if backup creation or file system operations fail.
      */
     public async downloadBackup(): Promise<{
         buffer: Buffer;
@@ -203,13 +209,16 @@ export class DatabaseManager {
      * Uses the command pattern to serialize all application data for backup or
      * migration.
      *
-     * @returns A promise resolving to a JSON string containing all exported data.
-     * @throws Error if database access or data serialization fails.
-     *
      * @example
+     *
      * ```typescript
      * const exportData = await databaseManager.exportData();
      * ```
+     *
+     * @returns A promise resolving to a JSON string containing all exported
+     *   data.
+     *
+     * @throws Error if database access or data serialization fails.
      */
     public async exportData(): Promise<string> {
         const command = new ExportDataCommand(
@@ -229,6 +238,7 @@ export class DatabaseManager {
      * event emission. Always emits a failure event if import fails.
      *
      * @param data - The JSON string containing import data.
+     *
      * @returns A promise resolving to a boolean indicating success.
      */
     public async importData(data: string): Promise<boolean> {
@@ -280,7 +290,9 @@ export class DatabaseManager {
      * event emission are logged but do not interrupt initialization.
      *
      * @returns A promise that resolves when initialization is complete.
-     * @throws Error if database initialization, site loading, or settings loading fails.
+     *
+     * @throws Error if database initialization, site loading, or settings
+     *   loading fails.
      */
     public async initialize(): Promise<void> {
         return withErrorHandling(
@@ -348,6 +360,7 @@ export class DatabaseManager {
      * array.
      *
      * @returns A promise resolving to an array of loaded {@link Site} objects.
+     *
      * @throws Error if database access or cache update fails.
      */
     public async refreshSites(): Promise<Site[]> {
@@ -426,9 +439,12 @@ export class DatabaseManager {
      * memory. Emits a history-limit-updated event on success.
      *
      * @param limit - The new history limit value to set.
+     *
      * @returns A promise that resolves when the history limit is updated.
+     *
      * @throws TypeError if limit is not a valid number or integer.
-     * @throws RangeError if limit is negative, infinite, or exceeds the configured maximum.
+     * @throws RangeError if limit is negative, infinite, or exceeds the
+     *   configured maximum.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
         // Comprehensive input validation
@@ -549,10 +565,10 @@ export class DatabaseManager {
      * replacement.
      *
      * @remarks
-     * Loads all sites from the database into a temporary cache, then
-     * atomically replaces the existing cache to prevent race conditions. Sets
-     * up monitoring configuration for each loaded site. Intended for internal
-     * use only.
+     * Loads all sites from the database into a temporary cache, then atomically
+     * replaces the existing cache to prevent race conditions. Sets up
+     * monitoring configuration for each loaded site. Intended for internal use
+     * only.
      *
      * @internal
      */
@@ -674,7 +690,8 @@ export class DatabaseManager {
      * and orchestrators are created using the provided repositories and event
      * emitter.
      *
-     * @param dependencies - The set of dependencies required for all database operations.
+     * @param dependencies - The set of dependencies required for all database
+     *   operations.
      */
     public constructor(dependencies: DatabaseManagerDependencies) {
         this.dependencies = dependencies;

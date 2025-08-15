@@ -1,6 +1,6 @@
 /**
- * Standardized IPC response interface for consistent API communication.
- * All IPC handlers should return responses following this structure.
+ * Standardized IPC response interface for consistent API communication. All IPC
+ * handlers should return responses following this structure.
  */
 
 import type { ValidationResult } from "@shared/types/validation";
@@ -29,17 +29,18 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
  * handlers should use this response format.
  *
  * @example
+ *
  * ```typescript
  * // Success response
  * const response: IpcResponse<Site[]> = {
- *   success: true,
- *   data: sites
+ *     success: true,
+ *     data: sites,
  * };
  *
  * // Error response
  * const response: IpcResponse<void> = {
- *   success: false,
- *   error: "Failed to retrieve sites"
+ *     success: false,
+ *     error: "Failed to retrieve sites",
  * };
  * ```
  *
@@ -78,6 +79,7 @@ export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
  * Validation function type for IPC parameters.
  *
  * @param params - The parameters to validate
+ *
  * @returns Array of error messages, or null if validation passes
  *
  * @public

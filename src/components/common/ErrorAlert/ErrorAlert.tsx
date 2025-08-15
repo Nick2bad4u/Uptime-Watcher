@@ -4,6 +4,7 @@
  *
  * @remarks
  * This component provides a standardized way to display error messages with:
+ *
  * - Consistent styling and theming
  * - Proper icons instead of emojis
  * - Accessible markup and keyboard interaction
@@ -11,12 +12,13 @@
  * - Support for different error severity levels
  *
  * @example
+ *
  * ```tsx
  * <ErrorAlert
- *   message="Failed to load data"
- *   onDismiss={() => clearError()}
- *   variant="error"
- * />
+ *     message="Failed to load data"
+ *     onDismiss={() => clearError()}
+ *     variant="error"
+ * />;
  * ```
  *
  * @public
@@ -45,6 +47,7 @@ export interface ErrorAlertProperties {
 
 /**
  * Supported error alert variants.
+ *
  * @public
  */
 export type ErrorAlertVariant = "error" | "info" | "warning";
@@ -53,6 +56,7 @@ export type ErrorAlertVariant = "error" | "info" | "warning";
  * Get the appropriate icon for the error variant.
  *
  * @param variant - The error variant
+ *
  * @returns React icon component
  *
  * @internal
@@ -82,6 +86,7 @@ function getErrorIcon(variant: ErrorAlertVariant): JSX.Element {
  * Get the appropriate CSS classes for error variants.
  *
  * @param variant - The error variant
+ *
  * @returns CSS class string for variant styling
  *
  * @internal
@@ -107,6 +112,7 @@ function getVariantClasses(variant: ErrorAlertVariant): string {
  * Unified error alert component for consistent error display.
  *
  * @param props - Component props
+ *
  * @returns JSX element containing the error alert
  *
  * @public

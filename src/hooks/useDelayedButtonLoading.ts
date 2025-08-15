@@ -6,10 +6,8 @@
  * flickering on fast operations. Uses configurable delays for showing and
  * hiding the loading state.
  *
- * @param isLoading - Whether the operation is currently loading
- * @returns The delayed loading state for button display
- *
  * @example
+ *
  * ```tsx
  * const showButtonLoading = useDelayedButtonLoading(isSubmitting);
  *
@@ -19,6 +17,11 @@
  *   </Button>
  * );
  * ```
+ *
+ * @param isLoading - Whether the operation is currently loading
+ *
+ * @returns The delayed loading state for button display
+ *
  * @public
  */
 
@@ -30,6 +33,7 @@ import { UI_DELAYS } from "../constants";
  * Hook that manages delayed button loading states to prevent UI flickering.
  *
  * @param isLoading - Whether the operation is currently loading
+ *
  * @returns Delayed loading state for button display
  */
 export function useDelayedButtonLoading(isLoading: boolean): boolean {

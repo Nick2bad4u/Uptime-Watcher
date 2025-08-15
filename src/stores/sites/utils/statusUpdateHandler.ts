@@ -2,10 +2,10 @@
  * Status update handler utility for managing site status updates.
  *
  * @remarks
- * Provides optimized incremental updates with fallback mechanisms for
- * real-time site status synchronization. This module handles the complex
- * orchestration between frontend state and backend events. Implements
- * efficient incremental updates to minimize unnecessary data fetching.
+ * Provides optimized incremental updates with fallback mechanisms for real-time
+ * site status synchronization. This module handles the complex orchestration
+ * between frontend state and backend events. Implements efficient incremental
+ * updates to minimize unnecessary data fetching.
  *
  * @public
  */
@@ -24,8 +24,8 @@ import {
  * Monitor status changed event data structure.
  *
  * @remarks
- * This represents the actual data structure sent from the backend
- * when a monitor's status changes. Used for efficient incremental updates.
+ * This represents the actual data structure sent from the backend when a
+ * monitor's status changes. Used for efficient incremental updates.
  *
  * @internal
  */
@@ -41,8 +41,8 @@ interface MonitorStatusChangedEvent {
  *
  * @remarks
  * Defines the required dependencies and callbacks for managing status update
- * subscriptions. All functions should be stable references to avoid
- * unnecessary re-subscriptions.
+ * subscriptions. All functions should be stable references to avoid unnecessary
+ * re-subscriptions.
  *
  * @public
  */
@@ -93,11 +93,12 @@ export interface StatusUpdateHandlerOptions {
  * performance.
  *
  * @example
+ *
  * ```typescript
  * const manager = new StatusUpdateManager({
- *   fullSyncFromBackend: () => syncSites(),
- *   getSites: () => store.getSites(),
- *   setSites: (sites) => store.setSites(sites)
+ *     fullSyncFromBackend: () => syncSites(),
+ *     getSites: () => store.getSites(),
+ *     setSites: (sites) => store.setSites(sites),
  * });
  *
  * manager.subscribe();
@@ -121,13 +122,13 @@ export class StatusUpdateManager {
     /**
      * Handle incremental status updates efficiently without full sync.
      *
-     * @param event - Monitor status changed event data
-     *
      * @remarks
      * Applies status changes directly to existing site/monitor data in the
      * store. This is much more efficient than triggering a full sync for every
-     * status change. Falls back to full sync only if the site/monitor cannot
-     * be found.
+     * status change. Falls back to full sync only if the site/monitor cannot be
+     * found.
+     *
+     * @param event - Monitor status changed event data
      *
      * @internal
      */
@@ -202,12 +203,12 @@ export class StatusUpdateManager {
     /**
      * Constructs a new StatusUpdateManager instance.
      *
-     * @param options - Configuration options for the status update manager
-     *
      * @remarks
      * Initializes the manager with the required dependencies for status update
      * handling. Does not start listening for events until subscribe() is
      * called.
+     *
+     * @param options - Configuration options for the status update manager
      */
     public constructor(options: StatusUpdateHandlerOptions) {
         this.fullSyncFromBackend = options.fullSyncFromBackend;
@@ -219,10 +220,10 @@ export class StatusUpdateManager {
     /**
      * Check if currently subscribed to status updates.
      *
-     * @returns True if subscribed and listening for events, false otherwise
-     *
      * @remarks
      * Returns true when event listeners are active.
+     *
+     * @returns True if subscribed and listening for events, false otherwise
      */
     public isSubscribed(): boolean {
         return this.isListenerAttached;
@@ -239,6 +240,7 @@ export class StatusUpdateManager {
      * performance.
      *
      * @example
+     *
      * ```typescript
      * manager.subscribe();
      * ```
@@ -323,10 +325,11 @@ export class StatusUpdateManager {
      * Unsubscribe from all status update events.
      *
      * @remarks
-     * Cleans up all IPC event listeners and resets internal state.
-     * Safe to call multiple times - will not throw if already unsubscribed.
+     * Cleans up all IPC event listeners and resets internal state. Safe to call
+     * multiple times - will not throw if already unsubscribed.
      *
      * @example
+     *
      * ```typescript
      * manager.unsubscribe();
      * console.log(manager.isSubscribed()); // false
@@ -350,6 +353,7 @@ export class StatusUpdateManager {
      * @param site - Site containing the monitor
      * @param monitor - Monitor to update
      * @param event - Status change event
+     *
      * @returns Updated sites array
      *
      * @internal
@@ -383,6 +387,7 @@ export class StatusUpdateManager {
      *
      * @param site - Site to search for monitor
      * @param monitorId - Monitor ID to find
+     *
      * @returns Monitor if found, undefined otherwise
      *
      * @internal
@@ -399,6 +404,7 @@ export class StatusUpdateManager {
      *
      * @param sites - Array of sites to search
      * @param siteId - Site identifier to find
+     *
      * @returns Site if found, undefined otherwise
      *
      * @internal
@@ -410,13 +416,14 @@ export class StatusUpdateManager {
     /**
      * Type guard to validate incoming data as MonitorStatusChangedEvent.
      *
-     * @param data - Unknown data from IPC events
-     * @returns True if data conforms to MonitorStatusChangedEvent interface
-     *
      * @remarks
      * Performs structural validation to ensure the data has the expected shape
      * for incremental processing. This helps prevent runtime errors from
      * malformed data.
+     *
+     * @param data - Unknown data from IPC events
+     *
+     * @returns True if data conforms to MonitorStatusChangedEvent interface
      *
      * @internal
      */

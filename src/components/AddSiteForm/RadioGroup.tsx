@@ -8,36 +8,36 @@
  * consistent styling and error handling. Each radio option is rendered with
  * proper labeling and accessibility features.
  *
- * @example
- * Basic radio group with protocol selection:
+ * @example Basic radio group with protocol selection:
+ *
  * ```tsx
  * <RadioGroup
- *   id="protocol"
- *   name="protocol"
- *   label="Protocol"
- *   value={selectedProtocol}
- *   onChange={setProtocol}
- *   options={[
- *     { label: "HTTP", value: "http" },
- *     { label: "HTTPS", value: "https" }
- *   ]}
- *   required={true}
- * />
+ *     id="protocol"
+ *     name="protocol"
+ *     label="Protocol"
+ *     value={selectedProtocol}
+ *     onChange={setProtocol}
+ *     options={[
+ *         { label: "HTTP", value: "http" },
+ *         { label: "HTTPS", value: "https" },
+ *     ]}
+ *     required={true}
+ * />;
  * ```
  *
- * @example
- * Radio group with error state:
+ * @example Radio group with error state:
+ *
  * ```tsx
  * <RadioGroup
- *   id="method"
- *   name="method"
- *   label="Request Method"
- *   value={method}
- *   onChange={setMethod}
- *   options={methodOptions}
- *   error="Please select a valid method"
- *   helpText="Choose the HTTP method for requests"
- * />
+ *     id="method"
+ *     name="method"
+ *     label="Request Method"
+ *     value={method}
+ *     onChange={setMethod}
+ *     options={methodOptions}
+ *     error="Please select a valid method"
+ *     helpText="Choose the HTTP method for requests"
+ * />;
  * ```
  *
  * @public
@@ -98,25 +98,28 @@ export interface RadioOption {
  * FormField for consistent styling. Each radio option is rendered with proper
  * labeling and event handling.
  *
- * @param props - The component properties
- * @returns JSX element containing a radio button group
+ * @example Protocol selection with required validation:
  *
- * @example
- * Protocol selection with required validation:
  * ```tsx
  * <RadioGroup
- *   id="protocol"
- *   label="Protocol"
- *   name="protocol"
- *   value={formData.protocol}
- *   onChange={(value) => setFormData(prev => ({ ...prev, protocol: value }))}
- *   options={[
- *     { label: 'HTTP', value: 'http' },
- *     { label: 'HTTPS', value: 'https' }
- *   ]}
- *   required
- * />
+ *     id="protocol"
+ *     label="Protocol"
+ *     name="protocol"
+ *     value={formData.protocol}
+ *     onChange={(value) =>
+ *         setFormData((prev) => ({ ...prev, protocol: value }))
+ *     }
+ *     options={[
+ *         { label: "HTTP", value: "http" },
+ *         { label: "HTTPS", value: "https" },
+ *     ]}
+ *     required
+ * />;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns JSX element containing a radio button group
  *
  * @public
  */

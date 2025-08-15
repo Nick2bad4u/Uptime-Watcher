@@ -1,6 +1,6 @@
 /**
- * Site operations module.
- * Handles CRUD operations for sites and monitor management.
+ * Site operations module. Handles CRUD operations for sites and monitor
+ * management.
  *
  * Uses centralized error store for consistent error handling across the
  * application.

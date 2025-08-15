@@ -15,7 +15,9 @@ export interface ThemedTooltipProperties {
  * A themed tooltip component for displaying hover information
  *
  * @param props - The tooltip properties
+ *
  * @returns The themed tooltip JSX element
+ *
  * @public
  */
 const ThemedTooltip = ({

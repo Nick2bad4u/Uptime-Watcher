@@ -4,8 +4,9 @@
  *
  * @remarks
  * - Provides a comprehensive form with validation and flexible configuration
- * options. - Supports both HTTP and port monitoring types, with customizable
- * check intervals. - Uses domain-specific Zustand stores for state management.
+ *   options. - Supports both HTTP and port monitoring types, with customizable
+ *   check intervals. - Uses domain-specific Zustand stores for state
+ *   management.
  * - Loads monitor types dynamically from the backend.
  * - Handles errors via a centralized error store and logger.
  * - All form state is managed via the {@link useAddSiteForm} custom hook.
@@ -37,6 +38,7 @@ import TextField from "./TextField";
 
 /**
  * Props for the AddSiteForm component.
+ *
  * @public
  */
 export interface AddSiteFormProperties {
@@ -46,6 +48,7 @@ export interface AddSiteFormProperties {
 
 /**
  * Supported add modes for the form.
+ *
  * @public
  */
 type AddMode = "existing" | "new";
@@ -53,14 +56,16 @@ type AddMode = "existing" | "new";
 /**
  * Type-safe validation for add mode values.
  *
- * @param value - The value to validate as an add mode.
- * @returns True if the value is a valid {@link AddMode}, otherwise false.
- *
  * @example
+ *
  * ```typescript
  * isValidAddMode("new"); // true
  * isValidAddMode("invalid"); // false
  * ```
+ *
+ * @param value - The value to validate as an add mode.
+ *
+ * @returns True if the value is a valid {@link AddMode}, otherwise false.
  */
 function isValidAddMode(value: string): value is AddMode {
     return value === "existing" || value === "new";
@@ -69,11 +74,12 @@ function isValidAddMode(value: string): value is AddMode {
 /**
  * Type-safe validation for monitor type values.
  *
- * @param value - The value to validate as a monitor type.
- * @returns True if the value is a valid {@link MonitorType}, otherwise false.
- *
  * @remarks
  * Checks against {@link BASE_MONITOR_TYPES} for allowed types.
+ *
+ * @param value - The value to validate as a monitor type.
+ *
+ * @returns True if the value is a valid {@link MonitorType}, otherwise false.
  */
 function isValidMonitorType(value: string): value is MonitorType {
     return BASE_MONITOR_TYPES.includes(value as MonitorType);
@@ -84,18 +90,21 @@ function isValidMonitorType(value: string): value is MonitorType {
  *
  * @remarks
  * - Allows creation of new sites with monitors, or adding monitors to existing
- * sites. - Supports HTTP and port monitoring, with dynamic fields based on
- * monitor type. - Handles form validation, error display, and loading states.
+ *   sites. - Supports HTTP and port monitoring, with dynamic fields based on
+ *   monitor type. - Handles form validation, error display, and loading
+ *   states.
  * - Uses Zustand stores for state and error management.
  * - Loads monitor types from backend and displays dynamic help text.
  *
- * @param props - AddSiteForm component props
- * @returns The rendered AddSiteForm JSX element.
- *
  * @example
+ *
  * ```tsx
- * <AddSiteForm onSuccess={() => console.log('Site added!')} />
+ * <AddSiteForm onSuccess={() => console.log("Site added!")} />;
  * ```
+ *
+ * @param props - AddSiteForm component props
+ *
+ * @returns The rendered AddSiteForm JSX element.
  */
 export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
     React.memo(function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
@@ -199,10 +208,11 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         /**
          * Handles form submission for adding a site or monitor.
          *
-         * @param event - The form submission event.
          * @remarks
          * Delegates to {@link handleSubmit} with all relevant form state and
          * handlers.
+         *
+         * @param event - The form submission event.
          */
         const onSubmit = useCallback(
             async (event: React.FormEvent) => {

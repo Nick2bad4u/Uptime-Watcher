@@ -6,6 +6,7 @@
  * @remarks
  * This store manages all monitor type related functionality with caching and
  * backend synchronization. It provides:
+ *
  * - Monitor type configuration loading and caching
  * - Monitor data validation through backend registry
  * - Monitor detail formatting and title suffix generation
@@ -16,6 +17,7 @@
  * management and eliminating direct ElectronAPI calls.
  *
  * @example
+ *
  * ```typescript
  * // Get available monitor types
  * const { monitorTypes, loadMonitorTypes } = useMonitorTypesStore();
@@ -23,11 +25,16 @@
  *
  * // Validate monitor data
  * const { validateMonitorData } = useMonitorTypesStore();
- * const result = await validateMonitorData('http', { url: 'https://example.com' });
+ * const result = await validateMonitorData("http", {
+ *     url: "https://example.com",
+ * });
  *
  * // Format monitor details
  * const { formatMonitorDetail } = useMonitorTypesStore();
- * const formatted = await formatMonitorDetail('http', 'Response time: 150ms');
+ * const formatted = await formatMonitorDetail(
+ *     "http",
+ *     "Response time: 150ms"
+ * );
  * ```
  *
  * @public
@@ -50,13 +57,14 @@ import { logStoreAction } from "../utils";
  *
  * @remarks
  * Defines all actions available for monitor type management including:
+ *
  * - Loading and caching monitor type configurations
  * - Validating monitor data against type schemas
  * - Formatting monitor details and titles
  * - Managing field configurations for dynamic forms
  *
- * All actions provide consistent error handling and logging through
- * the centralized error management system.
+ * All actions provide consistent error handling and logging through the
+ * centralized error management system.
  *
  * @public
  */
@@ -65,11 +73,12 @@ export interface MonitorTypesActions {
      * Formats monitor detail text using backend registry.
      *
      * @remarks
-     * Uses the backend monitor type registry to format detail text
-     * according to type-specific rules and conventions.
+     * Uses the backend monitor type registry to format detail text according to
+     * type-specific rules and conventions.
      *
      * @param type - The monitor type identifier
      * @param details - Raw detail text to format
+     *
      * @returns Promise resolving to formatted detail text
      */
     formatMonitorDetail: (type: string, details: string) => Promise<string>;
@@ -78,12 +87,13 @@ export interface MonitorTypesActions {
      * Generates formatted title suffix for a monitor.
      *
      * @remarks
-     * Creates a descriptive suffix for monitor titles based on
-     * the monitor type and configuration. Used in UI displays
-     * to provide context about the monitor's target.
+     * Creates a descriptive suffix for monitor titles based on the monitor type
+     * and configuration. Used in UI displays to provide context about the
+     * monitor's target.
      *
      * @param type - The monitor type identifier
      * @param monitor - The monitor configuration object
+     *
      * @returns Promise resolving to formatted title suffix
      */
     formatMonitorTitleSuffix: (
@@ -95,10 +105,11 @@ export interface MonitorTypesActions {
      * Retrieves field configuration for a specific monitor type.
      *
      * @remarks
-     * Gets the field definitions used by dynamic form components
-     * to render monitor-specific input fields.
+     * Gets the field definitions used by dynamic form components to render
+     * monitor-specific input fields.
      *
      * @param type - The monitor type to get fields for
+     *
      * @returns Field configuration or undefined if type not found
      */
     getFieldConfig: (
@@ -109,9 +120,9 @@ export interface MonitorTypesActions {
      * Loads all available monitor type configurations from backend.
      *
      * @remarks
-     * Fetches monitor type definitions from the backend registry
-     * and caches them in the store. This includes field configurations,
-     * validation schemas, and UI metadata for each monitor type.
+     * Fetches monitor type definitions from the backend registry and caches
+     * them in the store. This includes field configurations, validation
+     * schemas, and UI metadata for each monitor type.
      *
      * Uses `safeExtractIpcData` for robust IPC response handling.
      *
@@ -123,9 +134,9 @@ export interface MonitorTypesActions {
      * Clears monitor types cache and reloads from backend.
      *
      * @remarks
-     * Forces a fresh load of monitor type configurations from
-     * the backend, bypassing any cached data. Useful for
-     * development or when types may have changed.
+     * Forces a fresh load of monitor type configurations from the backend,
+     * bypassing any cached data. Useful for development or when types may have
+     * changed.
      *
      * @returns Promise that resolves when refresh is complete
      */
@@ -135,12 +146,13 @@ export interface MonitorTypesActions {
      * Validates monitor data against type-specific schema.
      *
      * @remarks
-     * Performs comprehensive validation of monitor configuration data
-     * using the backend validation registry. Returns detailed validation
-     * results including success status, errors, and metadata.
+     * Performs comprehensive validation of monitor configuration data using the
+     * backend validation registry. Returns detailed validation results
+     * including success status, errors, and metadata.
      *
      * @param type - The monitor type to validate against
      * @param data - The monitor data to validate
+     *
      * @returns Promise resolving to validation result
      */
     validateMonitorData: (
@@ -154,12 +166,13 @@ export interface MonitorTypesActions {
  *
  * @remarks
  * Defines the state structure for monitor type management including:
+ *
  * - Cached monitor type configurations
  * - Field configurations mapped by type for efficient access
  * - Loading state to prevent duplicate operations
  *
- * The state is designed to provide fast access to monitor type
- * information while maintaining consistency with backend data.
+ * The state is designed to provide fast access to monitor type information
+ * while maintaining consistency with backend data.
  *
  * @public
  */
@@ -168,9 +181,9 @@ export interface MonitorTypesState {
      * Field configurations mapped by monitor type.
      *
      * @remarks
-     * Provides efficient access to field definitions for
-     * dynamic form rendering. Each monitor type maps to
-     * its specific field configuration array.
+     * Provides efficient access to field definitions for dynamic form
+     * rendering. Each monitor type maps to its specific field configuration
+     * array.
      */
     fieldConfigs: Record<string, MonitorTypeConfig["fields"]>;
 
@@ -178,8 +191,8 @@ export interface MonitorTypesState {
      * Flag indicating whether monitor types have been loaded.
      *
      * @remarks
-     * Used to prevent duplicate loading operations and to
-     * show appropriate loading states in the UI.
+     * Used to prevent duplicate loading operations and to show appropriate
+     * loading states in the UI.
      */
     isLoaded: boolean;
 
@@ -187,9 +200,9 @@ export interface MonitorTypesState {
      * Array of all available monitor type configurations.
      *
      * @remarks
-     * Contains the complete set of monitor type definitions
-     * loaded from the backend registry, including metadata,
-     * field definitions, and validation rules.
+     * Contains the complete set of monitor type definitions loaded from the
+     * backend registry, including metadata, field definitions, and validation
+     * rules.
      */
     monitorTypes: MonitorTypeConfig[];
 }
@@ -210,6 +223,7 @@ export type MonitorTypesStore = BaseStore &
  * management and eliminates direct ElectronAPI calls.
  *
  * @returns Complete monitor types store with all actions and state
+ *
  * @public
  */
 export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =

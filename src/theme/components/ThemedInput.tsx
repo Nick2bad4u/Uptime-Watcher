@@ -5,50 +5,50 @@
  * @remarks
  * This component provides a styled input field that integrates with the
  * application's theme system. It supports various input types (text, email,
- * number, password, url), accessibility attributes, and validation
- * constraints. The input automatically applies appropriate colors, focus
- * states, and disabled states based on the current theme.
+ * number, password, url), accessibility attributes, and validation constraints.
+ * The input automatically applies appropriate colors, focus states, and
+ * disabled states based on the current theme.
  *
- * @example
- * Basic text input:
+ * @example Basic text input:
+ *
  * ```tsx
  * <ThemedInput
- *   id="username"
- *   type="text"
- *   placeholder="Enter username"
- *   value={username}
- *   onChange={handleUsernameChange}
- *   required={true}
- * />
+ *     id="username"
+ *     type="text"
+ *     placeholder="Enter username"
+ *     value={username}
+ *     onChange={handleUsernameChange}
+ *     required={true}
+ * />;
  * ```
  *
- * @example
- * Number input with constraints:
+ * @example Number input with constraints:
+ *
  * ```tsx
  * <ThemedInput
- *   id="port"
- *   type="number"
- *   min={1}
- *   max={65535}
- *   step={1}
- *   value={port}
- *   onChange={handlePortChange}
- *   aria-label="Port number"
- * />
+ *     id="port"
+ *     type="number"
+ *     min={1}
+ *     max={65535}
+ *     step={1}
+ *     value={port}
+ *     onChange={handlePortChange}
+ *     aria-label="Port number"
+ * />;
  * ```
  *
- * @example
- * Email input with validation:
+ * @example Email input with validation:
+ *
  * ```tsx
  * <ThemedInput
- *   id="email"
- *   type="email"
- *   placeholder="user@example.com"
- *   value={email}
- *   onChange={handleEmailChange}
- *   aria-describedby="email-error"
- *   required={true}
- * />
+ *     id="email"
+ *     type="email"
+ *     placeholder="user@example.com"
+ *     value={email}
+ *     onChange={handleEmailChange}
+ *     aria-describedby="email-error"
+ *     required={true}
+ * />;
  * ```
  *
  * @public
@@ -103,20 +103,21 @@ export interface ThemedInputProperties {
  * various types and automatically applies appropriate styling based on the
  * current theme and state.
  *
- * @param props - The component properties
- * @returns The themed input JSX element
+ * @example URL input with validation:
  *
- * @example
- * URL input with validation:
  * ```tsx
  * <ThemedInput
- *   type="url"
- *   placeholder="https://example.com"
- *   value={websiteUrl}
- *   onChange={handleUrlChange}
- *   required={true}
- * />
+ *     type="url"
+ *     placeholder="https://example.com"
+ *     value={websiteUrl}
+ *     onChange={handleUrlChange}
+ *     required={true}
+ * />;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The themed input JSX element
  *
  * @public
  */

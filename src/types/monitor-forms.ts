@@ -1,6 +1,6 @@
 /**
- * Specific types for monitor form data and field handling.
- * Replaces generic `Record<string, unknown>` patterns.
+ * Specific types for monitor form data and field handling. Replaces generic
+ * `Record<string, unknown>` patterns.
  */
 
 import type { MonitorType } from "@shared/types";
@@ -67,6 +67,7 @@ export interface MonitorFieldValues {
  * Monitor validation result with specific error types
  *
  * @deprecated Use ValidationResult from unified validation system instead
+ *
  * @see {@link ValidationResult} in shared/types/validation.ts
  */
 export interface MonitorValidationResult {
@@ -118,13 +119,14 @@ export type MonitorFormFields =
 /**
  * Helper to get default fields for a monitor type.
  *
- * @param type - The monitor type to get defaults for
- * @returns Default field values for the specified monitor type
- *
  * @remarks
- * For unknown monitor types, this function falls back to HTTP monitor fields
- * as they represent the most common monitoring use case. This ensures the
- * function always returns valid form fields even for unsupported types.
+ * For unknown monitor types, this function falls back to HTTP monitor fields as
+ * they represent the most common monitoring use case. This ensures the function
+ * always returns valid form fields even for unsupported types.
+ *
+ * @param type - The monitor type to get defaults for
+ *
+ * @returns Default field values for the specified monitor type
  */
 export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
     const baseFields: BaseMonitorFields = {
@@ -171,13 +173,14 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
 /**
  * Type guard to check if fields are for HTTP monitor.
  *
- * @param fields - Monitor form fields to check
- * @returns True if fields contain HTTP monitor properties
- *
  * @remarks
  * Checks for presence of required HTTP properties and absence of
  * port/ping-specific ones to provide more robust type detection and prevent
  * false positives.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain HTTP monitor properties
  */
 export function isHttpMonitorFields(
     fields: MonitorFormFields
@@ -188,12 +191,13 @@ export function isHttpMonitorFields(
 /**
  * Type guard to check if fields are for Ping monitor.
  *
- * @param fields - Monitor form fields to check
- * @returns True if fields contain valid ping monitor properties
- *
  * @remarks
  * Validates presence of host property and absence of port property to
  * distinguish from port monitors which also have a host field.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid ping monitor properties
  */
 export function isPingMonitorFields(
     fields: MonitorFormFields
@@ -209,12 +213,13 @@ export function isPingMonitorFields(
 /**
  * Type guard to check if fields are for Port monitor.
  *
- * @param fields - Monitor form fields to check
- * @returns True if fields contain valid port monitor properties
- *
  * @remarks
- * Validates both presence and types of required properties to ensure
- * runtime type safety and prevent incorrect type assumptions.
+ * Validates both presence and types of required properties to ensure runtime
+ * type safety and prevent incorrect type assumptions.
+ *
+ * @param fields - Monitor form fields to check
+ *
+ * @returns True if fields contain valid port monitor properties
  */
 export function isPortMonitorFields(
     fields: MonitorFormFields

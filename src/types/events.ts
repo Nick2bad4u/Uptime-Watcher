@@ -1,6 +1,6 @@
 /**
- * Specific event payload type definitions for improved type safety.
- * Replaces generic `unknown` types in IPC event callbacks.
+ * Specific event payload type definitions for improved type safety. Replaces
+ * generic `unknown` types in IPC event callbacks.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -72,8 +72,8 @@ export interface TestEventData {
 }
 
 /**
- * Update release information interface.
- * Contains details about an available update.
+ * Update release information interface. Contains details about an available
+ * update.
  */
 export interface UpdateReleaseInfo {
     /** Release date timestamp or formatted string */

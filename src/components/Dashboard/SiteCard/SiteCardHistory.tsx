@@ -1,6 +1,6 @@
 /**
- * Site card history visualization component.
- * Displays monitor history data using a chart component.
+ * Site card history visualization component. Displays monitor history data
+ * using a chart component.
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
@@ -27,8 +27,8 @@ export interface SiteCardHistoryProperties {
 }
 
 /**
- * Compare SiteCardHistory props to determine if re-render is needed.
- * Broken into smaller functions to reduce complexity.
+ * Compare SiteCardHistory props to determine if re-render is needed. Broken
+ * into smaller functions to reduce complexity.
  */
 
 function areHistoryPropsEqual(
@@ -68,10 +68,11 @@ function areHistoryPropsEqual(
 }
 
 /**
- * History visualization component for site cards displaying monitor status
- * over time.
+ * History visualization component for site cards displaying monitor status over
+ * time.
  *
  * Features:
+ *
  * - Dynamic title generation based on monitor type and configuration
  * - Optimized with React.memo and custom comparison for performance
  * - Automatic updates when monitor history changes in store
@@ -80,16 +81,18 @@ function areHistoryPropsEqual(
  *
  * Data flow: Store → useSiteMonitor → useSite → SiteCard → SiteCardHistory
  *
- * @param props - Component props
- * @returns JSX element containing the history chart
- *
  * @example
+ *
  * ```tsx
  * <SiteCardHistory
- *   monitor={selectedMonitor}
- *   filteredHistory={recentHistory}
- * />
+ *     monitor={selectedMonitor}
+ *     filteredHistory={recentHistory}
+ * />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX element containing the history chart
  */
 export const SiteCardHistory: React.NamedExoticComponent<SiteCardHistoryProperties> =
     React.memo(

@@ -17,8 +17,8 @@ import ThemedText from "../../theme/components/ThemedText";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**
- * Props for the SiteDetailsNavigation component.
- * Contains all necessary handlers and state for monitoring control.
+ * Props for the SiteDetailsNavigation component. Contains all necessary
+ * handlers and state for monitoring control.
  *
  * @public
  */
@@ -57,6 +57,7 @@ export interface SiteDetailsNavigationProperties {
  * including start/stop monitoring, manual checks, and configuration options.
  *
  * @param props - Component props for navigation and control
+ *
  * @returns JSX element containing navigation controls
  */
 export const SiteDetailsNavigation = ({

@@ -9,6 +9,7 @@
  * responses in the defined format.
  *
  * The module includes:
+ *
  * - Standardized response format interface
  * - Type guards for runtime type checking
  * - Data extraction utilities with error handling
@@ -19,12 +20,13 @@
  * Electron application.
  *
  * @example
+ *
  * ```typescript
  * // Type-safe IPC response handling
  * const response = await window.electronAPI.getSites();
  * if (isIpcResponse<Site[]>(response)) {
- *   const sites = extractIpcData<Site[]>(response);
- *   setSites(sites);
+ *     const sites = extractIpcData<Site[]>(response);
+ *     setSites(sites);
  * }
  *
  * // Safe extraction with fallback
@@ -60,6 +62,7 @@ export interface IpcResponse<T> {
  * Type guard to check if a value is an IPC response.
  *
  * @param value - The value to check
+ *
  * @returns True if the value is an IPC response
  *
  * @public
@@ -78,7 +81,9 @@ export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
  * Extracts data from an IPC response or throws an error.
  *
  * @param response - The IPC response to extract data from
+ *
  * @returns The data from the response
+ *
  * @throws Error if the response indicates failure
  *
  * @public
@@ -103,6 +108,7 @@ export function extractIpcData<T>(response: unknown): T {
  *
  * @param response - The IPC response
  * @param fallback - Fallback value if operation failed
+ *
  * @returns The data or fallback value
  *
  * @public

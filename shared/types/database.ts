@@ -16,6 +16,7 @@
 export interface BaseRow {
     /**
      * Unique identifier for the row.
+     *
      * @remarks
      * May be a number (autoincrement) or string (custom).
      */
@@ -175,9 +176,8 @@ export interface SiteRow extends BaseRow {
 }
 
 /**
- * Validation utilities for database row type checking.
- * Provides atomic validation functions that can be composed for complex
- * validation.
+ * Validation utilities for database row type checking. Provides atomic
+ * validation functions that can be composed for complex validation.
  *
  * @internal
  */
@@ -216,7 +216,9 @@ const RowValidationUtils = {
  * Checks for required properties and value types to ensure type safety.
  *
  * @param obj - The object to check.
- * @returns True if the object matches the {@link HistoryRow} structure; otherwise, false.
+ *
+ * @returns True if the object matches the {@link HistoryRow} structure;
+ *   otherwise, false.
  */
 export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
     // Basic object validation
@@ -245,7 +247,9 @@ export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
  * Checks for required properties and value types to ensure type safety.
  *
  * @param obj - The object to check.
- * @returns True if the object matches the {@link MonitorRow} structure; otherwise, false.
+ *
+ * @returns True if the object matches the {@link MonitorRow} structure;
+ *   otherwise, false.
  */
 export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
     // Basic object validation
@@ -274,7 +278,9 @@ export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
  * Checks for required properties and value types to ensure type safety.
  *
  * @param obj - The object to check.
- * @returns True if the object matches the {@link SettingsRow} structure; otherwise, false.
+ *
+ * @returns True if the object matches the {@link SettingsRow} structure;
+ *   otherwise, false.
  */
 export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
     if (typeof obj !== "object" || obj === null) {
@@ -298,7 +304,9 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
  * Checks for required properties and value types to ensure type safety.
  *
  * @param obj - The object to check.
- * @returns True if the object matches the {@link SiteRow} structure; otherwise, false.
+ *
+ * @returns True if the object matches the {@link SiteRow} structure; otherwise,
+ *   false.
  */
 export function isValidSiteRow(obj: unknown): obj is SiteRow {
     if (typeof obj !== "object" || obj === null) {
@@ -322,16 +330,20 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * Returns the value of the specified property if it exists and is not
  * undefined; otherwise, returns the provided default value.
  *
- * @typeParam T - The expected type of the property value.
- * @param row - The database row object.
- * @param property - The property name to access.
- * @param defaultValue - The value to return if the property is missing or undefined.
- * @returns The property value if present; otherwise, the default value.
- *
  * @example
+ *
  * ```typescript
  * const name = safeGetRowProperty(row, "name", "Unknown");
  * ```
+ *
+ * @typeParam T - The expected type of the property value.
+ *
+ * @param row - The database row object.
+ * @param property - The property name to access.
+ * @param defaultValue - The value to return if the property is missing or
+ *   undefined.
+ *
+ * @returns The property value if present; otherwise, the default value.
  */
 export function safeGetRowProperty<T>(
     row: Record<string, unknown>,

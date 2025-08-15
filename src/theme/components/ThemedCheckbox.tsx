@@ -20,7 +20,9 @@ export interface ThemedCheckboxProperties {
  * A themed checkbox input component
  *
  * @param props - The checkbox properties
+ *
  * @returns The themed checkbox JSX element
+ *
  * @public
  */
 const ThemedCheckbox = ({

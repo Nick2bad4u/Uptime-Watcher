@@ -1,11 +1,11 @@
 /**
- * Theme system type definitions.
- * Defines the structure and interfaces for the application's theming system.
+ * Theme system type definitions. Defines the structure and interfaces for the
+ * application's theming system.
  */
 
 /**
- * Complete theme interface containing all theme properties.
- * Represents a complete theme configuration with all styling properties.
+ * Complete theme interface containing all theme properties. Represents a
+ * complete theme configuration with all styling properties.
  */
 export interface Theme {
     /** Border radius definitions */
@@ -25,8 +25,8 @@ export interface Theme {
 }
 
 /**
- * Border radius system interface for consistent corner rounding.
- * Defines standard border radius values for components.
+ * Border radius system interface for consistent corner rounding. Defines
+ * standard border radius values for components.
  */
 export interface ThemeBorderRadius {
     /** Fully rounded borders */
@@ -44,8 +44,8 @@ export interface ThemeBorderRadius {
 }
 
 /**
- * Color palette interface defining all theme colors.
- * Provides a comprehensive color system for consistent theming.
+ * Color palette interface defining all theme colors. Provides a comprehensive
+ * color system for consistent theming.
  */
 export interface ThemeColors {
     // Background colors
@@ -118,8 +118,8 @@ export interface ThemeColors {
 }
 
 /**
- * Shadow system interface for elevation and depth.
- * Defines consistent shadow styles for UI components.
+ * Shadow system interface for elevation and depth. Defines consistent shadow
+ * styles for UI components.
  */
 export interface ThemeShadows {
     /** Inner shadow for inset effects */
@@ -135,8 +135,8 @@ export interface ThemeShadows {
 }
 
 /**
- * Spacing scale interface for consistent layout spacing.
- * Defines standard spacing values used throughout the application.
+ * Spacing scale interface for consistent layout spacing. Defines standard
+ * spacing values used throughout the application.
  */
 export interface ThemeSpacing {
     /** Double extra large spacing */
@@ -156,8 +156,8 @@ export interface ThemeSpacing {
 }
 
 /**
- * Theme state interface for managing active themes.
- * Tracks current theme selection and custom theme definitions.
+ * Theme state interface for managing active themes. Tracks current theme
+ * selection and custom theme definitions.
  */
 export interface ThemeState {
     /** Currently active theme object */
@@ -171,8 +171,8 @@ export interface ThemeState {
 }
 
 /**
- * Typography system interface for text styling.
- * Defines font families, sizes, weights, and line heights.
+ * Typography system interface for text styling. Defines font families, sizes,
+ * weights, and line heights.
  */
 export interface ThemeTypography {
     /** Font family definitions */

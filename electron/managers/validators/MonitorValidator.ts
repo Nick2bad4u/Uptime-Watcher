@@ -3,16 +3,17 @@
  * approach.
  *
  * @remarks
- * This validator is used by {@link SiteManager} and {@link
- * ConfigurationManager} to validate monitor configurations before persistence
- * or updates. It delegates to the {@link MonitorTypeRegistry} for
- * type-specific validation using shared Zod schemas, ensuring consistency
- * between frontend and backend validation rules.
+ * This validator is used by {@link SiteManager} and {@link ConfigurationManager}
+ * to validate monitor configurations before persistence or updates. It
+ * delegates to the {@link MonitorTypeRegistry} for type-specific validation
+ * using shared Zod schemas, ensuring consistency between frontend and backend
+ * validation rules.
  *
  * The validator performs comprehensive checks including:
+ *
  * - Monitor type validation against registered types
- * - Type-specific property validation (URL for HTTP, host/port for port
- * monitors) - Common property validation (intervals, timeouts, retry attempts)
+ * - Type-specific property validation (URL for HTTP, host/port for port monitors)
+ *   - Common property validation (intervals, timeouts, retry attempts)
  * - Business rule validation (default intervals, etc.)
  *
  * @public
@@ -43,21 +44,25 @@ import {
  */
 export class MonitorValidator {
     /**
-     * Determines if a monitor should receive a default check interval
-     * according to business rules.
+     * Determines if a monitor should receive a default check interval according
+     * to business rules.
      *
      * @remarks
      * A default interval is applied if the monitor's `checkInterval` is zero.
      *
-     * @param monitor - The monitor configuration to evaluate. Must be a member of {@link Site.monitors}.
-     * @returns `true` if the monitor should receive a default check interval; otherwise, `false`.
-     *
      * @example
+     *
      * ```typescript
      * if (validator.shouldApplyDefaultInterval(monitor)) {
-     *   monitor.checkInterval = DEFAULT_INTERVAL;
+     *     monitor.checkInterval = DEFAULT_INTERVAL;
      * }
      * ```
+     *
+     * @param monitor - The monitor configuration to evaluate. Must be a member
+     *   of {@link Site.monitors}.
+     *
+     * @returns `true` if the monitor should receive a default check interval;
+     *   otherwise, `false`.
      */
     public shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return monitor.checkInterval === 0;
@@ -71,16 +76,20 @@ export class MonitorValidator {
      * Uses registry-driven validation for timing, retry attempts, and
      * type-specific requirements.
      *
-     * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
-     * @returns A {@link ValidationResult} object containing an array of error messages and validity status.
-     *
      * @example
+     *
      * ```typescript
      * const result = validator.validateMonitorConfiguration(monitor);
      * if (!result.isValid) {
-     *   console.error(result.errors);
+     *     console.error(result.errors);
      * }
      * ```
+     *
+     * @param monitor - The monitor configuration to validate. Must be a member
+     *   of {@link Site.monitors}.
+     *
+     * @returns A {@link ValidationResult} object containing an array of error
+     *   messages and validity status.
      */
     public validateMonitorConfiguration(
         monitor: Site["monitors"][0]
@@ -103,18 +112,24 @@ export class MonitorValidator {
      * properties using Zod schemas. Returns an array of error messages if
      * validation fails, or an empty array if valid.
      *
-     * @param monitor - The monitor configuration to validate. Must be a member of {@link Site.monitors}.
-     * @returns An array of validation error messages. Empty if the monitor is valid.
+     * @privateRemarks
+     * This method is intended for internal use within {@link MonitorValidator}.
      *
      * @example
+     *
      * ```typescript
      * const errors = validator["validateMonitorTypeSpecific"](monitor);
      * if (errors.length > 0) {
-     *   console.error(errors);
+     *     console.error(errors);
      * }
      * ```
-     * @privateRemarks
-     * This method is intended for internal use within {@link MonitorValidator}.
+     *
+     * @param monitor - The monitor configuration to validate. Must be a member
+     *   of {@link Site.monitors}.
+     *
+     * @returns An array of validation error messages. Empty if the monitor is
+     *   valid.
+     *
      * @internal
      */
     private validateMonitorTypeSpecific(

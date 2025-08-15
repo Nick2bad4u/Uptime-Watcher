@@ -1,6 +1,6 @@
 /**
- * Site card status display component.
- * Provides visual status indicator for site monitoring state.
+ * Site card status display component. Provides visual status indicator for site
+ * monitoring state.
  */
 
 import type { MonitorStatus } from "@shared/types";
@@ -25,21 +25,21 @@ export interface SiteCardStatusProperties {
  * Status section component for site card displaying current monitor status.
  *
  * Features:
+ *
  * - Visual status indicator using StatusBadge component
  * - Monitor type identification in status label
  * - Optimized with React.memo to prevent unnecessary re-renders
  * - Consistent styling with theme system
  *
- * @param props - Component props
- * @returns JSX.Element containing the status badge
- *
  * @example
+ *
  * ```tsx
- * <SiteCardStatus
- *   selectedMonitorId="http"
- *   status="up"
- * />
+ * <SiteCardStatus selectedMonitorId="http" status="up" />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX.Element containing the status badge
  *
  * @see StatusBadge For the underlying status display component
  */

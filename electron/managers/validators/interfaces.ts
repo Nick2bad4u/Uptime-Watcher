@@ -3,22 +3,24 @@
  * validity status.
  *
  * @remarks
- * Used by validators throughout the application to return standardized
- * results. Enables consistent error handling and user feedback by
- * encapsulating both error messages and overall validity.
+ * Used by validators throughout the application to return standardized results.
+ * Enables consistent error handling and user feedback by encapsulating both
+ * error messages and overall validity.
  *
  * @example
+ *
  * ```typescript
  * const result: ValidationResult = {
- *   errors: [],
- *   success: true
+ *     errors: [],
+ *     success: true,
  * };
  * // or
  * const result: ValidationResult = {
- *   errors: ["Field is required"],
- *   success: false
+ *     errors: ["Field is required"],
+ *     success: false,
  * };
  * ```
+ *
  * Base validation interface.
  *
  * @public

@@ -1,7 +1,6 @@
 /**
- * Main App component for Uptime Watcher application.
- * Manages global state, modals, notifications, and renders the main
- * application layout.
+ * Main App component for Uptime Watcher application. Manages global state,
+ * modals, notifications, and renders the main application layout.
  */
 
 import type { JSX } from "react/jsx-runtime";
@@ -47,14 +46,31 @@ const UI_MESSAGES = {
 } as const;
 
 /**
- * Main application component that serves as the root of the Uptime Watcher
- * app.
+ * Main application component that serves as the root of the Uptime Watcher app.
  *
  * @remarks
  * This is the primary entry point component that orchestrates the entire
  * application including state management, theming, error handling, and
  * real-time updates. Uses deferred state updates via timeouts to comply with
  * React best practices.
+ *
+ * @example
+ *
+ * ```tsx
+ * function App() {
+ *     return (
+ *         <ErrorBoundary>
+ *             <ThemeProvider>
+ *                 <div className="app-container">
+ *                     <Header />
+ *                 </div>
+ *             </ThemeProvider>
+ *         </ErrorBoundary>
+ *     );
+ * }
+ * ```
+ *
+ * @returns The main App component JSX
  *
  * @public
  *
@@ -63,23 +79,6 @@ const UI_MESSAGES = {
  *
  * @see {@link useTheme} for theme management
  * @see {@link useSitesStore} for site state management
- *
- * @example
- * ```tsx
- * function App() {
- *   return (
- *     <ErrorBoundary>
- *       <ThemeProvider>
- *         <div className="app-container">
- *           <Header />
- *         </div>
- *       </ThemeProvider>
- *     </ErrorBoundary>
- *   );
- * }
- * ```
- *
- * @returns The main App component JSX
  */
 const App = (): JSX.Element => {
     // Error store
@@ -126,9 +125,9 @@ const App = (): JSX.Element => {
     }, []);
 
     /**
-     * Only show loading overlay if loading takes more than 100ms
-     * This prevents flash for quick operations while still providing feedback
-     * for longer ones
+     * Only show loading overlay if loading takes more than 100ms This prevents
+     * flash for quick operations while still providing feedback for longer
+     * ones
      */
     useEffect(
         function handleLoadingOverlayCleanup(): (() => void) | undefined {
@@ -157,8 +156,9 @@ const App = (): JSX.Element => {
     );
 
     /**
-     * Initialize the application and set up status update subscriptions.
-     * This effect handles:
+     * Initialize the application and set up status update subscriptions. This
+     * effect handles:
+     *
      * - Development logging
      * - App initialization
      * - Status update subscription with smart incremental updates

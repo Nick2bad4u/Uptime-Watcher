@@ -39,11 +39,12 @@ interface LoggerInterface {
      * Raw access to the underlying electron-log instance.
      *
      * @remarks
-     * Use with caution! Direct access bypasses the application's
-     * logging conventions and structured format. Only use for advanced
-     * scenarios where the standard logger methods are insufficient.
+     * Use with caution! Direct access bypasses the application's logging
+     * conventions and structured format. Only use for advanced scenarios where
+     * the standard logger methods are insufficient.
      *
      * @example
+     *
      * ```typescript
      * // Only use when absolutely necessary
      * logger.raw.transports.file.level = "warn";
@@ -93,8 +94,8 @@ interface LoggerInterface {
 }
 
 /**
- * Type-safe access to log transports.
- * Avoids index signature issues with transport properties.
+ * Type-safe access to log transports. Avoids index signature issues with
+ * transport properties.
  */
 interface LogTransports {
     console: {
@@ -110,6 +111,7 @@ interface LogTransports {
  * Safely access a log transport property.
  *
  * @param transportName - Name of the transport
+ *
  * @returns Transport object or undefined if not available
  */
 function getLogTransport<K extends keyof LogTransports>(
@@ -199,11 +201,12 @@ const logger: LoggerInterface = {
      * Raw access to the underlying electron-log instance.
      *
      * @remarks
-     * Use with caution! Direct access bypasses the application's
-     * logging conventions and structured format. Only use for advanced
-     * scenarios where the standard logger methods are insufficient.
+     * Use with caution! Direct access bypasses the application's logging
+     * conventions and structured format. Only use for advanced scenarios where
+     * the standard logger methods are insufficient.
      *
      * @example
+     *
      * ```typescript
      * // Only use when absolutely necessary
      * logger.raw.transports.file.level = "warn";
@@ -307,14 +310,15 @@ export default logger;
  *
  * @remarks
  * Provides full type safety and IntelliSense support for the logger methods.
- * Use this type for dependency injection or when you need to reference
- * the logger type in function parameters or return types.
+ * Use this type for dependency injection or when you need to reference the
+ * logger type in function parameters or return types.
  *
  * @example
+ *
  * ```typescript
  * function setupLogging(loggerInstance: Logger): void {
- *   loggerInstance.info("Application starting");
- *   loggerInstance.site.added("example.com");
+ *     loggerInstance.info("Application starting");
+ *     loggerInstance.site.added("example.com");
  * }
  * ```
  *

@@ -1,11 +1,8 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @metamask/design-tokens/color-no-hex */
 /**
- * Custom hook for theme-aware CSS-in-JS styles
- * Provides consistent styling that respects user's theme preference
- *
- * @param isCollapsed - boolean - Whether the component is in collapsed state (default: false)
- * @returns ThemeStyles object containing all CSS-in-JS style properties
+ * Custom hook for theme-aware CSS-in-JS styles Provides consistent styling that
+ * respects user's theme preference
  *
  * @remarks
  * This hook provides theme-aware styling with proper SSR support and runtime
@@ -13,12 +10,14 @@
  * changes and updates styles accordingly.
  *
  * The hook handles:
+ *
  * - Server-side rendering compatibility
  * - Runtime theme preference changes
  * - Graceful fallback when window APIs are unavailable
  * - Smooth transitions between themes
  *
  * @example
+ *
  * ```tsx
  * function ThemeAwareComponent({ collapsed }) {
  *   const styles = useThemeStyles(collapsed);
@@ -31,6 +30,11 @@
  *   );
  * }
  * ```
+ *
+ * @param isCollapsed - Boolean - Whether the component is in collapsed state
+ *   (default: false)
+ *
+ * @returns ThemeStyles object containing all CSS-in-JS style properties
  */
 
 import type { CSSProperties } from "react";
@@ -70,6 +74,7 @@ const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
  * Generates collapse button styles based on theme
  *
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for collapse button
  */
 function getCollapseButtonStyle(isDarkMode: boolean): CSSProperties {
@@ -91,6 +96,7 @@ function getCollapseButtonStyle(isDarkMode: boolean): CSSProperties {
  * Generates content area styles based on collapse state
  *
  * @param isCollapsed - Whether the component is collapsed
+ *
  * @returns CSS properties for content area
  */
 function getContentStyle(isCollapsed: boolean): CSSProperties {
@@ -107,6 +113,7 @@ function getContentStyle(isCollapsed: boolean): CSSProperties {
  *
  * @param isCollapsed - Whether the component is collapsed
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for header section
  */
 function getHeaderStyle(
@@ -142,6 +149,7 @@ function getHeaderStyle(
  * Generates metadata text styles based on theme
  *
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for metadata text
  */
 function getMetaStyle(isDarkMode: boolean): CSSProperties {
@@ -161,6 +169,7 @@ function getMetaStyle(isDarkMode: boolean): CSSProperties {
  * Generates overlay/backdrop styles based on theme
  *
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for overlay backdrop
  */
 function getOverlayStyle(isDarkMode: boolean): CSSProperties {
@@ -188,6 +197,7 @@ function getOverlayStyle(isDarkMode: boolean): CSSProperties {
  * Generates title text styles based on theme
  *
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for title text
  */
 function getTitleStyle(isDarkMode: boolean): CSSProperties {
@@ -213,6 +223,7 @@ function getTitleStyle(isDarkMode: boolean): CSSProperties {
  * Generates URL/link text styles based on theme
  *
  * @param isDarkMode - Whether dark mode is active
+ *
  * @returns CSS properties for URL text
  */
 function getUrlStyle(isDarkMode: boolean): CSSProperties {

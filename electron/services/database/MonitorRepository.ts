@@ -36,8 +36,8 @@ import {
  * Repository dependencies for managing monitor data persistence.
  *
  * @remarks
- * Provides the required database service for monitor operations.
- * Used for dependency injection pattern to ensure proper service coupling.
+ * Provides the required database service for monitor operations. Used for
+ * dependency injection pattern to ensure proper service coupling.
  *
  * @public
  */
@@ -55,7 +55,9 @@ export interface MonitorRepositoryDependencies {
  * Common SQL queries for monitor persistence operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency. This constant is internal to the repository and not exported.
+ * Centralizes query strings for maintainability and consistency. This constant
+ * is internal to the repository and not exported.
+ *
  * @internal
  */
 const MONITOR_QUERIES = {
@@ -75,14 +77,14 @@ const MONITOR_QUERIES = {
 } as const;
 
 /**
+ * @remarks
+ * Handles all CRUD operations for monitors in the database using the repository
+ * pattern. All mutations are wrapped in transactions for consistency and error
+ * handling. All operations use the DatabaseService for transaction management
+ * and maintain atomicity.
+ *
  * @public
  * Repository for managing monitor data persistence.
- *
- * @remarks
- * Handles all CRUD operations for monitors in the database using the
- * repository pattern. All mutations are wrapped in transactions for
- * consistency and error handling. All operations use the DatabaseService for
- * transaction management and maintain atomicity.
  */
 export class MonitorRepository {
     /** @internal */
@@ -91,16 +93,22 @@ export class MonitorRepository {
     /**
      * Bulk creates monitors for a site.
      *
-     * @param siteIdentifier - The site identifier to associate monitors with.
-     * @param monitors - Array of monitor configuration objects to create.
-     * @returns Promise resolving to array of created monitors with IDs.
-     * @throws Error if the database operation fails or monitor creation fails.
      * @remarks
-     * Uses a transaction for atomicity. Each monitor is inserted and its ID is returned.
+     * Uses a transaction for atomicity. Each monitor is inserted and its ID is
+     * returned.
+     *
      * @example
+     *
      * ```typescript
      * await repo.bulkCreate("site-123", monitorsArray);
      * ```
+     *
+     * @param siteIdentifier - The site identifier to associate monitors with.
+     * @param monitors - Array of monitor configuration objects to create.
+     *
+     * @returns Promise resolving to array of created monitors with IDs.
+     *
+     * @throws Error if the database operation fails or monitor creation fails.
      */
     public async bulkCreate(
         siteIdentifier: string,
@@ -155,15 +163,17 @@ export class MonitorRepository {
     /**
      * Clears all active operations for a monitor.
      *
-     * @param monitorId - The ID of the monitor to clear operations for
-     * @returns Promise that resolves when all operations are cleared
-     * @throws Error if the database operation fails
-     *
      * @remarks
-     * This method is used when a monitor is stopped or reset to ensure
-     * no stale operations remain active. Use only for standalone operations.
-     * For operations within existing transactions, use
+     * This method is used when a monitor is stopped or reset to ensure no stale
+     * operations remain active. Use only for standalone operations. For
+     * operations within existing transactions, use
      * clearActiveOperationsInternal.
+     *
+     * @param monitorId - The ID of the monitor to clear operations for
+     *
+     * @returns Promise that resolves when all operations are cleared
+     *
+     * @throws Error if the database operation fails
      */
     public async clearActiveOperations(monitorId: string): Promise<void> {
         return withDatabaseOperation(
@@ -179,16 +189,22 @@ export class MonitorRepository {
     /**
      * Creates a new monitor for a site.
      *
-     * @param siteIdentifier - The site identifier to associate the monitor with.
-     * @param monitor - Monitor configuration data (without ID).
-     * @returns Promise resolving to the created monitor ID as string.
-     * @throws Error if the database operation fails or monitor creation fails.
      * @remarks
      * Uses a transaction for atomicity.
+     *
      * @example
+     *
      * ```typescript
      * const id = await repo.create("site-123", monitorObj);
      * ```
+     *
+     * @param siteIdentifier - The site identifier to associate the monitor
+     *   with.
+     * @param monitor - Monitor configuration data (without ID).
+     *
+     * @returns Promise resolving to the created monitor ID as string.
+     *
+     * @throws Error if the database operation fails or monitor creation fails.
      */
     public async create(
         siteIdentifier: string,
@@ -210,15 +226,20 @@ export class MonitorRepository {
     /**
      * Deletes a monitor and its history.
      *
-     * @param monitorId - The monitor ID to delete.
-     * @returns Promise resolving to true if deleted, false otherwise.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a transaction for atomicity. History is deleted before monitor.
+     *
      * @example
+     *
      * ```typescript
      * const deleted = await repo.delete("monitor-123");
      * ```
+     *
+     * @param monitorId - The monitor ID to delete.
+     *
+     * @returns Promise resolving to true if deleted, false otherwise.
+     *
+     * @throws Error if the database operation fails.
      */
     public async delete(monitorId: string): Promise<boolean> {
         return withDatabaseOperation(
@@ -249,14 +270,18 @@ export class MonitorRepository {
     /**
      * Clears all monitors from the database.
      *
-     * @returns Promise that resolves when all monitors are deleted.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a transaction for atomicity.
+     *
      * @example
+     *
      * ```typescript
      * await repo.deleteAll();
      * ```
+     *
+     * @returns Promise that resolves when all monitors are deleted.
+     *
+     * @throws Error if the database operation fails.
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
@@ -272,15 +297,21 @@ export class MonitorRepository {
     /**
      * Deletes all monitors for a specific site.
      *
-     * @param siteIdentifier - The site identifier to delete monitors for.
-     * @returns Promise that resolves when all monitors are deleted for the site.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a transaction for atomicity.
+     *
      * @example
+     *
      * ```typescript
      * await repo.deleteBySiteIdentifier("site-123");
      * ```
+     *
+     * @param siteIdentifier - The site identifier to delete monitors for.
+     *
+     * @returns Promise that resolves when all monitors are deleted for the
+     *   site.
+     *
+     * @throws Error if the database operation fails.
      */
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return withDatabaseOperation(
@@ -304,15 +335,21 @@ export class MonitorRepository {
     /**
      * Finds a monitor by its unique identifier.
      *
-     * @param monitorId - The unique identifier of the monitor to find.
-     * @returns A promise resolving to the monitor object, or `undefined` if not found.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a direct database query and maps the result to a monitor object.
+     *
      * @example
+     *
      * ```typescript
      * const monitor = await repo.findByIdentifier("monitor-123");
      * ```
+     *
+     * @param monitorId - The unique identifier of the monitor to find.
+     *
+     * @returns A promise resolving to the monitor object, or `undefined` if not
+     *   found.
+     *
+     * @throws Error if the database operation fails.
      */
     public async findByIdentifier(
         monitorId: string
@@ -337,15 +374,20 @@ export class MonitorRepository {
     /**
      * Finds all monitors for a specific site.
      *
-     * @param siteIdentifier - The site identifier to find monitors for.
-     * @returns A promise resolving to an array of monitor objects.
-     * @throws Error if the database operation fails.
      * @remarks
      * Uses a direct database query and maps the results to monitor objects.
+     *
      * @example
+     *
      * ```typescript
      * const monitors = await repo.findBySiteIdentifier("site-123");
      * ```
+     *
+     * @param siteIdentifier - The site identifier to find monitors for.
+     *
+     * @returns A promise resolving to an array of monitor objects.
+     *
+     * @throws Error if the database operation fails.
      */
     public async findBySiteIdentifier(
         siteIdentifier: string
@@ -365,14 +407,18 @@ export class MonitorRepository {
     /**
      * Gets all monitor IDs in the database.
      *
-     * @returns A promise resolving to an array of objects with monitor IDs.
-     * @throws Error if the database operation fails.
      * @remarks
      * Returns all monitor IDs as objects with an `id` property.
+     *
      * @example
+     *
      * ```typescript
      * const ids = await repo.getAllMonitorIds();
      * ```
+     *
+     * @returns A promise resolving to an array of objects with monitor IDs.
+     *
+     * @throws Error if the database operation fails.
      */
     public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
         return withDatabaseOperation(() => {
@@ -385,16 +431,21 @@ export class MonitorRepository {
     /**
      * Updates a monitor's configuration.
      *
-     * @param monitorId - The unique identifier of the monitor to update.
-     * @param monitor - Partial monitor configuration data to update.
-     * @returns A promise that resolves when the update is complete.
-     * @throws Error if the database operation fails.
      * @remarks
      * Only provided fields are updated. Uses a transaction for atomicity.
+     *
      * @example
+     *
      * ```typescript
      * await repo.update("monitor-123", { checkInterval: 60000 });
      * ```
+     *
+     * @param monitorId - The unique identifier of the monitor to update.
+     * @param monitor - Partial monitor configuration data to update.
+     *
+     * @returns A promise that resolves when the update is complete.
+     *
+     * @throws Error if the database operation fails.
      */
     public async update(
         monitorId: string,
@@ -415,22 +466,25 @@ export class MonitorRepository {
     /**
      * Constructs a new MonitorRepository instance.
      *
-     * @param dependencies - The required dependencies for monitor operations.
      * @example
+     *
      * ```typescript
      * const repo = new MonitorRepository({ databaseService });
      * ```
+     *
+     * @param dependencies - The required dependencies for monitor operations.
      */
     public constructor(dependencies: MonitorRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
     }
 
     /**
-     * Internal method to clear all active operations for a monitor.
-     * Must be called within an active transaction.
+     * Internal method to clear all active operations for a monitor. Must be
+     * called within an active transaction.
      *
      * @param db - Database connection within active transaction
      * @param monitorId - The ID of the monitor to clear operations for
+     *
      * @public
      */
     public clearActiveOperationsInternal(
@@ -451,13 +505,16 @@ export class MonitorRepository {
     /**
      * Internal method to create a monitor within an existing transaction.
      *
+     * @remarks
+     * Must be called within an active transaction context.
+     *
      * @param db - Database connection (must be within active transaction).
      * @param siteIdentifier - Site identifier to associate monitor with.
      * @param monitor - Monitor configuration data (without ID).
+     *
      * @returns Generated monitor ID as string.
+     *
      * @throws Error when monitor creation fails or returns invalid ID.
-     * @remarks
-     * Must be called within an active transaction context.
      */
     public createInternal(
         db: Database,
@@ -502,10 +559,12 @@ export class MonitorRepository {
      * Internal method to clear all monitors from the database within an
      * existing transaction.
      *
-     * @param db - Database connection (must be within active transaction).
-     * @returns void
      * @remarks
      * Use this method when already within a transaction context.
+     *
+     * @param db - Database connection (must be within active transaction).
+     *
+     * @returns Void
      */
     public deleteAllInternal(db: Database): void {
         db.run(MONITOR_QUERIES.DELETE_ALL);
@@ -516,11 +575,13 @@ export class MonitorRepository {
      * Internal method to delete all monitors for a specific site within an
      * existing transaction.
      *
-     * @param db - Database connection (must be within active transaction).
-     * @param siteIdentifier - The site identifier to delete monitors for.
-     * @returns void
      * @remarks
      * Deletes all history for monitors before deleting monitors.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param siteIdentifier - The site identifier to delete monitors for.
+     *
+     * @returns Void
      */
     public deleteBySiteIdentifierInternal(
         db: Database,
@@ -546,11 +607,13 @@ export class MonitorRepository {
      * Internal method to delete a monitor and its history within an existing
      * transaction.
      *
-     * @param db - Database connection (must be within active transaction).
-     * @param monitorId - The monitor ID to delete.
-     * @returns True if deleted, false otherwise.
      * @remarks
      * Deletes history before deleting monitor.
+     *
+     * @param db - Database connection (must be within active transaction).
+     * @param monitorId - The monitor ID to delete.
+     *
+     * @returns True if deleted, false otherwise.
      */
     public deleteInternal(db: Database, monitorId: string): boolean {
         // Delete history first (foreign key constraint)
@@ -562,17 +625,18 @@ export class MonitorRepository {
     }
 
     /**
-     * Updates a monitor's configuration within an existing transaction
-     * context.
+     * Updates a monitor's configuration within an existing transaction context.
      *
-     * @param db - The database connection (must be within an active transaction).
+     * @remarks
+     * Only provided fields are updated. Converts camelCase to snake_case for DB
+     * columns. Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
      * @param monitorId - The unique identifier of the monitor to update.
      * @param monitor - Partial monitor configuration data to update.
+     *
      * @throws Error if the update query fails.
-     * @remarks
-     * Only provided fields are updated. Converts camelCase to snake_case for
-     * DB columns. Use this method only when already within a transaction
-     * context.
      */
     public updateInternal(
         db: Database,
@@ -613,12 +677,15 @@ export class MonitorRepository {
     /**
      * Builds the update fields and values for the monitor update query.
      *
-     * @param row - Row object mapping monitor fields to DB columns.
-     * @param monitor - Partial monitor configuration data to update.
-     * @returns Object containing updateFields (SQL fragments) and updateValues (DB values).
      * @remarks
      * Only primitive types are included. Monitoring fields may be skipped per
      * domain logic.
+     *
+     * @param row - Row object mapping monitor fields to DB columns.
+     * @param monitor - Partial monitor configuration data to update.
+     *
+     * @returns Object containing updateFields (SQL fragments) and updateValues
+     *   (DB values).
      */
     private buildUpdateFieldsAndValues(
         row: Record<string, unknown>,
@@ -650,12 +717,14 @@ export class MonitorRepository {
     /**
      * Converts a value to the appropriate database format.
      *
-     * @param key - Field name for logging purposes.
-     * @param value - Value to convert for database storage.
-     * @returns Database-compatible value or null if conversion not possible.
      * @remarks
      * Strings and numbers are passed through. Booleans are converted to 1/0.
      * Other types are skipped.
+     *
+     * @param key - Field name for logging purposes.
+     * @param value - Value to convert for database storage.
+     *
+     * @returns Database-compatible value or null if conversion not possible.
      */
     private convertValueForDatabase(
         key: string,
@@ -680,13 +749,15 @@ export class MonitorRepository {
     /**
      * Executes the update query with the given fields and values.
      *
+     * @remarks
+     * Executes the SQL update statement for the monitor.
+     *
      * @param db - Database connection (must be within active transaction).
      * @param updateFields - Array of SQL field assignments.
      * @param updateValues - Array of values to bind.
      * @param monitorId - The monitor ID to update.
-     * @returns void
-     * @remarks
-     * Executes the SQL update statement for the monitor.
+     *
+     * @returns Void
      */
     private executeUpdateQuery(
         db: Database,
@@ -717,11 +788,13 @@ export class MonitorRepository {
     /**
      * Gets the database instance for internal repository operations.
      *
-     * @returns Database connection from the DatabaseService.
-     * @throws Error when database is not initialized.
      * @remarks
      * Only used for read operations and internal methods. Mutations must use
      * executeTransaction().
+     *
+     * @returns Database connection from the DatabaseService.
+     *
+     * @throws Error when database is not initialized.
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
@@ -730,12 +803,14 @@ export class MonitorRepository {
     /**
      * Checks if monitoring-related fields should be skipped during update.
      *
-     * @param key - Database field name to check.
-     * @param monitor - Monitor update data being processed.
-     * @returns True if the field should be skipped, false otherwise.
      * @remarks
      * The 'enabled' field is derived from 'monitoring' state. If neither is
      * provided, skip 'enabled'.
+     *
+     * @param key - Database field name to check.
+     * @param monitor - Monitor update data being processed.
+     *
+     * @returns True if the field should be skipped, false otherwise.
      */
     private shouldSkipMonitoringFields(
         key: string,

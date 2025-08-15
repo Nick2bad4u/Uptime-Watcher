@@ -1,12 +1,9 @@
 /**
  * Custom hook for dynamically loading monitor type help text.
  *
- * @param monitorType - MonitorType - The monitor type to load help text for
- * @returns Object containing help text data and loading state
- *
  * @remarks
- * This hook manages asynchronous loading of monitor-specific help text from
- * the backend configuration. It handles loading states, error scenarios, and
+ * This hook manages asynchronous loading of monitor-specific help text from the
+ * backend configuration. It handles loading states, error scenarios, and
  * provides appropriate fallbacks when help text is unavailable.
  *
  * The hook automatically cancels pending requests when the component unmounts
@@ -14,6 +11,7 @@
  * conditions.
  *
  * @example
+ *
  * ```tsx
  * function MonitorHelp({ monitorType }) {
  *   const { primary, secondary, error, isLoading } = useDynamicHelpText(monitorType);
@@ -29,6 +27,10 @@
  *   );
  * }
  * ```
+ *
+ * @param monitorType - MonitorType - The monitor type to load help text for
+ *
+ * @returns Object containing help text data and loading state
  */
 
 import type { MonitorType } from "@shared/types";
@@ -57,12 +59,13 @@ export interface DynamicHelpTextResult {
 /**
  * Custom hook for dynamically loading monitor type help text.
  *
- * @param monitorType - The monitor type to load help text for
- * @returns Object containing help text data and loading state
- *
  * @remarks
  * Provides monitor-specific help text with automatic loading state management.
  * Handles cancellation of pending requests on unmount or monitor type changes.
+ *
+ * @param monitorType - The monitor type to load help text for
+ *
+ * @returns Object containing help text data and loading state
  *
  * @public
  */

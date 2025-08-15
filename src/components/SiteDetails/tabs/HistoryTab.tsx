@@ -3,11 +3,12 @@
  *
  * @remarks
  * Provides comprehensive monitoring history visualization with filtering,
- * pagination, and detailed record display. Shows status changes over time
- * with support for different status types (up, down, all) and configurable
- * history limits from user settings.
+ * pagination, and detailed record display. Shows status changes over time with
+ * support for different status types (up, down, all) and configurable history
+ * limits from user settings.
  *
  * Features include:
+ *
  * - Real-time status filtering (all, up, down)
  * - Configurable history display limits
  * - Detailed record information with response times
@@ -15,8 +16,9 @@
  * - Accessible keyboard navigation and ARIA labels
  *
  * @example
+ *
  * ```tsx
- * <HistoryTab selectedMonitor={monitor} />
+ * <HistoryTab selectedMonitor={monitor} />;
  * ```
  *
  * @public
@@ -76,6 +78,7 @@ type HistoryFilter = "all" | "down" | "up";
  * Get the formatted label for filter buttons.
  *
  * @param filter - The filter type to get the label for
+ *
  * @returns The human-readable label for the filter button
  *
  * @internal
@@ -94,13 +97,16 @@ function getFilterButtonLabel(filter: HistoryFilter): string {
  * History tab component displaying paginated monitor check history.
  *
  * Features:
+ *
  * - Filterable history by status (all, up, down)
  * - Configurable display limits with pagination
  * - Detailed history records with timestamps and response times
  * - Export functionality for history data
  * - User action logging for analytics
  *
- * @param props - Component props containing formatting functions and monitor data
+ * @param props - Component props containing formatting functions and monitor
+ *   data
+ *
  * @returns JSX element displaying history interface
  */
 export const HistoryTab = ({
@@ -141,16 +147,9 @@ export const HistoryTab = ({
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
     // available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [
-        10,
-        25,
-        50,
-        100,
-        250,
-        500,
-        1000,
-        10_000,
-    ].filter((opt) => opt <= maxShow);
+    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter(
+        (opt) => opt <= maxShow
+    );
 
     // Always include 'All' if there are fewer than backendLimit
     if (

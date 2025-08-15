@@ -14,10 +14,10 @@ import { rowToHistoryEntry } from "./historyMapper";
  * Utility functions for querying monitor history data from the database.
  *
  * @remarks
- * These are internal utility functions designed to be called from {@link
- * HistoryRepository} methods that handle async operations, error recovery, and
- * operational hooks. All functions assume transaction context and error
- * handling are managed by the caller.
+ * These are internal utility functions designed to be called from
+ * {@link HistoryRepository} methods that handle async operations, error
+ * recovery, and operational hooks. All functions assume transaction context and
+ * error handling are managed by the caller.
  *
  * @internal
  */
@@ -26,7 +26,9 @@ import { rowToHistoryEntry } from "./historyMapper";
  * Common SQL queries for history query operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency. This constant is internal to the utility module and not exported.
+ * Centralizes query strings for maintainability and consistency. This constant
+ * is internal to the utility module and not exported.
+ *
  * @internal
  */
 const HISTORY_QUERY_QUERIES = {
@@ -41,12 +43,6 @@ const HISTORY_QUERY_QUERIES = {
 /**
  * Find all history entries for a specific monitor.
  *
- * @param db - Database connection instance
- * @param monitorId - Unique identifier of the monitor
- * @returns Array of StatusHistory objects ordered by timestamp (newest first)
- *
- * @throws {@link Error} When database query fails
- *
  * @remarks
  * **Repository Context**: Designed to be called from
  * HistoryRepository.findByMonitorId() which handles async operations and error
@@ -55,6 +51,13 @@ const HISTORY_QUERY_QUERIES = {
  * **Query Performance**: Uses indexed monitor_id field with timestamp ordering
  * for efficiency. Results are ordered by timestamp DESC to show most recent
  * entries first.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ *
+ * @returns Array of StatusHistory objects ordered by timestamp (newest first)
+ *
+ * @throws {@link Error} When database query fails
  *
  * @internal
  */
@@ -83,18 +86,19 @@ export function findHistoryByMonitorId(
 /**
  * Get the count of history entries for a monitor.
  *
- * @param db - Database connection instance
- * @param monitorId - Unique identifier of the monitor
- * @returns Number of history entries for the monitor (returns 0 if none found)
- *
- * @throws {@link Error} When database query fails
- *
  * @remarks
  * **Repository Context**: Called from HistoryRepository.getHistoryCount() and
  * HistoryRepository.getHistoryCountInternal() for transaction contexts.
  *
  * **Fallback Behavior**: Returns 0 if no results found or result is
  * null/undefined.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ *
+ * @returns Number of history entries for the monitor (returns 0 if none found)
+ *
+ * @throws {@link Error} When database query fails
  *
  * @internal
  */
@@ -117,19 +121,19 @@ export function getHistoryCount(db: Database, monitorId: string): number {
 /**
  * Get the most recent history entry for a monitor.
  *
- * @param db - Database connection instance
- * @param monitorId - Unique identifier of the monitor
- * @returns Most recent StatusHistory object, or undefined if no entries exist
- *
- * @throws {@link Error} When database query fails
- *
  * @remarks
- * **Repository Context**: Called from HistoryRepository.getLatestEntry()
- * which handles async operations and error recovery via
- * withDatabaseOperation().
+ * **Repository Context**: Called from HistoryRepository.getLatestEntry() which
+ * handles async operations and error recovery via withDatabaseOperation().
  *
  * **Query Behavior**: Uses ORDER BY timestamp DESC LIMIT 1 to get the most
  * recent entry. Returns undefined for monitors with no history entries.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier of the monitor
+ *
+ * @returns Most recent StatusHistory object, or undefined if no entries exist
+ *
+ * @throws {@link Error} When database query fails
  *
  * @internal
  */

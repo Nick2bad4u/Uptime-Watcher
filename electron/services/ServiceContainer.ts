@@ -8,6 +8,7 @@ import type { Site } from "@shared/types";
  * lifecycle, ensuring correct initialization order and singleton management.
  *
  * Services are categorized as:
+ *
  * - Core Services: Infrastructure (Database, IPC)
  * - Application Services: Business logic orchestrators
  * - Feature Services: Specific functionality (Monitoring, Notifications)
@@ -63,8 +64,8 @@ export interface ServiceContainerConfig {
      * Custom notification service configuration.
      *
      * @remarks
-     * Controls system notification behavior for monitor status changes.
-     * Can be modified at runtime via {@link NotificationService.updateConfig}.
+     * Controls system notification behavior for monitor status changes. Can be
+     * modified at runtime via {@link NotificationService.updateConfig}.
      *
      * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
      *
@@ -93,6 +94,7 @@ export class ServiceContainer {
 
     /**
      * Singleton instance of {@link AutoUpdaterService}.
+     *
      * @internal
      */
     private autoUpdaterService?: AutoUpdaterService;
@@ -101,84 +103,98 @@ export class ServiceContainer {
 
     /**
      * Singleton instance of {@link ConfigurationManager}.
+     *
      * @internal
      */
     private configurationManager?: ConfigurationManager;
 
     /**
      * Singleton instance of {@link DatabaseManager}.
+     *
      * @internal
      */
     private databaseManager?: DatabaseManager;
 
     /**
      * Singleton instance of {@link DatabaseService}.
+     *
      * @internal
      */
     private databaseService?: DatabaseService;
 
     /**
      * Singleton instance of {@link HistoryRepository}.
+     *
      * @internal
      */
     private historyRepository?: HistoryRepository;
 
     /**
      * Singleton instance of {@link IpcService}.
+     *
      * @internal
      */
     private ipcService?: IpcService;
 
     /**
      * Singleton instance of {@link MonitorManager}.
+     *
      * @internal
      */
     private monitorManager?: MonitorManager;
 
     /**
      * Singleton instance of {@link MonitorRepository}.
+     *
      * @internal
      */
     private monitorRepository?: MonitorRepository;
 
     /**
      * Singleton instance of {@link NotificationService}.
+     *
      * @internal
      */
     private notificationService?: NotificationService;
 
     /**
      * Singleton instance of {@link SettingsRepository}.
+     *
      * @internal
      */
     private settingsRepository?: SettingsRepository;
 
     /**
      * Singleton instance of {@link SiteManager}.
+     *
      * @internal
      */
     private siteManager?: SiteManager;
 
     /**
      * Singleton instance of {@link SiteRepository}.
+     *
      * @internal
      */
     private siteRepository?: SiteRepository;
 
     /**
      * Singleton instance of {@link SiteService}.
+     *
      * @internal
      */
     private siteService?: SiteService;
 
     /**
      * Singleton instance of {@link UptimeOrchestrator}.
+     *
      * @internal
      */
     private uptimeOrchestrator?: UptimeOrchestrator;
 
     /**
      * Singleton instance of {@link WindowService}.
+     *
      * @internal
      */
     private windowService?: WindowService;
@@ -191,6 +207,7 @@ export class ServiceContainer {
      * configuration.
      *
      * @param config - Optional configuration for the container.
+     *
      * @returns The singleton {@link ServiceContainer} instance.
      */
     public static getInstance(
@@ -204,14 +221,17 @@ export class ServiceContainer {
      * Resets the singleton container for testing purposes.
      *
      * @remarks
-     * Clears the singleton instance to allow clean test isolation.
-     * Does not clean up existing service instances or close resources.
-     * Call cleanup methods on services before reset if needed.
+     * Clears the singleton instance to allow clean test isolation. Does not
+     * clean up existing service instances or close resources. Call cleanup
+     * methods on services before reset if needed.
      *
      * @example
+     *
      * ```typescript
      * ServiceContainer.resetForTesting();
-     * const container = ServiceContainer.getInstance({ enableDebugLogging: true });
+     * const container = ServiceContainer.getInstance({
+     *     enableDebugLogging: true,
+     * });
      * ```
      *
      * @internal
@@ -251,8 +271,7 @@ export class ServiceContainer {
      * Constructs a new {@link ServiceContainer}.
      *
      * @remarks
-     * Use {@link ServiceContainer.getInstance} to obtain the singleton
-     * instance.
+     * Use {@link ServiceContainer.getInstance} to obtain the singleton instance.
      *
      * @param config - Optional configuration for service container behavior.
      */
@@ -297,8 +316,8 @@ export class ServiceContainer {
      * Gets the {@link DatabaseManager} singleton.
      *
      * @remarks
-     * Instantiates with required repositories, configuration manager, and
-     * event bus.
+     * Instantiates with required repositories, configuration manager, and event
+     * bus.
      *
      * @returns The {@link DatabaseManager} instance.
      */
@@ -451,6 +470,7 @@ export class ServiceContainer {
      * Forwards important events to the main orchestrator.
      *
      * @returns The {@link MonitorManager} instance.
+     *
      * @throws Error if {@link SiteManager} is not initialized when required.
      */
     public getMonitorManager(): MonitorManager {
@@ -571,6 +591,7 @@ export class ServiceContainer {
      * Forwards important events to the main orchestrator.
      *
      * @returns The {@link SiteManager} instance.
+     *
      * @throws Error if setting the history limit fails.
      */
     public getSiteManager(): SiteManager {
@@ -583,7 +604,9 @@ export class ServiceContainer {
                  * Delegates to {@link DatabaseManager.setHistoryLimit}.
                  *
                  * @param limit - Maximum number of history entries to retain.
+                 *
                  * @returns Promise that resolves when the limit is set.
+                 *
                  * @throws Error if setting the limit fails.
                  */
                 setHistoryLimit: async (limit: number): Promise<void> => {
@@ -612,6 +635,7 @@ export class ServiceContainer {
                  *
                  * @param site - The {@link Site} to set up monitors for.
                  * @param newMonitorIds - Array of monitor IDs to set up.
+                 *
                  * @returns Promise that resolves when setup is complete.
                  */
                 setupNewMonitors: async (
@@ -626,7 +650,9 @@ export class ServiceContainer {
                  *
                  * @param identifier - The site identifier.
                  * @param monitorId - The monitor ID.
-                 * @returns Promise resolving to true if monitoring started, false otherwise.
+                 *
+                 * @returns Promise resolving to true if monitoring started,
+                 *   false otherwise.
                  */
                 startMonitoringForSite: async (
                     identifier: string,
@@ -643,7 +669,9 @@ export class ServiceContainer {
                  *
                  * @param identifier - The site identifier.
                  * @param monitorId - The monitor ID.
-                 * @returns Promise resolving to true if monitoring stopped, false otherwise.
+                 *
+                 * @returns Promise resolving to true if monitoring stopped,
+                 *   false otherwise.
                  */
                 stopMonitoringForSite: async (
                     identifier: string,
@@ -761,7 +789,9 @@ export class ServiceContainer {
      * @remarks
      * Used internally for event forwarding.
      *
-     * @returns The {@link UptimeOrchestrator} instance, or null if not initialized.
+     * @returns The {@link UptimeOrchestrator} instance, or null if not
+     *   initialized.
+     *
      * @internal
      */
     private getMainOrchestrator(): null | UptimeOrchestrator {

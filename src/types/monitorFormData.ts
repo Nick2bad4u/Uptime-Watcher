@@ -1,6 +1,6 @@
 /**
- * Type definitions for monitor form data.
- * Provides type-safe interfaces for form handling and validation.
+ * Type definitions for monitor form data. Provides type-safe interfaces for
+ * form handling and validation.
  *
  * @remarks
  * These interfaces define the structure of form data used throughout the
@@ -27,8 +27,8 @@ export interface BaseFormData {
 }
 
 /**
- * Dynamic form data for extensible monitor types.
- * Used when monitor type is not known at compile time.
+ * Dynamic form data for extensible monitor types. Used when monitor type is not
+ * known at compile time.
  */
 export interface DynamicFormData extends Record<string, unknown> {
     checkInterval?: number;
@@ -76,6 +76,7 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
  * Create default form data for a specific monitor type.
  *
  * @param type - Monitor type
+ *
  * @returns Default form data for the specified type
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
@@ -97,6 +98,7 @@ export function createDefaultFormData(type: string): Partial<BaseFormData> {
  * Type guard to check if form data is for HTTP monitor.
  *
  * @param data - Form data to check
+ *
  * @returns True if data is HTTP form data
  */
 export function isHttpFormData(
@@ -109,6 +111,7 @@ export function isHttpFormData(
  * Type guard to check if form data is for ping monitor.
  *
  * @param data - Form data to check
+ *
  * @returns True if data is ping form data
  */
 export function isPingFormData(
@@ -121,6 +124,7 @@ export function isPingFormData(
  * Type guard to check if form data is for port monitor.
  *
  * @param data - Form data to check
+ *
  * @returns True if data is port form data
  */
 export function isPortFormData(
@@ -134,8 +138,8 @@ export function isPortFormData(
 }
 
 /**
- * Registry of type-specific validation functions.
- * Add new monitor types here to enable dynamic validation.
+ * Registry of type-specific validation functions. Add new monitor types here to
+ * enable dynamic validation.
  */
 const FORM_DATA_VALIDATORS = {
     http: isHttpFormData,
@@ -147,6 +151,7 @@ const FORM_DATA_VALIDATORS = {
  * Type guard to check if form data is valid and complete.
  *
  * @param data - Form data to validate
+ *
  * @returns True if data is valid monitor form data
  */
 export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
@@ -180,6 +185,7 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
  * @param data - Form data object
  * @param property - Property name to access
  * @param defaultValue - Default value if property is undefined
+ *
  * @returns Property value or default
  */
 export function safeGetFormProperty<T>(

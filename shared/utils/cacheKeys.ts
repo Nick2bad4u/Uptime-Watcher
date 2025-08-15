@@ -3,10 +3,11 @@
  *
  * @remarks
  * Provides standardized key generation functions to ensure consistency across
- * all cache implementations throughout the application. All cache keys follow
- * a predictable pattern: `domain:operation:identifier` or `domain:identifier`.
+ * all cache implementations throughout the application. All cache keys follow a
+ * predictable pattern: `domain:operation:identifier` or `domain:identifier`.
  *
  * @example
+ *
  * ```typescript
  * // Site-related cache keys
  * const siteKey = CacheKeys.site.byIdentifier("site-123");
@@ -53,6 +54,7 @@ const KEY_SEPARATOR = ":";
  * @param prefix - Domain prefix for the cache key
  * @param identifier - Unique identifier for the cached item
  * @param operation - Optional operation or sub-category
+ *
  * @returns Formatted cache key following the standard pattern
  *
  * @internal
@@ -86,14 +88,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for configuration value by name.
          *
-         * @param name - Configuration name or setting identifier
-         * @returns Standardized cache key for configuration values
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.config.byName("history-limit");
          * // Returns: "config:history-limit"
          * ```
+         *
+         * @param name - Configuration name or setting identifier
+         *
+         * @returns Standardized cache key for configuration values
          */
         byName: (name: string): string =>
             createCacheKey(CACHE_PREFIXES.CONFIG, name),
@@ -101,14 +105,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for configuration validation result.
          *
-         * @param name - Configuration name being validated
-         * @returns Standardized cache key for configuration validation
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.config.validation("monitor-config");
          * // Returns: "config:validation:monitor-config"
          * ```
+         *
+         * @param name - Configuration name being validated
+         *
+         * @returns Standardized cache key for configuration validation
          */
         validation: (name: string): string =>
             createCacheKey(CACHE_PREFIXES.CONFIG, name, "validation"),
@@ -121,14 +127,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for monitor by ID.
          *
-         * @param id - Monitor identifier
-         * @returns Standardized cache key for monitor data
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.monitor.byId("monitor-123");
          * // Returns: "monitor:monitor-123"
          * ```
+         *
+         * @param id - Monitor identifier
+         *
+         * @returns Standardized cache key for monitor data
          */
         byId: (id: string): string =>
             createCacheKey(CACHE_PREFIXES.MONITOR, id),
@@ -136,14 +144,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for monitors by site identifier.
          *
-         * @param siteIdentifier - Site identifier containing the monitors
-         * @returns Standardized cache key for site monitors
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.monitor.bySite("site-456");
          * // Returns: "monitor:site:site-456"
          * ```
+         *
+         * @param siteIdentifier - Site identifier containing the monitors
+         *
+         * @returns Standardized cache key for site monitors
          */
         bySite: (siteIdentifier: string): string =>
             createCacheKey(CACHE_PREFIXES.MONITOR, siteIdentifier, "site"),
@@ -151,14 +161,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for monitor operation status.
          *
-         * @param id - Monitor identifier
-         * @returns Standardized cache key for monitor operation tracking
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.monitor.operation("monitor-123");
          * // Returns: "monitor:operation:monitor-123"
          * ```
+         *
+         * @param id - Monitor identifier
+         *
+         * @returns Standardized cache key for monitor operation tracking
          */
         operation: (id: string): string =>
             createCacheKey(CACHE_PREFIXES.MONITOR, id, "operation"),
@@ -171,13 +183,14 @@ export const CacheKeys = {
         /**
          * Generate cache key for bulk site operations.
          *
-         * @returns Standardized cache key for bulk site operations
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.site.bulkOperation();
          * // Returns: "site:bulk"
          * ```
+         *
+         * @returns Standardized cache key for bulk site operations
          */
         bulkOperation: (): string =>
             createCacheKey(CACHE_PREFIXES.SITE, "bulk"),
@@ -185,14 +198,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for site by identifier.
          *
-         * @param identifier - Site identifier
-         * @returns Standardized cache key for site data
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.site.byIdentifier("site-123");
          * // Returns: "site:site-123"
          * ```
+         *
+         * @param identifier - Site identifier
+         *
+         * @returns Standardized cache key for site data
          */
         byIdentifier: (identifier: string): string =>
             createCacheKey(CACHE_PREFIXES.SITE, identifier),
@@ -200,14 +215,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for site loading operation.
          *
-         * @param identifier - Site identifier being loaded
-         * @returns Standardized cache key for site loading status
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.site.loading("site-123");
          * // Returns: "site:loading:site-123"
          * ```
+         *
+         * @param identifier - Site identifier being loaded
+         *
+         * @returns Standardized cache key for site loading status
          */
         loading: (identifier: string): string =>
             createCacheKey(CACHE_PREFIXES.SITE, identifier, "loading"),
@@ -220,15 +237,17 @@ export const CacheKeys = {
         /**
          * Generate cache key for validation result by type and identifier.
          *
-         * @param type - Type of validation (e.g., "monitor", "site")
-         * @param identifier - Item identifier being validated
-         * @returns Standardized cache key for validation results
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.validation.byType("monitor", "config-123");
          * // Returns: "validation:monitor:config-123"
          * ```
+         *
+         * @param type - Type of validation (e.g., "monitor", "site")
+         * @param identifier - Item identifier being validated
+         *
+         * @returns Standardized cache key for validation results
          */
         byType: (type: string, identifier: string): string =>
             createCacheKey(CACHE_PREFIXES.VALIDATION, identifier, type),
@@ -236,14 +255,16 @@ export const CacheKeys = {
         /**
          * Generate cache key for monitor type validation.
          *
-         * @param monitorType - Monitor type being validated
-         * @returns Standardized cache key for monitor type validation
-         *
          * @example
+         *
          * ```typescript
          * const key = CacheKeys.validation.monitorType("http");
          * // Returns: "validation:monitor-type:http"
          * ```
+         *
+         * @param monitorType - Monitor type being validated
+         *
+         * @returns Standardized cache key for monitor type validation
          */
         monitorType: (monitorType: string): string =>
             createCacheKey(
@@ -258,8 +279,8 @@ export const CacheKeys = {
  * Type representing all possible cache key patterns.
  *
  * @remarks
- * Provides type safety for cache key validation and ensures only
- * standardized keys are used throughout the application.
+ * Provides type safety for cache key validation and ensures only standardized
+ * keys are used throughout the application.
  *
  * @public
  */
@@ -279,10 +300,8 @@ export type StandardizedCacheKey = ReturnType<
 /**
  * Utility to validate if a string follows the standardized cache key pattern.
  *
- * @param key - Cache key to validate
- * @returns True if the key follows the standardized pattern
- *
  * @example
+ *
  * ```typescript
  * const isValid = isStandardizedCacheKey("site:site-123");
  * // Returns: true
@@ -290,6 +309,10 @@ export type StandardizedCacheKey = ReturnType<
  * const isInvalid = isStandardizedCacheKey("random-key");
  * // Returns: false
  * ```
+ *
+ * @param key - Cache key to validate
+ *
+ * @returns True if the key follows the standardized pattern
  *
  * @public
  */
@@ -313,14 +336,16 @@ export function isStandardizedCacheKey(
 /**
  * Parse a standardized cache key into its components.
  *
- * @param key - Standardized cache key to parse
- * @returns Object containing the key components
- *
  * @example
+ *
  * ```typescript
  * const components = parseCacheKey("site:loading:site-123");
  * // Returns: { identifier: "site-123", operation: "loading", prefix: "site" }
  * ```
+ *
+ * @param key - Standardized cache key to parse
+ *
+ * @returns Object containing the key components
  *
  * @public
  */

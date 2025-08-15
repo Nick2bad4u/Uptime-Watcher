@@ -25,7 +25,9 @@ export interface ThemedIconButtonProperties {
  * A themed icon button component optimized for displaying only icons
  *
  * @param props - The icon button properties
+ *
  * @returns The themed icon button JSX element
+ *
  * @public
  */
 const ThemedIconButton = ({

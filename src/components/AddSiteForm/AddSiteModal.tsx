@@ -23,8 +23,8 @@ import { AddSiteForm } from "./AddSiteForm";
  * Modal wrapper for the AddSiteForm component.
  *
  * @remarks
- * Provides a modal dialog containing the AddSiteForm with proper theming
- * and close functionality. Automatically closes when form submission succeeds.
+ * Provides a modal dialog containing the AddSiteForm with proper theming and
+ * close functionality. Automatically closes when form submission succeeds.
  *
  * @returns JSX element containing the modal dialog with AddSiteForm
  */

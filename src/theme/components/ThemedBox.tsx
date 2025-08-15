@@ -42,7 +42,9 @@ const DEFAULT_THEMED_BOX_STYLE = {};
  * A themed box component for containers and layouts
  *
  * @param props - The box properties
+ *
  * @returns The themed box JSX element
+ *
  * @public
  */
 const ThemedBox = ({

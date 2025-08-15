@@ -13,7 +13,9 @@
  * Determines if a value is an object (excluding `null` and arrays).
  *
  * @param value - The value to check.
- * @returns True if `value` is an object and not null or an array; otherwise, false.
+ *
+ * @returns True if `value` is an object and not null or an array; otherwise,
+ *   false.
  */
 export function isObject(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -23,6 +25,7 @@ export function isObject(value: unknown): value is Record<string, unknown> {
  * Determines if a value is a number (excluding `NaN`).
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a number and not `NaN`; otherwise, false.
  */
 export function isNumber(value: unknown): value is number {
@@ -32,17 +35,22 @@ export function isNumber(value: unknown): value is number {
 /**
  * Determines if an object contains all specified properties.
  *
- * @typeParam K - The type of property keys to check for.
- * @param value - The value to check.
- * @param properties - An array of property keys that must be present on the value.
- * @returns True if `value` is an object containing all specified properties; otherwise, false.
- *
  * @example
+ *
  * ```ts
- * if (hasProperties(obj, ['foo', 'bar'])) {
- *   // obj has both 'foo' and 'bar' properties
+ * if (hasProperties(obj, ["foo", "bar"])) {
+ *     // obj has both 'foo' and 'bar' properties
  * }
  * ```
+ *
+ * @typeParam K - The type of property keys to check for.
+ *
+ * @param value - The value to check.
+ * @param properties - An array of property keys that must be present on the
+ *   value.
+ *
+ * @returns True if `value` is an object containing all specified properties;
+ *   otherwise, false.
  */
 export function hasProperties<K extends PropertyKey>(
     value: unknown,
@@ -57,17 +65,21 @@ export function hasProperties<K extends PropertyKey>(
 /**
  * Determines if an object contains a specific property.
  *
- * @typeParam K - The property key to check for.
- * @param value - The value to check.
- * @param property - The property key that must be present on the value.
- * @returns True if `value` is an object containing the specified property; otherwise, false.
- *
  * @example
+ *
  * ```ts
- * if (hasProperty(obj, 'foo')) {
- *   // obj has the 'foo' property
+ * if (hasProperty(obj, "foo")) {
+ *     // obj has the 'foo' property
  * }
  * ```
+ *
+ * @typeParam K - The property key to check for.
+ *
+ * @param value - The value to check.
+ * @param property - The property key that must be present on the value.
+ *
+ * @returns True if `value` is an object containing the specified property;
+ *   otherwise, false.
  */
 export function hasProperty<K extends PropertyKey>(
     value: unknown,
@@ -79,17 +91,22 @@ export function hasProperty<K extends PropertyKey>(
 /**
  * Determines if a value is an array, optionally validating each item.
  *
- * @typeParam T - The type of array items, inferred by the optional validator.
- * @param value - The value to check.
- * @param itemValidator - Optional type guard to validate each item in the array.
- * @returns True if `value` is an array (and all items pass `itemValidator`, if provided); otherwise, false.
- *
  * @example
+ *
  * ```ts
  * if (isArray(arr, isString)) {
- *   // arr is string[]
+ *     // arr is string[]
  * }
  * ```
+ *
+ * @typeParam T - The type of array items, inferred by the optional validator.
+ *
+ * @param value - The value to check.
+ * @param itemValidator - Optional type guard to validate each item in the
+ *   array.
+ *
+ * @returns True if `value` is an array (and all items pass `itemValidator`, if
+ *   provided); otherwise, false.
  */
 export function isArray<T = unknown>(
     value: unknown,
@@ -109,15 +126,17 @@ export function isArray<T = unknown>(
 /**
  * Determines if a value is a boolean.
  *
- * @param value - The value to check.
- * @returns True if `value` is a boolean; otherwise, false.
- *
  * @example
+ *
  * ```ts
  * if (isBoolean(flag)) {
- *   // flag is boolean
+ *     // flag is boolean
  * }
  * ```
+ *
+ * @param value - The value to check.
+ *
+ * @returns True if `value` is a boolean; otherwise, false.
  */
 export function isBoolean(value: unknown): value is boolean {
     return typeof value === "boolean";
@@ -126,15 +145,17 @@ export function isBoolean(value: unknown): value is boolean {
 /**
  * Determines if a value is a valid `Date` instance.
  *
- * @param value - The value to check.
- * @returns True if `value` is a valid `Date` object; otherwise, false.
- *
  * @example
+ *
  * ```ts
  * if (isDate(dateCandidate)) {
- *   // dateCandidate is a Date
+ *     // dateCandidate is a Date
  * }
  * ```
+ *
+ * @param value - The value to check.
+ *
+ * @returns True if `value` is a valid `Date` object; otherwise, false.
  */
 export function isDate(value: unknown): value is Date {
     return value instanceof Date && !Number.isNaN(value.getTime());
@@ -144,6 +165,7 @@ export function isDate(value: unknown): value is Date {
  * Determines if a value is an `Error` instance.
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is an instance of `Error`; otherwise, false.
  */
 export function isError(value: unknown): value is Error {
@@ -155,6 +177,7 @@ export function isError(value: unknown): value is Error {
  * `-Infinity`).
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a finite number; otherwise, false.
  */
 export function isFiniteNumber(value: unknown): value is number {
@@ -164,15 +187,17 @@ export function isFiniteNumber(value: unknown): value is number {
 /**
  * Determines if a value is a function.
  *
- * @param value - The value to check.
- * @returns True if `value` is a function; otherwise, false.
- *
  * @example
+ *
  * ```ts
  * if (isFunction(fn)) {
- *   // fn is (...args: unknown[]) => unknown
+ *     // fn is (...args: unknown[]) => unknown
  * }
  * ```
+ *
+ * @param value - The value to check.
+ *
+ * @returns True if `value` is a function; otherwise, false.
  */
 export function isFunction(
     value: unknown
@@ -184,6 +209,7 @@ export function isFunction(
  * Determines if a value is a non-negative number (zero or positive).
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a non-negative number; otherwise, false.
  */
 export function isNonNegativeNumber(value: unknown): value is number {
@@ -194,6 +220,7 @@ export function isNonNegativeNumber(value: unknown): value is number {
  * Determines if a value is a non-null object.
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a non-null object; otherwise, false.
  */
 export function isNonNullObject(
@@ -206,6 +233,7 @@ export function isNonNullObject(
  * Determines if a value is a positive number (greater than zero).
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a positive number; otherwise, false.
  */
 export function isPositiveNumber(value: unknown): value is number {
@@ -216,6 +244,7 @@ export function isPositiveNumber(value: unknown): value is number {
  * Determines if a value is a string.
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a string; otherwise, false.
  */
 export function isString(value: unknown): value is string {
@@ -226,6 +255,7 @@ export function isString(value: unknown): value is string {
  * Determines if a value is a valid TCP/IP port number (1–65535).
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a valid port number; otherwise, false.
  */
 export function isValidPort(value: unknown): value is number {
@@ -242,6 +272,7 @@ export function isValidPort(value: unknown): value is number {
  * Allows timestamps up to 1 day in the future from the current time.
  *
  * @param value - The value to check.
+ *
  * @returns True if `value` is a valid timestamp; otherwise, false.
  */
 export function isValidTimestamp(value: unknown): value is number {

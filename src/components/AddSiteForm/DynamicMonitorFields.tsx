@@ -56,20 +56,23 @@ export interface DynamicMonitorFieldsProps {
  * - For each field in the configuration, renders a {@link DynamicField}.
  * - If a field's onChange handler is missing, logs an error.
  *
- * @param props - {@link DynamicMonitorFieldsProps}
- * @returns The rendered dynamic monitor fields as a React element.
- *
- * @throws If monitor type configuration fails to load, displays an error message.
- *
  * @example
+ *
  * ```tsx
  * <DynamicMonitorFields
- *   isLoading={false}
- *   monitorType="http"
- *   onChange={{ url: setUrl }}
- *   values={{ url: "https://example.com" }}
- * />
+ *     isLoading={false}
+ *     monitorType="http"
+ *     onChange={{ url: setUrl }}
+ *     values={{ url: "https://example.com" }}
+ * />;
  * ```
+ *
+ * @param props - {@link DynamicMonitorFieldsProps}
+ *
+ * @returns The rendered dynamic monitor fields as a React element.
+ *
+ * @throws If monitor type configuration fails to load, displays an error
+ *   message.
  */
 const DynamicMonitorFields = ({
     isLoading = false,

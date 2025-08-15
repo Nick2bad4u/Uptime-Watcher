@@ -2,14 +2,15 @@
  * Shared validation utilities using the validator package.
  *
  * @remarks
- * This module provides validation functions that can be used by both
- * frontend and backend to ensure consistent validation behavior.
- * Uses the well-tested validator.js package for reliable validation.
+ * This module provides validation functions that can be used by both frontend
+ * and backend to ensure consistent validation behavior. Uses the well-tested
+ * validator.js package for reliable validation.
  *
  * The functions in this module replace manual validation patterns throughout
  * the codebase, providing consistent validation behavior and better security.
  *
  * @example
+ *
  * ```typescript
  * // Replace manual string validation
  * // Old: typeof value === "string" && value.trim().length > 0
@@ -24,9 +25,9 @@
  * // New: isValidIdentifierArray(arr)
  * ```
  *
- * @see {@link https://github.com/validatorjs/validator.js} - Validator.js documentation
- *
  * @public
+ *
+ * @see {@link https://github.com/validatorjs/validator.js} - Validator.js documentation
  */
 
 import validator from "validator";
@@ -34,15 +35,17 @@ import validator from "validator";
 /**
  * Validates that a value is a non-empty string.
  *
- * @param value - Value to validate
- * @returns True if value is a non-empty string
- *
  * @example
+ *
  * ```typescript
- * isNonEmptyString("hello") // true
- * isNonEmptyString("") // false
- * isNonEmptyString(null) // false
+ * isNonEmptyString("hello"); // true
+ * isNonEmptyString(""); // false
+ * isNonEmptyString(null); // false
  * ```
+ *
+ * @param value - Value to validate
+ *
+ * @returns True if value is a non-empty string
  *
  * @public
  */
@@ -53,15 +56,17 @@ export function isNonEmptyString(value: unknown): value is string {
 /**
  * Validates that a value is a valid FQDN (Fully Qualified Domain Name).
  *
+ * @example
+ *
+ * ```typescript
+ * isValidFQDN("example.com"); // true
+ * isValidFQDN("localhost"); // false (no TLD by default)
+ * ```
+ *
  * @param value - Value to validate
  * @param options - FQDN validation options
- * @returns True if value is a valid FQDN
  *
- * @example
- * ```typescript
- * isValidFQDN("example.com") // true
- * isValidFQDN("localhost") // false (no TLD by default)
- * ```
+ * @returns True if value is a valid FQDN
  *
  * @public
  */
@@ -76,15 +81,17 @@ export function isValidFQDN(
  * Validates that a value is a valid identifier (alphanumeric with
  * hyphens/underscores).
  *
- * @param value - Value to validate
- * @returns True if value is a valid identifier
- *
  * @example
+ *
  * ```typescript
- * isValidIdentifier("abc123") // true
- * isValidIdentifier("abc-123_def") // true
- * isValidIdentifier("abc@123") // false
+ * isValidIdentifier("abc123"); // true
+ * isValidIdentifier("abc-123_def"); // true
+ * isValidIdentifier("abc@123"); // false
  * ```
+ *
+ * @param value - Value to validate
+ *
+ * @returns True if value is a valid identifier
  *
  * @public
  */
@@ -101,15 +108,17 @@ export function isValidIdentifier(value: unknown): value is string {
 /**
  * Validates that an array contains only valid string identifiers.
  *
- * @param value - Array to validate
- * @returns True if array contains only valid identifiers
- *
  * @example
+ *
  * ```typescript
- * isValidIdentifierArray(["abc", "def-123"]) // true
- * isValidIdentifierArray(["abc", 123]) // false
- * isValidIdentifierArray(["abc", ""]) // false
+ * isValidIdentifierArray(["abc", "def-123"]); // true
+ * isValidIdentifierArray(["abc", 123]); // false
+ * isValidIdentifierArray(["abc", ""]); // false
  * ```
+ *
+ * @param value - Array to validate
+ *
+ * @returns True if array contains only valid identifiers
  *
  * @public
  */
@@ -124,16 +133,18 @@ export function isValidIdentifierArray(value: unknown): value is string[] {
 /**
  * Validates that a value is a valid integer within optional bounds.
  *
+ * @example
+ *
+ * ```typescript
+ * isValidInteger("123"); // true
+ * isValidInteger("123.45"); // false
+ * isValidInteger("123", { min: 100, max: 200 }); // true
+ * ```
+ *
  * @param value - Value to validate
  * @param options - Integer validation options
- * @returns True if value is a valid integer
  *
- * @example
- * ```typescript
- * isValidInteger("123") // true
- * isValidInteger("123.45") // false
- * isValidInteger("123", { min: 100, max: 200 }) // true
- * ```
+ * @returns True if value is a valid integer
  *
  * @public
  */
@@ -147,15 +158,17 @@ export function isValidInteger(
 /**
  * Validates that a value is a valid numeric string within optional bounds.
  *
+ * @example
+ *
+ * ```typescript
+ * isValidNumeric("123.45"); // true
+ * isValidNumeric("abc"); // false
+ * ```
+ *
  * @param value - Value to validate
  * @param options - Numeric validation options
- * @returns True if value is a valid number
  *
- * @example
- * ```typescript
- * isValidNumeric("123.45") // true
- * isValidNumeric("abc") // false
- * ```
+ * @returns True if value is a valid number
  *
  * @public
  */
@@ -169,16 +182,18 @@ export function isValidNumeric(
 /**
  * Validates that a value is a valid host (IP address, FQDN, or localhost).
  *
- * @param value - Value to validate
- * @returns True if value is a valid host
- *
  * @example
+ *
  * ```typescript
- * isValidHost("192.168.1.1") // true
- * isValidHost("example.com") // true
- * isValidHost("localhost") // true
- * isValidHost("invalid..host") // false
+ * isValidHost("192.168.1.1"); // true
+ * isValidHost("example.com"); // true
+ * isValidHost("localhost"); // true
+ * isValidHost("invalid..host"); // false
  * ```
+ *
+ * @param value - Value to validate
+ *
+ * @returns True if value is a valid host
  *
  * @public
  */
@@ -213,16 +228,18 @@ export function isValidHost(value: unknown): value is string {
 /**
  * Validates that a value is a valid port number.
  *
- * @param value - Value to validate (number or string)
- * @returns True if value is a valid port number (1-65535)
- *
  * @example
+ *
  * ```typescript
- * isValidPort(80) // true
- * isValidPort("443") // true
- * isValidPort(0) // false
- * isValidPort(70000) // false
+ * isValidPort(80); // true
+ * isValidPort("443"); // true
+ * isValidPort(0); // false
+ * isValidPort(70000); // false
  * ```
+ *
+ * @param value - Value to validate (number or string)
+ *
+ * @returns True if value is a valid port number (1-65535)
  *
  * @public
  */
@@ -239,15 +256,17 @@ export function isValidPort(value: unknown): boolean {
 /**
  * Validates that a value is a valid URL.
  *
+ * @example
+ *
+ * ```typescript
+ * isValidUrl("https://example.com"); // true
+ * isValidUrl("not-a-url"); // false
+ * ```
+ *
  * @param value - Value to validate
  * @param options - URL validation options
- * @returns True if value is a valid URL
  *
- * @example
- * ```typescript
- * isValidUrl("https://example.com") // true
- * isValidUrl("not-a-url") // false
- * ```
+ * @returns True if value is a valid URL
  *
  * @public
  */
@@ -279,18 +298,20 @@ export function isValidUrl(
 /**
  * Safely converts a value to a positive integer with bounds checking.
  *
+ * @example
+ *
+ * ```typescript
+ * safeInteger("123", 0, 1, 1000); // 123
+ * safeInteger("abc", 0, 1, 1000); // 0
+ * safeInteger("2000", 0, 1, 1000); // 1000 (clamped)
+ * ```
+ *
  * @param value - Value to convert
  * @param defaultValue - Default value if conversion fails
  * @param min - Minimum allowed value
  * @param max - Maximum allowed value
- * @returns Converted integer or default value
  *
- * @example
- * ```typescript
- * safeInteger("123", 0, 1, 1000) // 123
- * safeInteger("abc", 0, 1, 1000) // 0
- * safeInteger("2000", 0, 1, 1000) // 1000 (clamped)
- * ```
+ * @returns Converted integer or default value
  *
  * @public
  */

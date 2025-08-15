@@ -9,10 +9,11 @@
  * Electron main process for update operations.
  *
  * The store persists update information and status across sessions to provide
- * continuity in the update process, while maintaining error states and
- * progress information in memory for the current session.
+ * continuity in the update process, while maintaining error states and progress
+ * information in memory for the current session.
  *
  * @example
+ *
  * ```typescript
  * import { useUpdatesStore } from './stores/updates/useUpdatesStore';
  *

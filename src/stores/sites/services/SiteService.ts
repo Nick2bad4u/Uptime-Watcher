@@ -1,10 +1,10 @@
 /**
- * Service layer for handling all site-related operations.
- * Provides a clean abstraction over electron API calls for site management.
+ * Service layer for handling all site-related operations. Provides a clean
+ * abstraction over electron API calls for site management.
  *
  * @remarks
- * All methods ensure the electron API is available before making calls.
- * All backend communication is performed via IPC and follows strict typing.
+ * All methods ensure the electron API is available before making calls. All
+ * backend communication is performed via IPC and follows strict typing.
  */
 
 import type { Site } from "@shared/types";
@@ -16,13 +16,21 @@ export const SiteService = {
     /**
      * Adds a new site to the backend.
      *
-     * @param site - The site object to add.
-     * @returns The newly created site object as returned by the backend.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
-     * const newSite = await SiteService.addSite({ name: "Example", url: "https://example.com" });
+     * const newSite = await SiteService.addSite({
+     *     name: "Example",
+     *     url: "https://example.com",
+     * });
      * ```
+     *
+     * @param site - The site object to add.
+     *
+     * @returns The newly created site object as returned by the backend.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async addSite(site: Site): Promise<Site> {
         await this.initialize();
@@ -33,14 +41,19 @@ export const SiteService = {
     /**
      * Triggers an immediate check for a site's monitor.
      *
-     * @param siteId - The identifier of the site to check.
-     * @param monitorId - The identifier of the monitor to check.
-     * @returns A promise that resolves when the check is triggered.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
      * await SiteService.checkSiteNow("site123", "monitor456");
      * ```
+     *
+     * @param siteId - The identifier of the site to check.
+     * @param monitorId - The identifier of the monitor to check.
+     *
+     * @returns A promise that resolves when the check is triggered.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async checkSiteNow(siteId: string, monitorId: string): Promise<void> {
         await this.initialize();
@@ -50,12 +63,15 @@ export const SiteService = {
     /**
      * Downloads a backup of the SQLite database.
      *
-     * @returns An object containing the backup buffer and the file name.
-     * @throws If the electron API is unavailable or the backup operation fails.
      * @example
+     *
      * ```typescript
      * const backup = await SiteService.downloadSQLiteBackup();
      * ```
+     *
+     * @returns An object containing the backup buffer and the file name.
+     *
+     * @throws If the electron API is unavailable or the backup operation fails.
      */
     async downloadSQLiteBackup(): Promise<{
         buffer: ArrayBuffer;
@@ -72,12 +88,16 @@ export const SiteService = {
     /**
      * Retrieves all sites from the backend.
      *
-     * @returns An array of site objects.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
      * const sites = await SiteService.getSites();
      * ```
+     *
+     * @returns An array of site objects.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async getSites(): Promise<Site[]> {
         await this.initialize();
@@ -88,10 +108,12 @@ export const SiteService = {
     /**
      * Ensures the electron API is available before making backend calls.
      *
-     * @returns A promise that resolves when the electron API is ready.
-     * @throws If the electron API is not available.
      * @remarks
      * This method should be called before any backend operation.
+     *
+     * @returns A promise that resolves when the electron API is ready.
+     *
+     * @throws If the electron API is not available.
      */
     async initialize(): Promise<void> {
         try {
@@ -105,14 +127,19 @@ export const SiteService = {
     /**
      * Removes a monitor from a site.
      *
-     * @param siteIdentifier - The identifier of the site.
-     * @param monitorId - The identifier of the monitor to remove.
-     * @returns A promise that resolves when the monitor is removed.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
      * await SiteService.removeMonitor("site123", "monitor456");
      * ```
+     *
+     * @param siteIdentifier - The identifier of the site.
+     * @param monitorId - The identifier of the monitor to remove.
+     *
+     * @returns A promise that resolves when the monitor is removed.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async removeMonitor(
         siteIdentifier: string,
@@ -125,13 +152,18 @@ export const SiteService = {
     /**
      * Removes a site from the backend.
      *
-     * @param identifier - The identifier of the site to remove.
-     * @returns A promise that resolves when the site is removed.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
      * await SiteService.removeSite("site123");
      * ```
+     *
+     * @param identifier - The identifier of the site to remove.
+     *
+     * @returns A promise that resolves when the site is removed.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async removeSite(identifier: string): Promise<void> {
         await this.initialize();
@@ -141,14 +173,19 @@ export const SiteService = {
     /**
      * Updates an existing site with the provided changes.
      *
-     * @param identifier - The identifier of the site to update.
-     * @param updates - Partial site object containing fields to update.
-     * @returns A promise that resolves when the site is updated.
-     * @throws If the electron API is unavailable or the backend operation fails.
      * @example
+     *
      * ```typescript
      * await SiteService.updateSite("site123", { name: "New Name" });
      * ```
+     *
+     * @param identifier - The identifier of the site to update.
+     * @param updates - Partial site object containing fields to update.
+     *
+     * @returns A promise that resolves when the site is updated.
+     *
+     * @throws If the electron API is unavailable or the backend operation
+     *   fails.
      */
     async updateSite(
         identifier: string,

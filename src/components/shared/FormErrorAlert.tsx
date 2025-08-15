@@ -25,17 +25,19 @@ export interface FormErrorAlertProps {
 /**
  * Standardized error alert component with dismiss functionality
  *
- * @param props - FormErrorAlert props
- * @returns Themed error alert component
- *
  * @example
+ *
  * ```tsx
  * <FormErrorAlert
- *   error={lastError}
- *   onClearError={clearError}
- *   isDark={isDarkTheme}
- * />
+ *     error={lastError}
+ *     onClearError={clearError}
+ *     isDark={isDarkTheme}
+ * />;
  * ```
+ *
+ * @param props - FormErrorAlert props
+ *
+ * @returns Themed error alert component
  */
 export const FormErrorAlert: React.FC<FormErrorAlertProps> = ({
     className = "",

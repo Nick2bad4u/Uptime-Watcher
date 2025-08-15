@@ -1,44 +1,44 @@
 /**
- * Single form field component that renders based on field definition.
- * Supports number, text, and URL field types with proper validation.
+ * Single form field component that renders based on field definition. Supports
+ * number, text, and URL field types with proper validation.
  *
  * @remarks
  * This component dynamically renders form fields based on their type
  * definition. It supports "number", "text", and "url" field types with proper
- * validation. For unsupported field types, displays an error message.
- * Numeric fields handle automatic conversion and validation of input values.
+ * validation. For unsupported field types, displays an error message. Numeric
+ * fields handle automatic conversion and validation of input values.
  *
- * @example
- * Basic usage with a number field:
+ * @example Basic usage with a number field:
+ *
  * ```tsx
  * <DynamicField
- *   disabled={false}
- *   field={{
- *     name: "port",
- *     label: "Port",
- *     type: "number",
- *     required: true,
- *     min: 1,
- *     max: 65535
- *   }}
- *   onChange={setPort}
- *   value={8080}
- * />
+ *     disabled={false}
+ *     field={{
+ *         name: "port",
+ *         label: "Port",
+ *         type: "number",
+ *         required: true,
+ *         min: 1,
+ *         max: 65535,
+ *     }}
+ *     onChange={setPort}
+ *     value={8080}
+ * />;
  * ```
  *
- * @example
- * Text field with help text:
+ * @example Text field with help text:
+ *
  * ```tsx
  * <DynamicField
- *   field={{
- *     name: "hostname",
- *     label: "Hostname",
- *     type: "text",
- *     helpText: "Enter the hostname or IP address"
- *   }}
- *   onChange={setHostname}
- *   value="example.com"
- * />
+ *     field={{
+ *         name: "hostname",
+ *         label: "Hostname",
+ *         type: "text",
+ *         helpText: "Enter the hostname or IP address",
+ *     }}
+ *     onChange={setHostname}
+ *     value="example.com"
+ * />;
  * ```
  *
  * @public
@@ -85,30 +85,30 @@ export interface DynamicFieldProps {
  * @remarks
  * This component renders appropriate form fields based on the field type
  * definition. Supports "number", "text", and "url" field types with proper
- * validation.
- * For unsupported field types, displays an error message.
- * Numeric fields handle automatic conversion and validation of input values.
+ * validation. For unsupported field types, displays an error message. Numeric
+ * fields handle automatic conversion and validation of input values.
  *
- * @param props - The component properties
- * @returns The rendered field as a React element
+ * @example Number field with validation:
  *
- * @example
- * Number field with validation:
  * ```tsx
  * <DynamicField
- *   disabled={false}
- *   field={{
- *     name: "port",
- *     label: "Port",
- *     type: "number",
- *     required: true,
- *     min: 1,
- *     max: 65535
- *   }}
- *   onChange={setPort}
- *   value={8080}
- * />
+ *     disabled={false}
+ *     field={{
+ *         name: "port",
+ *         label: "Port",
+ *         type: "number",
+ *         required: true,
+ *         min: 1,
+ *         max: 65535,
+ *     }}
+ *     onChange={setPort}
+ *     value={8080}
+ * />;
  * ```
+ *
+ * @param props - The component properties
+ *
+ * @returns The rendered field as a React element
  *
  * @public
  */

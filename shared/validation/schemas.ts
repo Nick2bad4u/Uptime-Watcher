@@ -5,8 +5,8 @@
  * @remarks
  * These schemas and functions are used by both frontend and backend to ensure
  * data integrity. Validation constraints are synchronized with UI constants in
- * {@link constants.ts}. All validation logic is centralized here for
- * consistency and maintainability.
+ * {@link constants.ts}. All validation logic is centralized here for consistency
+ * and maintainability.
  */
 
 import type {
@@ -32,8 +32,8 @@ import * as z from "zod";
 import { isValidHost, isValidPort } from "./validatorUtils";
 
 /**
- * Reusable host validation schema for monitors.
- * Eliminates duplication between port and ping monitor schemas.
+ * Reusable host validation schema for monitors. Eliminates duplication between
+ * port and ping monitor schemas.
  */
 const hostValidationSchema = z
     .string()
@@ -290,10 +290,11 @@ export type Site = z.infer<typeof siteSchema>;
  * Gets the appropriate Zod schema for a monitor type.
  *
  * @remarks
- * Uses the central schema registry for dynamic schema lookup.
- * Returns `undefined` if the type is not recognized.
+ * Uses the central schema registry for dynamic schema lookup. Returns
+ * `undefined` if the type is not recognized.
  *
  * @param type - The monitor type string (any supported monitor type).
+ *
  * @returns The Zod schema for the monitor type, or `undefined` if unknown.
  */
 function getMonitorSchema(
@@ -312,6 +313,7 @@ function getMonitorSchema(
  * @param type - The monitor type string ("http" or "port").
  * @param fieldName - The name of the field to validate.
  * @param value - The value of the field to validate.
+ *
  * @returns An object containing the validated field.
  *
  * @throws Error If the field name is unknown for the monitor type.
@@ -357,26 +359,29 @@ function validateFieldWithSchema(
  * Validates monitor data using the appropriate Zod schema.
  *
  * @remarks
- * Selects the schema based on monitor type ("http" or "port").
- * Returns a {@link ValidationResult} with success status, validated data,
- * errors, and warnings.
+ * Selects the schema based on monitor type ("http" or "port"). Returns a
+ * {@link ValidationResult} with success status, validated data, errors, and
+ * warnings.
+ *
+ * @example
+ *
+ * ```typescript
+ * const result = validateMonitorData("http", {
+ *     url: "https://example.com",
+ *     timeout: 5000,
+ * });
+ * if (result.success) {
+ *     console.log("Valid monitor:", result.data);
+ * } else {
+ *     console.error("Validation errors:", result.errors);
+ * }
+ * ```
  *
  * @param type - The monitor type string ("http" or "port").
  * @param data - The monitor data to validate.
+ *
  * @returns The validation result object.
  *
- * @example
- * ```typescript
- * const result = validateMonitorData("http", {
- *   url: "https://example.com",
- *   timeout: 5000
- * });
- * if (result.success) {
- *   console.log("Valid monitor:", result.data);
- * } else {
- *   console.error("Validation errors:", result.errors);
- * }
- * ```
  * @throws {@link z.ZodError} If validation fails and is not handled internally.
  */
 export function validateMonitorData(
@@ -456,6 +461,7 @@ export function validateMonitorData(
  * @param type - The monitor type string ("http" or "port").
  * @param fieldName - The name of the field to validate.
  * @param value - The value of the field to validate.
+ *
  * @returns The validation result object for the field.
  *
  * @throws {@link z.ZodError} If validation fails and is not handled internally.
@@ -519,10 +525,11 @@ export function validateMonitorField(
  * Validates site data using the shared Zod schema.
  *
  * @remarks
- * Validates the complete site structure, including all monitors.
- * Ensures data integrity for site operations.
+ * Validates the complete site structure, including all monitors. Ensures data
+ * integrity for site operations.
  *
  * @param data - The site data to validate.
+ *
  * @returns The validation result object for the site.
  *
  * @throws {@link z.ZodError} If validation fails and is not handled internally.

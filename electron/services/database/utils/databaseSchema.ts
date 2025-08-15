@@ -12,8 +12,8 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
  *
  * @remarks
  * Provides functions for creating database tables, indexes, and setting up
- * validation frameworks. All table creation operations are idempotent using
- * "IF NOT EXISTS" clauses. Used during application startup and migrations.
+ * validation frameworks. All table creation operations are idempotent using "IF
+ * NOT EXISTS" clauses. Used during application startup and migrations.
  *
  * @public
  */
@@ -22,7 +22,9 @@ import { generateMonitorTableSchema } from "./dynamicSchema";
  * Common SQL queries for database schema operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency. This constant is internal to the utility module and not exported.
+ * Centralizes query strings for maintainability and consistency. This constant
+ * is internal to the utility module and not exported.
+ *
  * @internal
  */
 const SCHEMA_QUERIES = {
@@ -83,7 +85,10 @@ const SCHEMA_QUERIES = {
  * malformed SQL.
  *
  * @param schema - The generated SQL schema string to validate.
- * @throws {@link Error} When schema validation fails due to missing or invalid content.
+ *
+ * @throws {@link Error} When schema validation fails due to missing or invalid
+ *   content.
+ *
  * @internal
  */
 function validateGeneratedSchema(schema: string): void {
@@ -105,13 +110,17 @@ function validateGeneratedSchema(schema: string): void {
  *
  * @remarks
  * Creates the following indexes:
+ *
  * - `idx_monitors_site_identifier`: Fast site-based monitor queries
  * - `idx_monitors_type`: Monitor type filtering
  * - `idx_history_monitor_id`: Fast history lookups by monitor
  * - `idx_history_timestamp`: Time-based history queries
  *
  * @param db - The {@link Database} instance to create indexes on.
- * @throws When index creation fails. Errors are logged and re-thrown for upstream handling.
+ *
+ * @throws When index creation fails. Errors are logged and re-thrown for
+ *   upstream handling.
+ *
  * @public
  */
 export function createDatabaseIndexes(db: Database): void {
@@ -140,6 +149,7 @@ export function createDatabaseIndexes(db: Database): void {
  *
  * @remarks
  * Creates the following tables:
+ *
  * - `sites`: Site configuration and monitoring status
  * - `monitors`: Monitor configuration and runtime data (dynamic schema)
  * - `history`: Historical monitoring data
@@ -151,7 +161,10 @@ export function createDatabaseIndexes(db: Database): void {
  * operations are idempotent.
  *
  * @param db - The {@link Database} instance to create tables on.
- * @throws When table creation fails. Errors are logged and re-thrown for upstream handling.
+ *
+ * @throws When table creation fails. Errors are logged and re-thrown for
+ *   upstream handling.
+ *
  * @public
  */
 export function createDatabaseTables(db: Database): void {
@@ -192,8 +205,11 @@ export function createDatabaseTables(db: Database): void {
  * and validation triggers to ensure data integrity for monitor type fields.
  * Currently logs the available types and prepares for future enhancements.
  *
- * @returns void
- * @throws When validation setup fails. Errors are logged but not re-thrown, as this is a non-critical enhancement.
+ * @returns Void
+ *
+ * @throws When validation setup fails. Errors are logged but not re-thrown, as
+ *   this is a non-critical enhancement.
+ *
  * @public
  */
 export function setupMonitorTypeValidation(): void {
@@ -248,7 +264,10 @@ export function setupMonitorTypeValidation(): void {
  * BEGIN/COMMIT. Rolls back on error to maintain database integrity.
  *
  * @param db - The {@link Database} instance to create the schema on.
- * @throws When schema creation fails. Errors are logged and re-thrown for upstream handling.
+ *
+ * @throws When schema creation fails. Errors are logged and re-thrown for
+ *   upstream handling.
+ *
  * @public
  */
 export function createDatabaseSchema(db: Database): void {
