@@ -1,5 +1,7 @@
 import type { Site } from "@shared/types";
 
+import { useMemo } from "react";
+
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { type SiteActionsResult, useSiteActions } from "./useSiteActions";
 import { type SiteMonitorResult, useSiteMonitor } from "./useSiteMonitor";
@@ -77,10 +79,13 @@ export function useSite(site: Site): UseSiteResult {
     const { isLoading } = useErrorStore();
 
     // Return everything together
-    return {
-        ...monitorData,
-        ...stats,
-        ...actions,
-        isLoading,
-    };
+    return useMemo(
+        () => ({
+            ...monitorData,
+            ...stats,
+            ...actions,
+            isLoading,
+        }),
+        [actions, isLoading, monitorData, stats]
+    );
 }

@@ -36,7 +36,7 @@
  * ```
  */
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
 import logger from "../services/logger";
@@ -97,11 +97,11 @@ export function useMonitorTypes(): UseMonitorTypesResult {
         }
     };
 
-    const refresh = async (): Promise<void> => {
+    const refresh = useCallback(async () => {
         await loadMonitorTypes();
-    };
+    }, []);
 
-    useMount(() => loadMonitorTypes());
+    useMount(useCallback(() => loadMonitorTypes(), []));
 
     return {
         error,

@@ -33,7 +33,7 @@
 
 import type { MonitorType } from "@shared/types";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import logger from "../services/logger";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
@@ -121,9 +121,12 @@ export function useDynamicHelpText(
         [monitorType]
     );
 
-    return {
-        ...helpTexts,
-        error,
-        isLoading,
-    };
+    return useMemo(
+        () => ({
+            ...helpTexts,
+            error,
+            isLoading,
+        }),
+        [error, helpTexts, isLoading]
+    );
 }

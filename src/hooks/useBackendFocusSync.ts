@@ -4,7 +4,7 @@
  * when users return to the application after being away.
  */
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
 
@@ -37,7 +37,7 @@ export function useBackendFocusSync(enabled = false): void {
     // Use selector to avoid unnecessary re-renders when other store state
     // changes
     const fullSyncFromBackend = useSitesStore(
-        (state) => state.fullSyncFromBackend
+        useCallback((state) => state.fullSyncFromBackend, [])
     );
 
     useEffect(

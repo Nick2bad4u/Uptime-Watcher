@@ -150,6 +150,7 @@ const ThemedCard = ({
 }: ThemedCardProperties): React.JSX.Element => {
     const { currentTheme } = useTheme();
 
+    // eslint-disable-next-line @arthurgeron/react-usememo/require-usememo
     const cardStyles: React.CSSProperties = {
         cursor: clickable ? "pointer" : "default",
         overflow: "hidden",

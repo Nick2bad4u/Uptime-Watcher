@@ -204,6 +204,22 @@ export const SiteOverviewTab = ({
         void handleRemoveSite();
     }, [handleRemoveSite]);
 
+    const domainIcon = useMemo(() => <MdDomain />, []);
+    const monitorHeartIcon = useMemo(() => <MdMonitorHeart />, []);
+    const factCheckIcon = useMemo(() => <MdOutlineFactCheck />, []);
+    const speedIcon = useMemo(() => <MdSpeed />, []);
+    const siteIcon = useMemo(
+        () => <MdDomain color={iconColors.site} />,
+        [iconColors.site]
+    );
+    const monitorsIcon = useMemo(
+        () => <MdMonitorHeart color={iconColors.monitors} />,
+        [iconColors.monitors]
+    );
+    const actionsIcon = useMemo(
+        () => <FiSettings color={iconColors.actions} />,
+        [iconColors.actions]
+    );
     return (
         <div className="space-y-6" data-testid="site-overview-tab">
             {/* Site Overview Metrics */}
@@ -211,7 +227,7 @@ export const SiteOverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center justify-center text-center"
                     hoverable
-                    icon={<MdDomain />}
+                    icon={domainIcon}
                     iconColor={iconColors.site}
                     title="Site Status"
                 >
@@ -225,7 +241,7 @@ export const SiteOverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center justify-center space-y-1 text-center"
                     hoverable
-                    icon={<MdMonitorHeart />}
+                    icon={monitorHeartIcon}
                     iconColor={iconColors.monitors}
                     title="Monitors"
                 >
@@ -243,7 +259,7 @@ export const SiteOverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center justify-center text-center"
                     hoverable
-                    icon={<MdOutlineFactCheck />}
+                    icon={factCheckIcon}
                     iconColor={iconColors.uptime}
                     title="Overall Uptime"
                 >
@@ -266,7 +282,7 @@ export const SiteOverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center justify-center space-y-1 text-center"
                     hoverable
-                    icon={<MdSpeed />}
+                    icon={speedIcon}
                     iconColor={iconColors.response}
                     title="Avg Response"
                 >
@@ -287,10 +303,7 @@ export const SiteOverviewTab = ({
             </div>
 
             {/* Site Information */}
-            <ThemedCard
-                icon={<MdDomain color={iconColors.site} />}
-                title="Site Information"
-            >
+            <ThemedCard icon={siteIcon} title="Site Information">
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <ThemedText
@@ -321,10 +334,7 @@ export const SiteOverviewTab = ({
             </ThemedCard>
 
             {/* Monitor Details */}
-            <ThemedCard
-                icon={<MdMonitorHeart color={iconColors.monitors} />}
-                title="Monitor Details"
-            >
+            <ThemedCard icon={monitorsIcon} title="Monitor Details">
                 <div className="space-y-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <ThemedText
@@ -415,10 +425,7 @@ export const SiteOverviewTab = ({
             </ThemedCard>
 
             {/* Site Actions */}
-            <ThemedCard
-                icon={<FiSettings color={iconColors.actions} />}
-                title="Site Actions"
-            >
+            <ThemedCard icon={actionsIcon} title="Site Actions">
                 <div className="flex flex-wrap items-center gap-4">
                     {allMonitorsRunning ? (
                         <ThemedButton

@@ -7,7 +7,7 @@ import type { Monitor } from "@shared/types";
 import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FaListOl } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 import {
@@ -126,15 +126,22 @@ export const OverviewTab = ({
     /**
      * Get response time color based on value
      */
-    const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 200) {
-            return currentTheme.colors.success;
-        }
-        if (responseTime <= 1000) {
-            return currentTheme.colors.warning;
-        }
-        return currentTheme.colors.error;
-    };
+    const getResponseTimeColor = useCallback(
+        (responseTime: number): string => {
+            if (responseTime <= 200) {
+                return currentTheme.colors.success;
+            }
+            if (responseTime <= 1000) {
+                return currentTheme.colors.warning;
+            }
+            return currentTheme.colors.error;
+        },
+        [
+            currentTheme.colors.error,
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+        ]
+    );
 
     // Icon colors configuration
     const getIconColors = (): {
@@ -184,6 +191,25 @@ export const OverviewTab = ({
         selectedMonitor.url,
     ]);
 
+    const checkIcon = useMemo(() => <MdOutlineFactCheck />, []);
+    const timeIcon = useMemo(() => <MdAccessTime />, []);
+    const speedIcon = useMemo(() => <MdSpeed />, []);
+    const responseTimeStyle = useMemo(
+        () => ({ color: getResponseTimeColor(avgResponseTime) }),
+        [avgResponseTime, getResponseTimeColor]
+    );
+    const listIcon = useMemo(() => <FaListOl />, []);
+    const performanceIcon = useMemo(
+        () => <MdBolt color={iconColors.fastest} />,
+        [iconColors.fastest]
+    );
+    const boltIcon = useMemo(() => <MdBolt />, []);
+    const accessTimeIcon = useMemo(() => <MdAccessTime />, []);
+    const quickActionIcon = useMemo(
+        () => <MdBolt color={iconColors.quickAction} />,
+        [iconColors.quickAction]
+    );
+    const trashIcon = useMemo(() => <FiTrash2 />, []);
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
@@ -191,7 +217,7 @@ export const OverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<MdOutlineFactCheck />}
+                    icon={checkIcon}
                     iconColor={iconColors.status}
                     title="Status"
                 >
@@ -205,7 +231,7 @@ export const OverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<MdAccessTime />}
+                    icon={timeIcon}
                     iconColor={iconColors.uptime}
                     title="Uptime"
                 >
@@ -227,13 +253,13 @@ export const OverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<MdSpeed />}
+                    icon={speedIcon}
                     iconColor={iconColors.response}
                     title="Response Time"
                 >
                     <ThemedText
                         size="xl"
-                        style={{ color: getResponseTimeColor(avgResponseTime) }}
+                        style={responseTimeStyle}
                         weight="bold"
                     >
                         {formatResponseTime(avgResponseTime)}
@@ -243,7 +269,7 @@ export const OverviewTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<FaListOl />}
+                    icon={listIcon}
                     iconColor={iconColors.checks}
                     title="Total Checks"
                 >
@@ -254,10 +280,7 @@ export const OverviewTab = ({
             </div>
 
             {/* Performance Metrics */}
-            <ThemedCard
-                icon={<MdBolt color={iconColors.fastest} />}
-                title="Performance Overview"
-            >
+            <ThemedCard icon={performanceIcon} title="Performance Overview">
                 <div className="flex justify-center">
                     <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">
@@ -266,7 +289,7 @@ export const OverviewTab = ({
                             </ThemedText>
                             <ThemedBadge
                                 className="ml-4"
-                                icon={<MdBolt />}
+                                icon={boltIcon}
                                 iconColor={iconColors.fastest}
                                 variant="success"
                             >
@@ -279,7 +302,7 @@ export const OverviewTab = ({
                             </ThemedText>
                             <ThemedBadge
                                 className="ml-4"
-                                icon={<MdAccessTime />}
+                                icon={accessTimeIcon}
                                 iconColor={iconColors.slowest}
                                 variant="warning"
                             >
@@ -291,10 +314,7 @@ export const OverviewTab = ({
             </ThemedCard>
 
             {/* Quick Actions */}
-            <ThemedCard
-                icon={<MdBolt color={iconColors.quickAction} />}
-                title="Quick Actions"
-            >
+            <ThemedCard icon={quickActionIcon} title="Quick Actions">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     {/* Interval Control */}
                     <div className="flex items-center gap-2">
@@ -378,7 +398,7 @@ export const OverviewTab = ({
                     {/* Remove Monitor Button */}
                     <ThemedButton
                         disabled={isLoading}
-                        icon={<FiTrash2 />}
+                        icon={trashIcon}
                         onClick={handleRemoveClick}
                         size="sm"
                         variant="error"

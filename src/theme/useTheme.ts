@@ -4,8 +4,6 @@
  * color/styling utilities.
  */
 
-/* eslint-disable unicorn/consistent-function-scoping -- Hook utility functions must remain inside hook scope to access current theme state and prevent stale closures */
-
 import {
     isSiteStatus,
     type MonitorStatus,
@@ -183,9 +181,12 @@ export function useTheme(): UseThemeReturn {
      * setTheme("system"); // Use system preference
      * ```
      */
-    const setTheme = (themeName: ThemeName): void => {
-        updateSettings({ theme: themeName });
-    };
+    const setTheme = useCallback(
+        (themeName: ThemeName) => {
+            updateSettings({ theme: themeName });
+        },
+        [updateSettings]
+    );
 
     /**
      * Toggle between light and dark themes.
@@ -199,10 +200,10 @@ export function useTheme(): UseThemeReturn {
      * toggleTheme(); // Dark theme → Light theme
      * ```
      */
-    const toggleTheme = (): void => {
+    const toggleTheme = useCallback(() => {
         const newTheme = currentTheme.isDark ? "light" : "dark";
         setTheme(newTheme);
-    };
+    }, [currentTheme.isDark, setTheme]);
 
     /**
      * Get theme-aware color from a dot-notation path.
@@ -216,27 +217,30 @@ export function useTheme(): UseThemeReturn {
      * const primaryBg = getColor("background.primary");
      * ```
      */
-    const getColor = (path: string): string => {
-        const keys = path.split(".");
-        let value: unknown = currentTheme.colors;
-        for (const key of keys) {
-            if (
-                value &&
-                typeof value === "object" &&
-                Object.hasOwn(value, key)
-            ) {
-                value = (value as Record<string, unknown>)[key];
-            } else {
-                value = undefined;
-                break;
+    const getColor = useCallback(
+        (path: string) => {
+            const keys = path.split(".");
+            let value: unknown = currentTheme.colors;
+            for (const key of keys) {
+                if (
+                    value &&
+                    typeof value === "object" &&
+                    Object.hasOwn(value, key)
+                ) {
+                    value = (value as Record<string, unknown>)[key];
+                } else {
+                    value = undefined;
+                    break;
+                }
             }
-        }
 
-        // Use theme-aware fallback instead of hard-coded black
-        return typeof value === "string"
-            ? value
-            : currentTheme.colors.text.primary;
-    };
+            // Use theme-aware fallback instead of hard-coded black
+            return typeof value === "string"
+                ? value
+                : currentTheme.colors.text.primary;
+        },
+        [currentTheme.colors]
+    );
 
     /**
      * Get status-specific color from the current theme.
@@ -250,14 +254,17 @@ export function useTheme(): UseThemeReturn {
      * const downColor = getStatusColor("down");
      * ```
      */
-    const getStatusColor = (status: SiteStatus): string => {
-        // Validate status using shared type guard
-        if (isSiteStatus(status)) {
-            return currentTheme.colors.status[status];
-        }
-        // Use theme-aware fallback instead of hard-coded black
-        return currentTheme.colors.text.secondary;
-    };
+    const getStatusColor = useCallback(
+        (status: SiteStatus) => {
+            // Validate status using shared type guard
+            if (isSiteStatus(status)) {
+                return currentTheme.colors.status[status];
+            }
+            // Use theme-aware fallback instead of hard-coded black
+            return currentTheme.colors.text.secondary;
+        },
+        [currentTheme.colors.status, currentTheme.colors.text.secondary]
+    );
 
     /**
      * Get all available theme names.
@@ -298,31 +305,39 @@ export function useTheme(): UseThemeReturn {
 export function useAvailabilityColors(): UseAvailabilityColorsReturn {
     const { currentTheme } = useTheme();
 
-    const getAvailabilityColor = (percentage: number): string => {
-        // Clamp percentage between 0 and 100
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+    const getAvailabilityColor = useCallback(
+        (percentage: number) => {
+            // Clamp percentage between 0 and 100
+            const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
-        // Use theme colors for consistency - aligned with description
-        // thresholds
-        if (clampedPercentage >= 99.9) {
-            return currentTheme.colors.status.up; // Excellent
-        } else if (clampedPercentage >= 99) {
-            return currentTheme.colors.success; // Very Good
-        } else if (clampedPercentage >= 95) {
-            return currentTheme.colors.success; // Good
-        } else if (clampedPercentage >= 90) {
-            return currentTheme.colors.status.pending; // Fair
-        } else if (clampedPercentage >= 80) {
-            return currentTheme.colors.warning; // Poor
-        } else if (clampedPercentage >= 50) {
-            return currentTheme.colors.error; // Critical
-        }
-        return currentTheme.colors.status.down; // Failed
-    };
+            // Use theme colors for consistency - aligned with description
+            // thresholds
+            if (clampedPercentage >= 99.9) {
+                return currentTheme.colors.status.up; // Excellent
+            } else if (clampedPercentage >= 99) {
+                return currentTheme.colors.success; // Very Good
+            } else if (clampedPercentage >= 95) {
+                return currentTheme.colors.success; // Good
+            } else if (clampedPercentage >= 90) {
+                return currentTheme.colors.status.pending; // Fair
+            } else if (clampedPercentage >= 80) {
+                return currentTheme.colors.warning; // Poor
+            } else if (clampedPercentage >= 50) {
+                return currentTheme.colors.error; // Critical
+            }
+            return currentTheme.colors.status.down; // Failed
+        },
+        [
+            currentTheme.colors.error,
+            currentTheme.colors.status.down,
+            currentTheme.colors.status.pending,
+            currentTheme.colors.status.up,
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+        ]
+    );
 
-    const getAvailabilityVariant = (
-        percentage: number
-    ): "danger" | "success" | "warning" => {
+    const getAvailabilityVariant = useCallback((percentage: number) => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
         if (clampedPercentage >= 95) {
@@ -331,9 +346,9 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
             return "warning";
         }
         return "danger";
-    };
+    }, []);
 
-    const getAvailabilityDescription = (percentage: number): string => {
+    const getAvailabilityDescription = useCallback((percentage: number) => {
         const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
         if (clampedPercentage >= 99.9) {
@@ -350,7 +365,7 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
             return "Critical";
         }
         return "Failed";
-    };
+    }, []);
 
     return {
         getAvailabilityColor,
@@ -409,35 +424,46 @@ export function useStatusColors(): UseStatusColorsReturn {
 export function useThemeClasses(): UseThemeClassesReturn {
     const { getColor } = useTheme();
 
-    const getBackgroundClass = (
-        variant: "primary" | "secondary" | "tertiary" = "primary"
-    ): { backgroundColor: string } => ({
-        backgroundColor: `var(--color-background-${variant})`,
-    });
+    const getBackgroundClass = useCallback(
+        (variant: "primary" | "secondary" | "tertiary" = "primary") => ({
+            backgroundColor: `var(--color-background-${variant})`,
+        }),
+        []
+    );
 
-    const getTextClass = (
-        variant: "inverse" | "primary" | "secondary" | "tertiary" = "primary"
-    ): { color: string } => ({
-        color: `var(--color-text-${variant})`,
-    });
+    const getTextClass = useCallback(
+        (
+            variant:
+                | "inverse"
+                | "primary"
+                | "secondary"
+                | "tertiary" = "primary"
+        ) => ({
+            color: `var(--color-text-${variant})`,
+        }),
+        []
+    );
 
-    const getBorderClass = (
-        variant: "focus" | "primary" | "secondary" = "primary"
-    ): { borderColor: string } => ({
-        borderColor: `var(--color-border-${variant})`,
-    });
+    const getBorderClass = useCallback(
+        (variant: "focus" | "primary" | "secondary" = "primary") => ({
+            borderColor: `var(--color-border-${variant})`,
+        }),
+        []
+    );
 
-    const getSurfaceClass = (
-        variant: "base" | "elevated" | "overlay" = "base"
-    ): { backgroundColor: string } => ({
-        backgroundColor: `var(--color-surface-${variant})`,
-    });
+    const getSurfaceClass = useCallback(
+        (variant: "base" | "elevated" | "overlay" = "base") => ({
+            backgroundColor: `var(--color-surface-${variant})`,
+        }),
+        []
+    );
 
-    const getStatusClass = (
-        status: MonitorStatus | SiteStatus
-    ): { color: string } => ({
-        color: `var(--color-status-${status})`,
-    });
+    const getStatusClass = useCallback(
+        (status: MonitorStatus | SiteStatus) => ({
+            color: `var(--color-status-${status})`,
+        }),
+        []
+    );
 
     return {
         getBackgroundClass,
@@ -458,5 +484,3 @@ export function useThemeValue<T>(selector: (theme: Theme) => T): T {
     const { currentTheme } = useTheme();
     return selector(currentTheme);
 }
-
-/* eslint-enable unicorn/consistent-function-scoping */

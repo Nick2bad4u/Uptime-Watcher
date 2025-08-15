@@ -5,7 +5,7 @@
 import type { MonitorStatus, SiteStatus } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 import { formatResponseTime } from "../../utils/time";
 import { useTheme } from "../useTheme";
@@ -30,12 +30,15 @@ const MiniChartBar = ({
 }: MiniChartBarProperties): JSX.Element => {
     const { currentTheme, getStatusColor } = useTheme();
 
-    const styles: React.CSSProperties = {
-        backgroundColor: getStatusColor(status),
-        borderRadius: currentTheme.borderRadius.sm,
-        height: "32px",
-        width: "8px",
-    };
+    const styles = useMemo(
+        (): React.CSSProperties => ({
+            backgroundColor: getStatusColor(status),
+            borderRadius: currentTheme.borderRadius.sm,
+            height: "32px",
+            width: "8px",
+        }),
+        [currentTheme.borderRadius.sm, getStatusColor, status]
+    );
     return (
         <div
             className={`themed-mini-chart-bar ${className}`}

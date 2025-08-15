@@ -523,11 +523,10 @@ export class StandardizedCache<T> {
     private updateHitRatio(): void {
         const total = this.stats.hits + this.stats.misses;
         this.stats.hitRatio = total > 0 ? this.stats.hits / total : 0;
-    }
-
-    /**
+    } /**
      * Update size statistic.
      */
+
     private updateSize(): void {
         this.stats.size = this.cache.size;
     }

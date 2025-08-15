@@ -164,50 +164,51 @@ const App = (): JSX.Element => {
      * - Status update subscription with smart incremental updates
      * - Cleanup on component unmount
      */
-    useMount(
-        async () => {
-            if (isProduction()) {
-                logger.app.started();
-            }
-
-            // Get fresh references to avoid stale closures
-            const sitesStore = useSitesStore.getState();
-            const settingsStore = useSettingsStore.getState();
-
-            // Initialize both stores
-            await Promise.all([
-                sitesStore.initializeSites(),
-                settingsStore.initializeSettings(),
-            ]);
-
-            // Set up cache synchronization with backend and store cleanup
-            // function
-            // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
-            const cacheSyncCleanup = setupCacheSync();
-            cacheSyncCleanupRef.current = cacheSyncCleanup;
-
-            // Subscribe to status updates
-            sitesStore.subscribeToStatusUpdates((update) => {
-                // Optional callback for additional processing if needed
-                if (isDevelopment()) {
-                    const timestamp = new Date().toLocaleTimeString();
-                    logger.debug(
-                        `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
-                    );
-                }
-            });
-        },
-        () => {
-            const currentSitesStore = useSitesStore.getState();
-            currentSitesStore.unsubscribeFromStatusUpdates();
-
-            // Clean up cache sync
-            if (cacheSyncCleanupRef.current) {
-                cacheSyncCleanupRef.current();
-                cacheSyncCleanupRef.current = null;
-            }
+    const initializeApp = useCallback(async () => {
+        if (isProduction()) {
+            logger.app.started();
         }
-    );
+
+        // Get fresh references to avoid stale closures
+        const sitesStore = useSitesStore.getState();
+        const settingsStore = useSettingsStore.getState();
+
+        // Initialize both stores
+        await Promise.all([
+            sitesStore.initializeSites(),
+            settingsStore.initializeSettings(),
+        ]);
+
+        // Set up cache synchronization with backend and store cleanup
+        // function
+        // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
+        const cacheSyncCleanup = setupCacheSync();
+        cacheSyncCleanupRef.current = cacheSyncCleanup;
+
+        // Subscribe to status updates
+        sitesStore.subscribeToStatusUpdates((update) => {
+            // Optional callback for additional processing if needed
+            if (isDevelopment()) {
+                const timestamp = new Date().toLocaleTimeString();
+                logger.debug(
+                    `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
+                );
+            }
+        });
+    }, []);
+
+    const cleanupApp = useCallback(() => {
+        const currentSitesStore = useSitesStore.getState();
+        currentSitesStore.unsubscribeFromStatusUpdates();
+
+        // Clean up cache sync
+        if (cacheSyncCleanupRef.current) {
+            cacheSyncCleanupRef.current();
+            cacheSyncCleanupRef.current = null;
+        }
+    }, []);
+
+    useMount(initializeApp, cleanupApp);
 
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation

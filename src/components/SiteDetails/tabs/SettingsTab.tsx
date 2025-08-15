@@ -7,7 +7,7 @@
 import type { Monitor, Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
 import {
     MdDangerous,
@@ -319,13 +319,31 @@ export const SettingsTab = ({
         void loggedHandleRemoveSite();
     }, [loggedHandleRemoveSite]);
 
+    const settingsIcon = useMemo(
+        () => <MdSettings color={iconColors.settings} />,
+        [iconColors.settings]
+    );
+    const saveIcon = useMemo(() => <FiSave />, []);
+    const timerIcon = useMemo(
+        () => <MdTimer color={iconColors.timing} />,
+        [iconColors.timing]
+    );
+    const saveIconTwo = useMemo(() => <FiSave />, []);
+    const saveIconThree = useMemo(() => <FiSave />, []);
+    const saveIconFour = useMemo(() => <FiSave />, []);
+    const infoIcon = useMemo(
+        () => <MdInfoOutline color={iconColors.info} />,
+        [iconColors.info]
+    );
+    const dangerIcon = useMemo(
+        () => <MdDangerous color={iconColors.danger} />,
+        [iconColors.danger]
+    );
+    const trashIcon = useMemo(() => <FiTrash2 />, []);
     return (
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
-            <ThemedCard
-                icon={<MdSettings color={iconColors.settings} />}
-                title="Site Configuration"
-            >
+            <ThemedCard icon={settingsIcon} title="Site Configuration">
                 <div className="space-y-6">
                     {/* Site Name */}
                     <div className="space-y-2">
@@ -346,7 +364,7 @@ export const SettingsTab = ({
                             />
                             <ThemedButton
                                 disabled={!hasUnsavedChanges || isLoading}
-                                icon={<FiSave />}
+                                icon={saveIcon}
                                 loading={isLoading}
                                 onClick={handleSaveNameClick}
                                 size="sm"
@@ -392,10 +410,7 @@ export const SettingsTab = ({
             </ThemedCard>
 
             {/* Monitoring Configuration */}
-            <ThemedCard
-                icon={<MdTimer color={iconColors.timing} />}
-                title="Monitoring Configuration"
-            >
+            <ThemedCard icon={timerIcon} title="Monitoring Configuration">
                 <div className="space-y-6">
                     {/* Check Interval */}
                     <div className="space-y-2">
@@ -427,7 +442,7 @@ export const SettingsTab = ({
                             </ThemedSelect>
                             <ThemedButton
                                 disabled={!intervalChanged}
-                                icon={<FiSave />}
+                                icon={saveIconTwo}
                                 onClick={loggedHandleSaveInterval}
                                 size="sm"
                                 variant={
@@ -465,7 +480,7 @@ export const SettingsTab = ({
                             />
                             <ThemedButton
                                 disabled={!timeoutChanged}
-                                icon={<FiSave />}
+                                icon={saveIconThree}
                                 onClick={handleSaveTimeoutClick}
                                 size="sm"
                                 variant={
@@ -502,7 +517,7 @@ export const SettingsTab = ({
                             />
                             <ThemedButton
                                 disabled={!retryAttemptsChanged}
-                                icon={<FiSave />}
+                                icon={saveIconFour}
                                 onClick={handleSaveRetryAttemptsClick}
                                 size="sm"
                                 variant={
@@ -543,10 +558,7 @@ export const SettingsTab = ({
             </ThemedCard>
 
             {/* Site Information */}
-            <ThemedCard
-                icon={<MdInfoOutline color={iconColors.info} />}
-                title="Site Information"
-            >
+            <ThemedCard icon={infoIcon} title="Site Information">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -592,7 +604,7 @@ export const SettingsTab = ({
             {/* Danger Zone */}
             <ThemedCard
                 className="border-error/30 bg-error/5 border-2"
-                icon={<MdDangerous color={iconColors.danger} />}
+                icon={dangerIcon}
                 title="Danger Zone"
             >
                 <div className="space-y-4">
@@ -615,7 +627,7 @@ export const SettingsTab = ({
                         </ThemedText>
                         <ThemedButton
                             className="w-full"
-                            icon={<FiTrash2 />}
+                            icon={trashIcon}
                             loading={isLoading}
                             onClick={handleRemoveSiteClick}
                             size="md"

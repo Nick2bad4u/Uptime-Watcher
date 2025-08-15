@@ -2,7 +2,7 @@
  * SaveButton component for consistent save actions
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { FiSave } from "react-icons/fi";
 
 import ThemedButton from "../../theme/components/ThemedButton";
@@ -48,17 +48,21 @@ export const SaveButton: React.FC<SaveButtonProps> = ({
     onClick,
     size = "sm",
     ...props
-}) => (
-    <ThemedButton
-        {...props}
-        aria-label={ariaLabel}
-        className={className}
-        disabled={disabled || isLoading}
-        icon={<FiSave />}
-        onClick={onClick}
-        size={size}
-        variant={disabled ? "secondary" : "primary"}
-    >
-        Save
-    </ThemedButton>
-);
+}) => {
+    const saveIcon = useMemo(() => <FiSave />, []);
+
+    return (
+        <ThemedButton
+            {...props}
+            aria-label={ariaLabel}
+            className={className}
+            disabled={disabled || isLoading}
+            icon={saveIcon}
+            onClick={onClick}
+            size={size}
+            variant={disabled ? "secondary" : "primary"}
+        >
+            Save
+        </ThemedButton>
+    );
+};

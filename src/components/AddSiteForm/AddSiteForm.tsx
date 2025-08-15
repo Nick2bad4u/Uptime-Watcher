@@ -14,7 +14,7 @@
  */
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -166,6 +166,32 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
             resetForm();
             onSuccess?.();
         }, [onSuccess, resetForm]);
+
+        // Dynamic monitor field change handlers
+        const handleDynamicFieldChange = useMemo(
+            () => ({
+                host: (value: number | string): void => {
+                    setHost(String(value));
+                },
+                port: (value: number | string): void => {
+                    setPort(String(value));
+                },
+                url: (value: number | string): void => {
+                    setUrl(String(value));
+                },
+            }),
+            [setHost, setPort, setUrl]
+        );
+
+        // Dynamic monitor field values
+        const dynamicFieldValues = useMemo(
+            () => ({
+                host: host,
+                port: port,
+                url: url,
+            }),
+            [host, port, url]
+        );
 
         // Delayed loading state for button spinner (managed by custom hook)
         const showButtonLoading = useDelayedButtonLoading(isLoading);
@@ -349,22 +375,8 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                     <DynamicMonitorFields
                         isLoading={isLoading}
                         monitorType={monitorType}
-                        onChange={{
-                            host: (value: number | string) => {
-                                setHost(String(value));
-                            },
-                            port: (value: number | string) => {
-                                setPort(String(value));
-                            },
-                            url: (value: number | string) => {
-                                setUrl(String(value));
-                            },
-                        }}
-                        values={{
-                            host: host,
-                            port: port,
-                            url: url,
-                        }}
+                        onChange={handleDynamicFieldChange}
+                        values={dynamicFieldValues}
                     />
 
                     <SelectField

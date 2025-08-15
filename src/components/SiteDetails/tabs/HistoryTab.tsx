@@ -26,7 +26,7 @@ import type { Monitor, StatusHistory } from "@shared/types";
 import type { ChangeEvent, ReactElement } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
@@ -275,13 +275,18 @@ export const HistoryTab = ({
         [backendLimit, historyLength, selectedMonitor.id]
     );
 
+    const filterIcon = useMemo(
+        () => <FiFilter color={iconColors.filters} />,
+        [iconColors.filters]
+    );
+    const historyIcon = useMemo(
+        () => <MdHistory color={iconColors.history} />,
+        [iconColors.history]
+    );
     return (
         <div className="space-y-6" data-testid="history-tab">
             {/* History Controls */}
-            <ThemedCard
-                icon={<FiFilter color={iconColors.filters} />}
-                title="History Filters"
-            >
+            <ThemedCard icon={filterIcon} title="History Filters">
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center space-x-3">
                         <ThemedText size="sm" variant="secondary">
@@ -333,10 +338,7 @@ export const HistoryTab = ({
             </ThemedCard>
 
             {/* History List */}
-            <ThemedCard
-                icon={<MdHistory color={iconColors.history} />}
-                title="Check History"
-            >
+            <ThemedCard icon={historyIcon} title="Check History">
                 <div className="max-h-96 space-y-2 overflow-y-auto">
                     {filteredHistoryRecords.map((record) => (
                         <div

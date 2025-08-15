@@ -261,7 +261,7 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
 
     // Set up media query listener for theme changes
     useMount(
-        () => {
+        useCallback(() => {
             // Skip in SSR environments
             if (
                 typeof window === "undefined" ||
@@ -284,8 +284,8 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
                 // Fallback if matchMedia throws an error
                 // No setup needed
             }
-        },
-        () => {
+        }, [handleThemeChange]),
+        useCallback(() => {
             // Cleanup media query listener on unmount
             if (mediaQueryRef.current) {
                 try {
@@ -298,7 +298,7 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
                 }
                 mediaQueryRef.current = null;
             }
-        }
+        }, [handleThemeChange])
     );
 
     return useMemo<ThemeStyles>(

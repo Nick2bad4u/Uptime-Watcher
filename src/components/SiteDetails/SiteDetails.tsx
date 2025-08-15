@@ -166,7 +166,7 @@ export const SiteDetails = ({
         siteExists,
         timeoutChanged,
         // eslint-disable-next-line ex/no-unhandled -- Site prop is guaranteed to be valid by parent component's site selection logic and type validation
-    } = useSiteDetails({ site });
+    } = useSiteDetails(useMemo(() => ({ site }), [site]));
 
     // Create chart config service instance
     const chartConfig = useMemo(

@@ -30,7 +30,7 @@
 
 import type { Site } from "@shared/types";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
@@ -47,8 +47,10 @@ import { useUIStore } from "../stores/ui/useUiStore";
  * or sites array actually changes.
  */
 export function useSelectedSite(): Site | undefined {
-    const selectedSiteId = useUIStore((state) => state.selectedSiteId);
-    const sites = useSitesStore((state) => state.sites);
+    const selectedSiteId = useUIStore(
+        useCallback((state) => state.selectedSiteId, [])
+    );
+    const sites = useSitesStore(useCallback((state) => state.sites, []));
 
     return useMemo((): Site | undefined => {
         if (!selectedSiteId) {

@@ -35,6 +35,9 @@ export const ScreenshotThumbnail = ({
     const [hovered, setHovered] = useState(false);
     const [overlayVariables, setOverlayVariables] =
         useState<React.CSSProperties>({});
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+        null
+    );
     const linkReference = useRef<HTMLAnchorElement>(null);
     const portalReference = useRef<HTMLDivElement>(null);
     const hoverTimeoutReference = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -42,23 +45,34 @@ export const ScreenshotThumbnail = ({
     const { openExternal } = useUIStore();
     const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
 
-    // Clean up portal overlay on unmount and state changes
-    useMount(
-        () => {
-            // No initialization needed, just setup cleanup
+    // Set portal container on mount to avoid DOM access during render
+    const initializePortalContainer = useCallback(
+        function initializePortalContainer() {
+            setPortalContainer(document.body);
         },
-        () => {
-            // Clear any pending timeouts
-            if (hoverTimeoutReference.current) {
-                clearTimeout(hoverTimeoutReference.current);
-                hoverTimeoutReference.current = undefined;
-            }
-
-            // Reset state
-            setHovered(false);
-            setOverlayVariables({});
-        }
+        []
     );
+
+    useMount(initializePortalContainer);
+
+    // Clean up portal overlay on unmount and state changes
+    const initializeComponent = useCallback(() => {
+        // No initialization needed, just setup cleanup
+    }, []);
+
+    const cleanupComponent = useCallback(() => {
+        // Clear any pending timeouts
+        if (hoverTimeoutReference.current) {
+            clearTimeout(hoverTimeoutReference.current);
+            hoverTimeoutReference.current = undefined;
+        }
+
+        // Reset state
+        setHovered(false);
+        setOverlayVariables({});
+    }, []);
+
+    useMount(initializeComponent, cleanupComponent);
 
     // Create stable callbacks to avoid direct setState in useEffect
     const clearOverlayVariables = useCallback(() => {
@@ -219,7 +233,7 @@ export const ScreenshotThumbnail = ({
                     Preview: {siteName}
                 </span>
             </a>
-            {hovered
+            {hovered && portalContainer
                 ? createPortal(
                       <div
                           className={`site-details-thumbnail-portal-overlay theme-${themeName}`}
@@ -235,7 +249,7 @@ export const ScreenshotThumbnail = ({
                               />
                           </div>
                       </div>,
-                      document.body
+                      portalContainer
                   )
                 : null}
         </>

@@ -75,6 +75,7 @@ const ThemedIconButton = ({
             {...(onClick && { onClick })}
             icon={icon}
             {...(iconColor && { iconColor })}
+            // eslint-disable-next-line @arthurgeron/react-usememo/require-usememo
             style={{
                 height: buttonSize,
                 minWidth: "unset",

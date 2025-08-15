@@ -6,7 +6,7 @@
 import type { SiteStatus } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import React from "react";
+import React, { useMemo } from "react";
 
 import { getStatusIcon } from "../../utils/status";
 import { useTheme } from "../useTheme";
@@ -70,41 +70,68 @@ const StatusIndicator = ({
 
     const sizeStyles = getSizeStyles();
 
-    const indicatorStyle: React.CSSProperties = {
-        animation:
-            status === "pending"
-                ? "pulse 1.5s ease-in-out infinite"
-                : undefined,
-        backgroundColor: getStatusColor(status),
-        borderRadius: currentTheme.borderRadius.full,
-        boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
-        height: sizeStyles.height,
-        position: "relative",
-        width: sizeStyles.width,
-    };
+    const indicatorStyle: React.CSSProperties = useMemo(
+        () => ({
+            animation:
+                status === "pending"
+                    ? "pulse 1.5s ease-in-out infinite"
+                    : undefined,
+            backgroundColor: getStatusColor(status),
+            borderRadius: currentTheme.borderRadius.full,
+            boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
+            height: sizeStyles.height,
+            position: "relative",
+            width: sizeStyles.width,
+        }),
+        [
+            currentTheme.borderRadius.full,
+            currentTheme.colors.background.primary,
+            getStatusColor,
+            sizeStyles.height,
+            sizeStyles.width,
+            status,
+        ]
+    );
 
-    const iconStyle: React.CSSProperties = {
-        alignItems: "center",
-        display: "flex",
-        fontSize: sizeStyles.iconSize,
-        justifyContent: "center",
-        lineHeight: "1",
-    };
+    const iconStyle: React.CSSProperties = useMemo(
+        () => ({
+            alignItems: "center",
+            display: "flex",
+            fontSize: sizeStyles.iconSize,
+            justifyContent: "center",
+            lineHeight: "1",
+        }),
+        [sizeStyles.iconSize]
+    );
 
-    const textStyle: React.CSSProperties = {
-        alignItems: "center",
-        color: getStatusColor(status),
-        display: "flex",
-        fontSize: sizeStyles.fontSize,
-        fontWeight: currentTheme.typography.fontWeight.medium,
-        gap: currentTheme.spacing.xs,
-        marginLeft: currentTheme.spacing.xs,
-    };
+    const textStyle: React.CSSProperties = useMemo(
+        () => ({
+            alignItems: "center",
+            color: getStatusColor(status),
+            display: "flex",
+            fontSize: sizeStyles.fontSize,
+            fontWeight: currentTheme.typography.fontWeight.medium,
+            gap: currentTheme.spacing.xs,
+            marginLeft: currentTheme.spacing.xs,
+        }),
+        [
+            currentTheme.spacing.xs,
+            currentTheme.typography.fontWeight.medium,
+            getStatusColor,
+            sizeStyles.fontSize,
+            status,
+        ]
+    );
+
+    const containerStyle: React.CSSProperties = useMemo(
+        () => ({ alignItems: "center", display: "flex" }),
+        []
+    );
 
     return (
         <div
             className={`themed-status-indicator ${className}`}
-            style={{ alignItems: "center", display: "flex" }}
+            style={containerStyle}
         >
             {showText ? (
                 <div style={iconStyle}>{getStatusIcon(status)}</div>

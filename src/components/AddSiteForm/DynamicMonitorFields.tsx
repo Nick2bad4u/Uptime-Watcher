@@ -14,7 +14,7 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import logger from "../../services/logger";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
@@ -93,6 +93,15 @@ const DynamicMonitorFields = ({
         [isLoaded, lastError, loadMonitorTypes]
     );
 
+    // Memoized default onChange handler to prevent new function creation on
+    // each render
+    const defaultOnChange = useCallback(
+        (fieldName: string) => (): void => {
+            logger.warn(`No onChange handler provided for field: ${fieldName}`);
+        },
+        []
+    );
+
     if (!isLoaded) {
         return (
             <ThemedText variant="secondary">
@@ -137,14 +146,7 @@ const DynamicMonitorFields = ({
                         disabled={isLoading}
                         field={field}
                         key={field.name}
-                        onChange={
-                            fieldOnChange ??
-                            ((): void => {
-                                logger.warn(
-                                    `No onChange handler provided for field: ${field.name}`
-                                );
-                            })
-                        }
+                        onChange={fieldOnChange ?? defaultOnChange(field.name)}
                         value={fieldValue ?? defaultValue}
                     />
                 );

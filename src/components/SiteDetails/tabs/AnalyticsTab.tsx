@@ -8,7 +8,7 @@ import type { MonitorType } from "@shared/types";
 import type { ChartOptions } from "chart.js";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FiActivity, FiBarChart2, FiTrendingUp } from "react-icons/fi";
 import { MdAnalytics, MdPieChart, MdSpeed, MdTrendingUp } from "react-icons/md";
 
@@ -155,15 +155,22 @@ export const AnalyticsTab = ({
     const { currentTheme } = useTheme();
 
     // Function to get response time color based on performance
-    const getResponseTimeColor = (responseTime: number): string => {
-        if (responseTime <= 100) {
-            return currentTheme.colors.success;
-        } // Green for excellent (≤100ms)
-        if (responseTime <= 500) {
-            return currentTheme.colors.warning;
-        } // Yellow for good (≤500ms)
-        return currentTheme.colors.error; // Red for poor (>500ms)
-    };
+    const getResponseTimeColor = useCallback(
+        (responseTime: number): string => {
+            if (responseTime <= 100) {
+                return currentTheme.colors.success;
+            } // Green for excellent (≤100ms)
+            if (responseTime <= 500) {
+                return currentTheme.colors.warning;
+            } // Yellow for good (≤500ms)
+            return currentTheme.colors.error; // Red for poor (>500ms)
+        },
+        [
+            currentTheme.colors.error,
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+        ]
+    );
 
     // Parse uptime value once with validation
     const uptimeValue = parseUptimeValue(uptime);
@@ -251,10 +258,60 @@ export const AnalyticsTab = ({
         setShowAdvancedMetrics(newValue);
     }, [monitorType, setShowAdvancedMetrics, showAdvancedMetrics]);
 
+    // Memoized icons to prevent unnecessary re-renders
+    const analyticsIcon = useMemo(() => <MdAnalytics />, []);
+    const trendingIcon = useMemo(() => <MdTrendingUp />, []);
+    const activityIcon = useMemo(() => <FiActivity />, []);
+    const trendingUpIcon = useMemo(() => <FiTrendingUp />, []);
+
+    // Colored icons with dependencies on iconColors
+    const speedIconColored = useMemo(
+        () => <MdSpeed color={iconColors.performance} />,
+        [iconColors.performance]
+    );
+    const trendingUpIconColored = useMemo(
+        () => <FiTrendingUp color={iconColors.performance} />,
+        [iconColors.performance]
+    );
+    const pieChartIconColored = useMemo(
+        () => <MdPieChart color={iconColors.uptime} />,
+        [iconColors.uptime]
+    );
+    const barChartIconColored = useMemo(
+        () => <FiBarChart2 color={iconColors.charts} />,
+        [iconColors.charts]
+    );
+
+    // Memoized style objects to prevent object recreation
+    const fiftiethPercentileStyle = useMemo(
+        () => ({ color: getResponseTimeColor(p50) }),
+        [getResponseTimeColor, p50]
+    );
+    const ninetyFifthPercentileStyle = useMemo(
+        () => ({ color: getResponseTimeColor(p95) }),
+        [getResponseTimeColor, p95]
+    );
+    const ninetyNinthPercentileStyle = useMemo(
+        () => ({ color: getResponseTimeColor(p99) }),
+        [getResponseTimeColor, p99]
+    );
+    const mttrStyle = useMemo(
+        () => ({
+            color: getMttrColor(mttr, currentTheme),
+        }),
+        [currentTheme, mttr]
+    );
+    const incidentsStyle = useMemo(
+        () => ({
+            color: getIncidentsColor(downtimePeriods.length, currentTheme),
+        }),
+        [currentTheme, downtimePeriods.length]
+    );
+
     return (
         <div className="space-y-6" data-testid="analytics-tab">
             {/* Time Range Selector */}
-            <ThemedCard icon={<MdAnalytics />} title="Analytics Time Range">
+            <ThemedCard icon={analyticsIcon} title="Analytics Time Range">
                 <div className="flex items-center justify-between">
                     <ThemedText size="sm" variant="secondary">
                         Select time range for analytics data:
@@ -283,7 +340,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<MdAnalytics />}
+                    icon={analyticsIcon}
                     iconColor={iconColors.uptime}
                     title="Availability"
                 >
@@ -308,7 +365,7 @@ export const AnalyticsTab = ({
                     <ThemedCard
                         className="flex flex-col items-center text-center"
                         hoverable
-                        icon={<MdTrendingUp />}
+                        icon={trendingIcon}
                         iconColor={iconColors.performance}
                         title="Avg Response"
                     >
@@ -326,7 +383,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<FiActivity />}
+                    icon={activityIcon}
                     iconColor={iconColors.downtime}
                     title="Downtime"
                 >
@@ -343,7 +400,7 @@ export const AnalyticsTab = ({
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
-                    icon={<FiTrendingUp />}
+                    icon={trendingUpIcon}
                     iconColor={iconColors.analytics}
                     title="Total Checks"
                 >
@@ -361,7 +418,7 @@ export const AnalyticsTab = ({
             {/* Response Time Percentiles */}
             <ConditionalResponseTime monitorType={monitorType}>
                 <ThemedCard
-                    icon={<MdSpeed color={iconColors.performance} />}
+                    icon={speedIconColored}
                     title="Response Time Analysis"
                 >
                     <div className="space-y-4">
@@ -389,7 +446,7 @@ export const AnalyticsTab = ({
                                 </ThemedText>
                                 <ThemedText
                                     size="lg"
-                                    style={{ color: getResponseTimeColor(p50) }}
+                                    style={fiftiethPercentileStyle}
                                     weight="medium"
                                 >
                                     {safeResponseTimeFormat(p50)}
@@ -405,7 +462,7 @@ export const AnalyticsTab = ({
                                 </ThemedText>
                                 <ThemedText
                                     size="lg"
-                                    style={{ color: getResponseTimeColor(p95) }}
+                                    style={ninetyFifthPercentileStyle}
                                     weight="medium"
                                 >
                                     {safeResponseTimeFormat(p95)}
@@ -421,7 +478,7 @@ export const AnalyticsTab = ({
                                 </ThemedText>
                                 <ThemedText
                                     size="lg"
-                                    style={{ color: getResponseTimeColor(p99) }}
+                                    style={ninetyNinthPercentileStyle}
                                     weight="medium"
                                 >
                                     {safeResponseTimeFormat(p99)}
@@ -441,12 +498,7 @@ export const AnalyticsTab = ({
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
-                                        style={{
-                                            color: getMttrColor(
-                                                mttr,
-                                                currentTheme
-                                            ),
-                                        }}
+                                        style={mttrStyle}
                                         weight="medium"
                                     >
                                         {safeDurationFormat(mttr)}
@@ -462,12 +514,7 @@ export const AnalyticsTab = ({
                                     </ThemedText>
                                     <ThemedText
                                         size="lg"
-                                        style={{
-                                            color: getIncidentsColor(
-                                                downtimePeriods.length,
-                                                currentTheme
-                                            ),
-                                        }}
+                                        style={incidentsStyle}
                                         weight="medium"
                                     >
                                         {downtimePeriods.length}
@@ -484,7 +531,7 @@ export const AnalyticsTab = ({
                 {/* Response Time Chart */}
                 <ConditionalResponseTime monitorType={monitorType}>
                     <ThemedCard
-                        icon={<FiTrendingUp color={iconColors.performance} />}
+                        icon={trendingUpIconColored}
                         title="Response Time Trends"
                     >
                         <div className="h-64">
@@ -498,7 +545,7 @@ export const AnalyticsTab = ({
 
                 {/* Uptime Doughnut Chart */}
                 <ThemedCard
-                    icon={<MdPieChart color={iconColors.uptime} />}
+                    icon={pieChartIconColored}
                     title="Uptime Distribution"
                 >
                     <div className="h-64">
@@ -512,7 +559,7 @@ export const AnalyticsTab = ({
                 {/* Status Distribution Bar Chart */}
                 <ThemedCard
                     className="lg:col-span-2"
-                    icon={<FiBarChart2 color={iconColors.charts} />}
+                    icon={barChartIconColored}
                     title="Status Distribution"
                 >
                     <div className="h-64">
