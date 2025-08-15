@@ -118,6 +118,7 @@ export interface EventMetadata {
  * @returns A promise that resolves when the middleware chain is complete.
  * @throws Error if the middleware wishes to abort event processing.
  */
+// eslint-disable-next-line etc/prefer-interface -- Function type is simpler for middleware callbacks
 export type EventMiddleware<T = unknown> = (
     event: string,
     data: T,
@@ -628,6 +629,7 @@ export class TypedEventBus<
  * @param options - Optional configuration options for the event bus.
  * @returns A new {@link TypedEventBus} instance.
  */
+// eslint-disable-next-line etc/no-misused-generics -- EventMap must be explicitly provided for type safety
 export function createTypedEventBus<EventMap extends Record<string, unknown>>(
     name?: string,
     options?: { maxMiddleware?: number }

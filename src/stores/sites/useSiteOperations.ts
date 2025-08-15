@@ -12,6 +12,7 @@ import { isDevelopment } from "@shared/utils/environment";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 import type { BaseSiteOperations } from "./baseTypes";
+import type { SiteOperationsDependencies } from "./types";
 
 import logger from "../../services/logger";
 import { safeExtractIpcData } from "../../types/ipc";
@@ -33,14 +34,6 @@ export interface SiteOperationsActions extends BaseSiteOperations {
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-}
-
-export interface SiteOperationsDependencies {
-    addSite: (site: Site) => void;
-    getSites: () => Site[];
-    removeSite: (identifier: string) => void;
-    setSites: (sites: Site[]) => void;
-    syncSitesFromBackend: () => Promise<void>;
 }
 
 export const createSiteOperationsActions = (

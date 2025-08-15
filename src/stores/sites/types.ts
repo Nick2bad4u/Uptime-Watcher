@@ -110,3 +110,15 @@ export interface SitesState {
  * Provides a complete interface for site management functionality.
  */
 export type SitesStore = SitesActions & SitesState;
+
+/**
+ * Dependencies interface for site operations.
+ * Defines the minimal interface needed by operation helpers.
+ */
+export interface SiteOperationsDependencies {
+    addSite: (site: Site) => void;
+    getSites: () => Site[];
+    removeSite: (identifier: string) => void;
+    setSites: (sites: Site[]) => void;
+    syncSitesFromBackend: () => Promise<void>;
+}

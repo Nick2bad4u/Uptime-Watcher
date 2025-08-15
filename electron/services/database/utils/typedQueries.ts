@@ -104,6 +104,7 @@ export function queryForIds(
  * Use this when you know the SQL structure and expected return type.
  */
 export function queryForRecords<
+    // eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
     T extends Record<string, unknown> = Record<string, unknown>,
 >(db: Database, sql: string, params?: DbValue[]): T[] {
     return db.all(sql, params) as unknown as T[];

@@ -64,6 +64,7 @@ export interface IpcResponse<T> {
  *
  * @public
  */
+// eslint-disable-next-line etc/no-misused-generics -- Type parameter must be explicitly provided for type guard
 export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
     return (
         typeof value === "object" &&
@@ -82,7 +83,7 @@ export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
  *
  * @public
  */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter T provides type safety at call site; the generic enables callers to specify return type while maintaining type checking
+// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Type parameter must be explicitly provided for type assertion
 export function extractIpcData<T>(response: unknown): T {
     if (!isIpcResponse<T>(response)) {
         throw new Error(ERROR_CATALOG.ipc.INVALID_RESPONSE_FORMAT);

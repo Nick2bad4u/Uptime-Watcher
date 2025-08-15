@@ -92,6 +92,7 @@ export const IpcValidators = {
  *
  * @public
  */
+// eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
 export function createErrorResponse<T = void>(
     error: string,
     metadata?: Record<string, unknown>

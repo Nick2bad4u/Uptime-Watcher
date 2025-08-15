@@ -71,6 +71,7 @@ export interface MonitoringLifecycleConfig {
  * bulk operations (when monitorId is undefined). Error handling should be
  * managed within the callback implementation.
  */
+// eslint-disable-next-line etc/prefer-interface -- Function type is simpler for monitoring callbacks
 export type MonitoringCallback = (
     identifier: string,
     monitorId?: string

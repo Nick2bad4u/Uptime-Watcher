@@ -53,8 +53,6 @@
  *
  * @public
  */
-
-
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
@@ -178,4 +176,3 @@ const ThemedInput = ({
 };
 
 export default ThemedInput;
-

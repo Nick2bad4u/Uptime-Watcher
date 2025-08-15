@@ -7,7 +7,7 @@ import type { Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 
-import type { SiteOperationsDependencies } from "../useSiteOperations";
+import type { SiteOperationsDependencies } from "../types";
 
 import { logStoreAction } from "../../utils";
 import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
