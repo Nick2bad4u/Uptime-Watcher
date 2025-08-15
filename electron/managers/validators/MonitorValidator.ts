@@ -13,7 +13,7 @@
  *
  * - Monitor type validation against registered types
  * - Type-specific property validation (URL for HTTP, host/port for port monitors)
- *   - Common property validation (intervals, timeouts, retry attempts)
+ * - Common property validation (intervals, timeouts, retry attempts)
  * - Business rule validation (default intervals, etc.)
  *
  * @public

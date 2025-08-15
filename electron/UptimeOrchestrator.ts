@@ -43,6 +43,7 @@
  * - `addSite()`: Atomic site creation with monitoring setup or full rollback
  * - `removeMonitor()`: Atomic monitor removal with proper cleanup
  * - `setHistoryLimit()`: Atomic limit update with history pruning in transaction
+ *
  *   - `updateSite()`: Delegated to SiteManager with transaction support
  *
  * Events emitted:

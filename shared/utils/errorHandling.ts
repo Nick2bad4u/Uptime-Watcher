@@ -2,10 +2,12 @@
  * Shared error handling utility for async operations. Provides a unified
  * pattern for error logging, reporting, and state management.
  *
+ * ```typescript
  * Usage (frontend): await withErrorHandling(() => doSomethingAsync(), store)
  *
  * Usage (backend): await withErrorHandling(() => doSomethingAsync(), { logger,
  * operationName: "operation" })
+ * ```
  */
 
 export interface ErrorHandlingBackendContext {

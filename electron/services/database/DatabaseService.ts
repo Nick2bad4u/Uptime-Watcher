@@ -233,9 +233,11 @@ export class DatabaseService {
      * **Initialization Behavior:**
      *
      * - Creates the database file in the user data directory if it doesn't exist
+     *
      *   - Sets up the complete schema including all required tables and indexes
      *   - Safe to call multiple times - returns existing connection if already
-     *   initialized - Uses singleton pattern to prevent multiple connections
+     *       initialized - Uses singleton pattern to prevent multiple
+     *       connections
      *
      * **Thread Safety:**
      *

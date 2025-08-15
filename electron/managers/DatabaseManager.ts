@@ -82,8 +82,7 @@ export interface DatabaseManagerDependencies {
  * - **Backup Management**: SQLite database backup creation and download
  * - **Site Loading**: Coordinated loading of sites from database into cache
  * - **History Management**: Configuration and limits for status history retention
- *   - **Event Coordination**: Typed event emission for system-wide
- *   coordination
+ * - **Event Coordination**: Typed event emission for system-wide coordination
  *
  * The manager uses dependency injection for testability and follows the
  * repository pattern for data access. All operations are designed to be atomic

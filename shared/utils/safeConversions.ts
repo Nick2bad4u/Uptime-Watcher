@@ -198,7 +198,7 @@ export function safeParsePort(value: unknown, defaultValue = 80): number {
  * @param value - Value to convert to positive integer
  * @param defaultValue - Fallback value if conversion fails (default: 1)
  *
- * @returns Valid positive integer (> 0), or the default value
+ * @returns Valid positive integer `(> 0)`, or the default value
  */
 export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
     const result = safeParseInt(value, defaultValue);

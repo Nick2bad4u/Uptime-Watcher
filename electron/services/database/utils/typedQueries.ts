@@ -55,7 +55,7 @@ export function insertWithReturning(
  * Type-safe wrapper for count queries.
  *
  * @remarks
- * This function handles COUNT() queries which return {count: number}.
+ * This function handles COUNT() queries which return `{count: number}`.
  *
  * @param db - Database instance
  * @param sql - SQL query that returns a count

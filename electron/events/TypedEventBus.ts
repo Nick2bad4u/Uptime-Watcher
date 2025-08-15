@@ -563,10 +563,12 @@ export class TypedEventBus<
      * **Special Behaviors:**
      *
      * - **Arrays**: Preserves array structure with non-enumerable `_meta`
-     *   property. - **Objects with _meta**: Existing `_meta` preserved as
-     *   `_originalMeta` property. - **Primitives**: Wrapped in `{ value: data,
-     *   _meta: metadata }` structure. - **Type Safety**: All transformations
-     *   maintain compile-time type guarantees.
+     *   property.
+     * - **Objects with _meta**: Existing `_meta` preserved as `_originalMeta`
+     *   property.
+     * - **Primitives**: Wrapped in `{ value: data, _meta: metadata }` structure.
+     * - **Type Safety**: All transformations maintain compile-time type
+     *   guarantees.
      *
      * @example
      *

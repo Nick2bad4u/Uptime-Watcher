@@ -46,7 +46,7 @@ import type {
  * Shared domain type imports.
  *
  * @remarks
- * Import shared domain types directly from "@shared/types".
+ * Import shared domain types directly from "`@shared/types`".
  */
 
 /**

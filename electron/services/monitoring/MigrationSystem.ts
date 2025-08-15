@@ -471,7 +471,7 @@ class MigrationRegistry {
      * @param a - First version string.
      * @param b - Second version string.
      *
-     * @returns -1 if a < b, 1 if a > b, 0 if equal.
+     * @returns -1 if `a < b`, 1 if `a > b`, 0 if equal.
      *
      * @throws {@link Error} If either version string is malformed.
      *

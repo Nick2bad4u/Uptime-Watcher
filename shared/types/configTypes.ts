@@ -122,8 +122,8 @@ export type CacheValue =
  *
  * @remarks
  * Configuration values are stored as strings in the database but can represent:
- * - Strings: theme names, language codes, etc.
  *
+ * - Strings: theme names, language codes, etc.
  * - Numbers: history limits, timeouts, etc. (stored as string representations)
  * - Booleans: feature flags, etc. (stored as "true"/"false")
  * - Arrays: stored as JSON strings

@@ -32,7 +32,7 @@ export interface SiteCardMetricsProperties {
  * - Optimized with React.memo and useMemo to prevent unnecessary re-renders
  * - Consistent metric card formatting
  * - Handles undefined response times gracefully (displays "-" when not available)
- *   - Formats uptime to 1 decimal place for consistency
+ * - Formats uptime to 1 decimal place for consistency
  *
  * @example
  *

@@ -42,7 +42,7 @@ export interface NotificationConfig {
  * **Performance Considerations:**
  *
  * - Monitor lookup uses Array.find() - consider caching for high-frequency usage
- *   - Notification creation is synchronous but display is asynchronous
+ * - Notification creation is synchronous but display is asynchronous
  * - Platform support check is cached by Electron
  *
  * **Error Handling:**

@@ -197,11 +197,13 @@ export interface EnhancedMonitorCheckConfig {
  * **Key Features:**
  *
  * - **Operation Correlation**: Prevents duplicate operations on the same monitor
- *   - **Race Condition Prevention**: Ensures safe concurrent monitoring
- *   operations - **Advanced Timeout Management**: Handles operation timeouts
- *   with proper cleanup - **Status Update Safety**: Prevents conflicting status
- *   updates from concurrent checks - **Comprehensive Logging**: Detailed
- *   operation tracking for debugging and monitoring
+ * - **Race Condition Prevention**: Ensures safe concurrent monitoring operations
+ * - **Advanced Timeout Management**: Handles operation timeouts with proper
+ *   cleanup
+ * - **Status Update Safety**: Prevents conflicting status updates from concurrent
+ *   checks
+ * - **Comprehensive Logging**: Detailed operation tracking for debugging and
+ *   monitoring
  *
  * **Operation Lifecycle:**
  *

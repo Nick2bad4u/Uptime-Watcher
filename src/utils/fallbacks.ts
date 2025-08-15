@@ -9,8 +9,9 @@ import logger from "../services/logger";
 import { ensureError, withUtilityErrorHandling } from "./errorHandling";
 
 /**
- * Enhanced null/undefined check utility. Replaces scattered `value === null ||
- * value === undefined` patterns.
+ * Enhanced null/undefined check utility.
+ *
+ * Replaces scattered `value === null || value === undefined` patterns.
  *
  * @param value - Value to check
  *

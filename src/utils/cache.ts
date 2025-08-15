@@ -163,7 +163,7 @@ export class TypedCache<K, V> {
      *
      * @remarks
      * Current implementation uses O(n) iteration to find LRU entry. For large
-     * caches (>1000 entries), consider using a more efficient LRU
+     * caches `(>1000 entries)`, consider using a more efficient LRU
      * implementation with doubly-linked list for O(1) eviction.
      */
     public set(key: K, value: V, ttl?: number): void {

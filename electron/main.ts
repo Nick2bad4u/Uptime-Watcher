@@ -249,7 +249,7 @@ if (process.versions.electron) {
      * // Extensions are installed automatically in development mode.
      * ```
      *
-     * @returns Promise<Array<{id: string; name: string}>> The installed
+     * @returns `Promise<Array<{id: string; name: string}>>` The installed
      *   extension references, or an empty array in production or on failure.
      */
     void (async (): Promise<void> => {
