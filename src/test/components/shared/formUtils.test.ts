@@ -348,7 +348,9 @@ describe("Form Utilities", () => {
 
             it("should handle negative numbers", () => {
                 const validator = validationPatterns.oneOfNumbers([
-                    -1, -5, -10,
+                    -1,
+                    -5,
+                    -10,
                 ]);
 
                 expect(validator(-1)).toBe(true);
@@ -360,7 +362,9 @@ describe("Form Utilities", () => {
 
             it("should handle floating point numbers", () => {
                 const validator = validationPatterns.oneOfNumbers([
-                    1.5, 2.7, 3.14,
+                    1.5,
+                    2.7,
+                    3.14,
                 ]);
 
                 expect(validator(1.5)).toBe(true);

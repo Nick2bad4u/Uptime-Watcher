@@ -151,7 +151,7 @@ Other Backend Services (via event listeners)
 **Internal Events:**
 
 - `internal:site:added` - Internal site creation events
-- `internal:site:updated` - Internal site modification events  
+- `internal:site:updated` - Internal site modification events
 - `internal:site:removed` - Internal site deletion events
 - `internal:site:cache-updated` - Internal cache management
 - `internal:site:start-monitoring-requested` - Internal monitoring control

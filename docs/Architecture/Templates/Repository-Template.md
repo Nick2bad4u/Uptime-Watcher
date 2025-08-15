@@ -12,7 +12,7 @@ Repository classes manage data persistence using the dual-method pattern:
 
 ## Template Structure
 
-```typescript
+````typescript
 import { Database } from "node-sqlite3-wasm";
 import { logger } from "@shared/utils/logger";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
@@ -43,9 +43,10 @@ export interface ExampleRepositoryDependencies {
  */
 const EXAMPLE_QUERIES = {
  INSERT: "INSERT INTO example_table (id, name, createdAt) VALUES (?, ?, ?)",
- SELECT_ALL: "SELECT id, name, createdAt FROM example_table ORDER BY createdAt DESC",
+ SELECT_ALL:
+  "SELECT id, name, createdAt FROM example_table ORDER BY createdAt DESC",
  SELECT_BY_ID: "SELECT id, name, createdAt FROM example_table WHERE id = ?",
- UPDATE: "UPDATE example_table SET name = ? WHERE id = ?", 
+ UPDATE: "UPDATE example_table SET name = ? WHERE id = ?",
  DELETE_BY_ID: "DELETE FROM example_table WHERE id = ?",
  DELETE_ALL: "DELETE FROM example_table",
 } as const;
@@ -83,10 +84,11 @@ export class ExampleRepository {
   */
  public async create(data: ExampleRow): Promise<void> {
   return withDatabaseOperation(
-   async () => this.databaseService.executeTransaction((db) => {
-    this.createInternal(db, data);
-    return Promise.resolve();
-   }),
+   async () =>
+    this.databaseService.executeTransaction((db) => {
+     this.createInternal(db, data);
+     return Promise.resolve();
+    }),
    "ExampleRepository.create"
   );
  }
@@ -136,7 +138,9 @@ export class ExampleRepository {
  public async findById(id: string): Promise<ExampleRow | undefined> {
   return withDatabaseOperation(() => {
    const db = this.getDb();
-   const result = db.get(EXAMPLE_QUERIES.SELECT_BY_ID, [id]) as ExampleRow | undefined;
+   const result = db.get(EXAMPLE_QUERIES.SELECT_BY_ID, [id]) as
+    | ExampleRow
+    | undefined;
    return Promise.resolve(result);
   }, "ExampleRepository.findById");
  }
@@ -319,7 +323,7 @@ export class ExampleRepository {
   return this.databaseService.getDatabase();
  }
 }
-```
+````
 
 ## Customization Checklist
 

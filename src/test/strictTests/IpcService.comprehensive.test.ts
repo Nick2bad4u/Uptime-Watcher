@@ -532,7 +532,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             expect(httpConfig).toBeDefined();
             expect(httpConfig.displayName).toBe("HTTP (Website/API)");
-            expect(httpConfig.description).toBe("Monitors HTTP/HTTPS endpoints for availability and response time");
+            expect(httpConfig.description).toBe(
+                "Monitors HTTP/HTTPS endpoints for availability and response time"
+            );
             expect(httpConfig.version).toBe("1.0.0");
             expect(httpConfig.uiConfig).toBeDefined();
             expect(httpConfig.uiConfig.supportsAdvancedAnalytics).toBe(true);
@@ -683,7 +685,9 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             expect(result.success).toBe(true);
             expect(result.data.success).toBe(false);
-            expect(result.data.errors).toEqual(["Unsupported monitor type: invalid"]);
+            expect(result.data.errors).toEqual([
+                "Unsupported monitor type: invalid",
+            ]);
         });
 
         it("should handle validate-monitor-data with warnings", async () => {
@@ -844,11 +848,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            
+
             // Reset the mock to ensure clean state
             const mockWindow = BrowserWindow.getAllWindows()[0];
             vi.mocked(mockWindow.webContents.send).mockClear();
-            
+
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
@@ -952,7 +956,8 @@ describe("IpcService - Comprehensive Coverage", () => {
                 display: { showAdvancedMetrics: true, showUrl: true },
                 helpTexts: {
                     primary: "Enter the full URL including http:// or https://",
-                    secondary: "The monitor will check this URL according to your monitoring interval",
+                    secondary:
+                        "The monitor will check this URL according to your monitoring interval",
                 },
             });
         });
@@ -975,7 +980,8 @@ describe("IpcService - Comprehensive Coverage", () => {
                 display: { showAdvancedMetrics: true, showUrl: false },
                 helpTexts: {
                     primary: "Enter a valid host (domain or IP)",
-                    secondary: "The monitor will ping this host according to your monitoring interval",
+                    secondary:
+                        "The monitor will ping this host according to your monitoring interval",
                 },
             });
         });
@@ -1079,8 +1085,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent, "ping", "test details");
 
-            expect(result).toEqual({ 
-                success: true, 
+            expect(result).toEqual({
+                success: true,
                 data: "Ping: test details",
                 metadata: expect.objectContaining({
                     handler: "format-monitor-detail",
@@ -1141,4 +1147,3 @@ describe("IpcService - Comprehensive Coverage", () => {
         });
     });
 });
-

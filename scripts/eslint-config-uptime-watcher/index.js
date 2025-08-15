@@ -109,7 +109,7 @@ export function createUptimeWatcherConfig(options = {}) {
         useTailwind = false,
         useVitest = true,
         projectRoot = process.cwd(),
-        tsConfigPath = "tsconfig.json"
+        tsConfigPath = "tsconfig.json",
     } = options;
 
     return [
@@ -417,38 +417,44 @@ export function createUptimeWatcherConfig(options = {}) {
         },
 
         // Test files
-        ...(useVitest ? [
-            {
-                files: ["**/*.{test,spec}.{ts,tsx}", "**/test/**/*.{ts,tsx}"],
-                plugins: {
-                    vitest: vitest,
-                    ...(useReact && {
-                        "testing-library": pluginTestingLibrary,
-                    }),
-                },
-                rules: {
-                    ...vitest.configs.recommended.rules,
-                    ...(useReact && {
-                        ...pluginTestingLibrary.configs["flat/react"].rules,
-                    }),
-                    "no-console": "off",
-                },
-                languageOptions: {
-                    globals: {
-                        ...vitest.environments.env.globals,
-                        afterAll: "readonly",
-                        afterEach: "readonly",
-                        beforeAll: "readonly",
-                        beforeEach: "readonly",
-                        describe: "readonly",
-                        expect: "readonly",
-                        it: "readonly",
-                        test: "readonly",
-                        vi: "readonly",
-                    },
-                },
-            },
-        ] : []),
+        ...(useVitest
+            ? [
+                  {
+                      files: [
+                          "**/*.{test,spec}.{ts,tsx}",
+                          "**/test/**/*.{ts,tsx}",
+                      ],
+                      plugins: {
+                          vitest: vitest,
+                          ...(useReact && {
+                              "testing-library": pluginTestingLibrary,
+                          }),
+                      },
+                      rules: {
+                          ...vitest.configs.recommended.rules,
+                          ...(useReact && {
+                              ...pluginTestingLibrary.configs["flat/react"]
+                                  .rules,
+                          }),
+                          "no-console": "off",
+                      },
+                      languageOptions: {
+                          globals: {
+                              ...vitest.environments.env.globals,
+                              afterAll: "readonly",
+                              afterEach: "readonly",
+                              beforeAll: "readonly",
+                              beforeEach: "readonly",
+                              describe: "readonly",
+                              expect: "readonly",
+                              it: "readonly",
+                              test: "readonly",
+                              vi: "readonly",
+                          },
+                      },
+                  },
+              ]
+            : []),
 
         // Prettier config must be last
         eslintConfigPrettier,

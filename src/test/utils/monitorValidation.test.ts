@@ -899,7 +899,9 @@ describe("Monitor Validation Utilities", () => {
             );
 
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Unsupported monitor type: unknown");
+            expect(result.errors).toContain(
+                "Unsupported monitor type: unknown"
+            );
         });
 
         it("should handle empty form data", async () => {

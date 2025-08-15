@@ -294,7 +294,9 @@ describe("useSiteSync", () => {
             eventHandler(deleteEvent);
 
             // Verify that the event was handled (no specific action expected for delete events)
-            expect(mockElectronAPI.stateSync.onStateSyncEvent).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.stateSync.onStateSyncEvent
+            ).toHaveBeenCalled();
         });
 
         it("should handle update events with syncSitesFromBackend error", async () => {
@@ -308,7 +310,9 @@ describe("useSiteSync", () => {
             );
 
             // Mock SiteService to throw an error
-            vi.mocked(SiteService.getSites).mockRejectedValue(new Error("Sync error"));
+            vi.mocked(SiteService.getSites).mockRejectedValue(
+                new Error("Sync error")
+            );
 
             syncActions.subscribeToSyncEvents();
 
@@ -321,7 +325,9 @@ describe("useSiteSync", () => {
             await eventHandler(updateEvent);
 
             // Verify sync subscription was established
-            expect(mockElectronAPI.stateSync.onStateSyncEvent).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.stateSync.onStateSyncEvent
+            ).toHaveBeenCalled();
         });
     });
 

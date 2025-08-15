@@ -24,7 +24,7 @@ const mockTypedEventBus = vi.hoisted(() => {
             eventNames: vi.fn().mockReturnValue([]),
             setMaxListeners: vi.fn(),
             getMaxListeners: vi.fn().mockReturnValue(10),
-            
+
             // TypedEventBus-specific methods
             onTyped: vi.fn(),
             emitTyped: vi.fn().mockResolvedValue(undefined),

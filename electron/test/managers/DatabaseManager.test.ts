@@ -144,11 +144,18 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
             loadSitesFromDatabase: vi.fn(() => Promise.resolve([])),
         })),
         createDataBackupService: vi.fn(() => ({
-            downloadDatabaseBackup: vi.fn(() => Promise.resolve({ buffer: Buffer.from('test'), fileName: 'test.db' })),
+            downloadDatabaseBackup: vi.fn(() =>
+                Promise.resolve({
+                    buffer: Buffer.from("test"),
+                    fileName: "test.db",
+                })
+            ),
         })),
         createDataImportExportService: vi.fn(() => ({
             exportAllData: vi.fn(() => Promise.resolve('{"sites":[]}')),
-            importDataFromJson: vi.fn(() => Promise.resolve({ sites: [], settings: {} })),
+            importDataFromJson: vi.fn(() =>
+                Promise.resolve({ sites: [], settings: {} })
+            ),
             persistImportedData: vi.fn(() => Promise.resolve()),
         })),
     })),

@@ -117,10 +117,11 @@ export class ExampleRepository {
   }
 
   return withDatabaseOperation(
-   async () => this.databaseService.executeTransaction((db) => {
-    this.bulkInsertInternal(db, records);
-    return Promise.resolve();
-   }),
+   async () =>
+    this.databaseService.executeTransaction((db) => {
+     this.bulkInsertInternal(db, records);
+     return Promise.resolve();
+    }),
    "ExampleRepository.bulkInsert"
   );
  }
@@ -152,12 +153,14 @@ export class ExampleRepository {
   */
  public bulkInsertInternal(db: Database, records: ExampleRow[]): void {
   const stmt = db.prepare(QUERIES.INSERT);
-  
+
   try {
    for (const record of records) {
     stmt.run([record.id, record.name, record.createdAt]);
    }
-   logger.debug(`[ExampleRepository] Bulk inserted ${records.length} records (internal)`);
+   logger.debug(
+    `[ExampleRepository] Bulk inserted ${records.length} records (internal)`
+   );
   } finally {
    stmt.finalize();
   }
@@ -211,10 +214,11 @@ export class ExampleRepository {
   */
  public async deleteAll(): Promise<void> {
   return withDatabaseOperation(
-   async () => this.databaseService.executeTransaction((db) => {
-    this.deleteAllInternal(db);
-    return Promise.resolve();
-   }),
+   async () =>
+    this.databaseService.executeTransaction((db) => {
+     this.deleteAllInternal(db);
+     return Promise.resolve();
+    }),
    "ExampleRepository.deleteAll"
   );
  }
@@ -315,12 +319,13 @@ const QUERIES = {
   * SQL query to insert a single record.
   */
  INSERT: "INSERT INTO example_table (id, name, createdAt) VALUES (?, ?, ?)",
- 
+
  /**
   * SQL query to select all records.
   */
- SELECT_ALL: "SELECT id, name, createdAt FROM example_table ORDER BY createdAt DESC",
- 
+ SELECT_ALL:
+  "SELECT id, name, createdAt FROM example_table ORDER BY createdAt DESC",
+
  /**
   * SQL query to delete all records from the repository table.
   *

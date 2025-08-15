@@ -30,7 +30,9 @@ const mockCache = {
     cleanup: vi.fn(),
     invalidate: vi.fn(),
     invalidateAll: vi.fn(),
-    getStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
+    getStats: vi
+        .fn()
+        .mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
     onInvalidation: vi.fn().mockReturnValue(() => {}),
 };
 
@@ -77,7 +79,9 @@ vi.mock("../../utils/database/SiteWriterService", () => {
 describe("SiteManager Mock Debug", () => {
     it("should create SiteManager with working mocks", () => {
         const mockConfigurationManager = {
-            validateSiteConfiguration: vi.fn().mockResolvedValue({ success: true, errors: [] }),
+            validateSiteConfiguration: vi
+                .fn()
+                .mockResolvedValue({ success: true, errors: [] }),
             configCache: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
             monitorValidator: vi.fn(),
             siteValidator: vi.fn(),
@@ -99,7 +103,9 @@ describe("SiteManager Mock Debug", () => {
             getConfigHistory: vi.fn(),
             // Add missing required properties
             clearValidationCache: vi.fn(),
-            getCacheStats: vi.fn().mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
+            getCacheStats: vi
+                .fn()
+                .mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
             getDefaultMonitorInterval: vi.fn().mockReturnValue(60),
             getHistoryRetentionRules: vi.fn().mockReturnValue([]),
             getMonitorTypeInfo: vi.fn().mockReturnValue({}),
@@ -123,7 +129,9 @@ describe("SiteManager Mock Debug", () => {
         const mockDeps = {
             configurationManager: mockConfigurationManager,
             databaseService: {
-                executeTransaction: vi.fn().mockImplementation(async (fn) => fn()),
+                executeTransaction: vi
+                    .fn()
+                    .mockImplementation(async (fn) => fn()),
             },
             eventEmitter: {
                 emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -156,12 +164,12 @@ describe("SiteManager Mock Debug", () => {
         // Create SiteManager and test its internals
         // @ts-expect-error -- mocking private
         const siteManager = new SiteManager(mockDeps);
-        
+
         // Test that the cache is properly mocked
         const cache = siteManager["sitesCache"];
         const writer = siteManager["siteWriterService"];
         const repo = siteManager["siteRepositoryService"];
-        
+
         // Force output by throwing an error with the details we need
         const debugInfo = {
             cache: {
@@ -174,16 +182,20 @@ describe("SiteManager Mock Debug", () => {
                 constructor: writer?.constructor?.name,
                 hasCreateSite: !!writer?.createSite,
                 methods: Object.getOwnPropertyNames(writer || {}),
-                isCreateSiteMocked: writer?.createSite ? vi.isMockFunction(writer.createSite) : false,
+                isCreateSiteMocked: writer?.createSite
+                    ? vi.isMockFunction(writer.createSite)
+                    : false,
             },
             repo: {
                 constructor: repo?.constructor?.name,
                 hasGetSites: !!repo?.getSitesFromDatabase,
                 methods: Object.getOwnPropertyNames(repo || {}),
-                isGetSitesMocked: repo?.getSitesFromDatabase ? vi.isMockFunction(repo.getSitesFromDatabase) : false,
-            }
+                isGetSitesMocked: repo?.getSitesFromDatabase
+                    ? vi.isMockFunction(repo.getSitesFromDatabase)
+                    : false,
+            },
         };
-        
+
         // Verify that mocking is working correctly
         expect(debugInfo.cache.isGetMocked).toBe(true);
         expect(debugInfo.repo.isGetSitesMocked).toBe(true);

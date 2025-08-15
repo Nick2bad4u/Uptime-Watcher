@@ -93,8 +93,12 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.toLowerCase().includes("host"))).toBe(true);
-            expect(errors.some((error) => error.toLowerCase().includes("port"))).toBe(true);
+            expect(
+                errors.some((error) => error.toLowerCase().includes("host"))
+            ).toBe(true);
+            expect(
+                errors.some((error) => error.toLowerCase().includes("port"))
+            ).toBe(true);
         });
 
         it("should return errors for invalid check interval", () => {
@@ -126,9 +130,9 @@ describe("Shared Validation Utilities", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.some((error) => error.toLowerCase().includes("timeout"))).toBe(
-                true
-            );
+            expect(
+                errors.some((error) => error.toLowerCase().includes("timeout"))
+            ).toBe(true);
         });
 
         it("should return errors for invalid retry attempts", () => {

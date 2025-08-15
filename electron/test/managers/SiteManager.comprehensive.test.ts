@@ -131,7 +131,9 @@ describe("SiteManager - Comprehensive", () => {
         vi.mocked(mockCache.get).mockReturnValue(undefined);
 
         // Reset service mocks
-        mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue([]);
+        mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue(
+            []
+        );
         vi.mocked(mockCache.has).mockReturnValue(false);
         vi.mocked(mockCache.getAll).mockReturnValue([]);
         mockCache.keys.mockReturnValue([]);
@@ -394,7 +396,9 @@ describe("SiteManager - Comprehensive", () => {
         it("should handle database errors", async () => {
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockRejectedValue(new Error("DB error"));
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockRejectedValue(new Error("DB error"));
 
             await expect(siteManager.getSites()).rejects.toThrow("DB error");
         });
@@ -440,10 +444,14 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle initialization errors", async () => {
             // Mock the service to reject when called
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockRejectedValue(new Error("Init error"));
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockRejectedValue(new Error("Init error"));
 
             const failingSiteManager = new SiteManager(mockDeps);
-            await expect(failingSiteManager.initialize()).rejects.toThrow("Init error");
+            await expect(failingSiteManager.initialize()).rejects.toThrow(
+                "Init error"
+            );
         });
     });
 
@@ -552,7 +560,9 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
                 updatedSite
             );
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([updatedSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
 
             const result = await siteManager.updateSite("site-1", updates);
 
@@ -620,7 +630,9 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockSiteWriterService.detectNewMonitors).mockReturnValue([
                 "monitor-2",
             ]);
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([updatedSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
 
             const result = await siteManager.updateSite("site-1", updates);
 
@@ -648,7 +660,9 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
                 updatedSite
             );
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([updatedSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
 
             await expect(
                 siteManager.updateSite("site-1", updates)
@@ -744,7 +758,9 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockSiteWriterService.detectNewMonitors).mockReturnValue([
                 "monitor-2",
             ]);
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([updatedSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
 
             await expect(
                 siteManager.updateSite("site-1", updates)
@@ -837,7 +853,9 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
 
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([mockSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([mockSite]);
 
             await siteManager["loadSiteInBackground"]("site-1");
 
@@ -852,7 +870,9 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
 
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([]);
 
             await siteManager["loadSiteInBackground"]("site-1");
 
@@ -868,7 +888,9 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
 
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockRejectedValue(new Error("DB error"));
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockRejectedValue(new Error("DB error"));
 
             await siteManager["loadSiteInBackground"]("site-1");
 
@@ -884,7 +906,9 @@ describe("SiteManager - Comprehensive", () => {
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
 
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockRejectedValue(new Error("DB error"));
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockRejectedValue(new Error("DB error"));
             vi.mocked(mockDeps.eventEmitter.emitTyped).mockRejectedValue(
                 new Error("Event error")
             );
@@ -989,7 +1013,9 @@ describe("SiteManager - Comprehensive", () => {
             // Initialize
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([]);
             await siteManager.initialize();
 
             // Add site
@@ -1014,7 +1040,9 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
                 updatedSite
             );
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase).mockResolvedValue([updatedSite]);
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
 
             const result = await siteManager.updateSite("site-1", updates);
             expect(result).toEqual(updatedSite);
@@ -1027,4 +1055,3 @@ describe("SiteManager - Comprehensive", () => {
         });
     });
 });
-

@@ -445,7 +445,9 @@ describe("UptimeOrchestrator", () => {
             // This should throw a critical state inconsistency error
             await expect(
                 orchestrator.removeMonitor("test-site", "monitor-1")
-            ).rejects.toThrow("Critical state inconsistency: Monitor test-site/monitor-1 stopped but database removal failed and restart failed");
+            ).rejects.toThrow(
+                "Critical state inconsistency: Monitor test-site/monitor-1 stopped but database removal failed and restart failed"
+            );
         });
 
         it("should handle monitor removal errors", async () => {
