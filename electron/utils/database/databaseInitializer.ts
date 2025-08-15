@@ -1,6 +1,6 @@
 /**
- * Database initialization utility.
- * Handles database setup and site loading with proper error handling.
+ * Database initialization utility. Handles database setup and site loading with
+ * proper error handling.
  */
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -13,13 +13,13 @@ import { withDatabaseOperation } from "../operationalHooks";
 /**
  * Initialize the database and load sites.
  *
- * Handles database setup and site loading with proper error handling.
- * Errors are emitted via the event bus and re-thrown following project
- * guidelines.
+ * Handles database setup and site loading with proper error handling. Errors
+ * are emitted via the event bus and re-thrown following project guidelines.
  *
  * @param databaseService - The database service instance
  * @param loadSitesCallback - Callback function to load sites
  * @param eventEmitter - Event emitter for error handling
+ *
  * @throws Will re-throw any errors after logging and emitting events
  */
 export async function initDatabase(

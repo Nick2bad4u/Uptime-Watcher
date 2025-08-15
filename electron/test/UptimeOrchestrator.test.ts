@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for UptimeOrchestrator with 100% branch coverage.
- * Tests all orchestration paths, error handling, and event coordination.
+ * Comprehensive tests for UptimeOrchestrator with 100% branch coverage. Tests
+ * all orchestration paths, error handling, and event coordination.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

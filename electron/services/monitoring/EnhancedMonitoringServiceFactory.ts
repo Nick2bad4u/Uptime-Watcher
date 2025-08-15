@@ -10,6 +10,7 @@
  * initialization.
  *
  * **Key Responsibilities:**
+ *
  * - Creates and configures all enhanced monitoring service components
  * - Ensures proper dependency injection and service relationships
  * - Provides consistent configuration across all monitoring services
@@ -17,29 +18,32 @@
  * - Abstracts service creation complexity from consuming code
  *
  * **Service Components Created:**
+ *
  * - {@link EnhancedMonitorChecker} - Core monitoring logic with operation
- * correlation - {@link MonitorOperationRegistry} - Operation tracking and race
- * condition prevention - {@link MonitorStatusUpdateService} - Safe concurrent
- * status updates
+ *   correlation - {@link MonitorOperationRegistry} - Operation tracking and race
+ *   condition prevention - {@link MonitorStatusUpdateService} - Safe concurrent
+ *   status updates
  * - {@link OperationTimeoutManager} - Timeout management and resource cleanup
  *
  * @example
+ *
  * ```typescript
  * const dependencies = {
- *   eventEmitter: typedEventBus,
- *   getHistoryLimit: () => 100,
- *   historyRepository: historyRepo,
- *   // ... other dependencies
+ *     eventEmitter: typedEventBus,
+ *     getHistoryLimit: () => 100,
+ *     historyRepository: historyRepo,
+ *     // ... other dependencies
  * };
  *
- * const services = EnhancedMonitoringServiceFactory.createServices(dependencies);
+ * const services =
+ *     EnhancedMonitoringServiceFactory.createServices(dependencies);
  * const result = await services.checker.checkMonitor(site, monitorId);
  * ```
  *
+ * @public
+ *
  * @see {@link EnhancedMonitoringDependencies} for required dependencies
  * @see {@link EnhancedMonitoringServices} for provided services
- *
- * @public
  */
 
 import type { Site } from "@shared/types";
@@ -69,20 +73,22 @@ import { OperationTimeoutManager } from "./OperationTimeoutManager";
  * must be properly configured before service creation.
  *
  * **Dependency Categories:**
+ *
  * - **Data Access**: Repositories for persistent storage operations
  * - **Caching**: In-memory data access for performance optimization
  * - **Communication**: Event system for monitoring notifications
  * - **Configuration**: Dynamic settings and limits
  *
  * @example
+ *
  * ```typescript
  * const dependencies: EnhancedMonitoringDependencies = {
- *   eventEmitter: new TypedEventBus(),
- *   getHistoryLimit: () => userSettings.historyLimit,
- *   historyRepository: new HistoryRepository(dbService),
- *   monitorRepository: new MonitorRepository(dbService),
- *   siteRepository: new SiteRepository(dbService),
- *   sites: new StandardizedCache<Site>()
+ *     eventEmitter: new TypedEventBus(),
+ *     getHistoryLimit: () => userSettings.historyLimit,
+ *     historyRepository: new HistoryRepository(dbService),
+ *     monitorRepository: new MonitorRepository(dbService),
+ *     siteRepository: new SiteRepository(dbService),
+ *     sites: new StandardizedCache<Site>(),
  * };
  * ```
  *
@@ -90,8 +96,7 @@ import { OperationTimeoutManager } from "./OperationTimeoutManager";
  */
 export interface EnhancedMonitoringDependencies {
     /**
-     * Event emitter for system-wide communication and monitoring
-     * notifications.
+     * Event emitter for system-wide communication and monitoring notifications.
      *
      * @remarks
      * Used to broadcast monitor status changes, operation events, and other
@@ -101,15 +106,16 @@ export interface EnhancedMonitoringDependencies {
     eventEmitter: TypedEventBus<UptimeEvents>;
 
     /**
-     * Function to get the current maximum number of history entries to keep
-     * for each monitor.
+     * Function to get the current maximum number of history entries to keep for
+     * each monitor.
      *
      * @remarks
-     * This function provides dynamic access to the history limit setting,
-     * which may change during runtime based on user configuration or system
+     * This function provides dynamic access to the history limit setting, which
+     * may change during runtime based on user configuration or system
      * constraints. Used for automatic history pruning during status updates.
      *
-     * @returns The maximum number of status history entries to retain per monitor
+     * @returns The maximum number of status history entries to retain per
+     *   monitor
      */
     getHistoryLimit: () => number;
 
@@ -150,15 +156,15 @@ export interface EnhancedMonitoringDependencies {
      * @remarks
      * Provides high-performance, in-memory access to site configurations and
      * monitor definitions, reducing database load during frequent monitoring
-     * operations. Critical for maintaining acceptable monitoring performance
-     * at scale.
+     * operations. Critical for maintaining acceptable monitoring performance at
+     * scale.
      */
     sites: StandardizedCache<Site>;
 }
 
 /**
- * Complete bundle of enhanced monitoring services for operation correlation
- * and race condition prevention.
+ * Complete bundle of enhanced monitoring services for operation correlation and
+ * race condition prevention.
  *
  * @remarks
  * This interface defines the complete set of enhanced monitoring services that
@@ -167,20 +173,23 @@ export interface EnhancedMonitoringDependencies {
  * dependencies already established.
  *
  * **Service Architecture:**
- * - **Core Engine**: {@link EnhancedMonitorChecker} provides the main
- * monitoring logic - **Operation Tracking**: {@link MonitorOperationRegistry}
- * prevents race conditions - **Status Management**: {@link
- * MonitorStatusUpdateService} ensures safe concurrent updates - **Resource
- * Management**: {@link OperationTimeoutManager} handles timeouts and cleanup
  *
- * **Usage Pattern:**
- * All services in this bundle are designed to work together. The checker
- * service is the primary interface for consumers, while the other services
- * provide supporting functionality that the checker coordinates automatically.
+ * - **Core Engine**: {@link EnhancedMonitorChecker} provides the main monitoring
+ *   logic - **Operation Tracking**: {@link MonitorOperationRegistry} prevents
+ *   race conditions - **Status Management**: {@link MonitorStatusUpdateService}
+ *   ensures safe concurrent updates - **Resource Management**:
+ *   {@link OperationTimeoutManager} handles timeouts and cleanup
+ *
+ * **Usage Pattern:** All services in this bundle are designed to work together.
+ * The checker service is the primary interface for consumers, while the other
+ * services provide supporting functionality that the checker coordinates
+ * automatically.
  *
  * @example
+ *
  * ```typescript
- * const services = EnhancedMonitoringServiceFactory.createServices(dependencies);
+ * const services =
+ *     EnhancedMonitoringServiceFactory.createServices(dependencies);
  *
  * // Primary usage - checker coordinates all other services
  * const result = await services.checker.checkMonitor(site, monitorId);
@@ -190,10 +199,10 @@ export interface EnhancedMonitoringDependencies {
  * await services.statusUpdateService.updateStatus(monitorId, newStatus);
  * ```
  *
+ * @public
+ *
  * @see {@link EnhancedMonitoringServiceFactory.createServices} for service creation
  * @see {@link EnhancedMonitoringDependencies} for required dependencies
- *
- * @public
  */
 export interface EnhancedMonitoringServices {
     /**
@@ -201,8 +210,8 @@ export interface EnhancedMonitoringServices {
      * race condition prevention.
      *
      * @remarks
-     * This is the primary service interface for monitor checking operations.
-     * It coordinates with all other services in the bundle to provide safe,
+     * This is the primary service interface for monitor checking operations. It
+     * coordinates with all other services in the bundle to provide safe,
      * efficient monitoring capabilities. Most consumers should interact
      * exclusively with this service.
      */
@@ -254,11 +263,12 @@ export interface EnhancedMonitoringServices {
  * are ready for immediate use.
  *
  * **Factory Benefits:**
+ *
  * - **Centralized Configuration**: Single place to configure all monitoring
- * services - **Dependency Management**: Automatic handling of complex service
- * dependencies - **Consistency**: Ensures all service instances use compatible
- * configurations - **Simplicity**: Reduces boilerplate code for service
- * instantiation
+ *   services - **Dependency Management**: Automatic handling of complex service
+ *   dependencies - **Consistency**: Ensures all service instances use
+ *   compatible configurations - **Simplicity**: Reduces boilerplate code for
+ *   service instantiation
  * - **Testability**: Facilitates easy mocking and testing of service bundles
  *
  * @public
@@ -275,55 +285,62 @@ export const EnhancedMonitoringServiceFactory = {
      * internally.
      *
      * **Service Creation Order:**
+     *
      * 1. Operation registry for tracking active operations
      * 2. Status update service for safe concurrent updates
      * 3. Timeout manager for operation lifecycle management
      * 4. Enhanced checker with all dependencies injected
      *
-     * **Dependency Validation:**
-     * The factory validates that all required dependencies are provided and
-     * properly configured before creating services. Invalid or missing
-     * dependencies will result in clear error messages.
+     * **Dependency Validation:** The factory validates that all required
+     * dependencies are provided and properly configured before creating
+     * services. Invalid or missing dependencies will result in clear error
+     * messages.
+     *
+     * @example Basic Service Creation
+     *
+     * ```typescript
+     * const dependencies = {
+     *     eventEmitter: typedEventBus,
+     *     getHistoryLimit: () => 100,
+     *     historyRepository: historyRepo,
+     *     monitorRepository: monitorRepo,
+     *     siteRepository: siteRepo,
+     *     sites: sitesCache,
+     * };
+     *
+     * const services =
+     *     EnhancedMonitoringServiceFactory.createServices(dependencies);
+     * const result = await services.checker.checkMonitor(site, monitorId);
+     * ```
+     *
+     * @example Testing with Mocked Dependencies
+     *
+     * ```typescript
+     * const mockDependencies = {
+     *     eventEmitter: createMockEventBus(),
+     *     getHistoryLimit: () => 50,
+     *     historyRepository: createMockHistoryRepo(),
+     *     // ... other mocked dependencies
+     * };
+     *
+     * const services =
+     *     EnhancedMonitoringServiceFactory.createServices(
+     *         mockDependencies
+     *     );
+     * // Use services for testing...
+     * ```
      *
      * @param dependencies - Complete set of required external dependencies
      *
      * @returns A complete bundle of enhanced monitoring services ready for use
      *
      * @throws Throws descriptive errors if required dependencies are missing,
-     *         invalid, or incompatible with the enhanced monitoring system
+     *   invalid, or incompatible with the enhanced monitoring system
      *
-     * @example Basic Service Creation
-     * ```typescript
-     * const dependencies = {
-     *   eventEmitter: typedEventBus,
-     *   getHistoryLimit: () => 100,
-     *   historyRepository: historyRepo,
-     *   monitorRepository: monitorRepo,
-     *   siteRepository: siteRepo,
-     *   sites: sitesCache
-     * };
-     *
-     * const services = EnhancedMonitoringServiceFactory.createServices(dependencies);
-     * const result = await services.checker.checkMonitor(site, monitorId);
-     * ```
-     *
-     * @example Testing with Mocked Dependencies
-     * ```typescript
-     * const mockDependencies = {
-     *   eventEmitter: createMockEventBus(),
-     *   getHistoryLimit: () => 50,
-     *   historyRepository: createMockHistoryRepo(),
-     *   // ... other mocked dependencies
-     * };
-     *
-     * const services = EnhancedMonitoringServiceFactory.createServices(mockDependencies);
-     * // Use services for testing...
-     * ```
+     * @public
      *
      * @see {@link EnhancedMonitoringDependencies} for dependency requirements
      * @see {@link EnhancedMonitoringServices} for provided service bundle
-     *
-     * @public
      */
     createServices(
         dependencies: EnhancedMonitoringDependencies

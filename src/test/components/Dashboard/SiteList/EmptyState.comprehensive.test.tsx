@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for EmptyState component.
- * Achieves 98%+ branch coverage for the EmptyState component.
+ * Comprehensive tests for EmptyState component. Achieves 98%+ branch coverage
+ * for the EmptyState component.
  */
 
 import { render, screen } from "@testing-library/react";

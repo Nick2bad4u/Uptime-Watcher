@@ -9,10 +9,12 @@ export class Statistics {
   * Returns the average of two numbers.
   *
   * @remarks
-  * This method is part of the {@link core-library#Statistics | Statistics subsystem}.
+  * This method is part of the
+  * {@link core-library#Statistics | Statistics subsystem}.
   *
   * @param x - The first input number
   * @param y - The second input number
+  *
   * @returns The arithmetic mean of `x` and `y`
   *
   * @beta
@@ -64,15 +66,15 @@ Consider a hypothetical input:
 
 ````typescript
 /**
- * @returns true if the specified tag is surrounded with `{`
- * and `}` characters.
+ * @example Prints "true" for `{@link}` but "false" for `@internal`:
  *
- * @example
- * Prints "true" for `{@link}` but "false" for `@internal`:
  * ```ts
- * console.log(isInlineTag('{@link}'));
- * console.log(isInlineTag('@internal'));
+ * console.log(isInlineTag("{@link}"));
+ * console.log(isInlineTag("@internal"));
  * ```
+ *
+ * @returns True if the specified tag is surrounded with `{` and `}` characters.
+ *
  * @see {@link http://example.com/@internal | the @internal tag}
  */
 declare function isInlineTag(tagName: string): boolean;

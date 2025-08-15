@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared validation utilities
+ * @file Tests for shared validation utilities
  */
 
 import { describe, it, expect } from "vitest";

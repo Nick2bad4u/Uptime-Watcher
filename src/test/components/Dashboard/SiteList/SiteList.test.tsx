@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for SiteList component
- * Testing all code paths, hooks usage, and theme integration
+ * @file Comprehensive tests for SiteList component Testing all code paths,
+ *   hooks usage, and theme integration
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

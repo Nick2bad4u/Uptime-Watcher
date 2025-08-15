@@ -1,30 +1,35 @@
 /**
- * Provides HTTP/HTTPS monitoring for web endpoint health checks using Axios
- * and robust retry logic.
+ * Provides HTTP/HTTPS monitoring for web endpoint health checks using Axios and
+ * robust retry logic.
  *
  * @remarks
  * Implements the {@link IMonitorService} contract for HTTP monitoring. Uses a
  * custom-configured Axios instance with timing interceptors for precise
  * response time measurement, per-monitor timeout, and status code
  * interpretation. All requests are performed with retry logic and exponential
- * backoff via {@link withOperationalHooks}. Errors are handled and
- * standardized for frontend consumption.
+ * backoff via {@link withOperationalHooks}. Errors are handled and standardized
+ * for frontend consumption.
+ *
+ * @example
+ *
+ * ```typescript
+ * const httpMonitor = new HttpMonitor({ timeout: 5000 });
+ * const result = await httpMonitor.check({
+ *     id: "mon_1",
+ *     type: "http",
+ *     url: "https://example.com",
+ *     status: "pending",
+ * });
+ * console.log(
+ *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
+ * );
+ * ```
+ *
+ * @public
  *
  * @see {@link IMonitorService}
  * @see {@link MonitorConfig}
  * @see {@link MonitorCheckResult}
- * @example
- * ```typescript
- * const httpMonitor = new HttpMonitor({ timeout: 5000 });
- * const result = await httpMonitor.check({
- *   id: "mon_1",
- *   type: "http",
- *   url: "https://example.com",
- *   status: "pending",
- * });
- * console.log(`Status: ${result.status}, Response time: ${result.responseTime}ms`);
- * ```
- * @public
  */
 
 import type { Site } from "@shared/types";
@@ -62,13 +67,14 @@ import { determineMonitorStatus } from "./utils/httpStatusUtils";
  * Extends Axios types to support timing metadata for monitoring.
  *
  * @remarks
- * Declaration merging is used to add response time fields to {@link
- * AxiosError}, {@link AxiosResponse}, and {@link InternalAxiosRequestConfig}
- * for accurate timing. These fields are populated by Axios interceptors in
+ * Declaration merging is used to add response time fields to {@link AxiosError},
+ * {@link AxiosResponse}, and {@link InternalAxiosRequestConfig} for accurate
+ * timing. These fields are populated by Axios interceptors in
  * {@link createHttpClient}.
  *
- * @see {@link createHttpClient}
  * @internal
+ *
+ * @see {@link createHttpClient}
  */
 declare module "axios" {
     /**
@@ -115,8 +121,8 @@ declare module "axios" {
  * endpoint health checks.
  *
  * @remarks
- * Provides endpoint health checks with retry logic, timing, and error
- * handling. Uses Axios for requests, with custom interceptors for timing. All
+ * Provides endpoint health checks with retry logic, timing, and error handling.
+ * Uses Axios for requests, with custom interceptors for timing. All
  * configuration is managed via shallow merging and validated on update. All
  * errors are standardized for frontend consumption.
  *
@@ -127,7 +133,9 @@ export class HttpMonitor implements IMonitorService {
      * Axios instance configured for monitoring.
      *
      * @remarks
-     * Includes interceptors for timing and error handling. Recreated on config updates.
+     * Includes interceptors for timing and error handling. Recreated on config
+     * updates.
+     *
      * @internal
      */
     private axiosInstance: AxiosInstance;
@@ -136,7 +144,9 @@ export class HttpMonitor implements IMonitorService {
      * Configuration for HTTP monitoring.
      *
      * @remarks
-     * Includes timeout, user agent, and other settings. Used for all requests unless overridden per-monitor.
+     * Includes timeout, user agent, and other settings. Used for all requests
+     * unless overridden per-monitor.
+     *
      * @internal
      */
     private config: MonitorConfig;
@@ -150,17 +160,25 @@ export class HttpMonitor implements IMonitorService {
      * via {@link withOperationalHooks}. Returns a standardized result for all
      * error cases.
      *
-     * Now uses type guards to safely handle potentially undefined
-     * configuration values.
+     * Now uses type guards to safely handle potentially undefined configuration
+     * values.
      *
      * @example
+     *
      * ```typescript
-     * const result = await httpMonitor.check({ type: "http", url: "https://example.com" });
+     * const result = await httpMonitor.check({
+     *     type: "http",
+     *     url: "https://example.com",
+     * });
      * ```
      *
      * @param monitor - Monitor configuration object (must be type "http").
-     * @returns Promise resolving to {@link MonitorCheckResult} with status and timing.
-     * @throws {@link Error} if monitor type is not "http".
+     *
+     * @returns Promise resolving to {@link MonitorCheckResult} with status and
+     *   timing.
+     *
+     * @throws {@link Error} If monitor type is not "http".
+     *
      * @public
      */
     public async check(
@@ -201,8 +219,11 @@ export class HttpMonitor implements IMonitorService {
      *
      * @param url - The URL to request.
      * @param timeout - Request timeout in milliseconds.
+     *
      * @returns Promise resolving to {@link AxiosResponse} with timing metadata.
-     * @throws {@link AxiosError} if the request fails.
+     *
+     * @throws {@link AxiosError} If the request fails.
+     *
      * @internal
      */
     private async makeRequest(
@@ -225,8 +246,11 @@ export class HttpMonitor implements IMonitorService {
      *
      * @param url - The URL to health check.
      * @param timeout - Request timeout in milliseconds.
-     * @param maxRetries - Number of additional retry attempts after the initial attempt.
+     * @param maxRetries - Number of additional retry attempts after the initial
+     *   attempt.
+     *
      * @returns Promise resolving to {@link MonitorCheckResult}.
+     *
      * @internal
      */
     private async performHealthCheckWithRetry(
@@ -275,8 +299,11 @@ export class HttpMonitor implements IMonitorService {
      *
      * @param url - The URL to health check.
      * @param timeout - Request timeout in milliseconds.
+     *
      * @returns Promise resolving to {@link MonitorCheckResult}.
-     * @throws {@link AxiosError} if the request fails.
+     *
+     * @throws {@link AxiosError} If the request fails.
+     *
      * @internal
      */
     private async performSingleHealthCheck(
@@ -319,14 +346,16 @@ export class HttpMonitor implements IMonitorService {
     /**
      * Constructs a new {@link HttpMonitor} instance.
      *
-     * @param config - Optional configuration overrides for HTTP monitoring. See {@link MonitorConfig}.
-     *
      * @remarks
      * Initializes Axios instance with timing interceptors and merged
      * configuration. All configuration values are shallow-merged with
      * defaults.
      *
      * @defaultValue timeout: DEFAULT_REQUEST_TIMEOUT, userAgent: USER_AGENT
+     *
+     * @param config - Optional configuration overrides for HTTP monitoring. See
+     *   {@link MonitorConfig}.
+     *
      * @public
      */
     public constructor(config: MonitorConfig = {}) {
@@ -348,6 +377,7 @@ export class HttpMonitor implements IMonitorService {
      * Returns the current configuration for this monitor service.
      *
      * @returns A shallow copy of the current {@link MonitorConfig}.
+     *
      * @public
      */
     public getConfig(): MonitorConfig {
@@ -357,9 +387,11 @@ export class HttpMonitor implements IMonitorService {
     /**
      * Returns the monitor type handled by this service.
      *
-     * @returns The string "http".
      * @remarks
      * Used by the monitor factory to route checks to the appropriate service.
+     *
+     * @returns The string "http".
+     *
      * @public
      */
     public getType(): Site["monitors"][0]["type"] {
@@ -370,11 +402,13 @@ export class HttpMonitor implements IMonitorService {
      * Updates the configuration for this monitor service.
      *
      * @remarks
-     * Performs a shallow merge and recreates the Axios instance. Only
-     * validates types, not value ranges. Throws if invalid types are provided.
+     * Performs a shallow merge and recreates the Axios instance. Only validates
+     * types, not value ranges. Throws if invalid types are provided.
      *
      * @param config - Partial configuration to merge with existing settings.
+     *
      * @throws Error if config contains invalid property types.
+     *
      * @public
      */
     public updateConfig(config: Partial<MonitorConfig>): void {

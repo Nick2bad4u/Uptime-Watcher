@@ -1,8 +1,8 @@
 /**
  * Tests for useDynamicHelpText hook
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for the dynamic help text loading hook.
+ * @file Comprehensive tests covering all branches and edge cases for the
+ *   dynamic help text loading hook.
  */
 
 import { renderHook, waitFor } from "@testing-library/react";

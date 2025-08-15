@@ -1,9 +1,9 @@
 /**
  * Branch coverage tests for interfaces.ts
  *
- * This file currently has 0% coverage and needs basic test coverage.
- * Since interfaces.ts is likely a types-only file, we'll test any exposed
- * runtime functionality and document any parts that are compile-time only.
+ * This file currently has 0% coverage and needs basic test coverage. Since
+ * interfaces.ts is likely a types-only file, we'll test any exposed runtime
+ * functionality and document any parts that are compile-time only.
  */
 
 import { describe, expect, it } from "vitest";

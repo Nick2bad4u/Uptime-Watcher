@@ -1,13 +1,17 @@
 /**
  * Test suite for electronUtils
  *
- * @fileoverview Comprehensive tests for Electron utility functions
- * in the Uptime Watcher application.
+ * @module ElectronUtils
+ *
+ * @file Comprehensive tests for Electron utility functions in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Electron Utilities
- * @module ElectronUtils
+ *
  * @tags ["test", "electron", "utils"]
  */
 

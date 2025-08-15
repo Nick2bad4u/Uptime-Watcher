@@ -1,13 +1,17 @@
 /**
  * Test suite for event type utilities and classification functions.
  *
- * @fileoverview Comprehensive tests for event categorization and priority determination
- * in the Uptime Watcher event system.
+ * @module EventTypes
+ *
+ * @file Comprehensive tests for event categorization and priority determination
+ *   in the Uptime Watcher event system.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Events
- * @module EventTypes
+ *
  * @tags ["events", "categorization", "priority", "utilities"]
  */
 

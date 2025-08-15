@@ -1,6 +1,6 @@
 /**
- * Tests for useSiteStats hook.
- * Tests statistics calculation for site monitoring data.
+ * Tests for useSiteStats hook. Tests statistics calculation for site monitoring
+ * data.
  */
 
 import { renderHook } from "@testing-library/react";

@@ -47,8 +47,7 @@ export interface CacheEntry<T> {
  */
 export interface CacheStats {
     /**
-     * Hit ratio (0-1).
-     * Calculated as hits / (hits + misses).
+     * Hit ratio (0-1). Calculated as hits / (hits + misses).
      */
     hitRatio: number;
     /** Total cache hits */
@@ -65,6 +64,7 @@ export interface CacheStats {
  * Standardized cache implementation.
  *
  * Features:
+ *
  * - Consistent API across all managers
  * - Automatic TTL expiration
  * - LRU eviction when max size reached
@@ -116,8 +116,8 @@ export class StandardizedCache<T> {
     /**
      * Bulk update cache with new data.
      *
-     * Note: Emits only a single bulk-updated event for performance.
-     * Individual item cache events are not emitted during bulk operations.
+     * Note: Emits only a single bulk-updated event for performance. Individual
+     * item cache events are not emitted during bulk operations.
      */
     public bulkUpdate(
         items: Array<{ data: T; key: string; ttl?: number }>
@@ -291,8 +291,8 @@ export class StandardizedCache<T> {
     }
 
     /**
-     * Get cache statistics.
-     * Returns a snapshot of the current statistics, not a live reference.
+     * Get cache statistics. Returns a snapshot of the current statistics, not a
+     * live reference.
      */
     public getStats(): CacheStats {
         return { ...this.stats };
@@ -347,8 +347,7 @@ export class StandardizedCache<T> {
     }
 
     /**
-     * Get all cache keys.
-     * Filters out expired keys automatically.
+     * Get all cache keys. Filters out expired keys automatically.
      */
     public keys(): string[] {
         const validKeys: string[] = [];
@@ -378,9 +377,9 @@ export class StandardizedCache<T> {
      * Register invalidation callback for cache events.
      *
      * @param callback - Function to call when cache items are invalidated.
-     *                   Called with a specific key when a single item is
-     *                   invalidated, or with undefined when all items are
-     *                   invalidated.
+     *   Called with a specific key when a single item is invalidated, or with
+     *   undefined when all items are invalidated.
+     *
      * @returns Cleanup function to remove the callback
      */
     public onInvalidation(callback: (key?: string) => void): () => void {
@@ -403,7 +402,8 @@ export class StandardizedCache<T> {
      *
      * @param key - The cache key
      * @param data - The data to cache
-     * @param ttl - Time to live in milliseconds. If 0 or negative, the item will not expire.
+     * @param ttl - Time to live in milliseconds. If 0 or negative, the item
+     *   will not expire.
      */
     public set(key: string, data: T, ttl?: number): void {
         // Evict if at capacity and this is a new key
@@ -480,7 +480,8 @@ export class StandardizedCache<T> {
      * Calls all registered invalidation callbacks, handling any errors
      * gracefully.
      *
-     * @param key - The invalidated cache key, or undefined if all keys were invalidated
+     * @param key - The invalidated cache key, or undefined if all keys were
+     *   invalidated
      */
     private notifyInvalidation(key?: string): void {
         for (const callback of this.invalidationCallbacks) {

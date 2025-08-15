@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for monitor validation utilities.
- * Tests all validation functions, error handling, and edge cases.
+ * Comprehensive tests for monitor validation utilities. Tests all validation
+ * functions, error handling, and edge cases.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

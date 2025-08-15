@@ -1,8 +1,9 @@
 /**
- * Comprehensive test suite for themed components - achieving 90%+ branch coverage
+ * Comprehensive test suite for themed components - achieving 90%+ branch
+ * coverage
  *
- * Tests all conditional branches, edge cases, and prop variations for each component
- * to ensure robust behavior and complete coverage.
+ * Tests all conditional branches, edge cases, and prop variations for each
+ * component to ensure robust behavior and complete coverage.
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -122,13 +123,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render all size variants", () => {
-            const sizes = [
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl",
-            ] as const;
+            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -377,13 +372,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render all size variants", () => {
-            const sizes = [
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl",
-            ] as const;
+            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(

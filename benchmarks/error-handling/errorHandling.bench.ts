@@ -1,13 +1,17 @@
 /**
  * Benchmark tests for error handling operations
  *
- * @fileoverview Performance benchmarks for error handling, validation,
- * and recovery operations across the application.
+ * @file Performance benchmarks for error handling, validation, and recovery
+ *   operations across the application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark ErrorHandling
+ *
  * @tags ["performance", "error-handling", "validation", "recovery"]
  */
 

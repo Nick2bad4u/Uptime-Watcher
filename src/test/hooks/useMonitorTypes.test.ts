@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for useMonitorTypes hook
- * Tests monitor type configuration loading with error handling and fallback behavior
+ * @file Comprehensive tests for useMonitorTypes hook Tests monitor type
+ *   configuration loading with error handling and fallback behavior
  */
 
 import { act, renderHook, waitFor } from "@testing-library/react";

@@ -1,8 +1,8 @@
 /**
  * Tests for caching utilities
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for the TypedCache implementation and helper functions.
+ * @file Comprehensive tests covering all branches and edge cases for the
+ *   TypedCache implementation and helper functions.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";

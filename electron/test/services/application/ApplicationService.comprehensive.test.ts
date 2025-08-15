@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for ApplicationService
- * Testing service coordination, lifecycle management, and event handling
+ * @file Comprehensive tests for ApplicationService Testing service
+ *   coordination, lifecycle management, and event handling
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

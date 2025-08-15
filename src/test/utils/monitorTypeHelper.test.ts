@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for monitorTypeHelper utility functions
+ * @file Tests for monitorTypeHelper utility functions
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

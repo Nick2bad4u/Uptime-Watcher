@@ -1,14 +1,18 @@
 /**
  * Memory Usage and Cache Performance Benchmarks
  *
- * @fileoverview Performance benchmarks for memory-intensive operations
- * in the Uptime Watcher application, focusing on cache management,
- * memory allocation patterns, and garbage collection impact.
+ * @file Performance benchmarks for memory-intensive operations in the Uptime
+ *   Watcher application, focusing on cache management, memory allocation
+ *   patterns, and garbage collection impact.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Memory-Management
+ *
  * @tags ["performance", "memory", "cache", "gc", "allocation"]
  */
 

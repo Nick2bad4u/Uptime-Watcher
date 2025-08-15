@@ -1,6 +1,6 @@
 /**
- * Comprehensive middleware tests - targeting 90%+ branch coverage
- * Focuses on edge cases and untested branches in middleware.ts
+ * Comprehensive middleware tests - targeting 90%+ branch coverage Focuses on
+ * edge cases and untested branches in middleware.ts
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

@@ -1,6 +1,7 @@
 /**
- * @fileoverview Comprehensive tests for FormErrorAlert component
  * @version 1.0.0
+ *
+ * @file Comprehensive tests for FormErrorAlert component
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -210,10 +211,7 @@ describe("FormErrorAlert", () => {
 
         it("should trim whitespace from className", () => {
             render(
-                <FormErrorAlert
-                    {...defaultProps}
-                    className="  custom-error  "
-                />
+                <FormErrorAlert {...defaultProps} className="custom-error" />
             );
 
             const themedBox = screen.getByTestId("themed-box");

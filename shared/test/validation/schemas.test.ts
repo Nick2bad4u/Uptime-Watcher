@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for shared validation schemas
- * Targeting 98% branch coverage for all validation functions
+ * Comprehensive tests for shared validation schemas Targeting 98% branch
+ * coverage for all validation functions
  */
 
 import { describe, it, expect } from "vitest";
@@ -20,66 +20,41 @@ import {
     type Site,
 } from "../../validation/schemas";
 import type { ValidationResult } from "../../types/validation";
+import {
+    createValidBaseMonitor,
+    createValidHttpMonitor,
+    createValidPortMonitor,
+    createValidPingMonitor,
+    createValidSite,
+} from "./testHelpers";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {
         it("should validate valid base monitor data", () => {
-            const validData = {
-                checkInterval: 30_000,
-                id: "test-monitor",
-                lastChecked: new Date(),
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                status: "up" as const,
-                timeout: 5000,
-                type: "http" as const,
-            };
-
+            const validData = createValidBaseMonitor();
             expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
         });
 
         it("should reject invalid check intervals", () => {
-            const invalidData = {
+            const invalidData = createValidBaseMonitor({
                 checkInterval: 1000, // Below minimum 5000
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                status: "up" as const,
-                timeout: 5000,
-                type: "http" as const,
-            };
+            });
 
             expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
         });
 
         it("should reject check intervals exceeding maximum", () => {
-            const invalidData = {
+            const invalidData = createValidBaseMonitor({
                 checkInterval: 2_592_000_001, // Above maximum
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                status: "up" as const,
-                timeout: 5000,
-                type: "http" as const,
-            };
+            });
 
             expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
         });
 
         it("should reject negative retry attempts", () => {
-            const invalidData = {
-                checkInterval: 30_000,
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
+            const invalidData = createValidBaseMonitor({
                 retryAttempts: -1,
-                status: "up" as const,
-                timeout: 5000,
-                type: "http" as const,
-            };
+            });
 
             expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
         });
@@ -432,14 +407,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should validate valid ports", () => {
-            const validPorts = [
-                1,
-                80,
-                443,
-                8080,
-                3000,
-                65_535,
-            ];
+            const validPorts = [1, 80, 443, 8080, 3000, 65_535];
 
             for (const port of validPorts) {
                 const validData = {

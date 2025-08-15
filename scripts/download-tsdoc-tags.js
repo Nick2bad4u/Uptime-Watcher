@@ -108,18 +108,28 @@ const newHashes = {};
 /**
  * Rewrites relative Markdown links to absolute URLs for TSDoc documentation.
  *
- * - Converts links to spec pages: (../spec/page.md) → (https://tsdoc.org/pages/spec/page/)
- * - Converts links to tag pages: (../tags/tag.md) → (https://tsdoc.org/pages/tags/tag/)
+ * - Converts links to spec pages: (../spec/page.md) →
+ *   (https://tsdoc.org/pages/spec/page/)
+ * - Converts links to tag pages: (../tags/tag.md) →
+ *   (https://tsdoc.org/pages/tags/tag/)
  *
  * Limitations and Edge Cases:
- * - Only rewrites links matching the exact patterns: (../spec/[name].md) and (../tags/[name].md).
- * - Links with different formats, additional query parameters, anchors, or subdirectories will not be rewritten.
+ *
+ * - Only rewrites links matching the exact patterns: (../spec/[name].md) and
+ *   (../tags/[name].md).
+ * - Links with different formats, additional query parameters, anchors, or
+ *   subdirectories will not be rewritten.
  * - Non-Markdown links or malformed links are ignored.
- * - Nested Markdown links, links inside code blocks, or links with additional Markdown formatting (e.g., images, reference-style links) are not handled and may remain unchanged.
- * - If a link contains multiple levels of nesting or complex Markdown syntax, only the outermost matching pattern is processed.
- * - The function does not validate the existence of the target URLs or handle broken links.
+ * - Nested Markdown links, links inside code blocks, or links with additional
+ *   Markdown formatting (e.g., images, reference-style links) are not handled
+ *   and may remain unchanged.
+ * - If a link contains multiple levels of nesting or complex Markdown syntax,
+ *   only the outermost matching pattern is processed.
+ * - The function does not validate the existence of the target URLs or handle
+ *   broken links.
  *
  * @param {string} content - The Markdown content to process.
+ *
  * @returns {string} The content with rewritten links.
  */
 function rewriteLinks(content) {

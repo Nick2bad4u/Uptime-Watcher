@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for useErrorStore.
- * Ensures complete coverage of error management functionality.
+ * Comprehensive tests for useErrorStore. Ensures complete coverage of error
+ * management functionality.
  */
 
 import { act, renderHook } from "@testing-library/react";

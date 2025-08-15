@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for site monitoring operations.
- * Tests all monitoring lifecycle operations for sites and monitors.
+ * Comprehensive tests for site monitoring operations. Tests all monitoring
+ * lifecycle operations for sites and monitors.
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";

@@ -1,13 +1,17 @@
 /**
  * Test suite for MonitorManager
  *
- * @fileoverview Comprehensive tests for monitoring service management
- * in the Uptime Watcher application.
+ * @module MonitorManager
+ *
+ * @file Comprehensive tests for monitoring service management in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Monitoring
- * @module MonitorManager
+ *
  * @tags ["monitor", "test", "management", "core"]
  */
 

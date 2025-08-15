@@ -1,13 +1,18 @@
 /**
  * Event System Performance Benchmarks
  *
- * @fileoverview Performance benchmarks for the event system in the Uptime Watcher
- * application, focusing on event emission, listener performance, and event propagation.
+ * @file Performance benchmarks for the event system in the Uptime Watcher
+ *   application, focusing on event emission, listener performance, and event
+ *   propagation.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Event-System
+ *
  * @tags ["performance", "events", "emitters", "listeners", "async"]
  */
 

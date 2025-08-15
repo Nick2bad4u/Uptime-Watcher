@@ -1,6 +1,6 @@
 /**
- * Service edge cases and error paths to achieve 98% branch coverage
- * Targets specific uncovered branches in service classes
+ * Service edge cases and error paths to achieve 98% branch coverage Targets
+ * specific uncovered branches in service classes
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Tests for remaining uncovered lines in coverage report
- * These tests target specific uncovered lines to achieve 100% coverage
+ * Tests for remaining uncovered lines in coverage report These tests target
+ * specific uncovered lines to achieve 100% coverage
  */
 
 import { render, screen } from "@testing-library/react";

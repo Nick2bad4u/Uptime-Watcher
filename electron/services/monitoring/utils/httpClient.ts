@@ -7,9 +7,10 @@
  * manual status code handling in monitoring logic. All exported functions are
  * type-safe and never throw.
  *
+ * @public
+ *
  * @see {@link setupTimingInterceptors}
  * @see {@link MonitorConfig}
- * @public
  */
 
 import type { AxiosInstance } from "axios";
@@ -27,13 +28,15 @@ import type { MonitorConfig } from "../types";
  * Converts non-Error values to Error instances for consistent error handling.
  * Used internally by interceptors to guarantee error type safety.
  *
- * @param error - The unknown error value.
- * @returns An {@link Error} instance for consistent error handling.
- *
  * @example
+ *
  * ```typescript
  * throw ensureErrorInstance("Something went wrong");
  * ```
+ *
+ * @param error - The unknown error value.
+ *
+ * @returns An {@link Error} instance for consistent error handling.
  *
  * @public
  */
@@ -46,23 +49,26 @@ function ensureErrorInstance(error: unknown): Error {
  * an Axios instance.
  *
  * @remarks
- * Uses `performance.now()` for high-precision timing measurement. Adds
- * metadata to request config and calculates duration in response interceptor.
- * Also handles timing for error responses to ensure consistent measurement.
- * The timing data is attached to response/error objects via declaration
- * merging defined in HttpMonitor.ts for type safety. This function mutates the
- * provided Axios instance.
- *
- * @param axiosInstance - The {@link AxiosInstance} to configure with timing interceptors.
+ * Uses `performance.now()` for high-precision timing measurement. Adds metadata
+ * to request config and calculates duration in response interceptor. Also
+ * handles timing for error responses to ensure consistent measurement. The
+ * timing data is attached to response/error objects via declaration merging
+ * defined in HttpMonitor.ts for type safety. This function mutates the provided
+ * Axios instance.
  *
  * @example
+ *
  * ```typescript
  * const client = axios.create();
  * setupTimingInterceptors(client);
  * ```
  *
- * @see {@link createHttpClient}
+ * @param axiosInstance - The {@link AxiosInstance} to configure with timing
+ *   interceptors.
+ *
  * @public
+ *
+ * @see {@link createHttpClient}
  */
 export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     // Add request interceptor to record start time
@@ -108,26 +114,34 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * Creates a configured Axios instance optimized for HTTP monitoring.
  *
  * @remarks
- * Sets up connection pooling, custom status validation, and timing
- * measurement. All HTTP responses are treated as "successful" for manual
- * status code handling in monitoring logic. This allows proper evaluation of
- * HTTP error codes as legitimate monitoring results rather than Axios errors.
- * The 10KB request limit is suitable for monitoring scenarios which typically
- * send minimal data (headers, basic payloads). Response limit is 10MB to
- * handle larger pages if needed.
- *
- * @param config - The {@link MonitorConfig} containing timeout, userAgent, and other HTTP options.
- * @returns A configured {@link AxiosInstance} with timing interceptors and connection pooling.
+ * Sets up connection pooling, custom status validation, and timing measurement.
+ * All HTTP responses are treated as "successful" for manual status code
+ * handling in monitoring logic. This allows proper evaluation of HTTP error
+ * codes as legitimate monitoring results rather than Axios errors. The 10KB
+ * request limit is suitable for monitoring scenarios which typically send
+ * minimal data (headers, basic payloads). Response limit is 10MB to handle
+ * larger pages if needed.
  *
  * @example
+ *
  * ```typescript
- * const client = createHttpClient({ timeout: 5000, userAgent: "UptimeWatcher/1.0" });
+ * const client = createHttpClient({
+ *     timeout: 5000,
+ *     userAgent: "UptimeWatcher/1.0",
+ * });
  * const response = await client.get("https://example.com");
  * ```
  *
+ * @param config - The {@link MonitorConfig} containing timeout, userAgent, and
+ *   other HTTP options.
+ *
+ * @returns A configured {@link AxiosInstance} with timing interceptors and
+ *   connection pooling.
+ *
+ * @public
+ *
  * @see {@link MonitorConfig}
  * @see {@link setupTimingInterceptors}
- * @public
  */
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
     const headers: Record<string, string> = {};

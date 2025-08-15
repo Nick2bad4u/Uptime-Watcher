@@ -1,6 +1,6 @@
 /**
- * Tests for ScreenshotThumbnail component.
- * Comprehensive coverage for screenshot thumbnail functionality.
+ * Tests for ScreenshotThumbnail component. Comprehensive coverage for
+ * screenshot thumbnail functionality.
  */
 
 import {

@@ -1,6 +1,7 @@
 /**
- * @fileoverview ServiceContainer Application Services Tests
- * @description Focused tests for application service creation in ServiceContainer
+ * Focused tests for application service creation in ServiceContainer
+ *
+ * @file ServiceContainer Application Services Tests
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

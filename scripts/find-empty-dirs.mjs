@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Finds all empty directories recursively under specified folders.
- * Optionally deletes them when the --delete flag is provided.
+ * Finds all empty directories recursively under specified folders. Optionally
+ * deletes them when the --delete flag is provided.
  *
  * @remarks
  * Run this script from the project root. Requires Node.js.
  *
  * @example
+ *
  * ```bash
  * # Find empty directories in default folders (electron, src, shared)
  * node scripts/find-empty-dirs.mjs
@@ -33,12 +34,12 @@
  * node scripts/find-empty-dirs.mjs --format json
  * ```
  *
- * @throws
- * This script may fail due to:
- * - Permission errors when accessing certain directories or files.
- * - Missing target directories in the project root.
- * - Filesystem access issues such as EACCES, ENOENT, or other I/O errors.
- * - Permission errors when attempting to delete directories (with --delete flag).
+ * @throws This script may fail due to:
+ *
+ *   - Permission errors when accessing certain directories or files.
+ *   - Missing target directories in the project root.
+ *   - Filesystem access issues such as EACCES, ENOENT, or other I/O errors.
+ *   - Permission errors when attempting to delete directories (with --delete flag).
  */
 
 import { join, relative } from "node:path";
@@ -225,7 +226,9 @@ if (checkOnly) {
 
 /**
  * Helper to check if a directory should be excluded from search.
+ *
  * @param {string} dirName - Directory name to check
+ *
  * @returns {boolean} - True if directory should be excluded
  */
 function shouldExcludeDir(dirName) {
@@ -234,7 +237,9 @@ function shouldExcludeDir(dirName) {
 
 /**
  * Helper to check if a path is a directory, with error handling.
+ *
  * @param {string} path
+ *
  * @returns {Promise<boolean>}
  */
 async function isDirectory(path) {
@@ -252,9 +257,11 @@ async function isDirectory(path) {
 }
 
 /**
- * Helper to get directory entries, with error handling.
- * Returns an empty array if the directory cannot be read due to an error.
+ * Helper to get directory entries, with error handling. Returns an empty array
+ * if the directory cannot be read due to an error.
+ *
  * @param {string} dir
+ *
  * @returns {Promise<string[]>}
  */
 async function safeReadDir(dir) {
@@ -272,12 +279,14 @@ async function safeReadDir(dir) {
 /**
  * Recursively finds all empty directories under a given directory.
  *
- * If the input path is not a directory or cannot be accessed, returns an empty array.
- * Handles permission errors and inaccessible directories gracefully by skipping them.
- * Respects exclusion patterns for directory names.
+ * If the input path is not a directory or cannot be accessed, returns an empty
+ * array. Handles permission errors and inaccessible directories gracefully by
+ * skipping them. Respects exclusion patterns for directory names.
  *
  * @param {string} dir - Directory to search
- * @returns {Promise<string[]>} - Array of empty directory paths, each relative to ROOT_DIR.
+ *
+ * @returns {Promise<string[]>} - Array of empty directory paths, each relative
+ *   to ROOT_DIR.
  */
 async function findEmptyDirs(dir) {
     if (!(await isDirectory(dir))) return [];
@@ -327,9 +336,11 @@ async function findEmptyDirs(dir) {
 }
 
 /**
- * Safely deletes an empty directory with error handling.
- * Only deletes directories that are empty; does not handle non-empty directories.
+ * Safely deletes an empty directory with error handling. Only deletes
+ * directories that are empty; does not handle non-empty directories.
+ *
  * @param {string} dirPath - Absolute path to the directory to delete
+ *
  * @returns {Promise<boolean>} - True if successfully deleted, false otherwise
  */
 async function safeDeleteDir(dirPath) {

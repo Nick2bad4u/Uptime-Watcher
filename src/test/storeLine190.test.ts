@@ -1,6 +1,6 @@
 /**
- * Tests for specific operations that used to be in store.ts
- * This tests loading states and error handling in the new store structure
+ * Tests for specific operations that used to be in store.ts This tests loading
+ * states and error handling in the new store structure
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

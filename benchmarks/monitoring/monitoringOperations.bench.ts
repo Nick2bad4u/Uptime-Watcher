@@ -1,13 +1,17 @@
 /**
  * Benchmark tests for monitoring operations
  *
- * @fileoverview Performance benchmarks for monitoring-related computational operations
- * including network operations, data processing, and status calculations.
+ * @file Performance benchmarks for monitoring-related computational operations
+ *   including network operations, data processing, and status calculations.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Monitoring
+ *
  * @tags ["performance", "monitoring", "network", "ping", "status-processing"]
  */
 

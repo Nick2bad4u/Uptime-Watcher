@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for typedQueries database utilities
- * Tests type-safe database query helpers with 100% coverage including error paths
+ * @file Comprehensive tests for typedQueries database utilities Tests type-safe
+ *   database query helpers with 100% coverage including error paths
  */
 
 import {
@@ -393,9 +393,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             const result = queryForIds(
                 mockDb,
                 "SELECT id FROM sites WHERE status = ?",
-                [
-                    "deleted",
-                ]
+                ["deleted"]
             );
 
             // Assert

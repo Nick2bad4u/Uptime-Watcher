@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for MonitorManager.ts
- * Targets 90%+ branch coverage for all MonitorManager functions
+ * Comprehensive tests for MonitorManager.ts Targets 90%+ branch coverage for
+ * all MonitorManager functions
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,7 +9,8 @@ import type { Site, StatusUpdate, Monitor } from "../../types";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 
 /**
- * Helper function to create a complete Monitor object with all required properties
+ * Helper function to create a complete Monitor object with all required
+ * properties
  */
 function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {

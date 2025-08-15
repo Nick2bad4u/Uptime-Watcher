@@ -1,6 +1,6 @@
 /**
- * Test setup file for Electron backend tests.
- * Provides global mocks and utilities for consistent testing environment.
+ * Test setup file for Electron backend tests. Provides global mocks and
+ * utilities for consistent testing environment.
  */
 
 import { vi } from "vitest";

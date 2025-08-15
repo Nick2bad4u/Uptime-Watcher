@@ -3,8 +3,8 @@
  *
  * @remarks
  * This new architecture replaces hard-coded monitor types with a plugin-based
- * system that allows easy addition of new monitor types without code changes
- * in multiple files.
+ * system that allows easy addition of new monitor types without code changes in
+ * multiple files.
  */
 
 import type {
@@ -47,7 +47,8 @@ import { PortMonitor } from "./PortMonitor";
  * @param fields - Field definitions for dynamic form generation.
  * @param serviceFactory - Factory function to create monitor service instances.
  * @param type - Unique identifier for the monitor type.
- * @param uiConfig - Optional UI display configuration for analytics, history, and help texts.
+ * @param uiConfig - Optional UI display configuration for analytics, history,
+ *   and help texts.
  * @param validationSchema - Zod validation schema for this monitor type.
  * @param version - Version of the monitor implementation.
  *
@@ -83,7 +84,8 @@ export interface BaseMonitorConfig {
          * "Response Code: 200")
          */
         formatDetail?: (details: string) => string;
-        /** Function to format title suffix for history charts (e.g., " (https://example.com)") */
+        /** Function to format title suffix for history charts (e.g., "
+(https://example.com)") */
         formatTitleSuffix?: (monitor: Monitor) => string;
         /** Help text for form fields */
         helpTexts?: {
@@ -139,11 +141,14 @@ const monitorTypes = new Map<string, BaseMonitorConfig>();
  * Gets the configuration object for a given monitor type.
  *
  * @remarks
- * Returns the {@link BaseMonitorConfig} for the specified type, or undefined
- * if not registered.
+ * Returns the {@link BaseMonitorConfig} for the specified type, or undefined if
+ * not registered.
  *
  * @param type - The monitor type identifier.
- * @returns Monitor configuration object or undefined if the type is not registered.
+ *
+ * @returns Monitor configuration object or undefined if the type is not
+ *   registered.
+ *
  * @public
  */
 export function getMonitorTypeConfig(
@@ -160,6 +165,7 @@ export function getMonitorTypeConfig(
  * in the system.
  *
  * @returns Array of registered monitor type strings.
+ *
  * @public
  */
 export function getRegisteredMonitorTypes(): string[] {
@@ -174,7 +180,9 @@ export function getRegisteredMonitorTypes(): string[] {
  * otherwise.
  *
  * @param type - The monitor type identifier to check.
+ *
  * @returns True if the type is registered, false otherwise.
+ *
  * @public
  */
 export function isValidMonitorType(type: string): boolean {
@@ -190,12 +198,15 @@ export function isValidMonitorType(type: string): boolean {
  * without importing external validation utilities.
  *
  * Validation logic:
+ *
  * - Checks if type is a string
  * - Verifies type is registered in the monitor registry
  * - Returns structured result compatible with type guard patterns
  *
  * @param type - The monitor type to validate.
+ *
  * @returns Validation result compatible with EnhancedTypeGuard interface.
+ *
  * @internal
  */
 function validateMonitorTypeInternal(type: unknown): {
@@ -231,7 +242,9 @@ function validateMonitorTypeInternal(type: unknown): {
  * Returns an array of all monitor type configuration objects currently
  * registered in the system.
  *
- * @returns Array of {@link BaseMonitorConfig} objects for all registered monitor types.
+ * @returns Array of {@link BaseMonitorConfig} objects for all registered monitor
+ *   types.
+ *
  * @public
  */
 export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
@@ -246,7 +259,9 @@ export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
  * specified type, or undefined if not registered.
  *
  * @param type - The monitor type identifier.
+ *
  * @returns Service factory function or undefined if the type is not registered.
+ *
  * @public
  */
 export function getMonitorServiceFactory(
@@ -264,6 +279,7 @@ export function getMonitorServiceFactory(
  * it available for use in the system.
  *
  * @param config - The monitor type configuration object to register.
+ *
  * @public
  */
 export function registerMonitorType(config: BaseMonitorConfig): void {
@@ -424,29 +440,34 @@ versionManager.setVersion("port", "1.0.0");
 /**
  * Create monitor object with runtime type validation.
  *
- * @param type - Monitor type string to validate
- * @param data - Monitor data to merge with defaults
- * @returns Validation result with created monitor or errors
- *
  * @remarks
- * Provides runtime type safety by validating monitor type and creating
- * properly structured monitor objects with sensible defaults.
+ * Provides runtime type safety by validating monitor type and creating properly
+ * structured monitor objects with sensible defaults.
  *
  * Process:
+ *
  * 1. Validates monitor type using internal validation
  * 2. Creates monitor object with default values
  * 3. Merges provided data with defaults
  * 4. Returns structured result for error handling
  *
  * @example
+ *
  * ```typescript
- * const result = createMonitorWithTypeGuards("http", { url: "https://example.com" });
+ * const result = createMonitorWithTypeGuards("http", {
+ *     url: "https://example.com",
+ * });
  * if (result.success) {
- *   console.log("Created monitor:", result.monitor);
+ *     console.log("Created monitor:", result.monitor);
  * } else {
- *   console.error("Validation errors:", result.errors);
+ *     console.error("Validation errors:", result.errors);
  * }
  * ```
+ *
+ * @param type - Monitor type string to validate
+ * @param data - Monitor data to merge with defaults
+ *
+ * @returns Validation result with created monitor or errors
  */
 export function createMonitorWithTypeGuards(
     type: string,
@@ -494,38 +515,47 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
 /**
  * Migrate monitor data between versions with comprehensive error handling.
  *
- * @param monitorType - Type of monitor to migrate
- * @param fromVersion - Source version of the data
- * @param toVersion - Target version for migration
- * @param data - Optional monitor data to migrate
- * @returns Migration result with transformed data or errors
- *
  * @remarks
- * Provides version migration support for monitor configurations using
- * the migration system. Handles both data transformations and version updates.
+ * Provides version migration support for monitor configurations using the
+ * migration system. Handles both data transformations and version updates.
  *
  * Migration process:
+ *
  * 1. Validates monitor type using internal validation
  * 2. Checks if migration is needed (version comparison)
  * 3. Uses migration orchestrator for data transformation
  * 4. Returns structured result with applied migrations
  *
  * Error handling:
+ *
  * - Invalid monitor types return validation errors
  * - Missing migration paths return migration errors
  * - Transform failures include original error details
  * - All errors are logged for debugging
  *
  * @example
+ *
  * ```typescript
- * const result = await migrateMonitorType("http", "1.0.0", "1.1.0", monitorData);
+ * const result = await migrateMonitorType(
+ *     "http",
+ *     "1.0.0",
+ *     "1.1.0",
+ *     monitorData
+ * );
  * if (result.success) {
- *   console.log("Applied migrations:", result.appliedMigrations);
- *   return result.data;
+ *     console.log("Applied migrations:", result.appliedMigrations);
+ *     return result.data;
  * } else {
- *   console.error("Migration failed:", result.errors);
+ *     console.error("Migration failed:", result.errors);
  * }
  * ```
+ *
+ * @param monitorType - Type of monitor to migrate
+ * @param fromVersion - Source version of the data
+ * @param toVersion - Target version for migration
+ * @param data - Optional monitor data to migrate
+ *
+ * @returns Migration result with transformed data or errors
  */
 // Database migration helper - properly implemented with basic migration system
 export async function migrateMonitorType(

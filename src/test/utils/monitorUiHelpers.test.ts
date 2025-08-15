@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for monitor UI helper utilities
+ * @file Comprehensive tests for monitor UI helper utilities
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

@@ -23,7 +23,7 @@ In the code sample below, `Child.render()` overrides the virtual member `Base.re
 
 ```ts
 class Base {
- /** @virtual */
+ /** @abstract */
  public render(): void {}
 
  /** @sealed */

@@ -1,8 +1,8 @@
 /**
  * Tests for error handling utility functions
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for error handling utilities used throughout the application.
+ * @file Comprehensive tests covering all branches and edge cases for error
+ *   handling utilities used throughout the application.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

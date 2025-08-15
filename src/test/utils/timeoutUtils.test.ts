@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for timeout utilities.
- * Tests all timeout conversion and validation functions with edge cases.
+ * Comprehensive tests for timeout utilities. Tests all timeout conversion and
+ * validation functions with edge cases.
  */
 
 import { describe, expect, it } from "vitest";

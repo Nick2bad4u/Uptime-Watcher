@@ -1,13 +1,17 @@
 /**
  * Validation Operations Performance Benchmarks
  *
- * @fileoverview Performance benchmarks for validation operations including schema
- * validation, data parsing, type checking, and input sanitization.
+ * @file Performance benchmarks for validation operations including schema
+ *   validation, data parsing, type checking, and input sanitization.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Validation
+ *
  * @tags ["performance", "validation", "schema", "parsing", "sanitization"]
  */
 

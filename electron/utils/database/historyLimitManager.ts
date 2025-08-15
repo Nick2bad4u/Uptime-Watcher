@@ -50,10 +50,11 @@ interface SetHistoryLimitParams {
 /**
  * Get the current history limit.
  *
- * Simple getter function that provides access to the history limit.
- * This indirection enables dependency injection and testability.
+ * Simple getter function that provides access to the history limit. This
+ * indirection enables dependency injection and testability.
  *
  * @param getHistoryLimitFn - Function to retrieve the current history limit
+ *
  * @returns The current history limit
  */
 export function getHistoryLimit(getHistoryLimitFn: () => number): number {
@@ -64,11 +65,13 @@ export function getHistoryLimit(getHistoryLimitFn: () => number): number {
  * Set the history retention limit and prune older history entries if needed.
  *
  * Limit behavior:
+ *
  * - 0 or negative: Disables history retention (unlimited)
  * - 1-9: Will be increased to minimum of 10
  * - 10+: Used as specified
  *
  * @param params - Parameters for setting history limit
+ *
  * @throws Error when database operations fail
  */
 export async function setHistoryLimit(

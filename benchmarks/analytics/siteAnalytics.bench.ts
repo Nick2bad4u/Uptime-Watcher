@@ -1,13 +1,18 @@
 /**
  * Benchmark tests for site analytics calculations
  *
- * @fileoverview Performance benchmarks for heavy computational areas in site analytics
- * including downtime calculations, response time statistics, and data processing.
+ * @file Performance benchmarks for heavy computational areas in site analytics
+ *   including downtime calculations, response time statistics, and data
+ *   processing.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Analytics
+ *
  * @tags ["performance", "analytics", "site-monitoring", "statistics"]
  */
 

@@ -1,6 +1,6 @@
 /**
- * @fileoverview Complete DatabaseManager test coverage
- * Tests all public and private methods with proper mocking and error scenarios
+ * @file Complete DatabaseManager test coverage Tests all public and private
+ *   methods with proper mocking and error scenarios
  */
 
 import {

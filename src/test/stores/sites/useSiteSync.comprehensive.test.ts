@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for useSiteSync.ts
- * Targets 90%+ branch coverage for all site sync functions
+ * Comprehensive tests for useSiteSync.ts Targets 90%+ branch coverage for all
+ * site sync functions
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

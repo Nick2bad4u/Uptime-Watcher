@@ -1,6 +1,6 @@
 /**
- * Tests for AutoUpdaterService.
- * Validates auto-update functionality and status management.
+ * Tests for AutoUpdaterService. Validates auto-update functionality and status
+ * management.
  */
 
 import { autoUpdater } from "electron-updater";

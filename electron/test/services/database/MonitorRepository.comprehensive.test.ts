@@ -1,6 +1,7 @@
 /**
  * Comprehensive tests for MonitorRepository focusing on coverage improvement.
- * Tests all CRUD operations, bulk operations, and edge cases to achieve 90%+ coverage.
+ * Tests all CRUD operations, bulk operations, and edge cases to achieve 90%+
+ * coverage.
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";

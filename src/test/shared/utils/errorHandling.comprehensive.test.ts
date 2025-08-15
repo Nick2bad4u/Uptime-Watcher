@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for shared error handling utilities.
- * Tests both frontend and backend usage patterns of withErrorHandling function.
+ * Comprehensive tests for shared error handling utilities. Tests both frontend
+ * and backend usage patterns of withErrorHandling function.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

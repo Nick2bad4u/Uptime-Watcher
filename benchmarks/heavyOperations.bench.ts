@@ -1,13 +1,17 @@
 /**
  * Practical Performance Benchmarks for Heavy Computational Operations
  *
- * @fileoverview Focused benchmarks for performance-critical operations
- * that can become bottlenecks in the Uptime Watcher application.
+ * @file Focused benchmarks for performance-critical operations that can become
+ *   bottlenecks in the Uptime Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Heavy-Operations
+ *
  * @tags ["performance", "computation", "data-processing", "algorithms"]
  */
 

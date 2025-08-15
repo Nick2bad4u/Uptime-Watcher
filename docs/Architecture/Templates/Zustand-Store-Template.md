@@ -11,12 +11,14 @@ For stores with straightforward state that don't require modular composition:
  * [DESCRIPTION] store for managing [DOMAIN] state and interactions.
  *
  * @remarks
- * This store manages [DESCRIPTION OF WHAT IT MANAGES]. It uses Zustand [with/without] persistence
- * to [PERSISTENCE DESCRIPTION IF APPLICABLE].
+ * This store manages [DESCRIPTION OF WHAT IT MANAGES]. It uses Zustand
+ * [with/without] persistence to [PERSISTENCE DESCRIPTION IF APPLICABLE].
  *
- * The store follows the application's modular architecture by [ARCHITECTURE NOTES].
+ * The store follows the application's modular architecture by [ARCHITECTURE
+ * NOTES].
  *
  * @example
+ *
  * ```typescript
  * import { useExampleStore } from './stores/useExampleStore';
  *
@@ -45,8 +47,8 @@ import { logStoreAction } from "../utils";
  * Interface defining the state shape for the Example store.
  *
  * @remarks
- * Contains all state properties managed by this store.
- * Separating state from actions improves maintainability.
+ * Contains all state properties managed by this store. Separating state from
+ * actions improves maintainability.
  *
  * @public
  */
@@ -67,8 +69,8 @@ export interface ExampleState {
  * Interface defining the actions available in the Example store.
  *
  * @remarks
- * Contains all action methods that can modify the store state.
- * Actions should be descriptive and follow async/sync patterns consistently.
+ * Contains all action methods that can modify the store state. Actions should
+ * be descriptive and follow async/sync patterns consistently.
  *
  * @public
  */
@@ -223,12 +225,13 @@ export const useExampleStore = create<ExampleStore>()(
    /**
     * Partialize function for selective state persistence.
     *
-    * @param state - Current store state
-    * @returns Object with only the state properties that should be persisted
-    *
     * @remarks
-    * Only persists user preferences and settings. Transient state like
-    * loading states, selected items, and data arrays are excluded.
+    * Only persists user preferences and settings. Transient state like loading
+    * states, selected items, and data arrays are excluded.
+    *
+    * @param state - Current store state
+    *
+    * @returns Object with only the state properties that should be persisted
     */
    partialize: (state) => ({
     // Persist user preferences
@@ -279,11 +282,13 @@ import { createExampleSyncActions } from "./useExampleSync";
  * Main example store combining all functionality.
  *
  * @remarks
- * Creates a Zustand store that composes multiple action modules to provide
- * a complete interface for example management. The store uses dependency injection
- * to share common functions between modules while maintaining clear boundaries.
+ * Creates a Zustand store that composes multiple action modules to provide a
+ * complete interface for example management. The store uses dependency
+ * injection to share common functions between modules while maintaining clear
+ * boundaries.
  *
  * @returns Complete example store with all actions and state
+ *
  * @public
  */
 export const useExampleStore = create<ExampleStore>()((
@@ -336,9 +341,9 @@ For individual modules used in complex stores:
  * State management module for Example store.
  *
  * @remarks
- * Handles core state mutations and basic data operations.
- * This module is composed into the main store and provides
- * the foundational state management capabilities.
+ * Handles core state mutations and basic data operations. This module is
+ * composed into the main store and provides the foundational state management
+ * capabilities.
  *
  * @public
  */
@@ -385,6 +390,7 @@ export const initialExampleState: Pick<
  *
  * @param set - Zustand set function for state updates
  * @param get - Zustand get function for accessing current state
+ *
  * @returns Object containing all state management actions
  *
  * @public
@@ -447,8 +453,8 @@ export function createExampleStateActions(
 
 ```typescript
 /**
- * Comprehensive tests for useExampleStore.
- * Ensures complete coverage of store functionality.
+ * Comprehensive tests for useExampleStore. Ensures complete coverage of store
+ * functionality.
  */
 
 import { act, renderHook } from "@testing-library/react";

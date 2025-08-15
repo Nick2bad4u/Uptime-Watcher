@@ -1,13 +1,17 @@
 /**
  * Test suite for IPC Types
  *
- * @fileoverview Comprehensive tests for the IPC types and interfaces
- * in the Uptime Watcher application.
+ * @module IpcTypes
+ *
+ * @file Comprehensive tests for the IPC types and interfaces in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category IPC
- * @module IpcTypes
+ *
  * @tags ["test", "ipc", "types", "interfaces"]
  */
 
@@ -160,13 +164,7 @@ describe("IPC Types", () => {
         });
 
         it("should support array data types", () => {
-            const arrayData = [
-                1,
-                2,
-                3,
-                4,
-                5,
-            ];
+            const arrayData = [1, 2, 3, 4, 5];
 
             const response: IpcResponse<number[]> = {
                 success: true,

@@ -94,12 +94,11 @@ export function determineMonitorStatus(httpStatus: number): "down" | "up" {
 /**
  * Determine monitor status based on HTTP status code.
  *
- * @param httpStatus - HTTP status code to evaluate
- * @returns Monitor status: "up" if site is responding, "down" if server error or invalid code
- *
  * @remarks
  * Business rules for status determination:
- * - 1xx (Informational): "up" - rare but valid responses indicating server is active
+ *
+ * - 1xx (Informational): "up" - rare but valid responses indicating server is
+ *   active
  * - 2xx (Success): "up" - successful requests
  * - 3xx (Redirection): "up" - site is responding with redirects
  * - 4xx (Client Error): "up" - site is responding, client-side issue
@@ -107,12 +106,18 @@ export function determineMonitorStatus(httpStatus: number): "down" | "up" {
  * - Invalid codes (< 100, > 599): "down" - malformed or non-HTTP responses
  *
  * @example
+ *
  * ```typescript
  * determineMonitorStatus(200); // "up"
  * determineMonitorStatus(404); // "up" - site responding but resource not found
  * determineMonitorStatus(500); // "down" - server error
  * determineMonitorStatus(999); // "down" - invalid HTTP status code
  * ```
+ *
+ * @param httpStatus - HTTP status code to evaluate
+ *
+ * @returns Monitor status: "up" if site is responding, "down" if server error
+ *   or invalid code
  */
 ````
 

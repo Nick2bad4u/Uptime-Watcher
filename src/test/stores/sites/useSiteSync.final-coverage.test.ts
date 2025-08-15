@@ -1,6 +1,6 @@
 /**
- * Final 100% line coverage test for useSiteSync.ts
- * Covers the last remaining uncovered lines: 194-195, 207-220, 239
+ * Final 100% line coverage test for useSiteSync.ts Covers the last remaining
+ * uncovered lines: 194-195, 207-220, 239
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

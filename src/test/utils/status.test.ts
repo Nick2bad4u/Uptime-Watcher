@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for status utility functions.
- * Tests formatting and icon selection for all status types.
+ * Comprehensive tests for status utility functions. Tests formatting and icon
+ * selection for all status types.
  */
 
 import { describe, expect, it } from "vitest";

@@ -113,12 +113,14 @@ All functions need proper documentation following project standards:
 /**
  * Create a configured Axios instance optimized for HTTP monitoring.
  *
- * @param config - Monitor configuration containing timeout, userAgent, etc.
- * @returns Configured Axios instance with timing interceptors
- *
  * @remarks
  * Sets up connection pooling, custom status validation, and timing measurement.
- * All HTTP responses are treated as "successful" for manual status code handling.
+ * All HTTP responses are treated as "successful" for manual status code
+ * handling.
+ *
+ * @param config - Monitor configuration containing timeout, userAgent, etc.
+ *
+ * @returns Configured Axios instance with timing interceptors
  *
  * @see {@link MonitorConfig} for available configuration options
  * @see {@link setupTimingInterceptors} for timing measurement details

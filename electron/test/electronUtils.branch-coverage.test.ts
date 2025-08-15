@@ -1,11 +1,10 @@
 /**
  * Branch coverage tests for electronUtils.ts
  *
- * Current coverage: 50% branch coverage
- * Goal: Increase to 98%+ branch coverage
+ * Current coverage: 50% branch coverage Goal: Increase to 98%+ branch coverage
  *
- * The electronUtils module exports isDev() function which checks
- * both NODE_ENV=development and app.isPackaged status.
+ * The electronUtils module exports isDev() function which checks both
+ * NODE_ENV=development and app.isPackaged status.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

@@ -210,18 +210,19 @@ private compareVersions(a: string, b: string): number {
  * Registry for monitor type migrations.
  *
  * @remarks
- * Singleton instance for registering and retrieving migration rules.
- * Provides migration path calculation and validation for monitor data upgrades.
+ * Singleton instance for registering and retrieving migration rules. Provides
+ * migration path calculation and validation for monitor data upgrades.
  *
  * @example
+ *
  * ```typescript
  * // Register a migration
  * migrationRegistry.registerMigration("http", {
- *   fromVersion: "1.0.0",
- *   toVersion: "1.1.0",
- *   description: "Add timeout field",
- *   isBreaking: false,
- *   transform: async (data) => ({ ...data, timeout: 30000 })
+ *  fromVersion: "1.0.0",
+ *  toVersion: "1.1.0",
+ *  description: "Add timeout field",
+ *  isBreaking: false,
+ *  transform: async (data) => ({ ...data, timeout: 30000 }),
  * });
  * ```
  */
@@ -239,11 +240,11 @@ export const versionManager = new VersionManager();
 /**
  * Factory function for creating migration orchestrator instances.
  *
- * @returns New migration orchestrator instance
- *
  * @remarks
- * Use this when you need an isolated orchestrator instance instead of
- * the shared singleton pattern. Useful for testing or specialized workflows.
+ * Use this when you need an isolated orchestrator instance instead of the
+ * shared singleton pattern. Useful for testing or specialized workflows.
+ *
+ * @returns New migration orchestrator instance
  */
 export function createMigrationOrchestrator(): MigrationOrchestrator {
  return new MigrationOrchestrator(migrationRegistry, versionManager);
@@ -253,14 +254,21 @@ export function createMigrationOrchestrator(): MigrationOrchestrator {
  * Example migration definitions for reference and testing.
  *
  * @remarks
- * Provides working examples of migration rules for different monitor types.
- * Use these as templates when creating new migrations for your monitor types.
+ * Provides working examples of migration rules for different monitor types. Use
+ * these as templates when creating new migrations for your monitor types.
  *
  * @example
+ *
  * ```typescript
  * // Register example migrations
- * migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
- * migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
+ * migrationRegistry.registerMigration(
+ *  "http",
+ *  exampleMigrations.httpV1_0_to_1_1
+ * );
+ * migrationRegistry.registerMigration(
+ *  "port",
+ *  exampleMigrations.portV1_0_to_1_1
+ * );
  * ```
  */
 export const exampleMigrations = {
@@ -268,8 +276,8 @@ export const exampleMigrations = {
   * Example HTTP monitor migration: Add timeout field with default value.
   *
   * @remarks
-  * Demonstrates non-breaking migration that adds a new field with sensible default.
-  * Safe to apply to existing HTTP monitor configurations.
+  * Demonstrates non-breaking migration that adds a new field with sensible
+  * default. Safe to apply to existing HTTP monitor configurations.
   */
  httpV1_0_to_1_1: {
   // ... existing implementation
@@ -279,8 +287,8 @@ export const exampleMigrations = {
   * Example port monitor migration: Ensure port is numeric.
   *
   * @remarks
-  * Demonstrates data type normalization migration.
-  * Converts string port numbers to integers with validation.
+  * Demonstrates data type normalization migration. Converts string port numbers
+  * to integers with validation.
   */
  portV1_0_to_1_1: {
   description: "Ensure port is a number",

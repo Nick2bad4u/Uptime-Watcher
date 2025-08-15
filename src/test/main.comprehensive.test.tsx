@@ -1,5 +1,5 @@
 /**
- * @fileoverview Simple tests for main.tsx application entry point focusing on coverage
+ * @file Simple tests for main.tsx application entry point focusing on coverage
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

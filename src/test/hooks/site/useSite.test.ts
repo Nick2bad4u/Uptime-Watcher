@@ -1,6 +1,7 @@
 /**
  * Comprehensive tests for useSite.ts
- * @file src/test/hooks/site/useSite.test.ts
+ *
+ * @file Src/test/hooks/site/useSite.test.ts
  */
 
 import { renderHook } from "@testing-library/react";

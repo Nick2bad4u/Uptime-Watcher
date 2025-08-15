@@ -1,6 +1,6 @@
 /**
- * Tests for DynamicMonitorFields component.
- * Tests dynamic form field generation based on monitor type configuration.
+ * Tests for DynamicMonitorFields component. Tests dynamic form field generation
+ * based on monitor type configuration.
  */
 
 import { render, screen } from "@testing-library/react";

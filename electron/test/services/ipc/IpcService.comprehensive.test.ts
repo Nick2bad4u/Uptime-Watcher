@@ -1,8 +1,9 @@
 /**
  * Comprehensive IpcService Tests - Isolated Component Testing
  *
- * Tests IpcService without ServiceContainer dependencies to achieve 95% coverage.
- * Focuses on handler registration, validation, error handling, and response formatting.
+ * Tests IpcService without ServiceContainer dependencies to achieve 95%
+ * coverage. Focuses on handler registration, validation, error handling, and
+ * response formatting.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -21,8 +21,9 @@ Suppose we are analyzing a TypeScript code comment such as this:
 /**
  * This API calculates the average of a list of numbers.
  *
- * @param list - the array of input numbers
- * @returns the arithmetic mean, or 0 if `list` is an empty array
+ * @param list - The array of input numbers
+ *
+ * @returns The arithmetic mean, or 0 if `list` is an empty array
  *
  * @internal
  */
@@ -80,6 +81,7 @@ document its own APIs!)
  * {@link http://tsdoc.org/pages/tags/internal | @internal tag}.
  *
  * @example
+ *
  * ```ts
  * // Prints "true" if comment contains "@internal"
  * console.log(isApiInternal(input));

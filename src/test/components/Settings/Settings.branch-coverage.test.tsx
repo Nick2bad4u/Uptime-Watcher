@@ -1,16 +1,17 @@
 /**
- * @fileoverview Comprehensive branch coverage tests for Settings component
- *
- * @description Tests all conditional branches to improve overall branch coverage.
- * Targets Settings.tsx which currently has 36.36% branch coverage.
+ * Tests all conditional branches to improve overall branch coverage. Targets
+ * Settings.tsx which currently has 36.36% branch coverage.
  *
  * This test file focuses on:
+ *
  * - Conditional rendering branches (error/success states)
  * - Event handler conditional logic
  * - Async error handling branches
  * - Settings validation branches
  * - Button state conditions
  * - User confirmation flows
+ *
+ * @file Comprehensive branch coverage tests for Settings component
  */
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";

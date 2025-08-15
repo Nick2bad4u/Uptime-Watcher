@@ -1,6 +1,6 @@
 /**
- * Final Coverage Analysis Test
- * A comprehensive test that verifies the new store integration works correctly
+ * Final Coverage Analysis Test A comprehensive test that verifies the new store
+ * integration works correctly
  */
 
 import { describe, it, expect } from "vitest";

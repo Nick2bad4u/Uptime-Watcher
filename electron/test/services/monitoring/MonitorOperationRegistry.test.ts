@@ -2,8 +2,8 @@
  * Comprehensive tests for MonitorOperationRegistry.
  *
  * @remarks
- * Tests monitor operation lifecycle management, tracking, cancellation,
- * and correlation functionality.
+ * Tests monitor operation lifecycle management, tracking, cancellation, and
+ * correlation functionality.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

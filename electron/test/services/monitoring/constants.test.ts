@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for monitoring service constants
- * Testing all monitoring configuration constants and their relationships
+ * @file Comprehensive tests for monitoring service constants Testing all
+ *   monitoring configuration constants and their relationships
  */
 
 import { describe, expect, it } from "vitest";

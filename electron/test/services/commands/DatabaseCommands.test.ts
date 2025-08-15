@@ -1,6 +1,7 @@
 /**
  * Comprehensive test suite for DatabaseCommands.ts providing 100% coverage.
- * Tests all command classes, executor functionality, error handling, and edge cases.
+ * Tests all command classes, executor functionality, error handling, and edge
+ * cases.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -532,10 +533,12 @@ describe("DatabaseCommands", () => {
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             };
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([
-                    createTestSite("test1"),
-                    createTestSite("test2"),
-                ]),
+                getSitesFromDatabase: vi
+                    .fn()
+                    .mockResolvedValue([
+                        createTestSite("test1"),
+                        createTestSite("test2"),
+                    ]),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
                 mockImportExportService
@@ -701,10 +704,12 @@ describe("DatabaseCommands", () => {
 
         beforeEach(() => {
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([
-                    createTestSite("loaded1"),
-                    createTestSite("loaded2"),
-                ]),
+                getSitesFromDatabase: vi
+                    .fn()
+                    .mockResolvedValue([
+                        createTestSite("loaded1"),
+                        createTestSite("loaded2"),
+                    ]),
             };
             mockServiceFactory.createSiteRepositoryService.mockReturnValue(
                 mockSiteRepositoryService

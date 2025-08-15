@@ -5,15 +5,16 @@
  * @remarks
  * This module builds on the basic port checking utilities by adding
  * configurable retry logic, exponential backoff, and development-mode debug
- * logging. It integrates with the operational hooks system for consistent
- * error handling and event emission across the monitoring system. For single
- * port checks without retry logic, use {@link portChecker.ts} directly. For
- * error handling utilities, see {@link portErrorHandling.ts}.
+ * logging. It integrates with the operational hooks system for consistent error
+ * handling and event emission across the monitoring system. For single port
+ * checks without retry logic, use {@link portChecker.ts} directly. For error
+ * handling utilities, see {@link portErrorHandling.ts}.
+ *
+ * @public
  *
  * @see {@link performPortCheckWithRetry}
  * @see {@link portChecker.ts}
  * @see {@link portErrorHandling.ts}
- * @public
  */
 
 import type { MonitorCheckResult } from "../types";
@@ -31,30 +32,48 @@ import { handlePortCheckError } from "./portErrorHandling";
  *
  * @remarks
  * This function wraps {@link performSinglePortCheck} with retry logic using
- * {@link withOperationalHooks}. It attempts to connect to the specified host
- * and port, retrying on failure up to `maxRetries` times (for a total of
+ * {@link withOperationalHooks}. It attempts to connect to the specified host and
+ * port, retrying on failure up to `maxRetries` times (for a total of
  * `maxRetries + 1` attempts). Exponential backoff is applied between attempts.
  * Debug logging is enabled in development mode. If all attempts fail, a
  * standardized error result is returned via {@link handlePortCheckError}.
  *
  * @example
+ *
  * ```typescript
  * // Try once, no retries
- * const result = await performPortCheckWithRetry("example.com", 80, 5000, 0);
+ * const result = await performPortCheckWithRetry(
+ *     "example.com",
+ *     80,
+ *     5000,
+ *     0
+ * );
  *
  * // Try 4 times total (1 initial + 3 retries)
- * const result = await performPortCheckWithRetry("example.com", 443, 3000, 3);
+ * const result = await performPortCheckWithRetry(
+ *     "example.com",
+ *     443,
+ *     3000,
+ *     3
+ * );
  * ```
  *
  * @param host - Target hostname or IP address to check.
  * @param port - Port number to test connectivity.
- * @param timeout - Maximum time to wait for each connection attempt in milliseconds.
- * @param maxRetries - Number of additional retry attempts after initial failure (0 = try once only).
- * @returns A promise that resolves to a {@link MonitorCheckResult} containing port details, response time, and status. If all attempts fail, the result is a standardized error result.
+ * @param timeout - Maximum time to wait for each connection attempt in
+ *   milliseconds.
+ * @param maxRetries - Number of additional retry attempts after initial failure
+ *   (0 = try once only).
+ *
+ * @returns A promise that resolves to a {@link MonitorCheckResult} containing
+ *   port details, response time, and status. If all attempts fail, the result
+ *   is a standardized error result.
+ *
+ * @public
+ *
  * @see {@link withOperationalHooks}
  * @see {@link performSinglePortCheck}
  * @see {@link handlePortCheckError}
- * @public
  */
 export async function performPortCheckWithRetry(
     host: string,

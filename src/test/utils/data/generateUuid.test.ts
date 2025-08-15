@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for generateUuid utility function
+ * @file Tests for generateUuid utility function
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

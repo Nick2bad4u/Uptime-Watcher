@@ -61,15 +61,17 @@ export interface MonitoringLifecycleConfig {
 /**
  * Type for the monitoring lifecycle callback functions.
  *
- * @param identifier - Site identifier for the monitoring operation
- * @param monitorId - Optional specific monitor ID, if not provided operates on all site monitors
- * @returns Promise resolving to true if operation succeeded, false otherwise
- *
  * @remarks
- * Used for recursive calls in monitoring operations. The callback should
- * handle both individual monitor operations (when monitorId is provided) and
- * bulk operations (when monitorId is undefined). Error handling should be
- * managed within the callback implementation.
+ * Used for recursive calls in monitoring operations. The callback should handle
+ * both individual monitor operations (when monitorId is provided) and bulk
+ * operations (when monitorId is undefined). Error handling should be managed
+ * within the callback implementation.
+ *
+ * @param identifier - Site identifier for the monitoring operation
+ * @param monitorId - Optional specific monitor ID, if not provided operates on
+ *   all site monitors
+ *
+ * @returns Promise resolving to true if operation succeeded, false otherwise
  */
 // eslint-disable-next-line etc/prefer-interface -- Function type is simpler for monitoring callbacks
 export type MonitoringCallback = (
@@ -84,6 +86,7 @@ export type MonitoringCallback = (
  * @param monitorId - Monitor ID to find
  * @param identifier - Site identifier for logging
  * @param config - Configuration object for logging
+ *
  * @returns Monitor object if found, null otherwise
  */
 function findMonitorById(
@@ -103,16 +106,17 @@ function findMonitorById(
 /**
  * Validate monitor check interval.
  *
+ * @remarks
+ * Checks for falsy values that indicate no valid interval is set. This includes
+ * undefined, null, 0 (invalid - would cause infinite polling), and empty
+ * string. A checkInterval of 0 is intentionally treated as invalid since it
+ * would result in continuous polling without delay.
+ *
  * @param monitor - Monitor to validate
  * @param identifier - Site identifier for logging
  * @param config - Configuration object for logging
- * @returns True if interval is valid, false otherwise
  *
- * @remarks
- * Checks for falsy values that indicate no valid interval is set.
- * This includes undefined, null, 0 (invalid - would cause infinite polling),
- * and empty string. A checkInterval of 0 is intentionally treated as invalid
- * since it would result in continuous polling without delay.
+ * @returns True if interval is valid, false otherwise
  */
 function validateCheckInterval(
     monitor: Site["monitors"][0],
@@ -139,7 +143,9 @@ function validateCheckInterval(
  * @param site - Site containing the monitor
  * @param identifier - Site identifier for logging
  * @param monitorId - Monitor ID to find
- * @param validateInterval - Whether to validate check interval (needed for start operations)
+ * @param validateInterval - Whether to validate check interval (needed for
+ *   start operations)
+ *
  * @returns Monitor object if found and valid, null otherwise
  *
  * @internal Helper function to eliminate monitor lookup duplication
@@ -206,21 +212,24 @@ async function refreshSiteCache(
 /**
  * Helper function to start or stop monitoring for all monitors in a site.
  *
+ * @remarks
+ * The different aggregation strategies reflect the operational semantics:
+ *
+ * - Starting: If any monitor starts successfully, the site is considered
+ *   "partially active" - Stopping: All monitors must stop successfully for the
+ *   site to be "fully stopped"
+ *
  * @param config - Configuration object with required dependencies
  * @param site - Site containing monitors to process
  * @param identifier - Site identifier for logging
  * @param callback - Callback function to execute for each monitor
  * @param useOptimisticLogic - Result aggregation strategy:
- *   - true (optimistic): Success if ANY monitor operation succeeds (used for
- *   starting) - false (pessimistic): Success only if ALL monitor operations
- *   succeed (used for stopping)
- * @returns Promise resolving to aggregated success state based on logic type
  *
- * @remarks
- * The different aggregation strategies reflect the operational semantics:
- * - Starting: If any monitor starts successfully, the site is considered
- * "partially active" - Stopping: All monitors must stop successfully for the
- * site to be "fully stopped"
+ *   - True (optimistic): Success if ANY monitor operation succeeds (used for
+ *       starting) - false (pessimistic): Success only if ALL monitor operations
+ *       succeed (used for stopping)
+ *
+ * @returns Promise resolving to aggregated success state based on logic type
  */
 async function processAllSiteMonitors(
     config: MonitoringLifecycleConfig,
@@ -424,12 +433,9 @@ async function stopSpecificMonitor(
 /**
  * Start monitoring for all sites.
  *
- * @param config - Configuration object with required dependencies
- * @param isMonitoring - Current monitoring state
- * @returns Promise<boolean> - New monitoring state
- *
  * @remarks
  * **Side Effects:**
+ *
  * - Sets all monitors to "pending" status regardless of previous state
  * - Enables monitoring flag for all monitors
  * - Starts monitor scheduling for all sites
@@ -437,6 +443,11 @@ async function stopSpecificMonitor(
  * This intentionally sets all monitors to "pending" to indicate they are being
  * initialized for monitoring startup, providing a clear signal that the system
  * is transitioning to an active monitoring state.
+ *
+ * @param config - Configuration object with required dependencies
+ * @param isMonitoring - Current monitoring state
+ *
+ * @returns Promise<boolean> - New monitoring state
  */
 export async function startAllMonitoring(
     config: MonitoringLifecycleConfig,
@@ -502,8 +513,10 @@ export async function startAllMonitoring(
  *
  * @param config - Configuration object with required dependencies
  * @param identifier - Site identifier
- * @param monitorId - Optional monitor ID (if not provided, starts all monitors for the site)
+ * @param monitorId - Optional monitor ID (if not provided, starts all monitors
+ *   for the site)
  * @param callback - Callback function for recursive calls
+ *
  * @returns Promise<boolean> - True if monitoring was started successfully
  */
 export async function startMonitoringForSite(
@@ -526,11 +539,9 @@ export async function startMonitoringForSite(
 /**
  * Stop all monitoring and return updated monitoring state.
  *
- * @param config - Configuration object with required dependencies
- * @returns boolean - New monitoring state (always false)
- *
  * @remarks
  * **Side Effects:**
+ *
  * - Sets all monitors to "paused" status regardless of previous state
  * - Disables monitoring flag for all actively monitoring monitors
  * - Stops all monitor scheduling system-wide
@@ -538,6 +549,10 @@ export async function startMonitoringForSite(
  * This intentionally sets all monitors to "paused" to indicate that monitoring
  * has been stopped system-wide, providing a clear signal that the system is
  * transitioning to an inactive monitoring state.
+ *
+ * @param config - Configuration object with required dependencies
+ *
+ * @returns Boolean - New monitoring state (always false)
  */
 export async function stopAllMonitoring(
     config: MonitoringLifecycleConfig
@@ -601,8 +616,10 @@ export async function stopAllMonitoring(
  *
  * @param config - Configuration object with required dependencies
  * @param identifier - Site identifier
- * @param monitorId - Optional monitor ID (if not provided, stops all monitors for the site)
+ * @param monitorId - Optional monitor ID (if not provided, stops all monitors
+ *   for the site)
  * @param callback - Callback function for recursive calls
+ *
  * @returns Promise<boolean> - True if monitoring was stopped successfully
  */
 export async function stopMonitoringForSite(

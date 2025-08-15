@@ -1,11 +1,10 @@
 /**
  * Branch coverage tests for operationalHooks.ts
  *
- * Current coverage: 50% branch coverage
- * Goal: Increase to 98%+ branch coverage
+ * Current coverage: 50% branch coverage Goal: Increase to 98%+ branch coverage
  *
- * This file handles operational hooks for operations with error handling,
- * retry logic, and event emission capabilities.
+ * This file handles operational hooks for operations with error handling, retry
+ * logic, and event emission capabilities.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

@@ -54,9 +54,11 @@ if (fs.existsSync(hashesPath)) {
 const newHashes = {};
 
 /**
- * Removes everything from the line containing '::::: sponsors_container' onward,
- * and removes any line that contains '::::::: body'.
+ * Removes everything from the line containing '::::: sponsors_container'
+ * onward, and removes any line that contains '::::::: body'.
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function cleanContent(content) {
@@ -80,10 +82,14 @@ function cleanContent(content) {
 
 /**
  * Rewrites relative Markdown links to absolute URLs for Axios documentation.
- * - Converts links like (./other_page) to (https://axios-http.com/docs/other_page)
+ *
+ * - Converts links like (./other_page) to
+ *   (https://axios-http.com/docs/other_page)
  * - Only rewrites links matching the pattern: (./[name])
  * - Does not handle anchors, query params, or complex markdown links.
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function rewriteLinks(content) {
@@ -170,6 +176,7 @@ const axiosPagePromises = axiosPages.map((page) => {
 
 /**
  * Writes a log entry summarizing the results of all Axios doc downloads.
+ *
  * - Only writes the log if all expected files have been downloaded.
  * - Compares file hashes to detect changes and logs updated files.
  * - Updates the hashes file for future change detection.

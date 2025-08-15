@@ -120,27 +120,30 @@ export interface BaseMonitorConfig {
  /**
   * Factory function to create monitor service instances.
   *
-  * @returns New monitor service instance
-  *
   * @remarks
   * Should return a fresh instance for each call to avoid shared state issues.
-  * The returned instance must implement IMonitorService interface.
-  * Factory should handle any initialization required for the monitor type.
+  * The returned instance must implement IMonitorService interface. Factory
+  * should handle any initialization required for the monitor type.
   *
   * Error handling:
+  *
   * - Should throw descriptive errors if instantiation fails
   * - Must not return null or undefined
   * - Should validate internal dependencies are available
   *
   * Lifecycle:
+  *
   * - Each call creates a new instance
   * - Instances are managed by MonitorFactory
   * - No shared state between instances
   *
   * @example
+  *
   * ```typescript
-  * serviceFactory: () => new HttpMonitor()
+  * serviceFactory: () => new HttpMonitor();
   * ```
+  *
+  * @returns New monitor service instance
   */
  readonly serviceFactory: () => import("./types").IMonitorService;
 
@@ -156,21 +159,23 @@ export interface BaseMonitorConfig {
   * Zod validation schema for this monitor type.
   *
   * @remarks
-  * Must validate all required fields defined in the fields array.
-  * Should include appropriate type checking and format validation.
-  * Used for both client-side and server-side validation.
+  * Must validate all required fields defined in the fields array. Should
+  * include appropriate type checking and format validation. Used for both
+  * client-side and server-side validation.
   *
   * Expected schema structure:
+  *
   * - Object schema with field validation
   * - Proper error messages for field validation failures
   * - Support for optional fields with defaults
   *
   * @example
+  *
   * ```typescript
   * validationSchema: z.object({
-  *   url: z.string().url("Must be a valid URL"),
-  *   timeout: z.number().optional().default(10000)
-  * })
+  *  url: z.string().url("Must be a valid URL"),
+  *  timeout: z.number().optional().default(10000),
+  * });
   * ```
   */
  readonly validationSchema: z.ZodObject<Record<string, z.ZodTypeAny>>;
@@ -186,18 +191,20 @@ export interface BaseMonitorConfig {
 /**
  * Simple monitor type validation for internal use.
  *
- * @param type - Monitor type to validate
- * @returns Validation result compatible with EnhancedTypeGuard interface
- *
  * @remarks
- * Breaks circular dependency with EnhancedTypeGuards by providing basic validation.
- * Used internally by registry functions that need type validation without
- * importing external validation utilities.
+ * Breaks circular dependency with EnhancedTypeGuards by providing basic
+ * validation. Used internally by registry functions that need type validation
+ * without importing external validation utilities.
  *
  * Validation logic:
+ *
  * - Checks if type is a string
  * - Verifies type is registered in the monitor registry
  * - Returns structured result compatible with type guard patterns
+ *
+ * @param type - Monitor type to validate
+ *
+ * @returns Validation result compatible with EnhancedTypeGuard interface
  *
  * @internal
  */
@@ -212,29 +219,34 @@ function validateMonitorTypeInternal(type: unknown): {
 /**
  * Create monitor object with runtime type validation.
  *
- * @param type - Monitor type string to validate
- * @param data - Monitor data to merge with defaults
- * @returns Validation result with created monitor or errors
- *
  * @remarks
- * Provides runtime type safety by validating monitor type and creating
- * properly structured monitor objects with sensible defaults.
+ * Provides runtime type safety by validating monitor type and creating properly
+ * structured monitor objects with sensible defaults.
  *
  * Process:
+ *
  * 1. Validates monitor type using internal validation
  * 2. Creates monitor object with default values
  * 3. Merges provided data with defaults
  * 4. Returns structured result for error handling
  *
  * @example
+ *
  * ```typescript
- * const result = createMonitorWithTypeGuards("http", { url: "https://example.com" });
+ * const result = createMonitorWithTypeGuards("http", {
+ *  url: "https://example.com",
+ * });
  * if (result.success) {
- *   console.log("Created monitor:", result.monitor);
+ *  console.log("Created monitor:", result.monitor);
  * } else {
- *   console.error("Validation errors:", result.errors);
+ *  console.error("Validation errors:", result.errors);
  * }
  * ```
+ *
+ * @param type - Monitor type string to validate
+ * @param data - Monitor data to merge with defaults
+ *
+ * @returns Validation result with created monitor or errors
  */
 export function createMonitorWithTypeGuards(
  type: string,
@@ -250,38 +262,47 @@ export function createMonitorWithTypeGuards(
 /**
  * Migrate monitor data between versions with comprehensive error handling.
  *
- * @param monitorType - Type of monitor to migrate
- * @param fromVersion - Source version of the data
- * @param toVersion - Target version for migration
- * @param data - Optional monitor data to migrate
- * @returns Migration result with transformed data or errors
- *
  * @remarks
- * Provides version migration support for monitor configurations using
- * the migration system. Handles both data transformations and version updates.
+ * Provides version migration support for monitor configurations using the
+ * migration system. Handles both data transformations and version updates.
  *
  * Migration process:
+ *
  * 1. Validates monitor type using internal validation
  * 2. Checks if migration is needed (version comparison)
  * 3. Uses migration orchestrator for data transformation
  * 4. Returns structured result with applied migrations
  *
  * Error handling:
+ *
  * - Invalid monitor types return validation errors
  * - Missing migration paths return migration errors
  * - Transform failures include original error details
  * - All errors are logged for debugging
  *
  * @example
+ *
  * ```typescript
- * const result = await migrateMonitorType("http", "1.0.0", "1.1.0", monitorData);
+ * const result = await migrateMonitorType(
+ *  "http",
+ *  "1.0.0",
+ *  "1.1.0",
+ *  monitorData
+ * );
  * if (result.success) {
- *   console.log("Applied migrations:", result.appliedMigrations);
- *   return result.data;
+ *  console.log("Applied migrations:", result.appliedMigrations);
+ *  return result.data;
  * } else {
- *   console.error("Migration failed:", result.errors);
+ *  console.error("Migration failed:", result.errors);
  * }
  * ```
+ *
+ * @param monitorType - Type of monitor to migrate
+ * @param fromVersion - Source version of the data
+ * @param toVersion - Target version for migration
+ * @param data - Optional monitor data to migrate
+ *
+ * @returns Migration result with transformed data or errors
  */
 export async function migrateMonitorType(
  monitorType: MonitorType,
@@ -305,8 +326,8 @@ export async function migrateMonitorType(
  * UI configuration for monitor type display.
  *
  * @remarks
- * Defines the complete UI configuration structure for monitor types.
- * Must be kept in sync with BaseMonitorConfig.uiConfig for consistency.
+ * Defines the complete UI configuration structure for monitor types. Must be
+ * kept in sync with BaseMonitorConfig.uiConfig for consistency.
  */
 export interface MonitorUIConfig {
  /** Chart data formatters */
@@ -372,19 +393,22 @@ export async function migrateMonitorType(
  * Monitor type definitions and registration.
  *
  * @remarks
- * Field definitions and schemas are sourced from shared/types and shared/validation.
- * Each monitor type registration includes:
+ * Field definitions and schemas are sourced from shared/types and
+ * shared/validation. Each monitor type registration includes:
+ *
  * - UI field definitions for form generation
  * - Validation schemas for data integrity
  * - Service factory for monitor instances
  * - UI configuration for display customization
  *
  * For scalability, consider moving monitor definitions to separate files:
- * - monitors/http/registration.ts
- * - monitors/port/registration.ts
- * - etc.
+ *
+ * - Monitors/http/registration.ts
+ * - Monitors/port/registration.ts
+ * - Etc.
  *
  * Migration strategy:
+ *
  * - Each monitor type tracks its own version
  * - Migrations are registered in MigrationSystem
  * - Version updates are handled automatically
@@ -410,7 +434,8 @@ registerMonitorType({
  *
  * @remarks
  * Port monitors test TCP connectivity to specific host:port combinations.
- * Useful for checking database servers, internal services, and network connectivity.
+ * Useful for checking database servers, internal services, and network
+ * connectivity.
  */
 registerMonitorType({
  // ... existing Port registration with detailed comments

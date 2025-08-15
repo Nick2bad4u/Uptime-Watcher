@@ -1,8 +1,8 @@
 /**
  * Tests for useBackendFocusSync hook
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for the backend focus synchronization hook.
+ * @file Comprehensive tests covering all branches and edge cases for the
+ *   backend focus synchronization hook.
  */
 
 import { renderHook } from "@testing-library/react";

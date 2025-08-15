@@ -1,6 +1,6 @@
 /**
- * Shared interfaces for utilities.
- * Contains common interface definitions used across multiple utility files.
+ * Shared interfaces for utilities. Contains common interface definitions used
+ * across multiple utility files.
  */
 
 /**
@@ -23,13 +23,13 @@ export interface Logger {
     /**
      * Log error messages with optional error objects.
      *
-     * @param message - The error message to log
-     * @param error - Optional error object or additional context
-     * @param args - Additional arguments for context
-     *
      * @remarks
      * When an Error object is provided, the logger should extract and format
      * the error message and stack trace appropriately for debugging.
+     *
+     * @param message - The error message to log
+     * @param error - Optional error object or additional context
+     * @param args - Additional arguments for context
      */
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
 

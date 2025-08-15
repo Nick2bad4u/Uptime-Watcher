@@ -28,8 +28,8 @@ Reviewed 24 low-confidence AI claims across shared utility files. **18 claims ar
 
 ```typescript
 /**
- * Specific event payload type definitions for improved type safety.
- * Replaces generic `unknown` types in IPC event callbacks.
+ * Specific event payload type definitions for improved type safety. Replaces
+ * generic `unknown` types in IPC event callbacks.
  */
 ```
 

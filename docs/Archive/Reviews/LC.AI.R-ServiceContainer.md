@@ -255,8 +255,8 @@ public isInitialized(): boolean {
  * Configuration interface for service container behavior.
  *
  * @remarks
- * Controls various aspects of service initialization and behavior.
- * All properties are optional with sensible defaults.
+ * Controls various aspects of service initialization and behavior. All
+ * properties are optional with sensible defaults.
  *
  * @public
  */
@@ -264,27 +264,28 @@ export interface ServiceContainerConfig {
  /**
   * Enable debug logging for service initialization and lifecycle events.
   *
-  * @defaultValue false
-  *
   * @remarks
   * When enabled, logs detailed information about:
+  *
   * - Service creation and dependency injection
   * - Initialization order and timing
   * - Manager setup and event forwarding
   * - Error contexts and recovery attempts
   *
   * Useful for debugging service dependency issues and startup problems.
+  *
+  * @defaultValue false
   */
  enableDebugLogging?: boolean;
 
  /**
   * Custom notification service configuration.
   *
-  * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
-  *
   * @remarks
-  * Controls system notification behavior for monitor status changes.
-  * Can be modified at runtime via NotificationService.updateConfig().
+  * Controls system notification behavior for monitor status changes. Can be
+  * modified at runtime via NotificationService.updateConfig().
+  *
+  * @defaultValue `{ showDownAlerts: true, showUpAlerts: true }`
   *
   * @see {@link NotificationService} for runtime configuration updates
   */

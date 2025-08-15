@@ -176,16 +176,18 @@ class ImportDataCommand implements IDatabaseCommand {
    /**
     * Sets the history limit for status history retention.
     *
+    * @example
+    *
+    * ```typescript
+    * await databaseManager.setHistoryLimit(100);
+    * ```
+    *
     * @param limit - The new history limit value to set.
+    *
     * @returns Promise resolving when the history limit is updated.
     *
     * @throws TypeError if limit is not a valid number or integer.
     * @throws RangeError if limit is negative, infinite, or too large.
-    *
-    * @example
-    * ```typescript
-    * await databaseManager.setHistoryLimit(100);
-    * ```
     */
    ````
 

@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for useDelayedButtonLoading hook
- * Testing delayed loading states, timeouts, and cleanup behavior
+ * @file Comprehensive tests for useDelayedButtonLoading hook Testing delayed
+ *   loading states, timeouts, and cleanup behavior
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

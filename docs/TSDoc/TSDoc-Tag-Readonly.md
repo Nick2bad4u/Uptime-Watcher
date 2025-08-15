@@ -23,6 +23,7 @@ export class Book {
  /**
   * Technically property has a setter, but for documentation purposes it should
   * be presented as readonly.
+  *
   * @readonly
   */
  public get title(): string {

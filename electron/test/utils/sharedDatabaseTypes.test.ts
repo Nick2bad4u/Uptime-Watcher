@@ -1,6 +1,6 @@
 /**
- * Backend coverage test for shared types - database
- * Moved to electron/test to ensure coverage tracking
+ * Backend coverage test for shared types - database Moved to electron/test to
+ * ensure coverage tracking
  */
 
 import { describe, expect, it } from "vitest";

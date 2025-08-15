@@ -1,6 +1,6 @@
 /**
- * 100% line coverage test for useSiteSync.ts
- * Targets all uncovered lines specifically identified by coverage analysis
+ * 100% line coverage test for useSiteSync.ts Targets all uncovered lines
+ * specifically identified by coverage analysis
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Tests for shared validation types and functions
- * Achieves 100% coverage for shared/types/validation.ts
+ * Tests for shared validation types and functions Achieves 100% coverage for
+ * shared/types/validation.ts
  */
 
 import { describe, it, expect } from "vitest";

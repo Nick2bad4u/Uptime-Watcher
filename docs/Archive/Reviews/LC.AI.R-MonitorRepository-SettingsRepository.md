@@ -179,16 +179,16 @@ if (
 /**
  * Method description with clear purpose.
  *
+ * @remarks
+ * **Usage Context**: When to use this method **Domain Logic**: Business rule
+ * explanations **Pattern Notes**: Architectural considerations
+ *
  * @param param1 - Clear parameter description
  * @param param2 - Clear parameter description
+ *
  * @returns Clear return description
  *
  * @throws {@link Error} When specific conditions occur
- *
- * @remarks
- * **Usage Context**: When to use this method
- * **Domain Logic**: Business rule explanations
- * **Pattern Notes**: Architectural considerations
  */
 ```
 
@@ -216,9 +216,10 @@ private getDb(): Database {
 ```typescript
 /**
  * @remarks
- * **Transaction Context**: This method must be called within an existing transaction.
- * Uses synchronous database operations compatible with node-sqlite3-wasm.
- * No Promise wrapping needed as all operations complete immediately.
+ * **Transaction Context**: This method must be called within an existing
+ * transaction. Uses synchronous database operations compatible with
+ * node-sqlite3-wasm. No Promise wrapping needed as all operations complete
+ * immediately.
  */
 ```
 
@@ -300,8 +301,9 @@ throw new Error(
 ```typescript
 // Added: Clear explanation of monitoring state relationships
 /**
- * **Domain Logic**: The 'enabled' field is automatically derived from 'monitoring' state.
- * References Domain Event Contract for monitor state transitions.
+ * **Domain Logic**: The 'enabled' field is automatically derived from
+ * 'monitoring' state. References Domain Event Contract for monitor state
+ * transitions.
  */
 ```
 

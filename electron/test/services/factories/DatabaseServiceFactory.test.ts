@@ -1,13 +1,17 @@
 /**
  * Test suite for DatabaseServiceFactory
  *
- * @fileoverview Comprehensive tests for the DatabaseServiceFactory class
- * in the Uptime Watcher application.
+ * @module DatabaseServiceFactory
+ *
+ * @file Comprehensive tests for the DatabaseServiceFactory class in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Services
- * @module DatabaseServiceFactory
+ *
  * @tags ["test", "factory", "database", "services"]
  */
 

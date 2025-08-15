@@ -1,7 +1,6 @@
 /**
- * Shared utilities for monitor services to reduce code duplication
- * Contains common patterns used across PingMonitor, PortMonitor, and
- * HttpMonitor
+ * Shared utilities for monitor services to reduce code duplication Contains
+ * common patterns used across PingMonitor, PortMonitor, and HttpMonitor
  */
 
 import type { Monitor } from "@shared/types";
@@ -18,8 +17,10 @@ export const DEFAULT_RETRY_ATTEMPTS = 3;
 
 /**
  * Create a standardized error result for monitor health checks
+ *
  * @param error - Error message
  * @param responseTime - Response time in milliseconds
+ *
  * @returns Standardized monitor health check error result
  */
 export function createMonitorErrorResult(
@@ -35,8 +36,10 @@ export function createMonitorErrorResult(
 
 /**
  * Extract common monitor configuration values (timeout and retry attempts)
+ *
  * @param monitor - Monitor configuration
  * @param configTimeout - Default timeout from monitor config
+ *
  * @returns Object containing timeout and retry attempts
  */
 export function extractMonitorConfig(
@@ -57,7 +60,9 @@ export function extractMonitorConfig(
 
 /**
  * Validate that a monitor has the required host property
+ *
  * @param monitor - Monitor to validate
+ *
  * @returns Error message if validation fails, null if valid
  */
 export function validateMonitorHost(monitor: Monitor): null | string {
@@ -73,7 +78,9 @@ export function validateMonitorHost(monitor: Monitor): null | string {
 
 /**
  * Validate that a monitor has the required host and port properties
+ *
  * @param monitor - Monitor to validate
+ *
  * @returns Error message if validation fails, null if valid
  */
 export function validateMonitorHostAndPort(monitor: Monitor): null | string {
@@ -95,7 +102,9 @@ export function validateMonitorHostAndPort(monitor: Monitor): null | string {
 
 /**
  * Validate that a monitor has the required URL property
+ *
  * @param monitor - Monitor to validate
+ *
  * @returns Error message if validation fails, null if valid
  */
 export function validateMonitorUrl(monitor: Monitor): null | string {

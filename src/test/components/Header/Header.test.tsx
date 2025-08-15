@@ -1,6 +1,6 @@
 /**
- * Comprehensive test suite for Header component
- * Tests all branches, edge cases, and user interactions
+ * Comprehensive test suite for Header component Tests all branches, edge cases,
+ * and user interactions
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";

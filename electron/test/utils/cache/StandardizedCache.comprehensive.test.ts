@@ -7,6 +7,7 @@ import { UptimeEvents } from "../../../events/eventTypes";
  * Comprehensive test suite for StandardizedCache
  *
  * This test suite aims for 98% branch coverage by testing:
+ *
  * - All configuration options and their combinations
  * - TTL expiration scenarios including edge cases
  * - LRU eviction behavior

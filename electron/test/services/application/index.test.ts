@@ -1,6 +1,6 @@
 /**
- * Tests for application services index exports.
- * Validates that all services are properly exported.
+ * Tests for application services index exports. Validates that all services are
+ * properly exported.
  */
 
 import { describe, expect, it } from "vitest";

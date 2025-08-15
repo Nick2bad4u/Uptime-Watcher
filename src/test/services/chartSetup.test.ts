@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for chart setup module to ensure Chart.js is properly configured.
+ * @file Tests for chart setup module to ensure Chart.js is properly configured.
  */
 
 import { describe, it, expect } from "vitest";

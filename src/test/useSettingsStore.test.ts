@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for useSettingsStore.
- * Tests all store actions, state management, and persistence.
+ * Comprehensive tests for useSettingsStore. Tests all store actions, state
+ * management, and persistence.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

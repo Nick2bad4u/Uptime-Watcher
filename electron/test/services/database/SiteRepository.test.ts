@@ -1,13 +1,17 @@
 /**
  * Test suite for SiteRepository
  *
- * @fileoverview Comprehensive tests for unknown functionality
- * in the Uptime Watcher application.
+ * @module Unknown
+ *
+ * @file Comprehensive tests for unknown functionality in the Uptime Watcher
+ *   application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category General
- * @module Unknown
+ *
  * @tags ["test"]
  */
 

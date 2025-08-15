@@ -15,6 +15,7 @@ import { logger } from "./logger";
 export interface OperationalHooksConfig<T = unknown> {
     /**
      * Backoff strategy for retry delays.
+     *
      * @defaultValue "exponential"
      */
     backoff?: "exponential" | "linear";
@@ -26,6 +27,7 @@ export interface OperationalHooksConfig<T = unknown> {
 
     /**
      * Whether to emit events for this operation.
+     *
      * @defaultValue true
      */
     emitEvents?: boolean;
@@ -37,12 +39,14 @@ export interface OperationalHooksConfig<T = unknown> {
 
     /**
      * Initial delay between retries in milliseconds.
+     *
      * @defaultValue 100
      */
     initialDelay?: number;
 
     /**
      * Maximum number of retry attempts.
+     *
      * @defaultValue 3
      */
     maxRetries?: number;
@@ -69,6 +73,7 @@ export interface OperationalHooksConfig<T = unknown> {
 
     /**
      * Whether to throw on final failure.
+     *
      * @defaultValue true
      */
     throwOnFailure?: boolean;
@@ -89,8 +94,8 @@ function calculateDelay(
 }
 
 /**
- * Generate a unique operation ID for tracking.
- * Uses crypto.randomUUID() when available, falls back to timestamp-based ID.
+ * Generate a unique operation ID for tracking. Uses crypto.randomUUID() when
+ * available, falls back to timestamp-based ID.
  */
 function generateOperationId(): string {
     try {
@@ -402,10 +407,13 @@ export async function withOperationalHooks<T>(
  * categorization.
  *
  * @typeParam T - The return type of the database operation
+ *
  * @param operation - Database operation to execute with retry logic
- * @param operationName - Name of the database operation (will be prefixed with "database:")
+ * @param operationName - Name of the database operation (will be prefixed with
+ *   "database:")
  * @param eventEmitter - Optional event emitter for operation lifecycle events
  * @param context - Optional context data to include in events
+ *
  * @returns Promise resolving to the operation result
  */
 export async function withDatabaseOperation<T>(

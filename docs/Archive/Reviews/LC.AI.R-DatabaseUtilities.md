@@ -87,6 +87,7 @@ db.run(dynamicMonitorSchema);
  * Validate generated SQL schema before execution.
  *
  * @param schema - Generated SQL schema string
+ *
  * @throws {@link Error} When schema validation fails
  */
 function validateGeneratedSchema(schema: string): void {

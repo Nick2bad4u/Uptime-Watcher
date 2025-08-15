@@ -1,8 +1,10 @@
 /**
- * @fileoverview Comprehensive tests for WindowService
- * @module WindowService.test
- * @description Tests all functionality of the WindowService class including window creation,
+ * Tests all functionality of the WindowService class including window creation,
  * content loading, event handling, and environment-specific behavior.
+ *
+ * @module WindowService.test
+ *
+ * @file Comprehensive tests for WindowService
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

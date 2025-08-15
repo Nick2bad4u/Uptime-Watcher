@@ -1,9 +1,11 @@
 /**
- * IPC standardization testing concepts and validation patterns.
- * Demonstrates comprehensive testing approaches for standardized IPC systems.
+ * IPC standardization testing concepts and validation patterns. Demonstrates
+ * comprehensive testing approaches for standardized IPC systems.
  *
  * @remarks
- * This test suite validates the concepts and patterns used in IPC standardization:
+ * This test suite validates the concepts and patterns used in IPC
+ * standardization:
+ *
  * - Response format consistency
  * - Parameter validation approaches
  * - Error handling patterns

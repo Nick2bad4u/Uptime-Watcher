@@ -1,6 +1,6 @@
 /**
- * Foundation test for DatabaseManager - establishing working mock patterns
- * This test serves as a template for proper mocking architecture
+ * Foundation test for DatabaseManager - establishing working mock patterns This
+ * test serves as a template for proper mocking architecture
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Tests for IpcService - Comprehensive IPC handler coverage
- * Tests all IPC handler registration, validation, and cleanup functionality.
+ * Tests for IpcService - Comprehensive IPC handler coverage Tests all IPC
+ * handler registration, validation, and cleanup functionality.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

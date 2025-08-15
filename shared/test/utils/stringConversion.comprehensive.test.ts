@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for string conversion utilities
- * Targeting 98%+ branch coverage for all string conversion functions
+ * Comprehensive tests for string conversion utilities Targeting 98%+ branch
+ * coverage for all string conversion functions
  */
 
 import { describe, it, expect } from "vitest";

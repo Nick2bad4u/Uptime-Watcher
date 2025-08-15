@@ -92,13 +92,7 @@ describe("HTTP Status Utils", () => {
             }
 
             // Common client error scenarios (site is responding, just with errors)
-            const clientErrorCodes = [
-                400,
-                401,
-                403,
-                404,
-                429,
-            ];
+            const clientErrorCodes = [400, 401, 403, 404, 429];
             for (const code of clientErrorCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
             }

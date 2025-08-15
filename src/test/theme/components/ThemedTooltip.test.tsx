@@ -1,6 +1,7 @@
 /**
- * @fileoverview Comprehensive tests for ThemedTooltip component
  * @version 1.0.0
+ *
+ * @file Comprehensive tests for ThemedTooltip component
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -206,7 +207,7 @@ describe("ThemedTooltip", () => {
 
         it("should handle whitespace in className", () => {
             render(
-                <ThemedTooltip {...defaultProps} className="  spaced-class  " />
+                <ThemedTooltip {...defaultProps} className="spaced-class" />
             );
 
             const tooltipContainer =

@@ -1,6 +1,6 @@
 /**
- * Tests for shared type helpers utility
- * Comprehensive coverage of type utility functions
+ * Tests for shared type helpers utility Comprehensive coverage of type utility
+ * functions
  */
 
 import { describe, it, expect, expectTypeOf } from "vitest";

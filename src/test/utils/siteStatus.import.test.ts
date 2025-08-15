@@ -1,6 +1,6 @@
 /**
- * Test for src/utils/siteStatus.ts re-exports.
- * This tests the import/export functionality of the frontend wrapper.
+ * Test for src/utils/siteStatus.ts re-exports. This tests the import/export
+ * functionality of the frontend wrapper.
  */
 
 import { describe, expect, it } from "vitest";

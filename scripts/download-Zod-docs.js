@@ -1,14 +1,15 @@
 // @ts-nocheck
 // @ts-nocheck
 /**
- * Universal Doc Downloader & Cleaner Template
- * -------------------------------------------
+ * ## Universal Doc Downloader & Cleaner Template
+ *
  * Easily configure all variables at the top!
  *
  * HOW TO CONFIGURE:
- *   1. Set variables in the CONFIGURATION section below.
- *   2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
- *   3. Run: `node doc_downloader_template.js`
+ *
+ * 1. Set variables in the CONFIGURATION section below.
+ * 2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
+ * 3. Run: `node doc_downloader_template.js`
  */
 
 import { exec } from "node:child_process";
@@ -64,22 +65,22 @@ const OUTPUT_EXT = "md";
 
 /**
  * SECTION REMOVAL/STRIP OPTIONS:
- * - To remove everything from a marker onwards, add its string to REMOVE_FROM_MARKER (array, any string).
- * - To remove only lines that contain certain markers, add those to REMOVE_LINE_MARKERS (array).
- * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER (array).
+ *
+ * - To remove everything from a marker onwards, add its string to
+ *   REMOVE_FROM_MARKER (array, any string).
+ * - To remove only lines that contain certain markers, add those to
+ *   REMOVE_LINE_MARKERS (array).
+ * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER
+ *   (array).
  */
 
-const REMOVE_FROM_MARKER = [
-    '<div class="flex-1" role="none">',
-];
+const REMOVE_FROM_MARKER = ['<div class="flex-1" role="none">'];
 
 // const REMOVE_LINE_MARKERS = [
 //     "::::::: body"
 // ];
 
-const REMOVE_ABOVE_MARKER = [
-    '<h1 class="text-3xl font-semibold">',
-];
+const REMOVE_ABOVE_MARKER = ['<h1 class="text-3xl font-semibold">'];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
@@ -116,10 +117,13 @@ const CMD_TEMPLATE = (url, outFile) =>
  * Handles ./, ../, and subdirectory links.
  *
  * Limitations:
- * - Does not rewrite links containing anchors (#), query parameters (?), or non-standard formats.
+ *
+ * - Does not rewrite links containing anchors (#), query parameters (?), or
+ *   non-standard formats.
  * - Only rewrites links that start with ./ or ../ and do not contain # or ?.
  *
  * @param {string} content
+ *
  * @returns {string}
  */
 function rewriteLinks(content) {
@@ -142,10 +146,14 @@ function rewriteLinks(content) {
 
 /**
  * Cleans unwanted sections/lines from Markdown.
- * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER onward.
+ *
+ * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER
+ *   onward.
  * - Removes everything above the first occurrence of any REMOVE_ABOVE_MARKER.
  * - Removes any line that contains any REMOVE_LINE_MARKERS.
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function cleanContent(content) {
@@ -297,14 +305,17 @@ const pagePromises = PAGES.map((page) => {
 });
 
 /**
- * @function main
- * @async
- * @description
- * Main entry point for downloading and processing documentation files.
- * Executes all page download promises in parallel, writes logs upon completion,
- * and handles errors centrally by logging and re-throwing them after attempting to write the log.
+ * Main entry point for downloading and processing documentation files. Executes
+ * all page download promises in parallel, writes logs upon completion, and
+ * handles errors centrally by logging and re-throwing them after attempting to
+ * write the log.
  *
- * @returns {Promise<void>} Resolves when all downloads and processing are complete.
+ * @async
+ *
+ * @function main
+ *
+ * @returns {Promise<void>} Resolves when all downloads and processing are
+ *   complete.
  */
 (async function main() {
     try {
@@ -319,11 +330,11 @@ const pagePromises = PAGES.map((page) => {
 })();
 
 /**
+ * Writes a log entry and updates the hashes file if any files were successfully
+ * downloaded and changed. Only files that exist and were processed are
+ * considered. If no files were changed, no log entry is written.
+ *
  * @function writeLogIfComplete
- * @description
- * Writes a log entry and updates the hashes file if any files were successfully downloaded and changed.
- * Only files that exist and were processed are considered.
- * If no files were changed, no log entry is written.
  */
 function writeLogIfComplete() {
     // Only consider files that actually exist and were processed

@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for MonitorUiComponents
- * These components were previously untested (0% coverage)
+ * Comprehensive tests for MonitorUiComponents These components were previously
+ * untested (0% coverage)
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";

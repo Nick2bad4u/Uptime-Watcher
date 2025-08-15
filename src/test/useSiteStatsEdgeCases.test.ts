@@ -1,6 +1,6 @@
 /**
- * useSiteStats Edge Cases Tests
- * Tests for edge cases and error scenarios in useSiteStats hook
+ * UseSiteStats Edge Cases Tests Tests for edge cases and error scenarios in
+ * useSiteStats hook
  */
 
 import { renderHook } from "@testing-library/react";

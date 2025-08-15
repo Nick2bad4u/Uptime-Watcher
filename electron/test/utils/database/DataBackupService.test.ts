@@ -1,13 +1,17 @@
 /**
  * Test suite for DataBackupService
  *
- * @fileoverview Comprehensive tests for the DataBackupService class
- * in the Uptime Watcher application.
+ * @module DataBackupService
+ *
+ * @file Comprehensive tests for the DataBackupService class in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Database Utilities
- * @module DataBackupService
+ *
  * @tags ["test", "database", "backup", "service"]
  */
 

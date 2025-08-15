@@ -165,13 +165,15 @@ Always follow this order to minimize breaking changes:
  * @remarks
  * Detailed remarks about the component's purpose and behavior
  *
- * @param props - Component props description
- * @returns JSX element description
- *
  * @example
+ *
  * ```tsx
- * <MyComponent prop="value" />
+ * <MyComponent prop="value" />;
  * ```
+ *
+ * @param props - Component props description
+ *
+ * @returns JSX element description
  *
  * @public
  */
@@ -425,7 +427,7 @@ export const MyModal = React.memo(function MyModal() {
 
  return (
   <div
-   className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30"
+   className="bg-opacity-30 fixed inset-0 z-50 flex items-center justify-center bg-black backdrop-blur-sm"
    onClick={handleBackdropClick}
    role="button"
    tabIndex={0}
@@ -557,16 +559,18 @@ Follow the base tag guidelines in `docs/TSDoc/`:
  * Brief component description.
  *
  * @remarks
- * Detailed explanation of component behavior, patterns used,
- * and any important implementation details.
- *
- * @param props - Component props
- * @returns JSX element description
+ * Detailed explanation of component behavior, patterns used, and any important
+ * implementation details.
  *
  * @example
+ *
  * ```tsx
- * <Component prop="value" />
+ * <Component prop="value" />;
  * ```
+ *
+ * @param props - Component props
+ *
+ * @returns JSX element description
  *
  * @public
  */

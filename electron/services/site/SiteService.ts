@@ -16,8 +16,7 @@ import type { SiteRepository } from "../database/SiteRepository";
 import { logger } from "../../utils/logger";
 
 /**
- * Defines the dependencies required by {@link SiteService} for site
- * operations.
+ * Defines the dependencies required by {@link SiteService} for site operations.
  *
  * @remarks
  * Includes all repositories and the database service needed for coordinating
@@ -50,6 +49,7 @@ export class SiteService {
      * Used as a fallback when a site does not have a name in the database.
      *
      * @defaultValue "Unnamed Site"
+     *
      * @internal
      */
     private static readonly DEFAULT_SITE_NAME = "Unnamed Site";
@@ -71,8 +71,11 @@ export class SiteService {
      * monitors, and the site itself. Throws if any operation fails.
      *
      * @param identifier - The site identifier to delete.
+     *
      * @returns Promise resolving to true if all deletions succeeded.
+     *
      * @throws Error when any deletion operation fails.
+     *
      * @public
      */
     public async deleteSiteWithRelatedData(
@@ -159,7 +162,10 @@ export class SiteService {
      * the site, its monitors, and all monitor history in a single operation.
      *
      * @param identifier - The site identifier to find.
-     * @returns Promise resolving to the site with details, or undefined if not found.
+     *
+     * @returns Promise resolving to the site with details, or undefined if not
+     *   found.
+     *
      * @public
      */
     public async findByIdentifierWithDetails(
@@ -225,6 +231,7 @@ export class SiteService {
      * Returns all sites with complete details.
      *
      * @returns Promise resolving to an array of sites with complete data.
+     *
      * @public
      */
     public async getAllWithDetails(): Promise<Site[]> {
@@ -279,7 +286,8 @@ export class SiteService {
     /**
      * Constructs a new {@link SiteService} instance.
      *
-     * @param dependencies - The {@link SiteServiceDependencies} required for service operations.
+     * @param dependencies - The {@link SiteServiceDependencies} required for
+     *   service operations.
      */
     public constructor(dependencies: SiteServiceDependencies) {
         this.databaseService = dependencies.databaseService;
@@ -295,7 +303,9 @@ export class SiteService {
      * Used internally to ensure all sites have a displayable name.
      *
      * @param siteName - The site name from the database.
+     *
      * @returns Display name with fallback to the default.
+     *
      * @internal
      */
     private getDisplayName(siteName: null | string | undefined): string {

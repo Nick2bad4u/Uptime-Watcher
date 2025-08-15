@@ -163,17 +163,19 @@ function safeDateConversion(value: unknown): Date | undefined {
 /**
  * Convert database row to monitor object using dynamic schema.
  *
- * @param row - Database row data
- * @returns Converted monitor object
- *
  * @remarks
  * **Field Mappings:**
+ *
  * - `enabled` (database) → `monitoring` (application)
  * - `site_identifier` (database) → `siteIdentifier` (application)
  * - Timestamps are converted from Unix timestamps to Date objects
  *
- * **Type Safety:** Uses dynamic mapping based on monitor type registry.
- * The type assertion is necessary due to dynamic field assignment from schema.
+ * **Type Safety:** Uses dynamic mapping based on monitor type registry. The
+ * type assertion is necessary due to dynamic field assignment from schema.
+ *
+ * @param row - Database row data
+ *
+ * @returns Converted monitor object
  */
 ```
 

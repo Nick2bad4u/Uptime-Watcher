@@ -1,8 +1,13 @@
 /**
- * @fileoverview Comprehensive isolated test for MonitorScheduler service
- * @description Tests all functionality with proper vitest mocking and isolated test environment
+ * Tests all functionality with proper vitest mocking and isolated test
+ * environment
+ *
+ * @file Comprehensive isolated test for MonitorScheduler service
+ *
  * @category Backend Testing
+ *
  * @priority HIGH - Core monitoring functionality
+ *
  * @coverage Targeting 100% coverage of MonitorScheduler.ts
  */
 

@@ -1,6 +1,6 @@
 /**
- * Tests for theme/types.ts module.
- * Tests theme-related type definitions, interfaces, and type compatibility.
+ * Tests for theme/types.ts module. Tests theme-related type definitions,
+ * interfaces, and type compatibility.
  */
 
 import { describe, expect, it } from "vitest";

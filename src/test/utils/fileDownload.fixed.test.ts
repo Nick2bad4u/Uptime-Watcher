@@ -1,6 +1,6 @@
 /**
- * Fixed tests for fileDownload utility to improve coverage
- * Tests all edge cases, error conditions, and function paths
+ * Fixed tests for fileDownload utility to improve coverage Tests all edge
+ * cases, error conditions, and function paths
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

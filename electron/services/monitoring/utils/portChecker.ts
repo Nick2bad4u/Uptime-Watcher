@@ -13,13 +13,14 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * Provides low-level, single-attempt TCP port checking for use in monitor
  * health checks. Measures precise response times and supplies detailed error
  * information for retry and diagnostics. All database and event updates are
- * handled outside this utility. For port checks with retry logic, see {@link
- * portRetry.ts}.
+ * handled outside this utility. For port checks with retry logic, see
+ * {@link portRetry.ts}.
+ *
+ * @public
  *
  * @see {@link performSinglePortCheck}
  * @see {@link MonitorCheckResult}
  * @see {@link PortCheckError}
- * @public
  */
 
 /**
@@ -31,8 +32,9 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * mechanisms. For port checks with retry logic, use {@link portRetry.ts}
  * instead.
  *
- * @see {@link performSinglePortCheck}
  * @public
+ *
+ * @see {@link performSinglePortCheck}
  */
 
 /**
@@ -53,25 +55,35 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * handling logic.
  *
  * @example
+ *
  * ```typescript
  * try {
- *   const result = await performSinglePortCheck("example.com", 80, 5000);
- *   console.log(`Port check result: ${result.status} in ${result.responseTime}ms`);
+ *     const result = await performSinglePortCheck("example.com", 80, 5000);
+ *     console.log(
+ *         `Port check result: ${result.status} in ${result.responseTime}ms`
+ *     );
  * } catch (error) {
- *   if (error instanceof PortCheckError) {
- *     console.log(`Port unreachable after ${error.responseTime}ms`);
- *   }
+ *     if (error instanceof PortCheckError) {
+ *         console.log(`Port unreachable after ${error.responseTime}ms`);
+ *     }
  * }
  * ```
  *
- * @param host - The target hostname or IP address to check (e.g., "localhost", "192.168.1.1").
+ * @param host - The target hostname or IP address to check (e.g., "localhost",
+ *   "192.168.1.1").
  * @param port - The TCP port number to test for connectivity.
  * @param timeout - The maximum time to wait for a connection, in milliseconds.
- * @returns A promise that resolves to a {@link MonitorCheckResult} containing port details, response time, and status.
- * @throws {@link PortCheckError} Thrown if the port is not reachable within the timeout, with response time included for diagnostics and retry logic.
+ *
+ * @returns A promise that resolves to a {@link MonitorCheckResult} containing
+ *   port details, response time, and status.
+ *
+ * @throws {@link PortCheckError} Thrown if the port is not reachable within the
+ *   timeout, with response time included for diagnostics and retry logic.
+ *
+ * @public
+ *
  * @see {@link MonitorCheckResult}
  * @see {@link PortCheckError}
- * @public
  */
 export async function performSinglePortCheck(
     host: string,

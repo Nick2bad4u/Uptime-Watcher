@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for ConfigurationManager with 100% branch coverage
+ * @file Comprehensive tests for ConfigurationManager with 100% branch coverage
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

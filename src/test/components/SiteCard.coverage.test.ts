@@ -204,24 +204,15 @@ describe("SiteCard Component Coverage Tests", () => {
                 );
 
                 const siteWithAllRunning = {
-                    monitors: [
-                        { monitoring: true },
-                        { monitoring: true },
-                    ],
+                    monitors: [{ monitoring: true }, { monitoring: true }],
                 };
 
                 const siteWithSomeRunning = {
-                    monitors: [
-                        { monitoring: true },
-                        { monitoring: false },
-                    ],
+                    monitors: [{ monitoring: true }, { monitoring: false }],
                 };
 
                 const siteWithNoneRunning = {
-                    monitors: [
-                        { monitoring: false },
-                        { monitoring: false },
-                    ],
+                    monitors: [{ monitoring: false }, { monitoring: false }],
                 };
 
                 const emptyMonitors = {
@@ -428,9 +419,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 const siteWithMonitors = {
                     identifier: "test",
                     name: "Test Site",
-                    monitors: [
-                        { id: "monitor-1", type: "http" },
-                    ],
+                    monitors: [{ id: "monitor-1", type: "http" }],
                 };
 
                 expect(siteWithoutMonitors.monitors).toHaveLength(0);
@@ -486,15 +475,7 @@ describe("SiteCard Component Coverage Tests", () => {
 
         describe("SiteCard Performance", () => {
             it("should handle response time metrics", () => {
-                const responseTimes = [
-                    50,
-                    100,
-                    150,
-                    200,
-                    250,
-                    500,
-                    1000,
-                ];
+                const responseTimes = [50, 100, 150, 200, 250, 500, 1000];
 
                 for (const time of responseTimes) {
                     expect(typeof time).toBe("number");
@@ -508,13 +489,7 @@ describe("SiteCard Component Coverage Tests", () => {
             });
 
             it("should handle uptime calculations", () => {
-                const uptimeValues = [
-                    95.5,
-                    99.9,
-                    100,
-                    0,
-                    50,
-                ];
+                const uptimeValues = [95.5, 99.9, 100, 0, 50];
 
                 for (const uptime of uptimeValues) {
                     expect(typeof uptime).toBe("number");

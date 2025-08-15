@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for validation schemas
- * Targeting 98% branch coverage for all validation logic
+ * Comprehensive tests for validation schemas Targeting 98% branch coverage for
+ * all validation logic
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -293,14 +293,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should accept valid port ranges", () => {
-            const validPorts = [
-                0,
-                1,
-                80,
-                443,
-                8080,
-                65_535,
-            ]; // 0 is valid for validator.js
+            const validPorts = [0, 1, 80, 443, 8080, 65_535]; // 0 is valid for validator.js
 
             for (const port of validPorts) {
                 const monitor = {

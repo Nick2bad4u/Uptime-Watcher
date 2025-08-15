@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for useThemeStyles hook
- * Tests theme-aware CSS-in-JS styles with SSR support and theme change reactivity
+ * @file Comprehensive tests for useThemeStyles hook Tests theme-aware CSS-in-JS
+ *   styles with SSR support and theme change reactivity
  */
 
 import { act, renderHook } from "@testing-library/react";

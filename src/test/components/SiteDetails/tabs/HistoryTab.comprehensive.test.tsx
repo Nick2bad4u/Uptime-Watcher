@@ -1,6 +1,6 @@
 /**
- * Comprehensive test suite for HistoryTab component.
- * Tests filtering, pagination, display limits, and history management.
+ * Comprehensive test suite for HistoryTab component. Tests filtering,
+ * pagination, display limits, and history management.
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";

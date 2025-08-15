@@ -1,6 +1,6 @@
 /**
- * Additional tests for main.ts to achieve 98% branch coverage
- * Targets specific uncovered branches and edge cases
+ * Additional tests for main.ts to achieve 98% branch coverage Targets specific
+ * uncovered branches and edge cases
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

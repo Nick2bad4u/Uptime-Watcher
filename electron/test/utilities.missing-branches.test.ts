@@ -1,6 +1,6 @@
 /**
- * Additional tests for various utilities to achieve 98% branch coverage
- * Focuses on error paths and edge cases
+ * Additional tests for various utilities to achieve 98% branch coverage Focuses
+ * on error paths and edge cases
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -322,20 +322,8 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 [],
                 [null],
                 [undefined],
-                [
-                    0,
-                    false,
-                    "",
-                    null,
-                    undefined,
-                ],
-                [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                ],
+                [0, false, "", null, undefined],
+                [1, 2, 3, 4, 5],
                 Array.from({ length: 1000 }, () => 0),
                 Array.from({ length: 5 }),
                 Array.from({ length: 3 }, (_, i) => i),

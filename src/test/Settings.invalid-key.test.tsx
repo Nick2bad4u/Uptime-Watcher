@@ -1,9 +1,10 @@
 /**
- * Additional Settings component tests to achieve 100% coverage
- * Focus on missing lines 87-89 (invalid settings key warning)
+ * Additional Settings component tests to achieve 100% coverage Focus on missing
+ * lines 87-89 (invalid settings key warning)
  *
  * This test uses a creative approach to trigger the untested path by
- * temporarily modifying the component's allowedKeys to force the invalid key condition.
+ * temporarily modifying the component's allowedKeys to force the invalid key
+ * condition.
  */
 
 import { render, screen, act } from "@testing-library/react";
@@ -18,13 +19,7 @@ import { ThemeName } from "../theme/types";
 vi.mock("../constants", () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 100,
-    HISTORY_LIMIT_OPTIONS: [
-        50,
-        100,
-        200,
-        500,
-        1000,
-    ],
+    HISTORY_LIMIT_OPTIONS: [50, 100, 200, 500, 1000],
     TRANSITION_ALL: "all 0.2s ease-in-out",
     UI_DELAYS: {
         LOADING_BUTTON: 100,

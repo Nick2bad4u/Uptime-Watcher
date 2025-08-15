@@ -1,6 +1,6 @@
 /**
- * Comprehensive test suite for SiteValidator
- * Focuses on complete branch coverage and edge cases
+ * Comprehensive test suite for SiteValidator Focuses on complete branch
+ * coverage and edge cases
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 /**
  * Test suite for shared/utils/environment.ts
  *
- * @fileoverview Comprehensive tests for environment detection utilities
+ * @file Comprehensive tests for environment detection utilities
  */
 
 // Mock process object for environment testing

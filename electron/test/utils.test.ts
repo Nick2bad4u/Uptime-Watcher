@@ -1,13 +1,17 @@
 /**
  * Test suite for Electron utilities and main process functionality.
  *
- * @fileoverview Comprehensive tests for Electron utility functions and
- * main process interactions in the Uptime Watcher application.
+ * @module Utilities
+ *
+ * @file Comprehensive tests for Electron utility functions and main process
+ *   interactions in the Uptime Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Backend
- * @module Utilities
+ *
  * @tags ["electron", "utilities", "main-process", "mocking"]
  */
 

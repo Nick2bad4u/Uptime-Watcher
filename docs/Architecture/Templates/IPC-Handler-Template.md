@@ -19,9 +19,9 @@ electron/services/ipc/
  * IPC handlers for [DOMAIN] operations.
  *
  * @remarks
- * Provides type-safe IPC communication for [DOMAIN] management between
- * the main process and renderer process. All handlers use standardized
- * validation and error handling patterns.
+ * Provides type-safe IPC communication for [DOMAIN] management between the main
+ * process and renderer process. All handlers use standardized validation and
+ * error handling patterns.
  *
  * @public
  */
@@ -39,21 +39,22 @@ import {
 /**
  * Registers all [DOMAIN]-related IPC handlers.
  *
- * @param ipcService - The IPC service instance for handler registration
- * @param dependencies - Service dependencies needed for operations
- *
  * @remarks
- * This function registers all IPC handlers for [DOMAIN] operations using
- * the standardized registration pattern. Each handler includes proper
- * validation and error handling.
+ * This function registers all IPC handlers for [DOMAIN] operations using the
+ * standardized registration pattern. Each handler includes proper validation
+ * and error handling.
  *
  * @example
+ *
  * ```typescript
  * registerExampleHandlers(ipcService, {
- *   exampleManager: managerInstance,
- *   eventBus: eventBusInstance,
+ *  exampleManager: managerInstance,
+ *  eventBus: eventBusInstance,
  * });
  * ```
+ *
+ * @param ipcService - The IPC service instance for handler registration
+ * @param dependencies - Service dependencies needed for operations
  *
  * @public
  */
@@ -182,6 +183,7 @@ Add validation functions to `validators.ts` or import them from `../validation/e
 
 /**
  * Interface for example ID parameters.
+ *
  * @public
  */
 export interface ExampleIdParams {
@@ -190,6 +192,7 @@ export interface ExampleIdParams {
 
 /**
  * Interface for example creation data.
+ *
  * @public
  */
 export interface ExampleCreateData {
@@ -201,6 +204,7 @@ export interface ExampleCreateData {
 
 /**
  * Interface for example update parameters.
+ *
  * @public
  */
 export interface ExampleUpdateParams {
@@ -210,6 +214,7 @@ export interface ExampleUpdateParams {
 
 /**
  * Interface for bulk creation data.
+ *
  * @public
  */
 export interface ExampleBulkCreateData {
@@ -218,6 +223,7 @@ export interface ExampleBulkCreateData {
 
 /**
  * Interface for validation data.
+ *
  * @public
  */
 export interface ExampleValidationData {
@@ -228,6 +234,7 @@ export interface ExampleValidationData {
 
 /**
  * Interface for import data.
+ *
  * @public
  */
 export interface ExampleImportData {
@@ -241,16 +248,18 @@ export interface ExampleImportData {
 /**
  * Validates example ID parameters.
  *
- * @param data - Unknown data to validate
- * @returns Type predicate indicating if data is valid ExampleIdParams
- *
  * @example
+ *
  * ```typescript
  * if (isExampleIdParams(params)) {
- *   // params is now typed as ExampleIdParams
- *   console.log(params.id);
+ *  // params is now typed as ExampleIdParams
+ *  console.log(params.id);
  * }
  * ```
+ *
+ * @param data - Unknown data to validate
+ *
+ * @returns Type predicate indicating if data is valid ExampleIdParams
  */
 export function isExampleIdParams(data: unknown): data is ExampleIdParams {
  return (
@@ -266,6 +275,7 @@ export function isExampleIdParams(data: unknown): data is ExampleIdParams {
  * Validates example creation data.
  *
  * @param data - Unknown data to validate
+ *
  * @returns Type predicate indicating if data is valid ExampleCreateData
  */
 export function isExampleCreateData(data: unknown): data is ExampleCreateData {
@@ -294,6 +304,7 @@ export function isExampleCreateData(data: unknown): data is ExampleCreateData {
  * Validates example update parameters.
  *
  * @param data - Unknown data to validate
+ *
  * @returns Type predicate indicating if data is valid ExampleUpdateParams
  */
 export function isExampleUpdateParams(
@@ -338,6 +349,7 @@ export function isExampleUpdateParams(
  * Validates bulk creation data.
  *
  * @param data - Unknown data to validate
+ *
  * @returns Type predicate indicating if data is valid ExampleBulkCreateData
  */
 export function isExampleBulkCreateData(
@@ -361,6 +373,7 @@ export function isExampleBulkCreateData(
  * Validates example validation data.
  *
  * @param data - Unknown data to validate
+ *
  * @returns Type predicate indicating if data is valid ExampleValidationData
  */
 export function isExampleValidationData(
@@ -385,6 +398,7 @@ export function isExampleValidationData(
  * Validates import data.
  *
  * @param data - Unknown data to validate
+ *
  * @returns Type predicate indicating if data is valid ExampleImportData
  */
 export function isExampleImportData(data: unknown): data is ExampleImportData {
@@ -467,6 +481,7 @@ Add to your types file:
 
 /**
  * Core example entity interface.
+ *
  * @public
  */
 export interface Example {
@@ -481,6 +496,7 @@ export interface Example {
 
 /**
  * Validation result interface.
+ *
  * @public
  */
 export interface ValidationResult {
@@ -490,6 +506,7 @@ export interface ValidationResult {
 
 /**
  * Individual validation error.
+ *
  * @public
  */
 export interface ValidationError {
@@ -500,6 +517,7 @@ export interface ValidationError {
 
 /**
  * Export data structure.
+ *
  * @public
  */
 export interface ExportData {
@@ -513,6 +531,7 @@ export interface ExportData {
 
 /**
  * Import result structure.
+ *
  * @public
  */
 export interface ImportResult {
@@ -524,6 +543,7 @@ export interface ImportResult {
 
 /**
  * Import error details.
+ *
  * @public
  */
 export interface ImportError {

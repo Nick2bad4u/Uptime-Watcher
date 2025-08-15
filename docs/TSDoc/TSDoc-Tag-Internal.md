@@ -20,11 +20,13 @@ consume internal API items, e.g. because the packages are components of the same
 ```ts
 /**
  * Represents a book in the catalog.
+ *
  * @public
  */
 export class Book {
  /**
   * The title of the book.
+  *
   * @internal
   */
  public get _title(): string;

@@ -99,18 +99,20 @@ Add comprehensive documentation following project standards:
 /**
  * Find all history entries for a specific monitor.
  *
- * @param db - Database connection instance
- * @param monitorId - Unique identifier for the monitor
- * @returns Array of history entries ordered by timestamp (newest first)
- *
- * @throws {@link Error} When database query fails or data mapping errors occur
- *
  * @remarks
  * **Usage Context**: This utility function is designed to be called from
  * repository methods that manage transaction context and error handling.
  *
- * **Performance**: Uses indexed query on monitor_id and timestamp DESC ordering.
- * Results are automatically mapped from database rows to StatusHistory objects.
+ * **Performance**: Uses indexed query on monitor_id and timestamp DESC
+ * ordering. Results are automatically mapped from database rows to
+ * StatusHistory objects.
+ *
+ * @param db - Database connection instance
+ * @param monitorId - Unique identifier for the monitor
+ *
+ * @returns Array of history entries ordered by timestamp (newest first)
+ *
+ * @throws {@link Error} When database query fails or data mapping errors occur
  *
  * @internal
  */

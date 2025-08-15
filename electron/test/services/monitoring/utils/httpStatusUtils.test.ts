@@ -1,13 +1,17 @@
 /**
  * Test suite for httpStatusUtils
  *
- * @fileoverview Comprehensive tests for unknown functionality
- * in the Uptime Watcher application.
+ * @module Unknown
+ *
+ * @file Comprehensive tests for unknown functionality in the Uptime Watcher
+ *   application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category General
- * @module Unknown
+ *
  * @tags ["test"]
  */
 
@@ -96,13 +100,7 @@ describe("HTTP Status Utils", () => {
             }
 
             // Common client error scenarios (site is responding, just with errors)
-            const clientErrorCodes = [
-                400,
-                401,
-                403,
-                404,
-                429,
-            ];
+            const clientErrorCodes = [400, 401, 403, 404, 429];
             for (const code of clientErrorCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
             }

@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for JSON safety utilities
- * Targeting 98%+ branch coverage for all JSON safety functions
+ * Comprehensive tests for JSON safety utilities Targeting 98%+ branch coverage
+ * for all JSON safety functions
  */
 
 import { describe, it, expect } from "vitest";

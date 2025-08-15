@@ -1,6 +1,6 @@
 /**
- * Test file for src/components/index.ts barrel exports
- * Simple tests that exercise the module without causing circular dependency timeouts
+ * Test file for src/components/index.ts barrel exports Simple tests that
+ * exercise the module without causing circular dependency timeouts
  */
 
 import { describe, it, expect } from "vitest";

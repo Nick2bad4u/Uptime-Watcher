@@ -1,14 +1,18 @@
 /**
  * Test suite for monitorTypeGuards
  *
- * @fileoverview Comprehensive tests for monitor type guard and utility functions
- * in the Uptime Watcher application, including safe property extraction and
- * type checking for monitor configurations.
+ * @module MonitorTypeGuards
+ *
+ * @file Comprehensive tests for monitor type guard and utility functions in the
+ *   Uptime Watcher application, including safe property extraction and type
+ *   checking for monitor configurations.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Monitoring Utilities
- * @module MonitorTypeGuards
+ *
  * @tags ["test", "monitoring", "type-guards", "validation"]
  */
 
@@ -342,15 +346,7 @@ describe("Monitor Type Guards", () => {
 
     describe("hasValidPort", () => {
         it("should return true for valid port numbers", () => {
-            const validPorts = [
-                1,
-                22,
-                80,
-                443,
-                3000,
-                8080,
-                65_535,
-            ];
+            const validPorts = [1, 22, 80, 443, 3000, 8080, 65_535];
 
             for (const port of validPorts) {
                 const monitor = createTestMonitor({ port });
@@ -388,14 +384,7 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should return false when port is not a number", () => {
-            const invalidPorts = [
-                "80",
-                null,
-                undefined,
-                "invalid",
-                {},
-                [],
-            ];
+            const invalidPorts = ["80", null, undefined, "invalid", {}, []];
 
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port: port as any });
@@ -458,14 +447,7 @@ describe("Monitor Type Guards", () => {
 
     describe("hasValidRetryAttempts", () => {
         it("should return true for valid retry attempts", () => {
-            const validRetryAttempts = [
-                0,
-                1,
-                3,
-                5,
-                10,
-                100,
-            ];
+            const validRetryAttempts = [0, 1, 3, 5, 10, 100];
 
             for (const retryAttempts of validRetryAttempts) {
                 const monitor = createTestMonitor({ retryAttempts });
@@ -548,14 +530,7 @@ describe("Monitor Type Guards", () => {
 
     describe("hasValidTimeout", () => {
         it("should return true for valid timeout values", () => {
-            const validTimeouts = [
-                1,
-                100,
-                1000,
-                5000,
-                30_000,
-                60_000,
-            ];
+            const validTimeouts = [1, 100, 1000, 5000, 30_000, 60_000];
 
             for (const timeout of validTimeouts) {
                 const monitor = createTestMonitor({ timeout });

@@ -19,11 +19,13 @@ Same semantics as `@beta`, but used by tools that don't support an `@alpha` rele
 ```ts
 /**
  * Represents a book in the catalog.
+ *
  * @public
  */
 export class Book {
  /**
   * The title of the book.
+  *
   * @experimental
   */
  public get title(): string;

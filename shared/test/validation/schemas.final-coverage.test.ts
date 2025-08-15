@@ -1,6 +1,6 @@
 /**
- * Final test cases to achieve 98% branch coverage for schemas.ts
- * Targeting specific uncovered lines: 312, 326, 430, 484
+ * Final test cases to achieve 98% branch coverage for schemas.ts Targeting
+ * specific uncovered lines: 312, 326, 430, 484
  */
 
 import { describe, it, expect } from "vitest";

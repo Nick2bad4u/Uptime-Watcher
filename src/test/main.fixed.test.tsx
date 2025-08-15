@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for main.tsx application entry point
+ * @file Comprehensive tests for main.tsx application entry point
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

@@ -7,6 +7,7 @@
  * including content loading, event handling, and communication with renderers.
  *
  * Key responsibilities:
+ *
  * - Create and configure the main application window
  * - Load appropriate content based on environment (dev/prod)
  * - Handle window lifecycle events (ready-to-show, closed, etc.)
@@ -14,20 +15,22 @@
  * - Facilitate communication between main and renderer processes
  *
  * The service automatically handles environment-specific loading:
+ *
  * - Development: Loads from Vite dev server with DevTools
  * - Production: Loads from built static files
  *
  * @example
+ *
  * ```typescript
  * const windowService = new WindowService();
  * const mainWindow = windowService.createMainWindow();
  *
  * // Send data to renderer
- * windowService.sendToRenderer('status-update', { status: 'up' });
+ * windowService.sendToRenderer("status-update", { status: "up" });
  *
  * // Check if window exists
  * if (windowService.hasMainWindow()) {
- *   // Window operations...
+ *     // Window operations...
  * }
  * ```
  *
@@ -56,9 +59,9 @@ const currentDirectory = path.dirname(currentFilename);
  *
  * @remarks
  * Provides centralized management of Electron browser windows with proper
- * security configuration, content loading, and event handling. Ensures
- * windows are created with appropriate security settings including context
- * isolation and disabled node integration.
+ * security configuration, content loading, and event handling. Ensures windows
+ * are created with appropriate security settings including context isolation
+ * and disabled node integration.
  */
 export class WindowService {
     /** Configuration constants for Vite server connection */
@@ -124,30 +127,34 @@ export class WindowService {
     /**
      * Load development content after waiting for Vite server.
      *
-     * @returns Promise that resolves when content is loaded or rejects on error
-     *
      * @remarks
      * Handles the complete development content loading workflow:
      *
      * **Process:**
+     *
      * 1. Waits for Vite dev server using exponential backoff retry
      * 2. Loads content from localhost:5173 when server is ready
      * 3. Opens DevTools after 1s delay for better UX
      *
      * **Error Propagation:**
+     *
      * - Server connection errors are logged and re-thrown
      * - Content loading errors include URL and timing context
      * - DevTools opening errors are non-fatal and logged only
      *
      * **Timing Considerations:**
+     *
      * - DevTools delay prevents race conditions with renderer setup
      * - Server wait timeout prevents indefinite hanging
      * - All timeouts are configurable via constants
      *
      * **Recovery Strategy:**
+     *
      * - Method continues even if DevTools fail to open
      * - Window remains functional if content loads but DevTools fail
      * - Full error context provided for debugging server issues
+     *
+     * @returns Promise that resolves when content is loaded or rejects on error
      */
     private async loadDevelopmentContent(): Promise<void> {
         try {
@@ -202,11 +209,9 @@ export class WindowService {
     /**
      * Wait for Vite dev server to be ready with exponential backoff.
      *
-     * @returns Promise that resolves when server is ready
-     * @throws When server doesn't become available within timeout
-     *
      * @remarks
      * Uses exponential backoff strategy for efficient server detection:
+     *
      * - First attempt: 500ms delay
      * - Subsequent attempts: exponentially increasing delay up to 10s max
      * - Each fetch has 5s timeout to prevent hanging
@@ -214,6 +219,10 @@ export class WindowService {
      *
      * This approach provides fast response when server starts quickly while
      * being patient for slower startup scenarios.
+     *
+     * @returns Promise that resolves when server is ready
+     *
+     * @throws When server doesn't become available within timeout
      */
     private async waitForViteServer(): Promise<void> {
         const {
@@ -286,8 +295,8 @@ export class WindowService {
      *
      * @remarks
      * Initializes the service with proper defaults and prepares for window
-     * creation. Windows are not created automatically - call
-     * createMainWindow() to create the main window.
+     * creation. Windows are not created automatically - call createMainWindow()
+     * to create the main window.
      */
     public constructor() {
         if (isDev()) {
@@ -309,18 +318,19 @@ export class WindowService {
     /**
      * Create and configure the main application window.
      *
-     * @returns The created BrowserWindow instance
-     *
      * @remarks
      * Creates a new main window with secure defaults including:
+     *
      * - Context isolation enabled for security
      * - Node integration disabled in renderer
      * - Preload script for safe IPC communication
      * - Appropriate minimum and default dimensions
      * - Environment-specific content loading
      *
-     * The window is initially hidden and will be shown when ready-to-show
-     * event is fired to prevent visual flash.
+     * The window is initially hidden and will be shown when ready-to-show event
+     * is fired to prevent visual flash.
+     *
+     * @returns The created BrowserWindow instance
      */
     public createMainWindow(): BrowserWindow {
         this.mainWindow = new BrowserWindow({
@@ -388,13 +398,14 @@ export class WindowService {
     /**
      * Get the preload script path based on environment.
      *
-     * @returns Absolute path to preload script
-     *
      * @remarks
      * Resolves preload script path dynamically to handle:
+     *
      * - Different build outputs
      * - Development vs production paths
      * - Potential filename changes
+     *
+     * @returns Absolute path to preload script
      */
     private getPreloadPath(): string {
         const preloadFileName = "preload.js";
@@ -408,29 +419,32 @@ export class WindowService {
     /**
      * Load the appropriate content based on the current environment.
      *
-     * @returns void - Method handles content loading asynchronously
-     *
      * @remarks
      * Handles environment-specific content loading with comprehensive error
      * handling:
      *
      * **Development Mode:**
+     *
      * - Waits for Vite dev server to be ready using exponential backoff
      * - Loads from localhost:5173 when available
      * - Opens DevTools automatically after 1s delay
      * - Logs detailed connection progress for debugging
      *
      * **Production Mode:**
+     *
      * - Loads from built static files in app bundle
      * - Handles missing file errors gracefully
      * - Logs errors for production debugging
      *
      * **Error Handling:**
+     *
      * - All errors are logged with full context
      * - Development errors include server connection details
      * - Production errors include file path information
      * - Method continues execution on errors to prevent blocking
      * - Window remains functional even if content loading fails
+     *
+     * @returns Void - Method handles content loading asynchronously
      */
     private loadContent(): void {
         if (!this.mainWindow) {
@@ -503,8 +517,8 @@ export class WindowService {
      * Cleanup window event listeners.
      *
      * @remarks
-     * Removes all event listeners to prevent memory leaks.
-     * Should be called before destroying the window.
+     * Removes all event listeners to prevent memory leaks. Should be called
+     * before destroying the window.
      */
     public cleanupWindowEvents(): void {
         if (!this.mainWindow || this.mainWindow.isDestroyed()) return;

@@ -1,8 +1,9 @@
 /**
  * ServiceContainer test using factory bypass approach
  *
- * Instead of trying to fix SiteManager mocking, we mock EnhancedMonitoringServiceFactory
- * to avoid the getSitesCache dependency entirely
+ * Instead of trying to fix SiteManager mocking, we mock
+ * EnhancedMonitoringServiceFactory to avoid the getSitesCache dependency
+ * entirely
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

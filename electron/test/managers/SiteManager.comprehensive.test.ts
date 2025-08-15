@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for SiteManager.ts
- * Targets 90%+ branch coverage for all site management functions
+ * Comprehensive tests for SiteManager.ts Targets 90%+ branch coverage for all
+ * site management functions
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,7 +11,8 @@ import {
 } from "../../managers/SiteManager";
 
 /**
- * Helper function to create a complete Monitor object with all required properties
+ * Helper function to create a complete Monitor object with all required
+ * properties
  */
 function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {

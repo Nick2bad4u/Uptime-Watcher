@@ -1,6 +1,6 @@
 /**
- * Backend tests for environment utilities
- * Focus on backend-specific usage patterns in electron environment
+ * Backend tests for environment utilities Focus on backend-specific usage
+ * patterns in electron environment
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {

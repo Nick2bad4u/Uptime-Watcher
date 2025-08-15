@@ -1,6 +1,5 @@
 /**
- * Tests for useSitesState module
- * Tests core state management functionality
+ * Tests for useSitesState module Tests core state management functionality
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

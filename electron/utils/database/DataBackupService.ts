@@ -42,6 +42,7 @@ export class DataBackupService {
      * Pure data operation that returns backup buffer and filename.
      *
      * @returns Promise resolving to backup buffer and filename
+     *
      * @throws SiteLoadingError when backup creation fails
      */
     public async downloadDatabaseBackup(): Promise<{

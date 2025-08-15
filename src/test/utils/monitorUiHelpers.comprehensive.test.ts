@@ -5,7 +5,7 @@ import type { Monitor } from "../../../shared/types";
 /**
  * Test suite for src/utils/monitorUiHelpers.ts
  *
- * @fileoverview Comprehensive tests for monitor UI helper utilities
+ * @file Comprehensive tests for monitor UI helper utilities
  */
 
 // Mock dependencies

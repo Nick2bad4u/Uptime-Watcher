@@ -1,6 +1,6 @@
 /**
- * Backend test coverage for shared utilities - validation
- * This ensures backend tests exercise shared code for coverage reporting
+ * Backend test coverage for shared utilities - validation This ensures backend
+ * tests exercise shared code for coverage reporting
  */
 
 import { describe, expect, it } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Tests for types.ts module.
- * Tests type definitions, interfaces, and global window API declarations.
+ * Tests for types.ts module. Tests type definitions, interfaces, and global
+ * window API declarations.
  */
 
 import { describe, expect, it } from "vitest";

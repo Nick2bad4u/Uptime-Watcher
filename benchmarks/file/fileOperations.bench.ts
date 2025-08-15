@@ -1,13 +1,18 @@
 /**
  * File Operations Performance Benchmarks
  *
- * @fileoverview Performance benchmarks for file operations including data import/export,
- * backup/restore operations, configuration file processing, and I/O intensive tasks.
+ * @file Performance benchmarks for file operations including data
+ *   import/export, backup/restore operations, configuration file processing,
+ *   and I/O intensive tasks.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark FileOperations
+ *
  * @tags ["performance", "file-io", "import", "export", "backup", "configuration"]
  */
 

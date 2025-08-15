@@ -1,9 +1,10 @@
 /**
- * Console statement remediation tool and analysis.
- * Identifies and provides fixes for console statements that should be replaced with proper logging.
+ * Console statement remediation tool and analysis. Identifies and provides
+ * fixes for console statements that should be replaced with proper logging.
  *
  * @remarks
  * This tool helps implement the console statement remediation plan by:
+ *
  * - Finding all console statements in the codebase
  * - Categorizing them by usage type
  * - Providing replacement recommendations

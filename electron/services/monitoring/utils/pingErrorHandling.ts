@@ -7,8 +7,9 @@
  * conjunction with the ping retry utilities to ensure uniform error reporting
  * across all ping operations.
  *
- * @see {@link handlePingCheckError}
  * @public
+ *
+ * @see {@link handlePingCheckError}
  */
 
 import type { MonitorCheckResult } from "../types";
@@ -35,14 +36,17 @@ export interface PingOperationContext {
  *
  * @remarks
  * This function processes errors from ping connectivity checks and returns a
- * consistent {@link MonitorCheckResult} structure. It logs the error details
- * and provides appropriate error messages for different failure scenarios.
+ * consistent {@link MonitorCheckResult} structure. It logs the error details and
+ * provides appropriate error messages for different failure scenarios.
  *
  * @param error - The error that occurred during the ping operation
  * @param context - Additional context about the ping operation
+ *
  * @returns A standardized error result with status "down"
- * @see {@link PingOperationContext}
+ *
  * @public
+ *
+ * @see {@link PingOperationContext}
  */
 export function handlePingCheckError(
     error: unknown,

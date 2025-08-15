@@ -37,6 +37,7 @@ interface IWarningOptions {
 
  /**
   * Whether the warning can interrupt a user's current activity.
+  *
   * @defaultValue
   * The default is `true` unless
   *  `WarningStyle.StatusMessage` was requested.

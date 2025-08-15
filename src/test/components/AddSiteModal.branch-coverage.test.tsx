@@ -1,5 +1,7 @@
 /**
- * @fileoverview Comprehensive tests for AddSiteModal component to improve branch coverage
+ * @file Comprehensive tests for AddSiteModal component to improve branch
+ *   coverage
+ *
  * @see Related Component: {@link src/components/AddSiteForm/AddSiteModal.tsx}
  *
  * Test Coverage Focus:

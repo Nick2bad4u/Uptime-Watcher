@@ -1,6 +1,6 @@
 /**
- * Additional test cases for schemas.ts to reach 98% branch coverage
- * This file targets the remaining uncovered branches and edge cases
+ * Additional test cases for schemas.ts to reach 98% branch coverage This file
+ * targets the remaining uncovered branches and edge cases
  */
 
 import { describe, it, expect } from "vitest";

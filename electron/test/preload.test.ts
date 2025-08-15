@@ -1,6 +1,6 @@
 /**
- * Tests for Electron preload script.
- * Validates secure IPC bridge and API exposure to renderer process.
+ * Tests for Electron preload script. Validates secure IPC bridge and API
+ * exposure to renderer process.
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";

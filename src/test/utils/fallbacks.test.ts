@@ -1,8 +1,8 @@
 /**
  * Tests for fallback and default value utilities
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for fallback utilities used throughout the application.
+ * @file Comprehensive tests covering all branches and edge cases for fallback
+ *   utilities used throughout the application.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

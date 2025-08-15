@@ -20,11 +20,13 @@ a public release.
 ```ts
 /**
  * Represents a book in the catalog.
+ *
  * @public
  */
 export class Book {
  /**
   * The title of the book.
+  *
   * @alpha
   */
  public get title(): string;

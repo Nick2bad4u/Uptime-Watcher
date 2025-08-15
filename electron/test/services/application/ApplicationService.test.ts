@@ -1,6 +1,7 @@
 /**
- * Tests for ApplicationService - Application lifecycle and window management coverage
- * Tests initialization, window management, settings, and cleanup functionality.
+ * Tests for ApplicationService - Application lifecycle and window management
+ * coverage Tests initialization, window management, settings, and cleanup
+ * functionality.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

@@ -1,8 +1,8 @@
 /**
  * Tests for useMonitorFields hook
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for the monitor fields hook that manages dynamic form field definitions.
+ * @file Comprehensive tests covering all branches and edge cases for the
+ *   monitor fields hook that manages dynamic form field definitions.
  */
 
 import { renderHook, waitFor } from "@testing-library/react";

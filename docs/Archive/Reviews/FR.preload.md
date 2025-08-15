@@ -216,8 +216,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
    ```typescript
    /**
+    * @remarks
+    * IMPORTANT: Call the returned cleanup function to prevent memory leaks
+    *
     * @returns Cleanup function to remove the listener
-    * @remarks IMPORTANT: Call the returned cleanup function to prevent memory leaks
     */
    ```
 

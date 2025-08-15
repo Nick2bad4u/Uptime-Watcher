@@ -1,13 +1,17 @@
 /**
  * IPC Communication Performance Benchmarks
  *
- * @fileoverview Performance benchmarks for IPC communication including serialization,
- * deserialization, message passing, and validation operations.
+ * @file Performance benchmarks for IPC communication including serialization,
+ *   deserialization, message passing, and validation operations.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark IPC
+ *
  * @tags ["performance", "ipc", "serialization", "communication"]
  */
 

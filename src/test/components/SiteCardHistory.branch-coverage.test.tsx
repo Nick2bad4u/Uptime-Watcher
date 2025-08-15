@@ -1,6 +1,6 @@
 /**
- * Branch coverage tests for SiteCardHistory component.
- * These tests specifically target untested conditional branches to improve coverage metrics.
+ * Branch coverage tests for SiteCardHistory component. These tests specifically
+ * target untested conditional branches to improve coverage metrics.
  */
 
 import { render, screen } from "@testing-library/react";

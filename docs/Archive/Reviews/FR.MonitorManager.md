@@ -203,8 +203,8 @@ interface IEventCoordinator {
    ```typescript
    /**
     * @remarks
-    * This method is asynchronous and may take several seconds to complete
-    * for sites with many monitors. Progress is not reported.
+    * This method is asynchronous and may take several seconds to complete for
+    * sites with many monitors. Progress is not reported.
     */
    ```
 

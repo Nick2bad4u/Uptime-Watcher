@@ -66,8 +66,8 @@ export interface SiteWritingConfig {
 /**
  * Custom error for site loading operations.
  *
- * Provides enhanced error context and stack trace preservation for site
- * loading failures.
+ * Provides enhanced error context and stack trace preservation for site loading
+ * failures.
  */
 export class SiteLoadingError extends Error {
     /**

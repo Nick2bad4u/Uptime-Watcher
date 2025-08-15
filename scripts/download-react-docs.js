@@ -1,6 +1,6 @@
 /**
- * React Documentation Downloader
- * Downloads key React documentation pages from the official React docs
+ * React Documentation Downloader Downloads key React documentation pages from
+ * the official React docs
  */
 
 import { exec } from "child_process";
@@ -76,7 +76,9 @@ const newHashes = {};
 
 /**
  * Clean React documentation content
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function cleanContent(content) {
@@ -93,7 +95,9 @@ function cleanContent(content) {
 
 /**
  * Rewrite React docs links to absolute URLs
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function rewriteLinks(content) {
@@ -106,10 +110,12 @@ function rewriteLinks(content) {
 
 /**
  * Download a React documentation page
+ *
  * @param {string} cmd
  * @param {string} filePath
  * @param {string} logMsg
  * @param {string} name
+ *
  * @returns {Promise<void>}
  */
 function downloadFile(cmd, filePath, logMsg, name) {

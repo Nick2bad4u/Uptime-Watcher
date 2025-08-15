@@ -1,13 +1,17 @@
 /**
  * Benchmark tests for cache operations
  *
- * @fileoverview Performance benchmarks for cache operations including
- * cache lookups, insertions, LRU evictions, and TTL cleanups.
+ * @file Performance benchmarks for cache operations including cache lookups,
+ *   insertions, LRU evictions, and TTL cleanups.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Cache
+ *
  * @tags ["performance", "cache", "memory", "storage"]
  */
 

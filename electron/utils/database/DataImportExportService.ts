@@ -56,10 +56,11 @@ export interface ImportSite {
 /**
  * Type guard for expected import data structure.
  *
- * Validates that the provided object matches the expected structure
- * for import data containing sites and optional settings.
+ * Validates that the provided object matches the expected structure for import
+ * data containing sites and optional settings.
  *
  * @param obj - Object to validate
+ *
  * @returns True if the object matches the expected import data structure
  */
 function isImportData(
@@ -75,8 +76,8 @@ function isImportData(
 /**
  * Service for handling data import/export operations.
  *
- * Separates data operations from side effects for better testability.
- * Handles the complete lifecycle of data import/export including validation,
+ * Separates data operations from side effects for better testability. Handles
+ * the complete lifecycle of data import/export including validation,
  * transformation, and persistence.
  */
 export class DataImportExportService {
@@ -96,8 +97,8 @@ export class DataImportExportService {
     };
 
     /**
-     * Export all application data as JSON string.
-     * Pure data operation without side effects.
+     * Export all application data as JSON string. Pure data operation without
+     * side effects.
      */
     public async exportAllData(): Promise<string> {
         try {
@@ -138,8 +139,8 @@ export class DataImportExportService {
     }
 
     /**
-     * Import data from JSON string.
-     * Pure data operation that returns the imported data.
+     * Import data from JSON string. Pure data operation that returns the
+     * imported data.
      */
     public async importDataFromJson(
         jsonData: string
@@ -184,8 +185,8 @@ export class DataImportExportService {
     }
 
     /**
-     * Import sites and settings into database.
-     * Database operation that persists the imported data.
+     * Import sites and settings into database. Database operation that persists
+     * the imported data.
      */
     public async persistImportedData(
         sites: ImportSite[],
@@ -234,8 +235,8 @@ export class DataImportExportService {
     }
 
     /**
-     * Import monitors with their history for all sites.
-     * Private helper method for monitor data persistence.
+     * Import monitors with their history for all sites. Private helper method
+     * for monitor data persistence.
      */
     private async importMonitorsWithHistory(
         db: Database,
@@ -341,8 +342,8 @@ export class DataImportExportService {
     }
 
     /**
-     * Import history for a specific monitor.
-     * Private helper method for history data persistence.
+     * Import history for a specific monitor. Private helper method for history
+     * data persistence.
      */
     private importMonitorHistory(
         db: Database,

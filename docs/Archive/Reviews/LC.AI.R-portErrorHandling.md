@@ -77,26 +77,27 @@ This is NOT redundant - it ensures consistent error message formatting
  * Port monitoring error classes and constants.
  *
  * @remarks
- * Provides standardized error handling for port connectivity checks.
- * Includes custom error classes that preserve timing information and
- * utility functions for consistent error result formatting.
+ * Provides standardized error handling for port connectivity checks. Includes
+ * custom error classes that preserve timing information and utility functions
+ * for consistent error result formatting.
  */
 
 /**
  * Error message constant for port connectivity failures.
  *
  * @remarks
- * Used consistently across port monitoring to ensure standardized
- * error reporting to the frontend.
+ * Used consistently across port monitoring to ensure standardized error
+ * reporting to the frontend.
  */
 export const PORT_NOT_REACHABLE = "Port not reachable";
 
 /**
- * Custom error class that preserves response time information from failed port checks.
+ * Custom error class that preserves response time information from failed port
+ * checks.
  *
  * @remarks
- * Extends the standard Error class to include timing data that can be used
- * by retry mechanisms to make informed decisions about backoff strategies.
+ * Extends the standard Error class to include timing data that can be used by
+ * retry mechanisms to make informed decisions about backoff strategies.
  */
 export class PortCheckError extends Error {
  /** Response time at point of failure in milliseconds */
@@ -140,11 +141,6 @@ interface PortCheckErrorResult {
 /**
  * Handle errors that occur during port checks with standardized formatting.
  *
- * @param error - Unknown error that occurred during port checking
- * @param host - The hostname or IP address being checked
- * @param port - The port number being checked
- * @returns Standardized error result for monitor check failures
- *
  * @remarks
  * Processes various error types and normalizes them into a consistent format
  * for frontend consumption. Extracts timing information from PortCheckError
@@ -152,6 +148,12 @@ interface PortCheckErrorResult {
  *
  * Response time defaults to -1 when timing information is unavailable,
  * distinguishing from valid 0ms responses.
+ *
+ * @param error - Unknown error that occurred during port checking
+ * @param host - The hostname or IP address being checked
+ * @param port - The port number being checked
+ *
+ * @returns Standardized error result for monitor check failures
  */
 export function handlePortCheckError(
  error: unknown,

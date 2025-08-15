@@ -40,14 +40,17 @@ import { withDatabaseOperation } from "@electron/utils/operationalHooks";
 import type { DatabaseService } from "@electron/services/database/DatabaseService";
 
 /**
- * Example repository demonstrating the standard repository pattern implementation.
+ * Example repository demonstrating the standard repository pattern
+ * implementation.
  *
  * @remarks
- * This repository follows the dual method pattern with public async methods that create
- * transactions and internal sync methods for use within existing transaction contexts.
- * All database operations are wrapped with proper error handling and event emission.
+ * This repository follows the dual method pattern with public async methods
+ * that create transactions and internal sync methods for use within existing
+ * transaction contexts. All database operations are wrapped with proper error
+ * handling and event emission.
  *
  * @example
+ *
  * ```typescript
  * const repository = new ExampleRepository({ databaseService });
  *
@@ -56,8 +59,8 @@ import type { DatabaseService } from "@electron/services/database/DatabaseServic
  *
  * // Internal sync method - used within existing transaction
  * await databaseService.executeTransaction((db) => {
- *     repository.bulkInsertInternal(db, [data1, data2]);
- *     // other operations...
+ *  repository.bulkInsertInternal(db, [data1, data2]);
+ *  // other operations...
  * });
  * ```
  *
@@ -67,23 +70,26 @@ export class ExampleRepository {
  /**
   * Database service instance for executing database operations.
   *
-  * @readonly
   * @private
+  *
+  * @readonly
   */
  private readonly databaseService: DatabaseService;
 
  /**
   * Creates a new ExampleRepository instance.
   *
-  * @param dependencies - Required dependencies for repository operations
-  * @param dependencies.databaseService - The {@link DatabaseService} instance for database access
-  *
   * @example
+  *
   * ```typescript
   * const repository = new ExampleRepository({
-  *     databaseService: serviceContainer.getDatabaseService()
+  *  databaseService: serviceContainer.getDatabaseService(),
   * });
   * ```
+  *
+  * @param dependencies - Required dependencies for repository operations
+  * @param dependencies.databaseService - The {@link DatabaseService} instance
+  *   for database access
   */
  constructor(dependencies: ExampleRepositoryDependencies) {
   this.databaseService = dependencies.databaseService;
@@ -94,22 +100,26 @@ export class ExampleRepository {
   *
   * @remarks
   * This is a public async method that creates its own database transaction.
-  * Uses {@link withDatabaseOperation} for retry logic and event emission.
-  * For use within existing transactions, use {@link bulkInsertInternal} instead.
-  *
-  * @param records - Array of records to insert
-  * @returns Promise that resolves when all records are successfully inserted
-  *
-  * @throws {@link Error} When database operation fails or transaction cannot be completed
+  * Uses {@link withDatabaseOperation} for retry logic and event emission. For
+  * use within existing transactions, use {@link bulkInsertInternal} instead.
   *
   * @example
+  *
   * ```typescript
   * // Bulk insert records with automatic transaction handling
   * await repository.bulkInsert([record1, record2, record3]);
   * ```
   *
-  * @see {@link bulkInsertInternal} for transaction-internal operations
+  * @param records - Array of records to insert
+  *
+  * @returns Promise that resolves when all records are successfully inserted
+  *
+  * @throws {@link Error} When database operation fails or transaction cannot be
+  *   completed
+  *
   * @public
+  *
+  * @see {@link bulkInsertInternal} for transaction-internal operations
   */
  public async bulkInsert(records: ExampleRow[]): Promise<void> {
   if (records.length === 0) {
@@ -130,26 +140,29 @@ export class ExampleRepository {
   * Bulk inserts multiple records within an existing transaction context.
   *
   * @remarks
-  * This is an internal sync method designed for use within existing database transactions.
-  * Uses prepared statements for optimal performance with large datasets.
-  * Does not create its own transaction - must be called within a transaction context.
+  * This is an internal sync method designed for use within existing database
+  * transactions. Uses prepared statements for optimal performance with large
+  * datasets. Does not create its own transaction - must be called within a
+  * transaction context.
+  *
+  * @example
+  *
+  * ```typescript
+  * // Use within an existing transaction
+  * await databaseService.executeTransaction((db) => {
+  *  repository.bulkInsertInternal(db, records);
+  *  // other transactional operations...
+  * });
+  * ```
   *
   * @param db - The active {@link Database} connection within a transaction
   * @param records - Array of records to insert
   *
   * @throws {@link Error} When the SQL execution fails
   *
-  * @example
-  * ```typescript
-  * // Use within an existing transaction
-  * await databaseService.executeTransaction((db) => {
-  *     repository.bulkInsertInternal(db, records);
-  *     // other transactional operations...
-  * });
-  * ```
+  * @public
   *
   * @see {@link bulkInsert} for standalone operation with automatic transaction
-  * @public
   */
  public bulkInsertInternal(db: Database, records: ExampleRow[]): void {
   const stmt = db.prepare(QUERIES.INSERT);
@@ -170,17 +183,18 @@ export class ExampleRepository {
   * Retrieves all records from the database.
   *
   * @remarks
-  * This is a read operation wrapped with {@link withDatabaseOperation} for consistent
-  * error handling and event emission.
+  * This is a read operation wrapped with {@link withDatabaseOperation} for
+  * consistent error handling and event emission.
+  *
+  * @example
+  *
+  * ```typescript
+  * const allRecords = await repository.findAll();
+  * ```
   *
   * @returns Promise resolving to array of all records
   *
   * @throws {@link Error} When database operation fails
-  *
-  * @example
-  * ```typescript
-  * const allRecords = await repository.findAll();
-  * ```
   *
   * @public
   */
@@ -196,21 +210,24 @@ export class ExampleRepository {
   *
   * @remarks
   * This is a public async method that creates its own database transaction.
-  * Uses {@link withDatabaseOperation} for retry logic and event emission.
-  * For use within existing transactions, use {@link deleteAllInternal} instead.
-  *
-  * @returns Promise that resolves when all records are successfully deleted
-  *
-  * @throws {@link Error} When database operation fails or transaction cannot be completed
+  * Uses {@link withDatabaseOperation} for retry logic and event emission. For
+  * use within existing transactions, use {@link deleteAllInternal} instead.
   *
   * @example
+  *
   * ```typescript
   * // Delete all records with automatic transaction handling
   * await repository.deleteAll();
   * ```
   *
-  * @see {@link deleteAllInternal} for transaction-internal operations
+  * @returns Promise that resolves when all records are successfully deleted
+  *
+  * @throws {@link Error} When database operation fails or transaction cannot be
+  *   completed
+  *
   * @public
+  *
+  * @see {@link deleteAllInternal} for transaction-internal operations
   */
  public async deleteAll(): Promise<void> {
   return withDatabaseOperation(
@@ -224,28 +241,31 @@ export class ExampleRepository {
  }
 
  /**
-  * Deletes all records from the repository table within an existing transaction context.
+  * Deletes all records from the repository table within an existing transaction
+  * context.
   *
   * @remarks
-  * This is an internal sync method designed for use within existing database transactions.
-  * Does not create its own transaction - must be called within a transaction context.
-  * Logs debug information about the operation completion.
+  * This is an internal sync method designed for use within existing database
+  * transactions. Does not create its own transaction - must be called within a
+  * transaction context. Logs debug information about the operation completion.
+  *
+  * @example
+  *
+  * ```typescript
+  * // Use within an existing transaction
+  * await databaseService.executeTransaction((db) => {
+  *  repository.deleteAllInternal(db);
+  *  // other transactional operations...
+  * });
+  * ```
   *
   * @param db - The active {@link Database} connection within a transaction
   *
   * @throws {@link Error} When the SQL execution fails
   *
-  * @example
-  * ```typescript
-  * // Use within an existing transaction
-  * await databaseService.executeTransaction((db) => {
-  *     repository.deleteAllInternal(db);
-  *     // other transactional operations...
-  * });
-  * ```
+  * @public
   *
   * @see {@link deleteAll} for standalone operation with automatic transaction
-  * @public
   */
  public deleteAllInternal(db: Database): void {
   db.run(QUERIES.DELETE_ALL);
@@ -256,18 +276,20 @@ export class ExampleRepository {
   * Gets the current database connection instance.
   *
   * @remarks
-  * Provides access to the underlying database connection through the database service.
-  * Should be used sparingly and only when the repository pattern methods are insufficient.
+  * Provides access to the underlying database connection through the database
+  * service. Should be used sparingly and only when the repository pattern
+  * methods are insufficient.
   *
-  * @returns The active {@link Database} connection instance
+  * @private
   *
   * @example
+  *
   * ```typescript
   * const db = repository.getDb();
   * // Use for complex queries not covered by repository methods
   * ```
   *
-  * @private
+  * @returns The active {@link Database} connection instance
   */
  private getDb(): Database {
   return this.databaseService.getDatabase();
@@ -290,8 +312,8 @@ interface ExampleRow {
  * Dependencies required for {@link ExampleRepository} instantiation.
  *
  * @remarks
- * Defines the dependency injection contract for the repository,
- * ensuring proper service availability and testability.
+ * Defines the dependency injection contract for the repository, ensuring proper
+ * service availability and testability.
  *
  * @public
  */
@@ -300,7 +322,8 @@ interface ExampleRepositoryDependencies {
   * Database service instance for executing database operations.
   *
   * @remarks
-  * Must be a properly initialized {@link DatabaseService} with an active database connection.
+  * Must be a properly initialized {@link DatabaseService} with an active
+  * database connection.
   */
  readonly databaseService: DatabaseService;
 }
@@ -309,8 +332,9 @@ interface ExampleRepositoryDependencies {
  * Centralized SQL query constants for the example repository.
  *
  * @remarks
- * Prevents SQL duplication across repository methods and improves maintainability.
- * All queries should be defined here rather than inline in methods.
+ * Prevents SQL duplication across repository methods and improves
+ * maintainability. All queries should be defined here rather than inline in
+ * methods.
  *
  * @private
  */

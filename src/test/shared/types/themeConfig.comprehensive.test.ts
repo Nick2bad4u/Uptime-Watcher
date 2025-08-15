@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for theme configuration types and interfaces.
- * Tests all theme-related type definitions and validation functions.
+ * Comprehensive tests for theme configuration types and interfaces. Tests all
+ * theme-related type definitions and validation functions.
  */
 
 import { describe, expect, it } from "vitest";

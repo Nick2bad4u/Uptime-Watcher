@@ -1,9 +1,10 @@
 /**
  * Enhanced comprehensive tests for AddSiteForm component
  *
- * @fileoverview This test file provides enhanced comprehensive coverage for the AddSiteForm component,
- * testing all functionality including form validation, user interactions, state management,
- * error handling scenarios, validation logic, and all code paths for maximum coverage.
+ * @file This test file provides enhanced comprehensive coverage for the
+ *   AddSiteForm component, testing all functionality including form validation,
+ *   user interactions, state management, error handling scenarios, validation
+ *   logic, and all code paths for maximum coverage.
  */
 
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";

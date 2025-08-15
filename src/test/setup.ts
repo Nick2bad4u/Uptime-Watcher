@@ -1,6 +1,6 @@
 /**
- * Test setup file for Vitest.
- * Configures testing environment for React components.
+ * Test setup file for Vitest. Configures testing environment for React
+ * components.
  */
 
 import "@testing-library/jest-dom";

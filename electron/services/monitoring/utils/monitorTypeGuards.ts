@@ -3,9 +3,8 @@
  *
  * @remarks
  * Provides safe type checking for monitor configuration properties that may be
- * undefined at runtime despite type definitions suggesting otherwise.
- * This addresses the type safety issues identified in HttpMonitor and
- * PortMonitor.
+ * undefined at runtime despite type definitions suggesting otherwise. This
+ * addresses the type safety issues identified in HttpMonitor and PortMonitor.
  */
 
 import type { Site } from "@shared/types";
@@ -20,6 +19,7 @@ import {
  * Type guard to safely check if a monitor has valid retry attempts.
  *
  * @param monitor - The monitor configuration to check
+ *
  * @returns True if the monitor has valid retry attempts, false otherwise
  */
 export function hasValidRetryAttempts(
@@ -36,6 +36,7 @@ export function hasValidRetryAttempts(
  * Type guard to safely check if a monitor has a valid timeout value.
  *
  * @param monitor - The monitor configuration to check
+ *
  * @returns True if the monitor has a valid timeout, false otherwise
  */
 export function hasValidTimeout(
@@ -52,7 +53,9 @@ export function hasValidTimeout(
  * Safely extracts retry attempts from monitor configuration.
  *
  * @param monitor - The monitor configuration
- * @param defaultRetryAttempts - Default retry attempts to use if monitor doesn't have them
+ * @param defaultRetryAttempts - Default retry attempts to use if monitor
+ *   doesn't have them
+ *
  * @returns The retry attempts value to use
  */
 export function getMonitorRetryAttempts(
@@ -69,6 +72,7 @@ export function getMonitorRetryAttempts(
  *
  * @param monitor - The monitor configuration
  * @param defaultTimeout - Default timeout to use if monitor doesn't have one
+ *
  * @returns The timeout value to use
  */
 export function getMonitorTimeout(
@@ -82,6 +86,7 @@ export function getMonitorTimeout(
  * Type guard to safely check if a monitor has a valid host using validator.
  *
  * @param monitor - The monitor configuration to check
+ *
  * @returns True if the monitor has a valid host, false otherwise
  */
 export function hasValidHost(
@@ -99,6 +104,7 @@ export function hasValidHost(
  * Type guard to safely check if a monitor has a valid port.
  *
  * @param monitor - The monitor configuration to check
+ *
  * @returns True if the monitor has a valid port, false otherwise
  */
 export function hasValidPort(
@@ -115,6 +121,7 @@ export function hasValidPort(
  * Type guard to safely check if a monitor has a valid URL using validator.
  *
  * @param monitor - The monitor configuration to check
+ *
  * @returns True if the monitor has a valid URL, false otherwise
  */
 export function hasValidUrl(

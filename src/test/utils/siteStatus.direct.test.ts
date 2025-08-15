@@ -1,8 +1,7 @@
 /**
- * @fileoverview
- * Direct tests for src/utils/siteStatus.ts frontend re-exports
+ * @file Direct tests for src/utils/siteStatus.ts frontend re-exports
  *
- * Tests the frontend re-export wrapper to ensure coverage
+ *   Tests the frontend re-export wrapper to ensure coverage
  */
 
 // Import directly from the frontend re-export file (src/utils/siteStatus.ts)

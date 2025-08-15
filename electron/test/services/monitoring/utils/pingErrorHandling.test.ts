@@ -2,8 +2,8 @@
  * Test suite for ping error handling utilities.
  *
  * @remarks
- * Tests the error handling functionality for ping operations,
- * including error formatting, logging, and result standardization.
+ * Tests the error handling functionality for ping operations, including error
+ * formatting, logging, and result standardization.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

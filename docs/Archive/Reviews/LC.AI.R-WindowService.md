@@ -357,16 +357,18 @@ private async loadDevelopmentContent(): Promise<void> {
  *
  * @remarks
  * Provides centralized management of Electron browser windows with proper
- * security configuration, content loading, and event handling. Ensures
- * windows are created with appropriate security settings including context
- * isolation and disabled node integration.
+ * security configuration, content loading, and event handling. Ensures windows
+ * are created with appropriate security settings including context isolation
+ * and disabled node integration.
  *
  * **Window Management:**
+ *
  * - Singleton pattern for main application window
  * - Proper lifecycle management with cleanup
  * - Environment-specific content loading strategies
  *
  * **Security Features:**
+ *
  * - Context isolation enabled by default
  * - Node integration disabled in renderer
  * - Secure preload script for IPC communication
@@ -379,8 +381,9 @@ export class WindowService {
   * Create a new WindowService instance.
   *
   * @remarks
-  * Initializes the service with proper defaults and prepares for window creation.
-  * Windows are not created automatically - call createMainWindow() to create the main window.
+  * Initializes the service with proper defaults and prepares for window
+  * creation. Windows are not created automatically - call createMainWindow() to
+  * create the main window.
   */
  constructor() {
   this._mainWindow = null;

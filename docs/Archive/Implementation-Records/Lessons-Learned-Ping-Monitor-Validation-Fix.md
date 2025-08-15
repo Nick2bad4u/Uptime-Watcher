@@ -70,12 +70,14 @@ function validateTypeSpecificFields(
 /**
  * Validates ping monitor form data by checking required host field.
  *
- * @param data - Form data to validate
- * @returns Array of validation error messages
- *
  * @remarks
- * Ping monitors require a host field that must be a valid hostname, IP address, or localhost.
- * Uses shared validation to ensure consistency with backend validation rules.
+ * Ping monitors require a host field that must be a valid hostname, IP address,
+ * or localhost. Uses shared validation to ensure consistency with backend
+ * validation rules.
+ *
+ * @param data - Form data to validate
+ *
+ * @returns Array of validation error messages
  */
 const validatePingMonitorFormData = (data: Record<string, unknown>) => {
  const errors: string[] = [];
@@ -99,8 +101,8 @@ const validatePingMonitorFormData = (data: Record<string, unknown>) => {
  * Validates ping monitor-specific fields.
  *
  * @remarks
- * Checks that the host field is present and a string. Ping monitors only require a host field,
- * unlike port monitors which also require a port number.
+ * Checks that the host field is present and a string. Ping monitors only
+ * require a host field, unlike port monitors which also require a port number.
  */
 function validatePingMonitorFields(
  monitor: Partial<Monitor>,

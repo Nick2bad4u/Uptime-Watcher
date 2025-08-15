@@ -1,6 +1,6 @@
 /**
- * Enhanced test utilities and factory functions for comprehensive test coverage.
- * Provides robust mocking utilities based on modern Vitest patterns.
+ * Enhanced test utilities and factory functions for comprehensive test
+ * coverage. Provides robust mocking utilities based on modern Vitest patterns.
  */
 
 import { vi } from "vitest";
@@ -253,7 +253,8 @@ export function resetAllMocks(obj: any): void {
 }
 
 /**
- * Creates a properly mocked database command executor that can handle different command types
+ * Creates a properly mocked database command executor that can handle different
+ * command types
  */
 export function createMockCommandExecutor(): any {
     return {

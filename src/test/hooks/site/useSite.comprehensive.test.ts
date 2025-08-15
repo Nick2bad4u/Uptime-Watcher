@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for useSite hook
- * This file tests the useSite hook which combines site monitoring, actions, statistics, and UI state
+ * @file Comprehensive tests for useSite hook This file tests the useSite hook
+ *   which combines site monitoring, actions, statistics, and UI state
  */
 
 import { renderHook } from "@testing-library/react";

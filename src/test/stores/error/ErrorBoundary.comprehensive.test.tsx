@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for ErrorBoundary component.
- * Tests error catching, fallback rendering, retry functionality, and HOC behavior.
+ * Comprehensive tests for ErrorBoundary component. Tests error catching,
+ * fallback rendering, retry functionality, and HOC behavior.
  */
 
 import { render, screen, waitFor } from "@testing-library/react";

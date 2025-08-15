@@ -1,6 +1,6 @@
 /**
- * Final Coverage Enhancement Tests - Simplified
- * Focused tests to improve coverage on key areas
+ * Final Coverage Enhancement Tests - Simplified Focused tests to improve
+ * coverage on key areas
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -34,28 +34,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return result;
             };
 
-            expect(
-                unique([
-                    1,
-                    2,
-                    2,
-                    3,
-                    3,
-                    3,
-                ])
-            ).toEqual([1, 2, 3]);
-            expect(
-                chunk(
-                    [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                    ],
-                    2
-                )
-            ).toEqual([[1, 2], [3, 4], [5]]);
+            expect(unique([1, 2, 2, 3, 3, 3])).toEqual([1, 2, 3]);
+            expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
         });
 
         it("should handle object operations", () => {

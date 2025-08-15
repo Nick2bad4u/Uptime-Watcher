@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for useUIStore.
- * Ensures complete coverage of UI state management functionality.
+ * Comprehensive tests for useUIStore. Ensures complete coverage of UI state
+ * management functionality.
  */
 
 import { act, renderHook } from "@testing-library/react";

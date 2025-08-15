@@ -1,6 +1,6 @@
 /**
- * Tests for monitoring services types.
- * Validates type definitions and interfaces for monitoring functionality.
+ * Tests for monitoring services types. Validates type definitions and
+ * interfaces for monitoring functionality.
  */
 
 import { describe, expect, it } from "vitest";

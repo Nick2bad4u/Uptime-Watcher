@@ -2,8 +2,8 @@
  * Comprehensive tests for historyQuery utilities.
  *
  * @remarks
- * Tests all history query functions including edge cases, error handling,
- * and database interaction scenarios.
+ * Tests all history query functions including edge cases, error handling, and
+ * database interaction scenarios.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

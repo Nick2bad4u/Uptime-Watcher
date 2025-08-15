@@ -1,26 +1,29 @@
 /**
- * @fileoverview Comprehensive isolated tests for DataImportExportService
+ * @file Comprehensive isolated tests for DataImportExportService
  *
- * This test suite achieves high coverage for the DataImportExportService class
- * through comprehensive isolated testing with complete dependency mocking.
- * Tests all public methods, private method integration, error handling, and
- * various edge cases for data import/export operations.
+ *   This test suite achieves high coverage for the DataImportExportService class
+ *   through comprehensive isolated testing with complete dependency mocking.
+ *   Tests all public methods, private method integration, error handling, and
+ *   various edge cases for data import/export operations.
  *
- * Coverage targets:
- * - Constructor initialization
- * - exportAllData method with success and error paths
- * - importDataFromJson method with validation scenarios
- * - persistImportedData method with transaction handling
- * - Private method integration (importMonitorsWithHistory, importHistoryForMonitors, importMonitorHistory)
- * - Error handling and event emission
- * - Edge cases and boundary conditions
+ *   Coverage targets:
  *
- * Testing Strategy:
- * - Complete dependency isolation using vi.mock and manual mocks
- * - Comprehensive scenario coverage for all code paths
- * - Error injection and recovery testing
- * - Integration testing of private method collaboration
- * - Event emission verification
+ *   - Constructor initialization
+ *   - ExportAllData method with success and error paths
+ *   - ImportDataFromJson method with validation scenarios
+ *   - PersistImportedData method with transaction handling
+ *   - Private method integration (importMonitorsWithHistory,
+ *       importHistoryForMonitors, importMonitorHistory)
+ *   - Error handling and event emission
+ *   - Edge cases and boundary conditions
+ *
+ *   Testing Strategy:
+ *
+ *   - Complete dependency isolation using vi.mock and manual mocks
+ *   - Comprehensive scenario coverage for all code paths
+ *   - Error injection and recovery testing
+ *   - Integration testing of private method collaboration
+ *   - Event emission verification
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

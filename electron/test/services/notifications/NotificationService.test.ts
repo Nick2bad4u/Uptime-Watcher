@@ -1,6 +1,6 @@
 /**
- * Tests for NotificationService.
- * Validates system notification management and configuration.
+ * Tests for NotificationService. Validates system notification management and
+ * configuration.
  */
 
 import { Notification } from "electron";

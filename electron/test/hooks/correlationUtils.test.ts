@@ -1,5 +1,6 @@
 /**
- * Tests for correlation utilities including correlation ID generation and ValidationError.
+ * Tests for correlation utilities including correlation ID generation and
+ * ValidationError.
  */
 
 import { describe, it, expect } from "vitest";

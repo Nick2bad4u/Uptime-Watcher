@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for monitoring data validation utilities
- * Tests parseUptimeValue and safeGetHostname functions for 100% coverage
+ * @file Comprehensive tests for monitoring data validation utilities Tests
+ *   parseUptimeValue and safeGetHostname functions for 100% coverage
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

@@ -1,14 +1,15 @@
 /**
- * @fileoverview Comprehensive isolated tests for IPC parameter validators
+ * Provides complete test coverage for all exported validator groups in the
+ * validators.ts module using isolated testing with comprehensive dependency
+ * mocking. Tests the actual validator behavior and parameter validation logic.
+ *
  * @module ValidatorsTest
  *
- * @description
- * Provides complete test coverage for all exported validator groups in the
- * validators.ts module using isolated testing with comprehensive dependency mocking.
- * Tests the actual validator behavior and parameter validation logic.
+ * @version 1.0.0
+ *
+ * @file Comprehensive isolated tests for IPC parameter validators
  *
  * @author Uptime-Watcher
- * @version 1.0.0
  */
 
 import { describe, it, expect } from "vitest";

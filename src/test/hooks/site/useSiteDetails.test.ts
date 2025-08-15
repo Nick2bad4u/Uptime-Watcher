@@ -1,6 +1,7 @@
 /**
  * Basic tests for useSiteDetails.ts
- * @file src/test/hooks/site/useSiteDetails.test.ts
+ *
+ * @file Src/test/hooks/site/useSiteDetails.test.ts
  */
 
 import { renderHook, act } from "@testing-library/react";

@@ -1,7 +1,7 @@
 /**
- * Comprehensive test suite for App.tsx component.
- * Tests all major functionality including state management, modal behavior,
- * error handling, loading states, and update notifications.
+ * Comprehensive test suite for App.tsx component. Tests all major functionality
+ * including state management, modal behavior, error handling, loading states,
+ * and update notifications.
  */
 
 import { act, render, screen, waitFor } from "@testing-library/react";

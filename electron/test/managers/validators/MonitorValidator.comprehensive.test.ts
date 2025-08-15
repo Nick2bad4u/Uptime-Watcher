@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for MonitorValidator
- * Targeting 98% branch coverage for all validation logic
+ * Comprehensive tests for MonitorValidator Targeting 98% branch coverage for
+ * all validation logic
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -210,13 +210,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
         });
 
         it("should handle monitors with different responseTime values", () => {
-            const responseTimes = [
-                -1,
-                0,
-                100,
-                1000,
-                5000,
-            ];
+            const responseTimes = [-1, 0, 100, 1000, 5000];
 
             for (const responseTime of responseTimes) {
                 const monitor = createMockMonitor({

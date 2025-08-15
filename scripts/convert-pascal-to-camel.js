@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Script to convert all PascalCase filenames to camelCase
- * Recursively searches through the project and renames files
+ * Script to convert all PascalCase filenames to camelCase Recursively searches
+ * through the project and renames files
  */
 
 const fs = require("fs");
@@ -10,7 +10,9 @@ const path = require("path");
 
 /**
  * Convert PascalCase string to camelCase
+ *
  * @param {string} str - The PascalCase string to convert
+ *
  * @returns {string} - The camelCase string
  */
 function pascalToCamelCase(str) {
@@ -25,7 +27,9 @@ function pascalToCamelCase(str) {
 
 /**
  * Check if a filename is in PascalCase
+ *
  * @param {string} filename - The filename to check
+ *
  * @returns {boolean} - True if the filename is in PascalCase
  */
 function isPascalCase(filename) {
@@ -42,6 +46,7 @@ function isPascalCase(filename) {
 
 /**
  * Recursively process directory to find and rename PascalCase files
+ *
  * @param {string} dirPath - Directory path to process
  * @param {boolean} dryRun - If true, only log what would be renamed
  */

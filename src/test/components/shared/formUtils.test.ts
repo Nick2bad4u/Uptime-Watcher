@@ -1,6 +1,7 @@
 /**
- * @fileoverview Comprehensive tests for form utility functions
  * @version 1.0.0
+ *
+ * @file Comprehensive tests for form utility functions
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -348,9 +349,7 @@ describe("Form Utilities", () => {
 
             it("should handle negative numbers", () => {
                 const validator = validationPatterns.oneOfNumbers([
-                    -1,
-                    -5,
-                    -10,
+                    -1, -5, -10,
                 ]);
 
                 expect(validator(-1)).toBe(true);
@@ -362,9 +361,7 @@ describe("Form Utilities", () => {
 
             it("should handle floating point numbers", () => {
                 const validator = validationPatterns.oneOfNumbers([
-                    1.5,
-                    2.7,
-                    3.14,
+                    1.5, 2.7, 3.14,
                 ]);
 
                 expect(validator(1.5)).toBe(true);
@@ -493,11 +490,7 @@ describe("Form Utilities", () => {
             const setValue = vi.fn();
             const rangeValidator = validationPatterns.numberInRange(1, 100);
             const allowedValidator = validationPatterns.oneOfNumbers([
-                10,
-                20,
-                30,
-                40,
-                50,
+                10, 20, 30, 40, 50,
             ]);
 
             // Combined validation for string inputs that represent numbers

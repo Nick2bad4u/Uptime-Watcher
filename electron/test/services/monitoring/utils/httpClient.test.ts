@@ -1,6 +1,6 @@
 /**
- * Tests for HTTP client utilities.
- * Tests the Axios configuration and timing interceptors.
+ * Tests for HTTP client utilities. Tests the Axios configuration and timing
+ * interceptors.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

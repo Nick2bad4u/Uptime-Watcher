@@ -1,6 +1,7 @@
 /**
  * Tests for valueConverters utility - Database value conversion functionality
- * Tests all database value converters for proper type conversion and edge cases.
+ * Tests all database value converters for proper type conversion and edge
+ * cases.
  */
 
 import { describe, it, expect } from "vitest";
@@ -19,15 +20,7 @@ describe("Value Converters Utility", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            const values: DbValue[] = [
-                null,
-                123,
-                "string",
-                0,
-                -1,
-                3.14,
-                "",
-            ];
+            const values: DbValue[] = [null, 123, "string", 0, -1, 3.14, ""];
 
             expect(values).toHaveLength(7);
             expect(values[0]).toBeNull();

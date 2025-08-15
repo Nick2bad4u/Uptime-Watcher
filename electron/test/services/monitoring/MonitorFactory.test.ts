@@ -1,5 +1,5 @@
 /**
- * @fileoverview Fixed tests for MonitorFactory using correct API
+ * @file Fixed tests for MonitorFactory using correct API
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

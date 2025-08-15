@@ -1,6 +1,7 @@
 /**
- * @fileoverview Test suite for SiteService
  * @module SiteService.test
+ *
+ * @file Test suite for SiteService
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -228,15 +228,17 @@ public updateConfig(config: Partial<NotificationConfig>): void {
 
 ````typescript
 /**
- * Service responsible for handling system notifications for monitor status changes.
+ * Service responsible for handling system notifications for monitor status
+ * changes.
  *
  * @remarks
  * Manages desktop notifications for monitor status changes using Electron's
  * Notification API. Provides configurable settings for different notification
  * types and handles platform compatibility checks.
  *
- * **Thread Safety and Concurrency:**
- * This service is designed to be thread-safe for typical Electron usage patterns:
+ * **Thread Safety and Concurrency:** This service is designed to be thread-safe
+ * for typical Electron usage patterns:
+ *
  * - Safe to call from main process event handlers
  * - Safe to call from IPC message handlers
  * - Safe to call from multiple timer callbacks concurrently
@@ -244,26 +246,23 @@ public updateConfig(config: Partial<NotificationConfig>): void {
  * - No shared mutable state between notification calls
  *
  * **Performance Considerations:**
+ *
  * - Monitor lookup uses Array.find() - consider caching for high-frequency usage
  * - Notification creation is synchronous but display is asynchronous
  * - Platform support check is cached by Electron
  *
  * **Error Handling:**
+ *
  * - Invalid monitor IDs are logged and skipped gracefully
  * - Platform compatibility issues are handled automatically
  * - Invalid input parameters result in warning logs and early returns
  *
- * @public
- *
- * @see {@link NotificationConfig} for configuration options
- * @see {@link Site} for site data structure
- * @see {@link Monitor} for monitor data structure
- *
  * @example
+ *
  * ```typescript
  * const notificationService = new NotificationService({
- *   showDownAlerts: true,
- *   showUpAlerts: false
+ *  showDownAlerts: true,
+ *  showUpAlerts: false,
  * });
  *
  * // Show notification when a monitor goes down
@@ -271,10 +270,16 @@ public updateConfig(config: Partial<NotificationConfig>): void {
  *
  * // Safe to call from multiple contexts concurrently
  * Promise.all([
- *   notificationService.notifyMonitorDown(site1, monitor1),
- *   notificationService.notifyMonitorUp(site2, monitor2)
+ *  notificationService.notifyMonitorDown(site1, monitor1),
+ *  notificationService.notifyMonitorUp(site2, monitor2),
  * ]);
  * ```
+ *
+ * @public
+ *
+ * @see {@link NotificationConfig} for configuration options
+ * @see {@link Site} for site data structure
+ * @see {@link Monitor} for monitor data structure
  */
 export class NotificationService {
  // ... existing implementation

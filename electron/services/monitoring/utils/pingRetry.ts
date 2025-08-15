@@ -5,14 +5,15 @@
  * @remarks
  * This module builds on the basic ping checking utilities by adding
  * configurable retry logic, exponential backoff, and development-mode debug
- * logging. It integrates with the operational hooks system for consistent
- * error handling and event emission across the monitoring system.
+ * logging. It integrates with the operational hooks system for consistent error
+ * handling and event emission across the monitoring system.
  *
  * All ping operations use only cross-platform compatible options to ensure
  * consistent behavior across Windows, macOS, and Linux platforms. The module
  * provides both single-attempt and retry-enabled ping functions.
  *
  * Key features:
+ *
  * - Cross-platform ping execution using only compatible options
  * - Configurable retry logic with exponential backoff
  * - Integration with operational hooks for monitoring and debugging
@@ -20,6 +21,7 @@
  * - Development mode debug logging for troubleshooting
  *
  * @example
+ *
  * ```typescript
  * // Basic ping with retries
  * const result = await performPingCheckWithRetry("google.com", 5000, 3);
@@ -28,11 +30,12 @@
  * const result = await performSinglePingCheck("192.168.1.1", 3000);
  * ```
  *
+ * @public
+ *
  * @see {@link performPingCheckWithRetry} - Main retry-enabled ping function
  * @see {@link performSinglePingCheck} - Single-attempt ping function
  * @see {@link withOperationalHooks} - Operational hooks integration
  * @see {@link handlePingCheckError} - Error handling utilities
- * @public
  */
 
 import * as ping from "ping";
@@ -50,20 +53,24 @@ import { handlePingCheckError } from "./pingErrorHandling";
  *
  * @remarks
  * This function performs a single ping attempt to the specified host using the
- * node-ping library. It measures response time and returns a structured
- * result. This function is used internally by {@link
- * performPingCheckWithRetry} and can also be used directly for single-attempt
- * checks.
+ * node-ping library. It measures response time and returns a structured result.
+ * This function is used internally by {@link performPingCheckWithRetry} and can
+ * also be used directly for single-attempt checks.
  *
  * Uses only cross-platform ping options: numeric, timeout, and min_reply for
  * maximum compatibility.
  *
  * @param host - Target hostname or IP address to ping.
  * @param timeout - Maximum time to wait for the ping response in milliseconds.
- * @returns A promise that resolves to a {@link MonitorCheckResult} with ping status and timing.
+ *
+ * @returns A promise that resolves to a {@link MonitorCheckResult} with ping
+ *   status and timing.
+ *
  * @throws Error if the ping operation fails or times out.
- * @see {@link performPingCheckWithRetry}
+ *
  * @public
+ *
+ * @see {@link performPingCheckWithRetry}
  */
 export async function performSinglePingCheck(
     host: string,
@@ -115,28 +122,25 @@ export async function performSinglePingCheck(
 /**
  * Performs a ping connectivity check with retry logic and exponential backoff.
  *
- * @param host - Target hostname or IP address to ping
- * @param timeout - Maximum time to wait for each ping attempt in milliseconds
- * @param maxRetries - Number of additional retry attempts after initial failure (0 = try once only)
- * @returns Promise resolving to {@link MonitorCheckResult} with ping status, timing, and details
- *
  * @remarks
  * This function wraps {@link performSinglePingCheck} with retry logic using
- * {@link withOperationalHooks}. It attempts to ping the specified host,
- * retrying on failure up to `maxRetries` times (for a total of `maxRetries` +
- * `1` attempts). Exponential backoff is applied between attempts.
+ * {@link withOperationalHooks}. It attempts to ping the specified host, retrying
+ * on failure up to `maxRetries` times (for a total of `maxRetries` + `1`
+ * attempts). Exponential backoff is applied between attempts.
  *
  * Process flow:
+ *
  * 1. Validates input parameters
  * 2. Performs initial ping attempt
  * 3. On failure, retries with exponential backoff
  * 4. Returns standardized result or error
  *
- * Debug logging is enabled in development mode to aid troubleshooting.
- * If all attempts fail, returns a standardized error result via {@link
- * handlePingCheckError}.
+ * Debug logging is enabled in development mode to aid troubleshooting. If all
+ * attempts fail, returns a standardized error result via
+ * {@link handlePingCheckError}.
  *
  * @example
+ *
  * ```typescript
  * // Try once, no retries
  * const result = await performPingCheckWithRetry("example.com", 5000, 0);
@@ -144,16 +148,25 @@ export async function performSinglePingCheck(
  * // Try 4 times total (1 initial + 3 retries) with 3-second timeout
  * const result = await performPingCheckWithRetry("google.com", 3000, 3);
  * if (result.status === "up") {
- *   console.log(`Ping successful: ${result.responseTime}ms`);
+ *     console.log(`Ping successful: ${result.responseTime}ms`);
  * } else {
- *   console.log(`Ping failed: ${result.error}`);
+ *     console.log(`Ping failed: ${result.error}`);
  * }
  * ```
+ *
+ * @param host - Target hostname or IP address to ping
+ * @param timeout - Maximum time to wait for each ping attempt in milliseconds
+ * @param maxRetries - Number of additional retry attempts after initial failure
+ *   (0 = try once only)
+ *
+ * @returns Promise resolving to {@link MonitorCheckResult} with ping status,
+ *   timing, and details
+ *
+ * @public
  *
  * @see {@link withOperationalHooks} - Retry logic implementation
  * @see {@link performSinglePingCheck} - Single ping attempt function
  * @see {@link handlePingCheckError} - Error handling utility
- * @public
  */
 export async function performPingCheckWithRetry(
     host: string,

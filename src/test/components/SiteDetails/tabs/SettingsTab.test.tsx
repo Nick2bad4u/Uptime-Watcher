@@ -1,6 +1,6 @@
 /**
- * Comprehensive test for SettingsTab component to improve coverage.
- * Tests various props combinations, edge cases, and user interactions.
+ * Comprehensive test for SettingsTab component to improve coverage. Tests
+ * various props combinations, edge cases, and user interactions.
  */
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";

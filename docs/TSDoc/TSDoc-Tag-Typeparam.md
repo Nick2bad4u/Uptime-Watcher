@@ -27,7 +27,9 @@ type List<T> = Array<T>;
 
 /**
  * Wrapper for an HTTP Response
+ *
  * @typeParam B - Response body
+ *
  * @param <H> - Headers
  */
 interface HttpResponse<B, H> {

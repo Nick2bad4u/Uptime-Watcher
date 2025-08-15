@@ -1,6 +1,6 @@
 /**
- * Tests for Electron backend types.
- * Validates type definitions and provides runtime type checking for critical interfaces.
+ * Tests for Electron backend types. Validates type definitions and provides
+ * runtime type checking for critical interfaces.
  */
 
 import { describe, expect, it } from "vitest";

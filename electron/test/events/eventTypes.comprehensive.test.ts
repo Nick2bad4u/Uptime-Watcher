@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for eventTypes.ts - targeting 90%+ branch coverage
- * Tests all event categories, priorities, and utility functions
+ * Comprehensive tests for eventTypes.ts - targeting 90%+ branch coverage Tests
+ * all event categories, priorities, and utility functions
  */
 
 import { describe, it, expect } from "vitest";

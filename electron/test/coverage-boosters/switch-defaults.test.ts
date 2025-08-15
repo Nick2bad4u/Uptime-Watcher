@@ -1,7 +1,8 @@
 /**
  * Targeted tests for switch statement default cases and uncovered conditionals
- * This test file specifically targets missing branch coverage in switch statements,
- * error handling, and conditional logic to boost overall coverage percentage.
+ * This test file specifically targets missing branch coverage in switch
+ * statements, error handling, and conditional logic to boost overall coverage
+ * percentage.
  */
 
 import { describe, expect, it } from "vitest";

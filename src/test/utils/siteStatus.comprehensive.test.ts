@@ -2,8 +2,9 @@
  * Comprehensive tests for siteStatus utilities.
  *
  * @remarks
- * These tests ensure 90%+ branch coverage for all site status calculation functions.
- * Tests cover all possible combinations of monitor states and edge cases.
+ * These tests ensure 90%+ branch coverage for all site status calculation
+ * functions. Tests cover all possible combinations of monitor states and edge
+ * cases.
  */
 
 import { describe, expect, it } from "vitest";

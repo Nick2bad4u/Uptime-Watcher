@@ -22,11 +22,13 @@ developer preview release.
 ```ts
 /**
  * Represents a book in the catalog.
+ *
  * @public
  */
 export class Book {
  /**
   * The title of the book.
+  *
   * @beta
   */
  public get title(): string;

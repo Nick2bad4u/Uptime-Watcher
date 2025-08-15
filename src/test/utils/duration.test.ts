@@ -1,8 +1,8 @@
 /**
  * Tests for duration utility functions
  *
- * @fileoverview Comprehensive tests covering all branches and edge cases
- * for duration calculation utilities.
+ * @file Comprehensive tests covering all branches and edge cases for duration
+ *   calculation utilities.
  */
 
 import { describe, it, expect } from "vitest";

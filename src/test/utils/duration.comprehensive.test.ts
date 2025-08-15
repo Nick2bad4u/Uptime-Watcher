@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for calculateMaxDuration utility function
- * Testing duration calculations, retry logic, and formatting
+ * @file Comprehensive tests for calculateMaxDuration utility function Testing
+ *   duration calculations, retry logic, and formatting
  */
 
 import { describe, expect, it } from "vitest";

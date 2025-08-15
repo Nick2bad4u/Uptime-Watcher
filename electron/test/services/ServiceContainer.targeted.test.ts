@@ -1,5 +1,6 @@
 /**
- * Targeted test for ServiceContainer SiteManager creation with event bus mocking
+ * Targeted test for ServiceContainer SiteManager creation with event bus
+ * mocking
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

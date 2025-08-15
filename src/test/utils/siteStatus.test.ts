@@ -13,7 +13,8 @@ import {
 } from "../../utils/siteStatus";
 /**
  * Site Status Utility Tests
- * @description Tests for site status utility functions
+ *
+ * Tests for site status utility functions
  */
 import type { SiteForStatus } from "../../../shared/types";
 

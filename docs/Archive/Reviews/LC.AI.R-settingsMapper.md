@@ -218,13 +218,14 @@ export function settingsToRecord(
 /**
  * Convert a single database row to a setting value.
  *
- * @param row - Raw database row
- * @returns Setting value as string, or undefined if not found or null
- *
  * @remarks
  * **Falsy Value Handling**: Preserves all falsy values except null/undefined.
  * Empty strings, 0, and false are converted to their string representations.
  * Only null and undefined values return undefined.
+ *
+ * @param row - Raw database row
+ *
+ * @returns Setting value as string, or undefined if not found or null
  */
 ```
 

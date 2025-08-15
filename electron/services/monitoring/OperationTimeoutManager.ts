@@ -2,8 +2,8 @@
  * Operation timeout manager for monitoring operations.
  *
  * @remarks
- * Manages timeouts for monitoring operations to prevent resource leaks
- * and ensure stale operations are properly cleaned up.
+ * Manages timeouts for monitoring operations to prevent resource leaks and
+ * ensure stale operations are properly cleaned up.
  *
  * @packageDocumentation
  */
@@ -21,8 +21,8 @@ import { monitorLogger as logger } from "../../utils/logger";
  * Manages timeouts for monitoring operations.
  *
  * @remarks
- * Provides automatic cleanup of operations that exceed their timeout
- * period, preventing resource leaks and ensuring system stability.
+ * Provides automatic cleanup of operations that exceed their timeout period,
+ * preventing resource leaks and ensuring system stability.
  *
  * @public
  */

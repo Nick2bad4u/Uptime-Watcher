@@ -1,13 +1,17 @@
 /**
  * Benchmark tests for database operations
  *
- * @fileoverview Performance benchmarks for heavy computational database operations
- * including bulk insertions, data mapping, and query processing.
+ * @file Performance benchmarks for heavy computational database operations
+ *   including bulk insertions, data mapping, and query processing.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Database
+ *
  * @tags ["performance", "database", "mapping", "bulk-operations"]
  */
 
@@ -90,10 +94,7 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
             status: Math.random() > 0.05 ? "up" : "down",
             responseTime: Math.floor(Math.random() * 1000) + 50,
             lastChecked: new Date(Date.now() - Math.random() * 86400000),
-            active_operations: JSON.stringify([
-                `op-${i}-1`,
-                `op-${i}-2`,
-            ]),
+            active_operations: JSON.stringify([`op-${i}-1`, `op-${i}-2`]),
         });
     }
 

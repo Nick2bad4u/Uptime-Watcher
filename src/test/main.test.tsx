@@ -1,6 +1,6 @@
 /**
- * Tests for React application entry point dependencies and structure.
- * Validates that main.tsx dependencies are properly available.
+ * Tests for React application entry point dependencies and structure. Validates
+ * that main.tsx dependencies are properly available.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

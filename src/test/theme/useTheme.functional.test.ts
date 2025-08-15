@@ -1,6 +1,6 @@
 /**
- * Functional tests for useTheme hooks.
- * Note: These tests are currently skipped due to complex mock setup requirements.
+ * Functional tests for useTheme hooks. Note: These tests are currently skipped
+ * due to complex mock setup requirements.
  */
 
 import { describe, it, expect } from "vitest";

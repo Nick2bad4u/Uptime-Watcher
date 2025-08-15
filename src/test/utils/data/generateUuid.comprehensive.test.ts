@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for generateUuid utility function
- * Testing UUID generation, crypto availability, and fallback behavior
+ * @file Comprehensive tests for generateUuid utility function Testing UUID
+ *   generation, crypto availability, and fallback behavior
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

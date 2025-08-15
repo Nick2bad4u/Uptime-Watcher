@@ -1,6 +1,6 @@
 /**
- * Zustand Documentation Downloader
- * Downloads Zustand documentation from GitHub repository
+ * Zustand Documentation Downloader Downloads Zustand documentation from GitHub
+ * repository
  */
 
 import { exec } from "child_process";
@@ -75,7 +75,9 @@ const newHashes = {};
 
 /**
  * Clean Zustand documentation content
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function cleanContent(content) {
@@ -89,7 +91,9 @@ function cleanContent(content) {
 
 /**
  * Rewrite relative links to absolute GitHub URLs
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function rewriteLinks(content) {
@@ -104,10 +108,12 @@ function rewriteLinks(content) {
 
 /**
  * Download a Zustand documentation file
+ *
  * @param {string} cmd
  * @param {string} filePath
  * @param {string} logMsg
  * @param {string} name
+ *
  * @returns {Promise<void>}
  */
 function downloadFile(cmd, filePath, logMsg, name) {

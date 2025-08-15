@@ -1,6 +1,6 @@
 /**
- * Tests for Electron backend constants.
- * Validates that all constants are properly exported and have expected values.
+ * Tests for Electron backend constants. Validates that all constants are
+ * properly exported and have expected values.
  */
 
 import { describe, expect, it } from "vitest";

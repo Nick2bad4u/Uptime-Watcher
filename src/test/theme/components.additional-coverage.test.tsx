@@ -1,6 +1,7 @@
 /**
  * Additional test coverage for theme components to reach 98% branch coverage
- * Focuses on components and branches not covered by the comprehensive test suite
+ * Focuses on components and branches not covered by the comprehensive test
+ * suite
  */
 
 import { render } from "@testing-library/react";

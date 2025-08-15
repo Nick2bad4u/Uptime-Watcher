@@ -23,14 +23,14 @@ For example:
 /**
  * Retrieves metadata about a book from the catalog.
  *
- * @param isbnCode - the ISBN number for the book
- * @returns the retrieved book object
+ * @param isbnCode - The ISBN number for the book
  *
- * @throws {@link IsbnSyntaxError}
- * This exception is thrown if the input is not a valid ISBN number.
+ * @returns The retrieved book object
  *
- * @throws {@link book-lib#BookNotFoundError}
- * Thrown if the ISBN number is valid, but no such book exists in the catalog.
+ * @throws {@link IsbnSyntaxError} This exception is thrown if the input is not
+ *   a valid ISBN number.
+ * @throws {@link book-lib#BookNotFoundError} Thrown if the ISBN number is
+ *   valid, but no such book exists in the catalog.
  *
  * @public
  */

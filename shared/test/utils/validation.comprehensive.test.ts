@@ -1,6 +1,6 @@
 /**
- * Comprehensive test suite for shared validation utilities.
- * Provides 100% coverage for validation functions.
+ * Comprehensive test suite for shared validation utilities. Provides 100%
+ * coverage for validation functions.
  */
 
 import { describe, expect, it } from "vitest";

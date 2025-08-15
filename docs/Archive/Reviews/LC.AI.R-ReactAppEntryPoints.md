@@ -220,8 +220,8 @@ useSettingsStore();
 
 ```tsx
 /**
- * Initialize and render the React application.
- * Creates the React root and renders the App component with StrictMode for development benefits.
+ * Initialize and render the React application. Creates the React root and
+ * renders the App component with StrictMode for development benefits.
  */
 const rootElement = document.querySelector("#root");
 ```

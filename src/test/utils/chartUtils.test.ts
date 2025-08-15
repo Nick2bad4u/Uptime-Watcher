@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for chartUtils utility functions
- * Tests type-safe Chart.js configuration utilities for 100% branch coverage
+ * @file Comprehensive tests for chartUtils utility functions Tests type-safe
+ *   Chart.js configuration utilities for 100% branch coverage
  */
 
 import { describe, it, expect } from "vitest";
@@ -537,15 +537,7 @@ describe("Chart Utilities", () => {
         });
 
         it("should handle all function combinations with invalid inputs", () => {
-            const invalidInputs = [
-                null,
-                undefined,
-                "",
-                0,
-                false,
-                [],
-                {},
-            ];
+            const invalidInputs = [null, undefined, "", 0, false, [], {}];
 
             for (const input of invalidInputs) {
                 expect(hasScales(input)).toBe(

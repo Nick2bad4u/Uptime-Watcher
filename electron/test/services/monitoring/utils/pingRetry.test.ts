@@ -2,8 +2,8 @@
  * Test suite for ping retry utilities.
  *
  * @remarks
- * Tests the ping retry functionality including single ping attempts,
- * retry logic, error handling, and cross-platform compatibility.
+ * Tests the ping retry functionality including single ping attempts, retry
+ * logic, error handling, and cross-platform compatibility.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

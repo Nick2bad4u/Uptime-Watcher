@@ -2,6 +2,7 @@
  * Comprehensive test suite for SiteOverviewTab.tsx component.
  *
  * This test suite provides complete coverage for the SiteOverviewTab component:
+ *
  * - Component rendering with different site configurations
  * - Monitor status calculations and display
  * - Site-level statistics and aggregations

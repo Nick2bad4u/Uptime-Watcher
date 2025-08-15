@@ -1,8 +1,8 @@
 /**
  * Comprehensive tests for ServiceContainer.ts
  *
- * Tests all service creation, dependency injection, initialization flow,
- * error handling, debugging capabilities, and event forwarding mechanisms.
+ * Tests all service creation, dependency injection, initialization flow, error
+ * handling, debugging capabilities, and event forwarding mechanisms.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

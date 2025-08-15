@@ -1,13 +1,17 @@
 /**
  * Comprehensive tests for theme hooks
  *
- * @fileoverview Tests for useTheme, useAvailabilityColors, useStatusColors,
- * useThemeClasses, and useThemeValue hooks to achieve 100% coverage
+ * @module useTheme
+ *
+ * @file Tests for useTheme, useAvailabilityColors, useStatusColors,
+ *   useThemeClasses, and useThemeValue hooks to achieve 100% coverage
  *
  * @author GitHub Copilot
+ *
  * @since 2025-01-15
+ *
  * @category Theme
- * @module useTheme
+ *
  * @tags ["test", "theme", "hooks", "coverage"]
  */
 

@@ -1,20 +1,22 @@
 /**
+ * Tests for history it("should set limit to 0 for negative values without
+ * pruning", async () => { const setHistoryLimitCallback = vi.fn(); const limit
+ * = -10; const expectedLimit = 0;
+ *
+ * ```
+ *         await setHistoryLimit({
+ *             limit,
+ *             databaseService: mockDatabaseService,
+ *             repositories: {
+ *                 history: mockHistoryRepository,
+ *                 settings: mockSettingsRepository,
+ *             },
+ *             setHistoryLimit: setHistoryLimitCallback,
+ *             logger: mockLogger,
+ *         });nt utilities
+ * ```
+ *
  * @file Test suite for historyLimitManager.ts
- * @description Tests for history         it("should set limit to 0 for negative values without pruning", async () => {
-            const setHistoryLimitCallback = vi.fn();
-            const limit = -10;
-            const expectedLimit = 0;
-
-            await setHistoryLimit({
-                limit,
-                databaseService: mockDatabaseService,
-                repositories: {
-                    history: mockHistoryRepository,
-                    settings: mockSettingsRepository,
-                },
-                setHistoryLimit: setHistoryLimitCallback,
-                logger: mockLogger,
-            });nt utilities
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Tests for store utility functions.
- * Tests the core utilities used across all Zustand stores in the application.
+ * Tests for store utility functions. Tests the core utilities used across all
+ * Zustand stores in the application.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

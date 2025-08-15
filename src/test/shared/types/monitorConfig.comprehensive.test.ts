@@ -1,9 +1,9 @@
 /**
  * Comprehensive test suite for Monitor Configuration types.
  *
- * @fileoverview
- * This test suite provides 100% test coverage for the monitor configuration type definitions
- * including all interfaces, type guards, default configurations, and validation logic.
+ * @file This test suite provides 100% test coverage for the monitor
+ *   configuration type definitions including all interfaces, type guards,
+ *   default configurations, and validation logic.
  */
 
 import { describe, expect, it } from "vitest";

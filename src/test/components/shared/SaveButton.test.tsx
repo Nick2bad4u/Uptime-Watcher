@@ -1,6 +1,7 @@
 /**
- * @fileoverview Comprehensive tests for SaveButton component
  * @version 1.0.0
+ *
+ * @file Comprehensive tests for SaveButton component
  */
 
 import { describe, expect, it, vi } from "vitest";

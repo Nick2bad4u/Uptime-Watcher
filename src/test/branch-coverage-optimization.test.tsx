@@ -1,8 +1,8 @@
 /**
  * Branch Coverage Optimization Tests
  *
- * Targeted tests to improve branch coverage for specific files identified
- * in the coverage report as having branch coverage below 90%.
+ * Targeted tests to improve branch coverage for specific files identified in
+ * the coverage report as having branch coverage below 90%.
  */
 
 import { describe, expect, it, vi } from "vitest";

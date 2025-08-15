@@ -21,8 +21,8 @@ import { monitorLogger as logger } from "../../utils/logger";
  * Interface for monitor check operations.
  *
  * @remarks
- * Represents a single monitoring check operation with correlation ID
- * and cancellation support.
+ * Represents a single monitoring check operation with correlation ID and
+ * cancellation support.
  *
  * @public
  */
@@ -62,8 +62,8 @@ export interface MonitorCheckResult {
  * Registry for tracking active monitoring operations.
  *
  * @remarks
- * Provides operation correlation and cancellation capabilities to prevent
- * race conditions between monitor state changes and check operations.
+ * Provides operation correlation and cancellation capabilities to prevent race
+ * conditions between monitor state changes and check operations.
  *
  * @public
  */
@@ -131,6 +131,7 @@ export class MonitorOperationRegistry {
      * Get a specific operation by ID.
      *
      * @param operationId - ID of operation to retrieve
+     *
      * @returns Operation if found, undefined otherwise
      */
     public getOperation(
@@ -143,6 +144,7 @@ export class MonitorOperationRegistry {
      * Initiate a new check operation for a monitor.
      *
      * @param monitorId - ID of monitor to check
+     *
      * @returns Unique operation ID
      */
     public initiateCheck(monitorId: string): string {
@@ -179,6 +181,7 @@ export class MonitorOperationRegistry {
      * Validate that an operation is still active and not cancelled.
      *
      * @param operationId - ID of operation to validate
+     *
      * @returns True if operation is valid and not cancelled
      */
     public validateOperation(operationId: string): boolean {

@@ -1,25 +1,28 @@
 /**
- * Service for site writing operations.
- * Provides a testable, dependency-injected service for site c    /**
- * Detect new monitors that were added to an existing site.
- *
- * @param originalMonitors - The original monitors before update
- * @param updatedMonitors - The updated monitors after update
- * @returns Array of new monitor IDs, including empty string placeholders for monitors without IDs
+ * Service for site writing operations. Provides a testable, dependency-injected
+ * service for site c /** Detect new monitors that were added to an existing
+ * site.
  *
  * @remarks
  * This method handles two scenarios:
+ *
  * 1. **Monitors with IDs**: Compares IDs to detect new ones
- * 2. **Monitors without IDs**: Detects new monitors by comparing monitor
- * objects
+ * 2. **Monitors without IDs**: Detects new monitors by comparing monitor objects
  *    since IDs are assigned during database creation
  *
  * **Empty String Placeholder Contract:**
- * - When a monitor doesn't have an ID yet (new monitors), an empty string ("")
- * is returned - Downstream consumers MUST handle empty strings as "new monitor
- * without ID" indicators - These placeholders signal that the monitor needs
- * database creation and ID assignment - Empty strings should NOT be treated as
- * valid monitor IDs for database operations
+ *
+ * - When a monitor doesn't have an ID yet (new monitors), an empty string ("") is
+ *   returned - Downstream consumers MUST handle empty strings as "new monitor
+ *   without ID" indicators - These placeholders signal that the monitor needs
+ *   database creation and ID assignment - Empty strings should NOT be treated
+ *   as valid monitor IDs for database operations
+ *
+ * @param originalMonitors - The original monitors before update
+ * @param updatedMonitors - The updated monitors after update
+ *
+ * @returns Array of new monitor IDs, including empty string placeholders for
+ *   monitors without IDs
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -38,15 +41,17 @@ import { withDatabaseOperation } from "../operationalHooks";
 import { SiteNotFoundError } from "./interfaces";
 
 /**
- * Service for handling site writing operations.
- * Separates data operations from side effects for better testability.
+ * Service for handling site writing operations. Separates data operations from
+ * side effects for better testability.
  */
 
 /**
  * Common SQL queries for site writer operations.
  *
  * @remarks
- * Centralizes query strings for maintainability and consistency. This constant is internal to the service and not exported.
+ * Centralizes query strings for maintainability and consistency. This constant
+ * is internal to the service and not exported.
+ *
  * @internal
  */
 const SITE_WRITER_QUERIES = {
@@ -64,17 +69,12 @@ export class SiteWriterService {
     };
 
     /**
-     * Create a new site in the database with its monitors.
-     * Pure data operation without side effects.
-     *
-     * @param siteData - Site configuration including monitors to create
-     * @returns Promise resolving to the created site with assigned monitor IDs
-     *
-     * @throws DatabaseError When database operations fail
-     * @throws TransactionError When transaction rollback occurs
+     * Create a new site in the database with its monitors. Pure data operation
+     * without side effects.
      *
      * @remarks
      * This method performs atomic multi-step operations:
+     *
      * 1. Creates the site record in the database
      * 2. Removes any existing monitors for this site (cleanup)
      * 3. Creates new monitors and assigns generated IDs
@@ -84,28 +84,36 @@ export class SiteWriterService {
      * object.
      *
      * @example
+     *
      * ```typescript
      * const newSite = await siteWriter.createSite({
-     *   identifier: 'my-site',
-     *   name: 'My Website',
-     *   monitoring: false,
-     *   monitors: [
-     *     {
-     *       id: '', // Will be assigned during creation
-     *       type: 'http',
-     *       url: 'https://example.com',
-     *       checkInterval: 30000,
-     *       timeout: 5000,
-     *       retryAttempts: 3,
-     *       monitoring: false,
-     *       status: 'pending',
-     *       responseTime: 0,
-     *       history: []
-     *     }
-     *   ]
+     *     identifier: "my-site",
+     *     name: "My Website",
+     *     monitoring: false,
+     *     monitors: [
+     *         {
+     *             id: "", // Will be assigned during creation
+     *             type: "http",
+     *             url: "https://example.com",
+     *             checkInterval: 30000,
+     *             timeout: 5000,
+     *             retryAttempts: 3,
+     *             monitoring: false,
+     *             status: "pending",
+     *             responseTime: 0,
+     *             history: [],
+     *         },
+     *     ],
      * });
      * console.log(newSite.monitors[0].id); // Generated ID like 'mon_123'
      * ```
+     *
+     * @param siteData - Site configuration including monitors to create
+     *
+     * @returns Promise resolving to the created site with assigned monitor IDs
+     *
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
      */
     public async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
@@ -158,36 +166,43 @@ export class SiteWriterService {
     }
 
     /**
-     * Delete a site and all its monitors from the database.
-     * Pure data operation without side effects.
-     *
-     * @param sitesCache - Cache containing sites to update after deletion
-     * @param identifier - Site identifier to delete
-     * @returns Promise resolving to true if site was found and deleted, false if not found
-     *
-     * @throws DatabaseError When database operations fail
-     * @throws TransactionError When transaction rollback occurs
+     * Delete a site and all its monitors from the database. Pure data operation
+     * without side effects.
      *
      * @remarks
      * This method performs atomic multi-table deletion:
+     *
      * 1. Removes the site from the cache
      * 2. Deletes all associated monitors from the database
      * 3. Deletes the site record from the database
      *
      * All database operations are wrapped in a transaction to ensure
-     * consistency. If the site is not found in the cache, it will still
-     * attempt database cleanup to handle cases where cache and database are
-     * out of sync.
+     * consistency. If the site is not found in the cache, it will still attempt
+     * database cleanup to handle cases where cache and database are out of
+     * sync.
      *
      * @example
+     *
      * ```typescript
-     * const deleted = await siteWriter.deleteSite(sitesCache, 'my-site-id');
+     * const deleted = await siteWriter.deleteSite(
+     *     sitesCache,
+     *     "my-site-id"
+     * );
      * if (deleted) {
-     *   console.log('Site deleted successfully');
+     *     console.log("Site deleted successfully");
      * } else {
-     *   console.log('Site not found');
+     *     console.log("Site not found");
      * }
      * ```
+     *
+     * @param sitesCache - Cache containing sites to update after deletion
+     * @param identifier - Site identifier to delete
+     *
+     * @returns Promise resolving to true if site was found and deleted, false
+     *   if not found
+     *
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
      */
     public async deleteSite(
         sitesCache: StandardizedCache<Site>,
@@ -230,8 +245,8 @@ export class SiteWriterService {
     }
 
     /**
-     * Handle monitoring state changes when monitor intervals are modified.
-     * Side effect operation separated from data updates.
+     * Handle monitoring state changes when monitor intervals are modified. Side
+     * effect operation separated from data updates.
      */
     public async handleMonitorIntervalChanges(
         identifier: string,
@@ -284,20 +299,11 @@ export class SiteWriterService {
     }
 
     /**
-     * Update a site with new values.
-     * Pure data operation without side effects.
-     *
-     * @param sitesCache - Cache containing sites to update
-     * @param identifier - Site identifier to update
-     * @param updates - Partial site data with fields to update
-     * @returns Promise resolving to the updated site object
-     *
-     * @throws SiteNotFoundError When the site is not found in cache
-     * @throws DatabaseError When database operations fail
-     * @throws TransactionError When transaction rollback occurs
+     * Update a site with new values. Pure data operation without side effects.
      *
      * @remarks
      * This method performs atomic updates while preserving monitor history:
+     *
      * 1. Validates the site exists in the cache
      * 2. Merges updates with existing site data
      * 3. Persists changes to the database within a transaction
@@ -308,28 +314,43 @@ export class SiteWriterService {
      * and prevents ID changes that could break external references.
      *
      * @example
+     *
      * ```typescript
-     * const updatedSite = await siteWriter.updateSite(sitesCache, 'my-site', {
-     *   name: 'Updated Site Name',
-     *   monitoring: true,
-     *   monitors: [
+     * const updatedSite = await siteWriter.updateSite(
+     *     sitesCache,
+     *     "my-site",
      *     {
-     *       id: 'existing-monitor-id', // Existing monitor - will be updated
-     *       type: 'http',
-     *       url: 'https://updated-url.com',
-     *       checkInterval: 60000,
-     *       // ... other fields
-     *     },
-     *     {
-     *       id: '', // New monitor - will get new ID
-     *       type: 'port',
-     *       host: 'example.com',
-     *       port: 443,
-     *       // ... other fields
+     *         name: "Updated Site Name",
+     *         monitoring: true,
+     *         monitors: [
+     *             {
+     *                 id: "existing-monitor-id", // Existing monitor - will be updated
+     *                 type: "http",
+     *                 url: "https://updated-url.com",
+     *                 checkInterval: 60000,
+     *                 // ... other fields
+     *             },
+     *             {
+     *                 id: "", // New monitor - will get new ID
+     *                 type: "port",
+     *                 host: "example.com",
+     *                 port: 443,
+     *                 // ... other fields
+     *             },
+     *         ],
      *     }
-     *   ]
-     * });
+     * );
      * ```
+     *
+     * @param sitesCache - Cache containing sites to update
+     * @param identifier - Site identifier to update
+     * @param updates - Partial site data with fields to update
+     *
+     * @returns Promise resolving to the updated site object
+     *
+     * @throws SiteNotFoundError When the site is not found in cache
+     * @throws DatabaseError When database operations fail
+     * @throws TransactionError When transaction rollback occurs
      */
     public async updateSite(
         sitesCache: StandardizedCache<Site>,
@@ -386,19 +407,21 @@ export class SiteWriterService {
     /**
      * Detect new monitors that were added to an existing site.
      *
-     * @param originalMonitors - The original monitors before update
-     * @param updatedMonitors - The updated monitors after update
-     * @returns Array of new monitor IDs (may include empty strings for monitors without IDs)
-     *
      * @remarks
      * This method handles two scenarios:
+     *
      * 1. **Monitors with IDs**: Compares IDs to detect new ones
      * 2. **Monitors without IDs**: Detects new monitors by comparing monitor
-     * objects
-     *    since IDs are assigned during database creation
+     *    objects since IDs are assigned during database creation
      *
      * Monitors without IDs are returned with empty string placeholders to
      * indicate they need special handling during monitor setup operations.
+     *
+     * @param originalMonitors - The original monitors before update
+     * @param updatedMonitors - The updated monitors after update
+     *
+     * @returns Array of new monitor IDs (may include empty strings for monitors
+     *   without IDs)
      */
     public detectNewMonitors(
         originalMonitors: Site["monitors"],
@@ -466,13 +489,14 @@ export class SiteWriterService {
     /**
      * Create a unique signature for a monitor based on its configuration.
      *
-     * @param monitor - The monitor to create a signature for
-     * @returns A string signature representing the monitor's configuration
-     *
      * @remarks
      * Used to detect new monitors that don't have IDs yet. The signature
      * includes all configuration properties that make a monitor unique,
      * excluding runtime properties like status, lastChecked, and responseTime.
+     *
+     * @param monitor - The monitor to create a signature for
+     *
+     * @returns A string signature representing the monitor's configuration
      */
     private createMonitorSignature(monitor: Site["monitors"][0]): string {
         return [
@@ -652,18 +676,20 @@ export class SiteWriterService {
     }
 
     /**
-     * Update monitors preserving their history and IDs.
-     * This method updates existing monitors and creates new ones as needed.
-     *
-     * @param db - Database transaction instance to ensure transactional consistency
-     * @param siteIdentifier - The site identifier to update monitors for
-     * @param newMonitors - Array of new monitor configurations
-     * @returns Promise that resolves when all monitor updates are complete
+     * Update monitors preserving their history and IDs. This method updates
+     * existing monitors and creates new ones as needed.
      *
      * @remarks
      * This method operates within a transaction context and uses the provided
      * database instance to maintain transactional consistency. All database
      * operations must use the same transaction instance.
+     *
+     * @param db - Database transaction instance to ensure transactional
+     *   consistency
+     * @param siteIdentifier - The site identifier to update monitors for
+     * @param newMonitors - Array of new monitor configurations
+     *
+     * @returns Promise that resolves when all monitor updates are complete
      */
     private updateMonitorsPreservingHistory(
         db: Database,

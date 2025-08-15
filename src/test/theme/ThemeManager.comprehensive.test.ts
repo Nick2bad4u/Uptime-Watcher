@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for ThemeManager.ts
- * Targets 90%+ branch coverage for all theme management functions
+ * Comprehensive tests for ThemeManager.ts Targets 90%+ branch coverage for all
+ * theme management functions
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

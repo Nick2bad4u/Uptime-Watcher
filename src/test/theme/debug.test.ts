@@ -22,23 +22,8 @@ describe("Debug Availability Description", () => {
 
         // Test all percentage boundary conditions
         const testCases = [
-            100,
-            99.9,
-            99.5,
-            99,
-            98.5,
-            98,
-            95.5,
-            95,
-            94.5,
-            90.5,
-            90,
-            85,
-            80,
-            60,
-            50,
-            30,
-            0,
+            100, 99.9, 99.5, 99, 98.5, 98, 95.5, 95, 94.5, 90.5, 90, 85, 80, 60,
+            50, 30, 0,
         ];
 
         console.log("Complete test of all boundaries:");

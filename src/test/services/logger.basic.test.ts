@@ -1,6 +1,6 @@
 /**
- * Simple test coverage for logger service to achieve 100% coverage
- * Tests basic logger functionality without complex mocking
+ * Simple test coverage for logger service to achieve 100% coverage Tests basic
+ * logger functionality without complex mocking
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

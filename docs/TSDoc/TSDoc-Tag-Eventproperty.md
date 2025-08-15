@@ -23,6 +23,7 @@ display such properties under an "Events" heading instead of the usual "Properti
 class MyClass {
  /**
   * This event is fired whenever the application navigates to a new page.
+  *
   * @eventProperty
   */
  public readonly navigatedEvent: FrameworkEvent<NavigatedEventArgs>;

@@ -1,6 +1,6 @@
 /**
- * @fileoverview High-impact targeted tests for specific uncovered branches
- * Based on semantic search analysis of error handling and conditional branches
+ * @file High-impact targeted tests for specific uncovered branches Based on
+ *   semantic search analysis of error handling and conditional branches
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

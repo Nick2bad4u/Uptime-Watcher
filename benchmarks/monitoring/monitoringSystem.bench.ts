@@ -1,8 +1,8 @@
 /**
  * Benchmarks for Monitoring System Performance
  *
- * Tests performance of monitor scheduling, operation tracking,
- * race condition prevention, and heavy monitoring operations.
+ * Tests performance of monitor scheduling, operation tracking, race condition
+ * prevention, and heavy monitoring operations.
  */
 
 import { bench, describe } from "vitest";

@@ -9,8 +9,8 @@ import { logger } from "../../utils/logger";
  * Configuration options for the notification service.
  *
  * @remarks
- * Controls which types of monitor status change notifications are displayed
- * to the user. Both settings can be independently enabled or disabled.
+ * Controls which types of monitor status change notifications are displayed to
+ * the user. Both settings can be independently enabled or disabled.
  *
  * @public
  */
@@ -30,35 +30,33 @@ export interface NotificationConfig {
  * Notification API. Provides configurable settings for different notification
  * types and handles platform compatibility checks.
  *
- * **Thread Safety and Concurrency:**
- * This service is designed to be thread-safe for typical Electron usage
- * patterns: - Safe to call from main process event handlers
+ * **Thread Safety and Concurrency:** This service is designed to be thread-safe
+ * for typical Electron usage patterns: - Safe to call from main process event
+ * handlers
+ *
  * - Safe to call from IPC message handlers
  * - Safe to call from multiple timer callbacks concurrently
  * - Configuration updates are applied atomically
  * - No shared mutable state between notification calls
  *
  * **Performance Considerations:**
- * - Monitor lookup uses Array.find() - consider caching for high-frequency
- * usage - Notification creation is synchronous but display is asynchronous
+ *
+ * - Monitor lookup uses Array.find() - consider caching for high-frequency usage
+ *   - Notification creation is synchronous but display is asynchronous
  * - Platform support check is cached by Electron
  *
  * **Error Handling:**
+ *
  * - Invalid monitor IDs are logged and skipped gracefully
  * - Platform compatibility issues are handled automatically
  * - Invalid input parameters result in warning logs and early returns
  *
- * @public
- *
- * @see {@link NotificationConfig} for configuration options
- * @see {@link Site} for site data structure
- * @see {@link Monitor} for monitor data structure
- *
  * @example
+ *
  * ```typescript
  * const notificationService = new NotificationService({
- *   showDownAlerts: true,
- *   showUpAlerts: false
+ *     showDownAlerts: true,
+ *     showUpAlerts: false,
  * });
  *
  * // Show notification when a monitor goes down
@@ -66,10 +64,16 @@ export interface NotificationConfig {
  *
  * // Safe to call from multiple contexts concurrently
  * Promise.all([
- *   notificationService.notifyMonitorDown(site1, monitor1),
- *   notificationService.notifyMonitorUp(site2, monitor2)
+ *     notificationService.notifyMonitorDown(site1, monitor1),
+ *     notificationService.notifyMonitorUp(site2, monitor2),
  * ]);
  * ```
+ *
+ * @public
+ *
+ * @see {@link NotificationConfig} for configuration options
+ * @see {@link Site} for site data structure
+ * @see {@link Monitor} for monitor data structure
  */
 export class NotificationService {
     private config: NotificationConfig;
@@ -77,12 +81,12 @@ export class NotificationService {
     /**
      * Create a new notification service instance.
      *
-     * @param config - Optional configuration for notification behavior
-     *
      * @remarks
      * If no configuration is provided, both down and up alerts are enabled by
-     * default. The configuration can be updated later using {@link
-     * NotificationService.updateConfig}.
+     * default. The configuration can be updated later using
+     * {@link NotificationService.updateConfig}.
+     *
+     * @param config - Optional configuration for notification behavior
      */
     public constructor(config?: NotificationConfig) {
         this.config = config ?? { showDownAlerts: true, showUpAlerts: true };
@@ -91,12 +95,12 @@ export class NotificationService {
     /**
      * Get the current notification configuration.
      *
-     * @returns A copy of the current configuration
-     *
      * @remarks
      * Returns a copy to prevent external modification of the internal
      * configuration. Use {@link NotificationService.updateConfig} to modify
      * settings.
+     *
+     * @returns A copy of the current configuration
      */
     public getConfig(): NotificationConfig {
         return { ...this.config };
@@ -105,12 +109,12 @@ export class NotificationService {
     /**
      * Check if system notifications are supported on the current platform.
      *
-     * @returns `true` if notifications are supported, `false` otherwise
-     *
      * @remarks
      * Uses Electron's built-in platform detection to determine notification
-     * support. On unsupported platforms, notification methods will log
-     * warnings instead of attempting to display notifications.
+     * support. On unsupported platforms, notification methods will log warnings
+     * instead of attempting to display notifications.
+     *
+     * @returns `true` if notifications are supported, `false` otherwise
      */
     public isSupported(): boolean {
         return Notification.isSupported();
@@ -119,24 +123,25 @@ export class NotificationService {
     /**
      * Show a notification when a monitor goes down.
      *
-     * @param site - The site containing the monitor that went down
-     * @param monitorId - ID of the specific monitor that went down
-     *
      * @remarks
-     * Displays a critical urgency notification with site name and monitor
-     * type. Automatically skipped if down alerts are disabled in configuration
-     * or
-     * if notifications are not supported on the current platform.
+     * Displays a critical urgency notification with site name and monitor type.
+     * Automatically skipped if down alerts are disabled in configuration or if
+     * notifications are not supported on the current platform.
      *
      * The notification includes:
+     *
      * - Site name for easy identification
      * - Monitor type (HTTP, port, etc.)
      * - Critical urgency level to ensure visibility
      *
      * Error handling:
+     *
      * - Logs warning and skips notification if monitor not found
      * - Validates input parameters before processing
      * - Provides detailed error information for debugging
+     *
+     * @param site - The site containing the monitor that went down
+     * @param monitorId - ID of the specific monitor that went down
      */
     public notifyMonitorDown(site: Site, monitorId: string): void {
         if (!this.config.showDownAlerts) return;
@@ -183,23 +188,25 @@ export class NotificationService {
     /**
      * Show a notification when a monitor comes back up.
      *
-     * @param site - The site containing the monitor that came back up
-     * @param monitorId - ID of the specific monitor that was restored
-     *
      * @remarks
      * Displays a normal urgency notification indicating service restoration.
-     * Automatically skipped if up alerts are disabled in configuration or
-     * if notifications are not supported on the current platform.
+     * Automatically skipped if up alerts are disabled in configuration or if
+     * notifications are not supported on the current platform.
      *
      * The notification includes:
+     *
      * - Site name for easy identification
      * - Monitor type (HTTP, port, etc.)
      * - Normal urgency level (less intrusive than down alerts)
      *
      * Error handling:
+     *
      * - Logs warning and skips notification if monitor not found
      * - Validates input parameters before processing
      * - Provides detailed error information for debugging
+     *
+     * @param site - The site containing the monitor that came back up
+     * @param monitorId - ID of the specific monitor that was restored
      */
     public notifyMonitorUp(site: Site, monitorId: string): void {
         if (!this.config.showUpAlerts) return;
@@ -246,29 +253,31 @@ export class NotificationService {
     /**
      * Update the notification configuration.
      *
-     * @param config - Partial configuration object with settings to update
-     *
      * @remarks
-     * Allows runtime modification of notification behavior without creating
-     * a new service instance.
+     * Allows runtime modification of notification behavior without creating a
+     * new service instance.
      *
      * **Partial Update Behavior:**
+     *
      * - Only properties specified in the config parameter are updated
      * - Omitted properties retain their current values
      * - No properties are reset to default values
      * - Changes take effect immediately for subsequent notifications
      *
      * @example
+     *
      * ```typescript
      * // Only update showDownAlerts, showUpAlerts remains unchanged
      * service.updateConfig({ showDownAlerts: false });
      *
      * // Update both properties
      * service.updateConfig({
-     *   showDownAlerts: true,
-     *   showUpAlerts: false
+     *     showDownAlerts: true,
+     *     showUpAlerts: false,
      * });
      * ```
+     *
+     * @param config - Partial configuration object with settings to update
      */
     public updateConfig(config: Partial<NotificationConfig>): void {
         this.config = {

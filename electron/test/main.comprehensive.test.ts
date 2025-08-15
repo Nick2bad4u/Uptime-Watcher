@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for main.ts - Electron main process entry point
- * These tests cover application initialization, logging configuration, and cleanup
+ * Comprehensive tests for main.ts - Electron main process entry point These
+ * tests cover application initialization, logging configuration, and cleanup
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

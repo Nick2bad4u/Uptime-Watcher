@@ -1,6 +1,7 @@
 /**
  * Tests for useSiteMonitor.ts
- * @file src/test/hooks/site/useSiteMonitor.test.ts
+ *
+ * @file Src/test/hooks/site/useSiteMonitor.test.ts
  */
 
 import { renderHook, act } from "@testing-library/react";

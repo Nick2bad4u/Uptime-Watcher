@@ -37,11 +37,7 @@ describe("Settings Component Coverage Tests", () => {
                 "theme",
             ];
 
-            const invalidKeys = [
-                "invalidKey",
-                "anotherInvalid",
-                "notAllowed",
-            ];
+            const invalidKeys = ["invalidKey", "anotherInvalid", "notAllowed"];
 
             for (const key of validKeys) {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(true);
@@ -228,14 +224,7 @@ describe("Settings Component Coverage Tests", () => {
 
     describe("History Limit Handling", () => {
         it("should handle history limit options", () => {
-            const HISTORY_LIMIT_OPTIONS = [
-                25,
-                50,
-                100,
-                250,
-                500,
-                1000,
-            ];
+            const HISTORY_LIMIT_OPTIONS = [25, 50, 100, 250, 500, 1000];
             const DEFAULT_HISTORY_LIMIT = 100;
 
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);

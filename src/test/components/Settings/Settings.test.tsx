@@ -1,6 +1,6 @@
 /**
- * Tests for Settings component.
- * Focuses on essential functionality and proper mocking.
+ * Tests for Settings component. Focuses on essential functionality and proper
+ * mocking.
  */
 
 import "@testing-library/jest-dom";

@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for useSelectedSite hook
- * Testing store coordination, memoization, and state management
+ * @file Comprehensive tests for useSelectedSite hook Testing store
+ *   coordination, memoization, and state management
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";

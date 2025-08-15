@@ -12,9 +12,9 @@
  * Shared type definitions for Uptime Watcher (frontend & backend).
  *
  * @remarks
- * All core domain types (Monitor, Site, StatusUpdate, etc.) live here.
- * Both frontend and backend must import from this file for consistency.
- * Event types are separate to avoid circular dependencies.
+ * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both
+ * frontend and backend must import from this file for consistency. Event types
+ * are separate to avoid circular dependencies.
  *
  * @packageDocumentation
  */
@@ -90,6 +90,7 @@ export const MONITOR_STATUS: MonitorStatusConstants = {
  * Default monitor status value.
  *
  * @defaultValue MONITOR_STATUS.PENDING
+ *
  * @public
  */
 export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
@@ -98,6 +99,7 @@ export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
  * Default site status value.
  *
  * @defaultValue "unknown"
+ *
  * @public
  */
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
@@ -122,8 +124,8 @@ export interface Monitor {
  * Field definition for dynamic form generation.
  *
  * @remarks
- * Used for monitor type configuration in both frontend and backend. Defines
- * the structure of fields for dynamic forms and monitor configuration.
+ * Used for monitor type configuration in both frontend and backend. Defines the
+ * structure of fields for dynamic forms and monitor configuration.
  *
  * @public
  */
@@ -191,6 +193,7 @@ export interface StatusUpdate {
  * identifiers.
  *
  * @param activeOperations - Array to validate
+ *
  * @returns True if all elements are valid identifiers
  */
 function isValidActiveOperations(
@@ -221,19 +224,14 @@ export function isMonitorStatus(status: string): status is MonitorStatus {
 }
 
 export function isSiteStatus(status: string): status is SiteStatus {
-    return [
-        "down",
-        "mixed",
-        "paused",
-        "pending",
-        "unknown",
-        "up",
-    ].includes(status);
+    return ["down", "mixed", "paused", "pending", "unknown", "up"].includes(
+        status
+    );
 }
 
 /**
- * Enhanced monitor validation using shared type guards.
- * Provides consistent validation across frontend and backend.
+ * Enhanced monitor validation using shared type guards. Provides consistent
+ * validation across frontend and backend.
  */
 export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
     return (

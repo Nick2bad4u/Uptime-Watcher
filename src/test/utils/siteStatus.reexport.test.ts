@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 /**
  * Test suite for src/utils/siteStatus.ts re-exports
  *
- * @fileoverview Tests the frontend wrapper that re-exports shared site status utilities
+ * @file Tests the frontend wrapper that re-exports shared site status utilities
  */
 
 describe("Frontend SiteStatus Re-exports", () => {

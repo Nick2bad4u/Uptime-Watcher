@@ -1,5 +1,6 @@
 /**
- * @fileoverview Tests for error constants to ensure they are properly exported and accessible.
+ * @file Tests for error constants to ensure they are properly exported and
+ *   accessible.
  */
 
 import { describe, it, expect } from "vitest";

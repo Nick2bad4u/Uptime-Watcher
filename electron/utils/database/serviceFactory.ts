@@ -11,9 +11,9 @@ import { StandardizedCache } from "../cache/StandardizedCache";
 /**
  * Adapter for the logger to implement Logger interface.
  *
- * Adapts the monitorLogger instance to match the Logger interface required
- * by database services, providing a consistent logging interface across
- * different components while maintaining type safety.
+ * Adapts the monitorLogger instance to match the Logger interface required by
+ * database services, providing a consistent logging interface across different
+ * components while maintaining type safety.
  *
  * @see {@link Logger} for the interface this class implements
  */
@@ -44,9 +44,9 @@ export class LoggerAdapter {
 /**
  * Factory function to create a standardized site cache.
  *
- * Creates a temporary cache instance optimized for site operations
- * with appropriate TTL and size limits for temporary data storage.
- * Statistics are disabled for performance in temporary use cases.
+ * Creates a temporary cache instance optimized for site operations with
+ * appropriate TTL and size limits for temporary data storage. Statistics are
+ * disabled for performance in temporary use cases.
  *
  * @returns New StandardizedCache instance configured for temporary site storage
  */

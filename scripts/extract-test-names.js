@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Script to extract and export all test names from the project
- * Parses test files to find describe() and it() blocks and exports test names
+ * Script to extract and export all test names from the project Parses test
+ * files to find describe() and it() blocks and exports test names
  */
 
 const fs = require("fs");
@@ -10,7 +10,9 @@ const path = require("path");
 
 /**
  * Extract test names from a single test file
+ *
  * @param {string} filePath - Path to the test file
+ *
  * @returns {Object} - Object containing test structure
  */
 function extractTestNames(filePath) {
@@ -50,6 +52,7 @@ function extractTestNames(filePath) {
 
 /**
  * Find all test files in the project
+ *
  * @param {string} dirPath - Directory to search
  * @param {Array} testFiles - Array to collect test file paths
  */
@@ -101,6 +104,7 @@ function findTestFiles(dirPath, testFiles = []) {
 
 /**
  * Format test names for different output formats
+ *
  * @param {Array} testStructures - Array of test structures
  * @param {string} format - Output format ('list', 'json', 'tree', 'flat')
  */

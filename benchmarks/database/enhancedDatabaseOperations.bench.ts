@@ -1,14 +1,18 @@
 /**
  * Enhanced Database Performance Benchmarks
  *
- * @fileoverview Comprehensive performance benchmarks for database operations
- * in the Uptime Watcher application. Focuses on realistic workloads and
- * performance-critical scenarios.
+ * @file Comprehensive performance benchmarks for database operations in the
+ *   Uptime Watcher application. Focuses on realistic workloads and
+ *   performance-critical scenarios.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Performance
+ *
  * @benchmark Database
+ *
  * @tags ["performance", "database", "heavy-operations", "scalability"]
  */
 

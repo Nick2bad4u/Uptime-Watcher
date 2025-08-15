@@ -194,14 +194,16 @@ public close(): void {
  *
  * @remarks
  * **Platform Compatibility:**
+ *
  * - Built for Electron main process environment
  * - Uses node-sqlite3-wasm (compiled for Node.js compatibility)
  * - No platform-specific caveats for Windows/macOS/Linux
  * - WASM binary ensures consistent behavior across platforms
  *
  * **Thread Safety:**
+ *
  * - Singleton pattern ensures single database connection
- * - node-sqlite3-wasm operations are synchronous and thread-safe
+ * - Node-sqlite3-wasm operations are synchronous and thread-safe
  * - Multiple initialize() calls return same connection (idempotent)
  * - Concurrent access handled at application service layer
  */
@@ -227,6 +229,7 @@ public async methodName(params): Promise<ReturnType> {
  *
  * @remarks
  * **Transaction Behavior in node-sqlite3-wasm:**
+ *
  * - All operations (BEGIN, COMMIT, ROLLBACK) are synchronous
  * - No race conditions possible due to synchronous execution
  * - Automatic rollback on operation failure ensures consistency

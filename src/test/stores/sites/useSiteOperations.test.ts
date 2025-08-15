@@ -1,6 +1,6 @@
 /**
- * Tests for createSiteOperationsActions module
- * Tests CRUD operations for sites and monitor management
+ * Tests for createSiteOperationsActions module Tests CRUD operations for sites
+ * and monitor management
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

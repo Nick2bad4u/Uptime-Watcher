@@ -1,6 +1,7 @@
 /**
- * Comprehensive tests for DatabaseManager with 100% branch coverage.
- * Tests all database operations, initialization, import/export, and backup functionality.
+ * Comprehensive tests for DatabaseManager with 100% branch coverage. Tests all
+ * database operations, initialization, import/export, and backup
+ * functionality.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

@@ -141,7 +141,7 @@ export const SiteCardHeader = React.memo(function SiteCardHeader({
     {site.site.name}
    </ThemedText>
 
-   <div className="flex items-center gap-2 min-w-[180px]">
+   <div className="flex min-w-[180px] items-center gap-2">
     <MonitorSelector
      monitors={site.site.monitors}
      onChange={interactions.onMonitorIdChange}

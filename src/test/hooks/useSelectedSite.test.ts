@@ -1,6 +1,6 @@
 /**
- * @fileoverview Tests for useSelectedSite hook
- * Tests the hook that manages selected site state across store boundaries
+ * @file Tests for useSelectedSite hook Tests the hook that manages selected
+ *   site state across store boundaries
  */
 
 import { renderHook } from "@testing-library/react";

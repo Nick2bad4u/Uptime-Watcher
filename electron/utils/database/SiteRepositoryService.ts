@@ -6,36 +6,23 @@
  * operations, separating business logic from infrastructure concerns. Designed
  * with the repository pattern and service layer architecture to enable
  * comprehensive testing and maintainable code organization.
- *
- * @public
- *
- * @beta * Service for handling site repository operations.
- *
  * @remarks
  * Provides pure data operations for site management without side effects,
  * enabling easy testing and clean separation of concerns. All methods are
- * designed to be deterministic and focused on data transformation and
- * retrieval operations.
+ * designed to be deterministic and focused on data transformation and retrieval
+ * operations.
  *
  * The service abstracts repository complexity and provides a clean interface
  * for higher-level components while maintaining transaction safety and
  * comprehensive error handling throughout all operations.
  *
- * @see {@link SiteRepository} for data access patterns
- * @see {@link MonitorRepository} for monitor data operations
- * @see {@link HistoryRepository} for history data operations
- * @see {@link SettingsRepository} for settings data operations
- * This service is currently in beta and may undergo breaking changes.
- *
- * @see {@link SiteLoadingOrchestrator} for orchestration logic
- * @see {@link SiteRepository} for data access patterns
- *
  * @example
+ *
  * ```typescript
  * const service = new SiteRepositoryService({
- *   repositories: { site, monitor, history, settings },
- *   logger,
- *   eventEmitter
+ *     repositories: { site, monitor, history, settings },
+ *     logger,
+ *     eventEmitter,
  * });
  *
  * const sites = await service.getSitesFromDatabase();
@@ -47,17 +34,30 @@
  * while maintaining clean separation between pure functions and side effects.
  *
  * @example
+ *
  * ```typescript
  * const service = new SiteRepositoryService({
- *   repositories: { site, monitor, history, settings },
- *   logger,
- *   eventEmitter
+ *     repositories: { site, monitor, history, settings },
+ *     logger,
+ *     eventEmitter,
  * });
  *
  * const sites = await service.getSitesFromDatabase();
  * ```
  *
+ * @public
+ *
+ * @beta * Service for handling site repository operations.
+ *
  * @packageDocumentation
+ *
+ * @see {@link SiteRepository} for data access patterns
+ * @see {@link MonitorRepository} for monitor data operations
+ * @see {@link HistoryRepository} for history data operations
+ * @see {@link SettingsRepository} for settings data operations
+ * This service is currently in beta and may undergo breaking changes.
+ * @see {@link SiteLoadingOrchestrator} for orchestration logic
+ * @see {@link SiteRepository} for data access patterns
  */
 
 import type { Site } from "@shared/types";
@@ -77,15 +77,15 @@ import { DEFAULT_SITE_NAME } from "../../constants";
 import { SiteLoadingError } from "./interfaces";
 
 /**
- * Orchestrates the complete site loading process.
- * Coordinates data loading with side effects.
+ * Orchestrates the complete site loading process. Coordinates data loading with
+ * side effects.
  */
 export class SiteLoadingOrchestrator {
     private readonly siteRepositoryService: SiteRepositoryService;
 
     /**
-     * Load sites from database and start monitoring.
-     * Coordinates all aspects of site loading process.
+     * Load sites from database and start monitoring. Coordinates all aspects of
+     * site loading process.
      */
     public async loadSitesFromDatabase(
         siteCache: StandardizedCache<Site>,
@@ -130,8 +130,8 @@ export class SiteLoadingOrchestrator {
  * @remarks
  * Provides pure data operations for site management without side effects,
  * enabling easy testing and clean separation of concerns. All methods are
- * designed to be deterministic and focused on data transformation and
- * retrieval operations.
+ * designed to be deterministic and focused on data transformation and retrieval
+ * operations.
  *
  * The service abstracts repository complexity and provides a clean interface
  * for higher-level components while maintaining transaction safety and
@@ -150,8 +150,8 @@ export class SiteRepositoryService {
     };
 
     /**
-     * Apply history limit setting.
-     * Side effect operation separated from data loading.
+     * Apply history limit setting. Side effect operation separated from data
+     * loading.
      */
     public async applyHistoryLimitSetting(
         monitoringConfig: MonitoringConfig
@@ -164,8 +164,8 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Load history limit setting from database.
-     * Pure data operation without side effects.
+     * Load history limit setting from database. Pure data operation without
+     * side effects.
      */
     public async getHistoryLimitSetting(): Promise<number | undefined> {
         try {
@@ -196,18 +196,18 @@ export class SiteRepositoryService {
     /**
      * Get sites from database with their monitors and history.
      *
-     * @returns Promise resolving to array of complete site objects
-     *
-     * @throws SiteLoadingError When database operation fails
-     *
      * @remarks
      * Performs a complete site loading operation including all associated
-     * monitors and their status history. This operation includes logging
-     * and error handling side effects for comprehensive error tracking.
+     * monitors and their status history. This operation includes logging and
+     * error handling side effects for comprehensive error tracking.
      *
      * The operation builds complete site objects by fetching site metadata,
      * associated monitors, and historical data in an efficient manner while
      * maintaining proper error handling throughout the process.
+     *
+     * @returns Promise resolving to array of complete site objects
+     *
+     * @throws SiteLoadingError When database operation fails
      */
     public async getSitesFromDatabase(): Promise<Site[]> {
         try {
@@ -230,8 +230,7 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Load sites into cache.
-     * Pure data operation that populates the cache.
+     * Load sites into cache. Pure data operation that populates the cache.
      */
     public async loadSitesIntoCache(
         siteCache: StandardizedCache<Site>
@@ -263,8 +262,8 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Build a site object with monitors and history.
-     * Private helper method for data construction.
+     * Build a site object with monitors and history. Private helper method for
+     * data construction.
      */
     private async buildSiteWithMonitorsAndHistory(
         siteRow: SiteRow
@@ -298,12 +297,12 @@ export class SiteRepositoryService {
     /**
      * Create a new SiteRepositoryService instance.
      *
-     * @param config - Configuration with required dependencies
-     *
      * @remarks
      * Initializes the service with injected dependencies for repositories,
-     * logging, and event communication. All dependencies are required
-     * for proper operation and comprehensive functionality.
+     * logging, and event communication. All dependencies are required for
+     * proper operation and comprehensive functionality.
+     *
+     * @param config - Configuration with required dependencies
      */
     public constructor(config: SiteLoadingConfig) {
         this.repositories = config.repositories;

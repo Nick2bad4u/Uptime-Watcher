@@ -1,6 +1,5 @@
 /**
- * Edge cases test file.
- * Basic tests for edge cases in the application.
+ * Edge cases test file. Basic tests for edge cases in the application.
  */
 
 import { describe, expect, it } from "vitest";

@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for DefaultErrorFallback component.
- * Tests error display, button interactions, and edge cases.
+ * Comprehensive tests for DefaultErrorFallback component. Tests error display,
+ * button interactions, and edge cases.
  */
 
 import { render, screen } from "@testing-library/react";

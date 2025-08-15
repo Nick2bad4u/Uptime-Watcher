@@ -1,5 +1,5 @@
 /**
- * @fileoverview Simple debug test for MonitorScheduler to verify method existence
+ * @file Simple debug test for MonitorScheduler to verify method existence
  */
 
 import { describe, it, expect, vi } from "vitest";

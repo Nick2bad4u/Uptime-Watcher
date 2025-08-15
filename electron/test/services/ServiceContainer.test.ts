@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for ServiceContainer with 100% branch coverage.
- * Tests all service initialization paths, error handling, and lifecycle management.
+ * Comprehensive tests for ServiceContainer with 100% branch coverage. Tests all
+ * service initialization paths, error handling, and lifecycle management.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";

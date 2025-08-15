@@ -1,6 +1,7 @@
 /**
- * Comprehensive test coverage booster for uncovered code paths
- * This file targets the specific uncovered lines and branches identified in the coverage report
+ * Comprehensive test coverage booster for uncovered code paths This file
+ * targets the specific uncovered lines and branches identified in the coverage
+ * report
  */
 
 import { describe, it, expect } from "vitest";
@@ -424,9 +425,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             );
             expect(mockFallbacks.getFallbackArray(null)).toEqual([]);
             expect(mockFallbacks.getFallbackArray([1, 2, 3])).toEqual([
-                1,
-                2,
-                3,
+                1, 2, 3,
             ]);
         });
     });

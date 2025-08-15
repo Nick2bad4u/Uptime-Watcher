@@ -1,7 +1,7 @@
 /**
- * Targeted tests for validation error paths and uncovered edge cases
- * Focuses on improving branch coverage by testing error paths, validation failures,
- * and edge cases that are commonly missed in unit tests.
+ * Targeted tests for validation error paths and uncovered edge cases Focuses on
+ * improving branch coverage by testing error paths, validation failures, and
+ * edge cases that are commonly missed in unit tests.
  */
 
 import { describe, expect, it } from "vitest";
@@ -376,18 +376,11 @@ describe("Validation Error Paths and Edge Cases", () => {
                 return chunks;
             };
 
-            expect(
-                chunkArray(
-                    [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                    ],
-                    2
-                )
-            ).toEqual([[1, 2], [3, 4], [5]]);
+            expect(chunkArray([1, 2, 3, 4, 5], 2)).toEqual([
+                [1, 2],
+                [3, 4],
+                [5],
+            ]);
             expect(chunkArray([1, 2, 3], 3)).toEqual([[1, 2, 3]]);
             expect(chunkArray([1, 2, 3], 5)).toEqual([[1, 2, 3]]);
             expect(chunkArray([], 2)).toEqual([]);

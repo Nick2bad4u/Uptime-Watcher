@@ -1,6 +1,6 @@
 /**
- * Coverage-focused tests for DatabaseManager.
- * Uses comprehensive mocking to achieve stable test coverage.
+ * Coverage-focused tests for DatabaseManager. Uses comprehensive mocking to
+ * achieve stable test coverage.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

@@ -1,13 +1,14 @@
 // @ts-nocheck
 /**
- * Universal Doc Downloader & Cleaner Template
- * -------------------------------------------
+ * ## Universal Doc Downloader & Cleaner Template
+ *
  * Easily configure all variables at the top!
  *
  * HOW TO CONFIGURE:
- *   1. Set variables in the CONFIGURATION section below.
- *   2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
- *   3. Run: `node doc_downloader_template.js`
+ *
+ * 1. Set variables in the CONFIGURATION section below.
+ * 2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
+ * 3. Run: `node doc_downloader_template.js`
  */
 
 const { exec } = require("child_process");
@@ -52,8 +53,11 @@ const OUTPUT_EXT = "md";
 
 /**
  * SECTION REMOVAL/STRIP OPTIONS:
- * - To remove everything from a marker onwards, add its string to REMOVE_FROM_MARKER (array, any string).
- * - To remove only lines that contain certain markers, add those to REMOVE_LINE_MARKERS (array).
+ *
+ * - To remove everything from a marker onwards, add its string to
+ *   REMOVE_FROM_MARKER (array, any string).
+ * - To remove only lines that contain certain markers, add those to
+ *   REMOVE_LINE_MARKERS (array).
  */
 const REMOVE_FROM_MARKER = ["::::: sponsors_container"];
 const REMOVE_LINE_MARKERS = ["::::::: body"];
@@ -83,7 +87,9 @@ const CMD_TEMPLATE = (url, outFile) =>
 /**
  * Rewrites relative Markdown links to absolute URLs for your documentation set.
  * Customize as needed for your doc set.
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function rewriteLinks(content) {
@@ -95,9 +101,13 @@ function rewriteLinks(content) {
 
 /**
  * Cleans unwanted sections/lines from Markdown.
- * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER onward.
+ *
+ * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER
+ *   onward.
  * - Removes any line that contains any REMOVE_LINE_MARKERS.
+ *
  * @param {string} content
+ *
  * @returns {string}
  */
 function cleanContent(content) {

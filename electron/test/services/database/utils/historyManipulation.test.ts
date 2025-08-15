@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for historyManipulation utility functions
- * Testing all database manipulation functions with proper mocking
+ * @file Comprehensive tests for historyManipulation utility functions Testing
+ *   all database manipulation functions with proper mocking
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
@@ -530,11 +530,7 @@ describe("History Manipulation Utilities", () => {
             await annotate("Priority: High", "priority");
 
             // Arrange
-            const excessEntries = [
-                { id: 10 },
-                { id: 11 },
-                { id: 12 },
-            ];
+            const excessEntries = [{ id: 10 }, { id: 11 }, { id: 12 }];
             mockDb.all = vi.fn().mockReturnValue(excessEntries);
             mockDb.run = vi.fn();
             mockIsDev.mockReturnValue(false);

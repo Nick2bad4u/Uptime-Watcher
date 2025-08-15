@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for useSiteAnalytics hook.
- * Tests all analytics calculations with full coverage including edge cases.
+ * Comprehensive tests for useSiteAnalytics hook. Tests all analytics
+ * calculations with full coverage including edge cases.
  */
 
 import { renderHook } from "@testing-library/react";

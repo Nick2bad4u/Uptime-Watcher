@@ -1,6 +1,6 @@
 /**
- * Additional tests for preload.ts to achieve 98% branch coverage
- * Targets IPC error handling and edge cases
+ * Additional tests for preload.ts to achieve 98% branch coverage Targets IPC
+ * error handling and edge cases
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

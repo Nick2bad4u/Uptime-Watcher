@@ -1,6 +1,6 @@
 /**
- * Simple coverage test for Settings component - targeting specific missing lines
- * Focus on testing the warning logic without full component rendering
+ * Simple coverage test for Settings component - targeting specific missing
+ * lines Focus on testing the warning logic without full component rendering
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";

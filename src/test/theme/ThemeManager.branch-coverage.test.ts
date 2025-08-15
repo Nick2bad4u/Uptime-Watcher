@@ -1,6 +1,6 @@
 /**
- * Additional branch coverage tests for ThemeManager.ts
- * Focuses on achieving 98% branch coverage by testing edge cases
+ * Additional branch coverage tests for ThemeManager.ts Focuses on achieving 98%
+ * branch coverage by testing edge cases
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

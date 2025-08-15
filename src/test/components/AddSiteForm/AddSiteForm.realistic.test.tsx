@@ -1,6 +1,6 @@
 /**
- * Comprehensive test suite for AddSiteForm component
- * Fixed to match actual component behavior and interface structure
+ * Comprehensive test suite for AddSiteForm component Fixed to match actual
+ * component behavior and interface structure
  */
 
 import { render, screen } from "@testing-library/react";

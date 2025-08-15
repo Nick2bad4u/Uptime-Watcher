@@ -62,31 +62,48 @@ The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is
 /**
  * Perform port check with sophisticated retry logic and exponential backoff.
  *
- * @param host - Target hostname or IP address to check
- * @param port - Port number to test connectivity
- * @param timeout - Maximum time to wait for each connection attempt in milliseconds
- * @param maxRetries - Number of additional retry attempts after initial failure (0 = try once only)
- * @returns Promise resolving to monitor check result with timing and status information
- *
  * @remarks
- * Uses {@link withOperationalHooks} for sophisticated retry logic with exponential backoff.
- * The maxRetries parameter represents additional attempts after the initial attempt,
- * so maxRetries=3 results in 4 total attempts (1 initial + 3 retries).
+ * Uses {@link withOperationalHooks} for sophisticated retry logic with
+ * exponential backoff. The maxRetries parameter represents additional attempts
+ * after the initial attempt, so maxRetries=3 results in 4 total attempts (1
+ * initial + 3 retries).
  *
  * Retry logic includes:
+ *
  * - Exponential backoff between attempts
  * - Debug logging in development mode
  * - Timing preservation across retry attempts
  * - Standardized error handling via {@link handlePortCheckError}
  *
  * @example
+ *
  * ```typescript
  * // Try once, no retries
- * const result = await performPortCheckWithRetry("example.com", 80, 5000, 0);
+ * const result = await performPortCheckWithRetry(
+ *  "example.com",
+ *  80,
+ *  5000,
+ *  0
+ * );
  *
  * // Try 4 times total (1 initial + 3 retries)
- * const result = await performPortCheckWithRetry("example.com", 443, 3000, 3);
+ * const result = await performPortCheckWithRetry(
+ *  "example.com",
+ *  443,
+ *  3000,
+ *  3
+ * );
  * ```
+ *
+ * @param host - Target hostname or IP address to check
+ * @param port - Port number to test connectivity
+ * @param timeout - Maximum time to wait for each connection attempt in
+ *   milliseconds
+ * @param maxRetries - Number of additional retry attempts after initial failure
+ *   (0 = try once only)
+ *
+ * @returns Promise resolving to monitor check result with timing and status
+ *   information
  *
  * @see {@link withOperationalHooks} for retry mechanism details
  * @see {@link performSinglePortCheck} for single attempt logic
@@ -141,8 +158,9 @@ export async function performPortCheckWithRetry(
  * Utility functions for performing port checks with retry logic.
  *
  * @remarks
- * This module provides high-level port checking with sophisticated retry mechanisms.
- * It builds on the basic port checking in portChecker.ts by adding:
+ * This module provides high-level port checking with sophisticated retry
+ * mechanisms. It builds on the basic port checking in portChecker.ts by
+ * adding:
  *
  * - Exponential backoff retry logic via {@link withOperationalHooks}
  * - Development mode debug logging
@@ -153,8 +171,8 @@ export async function performPortCheckWithRetry(
  * integrates with the operational hooks system for consistent error handling
  * and event emission across the monitoring system.
  *
- * For single port checks without retry logic, use portChecker.ts directly.
- * For error handling utilities, see portErrorHandling.ts.
+ * For single port checks without retry logic, use portChecker.ts directly. For
+ * error handling utilities, see portErrorHandling.ts.
  */
 ```
 

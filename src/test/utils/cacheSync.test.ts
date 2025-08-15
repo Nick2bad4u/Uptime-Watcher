@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for Frontend Cache Synchronization utilities.
- * Tests cache invalidation event handling and frontend cache clearing.
+ * Comprehensive tests for Frontend Cache Synchronization utilities. Tests cache
+ * invalidation event handling and frontend cache clearing.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";

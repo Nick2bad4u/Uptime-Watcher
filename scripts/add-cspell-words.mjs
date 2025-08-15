@@ -1,7 +1,8 @@
 /**
- * Script to automatically append new unknown words found by cspell to custom-words.txt.
- * Usage: Run this script from the project root to update your custom spelling dictionary.
- * Requires: Node.js, cspell installed (npx cspell).
+ * Script to automatically append new unknown words found by cspell to
+ * custom-words.txt. Usage: Run this script from the project root to update your
+ * custom spelling dictionary. Requires: Node.js, cspell installed (npx
+ * cspell).
  */
 
 import { execSync } from "child_process";

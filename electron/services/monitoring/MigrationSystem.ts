@@ -23,11 +23,12 @@ import { MAX_LOG_DATA_LENGTH, MAX_MIGRATION_STEPS } from "./constants";
  * Describes a migration rule for a monitor type.
  *
  * @remarks
- * Each migration rule transforms monitor configuration data from one version
- * to another. Used by the migration system to upgrade or modify monitor
+ * Each migration rule transforms monitor configuration data from one version to
+ * another. Used by the migration system to upgrade or modify monitor
  * configuration schemas.
  *
  * @example
+ *
  * ```typescript
  * {
  *   description: "Add timeout field",
@@ -78,7 +79,9 @@ export interface MigrationRule {
      * invalid.
      *
      * @param data - The monitor configuration data to transform.
+     *
      * @returns A promise resolving to the transformed data.
+     *
      * @throws Throws if transformation fails or data is invalid.
      */
     transform: (
@@ -90,8 +93,8 @@ export interface MigrationRule {
  * Tracks version information for a monitor type.
  *
  * @remarks
- * Used by {@link VersionManager} to record migration state and applied
- * versions for each monitor type.
+ * Used by {@link VersionManager} to record migration state and applied versions
+ * for each monitor type.
  *
  * @public
  */
@@ -141,20 +144,29 @@ class MigrationOrchestrator {
      * @remarks
      * Applies all necessary migrations in order. Updates version state if
      * successful. Returns a summary object with migration results, errors, and
-     * warnings. Throws only if orchestration fails unexpectedly (e.g.,
-     * registry or version manager error).
+     * warnings. Throws only if orchestration fails unexpectedly (e.g., registry
+     * or version manager error).
+     *
+     * @example
+     *
+     * ```typescript
+     * const result = await orchestrator.migrateMonitorData(
+     *     "http",
+     *     config,
+     *     "1.0.0",
+     *     "1.1.0"
+     * );
+     * ```
      *
      * @param monitorType - The monitor type (e.g., "http", "port").
      * @param data - The monitor configuration data to migrate.
      * @param fromVersion - The current version of the data.
      * @param toVersion - The target version to migrate to.
-     * @returns An object containing applied migrations, migrated data, errors, success flag, and warnings.
-     * @throws Throws if migration orchestration fails unexpectedly.
      *
-     * @example
-     * ```typescript
-     * const result = await orchestrator.migrateMonitorData("http", config, "1.0.0", "1.1.0");
-     * ```
+     * @returns An object containing applied migrations, migrated data, errors,
+     *   success flag, and warnings.
+     *
+     * @throws Throws if migration orchestration fails unexpectedly.
      */
     public async migrateMonitorData(
         monitorType: string,
@@ -309,6 +321,7 @@ class MigrationRegistry {
      * @param monitorType - The monitor type.
      * @param fromVersion - The source version.
      * @param toVersion - The target version.
+     *
      * @returns True if migration is possible, false otherwise.
      */
     public canMigrate(
@@ -330,8 +343,8 @@ class MigrationRegistry {
      *
      * @remarks
      * Throws if no valid path exists, a circular path is detected, or the path
-     * exceeds the maximum steps limit. Used internally by orchestrators and
-     * for migration feasibility checks.
+     * exceeds the maximum steps limit. Used internally by orchestrators and for
+     * migration feasibility checks.
      *
      * Algorithm ensures no infinite loops by checking for visited versions
      * before adding them to the path. The maximum path length prevents
@@ -340,8 +353,11 @@ class MigrationRegistry {
      * @param monitorType - The monitor type.
      * @param fromVersion - The source version.
      * @param toVersion - The target version.
+     *
      * @returns Array of migration rules to apply in order.
-     * @throws {@link Error} If no migration path exists, circular path detected, or path exceeds maximum steps.
+     *
+     * @throws {@link Error} If no migration path exists, circular path
+     *   detected, or path exceeds maximum steps.
      */
     public getMigrationPath(
         monitorType: string,
@@ -411,6 +427,7 @@ class MigrationRegistry {
      *
      * @param monitorType - The monitor type.
      * @param rule - The migration rule to register.
+     *
      * @throws Throws if migration rules cannot be created for the monitor type.
      */
     public registerMigration(monitorType: string, rule: MigrationRule): void {
@@ -448,14 +465,16 @@ class MigrationRegistry {
      * Compares two semantic version strings.
      *
      * @remarks
-     * Used for sorting migration rules and determining migration order.
-     * Now includes validation to prevent NaN comparisons from malformed
-     * versions.
+     * Used for sorting migration rules and determining migration order. Now
+     * includes validation to prevent NaN comparisons from malformed versions.
      *
      * @param a - First version string.
      * @param b - Second version string.
-     * @returns -1 if a \< b, 1 if a \> b, 0 if equal.
+     *
+     * @returns -1 if a < b, 1 if a > b, 0 if equal.
+     *
      * @throws {@link Error} If either version string is malformed.
+     *
      * @internal
      */
     private compareVersions(a: string, b: string): number {
@@ -488,7 +507,9 @@ class MigrationRegistry {
      *
      * @param version - The version string to validate.
      * @param parameterName - The parameter name for error reporting.
+     *
      * @throws {@link Error} If the version string format is invalid.
+     *
      * @internal
      */
     private validateVersionString(
@@ -544,7 +565,8 @@ class VersionManager {
     /**
      * Retrieves all version info for all monitor types.
      *
-     * @returns Map of monitor type to version info. Keys are monitor type strings, values are {@link VersionInfo} objects.
+     * @returns Map of monitor type to version info. Keys are monitor type
+     *   strings, values are {@link VersionInfo} objects.
      */
     public getAllVersions(): Map<string, VersionInfo> {
         return new Map(this.versions);
@@ -554,7 +576,9 @@ class VersionManager {
      * Gets the current version for a monitor type.
      *
      * @param monitorType - The monitor type.
-     * @returns The version string, or undefined if not set for this monitor type.
+     *
+     * @returns The version string, or undefined if not set for this monitor
+     *   type.
      */
     public getVersion(monitorType: string): string | undefined {
         return this.versions.get(monitorType)?.version;
@@ -565,6 +589,7 @@ class VersionManager {
      *
      * @param monitorType - The monitor type.
      * @param version - The version string to check.
+     *
      * @returns True if the version is applied, false otherwise.
      */
     public isVersionApplied(monitorType: string, version: string): boolean {
@@ -575,10 +600,11 @@ class VersionManager {
     /**
      * Sets the version for a monitor type.
      *
-     * @param monitorType - The monitor type.
-     * @param version - The version string to set.
      * @remarks
      * Updates the version info and timestamp for the given monitor type.
+     *
+     * @param monitorType - The monitor type.
+     * @param version - The version string to set.
      */
     public setVersion(monitorType: string, version: string): void {
         this.versions.set(monitorType, {
@@ -597,13 +623,14 @@ class VersionManager {
  * across the application.
  *
  * @example
+ *
  * ```typescript
  * migrationRegistry.registerMigration("http", {
- *   fromVersion: "1.0.0",
- *   toVersion: "1.1.0",
- *   description: "Add timeout field",
- *   isBreaking: false,
- *   transform: async (data) => ({ ...data, timeout: 30000 })
+ *     fromVersion: "1.0.0",
+ *     toVersion: "1.1.0",
+ *     description: "Add timeout field",
+ *     isBreaking: false,
+ *     transform: async (data) => ({ ...data, timeout: 30000 }),
  * });
  * ```
  *
@@ -626,16 +653,17 @@ export const versionManager: VersionManager = new VersionManager();
  * Factory for creating migration orchestrator instances.
  *
  * @remarks
- * Use for isolated migration workflows or testing. Returns a new {@link
- * MigrationOrchestrator} instance using the shared registry and version
+ * Use for isolated migration workflows or testing. Returns a new
+ * {@link MigrationOrchestrator} instance using the shared registry and version
  * manager.
  *
- * @returns A new {@link MigrationOrchestrator} instance.
- *
  * @example
+ *
  * ```typescript
  * const orchestrator = createMigrationOrchestrator();
  * ```
+ *
+ * @returns A new {@link MigrationOrchestrator} instance.
  *
  * @public
  */
@@ -651,9 +679,16 @@ export function createMigrationOrchestrator(): MigrationOrchestrator {
  * by default; register as needed for tests or new monitor types.
  *
  * @example
+ *
  * ```typescript
- * migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
- * migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
+ * migrationRegistry.registerMigration(
+ *     "http",
+ *     exampleMigrations.httpV1_0_to_1_1
+ * );
+ * migrationRegistry.registerMigration(
+ *     "port",
+ *     exampleMigrations.portV1_0_to_1_1
+ * );
  * ```
  *
  * @public
@@ -665,13 +700,19 @@ export const exampleMigrations = {
      * @remarks
      * Non-breaking migration. Adds `timeout` field if missing.
      *
-     * @param data - The monitor configuration data.
-     * @returns Promise resolving to data with `timeout` field set.
-     * @defaultValue timeout = 30000
      * @example
+     *
      * ```typescript
-     * const migrated = await exampleMigrations.httpV1_0_to_1_1.transform({ url: "https://..." });
+     * const migrated = await exampleMigrations.httpV1_0_to_1_1.transform({
+     *     url: "https://...",
+     * });
      * ```
+     *
+     * @defaultValue timeout = 30000
+     *
+     * @param data - The monitor configuration data.
+     *
+     * @returns Promise resolving to data with `timeout` field set.
      */
     httpV1_0_to_1_1: {
         description: "Add timeout field with default 30s",
@@ -691,13 +732,19 @@ export const exampleMigrations = {
      * @remarks
      * Converts string port numbers to integers. Validates port range.
      *
-     * @param data - The monitor configuration data.
-     * @returns Promise resolving to data with numeric port.
-     * @throws Throws if port is invalid or not in range 1-65535.
      * @example
+     *
      * ```typescript
-     * const migrated = await exampleMigrations.portV1_0_to_1_1.transform({ port: "8080" });
+     * const migrated = await exampleMigrations.portV1_0_to_1_1.transform({
+     *     port: "8080",
+     * });
      * ```
+     *
+     * @param data - The monitor configuration data.
+     *
+     * @returns Promise resolving to data with numeric port.
+     *
+     * @throws Throws if port is invalid or not in range 1-65535.
      */
     portV1_0_to_1_1: {
         description: "Ensure port is a number",

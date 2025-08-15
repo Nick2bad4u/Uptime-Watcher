@@ -2,10 +2,10 @@
  * Monitor status update service with operation correlation support.
  *
  * @remarks
- * This service ensures that status updates from monitoring operations
- * are only applied if the operation is still valid and the monitor
- * is actively monitoring. Prevents race conditions between state changes
- * and delayed check results.
+ * This service ensures that status updates from monitoring operations are only
+ * applied if the operation is still valid and the monitor is actively
+ * monitoring. Prevents race conditions between state changes and delayed check
+ * results.
  *
  * @packageDocumentation
  */
@@ -78,7 +78,9 @@ export class MonitorStatusUpdateService {
      * Update monitor status only if the operation is still valid.
      *
      * @param result - Check result with operation correlation
-     * @returns Promise resolving to true if update was applied, false if ignored
+     *
+     * @returns Promise resolving to true if update was applied, false if
+     *   ignored
      */
     public async updateMonitorStatus(
         result: StatusUpdateMonitorCheckResult

@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for Theme components to achieve 98%+ coverage.
- * Tests all theme component variants, props, and edge cases.
+ * Comprehensive tests for Theme components to achieve 98%+ coverage. Tests all
+ * theme component variants, props, and edge cases.
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -53,13 +53,7 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all padding variants", () => {
-            const paddings = [
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl",
-            ] as const;
+            const paddings = ["xs", "sm", "md", "lg", "xl"] as const;
 
             for (const padding of paddings) {
                 const { unmount } = render(
@@ -114,13 +108,7 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle rounded prop", () => {
-            const roundedOptions = [
-                "none",
-                "sm",
-                "md",
-                "lg",
-                "full",
-            ] as const;
+            const roundedOptions = ["none", "sm", "md", "lg", "full"] as const;
 
             for (const rounded of roundedOptions) {
                 const { unmount } = render(
@@ -135,13 +123,7 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle shadow prop", () => {
-            const shadowOptions = [
-                "sm",
-                "md",
-                "lg",
-                "xl",
-                "inner",
-            ] as const;
+            const shadowOptions = ["sm", "md", "lg", "xl", "inner"] as const;
 
             for (const shadow of shadowOptions) {
                 const { unmount } = render(
@@ -227,13 +209,7 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all size variants", () => {
-            const sizes = [
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl",
-            ] as const;
+            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -368,12 +344,7 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different input types", () => {
-            const types = [
-                "text",
-                "email",
-                "password",
-                "url",
-            ] as const;
+            const types = ["text", "email", "password", "url"] as const;
 
             for (const type of types) {
                 const { unmount } = render(

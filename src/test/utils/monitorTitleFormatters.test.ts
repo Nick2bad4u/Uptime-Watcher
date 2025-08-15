@@ -1,5 +1,5 @@
 /**
- * @fileoverview Comprehensive tests for monitor title formatter utilities
+ * @file Comprehensive tests for monitor title formatter utilities
  */
 
 import { describe, it, expect, beforeEach } from "vitest";

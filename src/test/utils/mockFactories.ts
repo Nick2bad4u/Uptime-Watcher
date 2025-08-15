@@ -2,11 +2,13 @@
  * Test utilities for creating mock objects that match actual type definitions.
  *
  * @remarks
- * This module provides factory functions for creating mock data objects used in testing.
- * The mock objects are designed to match the actual application type definitions while
- * providing sensible defaults that can be easily overridden for specific test scenarios.
+ * This module provides factory functions for creating mock data objects used in
+ * testing. The mock objects are designed to match the actual application type
+ * definitions while providing sensible defaults that can be easily overridden
+ * for specific test scenarios.
  *
  * Key features:
+ *
  * - Type-safe mock object creation
  * - Sensible default values for all properties
  * - Easy customization through partial override objects
@@ -14,21 +16,22 @@
  * - Useful for unit tests, integration tests, and story books
  *
  * @example
+ *
  * ```typescript
  * // Create a mock monitor with defaults
  * const monitor = createMockMonitor();
  *
  * // Create a mock monitor with custom properties
  * const customMonitor = createMockMonitor({
- *   status: "down",
- *   responseTime: 5000,
- *   type: "port"
+ *     status: "down",
+ *     responseTime: 5000,
+ *     type: "port",
  * });
  *
  * // Create a mock site with custom monitors
  * const site = createMockSite({
- *   name: "Test Site",
- *   monitors: [monitor, customMonitor]
+ *     name: "Test Site",
+ *     monitors: [monitor, customMonitor],
  * });
  * ```
  *
@@ -40,7 +43,8 @@
  *
  * @remarks
  * Represents a site with all required properties for comprehensive testing.
- * This interface includes the core site properties used throughout the application.
+ * This interface includes the core site properties used throughout the
+ * application.
  *
  * @public
  */
@@ -109,14 +113,12 @@ export interface CompleteMonitor {
  * Creates a mock monitor object with default values.
  *
  * @remarks
- * Generates a monitor object with sensible defaults for testing purposes.
- * All properties can be overridden by providing a partial object with
- * the desired values.
- *
- * @param overrides - Partial monitor object to override default values
- * @returns Complete monitor object suitable for testing
+ * Generates a monitor object with sensible defaults for testing purposes. All
+ * properties can be overridden by providing a partial object with the desired
+ * values.
  *
  * @example
+ *
  * ```typescript
  * // Create with defaults
  * const monitor = createMockMonitor();
@@ -124,6 +126,10 @@ export interface CompleteMonitor {
  * // Create with custom status
  * const downMonitor = createMockMonitor({ status: "down" });
  * ```
+ *
+ * @param overrides - Partial monitor object to override default values
+ *
+ * @returns Complete monitor object suitable for testing
  *
  * @public
  */
@@ -147,27 +153,29 @@ export const createMockMonitor = (
  * Creates a mock site object with default values.
  *
  * @remarks
- * Generates a site object with sensible defaults for testing purposes.
- * The default site includes one HTTP monitor, but this can be overridden
- * to create sites with different monitor configurations.
- *
- * @param overrides - Partial site object to override default values
- * @returns Complete site object suitable for testing
+ * Generates a site object with sensible defaults for testing purposes. The
+ * default site includes one HTTP monitor, but this can be overridden to create
+ * sites with different monitor configurations.
  *
  * @example
+ *
  * ```typescript
  * // Create with defaults (includes one HTTP monitor)
  * const site = createMockSite();
  *
  * // Create with custom name and multiple monitors
  * const customSite = createMockSite({
- *   name: "Production Site",
- *   monitors: [
- *     createMockMonitor({ type: "http" }),
- *     createMockMonitor({ type: "port", port: 443 })
- *   ]
+ *     name: "Production Site",
+ *     monitors: [
+ *         createMockMonitor({ type: "http" }),
+ *         createMockMonitor({ type: "port", port: 443 }),
+ *     ],
  * });
  * ```
+ *
+ * @param overrides - Partial site object to override default values
+ *
+ * @returns Complete site object suitable for testing
  *
  * @public
  */

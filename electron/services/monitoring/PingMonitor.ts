@@ -4,9 +4,9 @@
  *
  * @remarks
  * Provides comprehensive ping monitoring capabilities for network hosts and
- * endpoints with configurable timeouts, retry logic, and detailed response
- * time measurement. Designed for reliable network connectivity verification
- * using native system ping utilities.
+ * endpoints with configurable timeouts, retry logic, and detailed response time
+ * measurement. Designed for reliable network connectivity verification using
+ * native system ping utilities.
  *
  * The service uses the node-ping wrapper around system ping utilities for
  * cross-platform compatibility, ensuring consistent behavior across Windows,
@@ -14,24 +14,28 @@
  * maximize compatibility.
  *
  * @example
+ *
  * ```typescript
  * const pingMonitor = new PingMonitor({ timeout: 5000, retryAttempts: 3 });
  * const result = await pingMonitor.check({
- *   id: "monitor_123",
- *   type: "ping",
- *   host: "example.com",
- *   status: "pending",
- *   monitoring: true,
- *   checkInterval: 300000,
- *   retryAttempts: 3,
- *   timeout: 5000,
- *   responseTime: -1,
- *   history: []
+ *     id: "monitor_123",
+ *     type: "ping",
+ *     host: "example.com",
+ *     status: "pending",
+ *     monitoring: true,
+ *     checkInterval: 300000,
+ *     retryAttempts: 3,
+ *     timeout: 5000,
+ *     responseTime: -1,
+ *     history: [],
  * });
- * console.log(`Status: ${result.status}, Response time: ${result.responseTime}ms`);
+ * console.log(
+ *     `Status: ${result.status}, Response time: ${result.responseTime}ms`
+ * );
  * ```
  *
  * @public
+ *
  * @see {@link IMonitorService} - Interface contract for monitor services
  * @see {@link MonitorConfig} - Configuration options for monitors
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
@@ -68,6 +72,7 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * compatibility.
  *
  * Key features:
+ *
  * - Cross-platform ping execution using only compatible options
  * - Configurable timeout and retry behavior
  * - Detailed response time measurement
@@ -75,15 +80,16 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * - Integration with operational hooks for monitoring and debugging
  *
  * @example
+ *
  * ```typescript
  * const monitor = new PingMonitor({
- *   timeout: 10000,
- *   retryAttempts: 3
+ *     timeout: 10000,
+ *     retryAttempts: 3,
  * });
  *
  * const result = await monitor.check(pingMonitorData);
  * if (result.status === "up") {
- *   console.log(`Ping successful: ${result.responseTime}ms`);
+ *     console.log(`Ping successful: ${result.responseTime}ms`);
  * }
  * ```
  *
@@ -95,11 +101,6 @@ export class PingMonitor implements IMonitorService {
     /**
      * Performs a ping connectivity check on the specified monitor.
      *
-     * @param monitor - Monitor configuration containing host and ping settings
-     * @returns Promise resolving to {@link MonitorCheckResult} with status, timing, and error data
-     *
-     * @throws {@link Error} When monitor validation fails (wrong type or missing host)
-     *
      * @remarks
      * Validates the monitor configuration before performing the ping check,
      * ensuring the monitor type is "ping" and a valid host is provided. Uses
@@ -107,29 +108,40 @@ export class PingMonitor implements IMonitorService {
      * to service defaults.
      *
      * The check process:
+     *
      * 1. Validates monitor type and required fields
      * 2. Extracts timeout and retry configuration
-     * 3. Performs ping with retry logic using {@link
-     * performPingCheckWithRetry} 4. Returns standardized result with status,
-     * response time, and details
+     * 3. Performs ping with retry logic using {@link performPingCheckWithRetry} 4.
+     *    Returns standardized result with status, response time, and details
      *
      * Response time measurement includes the complete ping operation duration,
      * from initiation to completion or failure.
      *
      * @example
+     *
      * ```typescript
      * const monitor = {
-     *   id: "ping_001",
-     *   type: "ping" as const,
-     *   host: "google.com",
-     *   timeout: 5000,
-     *   retryAttempts: 3,
-     *   // ... other required monitor properties
+     *     id: "ping_001",
+     *     type: "ping" as const,
+     *     host: "google.com",
+     *     timeout: 5000,
+     *     retryAttempts: 3,
+     *     // ... other required monitor properties
      * };
      *
      * const result = await pingMonitor.check(monitor);
-     * console.log(`Ping ${monitor.host}: ${result.status} (${result.responseTime}ms)`);
+     * console.log(
+     *     `Ping ${monitor.host}: ${result.status} (${result.responseTime}ms)`
+     * );
      * ```
+     *
+     * @param monitor - Monitor configuration containing host and ping settings
+     *
+     * @returns Promise resolving to {@link MonitorCheckResult} with status,
+     *   timing, and error data
+     *
+     * @throws {@link Error} When monitor validation fails (wrong type or
+     *   missing host)
      *
      * @see {@link hasValidHost} - Host validation utility
      * @see {@link getMonitorTimeout} - Timeout extraction utility
@@ -167,29 +179,31 @@ export class PingMonitor implements IMonitorService {
     /**
      * Creates a new PingMonitor instance with the specified configuration.
      *
-     * @param config - Configuration options for the monitor service
-     *
      * @remarks
      * Initializes the monitor with default timeout and retry values, merging
-     * any provided configuration options. The monitor uses sensible defaults
-     * if no configuration is provided, making it safe to instantiate without
+     * any provided configuration options. The monitor uses sensible defaults if
+     * no configuration is provided, making it safe to instantiate without
      * parameters.
      *
      * Default configuration:
-     * - timeout: 30000ms (30 seconds)
-     * - retryAttempts: 3
+     *
+     * - Timeout: 30000ms (30 seconds)
+     * - RetryAttempts: 3
      *
      * @example
+     *
      * ```typescript
      * // Use default configuration
      * const monitor = new PingMonitor();
      *
      * // Custom configuration
      * const monitor = new PingMonitor({
-     *   timeout: 5000,
-     *   retryAttempts: 5
+     *     timeout: 5000,
+     *     retryAttempts: 5,
      * });
      * ```
+     *
+     * @param config - Configuration options for the monitor service
      */
     public constructor(config: MonitorConfig = {}) {
         this.config = {
@@ -201,14 +215,14 @@ export class PingMonitor implements IMonitorService {
     /**
      * Get the current configuration.
      *
-     * @returns A shallow copy of the current monitor configuration
-     *
      * @remarks
      * Returns a defensive shallow copy of the current configuration to prevent
      * external modification. This ensures configuration immutability and
      * prevents accidental state corruption. Note that this is a shallow copy -
      * only the top-level properties are copied. If nested objects are added to
      * MonitorConfig in the future, they would be referenced, not cloned.
+     *
+     * @returns A shallow copy of the current monitor configuration
      */
     public getConfig(): MonitorConfig {
         return { ...this.config };
@@ -217,12 +231,12 @@ export class PingMonitor implements IMonitorService {
     /**
      * Get the monitor type this service handles.
      *
-     * @returns The monitor type identifier
-     *
      * @remarks
-     * Returns the string identifier used to route monitoring requests
-     * to this service implementation. Uses the {@link MonitorType} union type
-     * for type safety and consistency across the application.
+     * Returns the string identifier used to route monitoring requests to this
+     * service implementation. Uses the {@link MonitorType} union type for type
+     * safety and consistency across the application.
+     *
+     * @returns The monitor type identifier
      */
     public getType(): MonitorType {
         return "ping";
@@ -231,12 +245,12 @@ export class PingMonitor implements IMonitorService {
     /**
      * Update the configuration for this monitor service.
      *
-     * @param config - Partial configuration to update
-     *
      * @remarks
-     * Merges the provided configuration with the existing configuration.
-     * Only specified properties are updated; undefined properties are ignored.
-     * Used for runtime configuration updates without service recreation.
+     * Merges the provided configuration with the existing configuration. Only
+     * specified properties are updated; undefined properties are ignored. Used
+     * for runtime configuration updates without service recreation.
+     *
+     * @param config - Partial configuration to update
      */
     public updateConfig(config: Partial<MonitorConfig>): void {
         this.config = {

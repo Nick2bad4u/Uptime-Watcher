@@ -1,9 +1,9 @@
 /**
- * @fileoverview Comprehensive test suite for useAddSiteForm hook
+ * @file Comprehensive test suite for useAddSiteForm hook
  *
- * Tests cover all functionality including form state management, validation,
- * mode switching, monitor type changes, field resets, and edge cases.
- * Targets 100% coverage for all statements, branches, functions, and lines.
+ *   Tests cover all functionality including form state management, validation,
+ *   mode switching, monitor type changes, field resets, and edge cases. Targets
+ *   100% coverage for all statements, branches, functions, and lines.
  */
 
 import { act, renderHook } from "@testing-library/react";

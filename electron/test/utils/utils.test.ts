@@ -1,6 +1,6 @@
 /**
- * Tests for Electron utilities.
- * Validates development mode detection and other utility functions.
+ * Tests for Electron utilities. Validates development mode detection and other
+ * utility functions.
  */
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";

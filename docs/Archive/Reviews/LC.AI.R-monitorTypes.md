@@ -113,15 +113,15 @@ export function isBaseMonitorType(type: string): type is MonitorType {
 
 ````typescript
 /**
- * @summary Core monitor type definitions and utilities.
- *
  * @remarks
- * This file provides utilities for working with BASE monitor types only.
- * The core MonitorType union is defined in ../../types.ts to avoid
- * circular dependencies.
+ * This file provides utilities for working with BASE monitor types only. The
+ * core MonitorType union is defined in ../../types.ts to avoid circular
+ * dependencies.
  *
- * For extensible monitor type registration, see MonitorTypeRegistry.
- * These functions only handle the base built-in types.
+ * For extensible monitor type registration, see MonitorTypeRegistry. These
+ * functions only handle the base built-in types.
+ *
+ * @summary Core monitor type definitions and utilities.
  *
  * @see {@link MonitorTypeRegistry} for runtime type registration
  * @see {@link MonitorType} for type definition
@@ -130,29 +130,31 @@ export function isBaseMonitorType(type: string): type is MonitorType {
 /**
  * Get all base monitor types as an array.
  *
- * @returns Array containing only the built-in base monitor types
- *
  * @remarks
- * This function returns only the core base types (http, port) that are
- * built into the system. It does NOT include dynamically registered
- * monitor types from the registry.
+ * This function returns only the core base types (http, port) that are built
+ * into the system. It does NOT include dynamically registered monitor types
+ * from the registry.
  *
  * @example
+ *
  * ```typescript
  * const baseTypes = getBaseMonitorTypes(); // ["http", "port"]
  * ```
+ *
+ * @returns Array containing only the built-in base monitor types
  */
 
 /**
  * Type guard to check if a string is a valid base monitor type.
  *
- * @param type - The string to check against base monitor types
- * @returns True if the type is a known base monitor type
- *
  * @remarks
- * This function only validates against BASE monitor types (http, port).
- * It does NOT check against dynamically registered types in the registry.
- * For full type checking including dynamic types, use the registry.
+ * This function only validates against BASE monitor types (http, port). It does
+ * NOT check against dynamically registered types in the registry. For full type
+ * checking including dynamic types, use the registry.
+ *
+ * @param type - The string to check against base monitor types
+ *
+ * @returns True if the type is a known base monitor type
  *
  * @see {@link MonitorTypeRegistry.isValidType} for complete type checking
  */

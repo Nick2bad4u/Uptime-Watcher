@@ -1,6 +1,6 @@
 /**
- * Type definitions for Vitest with jest-dom matchers.
- * This file extends Vitest's expect interface with jest-dom matchers.
+ * Type definitions for Vitest with jest-dom matchers. This file extends
+ * Vitest's expect interface with jest-dom matchers.
  */
 
 import type { TestingLibraryMatchers } from "@testing-library/jest-dom/matchers";

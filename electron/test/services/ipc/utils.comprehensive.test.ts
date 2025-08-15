@@ -1,7 +1,7 @@
 /**
- * Comprehensive tests for IPC utils module targeting 95%+ coverage.
- * Tests all validators, response creators, and handler wrappers with
- * isolated component testing strategy.
+ * Comprehensive tests for IPC utils module targeting 95%+ coverage. Tests all
+ * validators, response creators, and handler wrappers with isolated component
+ * testing strategy.
  */
 
 import { ipcMain } from "electron";

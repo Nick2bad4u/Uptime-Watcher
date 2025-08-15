@@ -1,6 +1,7 @@
 /**
- * @fileoverview Targeted tests to achieve the final 8.26% branch coverage needed to reach 98%
- * Focuses on specific uncovered branches in core files to maximize coverage impact
+ * @file Targeted tests to achieve the final 8.26% branch coverage needed to
+ *   reach 98% Focuses on specific uncovered branches in core files to maximize
+ *   coverage impact
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

@@ -25,7 +25,7 @@ but `Base.initialize()` must not be overridden because it is marked as "sealed".
 
 ```ts
 class Base {
- /** @virtual */
+ /** @abstract */
  public render(): void {}
 
  /** @sealed */

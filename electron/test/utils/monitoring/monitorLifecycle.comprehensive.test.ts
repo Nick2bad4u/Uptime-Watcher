@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for monitor lifecycle management utilities
- * Targeting 98% branch coverage for all monitoring lifecycle functions
+ * Comprehensive tests for monitor lifecycle management utilities Targeting 98%
+ * branch coverage for all monitoring lifecycle functions
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

@@ -65,13 +65,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should validate HTTP methods", () => {
-            const validMethods = [
-                "DELETE",
-                "GET",
-                "HEAD",
-                "POST",
-                "PUT",
-            ];
+            const validMethods = ["DELETE", "GET", "HEAD", "POST", "PUT"];
 
             for (const method of validMethods) {
                 const httpFields = {
@@ -329,13 +323,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
     describe("Method Validation", () => {
         it("should validate all HTTP methods", () => {
-            const httpMethods = [
-                "DELETE",
-                "GET",
-                "HEAD",
-                "POST",
-                "PUT",
-            ];
+            const httpMethods = ["DELETE", "GET", "HEAD", "POST", "PUT"];
 
             for (const method of httpMethods) {
                 const isValid = [

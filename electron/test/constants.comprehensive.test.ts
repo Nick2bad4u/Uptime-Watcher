@@ -1,13 +1,17 @@
 /**
  * Test suite for electron constants
  *
- * @fileoverview Comprehensive tests for backend constants configuration
- * in the Uptime Watcher application.
+ * @module Constants
+ *
+ * @file Comprehensive tests for backend constants configuration in the Uptime
+ *   Watcher application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Backend Constants
- * @module Constants
+ *
  * @tags ["test", "electron", "constants", "configuration"]
  */
 

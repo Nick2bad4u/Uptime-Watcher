@@ -1,13 +1,17 @@
 /**
  * Test suite for retry utilities
  *
- * @fileoverview Comprehensive tests for retry utility functions
- * in the Uptime Watcher application.
+ * @module Retry
+ *
+ * @file Comprehensive tests for retry utility functions in the Uptime Watcher
+ *   application.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-11
+ *
  * @category Backend Utilities
- * @module Retry
+ *
  * @tags ["test", "electron", "utils", "retry", "resilience"]
  */
 

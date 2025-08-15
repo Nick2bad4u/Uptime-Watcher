@@ -1,6 +1,6 @@
 /**
- * @fileoverview Shared ESLint configuration for Uptime Watcher projects
- * Optimized for Electron + React + TypeScript architecture with modern ES2024+ features
+ * @file Shared ESLint configuration for Uptime Watcher projects Optimized for
+ *   Electron + React + TypeScript architecture with modern ES2024+ features
  */
 
 import { importX } from "eslint-plugin-import-x";
