@@ -11,7 +11,8 @@
     "plugins": [
         "prettier-plugin-jsdoc",
         "prettier-plugin-tailwindcss",
-        "prettier-plugin-multiline-arrays"
+        "prettier-plugin-multiline-arrays",
+        "@awmottaz/prettier-plugin-void-html"
     ],
     "tsdoc": true,
     "jsdocPreferCodeFences": true,
@@ -48,7 +49,9 @@
         {
             "files": "*.html",
             "options": {
-                "printWidth": 80
+                "printWidth": 80,
+                "singleAttributePerLine": true,
+                "htmlWhitespaceSensitivity": "strict"
             }
         },
         {

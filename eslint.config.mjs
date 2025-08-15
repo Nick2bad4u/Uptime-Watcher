@@ -11,6 +11,8 @@
  * - Enhanced security and performance rules
  */
 
+/* eslint-disable import-x/namespace */
+/* eslint-disable import-x/no-named-as-default-member */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-magic-numbers */
 /* eslint-disable no-inline-comments */
@@ -42,7 +44,9 @@ import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
 import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import eslintReactWeb from "eslint-plugin-react-web-api";
 import globals from "globals";
-import html from "eslint-plugin-html";
+// import html from "eslint-plugin-html";
+import html from "@html-eslint/eslint-plugin";
+import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 import istanbul from "eslint-plugin-istanbul";
 import js from "@eslint/js";
@@ -59,6 +63,7 @@ import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginComments from "eslint-plugin-eslint-comments";
+// eslint-disable-next-line import-x/no-unresolved -- Works fine
 import pluginCompat from "eslint-plugin-compat";
 import pluginFunctional from "eslint-plugin-functional";
 import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
@@ -69,7 +74,8 @@ import pluginPrettier from "eslint-plugin-prettier";
 import pluginPromise from "eslint-plugin-promise";
 // eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
+// eslint-disable-next-line import-x/default -- Works fine
+import reactHooks from "eslint-plugin-react-hooks";
 import pluginRedos from "eslint-plugin-redos";
 import pluginRegexp from "eslint-plugin-regexp";
 import pluginSecurity from "eslint-plugin-security";
@@ -103,6 +109,7 @@ import * as pluginFunctionNames from "eslint-plugin-function-name";
 import * as pluginCleanCode from "eslint-plugin-clean-code";
 import pluginFilenameExport from "eslint-plugin-filename-export";
 import nitpick from "eslint-plugin-nitpick";
+// Zod Tree Shaking Plugin https://github.com/colinhacks/zod/issues/4433#issuecomment-2921500831
 import importZod from "eslint-plugin-import-zod";
 import pluginUseMemo from "eslint-plugin-usememo-recommendations";
 import pluginGoodEffects from "eslint-plugin-goodeffects";
@@ -116,6 +123,19 @@ import pluginFormatSQL from "eslint-plugin-format-sql";
 import pluginNeverThrow from "eslint-plugin-neverthrow";
 import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
 import pluginDeprecation from "eslint-plugin-deprecation";
+import pluginReactTest from "eslint-plugin-react-require-testid";
+import reactUseEffect from "eslint-plugin-react-useeffect";
+import pluginNoConstructBind from "eslint-plugin-no-constructor-bind";
+import pluginTotalFunctions from "eslint-plugin-total-functions";
+import pluginValidateJSX from "eslint-plugin-validate-jsx-nesting";
+import styledA11y from "eslint-plugin-styled-components-a11y";
+import pluginReactFormFields from "eslint-plugin-react-form-fields";
+import pluginReactHookForm from "eslint-plugin-react-hook-form";
+// eslint-disable-next-line import-x/default -- Working fine just old
+import preferFunctionComponent from "eslint-plugin-react-prefer-function-component";
+import pluginSSR from "eslint-plugin-ssr-friendly";
+import reactPerfPlugin from "eslint-plugin-react-perf";
+import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -144,6 +164,7 @@ import { fixupPluginRules } from "@eslint/compat";
 // eslint-plugin-use-selector-with -- Broken
 // eslint-plugin-zod-import -- Didn't test but does similar function to import-zod
 // @fluentui/eslint-plugin-react-components
+// eslint-plugin-solid
 
 // ESLint Tools
 // Import { FlatCompat } from "@eslint/eslintrc";
@@ -156,6 +177,8 @@ import { fixupPluginRules } from "@eslint/compat";
 
 import path from "node:path";
 
+// const __filename = fileURLToPath(import.meta.url);
+// const gitignorePath = path.resolve(__dirname, ".gitignore");
 const __dirname = import.meta.dirname;
 
 export default [
@@ -283,9 +306,18 @@ export default [
 
     // HTML files
     {
-        plugins: { html },
+        plugins: {
+            "@html-eslint": html,
+        },
+        languageOptions: {
+            parser: htmlParser,
+        },
         files: ["**/*.html"],
         ignores: ["docs/docusaurus/**", "report/**"],
+        rules: {
+            ...html.configs["flat/recommended"].rules,
+            "@html-eslint/indent": "error",
+        },
     },
 
     // Markdown files
@@ -344,15 +376,12 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                     impliedStrict: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -439,15 +468,12 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                     impliedStrict: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -502,7 +528,7 @@ export default [
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
-            "react-hooks": pluginReactHooks,
+            "react-hooks": reactHooks,
             "react-refresh": reactRefresh,
             "sort-class-members": pluginSortClassMembers,
             "unused-imports": pluginUnusedImports,
@@ -569,6 +595,18 @@ export default [
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             deprecation: fixupPluginRules(pluginDeprecation),
+            "react-require-testid": pluginReactTest,
+            "react-useeffect": reactUseEffect,
+            "no-constructor-bind": pluginNoConstructBind,
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
+            "validate-jsx-nesting": pluginValidateJSX,
+            "styled-components-a11y": styledA11y,
+            "react-form-fields": pluginReactFormFields,
+            "react-hook-form": pluginReactHookForm,
+            "react-prefer-function-component": preferFunctionComponent,
+            "ssr-friendly": fixupPluginRules(pluginSSR),
+            "react-perf": reactPerfPlugin,
+            "@arthurgeron/react-usememo": pluginUseMemo2,
         },
         rules: {
             // TypeScript rules
@@ -581,11 +619,14 @@ export default [
             ...tseslint.configs.stylistic.rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
+            ...importX.flatConfigs.recommended.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginReact.configs.all.rules,
-            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
@@ -611,6 +652,160 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+            ...pluginTotalFunctions.configs.recommended.rules,
+            ...styledA11y.flatConfigs.strict.rules,
+            ...pluginReactHookForm.configs.recommended.rules,
+            ...reactPerfPlugin.configs.all.rules,
+
+            "@arthurgeron/react-usememo/require-usememo": "error",
+            "@arthurgeron/react-usememo/require-memo": "off",
+            "@arthurgeron/react-usememo/require-usememo-children": "off",
+
+            "ssr-friendly/no-dom-globals-in-module-scope": "error",
+            "ssr-friendly/no-dom-globals-in-constructor": "error",
+            "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
+            "ssr-friendly/no-dom-globals-in-react-fc": "error",
+
+            "react-prefer-function-component/react-prefer-function-component": [
+                "error",
+                { allowComponentDidCatch: false },
+            ],
+
+            "react-hook-form/no-use-watch": "error",
+
+            "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
+            "react-form-fields/no-only-value-prop": "error",
+            "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
+                "error",
+            "react-form-fields/styled-no-only-value-prop": "error",
+
+            "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
+
+            "total-functions/no-unsafe-type-assertion": "off",
+            "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+
+            "no-constructor-bind/no-constructor-bind": "error",
+            "no-constructor-bind/no-constructor-state": "error",
+
+            "react-useeffect/no-non-function-return": "error",
+
+            "react-require-testid/testid-missing": [
+                "warn",
+                {
+                    disableDefaultComponents: [
+                        "a",
+                        "abbr",
+                        "address",
+                        "area",
+                        "article",
+                        "aside",
+                        "audio",
+                        "b",
+                        "base",
+                        "bdi",
+                        "bdo",
+                        "blockquote",
+                        "body",
+                        "br",
+                        "button",
+                        "canvas",
+                        "caption",
+                        "cite",
+                        "code",
+                        "col",
+                        "colgroup",
+                        "data",
+                        "datalist",
+                        "dd",
+                        "del",
+                        "details",
+                        "dfn",
+                        "dialog",
+                        "div",
+                        "dl",
+                        "dt",
+                        "em",
+                        "embed",
+                        "fieldset",
+                        "figcaption",
+                        "figure",
+                        "footer",
+                        "form",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "h4",
+                        "h5",
+                        "h6",
+                        "head",
+                        "header",
+                        "hr",
+                        "html",
+                        "i",
+                        "iframe",
+                        "img",
+                        "input",
+                        "ins",
+                        "kbd",
+                        "label",
+                        "legend",
+                        "li",
+                        "link",
+                        "main",
+                        "map",
+                        "mark",
+                        "meta",
+                        "meter",
+                        "nav",
+                        "noscript",
+                        "object",
+                        "ol",
+                        "optgroup",
+                        "option",
+                        "output",
+                        "p",
+                        "param",
+                        "picture",
+                        "pre",
+                        "progress",
+                        "q",
+                        "rp",
+                        "rt",
+                        "ruby",
+                        "s",
+                        "samp",
+                        "script",
+                        "section",
+                        "select",
+                        "small",
+                        "source",
+                        "span",
+                        "strong",
+                        "style",
+                        "sub",
+                        "summary",
+                        "sup",
+                        "table",
+                        "tbody",
+                        "td",
+                        "template",
+                        "textarea",
+                        "tfoot",
+                        "th",
+                        "thead",
+                        "time",
+                        "title",
+                        "tr",
+                        "track",
+                        "u",
+                        "ul",
+                        "var",
+                        "video",
+                        "wbr",
+                    ],
+                    enableComponents: [],
+                },
+            ],
 
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -1593,15 +1788,12 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.electron.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                     impliedStrict: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -1655,7 +1847,7 @@ export default [
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
-            "react-hooks": pluginReactHooks,
+            "react-hooks": reactHooks,
             "sort-class-members": pluginSortClassMembers,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -1717,6 +1909,11 @@ export default [
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             deprecation: fixupPluginRules(pluginDeprecation),
+            "no-constructor-bind": pluginNoConstructBind,
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
+            "validate-jsx-nesting": pluginValidateJSX,
+            "styled-components-a11y": styledA11y,
+            "ssr-friendly": fixupPluginRules(pluginSSR),
         },
         rules: {
             // TypeScript backend rules
@@ -1728,11 +1925,15 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
             ...pluginRegexp.configs["flat/all"].rules,
+            ...importX.flatConfigs.recommended.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            ...importX.flatConfigs.electron.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginReact.configs.all.rules,
-            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
@@ -1757,6 +1958,21 @@ export default [
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
+            ...pluginTotalFunctions.configs.recommended.rules,
+            ...styledA11y.flatConfigs.strict.rules,
+
+            "ssr-friendly/no-dom-globals-in-module-scope": "error",
+            "ssr-friendly/no-dom-globals-in-constructor": "error",
+            "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
+            "ssr-friendly/no-dom-globals-in-react-fc": "error",
+
+            "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
+
+            "total-functions/no-unsafe-type-assertion": "off",
+            "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+
+            "no-constructor-bind/no-constructor-bind": "error",
+            "no-constructor-bind/no-constructor-state": "error",
 
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -2609,6 +2825,9 @@ export default [
             "src/**/*.spec.{ts,tsx}",
             "src/**/*.test.{ts,tsx}",
             "src/test/**/*.{ts,tsx}",
+            "tests/**/*.{ts,tsx}",
+            "tests/**/*.spec.{ts,tsx}",
+            "tests/**/*.test.{ts,tsx}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -2616,14 +2835,11 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.test.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -2676,7 +2892,7 @@ export default [
             "import-x": importX,
             "unused-imports": pluginUnusedImports,
             react: pluginReact,
-            "react-hooks": pluginReactHooks,
+            "react-hooks": reactHooks,
             n: nodePlugin,
             "eslint-comments": pluginComments,
             unicorn: pluginUnicorn,
@@ -2742,14 +2958,11 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.electron.test.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -2864,14 +3077,11 @@ export default [
                 ecmaVersion: "latest",
                 project: "tsconfig.electron.test.json",
                 sourceType: "module",
-                tsconfigRootDir: import.meta.dirname,
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
                     jsx: true,
                 },
-                experimentalDecorators: true,
-                JSDocParsingMode: "all",
-                jsxFragmentName: "React.Fragment",
-                jsxPragma: "React",
+                jsDocParsingMode: "all",
                 warnOnUnsupportedTypeScriptVersion: true,
             },
             globals: {
@@ -2962,6 +3172,9 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
             ...pluginRegexp.configs["flat/all"].rules,
+            ...importX.flatConfigs.recommended.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
@@ -3375,7 +3588,7 @@ export default [
             "jsx-a11y": jsxA11y,
             "no-unsanitized": nounsanitized,
             "prefer-arrow": pluginPreferArrow,
-            "react-hooks": pluginReactHooks,
+            "react-hooks": reactHooks,
             "sort-class-members": pluginSortClassMembers,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -3403,11 +3616,14 @@ export default [
         rules: {
             ...js.configs.all.rules,
             ...pluginRegexp.configs["flat/all"].rules,
+            ...importX.flatConfigs.recommended.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginReact.configs.all.rules,
-            ...pluginReactHooks.configs["recommended-latest"].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
