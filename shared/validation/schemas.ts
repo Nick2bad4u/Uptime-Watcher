@@ -40,6 +40,21 @@ const hostValidationSchema = z
     .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
 
 /**
+ * Zod schema for status history entries.
+ *
+ * @remarks
+ * Validates historical status records for monitors.
+ */
+const statusHistorySchema = z
+    .object({
+        details: z.string().optional(),
+        responseTime: z.number(),
+        status: z.enum(["up", "down"]),
+        timestamp: z.number(),
+    })
+    .strict();
+
+/**
  * Validation constraints for monitor fields.
  *
  * @remarks
@@ -66,51 +81,55 @@ const VALIDATION_CONSTRAINTS = {
  * @remarks
  * This schema is extended by type-specific monitor schemas.
  */
-export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
-    checkInterval: z
-        .number()
-        .min(
-            VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
-            "Check interval must be at least 5 seconds"
-        )
-        .max(
-            VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX,
-            "Check interval cannot exceed 30 days"
-        ),
-    id: z.string().min(1, "Monitor ID is required"),
-    lastChecked: z.date().optional(),
-    monitoring: z.boolean(),
-    /**
-     * Response time in milliseconds.
-     *
-     * @remarks
-     * Uses -1 as a sentinel value to indicate "never checked" state.
-     * Positive values represent actual response times in milliseconds.
-     */
-    responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
-    retryAttempts: z
-        .number()
-        .min(
-            VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN,
-            "Retry attempts cannot be negative"
-        )
-        .max(
-            VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
-            "Retry attempts cannot exceed 10"
-        ),
-    status: z.enum(["up", "down", "pending", "paused"]),
-    timeout: z
-        .number()
-        .min(
-            VALIDATION_CONSTRAINTS.TIMEOUT.MIN,
-            "Timeout must be at least 1 second"
-        )
-        .max(
-            VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
-            "Timeout cannot exceed 300 seconds"
-        ),
-    type: z.enum(["http", "port", "ping"]),
-});
+export const baseMonitorSchema: BaseMonitorSchemaType = z
+    .object({
+        activeOperations: z.array(z.string()).optional(),
+        checkInterval: z
+            .number()
+            .min(
+                VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
+                "Check interval must be at least 5 seconds"
+            )
+            .max(
+                VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX,
+                "Check interval cannot exceed 30 days"
+            ),
+        history: z.array(statusHistorySchema),
+        id: z.string().min(1, "Monitor ID is required"),
+        lastChecked: z.date().optional(),
+        monitoring: z.boolean(),
+        /**
+         * Response time in milliseconds.
+         *
+         * @remarks
+         * Uses -1 as a sentinel value to indicate "never checked" state.
+         * Positive values represent actual response times in milliseconds.
+         */
+        responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
+        retryAttempts: z
+            .number()
+            .min(
+                VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN,
+                "Retry attempts cannot be negative"
+            )
+            .max(
+                VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
+                "Retry attempts cannot exceed 10"
+            ),
+        status: z.enum(["up", "down", "pending", "paused"]),
+        timeout: z
+            .number()
+            .min(
+                VALIDATION_CONSTRAINTS.TIMEOUT.MIN,
+                "Timeout must be at least 1 second"
+            )
+            .max(
+                VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
+                "Timeout cannot exceed 300 seconds"
+            ),
+        type: z.enum(["http", "port", "ping"]),
+    })
+    .strict();
 
 /**
  * Zod schema for HTTP monitor fields.
@@ -120,8 +139,8 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z.object({
  * validation.
  */
 
-export const httpMonitorSchema: HttpMonitorSchemaType =
-    baseMonitorSchema.extend({
+export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
+    .extend({
         type: z.literal("http"),
         url: z.string().refine(
             (val) =>
@@ -139,7 +158,8 @@ export const httpMonitorSchema: HttpMonitorSchemaType =
                 }),
             "Must be a valid HTTP or HTTPS URL"
         ),
-    });
+    })
+    .strict();
 
 /**
  * Zod schema for port monitor fields.
@@ -148,14 +168,15 @@ export const httpMonitorSchema: HttpMonitorSchemaType =
  * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with
  * strict validation.
  */
-export const portMonitorSchema: PortMonitorSchemaType =
-    baseMonitorSchema.extend({
+export const portMonitorSchema: PortMonitorSchemaType = baseMonitorSchema
+    .extend({
         host: hostValidationSchema,
         port: z
             .number()
             .refine(isValidPort, "Must be a valid port number (1-65535)"),
         type: z.literal("port"),
-    });
+    })
+    .strict();
 
 /**
  * Zod schema for ping monitor fields.
@@ -164,11 +185,12 @@ export const portMonitorSchema: PortMonitorSchemaType =
  * Extends {@link baseMonitorSchema} and adds `host` field with strict
  * validation.
  */
-export const pingMonitorSchema: PingMonitorSchemaType =
-    baseMonitorSchema.extend({
+export const pingMonitorSchema: PingMonitorSchemaType = baseMonitorSchema
+    .extend({
         host: hostValidationSchema,
         type: z.literal("ping"),
-    });
+    })
+    .strict();
 
 /**
  * Zod discriminated union schema for all monitor types.
@@ -188,18 +210,22 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
  * @remarks
  * Validates site identifier, name, monitoring flag, and an array of monitors.
  */
-export const siteSchema: SiteSchemaType = z.object({
-    identifier: z
-        .string()
-        .min(1, "Site identifier is required")
-        .max(100, "Site identifier too long"),
-    monitoring: z.boolean(),
-    monitors: z.array(monitorSchema).min(1, "At least one monitor is required"),
-    name: z
-        .string()
-        .min(1, "Site name is required")
-        .max(200, "Site name too long"),
-});
+export const siteSchema: SiteSchemaType = z
+    .object({
+        identifier: z
+            .string()
+            .min(1, "Site identifier is required")
+            .max(100, "Site identifier too long"),
+        monitoring: z.boolean(),
+        monitors: z
+            .array(monitorSchema)
+            .min(1, "At least one monitor is required"),
+        name: z
+            .string()
+            .min(1, "Site name is required")
+            .max(200, "Site name too long"),
+    })
+    .strict();
 
 /**
  * Interface for monitor schemas by type.
@@ -306,7 +332,10 @@ function validateFieldWithSchema(
         // Use the specific schema's field definition
         const fieldSchema =
             schema.shape[fieldName as keyof typeof schema.shape];
-        return z.object({ [fieldName]: fieldSchema }).parse(testData);
+        return z
+            .object({ [fieldName]: fieldSchema })
+            .strict()
+            .parse(testData);
     }
 
     // Fallback to base schema for common fields
@@ -317,6 +346,7 @@ function validateFieldWithSchema(
                 [fieldName]:
                     commonFields[fieldName as keyof typeof commonFields],
             })
+            .strict()
             .parse(testData);
     }
 

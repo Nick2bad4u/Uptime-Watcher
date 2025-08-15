@@ -19,7 +19,7 @@
     "url": "https://github.com/Nick2bad4u/Uptime-Watcher.git"
   },
   "license": "Unlicense",
-  "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://Uptime-Watcher.typpi.online)",
+  "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://nick2bad4u.github.io/Uptime-Watcher/)",
   "maintainers": [
     {
       "name": "Nick2bad4u",
@@ -37,6 +37,10 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "ai:context": "repomix --compress --include \"src/**,electron/**\" --ignore \"**/test/**\"",
+    "bench": "vitest bench --run",
+    "bench:compare": "vitest bench --run --compare",
+    "bench:ui": "vitest bench --ui",
+    "bench:watch": "vitest bench",
     "build": "npm run build:electron-vite",
     "postbuild": "cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat",
     "build:electron-main": "tsc -p tsconfig.electron.json && npm run postbuild",
@@ -62,16 +66,13 @@
     "debug:renderer": "vite --debug",
     "debug:transform": "vite --debug plugin-transform",
     "debug:vite": "vite --debug",
-    "profile": "vite --profile",
-    "profile:debug": "vite --profile --debug",
-    "profile:transform": "vite --debug transform",
     "dep:check": "npm-check",
     "dep:update": "npm-check-updates -u && npm install",
     "detect-secrets": "detect-secrets scan",
     "dev": "vite",
     "dev:profile": "vite --profile",
-    "dev:warmup": "vite --debug transform",
     "dev:sqlite3": "cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat",
+    "dev:warmup": "vite --debug transform",
     "dev:with-sqlite3": "npm run dev:sqlite3 && npm run dev",
     "dist": "npm run build && electron-builder --publish=never",
     "docs": "typedoc --out docs src",
@@ -235,6 +236,9 @@
     "prestart:old": "npm run lint && npm run type-check",
     "pretest:old": "npm run lint && npm run type-check",
     "preview": "vite preview",
+    "profile": "vite --profile",
+    "profile:debug": "vite --profile --debug",
+    "profile:transform": "vite --debug transform",
     "prune": "npm prune",
     "quality": "npm run lint:full && npm run test:coverage",
     "quality:check": "npm run lint:ci && npm run test:codecov",
@@ -270,9 +274,9 @@
     "security:check": "npm audit",
     "security:fix": "npm audit fix",
     "sloc": "sloc src/ electron/ shared/",
+    "sort-eslint-rules": "node scripts/sort-eslint-rules.mjs",
     "sort-package": "sort-package-json",
     "sort-package-check": "sort-package-json --check",
-    "sort-eslint-rules": "node scripts/sort-eslint-rules.mjs",
     "sqlite:clean-wasm": "rm -f dist-electron/node-sqlite3-wasm.wasm",
     "sqlite:download-wasm": "node ./scripts/download-sqlite3-wasm.mjs",
     "sqlite:reinstall-wasm": "npm run sqlite:clean-wasm && npm run sqlite:download-wasm",
@@ -305,10 +309,6 @@
     "test:watch": "vitest run --watch",
     "test:watch:electron": "vitest run --config vitest.electron.config.ts --watch",
     "test:watch:frontend": "vitest run --config vitest.config.ts --watch",
-    "bench": "vitest bench --run",
-    "bench:watch": "vitest bench",
-    "bench:ui": "vitest bench --ui",
-    "bench:compare": "vitest bench --run --compare",
     "tsdoc-update": "node scripts/download-tsdoc-tags.js",
     "tsg:graph:electron": "tsg --TB --config tsconfig.electron.json",
     "tsg:graph:src": "tsg --TB --config tsconfig.json",
@@ -323,6 +323,12 @@
     "extends": "eslint.config.mjs"
   },
   "overrides": {
+    "*": {
+      "vite": "$vite",
+      "eslint": "$eslint",
+      "@typescript-eslint/parser": "$@typescript-eslint/parser",
+      "@typescript-eslint/utils": "$@typescript-eslint/utils"
+    },
     "@codecov/vite-plugin": {
       "vite": "$vite"
     },
@@ -330,13 +336,10 @@
       "react-scan": "$react-scan",
       "vite": "$vite"
     },
-    "eslint-plugin-istanbul": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-no-lookahead-lookbehind-regexp": {
-      "eslint": "$eslint"
-    },
     "eslint-plugin-deprecation": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-etc": {
       "eslint": "$eslint"
     },
     "eslint-plugin-fsecond": {
@@ -348,6 +351,12 @@
       },
       "eslint": "$eslint"
     },
+    "eslint-plugin-istanbul": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-no-lookahead-lookbehind-regexp": {
+      "eslint": "$eslint"
+    },
     "eslint-plugin-total-functions": {
       "eslint": "$eslint"
     },
@@ -357,16 +366,12 @@
       },
       "eslint": "$eslint"
     },
-    "*": {
-      "vite": "$vite",
-      "eslint": "$eslint",
-      "@typescript-eslint/parser": "$@typescript-eslint/parser",
-      "@typescript-eslint/utils": "$@typescript-eslint/utils"
+    "eslint-plugin-safe-jsx": {
+      "eslint": "$eslint"
     }
   },
   "dependencies": {
     "@eslint/compat": "^1.3.2",
-    "@shared/constants": "file:./shared/constants",
     "@shared/types": "file:./shared/types",
     "@shared/utils": "file:./shared/utils",
     "@shared/validation": "file:./shared/validation",
@@ -500,6 +505,7 @@
     "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-es-x": "^9.0.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-etc": "^2.0.3",
     "eslint-plugin-exception-handling": "^1.5.4",
     "eslint-plugin-file-progress": "^3.0.2",
     "eslint-plugin-filename-export": "^2.0.0",
@@ -517,6 +523,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-jsx-plus": "^0.1.0",
     "eslint-plugin-listeners": "^1.5.1",
+    "eslint-plugin-loadable-imports": "^1.0.1",
     "eslint-plugin-math": "^0.13.0",
     "eslint-plugin-module-interop": "^0.3.1",
     "eslint-plugin-n": "^17.21.3",
@@ -533,6 +540,7 @@
     "eslint-plugin-no-use-extend-native": "^0.7.2",
     "eslint-plugin-node-dependencies": "^1.1.2",
     "eslint-plugin-observers": "^1.0.1",
+    "eslint-plugin-package-json": "^0.53.0",
     "eslint-plugin-perfectionist": "^4.15.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^5.5.4",
@@ -556,6 +564,7 @@
     "eslint-plugin-redos": "^4.5.0",
     "eslint-plugin-regexp": "^2.10.0",
     "eslint-plugin-require-jsdoc": "^1.0.4",
+    "eslint-plugin-safe-jsx": "^1.1.1",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-sonarjs": "^3.0.4",
     "eslint-plugin-sort-class-members": "^1.21.0",
@@ -574,10 +583,10 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "eslint-plugin-usememo-recommendations": "^1.0.2",
     "eslint-plugin-validate-jsx-nesting": "^0.1.1",
-    "eslint-plugin-vitest-globals": "^1.5.0",
     "eslint-plugin-write-good-comments": "^0.2.0",
     "eslint-plugin-xss": "^0.1.12",
     "eslint-plugin-yml": "^1.18.0",
+    "eslint-plugin-zod": "^1.4.0",
     "git-cliff": "^2.10.0",
     "globals": "^16.3.0",
     "globals-vitest": "^3.2.4",

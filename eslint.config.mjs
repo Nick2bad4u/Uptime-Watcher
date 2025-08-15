@@ -136,6 +136,11 @@ import preferFunctionComponent from "eslint-plugin-react-prefer-function-compone
 import pluginSSR from "eslint-plugin-ssr-friendly";
 import reactPerfPlugin from "eslint-plugin-react-perf";
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
+import etc from "eslint-plugin-etc";
+import packageJson from "eslint-plugin-package-json";
+import pluginSafeJSX from "eslint-plugin-safe-jsx";
+import pluginLoadableImports from "eslint-plugin-loadable-imports";
+import zod from "eslint-plugin-zod";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -165,6 +170,8 @@ import { fixupPluginRules } from "@eslint/compat";
 // eslint-plugin-zod-import -- Didn't test but does similar function to import-zod
 // @fluentui/eslint-plugin-react-components
 // eslint-plugin-solid
+// @ospm/eslint-plugin-react-signals-hooks
+// eslint-plugin-pkg-json -- Package appears to be broken or incompatible
 
 // ESLint Tools
 // Import { FlatCompat } from "@eslint/eslintrc";
@@ -312,11 +319,42 @@ export default [
         languageOptions: {
             parser: htmlParser,
         },
-        files: ["**/*.html"],
+        files: [
+            "**/*.html",
+            "**/*.htm",
+            "*.html",
+            "*.htm",
+            "*.xhtml",
+        ],
         ignores: ["docs/docusaurus/**", "report/**"],
         rules: {
             ...html.configs["flat/recommended"].rules,
             "@html-eslint/indent": "error",
+        },
+    },
+
+    // Package.json Linting
+    {
+        files: ["**/package.json"],
+        plugins: { "package-json": packageJson },
+        languageOptions: {
+            parser: jsoncEslintParser,
+            parserOptions: { jsonSyntax: "JSON" },
+        },
+        ...packageJson.configs.recommended,
+        rules: {
+            // "pkg-json/no-conflict-types": "error", // Plugin disabled - appears broken
+            "package-json/no-redundant-files": "warn",
+            "package-json/require-author": "warn",
+            "package-json/require-bugs": "warn",
+            "package-json/require-bundleDependencies": "off",
+            "package-json/require-dependencies": "warn",
+            "package-json/require-devDependencies": "warn",
+            "package-json/require-engines": "warn",
+            "package-json/require-files": "off", // Not needed for Electron applications
+            "package-json/require-keywords": "warn",
+            "package-json/require-types": "off", // Not needed for Electron applications
+            "package-json/valid-local-dependency": "off",
         },
     },
 
@@ -607,6 +645,10 @@ export default [
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "react-perf": reactPerfPlugin,
             "@arthurgeron/react-usememo": pluginUseMemo2,
+            etc: fixupPluginRules(etc),
+            "safe-jsx": pluginSafeJSX,
+            "loadable-imports": pluginLoadableImports,
+            zod: zod,
         },
         rules: {
             // TypeScript rules
@@ -656,6 +698,21 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            ...etc.configs.recommended.rules,
+
+            "zod/prefer-enum": "error",
+            "zod/require-strict": "error",
+
+            "loadable-imports/sort": "error",
+
+            "safe-jsx/jsx-explicit-boolean": "error",
+
+            "etc/no-internal": "off",
+            "etc/no-t": "off",
+            "etc/no-const-enum": "warn",
+            "etc/no-misused-generics": "warn",
+            "etc/prefer-interface": "warn",
+            "etc/throw-error": "warn",
 
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -683,6 +740,8 @@ export default [
 
             "total-functions/no-unsafe-type-assertion": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-url-constructor": "off",
 
             "no-constructor-bind/no-constructor-bind": "error",
             "no-constructor-bind/no-constructor-state": "error",
@@ -1914,6 +1973,10 @@ export default [
             "validate-jsx-nesting": pluginValidateJSX,
             "styled-components-a11y": styledA11y,
             "ssr-friendly": fixupPluginRules(pluginSSR),
+            etc: fixupPluginRules(etc),
+            "safe-jsx": pluginSafeJSX,
+            "loadable-imports": pluginLoadableImports,
+            zod: zod,
         },
         rules: {
             // TypeScript backend rules
@@ -1960,6 +2023,21 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            ...etc.configs.recommended.rules,
+
+            "zod/prefer-enum": "error",
+            "zod/require-strict": "error",
+
+            "loadable-imports/sort": "error",
+
+            "safe-jsx/jsx-explicit-boolean": "error",
+
+            "etc/no-internal": "off",
+            "etc/no-t": "off",
+            "etc/no-const-enum": "warn",
+            "etc/no-misused-generics": "warn",
+            "etc/prefer-interface": "warn",
+            "etc/throw-error": "warn",
 
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
@@ -1970,6 +2048,8 @@ export default [
 
             "total-functions/no-unsafe-type-assertion": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-url-constructor": "off",
 
             "no-constructor-bind/no-constructor-bind": "error",
             "no-constructor-bind/no-constructor-state": "error",
@@ -2896,6 +2976,7 @@ export default [
             n: nodePlugin,
             "eslint-comments": pluginComments,
             unicorn: pluginUnicorn,
+            "loadable-imports": pluginLoadableImports,
         },
 
         rules: {
@@ -2905,6 +2986,8 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
+
+            "loadable-imports/sort": "error",
 
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -2989,6 +3072,7 @@ export default [
             vitest: vitest,
             n: nodePlugin,
             "testing-library": pluginTestingLibrary,
+            "loadable-imports": pluginLoadableImports,
         },
         rules: {
             ...tseslint.configs.strict.rules,
@@ -2996,6 +3080,8 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
+
+            "loadable-imports/sort": "error",
 
             "testing-library/no-node-access": "off",
             "testing-library/await-async-queries": "error",
@@ -3803,6 +3889,15 @@ export default [
             vitest: {
                 typecheck: true,
             },
+        },
+    },
+
+    // Theme components override - disable react-perf rule for inline styling
+    {
+        files: ["src/theme/**/*.{ts,tsx}"],
+        rules: {
+            // Theme components legitimately need inline styles for dynamic theming
+            "react-perf/jsx-no-new-object-as-prop": "off",
         },
     },
 

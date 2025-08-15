@@ -113,6 +113,21 @@ export default defineConfig(({}) => {
             }),
             // Inject package version into import.meta.env.PACKAGE_VERSION
             packageVersion(),
+            // Custom plugin to fix CSP eval() issue with zod in development
+            {
+                name: "csp-dev-fix",
+                transformIndexHtml(html, context) {
+                    if (context.server) {
+                        // Development mode: Add 'unsafe-eval' for zod compatibility
+                        return html.replace(
+                            /script-src 'self' blob:/,
+                            "script-src 'self' blob: 'unsafe-eval'"
+                        );
+                    }
+                    // Production mode: Keep strict CSP
+                    return html;
+                },
+            },
             electron([
                 {
                     // Main process entry file of the Electron App
