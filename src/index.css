@@ -35,9 +35,9 @@
 
     /* Better shadow system */
     --shadow-glow: 0 0 20px 0 var(--color-primary-500, #3b82f6);
-    --shadow-hard: 0 8px 32px 0 rgb(0 0 0 / 0.15);
-    --shadow-medium: 0 4px 16px 0 rgb(0 0 0 / 0.1);
-    --shadow-soft: 0 2px 8px 0 rgb(0 0 0 / 0.05);
+    --shadow-hard: 0 8px 32px 0 rgb(0 0 0 / 15%);
+    --shadow-medium: 0 4px 16px 0 rgb(0 0 0 / 10%);
+    --shadow-soft: 0 2px 8px 0 rgb(0 0 0 / 5%);
 
     /* Modern font families */
     --font-display: "Inter Display", "Inter", system-ui, sans-serif;
@@ -75,6 +75,7 @@
         animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
         transform: translateY(0);
     }
+
     50% {
         animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
         transform: translateY(-8px);
@@ -85,6 +86,7 @@
     0% {
         opacity: 0;
     }
+
     100% {
         opacity: 1;
     }
@@ -95,6 +97,7 @@
         opacity: 0;
         transform: scale(0.95);
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -106,6 +109,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -114,9 +118,10 @@
 
 /* Custom utilities using Tailwind v4 syntax */
 @utility scrollbar-hidden {
-    &::-webkit-scrollbar {
+    ::-webkit-scrollbar {
         display: none;
     }
+
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -159,45 +164,46 @@
     --color-status-paused-bg: #f3f4f6;
     --color-status-paused: #6b7280;
 
+    background-color: #242424;
+    color-scheme: light dark;
+
     /* Font and general styling */
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    font-weight: 400;
-    line-height: 1.5;
-    color-scheme: light dark;
-    background-color: #242424;
-    font-synthesis: none;
-    text-rendering: optimizelegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    font-weight: 400;
+    line-height: 1.5;
+    text-rendering: optimizelegibility;
     /* stylelint-disable-next-line property-no-vendor-prefix -- Required for cross-browser text scaling compatibility */
     -webkit-text-size-adjust: 100%;
 }
 
 body {
-    min-width: 320px;
-    min-height: 100vh;
     margin: 0;
+    min-block-size: 100vb;
+    min-inline-size: 320px;
 }
 
-#root {
-    max-width: 100vw;
+[id="root"] {
     margin: 0 auto;
-    text-align: left;
+    max-inline-size: 100vi;
+    text-align: start;
 }
 
 @layer base {
     html {
-        height: 100%;
+        block-size: 100%;
     }
 
     body {
-        height: 100%;
-        color: var(--color-gray-900, #111827);
         background-color: var(--color-gray-50, #f9fafb);
+        block-size: 100%;
+        color: var(--color-gray-900, #111827);
 
         @media (prefers-color-scheme: dark) {
-            color: var(--color-gray-100, #f3f4f6);
             background-color: var(--color-gray-900, #111827);
+            color: var(--color-gray-100, #f3f4f6);
         }
     }
 }
@@ -206,18 +212,18 @@ body {
 
 /* Light mode scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    block-size: 8px;
+    inline-size: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--color-background-secondary, #f9fafb);
     border-radius: 4px;
+    background: var(--color-background-secondary, #f9fafb);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--color-border-secondary, #d1d5db);
     border-radius: 4px;
+    background: var(--color-border-secondary, #d1d5db);
     transition: background 0.2s ease;
 
     &:hover {
@@ -259,50 +265,50 @@ body {
         display: inline-flex;
         align-items: center;
         padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
         font-size: 0.75rem;
         font-weight: 500;
-        border-radius: 9999px;
     }
 
     .status-up {
-        color: var(--color-status-up, #10b981);
         background-color: var(--color-status-up-bg, #e6f9f0);
+        color: var(--color-status-up, #10b981);
     }
 
     .status-down {
-        color: var(--color-status-down, #ef4444);
         background-color: var(--color-status-down-bg, #fde8e8);
+        color: var(--color-status-down, #ef4444);
     }
 
     .status-pending {
-        color: var(--color-status-pending, #f59e0b);
         background-color: var(--color-status-pending-bg, #fff7e6);
+        color: var(--color-status-pending, #f59e0b);
     }
 
     .status-paused {
-        color: var(--color-status-paused, #6b7280);
         background-color: var(--color-status-paused-bg, #f3f4f6);
+        color: var(--color-status-paused, #6b7280);
     }
 
     /* Theme-aware status classes */
     .themed-status-up {
-        background-color: var(--color-status-up, #10b981);
         border-radius: 50%;
+        background-color: var(--color-status-up, #10b981);
     }
 
     .themed-status-down {
-        background-color: var(--color-status-down, #ef4444);
         border-radius: 50%;
+        background-color: var(--color-status-down, #ef4444);
     }
 
     .themed-status-pending {
-        background-color: var(--color-status-pending, #f59e0b);
         border-radius: 50%;
+        background-color: var(--color-status-pending, #f59e0b);
     }
 
     .themed-status-paused {
-        background-color: var(--color-status-paused, #6b7280);
         border-radius: 50%;
+        background-color: var(--color-status-paused, #6b7280);
     }
 
     /* Theme-aware text classes */
@@ -332,8 +338,8 @@ body {
 
     /* Theme-aware box classes */
     .themed-box-surface-elevated {
-        background-color: var(--color-background-elevated, #f9fafb);
         border: 1px solid var(--color-border-primary, #e5e7eb);
+        background-color: var(--color-background-elevated, #f9fafb);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -350,8 +356,8 @@ body {
         }
 
         .themed-box-surface-elevated {
-            background-color: var(--color-background-elevated, #1f2937);
             border: 1px solid var(--color-border-primary, #374151);
+            background-color: var(--color-background-elevated, #1f2937);
         }
     }
 }
