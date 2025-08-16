@@ -1,7 +1,7 @@
 /**
- * Vitest configuration for frontend tests.
- * Dedicated config file to help VS Code testing extension recognize frontend tests.
- * Settings match the test configuration from vite.config.ts.
+ * Vitest configuration for frontend tests. Dedicated config file to help VS
+ * Code testing extension recognize frontend tests. Settings match the test
+ * configuration from vite.config.ts.
  */
 
 import {

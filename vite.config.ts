@@ -1,6 +1,6 @@
 /**
- * Vite configuration for the Uptime Watcher Electron application.
- * Configures React frontend build and Electron main/preload process compilation.
+ * Vite configuration for the Uptime Watcher Electron application. Configures
+ * React frontend build and Electron main/preload process compilation.
  */
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
@@ -29,8 +29,8 @@ import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment"
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Vite configuration object.
- * Sets up build settings for both renderer (React) and main/preload processes.
+ * Vite configuration object. Sets up build settings for both renderer (React)
+ * and main/preload processes.
  */
 
 export default defineConfig(({}) => {
@@ -94,13 +94,7 @@ export default defineConfig(({}) => {
         esbuild: {
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
-            include: [
-                "**/*.js",
-                "**/*.jsx",
-                "**/*.mjs",
-                "**/*.ts",
-                "**/*.tsx",
-            ],
+            include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
 
             // More aggressive transformation to help coverage parsing
             keepNames: true, // Preserve function names for better coverage reports
@@ -297,10 +291,7 @@ export default defineConfig(({}) => {
                                 try {
                                     // 1. Validate WASM magic bytes (0x00 0x61 0x73 0x6D)
                                     const wasmMagic = Buffer.from([
-                                        0x00,
-                                        0x61,
-                                        0x73,
-                                        0x6d,
+                                        0x00, 0x61, 0x73, 0x6d,
                                     ]);
                                     const isValidWasm = contents
                                         .subarray(0, 4)

@@ -1,31 +1,31 @@
 /**
- * Tailwind CSS configuration for the Uptime Watcher application.
+ * Tailwind CSS v4 configuration for the Uptime Watcher application.
  *
- * Defines custom colors for status indicators, extended animations,
- * and responsive design settings.
+ * Modern CSS-first configuration following Tailwind CSS v4 best practices:
+ * - Zero-config approach with minimal JavaScript configuration
+ * - All theme customization moved to CSS using @theme directive
+ * - Dark mode handled via CSS @media queries
+ * - Plugins configured in CSS using @layer and @utility directives
+ * - Optimized content paths for Electron + React architecture
+ * 
+ * This replaces the complex JavaScript configuration approach of v3
+ * with a clean, maintainable CSS-first approach for better performance.
  */
 export default {
-    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-    darkMode: "class",
-    plugins: [],
-    theme: {
-        extend: {
-            animation: {
-                "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                "scale-in": "scale-in 0.3s ease-out forwards",
-            },
-            colors: {
-                "status-down": "#ef4444",
-                "status-paused": "#6b7280",
-                "status-pending": "#f59e0b",
-                "status-up": "#10b981",
-            },
-            keyframes: {
-                "scale-in": {
-                    "0%": { opacity: "0", transform: "scale(0.95)" },
-                    "100%": { opacity: "1", transform: "scale(1)" },
-                },
-            },
-        },
-    },
+    content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+        "./electron/**/*.{js,ts}",
+        // Exclude test files for better performance
+        "!./src/**/*.test.{js,ts,jsx,tsx}",
+        "!./electron/test/**/*",
+        "!./src/test/**/*"
+    ],
+    // Tailwind v4: CSS-first configuration eliminates the need for JS config
+    // Dark mode, themes, and all customization handled in index.css
+    plugins: [
+        // Tailwind v4 uses CSS-first configuration - no plugins needed here
+        // All customization is done via CSS directives in index.css:
+        // @theme, @utility, @layer, @variant, etc.
+    ],
 };

@@ -1,48 +1,86 @@
 ---
 # Schema: https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
-ACTION_ACTIONLINT_CONFIG_FILE: ActionLintConfig.yaml
-CONFIG_REPORTER: true
-COPYPASTE_JSCPD_CONFIG_FILE: .jscpd.json
-CSS_STYLELINT_CONFIG_FILE: stylelint.config.js
-DISABLE_ERRORS: true
-DISABLE_LINTERS:
-    - CSS_STYLELINT
-    - TYPESCRIPT_STANDARD
-    - JAVASCRIPT_PRETTIER
-    - JSON_PRETTIER
-    - YAML_PRETTIER
-EXCLUDED_DIRECTORIES:
-    [libs, tests, screenshots, node_modules, icons, docs, dist-electron]
-FILEIO_REPORTER: true
-GITHUB_COMMENT_REPORTER: true
-GITHUB_STATUS_REPORTER: true
-HTML_HTMLHINT_CONFIG_FILE: .htmlhintrc
+# Performance optimizations
+PARALLEL: true
+SHOW_ELAPSED_TIME: true
+FLAVOR_SUGGESTIONS: true
+PRINT_ALPACA: false
+PRINT_ALL_FILES: false
+
+# Core configuration
+DISABLE_ERRORS: false
+FORMATTERS_DISABLE_ERRORS: false
+IGNORE_GITIGNORED_FILES: true
+IGNORE_GENERATED_FILES: true
+
+# Linters configuration
 JAVASCRIPT_DEFAULT_STYLE: prettier
+MARKDOWN_DEFAULT_STYLE: markdownlint
+
+# Config file references
+ACTION_ACTIONLINT_CONFIG_FILE: ActionLintConfig.yaml
+COPYPASTE_JSCPD_CONFIG_FILE: .jscpd.json
+CSS_STYLELINT_CONFIG_FILE: stylelint.config.mjs
+HTML_HTMLHINT_CONFIG_FILE: .htmlhintrc
 JAVASCRIPT_PRETTIER_CONFIG_FILE: .prettierrc
 JSON_PRETTIER_CONFIG_FILE: .prettierrc
-JSON_PRETTIER_DISABLE_ERRORS: true
-JSON_REPORTER: true
-JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.json
 MARKDOWN_MARKDOWN_LINK_CHECK_CONFIG_FILE: .markdown-link-check.json
+REPOSITORY_CHECKOV_CONFIG_FILE: .checkov.yml
+REPOSITORY_DEVSKIM_CONFIG_FILE: .devskim.json
+REPOSITORY_GRYPE_CONFIG_FILE: .grype.yaml
+REPOSITORY_KICS_CONFIG_FILE: kics.yaml
+REPOSITORY_SECRETLINT_CONFIG_FILE: .secretlintrc.json
+SPELL_CSPELL_CONFIG_FILE: .cspell.json
+SPELL_LYCHEE_CONFIG_FILE: lychee.toml
+YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
+
+# Disabled linters (use project-specific tools instead)
+DISABLE_LINTERS:
+    - CSS_STYLELINT # Using project stylelint config
+    - TYPESCRIPT_STANDARD # Using ESLint + Prettier
+    - JAVASCRIPT_PRETTIER # Handled by lint-staged
+    - JSON_PRETTIER # Handled by lint-staged
+    - YAML_PRETTIER # Handled by lint-staged
+
+# Error handling for specific linters
+JSON_PRETTIER_DISABLE_ERRORS: true
+JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
+REPOSITORY_DEVSKIM_DISABLE_ERRORS: true
+TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
+
+# Excluded directories
+EXCLUDED_DIRECTORIES:
+    - node_modules
+    - dist-electron
+    - coverage
+    - docs
+    - icons
+    - assets
+    - screenshots
+    - libs
+    - tests
+    - .git
+    - .vscode
+    - .idea
+
+# Markdown configuration
 MARKDOWN_MARKDOWN_TABLE_FORMATTER_FILTER_REGEX_EXCLUDE: ^.*(CHANGELOG|README|SECURITY)\.md$
-MARKDOWN_SUMMARY_REPORTER: true
+
+# Security and analysis plugins
 PLUGINS:
     - https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-repolinter/refs/heads/main/mega-linter-plugin-repolinter/repolinter.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml
-REPOSITORY_CHECKOV_CONFIG_FILE: .checkov.yml
-REPOSITORY_DEVSKIM_CONFIG_FILE: .devskim.json
-REPOSITORY_DEVSKIM_DISABLE_ERRORS: true
-REPOSITORY_GRYPE_CONFIG_FILE: .grype.yaml
-REPOSITORY_KICS_CONFIG_FILE: kics.yaml
+
+# Reporters configuration
+CONFIG_REPORTER: true
+FILEIO_REPORTER: true
+GITHUB_COMMENT_REPORTER: true
+GITHUB_STATUS_REPORTER: true
+JSON_REPORTER: true
+MARKDOWN_SUMMARY_REPORTER: true
 SARIF_REPORTER: true
-SHOW_ELAPSED_TIME: true
-SPELL_CSPELL_CONFIG_FILE: .cspell.json
-SPELL_LYCHEE_CONFIG_FILE: lychee.toml
 TAP_REPORTER: true
 TEXT_REPORTER: true
-TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
 UPDATED_SOURCES_REPORTER: true
-YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
-REPOSITORY_SECRETLINT_CONFIG_FILE: .secretlintrc.json

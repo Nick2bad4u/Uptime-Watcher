@@ -1,9 +1,9 @@
 /* eslint-disable eslint-comments/disable-enable-pair -- needed for standalone config*/
 
 /**
- * Vitest configuration for Electron backend tests.
- * Standalone config file that doesn't inherit from main vite config to avoid conflicts.
- * Specifically targets electron and shared files for backend testing.
+ * Vitest configuration for Electron backend tests. Standalone config file that
+ * doesn't inherit from main vite config to avoid conflicts. Specifically
+ * targets electron and shared files for backend testing.
  */
 
 import path from "node:path";
@@ -78,10 +78,7 @@ const vitestConfig = defineConfig({
             requireAssertions: true,
         },
         globals: true, // Enable global test functions (describe, it, expect)
-        include: [
-            "electron/**/*.test.ts",
-            "electron/**/*.spec.ts",
-        ],
+        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts"],
         name: {
             color: "magenta",
             label: "Backend",

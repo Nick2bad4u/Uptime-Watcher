@@ -3,6 +3,7 @@
  * Optimized ESLint configuration for Uptime Watcher
  *
  * This configuration is specifically tailored for:
+ *
  * - Electron + React + TypeScript architecture
  * - Domain-driven design with Zustand stores
  * - Service-based backend architecture
@@ -295,10 +296,7 @@ export default [
     // YAML files
     {
         plugins: { eslintPluginYml: eslintPluginYml },
-        files: [
-            "*.yaml",
-            "*.yml",
-        ],
+        files: ["*.yaml", "*.yml"],
         ignores: ["docs/docusaurus/**"],
         ...eslintPluginYml.configs["flat/prettier"].rules,
         ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
@@ -319,13 +317,7 @@ export default [
         languageOptions: {
             parser: htmlParser,
         },
-        files: [
-            "**/*.html",
-            "**/*.htm",
-            "*.html",
-            "*.htm",
-            "*.xhtml",
-        ],
+        files: ["**/*.html", "**/*.htm", "*.html", "*.htm", "*.xhtml"],
         ignores: ["docs/docusaurus/**", "report/**"],
         rules: {
             ...html.configs["flat/recommended"].rules,
@@ -404,9 +396,7 @@ export default [
 
     // TSX Tailwind Linting files
     {
-        files: [
-            "src/**/*.tsx",
-        ],
+        files: ["src/**/*.tsx"],
         ignores: [],
         languageOptions: {
             parser: tseslintParser,
@@ -699,6 +689,30 @@ export default [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+
+            "comment-length/limit-single-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
+
+            "comment-length/limit-multi-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
 
             "zod/prefer-enum": "error",
             "zod/require-strict": "error",
@@ -1185,14 +1199,8 @@ export default [
             ],
             "prefer-const": "error",
             "prefer-template": "warn",
-            curly: [
-                "error",
-                "all",
-            ],
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            curly: ["error", "all"],
+            eqeqeq: ["error", "always"],
 
             // Code spacing and formatting rules
             "lines-around-comment": [
@@ -1259,10 +1267,7 @@ export default [
 
             // React 19 optimized rules
             "react/jsx-boolean-value": "warn",
-            "react/jsx-fragments": [
-                "warn",
-                "syntax",
-            ],
+            "react/jsx-fragments": ["warn", "syntax"],
             "react/jsx-key": "error",
             "react/jsx-no-useless-fragment": "warn",
             "react/jsx-uses-react": "warn",
@@ -1313,19 +1318,11 @@ export default [
                         },
                         {
                             from: "hooks",
-                            allow: [
-                                "stores",
-                                "services",
-                                "types",
-                                "utils",
-                            ],
+                            allow: ["stores", "services", "types", "utils"],
                         },
                         {
                             from: "services",
-                            allow: [
-                                "types",
-                                "utils",
-                            ],
+                            allow: ["types", "utils"],
                         },
                         {
                             from: "stores",
@@ -1358,11 +1355,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -1398,10 +1391,7 @@ export default [
             "compat/compat": "off", // Electron supports modern APIs, Opera Mini not a target
 
             // Code style
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
 
             // Documentation
             "tsdoc/syntax": "warn",
@@ -1469,10 +1459,7 @@ export default [
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
@@ -1828,11 +1815,7 @@ export default [
 
     // Electron backend files
     {
-        files: [
-            "electron/**/*.ts",
-            "shared/**/*.ts",
-            "shared/**/*.tsx",
-        ],
+        files: ["electron/**/*.ts", "shared/**/*.ts", "shared/**/*.tsx"],
         ignores: [
             "electron/**/*.spec.{ts,tsx}",
             "electron/**/*.test.{ts,tsx}",
@@ -2024,6 +2007,30 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+
+            "comment-length/limit-single-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
+
+            "comment-length/limit-multi-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
 
             "zod/prefer-enum": "error",
             "zod/require-strict": "error",
@@ -2352,14 +2359,8 @@ export default [
             ],
             "prefer-const": "error",
             "prefer-template": "warn",
-            curly: [
-                "error",
-                "all",
-            ],
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            curly: ["error", "all"],
+            eqeqeq: ["error", "always"],
 
             // Code spacing and formatting rules
             "lines-around-comment": [
@@ -2453,27 +2454,15 @@ export default [
                         },
                         {
                             from: "managers",
-                            allow: [
-                                "services",
-                                "utils",
-                                "events",
-                                "types",
-                            ],
+                            allow: ["services", "utils", "events", "types"],
                         },
                         {
                             from: "preload",
-                            allow: [
-                                "utils",
-                                "types",
-                            ],
+                            allow: ["utils", "types"],
                         },
                         {
                             from: "services",
-                            allow: [
-                                "services",
-                                "utils",
-                                "types",
-                            ],
+                            allow: ["services", "utils", "types"],
                         },
                         { from: "types", allow: [] },
                         {
@@ -2504,11 +2493,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ],
@@ -2577,10 +2562,7 @@ export default [
                 },
             ],
 
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
 
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
@@ -2600,10 +2582,7 @@ export default [
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
@@ -2992,11 +2971,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -3096,11 +3071,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -3154,9 +3125,7 @@ export default [
         files: [
             "**/*.config.{ts}", // Configuration files
         ],
-        ignores: [
-            "./.*/**",
-        ],
+        ignores: ["./.*/**"],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
@@ -3351,27 +3320,15 @@ export default [
                         },
                         {
                             from: "managers",
-                            allow: [
-                                "services",
-                                "utils",
-                                "events",
-                                "types",
-                            ],
+                            allow: ["services", "utils", "events", "types"],
                         },
                         {
                             from: "preload",
-                            allow: [
-                                "utils",
-                                "types",
-                            ],
+                            allow: ["utils", "types"],
                         },
                         {
                             from: "services",
-                            allow: [
-                                "services",
-                                "utils",
-                                "types",
-                            ],
+                            allow: ["services", "utils", "types"],
                         },
                         { from: "types", allow: [] },
                         {
@@ -3402,11 +3359,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ],
@@ -3467,10 +3420,7 @@ export default [
                 },
             ],
 
-            "prettier/prettier": [
-                "warn",
-                { usePrettierrc: true },
-            ],
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
 
             // Advanced type-checked rules for backend async safety and runtime error prevention
             "@typescript-eslint/no-floating-promises": [
@@ -3490,10 +3440,7 @@ export default [
                 },
             ],
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
 
             // Enhanced type safety for backend services
             "@typescript-eslint/no-unnecessary-type-assertion": "off", // Remove redundant type assertions
@@ -3722,11 +3669,7 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
+                    disallowedPrefixes: ["interface", "type", "enum"],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -3876,9 +3819,7 @@ export default [
 
     // Strict Test files (Backend)
     {
-        files: [
-            "electron/test/StrictTests/*.{ts,tsx}",
-        ],
+        files: ["electron/test/StrictTests/*.{ts,tsx}"],
         plugins: {
             vitest: vitest,
         },

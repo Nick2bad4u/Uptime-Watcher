@@ -1,5 +1,6 @@
 {
     "$schema": "https://typedoc.org/schema.json",
+    "name": "Uptime Watcher - React App Documentation",
     "docsPath": "docs/docusaurus/docs/app",
     "out": "docs/docusaurus/docs/app",
     "tsconfig": "tsconfig.json",
@@ -7,6 +8,7 @@
         "src/**/*.*",
         "shared/**/*.*"
     ],
+    "entryPointStrategy": "expand",
     "exclude": [
         "**/dist",
         "**/dist/**",
@@ -27,7 +29,12 @@
         "**/spec/**",
         "**/specs/**",
         "**/examples",
-        "**/examples/**"
+        "**/examples/**",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/mock*",
+        "**/test-*",
+        "**/setupTests*"
     ],
     "externalSymbolLinkMappings": {
         "@types/react": {
@@ -36,6 +43,13 @@
             "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
             "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
             "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
+        },
+        "vite": {
+            "defineConfig": "https://vitejs.dev/config/",
+            "UserConfig": "https://vitejs.dev/config/"
+        },
+        "zustand": {
+            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
         }
     },
     "plugin": [
@@ -44,7 +58,80 @@
         "typedoc-plugin-mdn-links",
         "typedoc-plugin-zod",
         "typedoc-plugin-dt-links",
-        "typedoc-plugin-external-package-links"
+        "typedoc-plugin-external-package-links",
+        "typedoc-plugin-coverage",
+        "typedoc-plugin-missing-exports",
+        "typedoc-plugin-replace-text",
+        "typedoc-plugin-rename-defaults"
     ],
-    "pretty": true
+    "pretty": true,
+    "cleanOutputDir": true,
+    "readme": "README.md",
+    "includeVersion": true,
+    "sort": ["source-order", "alphabetical"],
+    "kindSortOrder": [
+        "Document",
+        "Project",
+        "Module",
+        "Namespace",
+        "Enum",
+        "EnumMember",
+        "Class",
+        "Interface",
+        "TypeAlias",
+        "Constructor",
+        "Property",
+        "Variable",
+        "Function",
+        "Method",
+        "Parameter",
+        "TypeParameter",
+        "Accessor",
+        "GetSignature",
+        "SetSignature",
+        "CallSignature",
+        "IndexSignature"
+    ],
+    "categoryOrder": [
+        "Core",
+        "Components",
+        "Hooks",
+        "Stores",
+        "Utils",
+        "Types",
+        "Constants",
+        "*"
+    ],
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "validation": {
+        "notDocumented": true,
+        "invalidLink": true,
+        "notExported": false
+    },
+    "treatWarningsAsErrors": false,
+    "commentStyle": "jsdoc",
+    "visibilityFilters": {
+        "protected": false,
+        "private": false,
+        "inherited": true,
+        "external": false,
+        "@alpha": false,
+        "@beta": false
+    },
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "excludeNotDocumented": false,
+    "excludeReferences": false,
+    "githubPages": true,
+    "gitRevision": "main",
+    "gitRemote": "origin",
+    "hideGenerator": false,
+    "searchGroupBoosts": {
+        "Classes": 1.5,
+        "Interfaces": 1.3,
+        "Functions": 1.2,
+        "Types": 1.1
+    }
 }

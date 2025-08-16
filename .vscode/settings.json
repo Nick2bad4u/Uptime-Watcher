@@ -524,14 +524,12 @@
         "vue-tsx",
         "vue-html",
         "vue-component",
-        "vue-ts"
+        "vue-ts",
+        "tailwindcss"
     ],
     "eslint.workingDirectories": [
         "."
     ],
-    "files.associations": {
-        "*.css": "tailwindcss"
-    },
     "files.exclude": {
         "**/.husky/**": true,
         "**/coverage/**": true,
@@ -688,5 +686,13 @@
         "terminal.background": "#000000",
         "terminal.foreground": "#00FD61",
         "terminalCursor.foreground": "#ce2952"
-    }
+    },
+    "stylelint.enable": true,
+    "stylelint.validate": ["css", "postcss", "scss"],
+    "stylelint.configFile": "./stylelint.config.mjs",
+    "stylelint.customSyntax": "",
+    "stylelint.reportNeedlessDisables": true,
+    "stylelint.reportInvalidScopeDisables": true,
+    "stylelint.snippet": ["css", "postcss", "scss"],
+    "css.validate": false
 }
