@@ -71,13 +71,28 @@ export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperti
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
             const monitorLabel = monitor.type.toUpperCase();
             const getDetail = (): string => {
-                if (monitor.port) {
-                    return `: ${monitor.port}`;
+                // Show details based on monitor type
+                switch (monitor.type) {
+                    case "http": {
+                        return monitor.url ? `: ${monitor.url}` : "";
+                    }
+                    case "ping": {
+                        return monitor.host ? `: ${monitor.host}` : "";
+                    }
+                    case "port": {
+                        return monitor.port ? `: ${monitor.port}` : "";
+                    }
+                    default: {
+                        // Fallback to port or URL for unknown types
+                        if (monitor.port) {
+                            return `: ${monitor.port}`;
+                        }
+                        if (monitor.url) {
+                            return `: ${monitor.url}`;
+                        }
+                        return "";
+                    }
                 }
-                if (monitor.url) {
-                    return `: ${monitor.url}`;
-                }
-                return "";
             };
             return `${monitorLabel}${getDetail()}`;
         }, []);

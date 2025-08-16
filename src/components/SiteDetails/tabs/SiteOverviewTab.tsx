@@ -71,6 +71,19 @@ function getMonitorStatusText(monitor: Monitor): string {
 }
 
 /**
+ * Get display text for monitor based on type and available properties
+ */
+function getMonitorDisplayText(monitor: Monitor): string {
+    if (monitor.url) {
+        return monitor.url;
+    }
+    if (monitor.host) {
+        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
+    }
+    return monitor.id;
+}
+
+/**
  * Site Overview tab component that displays comprehensive site information.
  *
  * Features:
@@ -385,10 +398,7 @@ export const SiteOverviewTab = ({
                                             size="sm"
                                             variant="secondary"
                                         >
-                                            {monitor.url ??
-                                                (monitor.host
-                                                    ? `${monitor.host}:${monitor.port}`
-                                                    : monitor.id)}
+                                            {getMonitorDisplayText(monitor)}
                                         </ThemedText>
 
                                         <ThemedText
