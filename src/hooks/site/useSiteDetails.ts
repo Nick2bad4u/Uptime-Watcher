@@ -384,9 +384,9 @@ export function useSiteDetails({
         clearError();
         await withUtilityErrorHandling(
             async () => {
-                // First, update the site's monitoring field in the database
-                await modifySite(currentSite.identifier, { monitoring: true });
-                // Then start the actual monitoring processes
+                // Start the monitoring processes directly - this handles setting
+                // the monitoring state appropriately without requiring a separate
+                // database update that could trigger validation issues
                 await startSiteMonitoring(currentSite.identifier);
                 logger.user.action("Started site monitoring", {
                     monitorCount: currentSite.monitors.length,
@@ -401,7 +401,6 @@ export function useSiteDetails({
         clearError,
         currentSite.identifier,
         currentSite.monitors.length,
-        modifySite,
         startSiteMonitoring,
     ]);
 
@@ -409,9 +408,9 @@ export function useSiteDetails({
         clearError();
         await withUtilityErrorHandling(
             async () => {
-                // First, update the site's monitoring field in the database
-                await modifySite(currentSite.identifier, { monitoring: false });
-                // Then stop the actual monitoring processes
+                // Stop the monitoring processes directly - this handles setting
+                // the monitoring state appropriately without requiring a separate
+                // database update that could trigger validation issues
                 await stopSiteMonitoring(currentSite.identifier);
                 logger.user.action("Stopped site monitoring", {
                     monitorCount: currentSite.monitors.length,
@@ -426,7 +425,6 @@ export function useSiteDetails({
         clearError,
         currentSite.identifier,
         currentSite.monitors.length,
-        modifySite,
         stopSiteMonitoring,
     ]);
 
