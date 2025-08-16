@@ -1,6 +1,6 @@
 /**
- * Comprehensive test coverage for ErrorAlert component.
- * Targeting 100% coverage with focus on variants, interactions, and accessibility.
+ * Comprehensive test coverage for ErrorAlert component. Targeting 100% coverage
+ * with focus on variants, interactions, and accessibility.
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -49,9 +49,9 @@ describe("ErrorAlert - Complete Coverage", () => {
 
         it("should render with custom className", () => {
             const { container } = render(
-                <ErrorAlert 
-                    message="Test message" 
-                    className="custom-error-class" 
+                <ErrorAlert
+                    message="Test message"
+                    className="custom-error-class"
                 />
             );
 
@@ -63,7 +63,14 @@ describe("ErrorAlert - Complete Coverage", () => {
             const { container } = render(<ErrorAlert message="Test message" />);
 
             const alertElement = screen.getByRole("alert");
-            expect(alertElement).toHaveClass("flex", "items-start", "gap-3", "rounded-md", "border", "p-4");
+            expect(alertElement).toHaveClass(
+                "flex",
+                "items-start",
+                "gap-3",
+                "rounded-md",
+                "border",
+                "p-4"
+            );
         });
 
         it("should have proper accessibility attributes", () => {
@@ -81,7 +88,11 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
             const alertElement = screen.getByRole("alert");
-            expect(alertElement).toHaveClass("border-error-default", "bg-error-muted", "text-error-default");
+            expect(alertElement).toHaveClass(
+                "border-error-default",
+                "bg-error-muted",
+                "text-error-default"
+            );
         });
 
         it("should render error variant explicitly", () => {
@@ -90,8 +101,8 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
             const alertElement = screen.getByRole("alert");
             expect(alertElement).toHaveClass(
-                "border-error-default", 
-                "bg-error-muted", 
+                "border-error-default",
+                "bg-error-muted",
                 "text-error-default",
                 "dark:border-error-default",
                 "dark:bg-error-muted",
@@ -102,11 +113,13 @@ describe("ErrorAlert - Complete Coverage", () => {
         it("should render warning variant correctly", () => {
             render(<ErrorAlert message="Warning message" variant="warning" />);
 
-            expect(screen.getByTestId("alert-triangle-icon")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("alert-triangle-icon")
+            ).toBeInTheDocument();
             const alertElement = screen.getByRole("alert");
             expect(alertElement).toHaveClass(
-                "border-warning-default", 
-                "bg-warning-muted", 
+                "border-warning-default",
+                "bg-warning-muted",
                 "text-warning-default",
                 "dark:border-warning-default",
                 "dark:bg-warning-muted",
@@ -120,8 +133,8 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("info-icon")).toBeInTheDocument();
             const alertElement = screen.getByRole("alert");
             expect(alertElement).toHaveClass(
-                "border-info-default", 
-                "bg-info-muted", 
+                "border-info-default",
+                "bg-info-muted",
                 "text-info-default",
                 "dark:border-info-default",
                 "dark:bg-info-muted",
@@ -130,11 +143,20 @@ describe("ErrorAlert - Complete Coverage", () => {
         });
 
         it("should handle invalid variant by defaulting to error", () => {
-            render(<ErrorAlert message="Invalid variant" variant={"invalid" as ErrorAlertVariant} />);
+            render(
+                <ErrorAlert
+                    message="Invalid variant"
+                    variant={"invalid" as ErrorAlertVariant}
+                />
+            );
 
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
             const alertElement = screen.getByRole("alert");
-            expect(alertElement).toHaveClass("border-error-default", "bg-error-muted", "text-error-default");
+            expect(alertElement).toHaveClass(
+                "border-error-default",
+                "bg-error-muted",
+                "text-error-default"
+            );
         });
     });
 
@@ -178,11 +200,16 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             const messageElement = screen.getByText("Simple error message");
             expect(messageElement).toBeInTheDocument();
-            expect(messageElement).toHaveClass("text-sm", "font-medium", "break-words");
+            expect(messageElement).toHaveClass(
+                "text-sm",
+                "font-medium",
+                "break-words"
+            );
         });
 
         it("should handle long messages with proper text wrapping", () => {
-            const longMessage = "This is a very long error message that should wrap properly and not break the layout even when it contains many words and characters";
+            const longMessage =
+                "This is a very long error message that should wrap properly and not break the layout even when it contains many words and characters";
             render(<ErrorAlert message={longMessage} />);
 
             const messageElement = screen.getByText(longMessage);
@@ -195,20 +222,24 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             // Find the specific message paragraph element, not by text content
             const alertElement = screen.getByRole("alert");
-            const messageElement = alertElement.querySelector("p.text-sm.font-medium.break-words");
+            const messageElement = alertElement.querySelector(
+                "p.text-sm.font-medium.break-words"
+            );
             expect(messageElement).toBeInTheDocument();
             expect(messageElement).toHaveTextContent("");
         });
 
         it("should handle message with special characters", () => {
-            const specialMessage = "Error: Failed to connect to server @ 192.168.1.1:8080 - Connection refused (errno: 111)";
+            const specialMessage =
+                "Error: Failed to connect to server @ 192.168.1.1:8080 - Connection refused (errno: 111)";
             render(<ErrorAlert message={specialMessage} />);
 
             expect(screen.getByText(specialMessage)).toBeInTheDocument();
         });
 
         it("should handle message with HTML-like content as plain text", () => {
-            const htmlMessage = "<script>alert('test')</script> This should be safe";
+            const htmlMessage =
+                "<script>alert('test')</script> This should be safe";
             render(<ErrorAlert message={htmlMessage} />);
 
             expect(screen.getByText(htmlMessage)).toBeInTheDocument();
@@ -227,18 +258,25 @@ describe("ErrorAlert - Complete Coverage", () => {
         it("should not render dismiss button when onDismiss is not provided", () => {
             render(<ErrorAlert message="No dismiss" />);
 
-            expect(screen.queryByLabelText("Dismiss error")).not.toBeInTheDocument();
+            expect(
+                screen.queryByLabelText("Dismiss error")
+            ).not.toBeInTheDocument();
             expect(screen.queryByTestId("x-icon")).not.toBeInTheDocument();
         });
 
         it("should render dismiss button when onDismiss is provided", () => {
             const mockDismiss = vi.fn();
-            render(<ErrorAlert message="With dismiss" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="With dismiss" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             expect(dismissButton).toBeInTheDocument();
             expect(dismissButton).toHaveAttribute("type", "button");
-            expect(dismissButton).toHaveAttribute("title", "Dismiss this error message");
+            expect(dismissButton).toHaveAttribute(
+                "title",
+                "Dismiss this error message"
+            );
             expect(screen.getByTestId("x-icon")).toBeInTheDocument();
         });
 
@@ -246,7 +284,12 @@ describe("ErrorAlert - Complete Coverage", () => {
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
-            render(<ErrorAlert message="Clickable dismiss" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert
+                    message="Clickable dismiss"
+                    onDismiss={mockDismiss}
+                />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             await user.click(dismissButton);
@@ -256,7 +299,9 @@ describe("ErrorAlert - Complete Coverage", () => {
 
         it("should call onDismiss with fireEvent click", () => {
             const mockDismiss = vi.fn();
-            render(<ErrorAlert message="Fire event test" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Fire event test" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             fireEvent.click(dismissButton);
@@ -268,7 +313,9 @@ describe("ErrorAlert - Complete Coverage", () => {
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
-            render(<ErrorAlert message="Multiple clicks" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Multiple clicks" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             await user.click(dismissButton);
@@ -280,7 +327,9 @@ describe("ErrorAlert - Complete Coverage", () => {
 
         it("should have proper styling for dismiss button", () => {
             const mockDismiss = vi.fn();
-            render(<ErrorAlert message="Button styling" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Button styling" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             expect(dismissButton).toHaveClass(
@@ -296,7 +345,9 @@ describe("ErrorAlert - Complete Coverage", () => {
 
         it("should render X icon with correct styling", () => {
             const mockDismiss = vi.fn();
-            render(<ErrorAlert message="Icon styling" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Icon styling" onDismiss={mockDismiss} />
+            );
 
             const xIcon = screen.getByTestId("x-icon");
             expect(xIcon).toHaveClass("h-4", "w-4");
@@ -308,10 +359,12 @@ describe("ErrorAlert - Complete Coverage", () => {
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
-            render(<ErrorAlert message="Keyboard test" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Keyboard test" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
-            
+
             // Focus the button
             await user.tab();
             expect(dismissButton).toHaveFocus();
@@ -325,7 +378,9 @@ describe("ErrorAlert - Complete Coverage", () => {
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
-            render(<ErrorAlert message="Space key test" onDismiss={mockDismiss} />);
+            render(
+                <ErrorAlert message="Space key test" onDismiss={mockDismiss} />
+            );
 
             const dismissButton = screen.getByLabelText("Dismiss error");
             dismissButton.focus();
@@ -337,26 +392,38 @@ describe("ErrorAlert - Complete Coverage", () => {
 
     describe("Edge Cases", () => {
         it("should handle undefined onDismiss gracefully", () => {
-            render(<ErrorAlert message="Undefined dismiss" onDismiss={undefined} />);
+            render(
+                <ErrorAlert message="Undefined dismiss" onDismiss={undefined} />
+            );
 
-            expect(screen.queryByLabelText("Dismiss error")).not.toBeInTheDocument();
+            expect(
+                screen.queryByLabelText("Dismiss error")
+            ).not.toBeInTheDocument();
         });
 
         it("should handle null onDismiss gracefully", () => {
-            render(<ErrorAlert message="Null dismiss" onDismiss={null as any} />);
+            render(
+                <ErrorAlert message="Null dismiss" onDismiss={null as any} />
+            );
 
-            expect(screen.queryByLabelText("Dismiss error")).not.toBeInTheDocument();
+            expect(
+                screen.queryByLabelText("Dismiss error")
+            ).not.toBeInTheDocument();
         });
 
         it("should maintain stable callback reference with useCallback", () => {
             const mockDismiss = vi.fn();
-            const { rerender } = render(<ErrorAlert message="Callback test" onDismiss={mockDismiss} />);
+            const { rerender } = render(
+                <ErrorAlert message="Callback test" onDismiss={mockDismiss} />
+            );
 
             const firstButton = screen.getByLabelText("Dismiss error");
             const firstOnClick = (firstButton as any).onclick;
 
             // Re-render with same props
-            rerender(<ErrorAlert message="Callback test" onDismiss={mockDismiss} />);
+            rerender(
+                <ErrorAlert message="Callback test" onDismiss={mockDismiss} />
+            );
 
             const secondButton = screen.getByLabelText("Dismiss error");
             const secondOnClick = (secondButton as any).onclick;
@@ -368,11 +435,15 @@ describe("ErrorAlert - Complete Coverage", () => {
 
     describe("Component Integration", () => {
         it("should render all variants together correctly", () => {
-            const { rerender } = render(<ErrorAlert message="Test" variant="error" />);
+            const { rerender } = render(
+                <ErrorAlert message="Test" variant="error" />
+            );
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
 
             rerender(<ErrorAlert message="Test" variant="warning" />);
-            expect(screen.getByTestId("alert-triangle-icon")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("alert-triangle-icon")
+            ).toBeInTheDocument();
 
             rerender(<ErrorAlert message="Test" variant="info" />);
             expect(screen.getByTestId("info-icon")).toBeInTheDocument();
@@ -381,8 +452,8 @@ describe("ErrorAlert - Complete Coverage", () => {
         it("should combine all props correctly", () => {
             const mockDismiss = vi.fn();
             render(
-                <ErrorAlert 
-                    message="Full props test" 
+                <ErrorAlert
+                    message="Full props test"
                     variant="warning"
                     className="custom-alert"
                     onDismiss={mockDismiss}
@@ -393,7 +464,9 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(alertElement).toHaveClass("custom-alert");
             expect(alertElement).toHaveClass("border-warning-default");
             expect(screen.getByText("Full props test")).toBeInTheDocument();
-            expect(screen.getByTestId("alert-triangle-icon")).toBeInTheDocument();
+            expect(
+                screen.getByTestId("alert-triangle-icon")
+            ).toBeInTheDocument();
             expect(screen.getByLabelText("Dismiss error")).toBeInTheDocument();
         });
     });

@@ -43,7 +43,7 @@
             "files": "*.css",
             "options": {
                 "printWidth": 80,
-                 "multilineArraysWrapThreshold": 1
+                "multilineArraysWrapThreshold": 1
             }
         },
         {

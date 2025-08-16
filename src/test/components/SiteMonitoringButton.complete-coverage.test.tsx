@@ -1,6 +1,6 @@
 /**
- * Comprehensive test coverage for SiteMonitoringButton component.
- * Targeting 100% coverage with focus on state handling, interactions, and accessibility.
+ * Comprehensive test coverage for SiteMonitoringButton component. Targeting
+ * 100% coverage with focus on state handling, interactions, and accessibility.
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -11,15 +11,15 @@ import ThemeProvider from "../../theme/components/ThemeProvider";
 
 // Mock ThemedButton component
 vi.mock("../../theme/components/ThemedButton", () => ({
-    default: ({ 
-        children, 
-        onClick, 
-        disabled, 
-        "aria-label": ariaLabel, 
+    default: ({
+        children,
+        onClick,
+        disabled,
+        "aria-label": ariaLabel,
         className,
         size,
         variant,
-        ...props 
+        ...props
     }: any) => (
         <button
             onClick={onClick}
@@ -58,7 +58,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     describe("Basic Rendering", () => {
         it("should render start button when monitors are not running", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                 />
@@ -66,7 +66,10 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             const button = screen.getByTestId("themed-button");
             expect(button).toBeInTheDocument();
-            expect(button).toHaveAttribute("aria-label", "Start All Monitoring");
+            expect(button).toHaveAttribute(
+                "aria-label",
+                "Start All Monitoring"
+            );
             expect(button).toHaveAttribute("data-variant", "success");
             expect(button).toHaveAttribute("data-size", "sm");
             expect(screen.getByText("▶️")).toBeInTheDocument();
@@ -75,7 +78,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should render stop button when monitors are running", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                 />
@@ -92,14 +95,19 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should apply custom className", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     className="custom-class"
                 />
             );
 
             const button = screen.getByTestId("themed-button");
-            expect(button).toHaveClass("flex", "items-center", "gap-1", "custom-class");
+            expect(button).toHaveClass(
+                "flex",
+                "items-center",
+                "gap-1",
+                "custom-class"
+            );
         });
 
         it("should apply default className when none provided", () => {
@@ -113,7 +121,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     describe("Compact Mode", () => {
         it("should hide text in compact mode for start button", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     compact={true}
@@ -126,7 +134,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should hide text in compact mode for stop button", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     compact={true}
@@ -139,7 +147,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should show text when compact is false", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     compact={false}
@@ -151,7 +159,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should show text when compact is undefined (default)", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                 />
@@ -164,7 +172,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     describe("Loading State", () => {
         it("should disable start button when loading", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     isLoading={true}
@@ -177,7 +185,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should disable stop button when loading", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     isLoading={true}
@@ -190,10 +198,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should enable button when not loading", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
-                    {...defaultProps}
-                    isLoading={false}
-                />
+                <SiteMonitoringButton {...defaultProps} isLoading={false} />
             );
 
             const button = screen.getByTestId("themed-button");
@@ -207,7 +212,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -225,7 +230,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     onStopSiteMonitoring={mockStop}
@@ -244,7 +249,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     isLoading={true}
@@ -257,7 +262,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(mockStart).not.toHaveBeenCalled();
 
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     isLoading={true}
@@ -275,7 +280,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -298,7 +303,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             renderWithTheme(
                 <div onClick={mockParentClick}>
-                    <SiteMonitoringButton 
+                    <SiteMonitoringButton
                         {...defaultProps}
                         allMonitorsRunning={false}
                         onStartSiteMonitoring={mockStart}
@@ -319,7 +324,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             renderWithTheme(
                 <div onClick={mockParentClick}>
-                    <SiteMonitoringButton 
+                    <SiteMonitoringButton
                         {...defaultProps}
                         allMonitorsRunning={true}
                         onStopSiteMonitoring={mockStop}
@@ -338,7 +343,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStart = vi.fn();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -356,7 +361,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     describe("State Transitions", () => {
         it("should switch from start to stop when allMonitorsRunning changes", () => {
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                 />
@@ -366,7 +371,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(screen.getByText("▶️")).toBeInTheDocument();
 
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                 />
@@ -378,7 +383,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should maintain button attributes during state transitions", () => {
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     className="custom-class"
@@ -390,7 +395,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toHaveAttribute("data-size", "sm");
 
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     className="custom-class"
@@ -406,19 +411,22 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
     describe("Accessibility", () => {
         it("should have proper aria-label for start button", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                 />
             );
 
             const button = screen.getByTestId("themed-button");
-            expect(button).toHaveAttribute("aria-label", "Start All Monitoring");
+            expect(button).toHaveAttribute(
+                "aria-label",
+                "Start All Monitoring"
+            );
         });
 
         it("should have proper aria-label for stop button", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                 />
@@ -433,7 +441,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -441,7 +449,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const button = screen.getByTestId("themed-button");
-            
+
             // Focus the button
             await user.tab();
             expect(button).toHaveFocus();
@@ -456,7 +464,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const user = userEvent.setup();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -476,21 +484,25 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(typeof SiteMonitoringButton).toBe("object");
             expect(SiteMonitoringButton).toBeDefined();
             // Check that it's a React.memo component
-            expect(SiteMonitoringButton.$$typeof).toBe(Symbol.for("react.memo"));
+            expect(SiteMonitoringButton.$$typeof).toBe(
+                Symbol.for("react.memo")
+            );
         });
 
         it("should have proper display name", () => {
             // React.memo with function name preserves displayName (may have number suffix in testing)
-            const displayName = SiteMonitoringButton.displayName || (SiteMonitoringButton as any).type?.name;
+            const displayName =
+                SiteMonitoringButton.displayName ||
+                (SiteMonitoringButton as any).type?.name;
             expect(displayName).toMatch(/^SiteMonitoringButton\d*$/);
         });
 
         it("should maintain stable callback references", () => {
             const mockStart = vi.fn();
             const mockStop = vi.fn();
-            
+
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
@@ -502,7 +514,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             // Re-render with same props
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
@@ -523,7 +535,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStop = vi.fn();
 
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
@@ -535,7 +547,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             // Re-render with different allMonitorsRunning but same callbacks
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
@@ -554,7 +566,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStart2 = vi.fn();
 
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart1}
                     allMonitorsRunning={false}
@@ -566,7 +578,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             // Re-render with different callback
             rerender(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     onStartSiteMonitoring={mockStart2}
                     allMonitorsRunning={false}
@@ -584,7 +596,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStart = vi.fn();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
@@ -592,7 +604,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const button = screen.getByTestId("themed-button");
-            
+
             // Trigger click which calls handleStartClick
             fireEvent.click(button, { stopPropagation: undefined });
             expect(mockStart).toHaveBeenCalledTimes(1);
@@ -602,7 +614,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStop = vi.fn();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={true}
                     onStopSiteMonitoring={mockStop}
@@ -610,7 +622,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const button = screen.getByTestId("themed-button");
-            
+
             // Trigger click which calls handleStopClick
             fireEvent.click(button, { stopPropagation: undefined });
             expect(mockStop).toHaveBeenCalledTimes(1);
@@ -618,7 +630,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should handle rapid state changes", () => {
             const { rerender } = renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     {...defaultProps}
                     allMonitorsRunning={false}
                 />
@@ -627,7 +639,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             // Rapid state changes
             for (let i = 0; i < 10; i++) {
                 rerender(
-                    <SiteMonitoringButton 
+                    <SiteMonitoringButton
                         {...defaultProps}
                         allMonitorsRunning={i % 2 === 0}
                     />
@@ -640,10 +652,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
         it("should handle empty className gracefully", () => {
             renderWithTheme(
-                <SiteMonitoringButton 
-                    {...defaultProps}
-                    className=""
-                />
+                <SiteMonitoringButton {...defaultProps} className="" />
             );
 
             const button = screen.getByTestId("themed-button");
@@ -657,7 +666,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const mockStop = vi.fn();
 
             renderWithTheme(
-                <SiteMonitoringButton 
+                <SiteMonitoringButton
                     allMonitorsRunning={false}
                     className="test-class"
                     compact={true}

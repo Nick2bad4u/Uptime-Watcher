@@ -1,6 +1,6 @@
 /**
- * Targeted test coverage for useSiteOperations uncovered lines
- * Focuses on specific error handling paths and edge cases
+ * Targeted test coverage for useSiteOperations uncovered lines Focuses on
+ * specific error handling paths and edge cases
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -133,7 +133,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 removeMonitor: vi.fn().mockResolvedValue({ success: true }),
             },
             monitoring: {
-                stopMonitoringForSite: vi.fn().mockResolvedValue({ success: true }),
+                stopMonitoringForSite: vi
+                    .fn()
+                    .mockResolvedValue({ success: true }),
             },
             data: {
                 downloadSQLiteBackup: vi.fn().mockResolvedValue({
@@ -149,7 +151,10 @@ describe("useSiteOperations - Targeted Coverage", () => {
         };
 
         mockSiteDeps = {
-            getSites: vi.fn(() => [mockSiteWithMultipleMonitors, mockSiteWithSingleMonitor]),
+            getSites: vi.fn(() => [
+                mockSiteWithMultipleMonitors,
+                mockSiteWithSingleMonitor,
+            ]),
             removeSite: vi.fn(),
             addSite: vi.fn(),
             setSites: vi.fn(),
@@ -171,7 +176,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             // Verify logger.warn was called for the failed monitor (line 115-116)
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Failed to stop monitoring for monitor"),
+                expect.stringContaining(
+                    "Failed to stop monitoring for monitor"
+                ),
                 expect.any(Error)
             );
 
@@ -194,7 +201,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             // Verify logger.warn was called with Error wrapper for non-Error (line 118-120)
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Failed to stop monitoring for monitor"),
+                expect.stringContaining(
+                    "Failed to stop monitoring for monitor"
+                ),
                 expect.any(Error)
             );
         });
@@ -203,12 +212,18 @@ describe("useSiteOperations - Targeted Coverage", () => {
     describe("downloadSQLiteBackup Error Handling (Lines 147-151)", () => {
         it("should handle and rethrow errors when SQLite backup download fails", async () => {
             const downloadError = new Error("Backup download failed");
-            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(downloadError);
+            mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
+                downloadError
+            );
 
             // Console.error should be called and error should be rethrown
-            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "error")
+                .mockImplementation(() => {});
 
-            await expect(actions.downloadSQLiteBackup()).rejects.toThrow("Backup download failed");
+            await expect(actions.downloadSQLiteBackup()).rejects.toThrow(
+                "Backup download failed"
+            );
 
             // Verify console.error was called (line 147-148)
             expect(consoleSpy).toHaveBeenCalledWith(
@@ -222,7 +237,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
         it("should handle successful backup download", async () => {
             await actions.downloadSQLiteBackup();
 
-            expect(mockElectronAPI.data.downloadSQLiteBackup).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.data.downloadSQLiteBackup
+            ).toHaveBeenCalled();
         });
     });
 
@@ -237,7 +254,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
             ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
             // Verify no backend calls were made since validation failed early
-            expect(mockElectronAPI.monitoring.stopMonitoringForSite).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.removeMonitor).not.toHaveBeenCalled();
         });
     });
@@ -245,7 +264,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
     describe("removeMonitorFromSite Error Handling (Lines 214-215)", () => {
         it("should handle and log errors when stopping monitoring fails but continue with monitor removal", async () => {
             const stopError = new Error("Stop monitoring failed");
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(stopError);
+            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
+                stopError
+            );
 
             // Monitor removal should still succeed despite stop monitoring failure
             await actions.removeMonitorFromSite(
@@ -255,7 +276,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             // Verify logger.warn was called for the failed stop operation (lines 214-215)
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Failed to stop monitoring for monitor"),
+                expect.stringContaining(
+                    "Failed to stop monitoring for monitor"
+                ),
                 stopError
             );
 
@@ -278,7 +301,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             // Verify logger.warn was called with Error wrapper (lines 216-219)
             expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Failed to stop monitoring for monitor"),
+                expect.stringContaining(
+                    "Failed to stop monitoring for monitor"
+                ),
                 expect.any(Error)
             );
         });
@@ -291,7 +316,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[0].id
             );
 
-            expect(mockElectronAPI.monitoring.stopMonitoringForSite).toHaveBeenCalledWith(
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0].id
             );

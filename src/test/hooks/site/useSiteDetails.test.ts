@@ -32,14 +32,26 @@ vi.mock("../../../utils/errorHandling", () => ({
 // Mock validation utilities
 vi.mock("../../../utils/monitorValidation", () => ({
     validateMonitorFieldClientSide: vi.fn((type, field, value) => {
-        if (field === "checkInterval" && (value < 10_000 || value > 86_400_000)) {
-            return { success: false, errors: ["Check interval must be between 10s and 24h"] };
+        if (
+            field === "checkInterval" &&
+            (value < 10_000 || value > 86_400_000)
+        ) {
+            return {
+                success: false,
+                errors: ["Check interval must be between 10s and 24h"],
+            };
         }
         if (field === "timeout" && (value < 1000 || value > 30_000)) {
-            return { success: false, errors: ["Timeout must be between 1s and 30s"] };
+            return {
+                success: false,
+                errors: ["Timeout must be between 1s and 30s"],
+            };
         }
         if (field === "retryAttempts" && (value < 0 || value > 10)) {
-            return { success: false, errors: ["Retry attempts must be between 0 and 10"] };
+            return {
+                success: false,
+                errors: ["Retry attempts must be between 0 and 10"],
+            };
         }
         return { success: true };
     }),
@@ -105,7 +117,7 @@ vi.mock("../../../hooks/site/useSiteAnalytics", () => ({
 }));
 
 // Mock globalThis.confirm for destructive action tests
-Object.defineProperty(globalThis, 'confirm', {
+Object.defineProperty(globalThis, "confirm", {
     writable: true,
     value: vi.fn(() => true),
 });
@@ -508,7 +520,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
 
             // Should complete without throwing when no monitor is selected
-            await expect(result.current.handleCheckNow()).resolves.toBeUndefined();
+            await expect(
+                result.current.handleCheckNow()
+            ).resolves.toBeUndefined();
         });
     });
 
@@ -593,7 +607,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Try to save the invalid interval - should throw
             await act(async () => {
-                await expect(result.current.handleSaveInterval()).rejects.toThrow();
+                await expect(
+                    result.current.handleSaveInterval()
+                ).rejects.toThrow();
             });
 
             // Should not call store method with invalid value
@@ -680,7 +696,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Try to save the invalid timeout - should throw
             await act(async () => {
-                await expect(result.current.handleSaveTimeout()).rejects.toThrow();
+                await expect(
+                    result.current.handleSaveTimeout()
+                ).rejects.toThrow();
             });
 
             // Should not call store method with invalid value
@@ -767,7 +785,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Try to save the invalid retry attempts - should throw
             await act(async () => {
-                await expect(result.current.handleSaveRetryAttempts()).rejects.toThrow();
+                await expect(
+                    result.current.handleSaveRetryAttempts()
+                ).rejects.toThrow();
             });
 
             // Should not call store method with invalid value
@@ -955,9 +975,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         it("should handle start monitoring for specific monitor", async () => {
             const siteWithInactiveMonitor = {
                 ...mockSite,
-                monitors: [
-                    { ...mockSite.monitors[0], monitoring: false }
-                ]
+                monitors: [{ ...mockSite.monitors[0], monitoring: false }],
             };
 
             const { result } = renderHook(() =>
@@ -1077,9 +1095,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 updateSiteCheckInterval: vi.fn(),
             });
 
-            renderHook(() =>
-                useSiteDetails({ site: siteWithRemovedMonitor })
-            );
+            renderHook(() => useSiteDetails({ site: siteWithRemovedMonitor }));
 
             // Should update to the first available monitor
             expect(mockSetSelectedMonitorId).toHaveBeenCalledWith(
@@ -1181,7 +1197,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Try to save an invalid interval - should throw due to validation
             await act(async () => {
-                await expect(result.current.handleSaveInterval()).rejects.toThrow();
+                await expect(
+                    result.current.handleSaveInterval()
+                ).rejects.toThrow();
             });
 
             // Validation should prevent the store call

@@ -155,8 +155,12 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
         }
         public createImportExportService() {
             return {
-                exportAllData: vi.fn().mockResolvedValue('{"sites": [], "settings": []}'),
-                importDataFromJson: vi.fn().mockResolvedValue({ sites: [], settings: [] }),
+                exportAllData: vi
+                    .fn()
+                    .mockResolvedValue('{"sites": [], "settings": []}'),
+                importDataFromJson: vi
+                    .fn()
+                    .mockResolvedValue({ sites: [], settings: [] }),
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             };
         }

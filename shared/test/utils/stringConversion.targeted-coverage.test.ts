@@ -1,6 +1,6 @@
 /**
- * Targeted tests for stringConversion.ts to achieve 100% coverage
- * Specifically targeting lines 86-89 (undefined case and default case)
+ * Targeted tests for stringConversion.ts to achieve 100% coverage Specifically
+ * targeting lines 86-89 (undefined case and default case)
  */
 
 import { describe, it, expect } from "vitest";
@@ -12,7 +12,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             // Test normal undefined behavior (early return)
             expect(safeStringify(undefined)).toBe("");
             expect(safeStringify(null)).toBe("");
-            
+
             // Test all reachable types to ensure coverage
             expect(safeStringify("test")).toBe("test");
             expect(safeStringify(123)).toBe("123");
@@ -26,11 +26,11 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
         it("should create edge case object for typeof manipulation", () => {
             // While we can't easily make typeof return unknown values,
             // we can test objects that might behave unusually
-            
+
             // Test object with unusual prototype chain
             const weirdObject = Object.create(null);
             weirdObject.test = "value";
-            
+
             const result = safeStringify(weirdObject);
             expect(typeof result).toBe("string");
         });
@@ -39,10 +39,10 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             // Test various ways to get undefined values
             expect(safeStringify(undefined)).toBe("");
             expect(safeStringify(null)).toBe("");
-            
+
             // Test void 0 (another way to get undefined)
             expect(safeStringify(void 0)).toBe("");
-            
+
             // Test with a variable that's undefined
             let undefinedVar;
             expect(safeStringify(undefinedVar)).toBe("");
@@ -57,9 +57,13 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
                 { input: 123, expected: "123", type: "number" },
                 { input: {}, expected: "{}", type: "object" },
                 { input: "test", expected: "test", type: "string" },
-                { input: Symbol("test"), expected: "Symbol(test)", type: "symbol" }
+                {
+                    input: Symbol("test"),
+                    expected: "Symbol(test)",
+                    type: "symbol",
+                },
             ];
-            
+
             for (const { input, expected, type } of testCases) {
                 const result = safeStringify(input);
                 expect(typeof input).toBe(type);
@@ -69,7 +73,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
                     expect(result).toBe(expected);
                 }
             }
-            
+
             // Special test for undefined (handled early)
             expect(safeStringify(undefined)).toBe("");
         });

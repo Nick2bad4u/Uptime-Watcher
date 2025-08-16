@@ -1,47 +1,47 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { AddSiteForm } from '../../../components/AddSiteForm/AddSiteForm';
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock logger service with inline functions
-vi.mock('../../../services/logger', () => ({
+vi.mock("../../../services/logger", () => ({
     default: {
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
         debug: vi.fn(),
-    }
+    },
 }));
 
 // Import the mocked logger to access the spies
-import logger from '../../../services/logger';
-import { useErrorStore } from '../../../stores/error/useErrorStore';
+import logger from "../../../services/logger";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock the handleSubmit function
-vi.mock('../../../components/AddSiteForm/Submit', () => ({
+vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
 // Import the mocked handleSubmit
-import { handleSubmit } from '../../../components/AddSiteForm/Submit';
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 
 // Mock console.error to capture error handling
-const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 // Mock stores and hooks with proper setup to trigger specific conditions
-vi.mock('../../../stores/sites/useSitesStore', () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: () => ({
         sites: [
             {
-                identifier: 'site-1',
-                name: 'Test Site 1',
-                url: 'https://example.com',
+                identifier: "site-1",
+                name: "Test Site 1",
+                url: "https://example.com",
                 monitors: [],
             },
             {
-                identifier: 'site-2', 
-                name: 'Test Site 2',
-                url: 'https://example2.com',
+                identifier: "site-2",
+                name: "Test Site 2",
+                url: "https://example2.com",
                 monitors: [],
             },
         ],
@@ -50,16 +50,16 @@ vi.mock('../../../stores/sites/useSitesStore', () => ({
     }),
 }));
 
-vi.mock('../../../stores/monitor/useMonitorTypesStore', () => ({
+vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: () => ({
-        monitorTypes: ['http', 'ping', 'port'],
+        monitorTypes: ["http", "ping", "port"],
         isLoading: false,
         hasError: false,
         error: undefined,
     }),
 }));
 
-vi.mock('../../../stores/error/useErrorStore', () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({
         formError: undefined,
         clearError: vi.fn(),
@@ -76,38 +76,38 @@ const mockSetFormError = vi.fn();
 const mockClearError = vi.fn();
 const mockOnSuccess = vi.fn();
 
-vi.mock('../../../components/SiteDetails/useAddSiteForm', () => ({
+vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => ({
         // Form state
-        addMode: 'new',
+        addMode: "new",
         setAddMode: mockSetAddMode,
-        name: '',
+        name: "",
         setName: vi.fn(),
-        url: '',
+        url: "",
         setUrl: vi.fn(),
-        monitorType: 'http',
+        monitorType: "http",
         setMonitorType: mockSetMonitorType,
         checkInterval: 60_000,
         setCheckInterval: mockSetCheckInterval,
-        selectedExistingSite: '',
+        selectedExistingSite: "",
         setSelectedExistingSite: vi.fn(),
-        host: '',
+        host: "",
         setHost: vi.fn(),
-        port: '',
+        port: "",
         setPort: vi.fn(),
-        siteId: '',
-        description: '',
+        siteId: "",
+        description: "",
         setDescription: vi.fn(),
         timeout: 30_000,
         setTimeout: vi.fn(),
         retries: 3,
         setRetries: vi.fn(),
-        
+
         // Form actions
         resetForm: mockResetForm,
         createSite: mockCreateSite,
         addMonitorToSite: vi.fn(),
-        
+
         // Form state
         isValid: true,
         isLoading: false,
@@ -116,7 +116,7 @@ vi.mock('../../../components/SiteDetails/useAddSiteForm', () => ({
     }),
 }));
 
-vi.mock('../../../hooks/useMonitorFields', () => ({
+vi.mock("../../../hooks/useMonitorFields", () => ({
     useMonitorFields: () => ({
         getFieldsForMonitorType: vi.fn(() => []),
         isLoading: false,
@@ -124,21 +124,18 @@ vi.mock('../../../hooks/useMonitorFields', () => ({
     }),
 }));
 
-vi.mock('../../../hooks/useDynamicHelpText', () => ({
+vi.mock("../../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: () => ({
-        getHelpText: vi.fn(() => ''),
+        getHelpText: vi.fn(() => ""),
         isLoading: false,
         hasError: false,
     }),
 }));
 
 // Mock the component fields to intercept user interactions
-vi.mock('../../../components/AddSiteForm/SelectField', () => ({
+vi.mock("../../../components/AddSiteForm/SelectField", () => ({
     default: ({ onChange, options, id }: any) => (
-        <select 
-            data-testid={id}
-            onChange={(e) => onChange?.(e.target.value)}
-        >
+        <select data-testid={id} onChange={(e) => onChange?.(e.target.value)}>
             {options?.map((option: any) => (
                 <option key={option.value} value={option.value}>
                     {option.label}
@@ -152,13 +149,13 @@ vi.mock('../../../components/AddSiteForm/SelectField', () => ({
     ),
 }));
 
-vi.mock('../../../components/AddSiteForm/RadioGroup', () => ({
+vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
     default: ({ onChange, options, id }: any) => (
         <div data-testid={id}>
             {options?.map((option: any) => (
                 <label key={option.value}>
-                    <input 
-                        type="radio" 
+                    <input
+                        type="radio"
                         value={option.value}
                         onChange={(e) => onChange?.(e.target.value)}
                     />
@@ -167,8 +164,8 @@ vi.mock('../../../components/AddSiteForm/RadioGroup', () => ({
             ))}
             {/* Add invalid option for testing purposes */}
             <label>
-                <input 
-                    type="radio" 
+                <input
+                    type="radio"
                     value="invalid-add-mode"
                     onChange={(e) => onChange?.(e.target.value)}
                 />
@@ -178,17 +175,17 @@ vi.mock('../../../components/AddSiteForm/RadioGroup', () => ({
     ),
 }));
 
-vi.mock('../../../components/AddSiteForm/TextField', () => ({
+vi.mock("../../../components/AddSiteForm/TextField", () => ({
     default: ({ onChange, id, type }: any) => (
-        <input 
+        <input
             data-testid={id}
-            type={type || 'text'}
+            type={type || "text"}
             onChange={(e) => onChange?.(e.target.value)}
         />
     ),
 }));
 
-vi.mock('../../../components/AddSiteForm/DynamicMonitorFields', () => ({
+vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     default: ({ monitorType }: any) => (
         <div data-testid="dynamic-monitor-fields">
             <input data-testid="host" />
@@ -198,17 +195,17 @@ vi.mock('../../../components/AddSiteForm/DynamicMonitorFields', () => ({
     ),
 }));
 
-vi.mock('../../../hooks/useMonitorTypes', () => ({
+vi.mock("../../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => ({
         monitorTypes: [
-            { id: 'http', label: 'HTTP/HTTPS' },
-            { id: 'ping', label: 'Ping' },
-            { id: 'port', label: 'Port Check' },
+            { id: "http", label: "HTTP/HTTPS" },
+            { id: "ping", label: "Ping" },
+            { id: "port", label: "Port Check" },
         ],
         options: [
-            { label: 'HTTP/HTTPS', value: 'http' },
-            { label: 'Ping', value: 'ping' },
-            { label: 'Port Check', value: 'port' },
+            { label: "HTTP/HTTPS", value: "http" },
+            { label: "Ping", value: "ping" },
+            { label: "Port Check", value: "port" },
         ],
         isLoading: false,
         error: null,
@@ -216,11 +213,11 @@ vi.mock('../../../hooks/useMonitorTypes', () => ({
     }),
 }));
 
-vi.mock('../../../constants', () => ({
+vi.mock("../../../constants", () => ({
     CHECK_INTERVALS: [
-        { label: '1 minute', value: 60_000 },
-        { label: '5 minutes', value: 300_000 },
-        { label: '10 minutes', value: 600_000 },
+        { label: "1 minute", value: 60_000 },
+        { label: "5 minutes", value: 300_000 },
+        { label: "10 minutes", value: 600_000 },
     ],
     UI_DELAYS: {
         LOADING_BUTTON: 100,
@@ -229,19 +226,21 @@ vi.mock('../../../constants', () => ({
     },
 }));
 
-vi.mock('../../../utils/data/generateUuid', () => ({
-    generateUuid: () => 'mock-uuid',
+vi.mock("../../../utils/data/generateUuid", () => ({
+    generateUuid: () => "mock-uuid",
 }));
 
-vi.mock('../../../hooks/useDelayedButtonLoading', () => ({
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => false,
 }));
 
-vi.mock('../../theme/components/ThemedBox', () => ({
-    default: ({ children }: any) => <div className="themed-box">{children}</div>,
+vi.mock("../../theme/components/ThemedBox", () => ({
+    default: ({ children }: any) => (
+        <div className="themed-box">{children}</div>
+    ),
 }));
 
-vi.mock('../../theme/components/ThemedButton', () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     default: ({ children, onClick, type }: any) => (
         <button className="themed-button" onClick={onClick} type={type}>
             {children}
@@ -249,11 +248,13 @@ vi.mock('../../theme/components/ThemedButton', () => ({
     ),
 }));
 
-vi.mock('../../theme/components/ThemedText', () => ({
-    default: ({ children }: any) => <span className="themed-text">{children}</span>,
+vi.mock("../../theme/components/ThemedText", () => ({
+    default: ({ children }: any) => (
+        <span className="themed-text">{children}</span>
+    ),
 }));
 
-vi.mock('../../../components/common/ErrorAlert/ErrorAlert', () => ({
+vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: ({ message, onDismiss }: any) => (
         <div data-testid="error-alert">
             {message}
@@ -262,11 +263,11 @@ vi.mock('../../../components/common/ErrorAlert/ErrorAlert', () => ({
     ),
 }));
 
-vi.mock('../../../components/AddSiteForm/Submit', () => ({
+vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
-describe('AddSiteForm Uncovered Lines Coverage', () => {
+describe("AddSiteForm Uncovered Lines Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(logger.error).mockClear();
@@ -274,65 +275,73 @@ describe('AddSiteForm Uncovered Lines Coverage', () => {
         consoleErrorSpy.mockClear();
     });
 
-    it('should cover error logging when invalid monitor type is set', async () => {
+    it("should cover error logging when invalid monitor type is set", async () => {
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
+
         // Find monitor type select field and trigger change with invalid value
-        const monitorSelect = screen.getByTestId('monitorType');
-        fireEvent.change(monitorSelect, { target: { value: 'invalid-monitor-type' } });
-        
+        const monitorSelect = screen.getByTestId("monitorType");
+        fireEvent.change(monitorSelect, {
+            target: { value: "invalid-monitor-type" },
+        });
+
         // The form should call the internal validation and log error
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining('Invalid monitor type value: invalid-monitor-type')
+                expect.stringContaining(
+                    "Invalid monitor type value: invalid-monitor-type"
+                )
             );
         });
     });
 
-    it('should cover error logging when invalid check interval is set', async () => {
+    it("should cover error logging when invalid check interval is set", async () => {
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
+
         // Find check interval field and trigger change with non-numeric value
-        const intervalField = screen.getByTestId('checkInterval');
-        fireEvent.change(intervalField, { target: { value: 'not-a-number' } });
-        
+        const intervalField = screen.getByTestId("checkInterval");
+        fireEvent.change(intervalField, { target: { value: "not-a-number" } });
+
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining('Invalid check interval value: not-a-number')
+                expect.stringContaining(
+                    "Invalid check interval value: not-a-number"
+                )
             );
         });
     });
 
-    it('should cover success callback execution with onSuccess prop', async () => {
+    it("should cover success callback execution with onSuccess prop", async () => {
         // Mock handleSubmit to call the onSuccess callback
-        vi.mocked(handleSubmit).mockImplementation(async (event, properties) => {
-            // Simulate successful submission - call the onSuccess callback
-            properties.onSuccess?.();
-        });
+        vi.mocked(handleSubmit).mockImplementation(
+            async (event, properties) => {
+                // Simulate successful submission - call the onSuccess callback
+                properties.onSuccess?.();
+            }
+        );
 
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
-        const submitButton = screen.getByRole('button', { name: /add site/i });
+
+        const submitButton = screen.getByRole("button", { name: /add site/i });
         fireEvent.click(submitButton);
-        
+
         await waitFor(() => {
             expect(mockResetForm).toHaveBeenCalled();
         });
         expect(mockOnSuccess).toHaveBeenCalled();
     });
 
-    it('should cover dynamic field change handlers', async () => {
+    it("should cover dynamic field change handlers", async () => {
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
+
         // Test dynamic field changes for different monitor types
-        const hostField = screen.getByTestId('host');
-        const portField = screen.getByTestId('port');
-        const urlField = screen.getByTestId('url');
-        
-        fireEvent.change(hostField, { target: { value: 'test-host' } });
-        fireEvent.change(portField, { target: { value: '8080' } });
-        fireEvent.change(urlField, { target: { value: 'https://test.com' } });
-        
+        const hostField = screen.getByTestId("host");
+        const portField = screen.getByTestId("port");
+        const urlField = screen.getByTestId("url");
+
+        fireEvent.change(hostField, { target: { value: "test-host" } });
+        fireEvent.change(portField, { target: { value: "8080" } });
+        fireEvent.change(urlField, { target: { value: "https://test.com" } });
+
         // These should trigger the handleDynamicFieldChange methods
         await waitFor(() => {
             // Verify the handlers were called (through mocked setters)
@@ -340,80 +349,88 @@ describe('AddSiteForm Uncovered Lines Coverage', () => {
         });
     });
 
-    it('should cover form submission error handling catch block', async () => {
+    it("should cover form submission error handling catch block", async () => {
         // Mock handleSubmit to throw an error to trigger the catch block
-        vi.mocked(handleSubmit).mockRejectedValueOnce(new Error('Submission failed'));
-        
+        vi.mocked(handleSubmit).mockRejectedValueOnce(
+            new Error("Submission failed")
+        );
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
-        const submitButton = screen.getByRole('button', { name: /add site/i });
+
+        const submitButton = screen.getByRole("button", { name: /add site/i });
         fireEvent.click(submitButton);
-        
+
         await waitFor(() => {
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Form submission failed:', 
+                "Form submission failed:",
                 expect.any(Error)
             );
         });
     });
 
-    it('should cover error clearing functionality', async () => {
+    it("should cover error clearing functionality", async () => {
         // First set a form error to trigger the ErrorAlert component
         vi.mocked(useErrorStore).mockReturnValue({
-            lastError: 'Test error',
-            clearError: mockClearError
+            lastError: "Test error",
+            clearError: mockClearError,
         });
-        
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
+
         // Wait for the error alert to appear
         await waitFor(() => {
-            expect(screen.getByTestId('error-alert')).toBeInTheDocument();
+            expect(screen.getByTestId("error-alert")).toBeInTheDocument();
         });
-        
+
         // Find and click the clear button in the error alert
-        const clearButton = screen.getByRole('button', { name: /clear/i });
+        const clearButton = screen.getByRole("button", { name: /clear/i });
         fireEvent.click(clearButton);
-        
+
         await waitFor(() => {
             expect(mockClearError).toHaveBeenCalled();
         });
         expect(mockSetFormError).toHaveBeenCalledWith(undefined);
     });
 
-    it('should cover error logging when invalid add mode is set', async () => {
+    it("should cover error logging when invalid add mode is set", async () => {
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
-        
+
         // Find add mode radio group and trigger change with invalid value
-        const addModeRadio = screen.getByTestId('addMode');
-        const invalidOption = addModeRadio.querySelector('input[value="invalid-add-mode"]');
-        
+        const addModeRadio = screen.getByTestId("addMode");
+        const invalidOption = addModeRadio.querySelector(
+            'input[value="invalid-add-mode"]'
+        );
+
         if (invalidOption) {
             fireEvent.click(invalidOption);
         }
-        
+
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining('Invalid add mode value: invalid-add-mode')
+                expect.stringContaining(
+                    "Invalid add mode value: invalid-add-mode"
+                )
             );
         });
     });
 
-    it('should cover sites mapping logic for existing site options', async () => {
+    it("should cover sites mapping logic for existing site options", async () => {
         // Mock the form to be in existing site mode
         const ExistingSiteForm = () => {
             React.useEffect(() => {
-                mockSetAddMode('existing');
+                mockSetAddMode("existing");
             }, []);
-            
+
             return <AddSiteForm onSuccess={mockOnSuccess} />;
         };
-        
+
         render(<ExistingSiteForm />);
-        
+
         // The sites.map logic should be executed when rendering existing site options
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /add/i })
+            ).toBeInTheDocument();
             // The mapping logic creates options from sites array
             // This test ensures that code path is exercised
         });

@@ -115,7 +115,7 @@ describe("useSettingsStore", () => {
         await act(async () => {
             await result.current.resetSettings();
         });
-        
+
         // Also manually reset to default settings to ensure clean state
         act(() => {
             result.current.updateSettings({
@@ -329,7 +329,7 @@ describe("useSettingsStore", () => {
             await act(async () => {
                 await result.current.resetSettings();
             });
-            
+
             // Ensure we start with the actual default
             act(() => {
                 result.current.updateSettings({

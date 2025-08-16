@@ -144,7 +144,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const status of statuses) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -163,7 +163,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const type of types) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -192,7 +192,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const fieldToRemove of fieldsToTest) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -270,7 +270,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const url of validUrls) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -304,7 +304,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const url of invalidUrls) {
                 const invalidData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     id: "test",
                     monitoring: true,
                     responseTime: 200,
@@ -373,7 +373,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of validHosts) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     host,
                     id: "test",
                     monitoring: true,
@@ -406,7 +406,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of invalidHosts) {
                 const invalidData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     host,
                     id: "test",
                     monitoring: true,
@@ -428,7 +428,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const port of validPorts) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     host: "example.com",
                     id: "test",
                     monitoring: true,
@@ -450,7 +450,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const port of invalidPorts) {
                 const invalidData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     host: "example.com",
                     id: "test",
                     monitoring: true,
@@ -556,7 +556,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -580,7 +580,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -604,7 +604,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -628,7 +628,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -652,7 +652,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -687,7 +687,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -933,7 +933,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "monitor-1",
                         monitoring: true,
                         responseTime: 200,
@@ -984,7 +984,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitors: [
                     {
                         checkInterval: 30_000,
-                history: [],
+                        history: [],
                         id: "http-monitor",
                         lastChecked: new Date(),
                         monitoring: true,
@@ -1139,7 +1139,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const host of specialIPs) {
                 const validData = {
                     checkInterval: 30_000,
-                history: [],
+                    history: [],
                     host,
                     id: "test",
                     monitoring: true,

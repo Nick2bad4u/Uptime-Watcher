@@ -2,14 +2,15 @@
  * Tailwind CSS v4 configuration for the Uptime Watcher application.
  *
  * Modern CSS-first configuration following Tailwind CSS v4 best practices:
+ *
  * - Zero-config approach with minimal JavaScript configuration
  * - All theme customization moved to CSS using @theme directive
  * - Dark mode handled via CSS @media queries
  * - Plugins configured in CSS using @layer and @utility directives
  * - Optimized content paths for Electron + React architecture
- * 
- * This replaces the complex JavaScript configuration approach of v3
- * with a clean, maintainable CSS-first approach for better performance.
+ *
+ * This replaces the complex JavaScript configuration approach of v3 with a
+ * clean, maintainable CSS-first approach for better performance.
  */
 export default {
     content: [
@@ -19,7 +20,7 @@ export default {
         // Exclude test files for better performance
         "!./src/**/*.test.{js,ts,jsx,tsx}",
         "!./electron/test/**/*",
-        "!./src/test/**/*"
+        "!./src/test/**/*",
     ],
     // Tailwind v4: CSS-first configuration eliminates the need for JS config
     // Dark mode, themes, and all customization handled in index.css

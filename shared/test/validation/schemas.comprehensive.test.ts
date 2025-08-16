@@ -474,7 +474,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -498,7 +498,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                     {
                         id: "port-monitor",
@@ -511,7 +511,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -546,7 +546,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -576,7 +576,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending" as const,
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -838,7 +838,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -975,7 +975,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
-                    history: [],
+                        history: [],
                     },
                 ],
             };
@@ -1316,7 +1316,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                             monitoring: true,
                             status: "pending" as const,
                             responseTime: -1,
-                    history: [],
+                            history: [],
                         },
                     ],
                 });
@@ -1362,4 +1362,3 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
     });
 });
-

@@ -1,6 +1,6 @@
 /**
- * Comprehensive test coverage for AddSiteForm component.
- * Focuses on uncovered lines and edge cases to achieve 100% coverage.
+ * Comprehensive test coverage for AddSiteForm component. Focuses on uncovered
+ * lines and edge cases to achieve 100% coverage.
  */
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -161,11 +161,17 @@ vi.mock("../../hooks/useDelayedButtonLoading", () => ({
 vi.mock("../../theme/useTheme", () => ({
     useTheme: () => mockUseTheme,
     useThemeClasses: () => ({
-        getBackgroundClass: vi.fn(() => ({ backgroundColor: "var(--color-background-primary)" })),
-        getBorderClass: vi.fn(() => ({ borderColor: "var(--color-border-primary)" })),
+        getBackgroundClass: vi.fn(() => ({
+            backgroundColor: "var(--color-background-primary)",
+        })),
+        getBorderClass: vi.fn(() => ({
+            borderColor: "var(--color-border-primary)",
+        })),
         getColor: vi.fn(() => "#000000"),
         getStatusClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
-        getSurfaceClass: vi.fn(() => ({ backgroundColor: "var(--color-surface-base)" })),
+        getSurfaceClass: vi.fn(() => ({
+            backgroundColor: "var(--color-surface-base)",
+        })),
         getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
     }),
 }));
@@ -190,13 +196,13 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Error Handling Coverage", () => {
         it("should handle invalid check interval value and log error", async () => {
             renderAddSiteForm();
-            
+
             const checkIntervalInput = screen.getByLabelText(/check interval/i);
-            
+
             // Line 165: logger.error for invalid check interval
             await userEvent.clear(checkIntervalInput);
             await userEvent.type(checkIntervalInput, "invalid-number");
-            
+
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Invalid check interval value: invalid-number"
             );
@@ -204,17 +210,21 @@ describe("AddSiteForm - Coverage Enhancement", () => {
 
         it("should handle invalid add mode value and log error", async () => {
             renderAddSiteForm();
-            
+
             // Simulate invalid add mode change (line 286)
-            const addModeSelect = screen.getByRole("combobox", { name: /add mode/i });
-            
+            const addModeSelect = screen.getByRole("combobox", {
+                name: /add mode/i,
+            });
+
             // Mock the onChange to pass invalid value
             mockUseAddSiteForm.setAddMode.mockImplementationOnce(() => {
                 mockLogger.error("Invalid add mode value: invalid-mode");
             });
-            
-            fireEvent.change(addModeSelect, { target: { value: "invalid-mode" } });
-            
+
+            fireEvent.change(addModeSelect, {
+                target: { value: "invalid-mode" },
+            });
+
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Invalid add mode value: invalid-mode"
             );
@@ -223,17 +233,25 @@ describe("AddSiteForm - Coverage Enhancement", () => {
         it("should handle form submission error and log it", async () => {
             const mockError = new Error("Submission failed");
             mockUseAddSiteForm.createSite.mockRejectedValueOnce(mockError);
-            
+
             renderAddSiteForm();
-            
+
             // Fill required fields
-            await userEvent.type(screen.getByLabelText(/site name/i), "Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://example.com");
-            
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://example.com"
+            );
+
             // Submit form
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             await waitFor(() => {
                 expect(console.error).toHaveBeenCalledWith(
                     "Form submission failed:",
@@ -246,40 +264,56 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Optional Callback Handling", () => {
         it("should handle missing onSuccess callback", async () => {
             renderAddSiteForm({ onSuccess: undefined });
-            
+
             // Trigger success scenario
             mockUseAddSiteForm.createSite.mockResolvedValueOnce({});
-            
-            await userEvent.type(screen.getByLabelText(/site name/i), "Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://example.com");
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://example.com"
+            );
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             await waitFor(() => {
                 expect(mockUseAddSiteForm.resetForm).toHaveBeenCalled();
             });
-            
+
             // Line 176: onSuccess?.() - should not throw when undefined
         });
 
         it("should call onSuccess callback when provided", async () => {
             const onSuccessCallback = vi.fn();
             renderAddSiteForm({ onSuccess: onSuccessCallback });
-            
+
             // Trigger success scenario
             mockUseAddSiteForm.createSite.mockResolvedValueOnce({});
-            
-            await userEvent.type(screen.getByLabelText(/site name/i), "Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://example.com");
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://example.com"
+            );
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             await waitFor(() => {
                 expect(onSuccessCallback).toHaveBeenCalled();
             });
-            
+
             expect(mockUseAddSiteForm.resetForm).toHaveBeenCalled();
         });
     });
@@ -287,21 +321,25 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Dynamic Field Handlers Coverage", () => {
         it("should handle dynamic field changes with string conversion", async () => {
             renderAddSiteForm();
-            
+
             // Change to port monitor to test port field
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             await userEvent.selectOptions(monitorTypeSelect, "port");
-            
+
             // Test host field (line 183)
             const hostInput = screen.getByLabelText(/host/i);
             await userEvent.type(hostInput, "example.com");
-            expect(mockUseAddSiteForm.setHost).toHaveBeenCalledWith("example.com");
-            
+            expect(mockUseAddSiteForm.setHost).toHaveBeenCalledWith(
+                "example.com"
+            );
+
             // Test port field (line 185)
             const portInput = screen.getByLabelText(/port/i);
             await userEvent.type(portInput, "8080");
             expect(mockUseAddSiteForm.setPort).toHaveBeenCalledWith("8080");
-            
+
             // Test URL field (line 187) with numeric input converted to string
             const urlInput = screen.getByLabelText(/url/i);
             await userEvent.type(urlInput, "12345");
@@ -312,16 +350,17 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Form Submission Edge Cases", () => {
         it("should prevent default form submission", async () => {
             renderAddSiteForm();
-            
-            const form = screen.getByRole("form") || screen.getByTestId("add-site-form");
+
+            const form =
+                screen.getByRole("form") || screen.getByTestId("add-site-form");
             const preventDefaultSpy = vi.fn();
-            
+
             // Mock preventDefault
             const submitEvent = new Event("submit");
             submitEvent.preventDefault = preventDefaultSpy;
-            
+
             fireEvent.submit(form, submitEvent);
-            
+
             // Line 271: e.preventDefault()
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
@@ -331,18 +370,22 @@ describe("AddSiteForm - Coverage Enhancement", () => {
         it("should clear both store error and form error", async () => {
             mockUseErrorStore.error = "Some error message";
             mockUseAddSiteForm.formError = "Form specific error";
-            
+
             renderAddSiteForm();
-            
+
             // Find and click clear error button if visible
             const errorAlert = screen.queryByRole("alert");
             if (errorAlert) {
-                const clearButton = screen.getByRole("button", { name: /clear/i });
+                const clearButton = screen.getByRole("button", {
+                    name: /clear/i,
+                });
                 await userEvent.click(clearButton);
-                
+
                 // Line 276-277: clearError() and setFormError(undefined)
                 expect(mockUseErrorStore.clearError).toHaveBeenCalled();
-                expect(mockUseAddSiteForm.setFormError).toHaveBeenCalledWith(undefined);
+                expect(mockUseAddSiteForm.setFormError).toHaveBeenCalledWith(
+                    undefined
+                );
             }
         });
     });
@@ -350,33 +393,43 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Site Selection Coverage", () => {
         it("should handle existing site selection mode", async () => {
             mockUseAddSiteForm.addMode = "existing";
-            
+
             renderAddSiteForm();
-            
+
             // Line 336: Site selection dropdown should be rendered
-            const siteSelect = screen.getByRole("combobox", { name: /select site/i });
+            const siteSelect = screen.getByRole("combobox", {
+                name: /select site/i,
+            });
             expect(siteSelect).toBeInTheDocument();
-            
+
             // Test site selection
             await userEvent.selectOptions(siteSelect, "site1");
-            expect(mockUseAddSiteForm.setSelectedExistingSite).toHaveBeenCalledWith("site1");
+            expect(
+                mockUseAddSiteForm.setSelectedExistingSite
+            ).toHaveBeenCalledWith("site1");
         });
     });
 
     describe("Monitor Type Validation", () => {
         it("should validate monitor type correctly", async () => {
             renderAddSiteForm();
-            
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
-            
+
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
+
             // Test valid monitor type
             await userEvent.selectOptions(monitorTypeSelect, "http");
-            expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith("http");
-            
+            expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith(
+                "http"
+            );
+
             // Test another valid type
             await userEvent.selectOptions(monitorTypeSelect, "port");
-            expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith("port");
-            
+            expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith(
+                "port"
+            );
+
             // Line 87: isValidMonitorType function coverage
             // The function should return true for valid types
         });
@@ -385,12 +438,14 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Loading State Coverage", () => {
         it("should disable form elements during loading", async () => {
             mockUseAddSiteForm.isLoading = true;
-            
+
             renderAddSiteForm();
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             expect(submitButton).toBeDisabled();
-            
+
             const inputs = screen.getAllByRole("textbox");
             for (const input of inputs) {
                 expect(input).toBeDisabled();
@@ -401,49 +456,72 @@ describe("AddSiteForm - Coverage Enhancement", () => {
     describe("Form Validation Edge Cases", () => {
         it("should handle numeric value validation for check interval", async () => {
             renderAddSiteForm();
-            
+
             const checkIntervalInput = screen.getByLabelText(/check interval/i);
-            
+
             // Test valid numeric value
             await userEvent.clear(checkIntervalInput);
             await userEvent.type(checkIntervalInput, "60000");
-            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(60_000);
-            
+            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(
+                60_000
+            );
+
             // Test zero value
             await userEvent.clear(checkIntervalInput);
             await userEvent.type(checkIntervalInput, "0");
             expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(0);
-            
+
             // Test negative value (should still be processed)
             await userEvent.clear(checkIntervalInput);
             await userEvent.type(checkIntervalInput, "-1000");
-            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(-1000);
+            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(
+                -1000
+            );
         });
     });
 
     describe("Component Integration", () => {
         it("should integrate all form components correctly", async () => {
             renderAddSiteForm();
-            
+
             // Fill all required fields
-            await userEvent.type(screen.getByLabelText(/site name/i), "Integration Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://integration-test.com");
-            await userEvent.type(screen.getByLabelText(/site id/i), "integration-test-id");
-            
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Integration Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://integration-test.com"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/site id/i),
+                "integration-test-id"
+            );
+
             // Change check interval
             const checkIntervalInput = screen.getByLabelText(/check interval/i);
             await userEvent.clear(checkIntervalInput);
             await userEvent.type(checkIntervalInput, "45000");
-            
+
             // Submit form
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             // Verify all handlers were called appropriately
-            expect(mockUseAddSiteForm.setName).toHaveBeenCalledWith("Integration Test Site");
-            expect(mockUseAddSiteForm.setUrl).toHaveBeenCalledWith("https://integration-test.com");
-            expect(mockUseAddSiteForm.setSiteId).toHaveBeenCalledWith("integration-test-id");
-            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(45_000);
+            expect(mockUseAddSiteForm.setName).toHaveBeenCalledWith(
+                "Integration Test Site"
+            );
+            expect(mockUseAddSiteForm.setUrl).toHaveBeenCalledWith(
+                "https://integration-test.com"
+            );
+            expect(mockUseAddSiteForm.setSiteId).toHaveBeenCalledWith(
+                "integration-test-id"
+            );
+            expect(mockUseAddSiteForm.setCheckInterval).toHaveBeenCalledWith(
+                45_000
+            );
         });
     });
 
@@ -452,16 +530,20 @@ describe("AddSiteForm - Coverage Enhancement", () => {
             // These tests ensure the helper function is covered
             // The function is not exported, but it's used internally
             // Coverage is achieved through component interaction
-            
+
             renderAddSiteForm();
-            
-            const monitorTypeSelect = screen.getByRole("combobox", { name: /monitor type/i });
-            
+
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
+
             // Test all valid monitor types
             const validTypes = ["http", "port", "ping"];
             for (const type of validTypes) {
                 await userEvent.selectOptions(monitorTypeSelect, type);
-                expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith(type);
+                expect(mockUseAddSiteForm.setMonitorType).toHaveBeenCalledWith(
+                    type
+                );
             }
         });
     });
@@ -470,35 +552,51 @@ describe("AddSiteForm - Coverage Enhancement", () => {
         it("should handle async form submission correctly", async () => {
             const submitPromise = Promise.resolve();
             mockUseAddSiteForm.createSite.mockReturnValueOnce(submitPromise);
-            
+
             renderAddSiteForm();
-            
-            await userEvent.type(screen.getByLabelText(/site name/i), "Async Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://async-test.com");
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Async Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://async-test.com"
+            );
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             // Wait for async operation
             await waitFor(() => {
                 expect(mockUseAddSiteForm.createSite).toHaveBeenCalled();
             });
-            
+
             await submitPromise;
         });
 
         it("should handle async error in submission", async () => {
             const submitError = new Error("Async submission error");
             mockUseAddSiteForm.createSite.mockRejectedValueOnce(submitError);
-            
+
             renderAddSiteForm();
-            
-            await userEvent.type(screen.getByLabelText(/site name/i), "Error Test Site");
-            await userEvent.type(screen.getByLabelText(/url/i), "https://error-test.com");
-            
-            const submitButton = screen.getByRole("button", { name: /add site/i });
+
+            await userEvent.type(
+                screen.getByLabelText(/site name/i),
+                "Error Test Site"
+            );
+            await userEvent.type(
+                screen.getByLabelText(/url/i),
+                "https://error-test.com"
+            );
+
+            const submitButton = screen.getByRole("button", {
+                name: /add site/i,
+            });
             await userEvent.click(submitButton);
-            
+
             await waitFor(() => {
                 expect(console.error).toHaveBeenCalledWith(
                     "Form submission failed:",

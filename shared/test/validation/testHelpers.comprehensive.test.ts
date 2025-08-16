@@ -1,6 +1,6 @@
 /**
- * Comprehensive tests for test helper validation utilities.
- * Covers all branches and edge cases to achieve 100% coverage.
+ * Comprehensive tests for test helper validation utilities. Covers all branches
+ * and edge cases to achieve 100% coverage.
  */
 
 import { describe, it, expect } from "vitest";
@@ -17,7 +17,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidBaseMonitor", () => {
         it("should create a valid base monitor with default values", () => {
             const monitor = createValidBaseMonitor();
-            
+
             expect(monitor).toMatchObject({
                 checkInterval: 30_000,
                 history: [],
@@ -40,9 +40,9 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 status: "down" as const,
                 type: "ping" as const,
             };
-            
+
             const monitor = createValidBaseMonitor(overrides);
-            
+
             expect(monitor).toMatchObject({
                 ...overrides,
                 history: [],
@@ -54,14 +54,14 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
         it("should handle partial overrides", () => {
             const monitor = createValidBaseMonitor({ id: "partial-override" });
-            
+
             expect(monitor.id).toBe("partial-override");
             expect(monitor.checkInterval).toBe(30_000); // Default value preserved
         });
 
         it("should handle empty overrides object", () => {
             const monitor = createValidBaseMonitor({});
-            
+
             expect(monitor.id).toBe("test-monitor");
             expect(monitor.history).toEqual([]);
         });
@@ -70,7 +70,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             const httpMonitor = createValidBaseMonitor({ type: "http" });
             const portMonitor = createValidBaseMonitor({ type: "port" });
             const pingMonitor = createValidBaseMonitor({ type: "ping" });
-            
+
             expect(httpMonitor.type).toBe("http");
             expect(portMonitor.type).toBe("port");
             expect(pingMonitor.type).toBe("ping");
@@ -79,9 +79,11 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         it("should handle all status types", () => {
             const upMonitor = createValidBaseMonitor({ status: "up" });
             const downMonitor = createValidBaseMonitor({ status: "down" });
-            const pendingMonitor = createValidBaseMonitor({ status: "pending" });
+            const pendingMonitor = createValidBaseMonitor({
+                status: "pending",
+            });
             const pausedMonitor = createValidBaseMonitor({ status: "paused" });
-            
+
             expect(upMonitor.status).toBe("up");
             expect(downMonitor.status).toBe("down");
             expect(pendingMonitor.status).toBe("pending");
@@ -91,20 +93,20 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         it("should handle history override", () => {
             const history = [{ timestamp: Date.now(), status: "up" }];
             const monitor = createValidBaseMonitor({ history });
-            
+
             expect(monitor.history).toBe(history);
         });
 
         it("should handle lastChecked override", () => {
             const customDate = new Date("2023-01-01");
             const monitor = createValidBaseMonitor({ lastChecked: customDate });
-            
+
             expect(monitor.lastChecked).toBe(customDate);
         });
 
         it("should handle undefined lastChecked", () => {
             const monitor = createValidBaseMonitor({ lastChecked: undefined });
-            
+
             expect(monitor.lastChecked).toBeUndefined();
         });
     });
@@ -112,7 +114,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidHttpMonitor", () => {
         it("should create a valid HTTP monitor with default values", () => {
             const monitor = createValidHttpMonitor();
-            
+
             expect(monitor).toMatchObject({
                 type: "http",
                 url: "https://example.com",
@@ -132,22 +134,23 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 url: "https://custom.com",
                 id: "http-monitor",
             });
-            
+
             expect(monitor.url).toBe("https://custom.com");
             expect(monitor.id).toBe("http-monitor");
             expect(monitor.type).toBe("http");
         });
 
         it("should handle complex URL overrides", () => {
-            const complexUrl = "https://api.example.com:8080/v1/health?check=true";
+            const complexUrl =
+                "https://api.example.com:8080/v1/health?check=true";
             const monitor = createValidHttpMonitor({ url: complexUrl });
-            
+
             expect(monitor.url).toBe(complexUrl);
         });
 
         it("should preserve HTTP type even with overrides", () => {
             const monitor = createValidHttpMonitor({ type: "port" as any });
-            
+
             expect(monitor.type).toBe("http"); // Should be overridden back to http
         });
     });
@@ -155,7 +158,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidPortMonitor", () => {
         it("should create a valid port monitor with default values", () => {
             const monitor = createValidPortMonitor();
-            
+
             expect(monitor).toMatchObject({
                 type: "port",
                 host: "example.com",
@@ -177,7 +180,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 port: 443,
                 id: "port-monitor",
             });
-            
+
             expect(monitor.host).toBe("custom-host.com");
             expect(monitor.port).toBe(443);
             expect(monitor.id).toBe("port-monitor");
@@ -188,23 +191,25 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             const httpMonitor = createValidPortMonitor({ port: 80 });
             const httpsMonitor = createValidPortMonitor({ port: 443 });
             const customMonitor = createValidPortMonitor({ port: 8080 });
-            
+
             expect(httpMonitor.port).toBe(80);
             expect(httpsMonitor.port).toBe(443);
             expect(customMonitor.port).toBe(8080);
         });
 
         it("should handle localhost and IP addresses", () => {
-            const localhostMonitor = createValidPortMonitor({ host: "localhost" });
+            const localhostMonitor = createValidPortMonitor({
+                host: "localhost",
+            });
             const ipMonitor = createValidPortMonitor({ host: "192.168.1.1" });
-            
+
             expect(localhostMonitor.host).toBe("localhost");
             expect(ipMonitor.host).toBe("192.168.1.1");
         });
 
         it("should preserve port type even with overrides", () => {
             const monitor = createValidPortMonitor({ type: "http" as any });
-            
+
             expect(monitor.type).toBe("port"); // Should be overridden back to port
         });
     });
@@ -212,7 +217,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidPingMonitor", () => {
         it("should create a valid ping monitor with default values", () => {
             const monitor = createValidPingMonitor();
-            
+
             expect(monitor).toMatchObject({
                 type: "ping",
                 host: "example.com",
@@ -232,17 +237,21 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 host: "ping-host.com",
                 id: "ping-monitor",
             });
-            
+
             expect(monitor.host).toBe("ping-host.com");
             expect(monitor.id).toBe("ping-monitor");
             expect(monitor.type).toBe("ping");
         });
 
         it("should handle various host formats", () => {
-            const domainMonitor = createValidPingMonitor({ host: "google.com" });
+            const domainMonitor = createValidPingMonitor({
+                host: "google.com",
+            });
             const ipMonitor = createValidPingMonitor({ host: "8.8.8.8" });
-            const subdomainMonitor = createValidPingMonitor({ host: "api.example.com" });
-            
+            const subdomainMonitor = createValidPingMonitor({
+                host: "api.example.com",
+            });
+
             expect(domainMonitor.host).toBe("google.com");
             expect(ipMonitor.host).toBe("8.8.8.8");
             expect(subdomainMonitor.host).toBe("api.example.com");
@@ -250,7 +259,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
         it("should preserve ping type even with overrides", () => {
             const monitor = createValidPingMonitor({ type: "http" as any });
-            
+
             expect(monitor.type).toBe("ping"); // Should be overridden back to ping
         });
     });
@@ -258,7 +267,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidSite", () => {
         it("should create a valid site with default values", () => {
             const site = createValidSite();
-            
+
             expect(site).toMatchObject({
                 id: "test-site",
                 name: "Test Site",
@@ -279,14 +288,14 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 createValidPortMonitor({ id: "port-1" }),
                 createValidPingMonitor({ id: "ping-1" }),
             ];
-            
+
             const site = createValidSite({
                 id: "custom-site",
                 name: "Custom Site",
                 monitors: customMonitors,
                 status: "down",
             });
-            
+
             expect(site.id).toBe("custom-site");
             expect(site.name).toBe("Custom Site");
             expect(site.status).toBe("down");
@@ -295,7 +304,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
         it("should handle empty monitors array", () => {
             const site = createValidSite({ monitors: [] });
-            
+
             expect(site.monitors).toEqual([]);
         });
 
@@ -305,7 +314,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 createdAt: customDate,
                 updatedAt: customDate,
             });
-            
+
             expect(site.createdAt).toBe(customDate);
             expect(site.updatedAt).toBe(customDate);
         });
@@ -315,7 +324,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             const downSite = createValidSite({ status: "down" });
             const pendingSite = createValidSite({ status: "pending" });
             const pausedSite = createValidSite({ status: "paused" });
-            
+
             expect(upSite.status).toBe("up");
             expect(downSite.status).toBe("down");
             expect(pendingSite.status).toBe("pending");
@@ -328,9 +337,9 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 createValidPortMonitor({ id: "port-1" }),
                 createValidPingMonitor({ id: "ping-1" }),
             ];
-            
+
             const site = createValidSite({ monitors });
-            
+
             expect(site.monitors).toHaveLength(3);
             expect(site.monitors[0].type).toBe("http");
             expect(site.monitors[1].type).toBe("port");
@@ -341,7 +350,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidStatusHistory", () => {
         it("should create a valid status history with default values", () => {
             const history = createValidStatusHistory();
-            
+
             expect(history).toMatchObject({
                 responseTime: 150,
                 status: "up",
@@ -359,7 +368,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 timestamp: customTimestamp,
                 details: "Connection timeout",
             });
-            
+
             expect(history.responseTime).toBe(500);
             expect(history.status).toBe("down");
             expect(history.timestamp).toBe(customTimestamp);
@@ -369,16 +378,18 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         it("should handle both status types", () => {
             const upHistory = createValidStatusHistory({ status: "up" });
             const downHistory = createValidStatusHistory({ status: "down" });
-            
+
             expect(upHistory.status).toBe("up");
             expect(downHistory.status).toBe("down");
         });
 
         it("should handle various response times", () => {
             const fastHistory = createValidStatusHistory({ responseTime: 50 });
-            const slowHistory = createValidStatusHistory({ responseTime: 5000 });
+            const slowHistory = createValidStatusHistory({
+                responseTime: 5000,
+            });
             const zeroHistory = createValidStatusHistory({ responseTime: 0 });
-            
+
             expect(fastHistory.responseTime).toBe(50);
             expect(slowHistory.responseTime).toBe(5000);
             expect(zeroHistory.responseTime).toBe(0);
@@ -386,20 +397,22 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
         it("should handle undefined details", () => {
             const history = createValidStatusHistory({ details: undefined });
-            
+
             expect(history.details).toBeUndefined();
         });
 
         it("should handle empty details", () => {
             const history = createValidStatusHistory({ details: "" });
-            
+
             expect(history.details).toBe("");
         });
 
         it("should handle custom details messages", () => {
             const customDetails = "Custom error message with specific details";
-            const history = createValidStatusHistory({ details: customDetails });
-            
+            const history = createValidStatusHistory({
+                details: customDetails,
+            });
+
             expect(history.details).toBe(customDetails);
         });
     });
@@ -409,7 +422,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             const httpMonitor = createValidHttpMonitor();
             const portMonitor = createValidPortMonitor();
             const pingMonitor = createValidPingMonitor();
-            
+
             // All should have the same base structure
             const commonFields = [
                 "checkInterval",
@@ -423,7 +436,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 "timeout",
                 "type",
             ];
-            
+
             commonFields.forEach((field) => {
                 expect(httpMonitor).toHaveProperty(field);
                 expect(portMonitor).toHaveProperty(field);
@@ -440,7 +453,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                     createValidPingMonitor({ id: "ping-test" }),
                 ],
             });
-            
+
             expect(site.monitors).toHaveLength(3);
             expect(site.monitors.every((m) => m.history)).toBe(true);
             expect(site.monitors.every((m) => m.id)).toBe(true);
@@ -452,23 +465,23 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 monitoring: false,
                 retryAttempts: 5,
             };
-            
+
             const httpMonitor = createValidHttpMonitor({
                 ...baseOverrides,
                 url: "https://complex-override.com",
             });
-            
+
             const portMonitor = createValidPortMonitor({
                 ...baseOverrides,
                 host: "complex-host.com",
                 port: 9999,
             });
-            
+
             expect(httpMonitor.checkInterval).toBe(120_000);
             expect(httpMonitor.monitoring).toBe(false);
             expect(httpMonitor.retryAttempts).toBe(5);
             expect(httpMonitor.url).toBe("https://complex-override.com");
-            
+
             expect(portMonitor.checkInterval).toBe(120_000);
             expect(portMonitor.monitoring).toBe(false);
             expect(portMonitor.retryAttempts).toBe(5);
