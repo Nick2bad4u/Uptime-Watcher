@@ -91,9 +91,9 @@ export const createValidHttpMonitor = (
     const baseMonitor = createValidBaseMonitor({ type: "http" });
     return {
         ...baseMonitor,
-        type: "http",
         url: "https://example.com",
         ...overrides,
+        type: "http", // Ensure type is always http
     };
 };
 
@@ -110,10 +110,10 @@ export const createValidPortMonitor = (
     const baseMonitor = createValidBaseMonitor({ type: "port" });
     return {
         ...baseMonitor,
-        type: "port",
         host: "example.com",
         port: 80,
         ...overrides,
+        type: "port", // Ensure type is always port
     };
 };
 
@@ -130,9 +130,9 @@ export const createValidPingMonitor = (
     const baseMonitor = createValidBaseMonitor({ type: "ping" });
     return {
         ...baseMonitor,
-        type: "ping",
         host: "example.com",
         ...overrides,
+        type: "ping", // Ensure type is always ping
     };
 };
 

@@ -79,9 +79,22 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle unknown types with fallback", () => {
-            // BigInt is now properly handled, so it returns the string representation
+        it("should handle bigint values", () => {
             expect(safeStringify(BigInt(123))).toBe("123");
+            expect(safeStringify(BigInt(0))).toBe("0");
+            expect(safeStringify(BigInt(-456))).toBe("-456");
+        });
+
+        it("should document unreachable code paths", () => {
+            // Note: The 'undefined' case in the switch statement is unreachable
+            // because undefined is handled early in the function
+            // This test documents that undefined is properly handled
+            expect(safeStringify(undefined)).toBe("");
+            
+            // Note: The 'default' case is theoretically unreachable in JavaScript
+            // since typeof only returns known string values. This would require
+            // a future JavaScript version to add new types, or engine bugs.
+            // We cannot easily test this path without mocking typeof behavior.
         });
 
         it("should handle nested objects", () => {

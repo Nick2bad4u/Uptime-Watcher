@@ -109,11 +109,23 @@ describe("useSettingsStore", () => {
         });
     });
 
-    afterEach(() => {
-        // Reset store to defaults
+    afterEach(async () => {
+        // Reset store to defaults - must be awaited since resetSettings is async
         const { result } = renderHook(() => useSettingsStore());
+        await act(async () => {
+            await result.current.resetSettings();
+        });
+        
+        // Also manually reset to default settings to ensure clean state
         act(() => {
-            result.current.resetSettings();
+            result.current.updateSettings({
+                autoStart: false,
+                historyLimit: 500, // DEFAULT_HISTORY_LIMIT from constants
+                minimizeToTray: true,
+                notifications: true,
+                soundAlerts: false,
+                theme: "system",
+            });
         });
     });
 
@@ -150,7 +162,7 @@ describe("useSettingsStore", () => {
 
             expect(result.current.settings.theme).toBe("dark");
             expect(result.current.settings.notifications).toBe(false);
-            expect(result.current.settings.historyLimit).toBe(1000); // unchanged
+            expect(result.current.settings.historyLimit).toBe(500); // unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
         it("should update individual settings", () => {
@@ -313,9 +325,21 @@ describe("useSettingsStore", () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            // Reset to clean state first
+            // Reset to completely clean state first
+            await act(async () => {
+                await result.current.resetSettings();
+            });
+            
+            // Ensure we start with the actual default
             act(() => {
-                result.current.updateSettings({ historyLimit: 500 }); // Reset to default
+                result.current.updateSettings({
+                    autoStart: false,
+                    historyLimit: 500, // DEFAULT_HISTORY_LIMIT
+                    minimizeToTray: true,
+                    notifications: true,
+                    soundAlerts: false,
+                    theme: "system",
+                });
             });
 
             // Set initial value BEFORE setting up the error mock
