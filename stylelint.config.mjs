@@ -10,10 +10,10 @@
 export default {
     extends: [
         "stylelint-config-standard",
-        "stylelint-config-tailwindcss",
         "stylelint-config-recess-order",
         "stylelint-config-idiomatic-order",
         "stylelint-config-standard-scss",
+        "stylelint-config-tailwindcss",
     ],
     plugins: [
         "stylelint-plugin-defensive-css",
@@ -47,7 +47,7 @@ export default {
 
         // Declaration rules
         "declaration-no-important": true,
-        
+
         // "csstools/value-no-unknown-custom-properties": true, - No Tailwind Support
 
         "declaration-property-value-no-unknown": true,

@@ -128,11 +128,6 @@
     "eslint-find-rules:deprecated": "eslint-find-rules --deprecated --flatConfig .\\eslint.config.mjs",
     "eslint-find-rules:plugin": "eslint-find-rules --plugin --flatConfig .\\eslint.config.mjs",
     "eslint-find-rules:unused": "eslint-find-rules --unused --flatConfig .\\eslint.config.mjs",
-    "stylelint-find-rules:all": "stylelint-find-new-rules ./stylelint.config.mjs --available",
-    "stylelint-find-rules:current": "stylelint-find-new-rules ./stylelint.config.mjs --current",
-    "stylelint-find-rules:deprecated": "stylelint-find-new-rules ./stylelint.config.mjs --deprecated",
-    "stylelint-find-rules:invalid": "stylelint-find-new-rules ./stylelint.config.mjs --invalid",
-    "stylelint-find-rules:unused": "stylelint-find-new-rules ./stylelint.config.mjs --unused",
     "fetch-tsdoc": "node scripts/download-tsdoc-tags.js",
     "find-empty-dirs": "node .\\scripts\\find-empty-dirs.mjs",
     "find-empty-dirs:all": "node .\\scripts\\find-empty-dirs.mjs --dirs \".\\\"",
@@ -158,8 +153,9 @@
     "lint:commit": "commitlint --from HEAD~1 --to HEAD --verbose",
     "lint:complexity": "eslint --cache . --ext .js,.jsx,.ts,.tsx --rule '{\"complexity\": [\"warn\", 10], \"max-lines-per-function\": [\"warn\", 50], \"max-depth\": [\"warn\", 3]}' --format @eslint/eslint-formatter-compact",
     "lint:complexity:report": "eslint --cache . --ext .js,.jsx,.ts,.tsx --rule '{\"complexity\": [\"warn\", 10], \"max-lines-per-function\": [\"warn\", 50], \"max-depth\": [\"warn\", 3]}' --format json --output-file complexity-report.json",
-    "lint:css": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache --cache src/ electron/ shared/",
-    "lint:css-fix": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --fix",
+    "lint:css": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache --cache src/ electron/ shared/ --formatter=verbose",
+    "lint:css-fix": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --formatter=verbose --fix",
+    "lint:css:fix": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --formatter=verbose --fix",
     "lint:current": "eslint --cache .",
     "lint:depcheck": "depcheck",
     "lint:deps": "depcheck && npx knip",
@@ -219,6 +215,8 @@
     "lint:spell:fix": "node .\\scripts\\add-cspell-words.mjs",
     "lint:staged": "lint-staged",
     "lint:strict": "eslint --cache . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "lint:stylelint": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache --cache src/ electron/ shared/ --formatter=verbose",
+    "lint:stylelint:fix": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .\\stylelintcache src/ electron/ shared/ --formatter=verbose --fix",
     "lint:todo": "leasot 'src/**/*.{js,jsx,ts,tsx}' --reporter json",
     "lint:todos": "leasot 'src/**/*.{js,jsx,ts,tsx}' --reporter markdown",
     "lint:toml": "eslint --cache \"**/*.toml\" --parser toml-eslint-parser",
@@ -295,6 +293,11 @@
     "start:prod": "npm run build && npm run start:electron",
     "start:renderer": "vite",
     "start:reset": "npm run clean && npm run build && npm run start",
+    "stylelint-find-rules:all": "stylelint-find-new-rules ./stylelint.config.mjs --available",
+    "stylelint-find-rules:current": "stylelint-find-new-rules ./stylelint.config.mjs --current",
+    "stylelint-find-rules:deprecated": "stylelint-find-new-rules ./stylelint.config.mjs --deprecated",
+    "stylelint-find-rules:invalid": "stylelint-find-new-rules ./stylelint.config.mjs --invalid",
+    "stylelint-find-rules:unused": "stylelint-find-new-rules ./stylelint.config.mjs --unused",
     "test": "vitest run",
     "test:bail": "vitest --bail 50",
     "test:codecov": "npm run test:coverage",
@@ -328,18 +331,24 @@
     "extends": "eslint.config.mjs"
   },
   "overrides": {
-    "*": {
-      "vite": "$vite",
-      "eslint": "$eslint",
-      "@typescript-eslint/parser": "$@typescript-eslint/parser",
-      "@typescript-eslint/utils": "$@typescript-eslint/utils"
-    },
     "@codecov/vite-plugin": {
       "vite": "$vite"
     },
     "@react-scan/vite-plugin-react-scan": {
       "react-scan": "$react-scan",
       "vite": "$vite"
+    },
+    "@typescript-eslint/experimental-utils": {
+      "eslint": "$eslint"
+    },
+    "*": {
+      "vite": "$vite",
+      "eslint": "$eslint",
+      "@typescript-eslint/parser": "$@typescript-eslint/parser",
+      "@typescript-eslint/utils": "$@typescript-eslint/utils"
+    },
+    "eslint-etc": {
+      "eslint": "$eslint"
     },
     "eslint-plugin-deprecation": {
       "eslint": "$eslint"
@@ -362,6 +371,15 @@
     "eslint-plugin-no-lookahead-lookbehind-regexp": {
       "eslint": "$eslint"
     },
+    "eslint-plugin-react-form-fields": {
+      "@typescript-eslint/experimental-utils": {
+        "eslint": "$eslint"
+      },
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-safe-jsx": {
+      "eslint": "$eslint"
+    },
     "eslint-plugin-total-functions": {
       "eslint": "$eslint"
     },
@@ -371,35 +389,20 @@
       },
       "eslint": "$eslint"
     },
-    "eslint-plugin-safe-jsx": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-react-form-fields": {
-      "@typescript-eslint/experimental-utils": {
-        "eslint": "$eslint"
-      },
-      "eslint": "$eslint"
-    },
-    "@typescript-eslint/experimental-utils": {
-      "eslint": "$eslint"
-    },
-    "eslint-etc": {
-      "eslint": "$eslint"
-    },
     "is-immutable-type": {
       "eslint": "$eslint"
     },
-    "vite": {
-      "tsx": "$tsx"
-    },
     "stylelint-config-standard-scss": {
+      "stylelint": "$stylelint"
+    },
+    "stylelint-group-selectors": {
       "stylelint": "$stylelint"
     },
     "stylelint-high-performance-animation": {
       "stylelint": "$stylelint"
     },
-    "stylelint-group-selectors": {
-      "stylelint": "$stylelint"
+    "vite": {
+      "tsx": "$tsx"
     }
   },
   "dependencies": {
