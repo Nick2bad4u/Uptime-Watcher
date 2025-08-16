@@ -3,12 +3,12 @@
     "*.md": [
         "markdownlint --fix --cache"
     ],
-    "*.{js,jsx,ts,tsx}": [
-        "eslint --fix --cache --max-warnings=0",
-        "prettier --write --cache"
-    ],
     "*.{css,scss}": [
         "stylelint --fix --cache",
+        "prettier --write --cache"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+        "eslint --fix --cache --max-warnings=0",
         "prettier --write --cache"
     ],
     "*.{json,yaml,yml}": [

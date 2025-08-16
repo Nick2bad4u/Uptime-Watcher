@@ -7,11 +7,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-    ipcMain,
-    type IpcMainInvokeEvent,
-    type IpcMainEvent,
-} from "electron";
+import { ipcMain, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
 
 import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";

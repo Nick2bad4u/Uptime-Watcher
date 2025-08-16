@@ -471,15 +471,17 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         });
 
         // Reset withUtilityErrorHandling mock
-        (withUtilityErrorHandling as any).mockImplementation((fn: any, _context: any) => {
-            return async (...args: any[]) => {
-                try {
-                    return await fn(...args);
-                } catch (error) {
-                    throw error;
-                }
-            };
-        });
+        (withUtilityErrorHandling as any).mockImplementation(
+            (fn: any, _context: any) => {
+                return async (...args: any[]) => {
+                    try {
+                        return await fn(...args);
+                    } catch (error) {
+                        throw error;
+                    }
+                };
+            }
+        );
     });
 
     describe("Async Handler Error Handling", () => {

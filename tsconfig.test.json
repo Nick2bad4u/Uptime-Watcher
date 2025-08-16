@@ -1,5 +1,4 @@
 {
-    "extends": "./tsconfig.json",
     "compilerOptions": {
         "composite": true,
         "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo",
@@ -20,6 +19,7 @@
         "electron/**/*.test.ts",
         "electron/**/*.test.tsx"
     ],
+    "extends": "./tsconfig.json",
     "include": [
         "*.config.js",
         "*.config.mjs",

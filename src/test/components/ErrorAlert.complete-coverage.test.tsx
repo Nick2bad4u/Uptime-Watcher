@@ -60,7 +60,9 @@ describe("ErrorAlert - Complete Coverage", () => {
         });
 
         it("should render with default className when not provided", () => {
-            const { container: _container } = render(<ErrorAlert message="Test message" />);
+            const { container: _container } = render(
+                <ErrorAlert message="Test message" />
+            );
 
             const alertElement = screen.getByRole("alert");
             expect(alertElement).toHaveClass(
@@ -392,9 +394,7 @@ describe("ErrorAlert - Complete Coverage", () => {
 
     describe("Edge Cases", () => {
         it("should handle undefined onDismiss gracefully", () => {
-            render(
-                <ErrorAlert message="Undefined dismiss" />
-            );
+            render(<ErrorAlert message="Undefined dismiss" />);
 
             expect(
                 screen.queryByLabelText("Dismiss error")

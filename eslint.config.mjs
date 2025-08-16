@@ -42,6 +42,7 @@ import eslintPluginYml from "eslint-plugin-yml";
 import eslintReact from "@eslint-react/eslint-plugin";
 import eslintReactDom from "eslint-plugin-react-dom";
 import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
+import reactHooksAddons from "eslint-plugin-react-hooks-addons";
 import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import eslintReactWeb from "eslint-plugin-react-web-api";
 import globals from "globals";
@@ -142,6 +143,10 @@ import packageJson from "eslint-plugin-package-json";
 import pluginSafeJSX from "eslint-plugin-safe-jsx";
 import pluginLoadableImports from "eslint-plugin-loadable-imports";
 import zod from "eslint-plugin-zod";
+import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
+import css from "@eslint/css";
+// import * as tailwind4 from "tailwind-csstree";
+import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
@@ -360,6 +365,22 @@ export default [
         language: "markdown/gfm",
     },
 
+    // CSS files
+    {
+        files: ["**/*.css"],
+        ignores: ["docs/**", "**/test/**"],
+        plugins: {
+            css: css,
+        },
+        language: "css/css",
+        languageOptions: {
+            tolerant: true,
+        },
+        rules: {
+            // ...css.configs.recommended.rules,
+            "css/no-empty-blocks": "error",
+        },
+    },
     // JSON files
     {
         files: [
@@ -439,11 +460,23 @@ export default [
         plugins: {
             css: cssPlugin,
             tailwind: tailwind,
+            "undefined-css-classes": pluginUndefinedCss,
+            "no-hardcoded-strings": pluginNoHardcoded,
         },
         rules: {
             // TypeScript rules
             ...tailwind.configs["flat/recommended"].rules,
             ...cssPlugin.configs["flat/standard"].rules,
+            ...pluginUndefinedCss.configs["with-tailwind"].rules,
+
+            // "no-hardcoded-strings/no-hardcoded-strings": [
+            //     "warn",
+            //     {
+            //         allowedFunctionNames: ["t", "translate", "i18n"],
+            //         ignoreStrings: ["OK", "Cancel"],
+            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
+            //     },
+            // ],
 
             // Tailwind CSS
             "tailwind/classnames-order": "warn",
@@ -589,6 +622,7 @@ export default [
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/web-api": eslintReactWeb,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "react-hooks-addons": reactHooksAddons,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
             "array-func": arrayFunc,
@@ -689,6 +723,8 @@ export default [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+
+            "react-hooks-addons/no-unused-deps": "warn",
 
             "comment-length/limit-single-line-comments": [
                 "warn",
@@ -1920,6 +1956,7 @@ export default [
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/web-api": eslintReactWeb,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "react-hooks-addons": reactHooksAddons,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
             xss: xss,
             "array-func": arrayFunc,
@@ -2007,6 +2044,8 @@ export default [
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+
+            "react-hooks-addons/no-unused-deps": "warn",
 
             "comment-length/limit-single-line-comments": [
                 "warn",
@@ -2956,6 +2995,7 @@ export default [
             "eslint-comments": pluginComments,
             unicorn: pluginUnicorn,
             "loadable-imports": pluginLoadableImports,
+            "undefined-css-classes": pluginUndefinedCss,
         },
 
         rules: {
@@ -2965,6 +3005,8 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs["flat/all"].rules,
+
+            "undefined-css-classes/no-undefined-css-classes": "off",
 
             "loadable-imports/sort": "error",
 

@@ -48,68 +48,140 @@ const mockElectronAPI: {
         readFile: MockedFunction<(...args: any[]) => Promise<string>>;
         writeFile: MockedFunction<(...args: any[]) => Promise<boolean>>;
         exists: MockedFunction<(...args: any[]) => Promise<boolean>>;
-        showOpenDialog: MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>;
-        showSaveDialog: MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>;
+        showOpenDialog: MockedFunction<
+            (...args: any[]) => Promise<{ canceled: boolean }>
+        >;
+        showSaveDialog: MockedFunction<
+            (...args: any[]) => Promise<{ canceled: boolean }>
+        >;
     };
 } = {
     // IPC Communication
-    invoke: vi.fn().mockResolvedValue({}) satisfies MockedFunction<(...args: any[]) => Promise<any>> as MockedFunction<(...args: any[]) => Promise<any>>,
-    on: vi.fn() satisfies MockedFunction<(...args: any[]) => void> as MockedFunction<(...args: any[]) => void>,
-    off: vi.fn() satisfies MockedFunction<(...args: any[]) => void> as MockedFunction<(...args: any[]) => void>,
-    removeAllListeners: vi.fn() satisfies MockedFunction<(...args: any[]) => void> as MockedFunction<(...args: any[]) => void>,
+    invoke: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
+        (...args: any[]) => Promise<any>
+    > as MockedFunction<(...args: any[]) => Promise<any>>,
+    on: vi.fn() satisfies MockedFunction<
+        (...args: any[]) => void
+    > as MockedFunction<(...args: any[]) => void>,
+    off: vi.fn() satisfies MockedFunction<
+        (...args: any[]) => void
+    > as MockedFunction<(...args: any[]) => void>,
+    removeAllListeners: vi.fn() satisfies MockedFunction<
+        (...args: any[]) => void
+    > as MockedFunction<(...args: any[]) => void>,
 
     // Site Management
     sites: {
-        getAll: vi.fn().mockResolvedValue([]) satisfies MockedFunction<() => Promise<any[]>> as MockedFunction<() => Promise<any[]>>,
-        create: vi.fn().mockResolvedValue({}) satisfies MockedFunction<(...args: any[]) => Promise<any>> as MockedFunction<(...args: any[]) => Promise<any>>,
-        update: vi.fn().mockResolvedValue({}) satisfies MockedFunction<(...args: any[]) => Promise<any>> as MockedFunction<(...args: any[]) => Promise<any>>,
-        delete: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getById: vi.fn().mockResolvedValue(null) satisfies MockedFunction<(...args: any[]) => Promise<any>> as MockedFunction<(...args: any[]) => Promise<any>>,
+        getAll: vi.fn().mockResolvedValue([]) satisfies MockedFunction<
+            () => Promise<any[]>
+        > as MockedFunction<() => Promise<any[]>>,
+        create: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
+            (...args: any[]) => Promise<any>
+        > as MockedFunction<(...args: any[]) => Promise<any>>,
+        update: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
+            (...args: any[]) => Promise<any>
+        > as MockedFunction<(...args: any[]) => Promise<any>>,
+        delete: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        getById: vi.fn().mockResolvedValue(null) satisfies MockedFunction<
+            (...args: any[]) => Promise<any>
+        > as MockedFunction<(...args: any[]) => Promise<any>>,
     },
 
     // Settings Management
     settings: {
-        get: vi.fn().mockResolvedValue(null) satisfies MockedFunction<(...args: any[]) => Promise<any>> as MockedFunction<(...args: any[]) => Promise<any>>,
-        set: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getAll: vi.fn().mockResolvedValue({}) satisfies MockedFunction<() => Promise<any>> as MockedFunction<() => Promise<any>>,
+        get: vi.fn().mockResolvedValue(null) satisfies MockedFunction<
+            (...args: any[]) => Promise<any>
+        > as MockedFunction<(...args: any[]) => Promise<any>>,
+        set: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        getAll: vi.fn().mockResolvedValue({}) satisfies MockedFunction<
+            () => Promise<any>
+        > as MockedFunction<() => Promise<any>>,
     },
 
     // Monitor Management
     monitor: {
-        start: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        stop: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        getStatus: vi.fn().mockResolvedValue("stopped") satisfies MockedFunction<() => Promise<string>> as MockedFunction<() => Promise<string>>,
+        start: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        stop: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        getStatus: vi
+            .fn()
+            .mockResolvedValue("stopped") satisfies MockedFunction<
+            () => Promise<string>
+        > as MockedFunction<() => Promise<string>>,
     },
 
     // Window Management
     window: {
-        minimize: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<() => void>,
-        maximize: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<() => void>,
-        close: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<() => void>,
-        isMaximized: vi.fn().mockReturnValue(false) satisfies MockedFunction<() => boolean> as MockedFunction<() => boolean>,
+        minimize: vi.fn() satisfies MockedFunction<
+            () => void
+        > as MockedFunction<() => void>,
+        maximize: vi.fn() satisfies MockedFunction<
+            () => void
+        > as MockedFunction<() => void>,
+        close: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<
+            () => void
+        >,
+        isMaximized: vi.fn().mockReturnValue(false) satisfies MockedFunction<
+            () => boolean
+        > as MockedFunction<() => boolean>,
     },
 
     // App Information
     app: {
-        getVersion: vi.fn().mockReturnValue("1.0.0") satisfies MockedFunction<() => string> as MockedFunction<() => string>,
-        getName: vi.fn().mockReturnValue("Uptime Watcher") satisfies MockedFunction<() => string> as MockedFunction<() => string>,
-        quit: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<() => void>,
+        getVersion: vi.fn().mockReturnValue("1.0.0") satisfies MockedFunction<
+            () => string
+        > as MockedFunction<() => string>,
+        getName: vi
+            .fn()
+            .mockReturnValue("Uptime Watcher") satisfies MockedFunction<
+            () => string
+        > as MockedFunction<() => string>,
+        quit: vi.fn() satisfies MockedFunction<() => void> as MockedFunction<
+            () => void
+        >,
     },
 
     // Database Operations
     database: {
-        backup: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        restore: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        optimize: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        backup: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        restore: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        optimize: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
     },
 
     // File System Operations
     fs: {
-        readFile: vi.fn().mockResolvedValue("") satisfies MockedFunction<(...args: any[]) => Promise<string>> as MockedFunction<(...args: any[]) => Promise<string>>,
-        writeFile: vi.fn().mockResolvedValue(true) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        exists: vi.fn().mockResolvedValue(false) satisfies MockedFunction<(...args: any[]) => Promise<boolean>> as MockedFunction<(...args: any[]) => Promise<boolean>>,
-        showOpenDialog: vi.fn().mockResolvedValue({ canceled: true }) satisfies MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>> as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
-        showSaveDialog: vi.fn().mockResolvedValue({ canceled: true }) satisfies MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>> as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
+        readFile: vi.fn().mockResolvedValue("") satisfies MockedFunction<
+            (...args: any[]) => Promise<string>
+        > as MockedFunction<(...args: any[]) => Promise<string>>,
+        writeFile: vi.fn().mockResolvedValue(true) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        exists: vi.fn().mockResolvedValue(false) satisfies MockedFunction<
+            (...args: any[]) => Promise<boolean>
+        > as MockedFunction<(...args: any[]) => Promise<boolean>>,
+        showOpenDialog: vi
+            .fn()
+            .mockResolvedValue({ canceled: true }) satisfies MockedFunction<
+            (...args: any[]) => Promise<{ canceled: boolean }>
+        > as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
+        showSaveDialog: vi
+            .fn()
+            .mockResolvedValue({ canceled: true }) satisfies MockedFunction<
+            (...args: any[]) => Promise<{ canceled: boolean }>
+        > as MockedFunction<(...args: any[]) => Promise<{ canceled: boolean }>>,
     },
 };
 

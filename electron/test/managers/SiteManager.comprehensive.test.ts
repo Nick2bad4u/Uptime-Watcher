@@ -355,8 +355,9 @@ describe("SiteManager - Comprehensive", () => {
             // Mock cache.get to return undefined (cache miss)
             mockCache.get = vi.fn().mockReturnValue(undefined);
             // Mock getSitesFromDatabase to throw error
-            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase)
-                .mockRejectedValue(new Error("DB error"));
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockRejectedValue(new Error("DB error"));
 
             const result = siteManager.getSiteFromCache("site-1");
 

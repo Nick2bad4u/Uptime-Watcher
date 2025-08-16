@@ -5,15 +5,13 @@
  * all state management, actions, error handling, and IPC interactions.
  */
 
-import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    vi,
-} from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import type { Monitor, MonitorType, MonitorFieldDefinition } from "../../../../shared/types";
+import type {
+    Monitor,
+    MonitorType,
+    MonitorFieldDefinition,
+} from "../../../../shared/types";
 import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
 import type { ValidationResult } from "../../../../shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
@@ -27,7 +25,8 @@ vi.mock("@shared/utils/errorHandling", () => ({
             store.setLoading(true);
             return await operation();
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorMessage =
+                error instanceof Error ? error.message : String(error);
             store.setError(errorMessage);
             throw error;
         } finally {
@@ -66,7 +65,7 @@ describe("useMonitorTypesStore", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
-        
+
         // Reset Zustand store to initial state using store methods
         const store = useMonitorTypesStore.getState();
         store.clearError();
@@ -806,7 +805,9 @@ describe("useMonitorTypesStore", () => {
 
             // Add a guard to prevent the error
             if (!result.current) {
-                throw new Error("Hook did not render properly - result.current is null");
+                throw new Error(
+                    "Hook did not render properly - result.current is null"
+                );
             }
 
             await act(async () => {

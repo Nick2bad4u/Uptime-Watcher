@@ -1,11 +1,32 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
 
-    "vcs": {
+    "assist": {
         "enabled": true,
-        "clientKind": "git",
-        "useIgnoreFile": true,
-        "defaultBranch": "main"
+        "actions": {
+            "source": {
+                "recommended": true
+            }
+        }
+    },
+
+    "css": {
+        "parser": {
+            "cssModules": false
+        },
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "quoteStyle": "double"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
     },
 
     "files": {
@@ -47,6 +68,92 @@
             "shared/**/*",
             "scripts/**/*"
         ]
+    },
+
+    "graphql": {
+        "formatter": {
+            "enabled": false,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "quoteStyle": "double"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
+    },
+
+    "html": {
+        "formatter": {
+            "enabled": false,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "attributePosition": "auto",
+            "bracketSameLine": false,
+            "indentScriptAndStyle": true,
+            "selfCloseVoidElements": "never"
+        }
+    },
+
+    "javascript": {
+        "parser": {
+            "unsafeParameterDecoratorsEnabled": false,
+            "jsxEverywhere": true
+        },
+        "formatter": {
+            "jsxQuoteStyle": "double",
+            "quoteProperties": "asNeeded",
+            "trailingCommas": "es5",
+            "semicolons": "always",
+            "arrowParentheses": "always",
+            "bracketSameLine": false,
+            "quoteStyle": "double",
+            "attributePosition": "auto",
+            "bracketSpacing": true
+        },
+        "globals": [
+            "window",
+            "document",
+            "electronAPI",
+            "__dirname",
+            "__filename",
+            "process",
+            "Buffer",
+            "global",
+            "NodeJS"
+        ],
+        "jsxRuntime": "transparent",
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
+    },
+
+    "json": {
+        "parser": {
+            "allowComments": true,
+            "allowTrailingCommas": true
+        },
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "trailingCommas": "none",
+            "expand": "always"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
     },
 
     "linter": {
@@ -138,120 +245,6 @@
         }
     },
 
-    "assist": {
-        "enabled": true,
-        "actions": {
-            "source": {
-                "recommended": true
-            }
-        }
-    },
-
-    "javascript": {
-        "parser": {
-            "unsafeParameterDecoratorsEnabled": false,
-            "jsxEverywhere": true
-        },
-        "formatter": {
-            "jsxQuoteStyle": "double",
-            "quoteProperties": "asNeeded",
-            "trailingCommas": "es5",
-            "semicolons": "always",
-            "arrowParentheses": "always",
-            "bracketSameLine": false,
-            "quoteStyle": "double",
-            "attributePosition": "auto",
-            "bracketSpacing": true
-        },
-        "globals": [
-            "window",
-            "document",
-            "electronAPI",
-            "__dirname",
-            "__filename",
-            "process",
-            "Buffer",
-            "global",
-            "NodeJS"
-        ],
-        "jsxRuntime": "transparent",
-        "linter": {
-            "enabled": true
-        },
-        "assist": {
-            "enabled": true
-        }
-    },
-
-    "json": {
-        "parser": {
-            "allowComments": true,
-            "allowTrailingCommas": true
-        },
-        "formatter": {
-            "enabled": true,
-            "indentStyle": "space",
-            "indentWidth": 4,
-            "lineWidth": 120,
-            "trailingCommas": "none",
-            "expand": "always"
-        },
-        "linter": {
-            "enabled": true
-        },
-        "assist": {
-            "enabled": true
-        }
-    },
-
-    "css": {
-        "parser": {
-            "cssModules": false
-        },
-        "formatter": {
-            "enabled": true,
-            "indentStyle": "space",
-            "indentWidth": 4,
-            "lineWidth": 120,
-            "quoteStyle": "double"
-        },
-        "linter": {
-            "enabled": true
-        },
-        "assist": {
-            "enabled": true
-        }
-    },
-
-    "html": {
-        "formatter": {
-            "enabled": false,
-            "indentStyle": "space",
-            "indentWidth": 4,
-            "lineWidth": 120,
-            "attributePosition": "auto",
-            "bracketSameLine": false,
-            "indentScriptAndStyle": true,
-            "selfCloseVoidElements": "never"
-        }
-    },
-
-    "graphql": {
-        "formatter": {
-            "enabled": false,
-            "indentStyle": "space",
-            "indentWidth": 4,
-            "lineWidth": 120,
-            "quoteStyle": "double"
-        },
-        "linter": {
-            "enabled": true
-        },
-        "assist": {
-            "enabled": true
-        }
-    },
-
     "overrides": [
         {
             "includes": ["*.md", "*.mdx"],
@@ -338,5 +331,11 @@
                 }
             }
         }
-    ]
+    ],
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true,
+        "defaultBranch": "main"
+    }
 }

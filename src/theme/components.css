@@ -799,7 +799,7 @@
 
 .update-alert--error {
     border-color: var(--color-error);
-    
+
     &::before {
         background: linear-gradient(
             90deg,
@@ -1016,7 +1016,7 @@
     .bg-overlay-default\/10 {
         background-color: rgb(255 255 255 / 10%);
     }
-}/* Professional Container Animations */
+} /* Professional Container Animations */
 .container-fade-in {
     animation: fadeInUp var(--transition-slow) ease-out;
 

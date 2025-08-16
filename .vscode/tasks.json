@@ -1,5 +1,4 @@
 {
-    "version": "2.0.0",
     "tasks": [
         {
             "group": "build",
@@ -192,5 +191,6 @@
             "label": "Quality Check",
             "type": "shell"
         }
-    ]
+    ],
+    "version": "2.0.0"
 }

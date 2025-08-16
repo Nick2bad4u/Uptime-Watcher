@@ -51,9 +51,9 @@ describe("Debug Store Test", () => {
     it("should debug the basic store behavior", async () => {
         console.log("Starting debug test");
         console.log("window.electronAPI:", globalThis.window?.electronAPI);
-        
+
         const { result } = renderHook(() => useMonitorTypesStore());
-        
+
         console.log("Store initial state:", {
             monitorTypes: result.current.monitorTypes,
             isLoaded: result.current.isLoaded,
@@ -71,8 +71,11 @@ describe("Debug Store Test", () => {
             isLoaded: result.current.isLoaded,
         });
 
-        console.log("Mock call count:", mockElectronAPI.monitorTypes.getMonitorTypes.mock.calls.length);
-        
+        console.log(
+            "Mock call count:",
+            mockElectronAPI.monitorTypes.getMonitorTypes.mock.calls.length
+        );
+
         expect(mockElectronAPI.monitorTypes.getMonitorTypes).toHaveBeenCalled();
     });
 });

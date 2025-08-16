@@ -279,10 +279,10 @@ Configuration available in `.vscode/launch.json`:
 ```json
 {
  "name": "Debug Electron Main",
- "type": "node",
- "request": "launch",
  "program": "${workspaceFolder}/dist-electron/main.js",
- "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
+ "request": "launch",
+ "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+ "type": "node"
 }
 ```
 

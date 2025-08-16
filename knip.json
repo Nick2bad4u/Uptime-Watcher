@@ -7,14 +7,18 @@
         "vitest.config.ts",
         "vitest.electron.config.ts"
     ],
-    "project": [
-        "electron/**/*.{js,ts}",
-        "shared/**/*.{js,ts}",
-        "!**/*.d.ts",
-        "!**/node_modules/**",
-        "!**/dist/**",
-        "!**/dist-electron/**",
-        "!**/coverage/**"
+    "ignore": [
+        "shared/types/monitorTypes.ts",
+        "shared/types/themeConfig.ts",
+        "src/types/events.ts",
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/*.bench.ts",
+        "**/test/**",
+        "**/tests/**",
+        "docs/**",
+        "scripts/**",
+        "benchmarks/**"
     ],
     "ignoreBinaries": [
         "repomix",
@@ -135,6 +139,20 @@
         "@secretlint/secretlint-rule-pattern",
         "@secretlint/secretlint-rule-secp256k1-privatekey"
     ],
+    "ignoreExportsUsedInFile": {
+        "interface": true,
+        "type": true
+    },
+    "includeEntryExports": false,
+    "project": [
+        "electron/**/*.{js,ts}",
+        "shared/**/*.{js,ts}",
+        "!**/*.d.ts",
+        "!**/node_modules/**",
+        "!**/dist/**",
+        "!**/dist-electron/**",
+        "!**/coverage/**"
+    ],
     "rules": {
         "files": "error",
         "dependencies": "error",
@@ -148,24 +166,6 @@
         "enumMembers": "warn",
         "duplicates": "error"
     },
-    "ignore": [
-        "shared/types/monitorTypes.ts",
-        "shared/types/themeConfig.ts",
-        "src/types/events.ts",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/*.bench.ts",
-        "**/test/**",
-        "**/tests/**",
-        "docs/**",
-        "scripts/**",
-        "benchmarks/**"
-    ],
-    "ignoreExportsUsedInFile": {
-        "interface": true,
-        "type": true
-    },
-    "includeEntryExports": false,
     "workspaces": {
         ".": {
             "entry": [],

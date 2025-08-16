@@ -1,15 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
-    "language": "en",
-    "version": "0.2",
+    "allowCompoundWords": true,
     "cache": {
         "cacheFormat": "universal",
         "cacheLocation": ".cspellcache",
         "cacheStrategy": "metadata",
         "useCache": true
     },
-    "useGitignore": true,
-    "gitignoreRoot": "./",
     "dictionaries": [
         "aws",
         "bash",
@@ -66,6 +63,21 @@
             "scope": "folder"
         }
     ],
+    "enableFiletypes": [
+        "typescript",
+        "javascript",
+        "json",
+        "jsonc",
+        "yaml",
+        "yml",
+        "toml",
+        "markdown",
+        "html",
+        "css",
+        "scss",
+        "less"
+    ],
+    "gitignoreRoot": "./",
     "ignorePaths": [
         "**/test/**",
         "scripts",
@@ -106,28 +118,7 @@
     ],
     "ignoreWords": [],
     "import": [],
-    "words": [],
-    "allowCompoundWords": true,
-    "numSuggestions": 10,
-    "suggestionsTimeout": 800,
-    "minWordLength": 3,
-    "maxNumberOfProblems": 100,
-    "maxDuplicateProblems": 5,
-    "validateDirectives": true,
-    "enableFiletypes": [
-        "typescript",
-        "javascript",
-        "json",
-        "jsonc",
-        "yaml",
-        "yml",
-        "toml",
-        "markdown",
-        "html",
-        "css",
-        "scss",
-        "less"
-    ],
+    "language": "en",
     "languageSettings": [
         {
             "languageId": "typescript,javascript,typescriptreact,javascriptreact",
@@ -181,6 +172,10 @@
             ]
         }
     ],
+    "maxDuplicateProblems": 5,
+    "maxNumberOfProblems": 100,
+    "minWordLength": 3,
+    "numSuggestions": 10,
     "patterns": [
         {
             "name": "camelCase",
@@ -194,5 +189,10 @@
             "name": "CONSTANTS",
             "pattern": "/\\b[A-Z][A-Z0-9_]*\\b/g"
         }
-    ]
+    ],
+    "suggestionsTimeout": 800,
+    "useGitignore": true,
+    "validateDirectives": true,
+    "version": "0.2",
+    "words": []
 }

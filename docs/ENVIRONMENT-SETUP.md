@@ -84,26 +84,26 @@ Create `.vscode/settings.json` in your workspace:
 
 ```json
 {
- "typescript.preferences.importModuleSpecifier": "relative",
- "typescript.preferences.includePackageJsonAutoImports": "on",
- "editor.formatOnSave": true,
  "editor.codeActionsOnSave": {
   "source.fixAll.eslint": true,
   "source.organizeImports": true
  },
+ "editor.formatOnSave": true,
  "eslint.validate": [
   "javascript",
   "typescript",
   "javascriptreact",
   "typescriptreact"
  ],
+ "files.associations": {
+  "*.css": "tailwindcss"
+ },
  "tailwindCSS.includeLanguages": {
   "typescript": "javascript",
   "typescriptreact": "javascript"
  },
- "files.associations": {
-  "*.css": "tailwindcss"
- }
+ "typescript.preferences.importModuleSpecifier": "relative",
+ "typescript.preferences.includePackageJsonAutoImports": "on"
 }
 ```
 
@@ -113,7 +113,6 @@ Debugging configuration (`.vscode/launch.json`):
 
 ```json
 {
- "version": "0.2.0",
  "configurations": [
   {
    "name": "Debug Electron Main",
@@ -131,7 +130,8 @@ Debugging configuration (`.vscode/launch.json`):
    "url": "http://localhost:5173",
    "webRoot": "${workspaceFolder}/src"
   }
- ]
+ ],
+ "version": "0.2.0"
 }
 ```
 
@@ -275,6 +275,14 @@ Create `.vscode/uptime-watcher.code-workspace`:
 
 ```json
 {
+ "extensions": {
+  "recommendations": [
+   "ms-vscode.vscode-typescript-next",
+   "bradlc.vscode-tailwindcss",
+   "ms-vscode.vscode-eslint",
+   "esbenp.prettier-vscode"
+  ]
+ },
  "folders": [
   {
    "path": "."
@@ -291,14 +299,6 @@ Create `.vscode/uptime-watcher.code-workspace`:
    "**/.DS_Store": true,
    "**/coverage": true
   }
- },
- "extensions": {
-  "recommendations": [
-   "ms-vscode.vscode-typescript-next",
-   "bradlc.vscode-tailwindcss",
-   "ms-vscode.vscode-eslint",
-   "esbenp.prettier-vscode"
-  ]
  }
 }
 ```

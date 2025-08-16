@@ -1,52 +1,6 @@
 {
     "$schema": "https://repomix.com/schemas/latest/schema.json",
 
-    "input": {
-        "maxFileSize": 52428800
-    },
-
-    "output": {
-        "filePath": "repomix-output.xml",
-        "style": "xml",
-        "parsableStyle": false,
-        "compress": true,
-        "headerText": "Uptime Watcher - Electron Desktop Application for Website Monitoring",
-        "fileSummary": true,
-        "directoryStructure": true,
-        "files": true,
-        "removeComments": false,
-        "removeEmptyLines": true,
-        "topFilesLength": 10,
-        "showLineNumbers": false,
-        "copyToClipboard": false,
-        "includeEmptyDirectories": false,
-        "git": {
-            "sortByChanges": true,
-            "sortByChangesMaxCommits": 200,
-            "includeDiffs": false
-        }
-    },
-
-    "include": [
-        "src/**/*",
-        "electron/**/*",
-        "shared/**/*",
-        "*.{js,ts,json,md,yml,yaml}",
-        "package*.json",
-        "tsconfig*.json",
-        "vite.config.ts",
-        "vitest*.config.ts",
-        "commitlint.config.js",
-        "eslint.config.mjs",
-        "postcss.config.mjs",
-        "tailwind.config.mjs",
-        "electron/*.ts",
-        "electron/**/*.ts",
-        "src/*.{ts,tsx,css}",
-        "src/**/*.{ts,tsx,css}",
-        "docs/**/*.md"
-    ],
-
     "ignore": {
         "useGitignore": true,
         "useDefaultPatterns": true,
@@ -192,6 +146,52 @@
             "**/Vagrantfile",
             "**/.vagrant/**"
         ]
+    },
+
+    "include": [
+        "src/**/*",
+        "electron/**/*",
+        "shared/**/*",
+        "*.{js,ts,json,md,yml,yaml}",
+        "package*.json",
+        "tsconfig*.json",
+        "vite.config.ts",
+        "vitest*.config.ts",
+        "commitlint.config.js",
+        "eslint.config.mjs",
+        "postcss.config.mjs",
+        "tailwind.config.mjs",
+        "electron/*.ts",
+        "electron/**/*.ts",
+        "src/*.{ts,tsx,css}",
+        "src/**/*.{ts,tsx,css}",
+        "docs/**/*.md"
+    ],
+
+    "input": {
+        "maxFileSize": 52428800
+    },
+
+    "output": {
+        "filePath": "repomix-output.xml",
+        "style": "xml",
+        "parsableStyle": false,
+        "compress": true,
+        "headerText": "Uptime Watcher - Electron Desktop Application for Website Monitoring",
+        "fileSummary": true,
+        "directoryStructure": true,
+        "files": true,
+        "removeComments": false,
+        "removeEmptyLines": true,
+        "topFilesLength": 10,
+        "showLineNumbers": false,
+        "copyToClipboard": false,
+        "includeEmptyDirectories": false,
+        "git": {
+            "sortByChanges": true,
+            "sortByChangesMaxCommits": 200,
+            "includeDiffs": false
+        }
     },
 
     "security": {

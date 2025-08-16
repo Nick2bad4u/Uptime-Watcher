@@ -20,9 +20,7 @@ import {
     type Site,
 } from "../../validation/schemas";
 import type { ValidationResult } from "../../types/validation";
-import {
-    createValidBaseMonitor,
-} from "./testHelpers";
+import { createValidBaseMonitor } from "./testHelpers";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {

@@ -38,14 +38,15 @@ const createMockMonitor = (
     id: string,
     type: "http" | "port" | "ping",
     options: { url?: string; port?: number; host?: string } = {}
-): Monitor => createValidMonitor({
-    id,
-    type,
-    status: "pending",
-    monitoring: false,
-    responseTime: 0,
-    ...options,
-});
+): Monitor =>
+    createValidMonitor({
+        id,
+        type,
+        status: "pending",
+        monitoring: false,
+        responseTime: 0,
+        ...options,
+    });
 
 const defaultProps = {
     monitors: [

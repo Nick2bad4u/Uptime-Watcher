@@ -1,36 +1,20 @@
 {
-    "LanguageRuleIgnoreMap": {
-        "typescript": [
-            "DS172411"
-        ],
-        "javascript": [
-            "DS172411"
-        ],
-        "react": [],
-        "jsx": []
-    },
-    "OutputFile": "devskim-report.sarif",
-    "Rules": [],
-    "RuleIds": [],
-    "IgnoreRuleIds": [
-        "DS162092"
-    ],
-    "LanguagesPath": "",
+    "AbsolutePaths": false,
+    "BasePath": "",
+    "CacheLocation": ".devskim-cache",
     "CommentsPath": "",
-    "OutputTextFormat": "%F:%L:%C [%S] %R - %N",
-    "OutputFileFormat": "sarif",
-    "Severities": [
-        "Critical",
-        "Important",
-        "Moderate",
-        "BestPractice",
-        "ManualReview"
-    ],
     "Confidences": [
         "High",
         "Medium",
         "Low"
     ],
+    "ConsoleVerbosityLevel": "Information",
+    "CrawlArchives": false,
+    "DisableConsoleOutput": false,
+    "DisableParallel": false,
+    "DisableSuppression": false,
+    "EnableCaching": true,
+    "ExitCodeIsNumIssues": true,
     "Globs": [
         ".devskim.json",
         ".vscode/settings.json",
@@ -73,6 +57,38 @@
         "**/sw.js",
         "**/service-worker.js"
     ],
+    "IgnoreDefaultRules": false,
+    "IgnoreRuleIds": [
+        "DS162092"
+    ],
+    "LanguageRuleIgnoreMap": {
+        "typescript": [
+            "DS172411"
+        ],
+        "javascript": [
+            "DS172411"
+        ],
+        "react": [],
+        "jsx": []
+    },
+    "LanguagesPath": "",
+    "LogFileLevel": "Warning",
+    "LogFilePath": "devskim.log",
+    "MaxDepth": 50,
+    "OutputFile": "devskim-report.sarif",
+    "OutputFileFormat": "sarif",
+    "OutputTextFormat": "%F:%L:%C [%S] %R - %N",
+    "RespectGitIgnore": true,
+    "RuleIds": [],
+    "Rules": [],
+    "Severities": [
+        "Critical",
+        "Important",
+        "Moderate",
+        "BestPractice",
+        "ManualReview"
+    ],
+    "SkipExcerpts": false,
     "Suppressions": [
         {
             "Justification": "False positive: localhost redirect URI is required for OAuth dev flow (only present in development builds, not production)",
@@ -124,21 +140,5 @@
             "FilePattern": "electron/services/window/**",
             "RuleId": "DS172413"
         }
-    ],
-    "DisableSuppression": false,
-    "DisableParallel": false,
-    "IgnoreDefaultRules": false,
-    "CrawlArchives": false,
-    "ExitCodeIsNumIssues": true,
-    "BasePath": "",
-    "AbsolutePaths": false,
-    "RespectGitIgnore": true,
-    "SkipExcerpts": false,
-    "ConsoleVerbosityLevel": "Information",
-    "DisableConsoleOutput": false,
-    "LogFileLevel": "Warning",
-    "LogFilePath": "devskim.log",
-    "MaxDepth": 50,
-    "EnableCaching": true,
-    "CacheLocation": ".devskim-cache"
+    ]
 }

@@ -248,7 +248,9 @@ describe("DataBackupService", () => {
                 expect((error as SiteLoadingError).message).toBe(
                     "Failed to load sites: Failed to download backup: Original error"
                 );
-                expect((error as SiteLoadingError).stack).toContain("Caused by:");
+                expect((error as SiteLoadingError).stack).toContain(
+                    "Caused by:"
+                );
             }
         });
 

@@ -38,5 +38,3 @@ afterAll(async () => {
         performance.clearMeasures();
     }
 });
-
-

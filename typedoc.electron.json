@@ -1,14 +1,24 @@
 {
     "$schema": "https://typedoc.org/schema.json",
-    "name": "Uptime Watcher - Electron Main Process Documentation",
+    "categoryOrder": [
+        "Core",
+        "Managers",
+        "Services",
+        "Database",
+        "Events",
+        "Utils",
+        "Types",
+        "Constants",
+        "*"
+    ],
+    "cleanOutputDir": true,
+    "commentStyle": "jsdoc",
     "docsPath": "docs/docusaurus/docs/electron",
-    "out": "docs/docusaurus/docs/electron",
-    "tsconfig": "tsconfig.electron.json",
+    "entryPointStrategy": "expand",
     "entryPoints": [
         "electron/**/*.*",
         "shared/**/*.*"
     ],
-    "entryPointStrategy": "expand",
     "exclude": [
         "**/dist",
         "**/dist/**",
@@ -35,6 +45,11 @@
         "**/mock*",
         "**/test-*"
     ],
+    "excludeInternal": true,
+    "excludeNotDocumented": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeReferences": false,
     "externalSymbolLinkMappings": {
         "electron": {
             "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
@@ -54,23 +69,11 @@
             "Database": "https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#class-database"
         }
     },
-    "plugin": [
-        "typedoc-plugin-markdown",
-        "typedoc-docusaurus-theme",
-        "typedoc-plugin-mdn-links",
-        "typedoc-plugin-zod",
-        "typedoc-plugin-dt-links",
-        "typedoc-plugin-external-package-links",
-        "typedoc-plugin-coverage",
-        "typedoc-plugin-missing-exports",
-        "typedoc-plugin-replace-text",
-        "typedoc-plugin-rename-defaults"
-    ],
-    "pretty": true,
-    "cleanOutputDir": true,
-    "readme": "README.md",
+    "gitRemote": "origin",
+    "gitRevision": "main",
+    "githubPages": true,
+    "hideGenerator": false,
     "includeVersion": true,
-    "sort": ["source-order", "alphabetical"],
     "kindSortOrder": [
         "Document",
         "Project",
@@ -94,49 +97,22 @@
         "CallSignature",
         "IndexSignature"
     ],
-    "categoryOrder": [
-        "Core",
-        "Managers",
-        "Services",
-        "Database",
-        "Events",
-        "Utils",
-        "Types",
-        "Constants",
-        "*"
+    "name": "Uptime Watcher - Electron Main Process Documentation",
+    "out": "docs/docusaurus/docs/electron",
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-docusaurus-theme",
+        "typedoc-plugin-mdn-links",
+        "typedoc-plugin-zod",
+        "typedoc-plugin-dt-links",
+        "typedoc-plugin-external-package-links",
+        "typedoc-plugin-coverage",
+        "typedoc-plugin-missing-exports",
+        "typedoc-plugin-replace-text",
+        "typedoc-plugin-rename-defaults"
     ],
-    "searchInComments": true,
-    "searchInDocuments": true,
-    "validation": {
-        "notDocumented": true,
-        "invalidLink": true,
-        "notExported": false
-    },
-    "treatWarningsAsErrors": false,
-    "commentStyle": "jsdoc",
-    "visibilityFilters": {
-        "protected": false,
-        "private": false,
-        "inherited": true,
-        "external": false,
-        "@alpha": false,
-        "@beta": false
-    },
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "excludeInternal": true,
-    "excludeNotDocumented": false,
-    "excludeReferences": false,
-    "githubPages": true,
-    "gitRevision": "main",
-    "gitRemote": "origin",
-    "hideGenerator": false,
-    "searchGroupBoosts": {
-        "Classes": 1.5,
-        "Interfaces": 1.3,
-        "Functions": 1.2,
-        "Types": 1.1
-    },
+    "pretty": true,
+    "readme": "README.md",
     "replaceText": {
         "inCodeCommentText": true,
         "inCodeCommentTags": true,
@@ -155,5 +131,29 @@
                 "replace": "**NOTE:**"
             }
         ]
+    },
+    "searchGroupBoosts": {
+        "Classes": 1.5,
+        "Interfaces": 1.3,
+        "Functions": 1.2,
+        "Types": 1.1
+    },
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "sort": ["source-order", "alphabetical"],
+    "treatWarningsAsErrors": false,
+    "tsconfig": "tsconfig.electron.json",
+    "validation": {
+        "notDocumented": true,
+        "invalidLink": true,
+        "notExported": false
+    },
+    "visibilityFilters": {
+        "protected": false,
+        "private": false,
+        "inherited": true,
+        "external": false,
+        "@alpha": false,
+        "@beta": false
     }
 }

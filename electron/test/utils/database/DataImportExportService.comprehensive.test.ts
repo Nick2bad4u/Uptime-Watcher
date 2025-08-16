@@ -1011,7 +1011,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     "Failed to export data: Original database error"
                 );
                 // SiteLoadingError preserves stack trace but doesn't set cause property
-                expect((error as Error).stack).toContain("Original database error");
+                expect((error as Error).stack).toContain(
+                    "Original database error"
+                );
                 expect((error as Error).stack).toContain("Caused by:");
             }
         });

@@ -1,22 +1,6 @@
 {
     "$schema": "https://www.schemastore.org/jscpd.json",
-    "threshold": 50,
-    "minLines": 10,
-    "minTokens": 50,
-    "maxSize": "100kb",
-    "mode": "mild",
     "gitignore": true,
-    "reporters": [
-        "html",
-        "markdown",
-        "json",
-        "console",
-        "sarif",
-        "xml",
-        "badge",
-        "csv"
-    ],
-    "output": "./report/jscpd/",
     "ignore": [
         "**/node_modules/**",
         "**/.git/**",
@@ -69,5 +53,21 @@
         "**/*.gz",
         "**/*.bin",
         "**/*.wasm"
-    ]
+    ],
+    "maxSize": "100kb",
+    "minLines": 10,
+    "minTokens": 50,
+    "mode": "mild",
+    "output": "./report/jscpd/",
+    "reporters": [
+        "html",
+        "markdown",
+        "json",
+        "console",
+        "sarif",
+        "xml",
+        "badge",
+        "csv"
+    ],
+    "threshold": 50
 }

@@ -315,7 +315,9 @@ describe("Shared Types Coverage", () => {
             };
 
             expect(themeUtils.getColorByStatus("up")).toBe("#10b981");
-            expect(themeUtils.getColorByStatus("invalid" as any)).toBe("#6b7280");
+            expect(themeUtils.getColorByStatus("invalid" as any)).toBe(
+                "#6b7280"
+            );
             expect(themeUtils.getSpacingValue("lg")).toBe(24);
             expect(themeUtils.getSpacingValue("invalid")).toBe(16);
         });

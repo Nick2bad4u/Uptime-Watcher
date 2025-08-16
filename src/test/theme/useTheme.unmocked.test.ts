@@ -377,7 +377,9 @@ describe("useTheme - Complete Coverage", () => {
             expect(() =>
                 result.current.getStatusColor("invalid" as any)
             ).not.toThrow();
-            expect(() => result.current.getStatusColor("" as any)).not.toThrow();
+            expect(() =>
+                result.current.getStatusColor("" as any)
+            ).not.toThrow();
         });
     });
 });

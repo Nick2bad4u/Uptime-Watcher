@@ -44,7 +44,9 @@ beforeAll(() => {
     } as any;
 
     // Mock requestIdleCallback for performance testing
-    globalThis.requestIdleCallback = (callback: IdleRequestCallback): number => {
+    globalThis.requestIdleCallback = (
+        callback: IdleRequestCallback
+    ): number => {
         const id = setTimeout(
             () =>
                 callback({

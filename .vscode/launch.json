@@ -1,5 +1,4 @@
 {
-    "version": "0.2.0",
     "compounds": [
         {
             "name": "Dev: Vite + Electron Main",
@@ -147,5 +146,6 @@
             "smartStep": true,
             "console": "integratedTerminal"
         }
-    ]
+    ],
+    "version": "0.2.0"
 }

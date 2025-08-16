@@ -8,9 +8,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 // Import constants
-import {
-    DEFAULT_CHECK_INTERVAL,
-} from "../../../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 
 // Mock all dependencies with proper interfaces
 const mockSetAddMode = vi.fn();

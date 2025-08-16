@@ -19,7 +19,6 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 
-
 // Mock the dependencies
 vi.mock("../../stores/ui/useUiStore");
 vi.mock("../../theme/useTheme", () => ({

@@ -4,6 +4,6 @@
         "typedoc/tsdoc.json"
     ],
     "noStandardTags": false,
-    "tagDefinitions": [],
-    "supportForTags": {}
+    "supportForTags": {},
+    "tagDefinitions": []
 }
