@@ -361,7 +361,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
 
         it("should apply status history overrides", () => {
-            const customTimestamp = Date.now() - 10000;
+            const customTimestamp = Date.now() - 10_000;
             const history = createValidStatusHistory({
                 responseTime: 500,
                 status: "down",
@@ -437,11 +437,11 @@ describe("Test Helpers - Comprehensive Coverage", () => {
                 "type",
             ];
 
-            commonFields.forEach((field) => {
+            for (const field of commonFields) {
                 expect(httpMonitor).toHaveProperty(field);
                 expect(portMonitor).toHaveProperty(field);
                 expect(pingMonitor).toHaveProperty(field);
-            });
+            }
         });
 
         it("should work with real validation schemas", () => {

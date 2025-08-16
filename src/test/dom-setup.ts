@@ -8,7 +8,7 @@ import "@testing-library/jest-dom";
 // Enhanced DOM polyfills for comprehensive testing support
 beforeAll(() => {
     // Mock window.matchMedia for responsive design testing
-    Object.defineProperty(window, "matchMedia", {
+    Object.defineProperty(globalThis, "matchMedia", {
         writable: true,
         value: vi.fn().mockImplementation((query) => ({
             matches: false,
@@ -23,7 +23,7 @@ beforeAll(() => {
     });
 
     // Mock IntersectionObserver for component visibility testing
-    global.IntersectionObserver = class MockIntersectionObserver {
+    globalThis.IntersectionObserver = class MockIntersectionObserver {
         root = null;
         rootMargin = "";
         thresholds = [];
@@ -38,7 +38,7 @@ beforeAll(() => {
     } as any;
 
     // Mock ResizeObserver for responsive component testing
-    global.ResizeObserver = class MockResizeObserver {
+    globalThis.ResizeObserver = class MockResizeObserver {
         constructor() {}
         observe() {}
         unobserve() {}
@@ -46,7 +46,7 @@ beforeAll(() => {
     } as any;
 
     // Mock requestIdleCallback for performance testing
-    global.requestIdleCallback = (callback: IdleRequestCallback): number => {
+    globalThis.requestIdleCallback = (callback: IdleRequestCallback): number => {
         const id = setTimeout(
             () =>
                 callback({
@@ -58,12 +58,12 @@ beforeAll(() => {
         return id as unknown as number;
     };
 
-    global.cancelIdleCallback = (id: number): void => {
+    globalThis.cancelIdleCallback = (id: number): void => {
         clearTimeout(id as unknown as NodeJS.Timeout);
     };
 
     // Mock getComputedStyle for CSS-dependent tests
-    global.getComputedStyle = vi.fn().mockReturnValue({
+    globalThis.getComputedStyle = vi.fn().mockReturnValue({
         getPropertyValue: vi.fn().mockReturnValue(""),
     });
 
@@ -93,11 +93,11 @@ beforeAll(() => {
     });
 
     // Mock URL.createObjectURL
-    global.URL.createObjectURL = vi.fn().mockReturnValue("blob:mock-url");
-    global.URL.revokeObjectURL = vi.fn();
+    globalThis.URL.createObjectURL = vi.fn().mockReturnValue("blob:mock-url");
+    globalThis.URL.revokeObjectURL = vi.fn();
 
     // Mock File and FileReader for file upload testing
-    global.File = class MockFile {
+    globalThis.File = class MockFile {
         constructor(
             public chunks: any[],
             public name: string,
@@ -114,7 +114,7 @@ beforeAll(() => {
         }
     } as any;
 
-    global.FileReader = class MockFileReader {
+    globalThis.FileReader = class MockFileReader {
         readAsDataURL = vi.fn();
         readAsText = vi.fn();
         result = "";
@@ -123,11 +123,11 @@ beforeAll(() => {
     } as any;
 
     // Mock performance.now for timing tests
-    global.performance.now = vi.fn(() => Date.now());
+    globalThis.performance.now = vi.fn(() => Date.now());
 
     // Mock console methods to reduce test noise (optional)
     const originalConsole = { ...console };
-    global.console = {
+    globalThis.console = {
         ...originalConsole,
         // Suppress console.log in tests unless specifically needed
         log: process.env["NODE_ENV"] === "test" ? vi.fn() : originalConsole.log,

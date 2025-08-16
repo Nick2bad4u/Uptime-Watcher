@@ -69,7 +69,7 @@ describe("HistoryChart - Complete Coverage", () => {
         it("should render with required props", () => {
             const history: StatusHistory[] = [
                 createStatusHistory("up", Date.now(), 150),
-                createStatusHistory("down", Date.now() - 60000, 0),
+                createStatusHistory("down", Date.now() - 60_000, 0),
             ];
 
             renderWithTheme(
@@ -216,8 +216,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
         it("should pass correct props to MiniChartBar components", () => {
             const history: StatusHistory[] = [
-                createStatusHistory("up", 1234567891, 250, "Success"), // newer first in input
-                createStatusHistory("down", 1234567890, 0, "Timeout"), // older second in input
+                createStatusHistory("up", 1_234_567_891, 250, "Success"), // newer first in input
+                createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // older second in input
             ];
 
             renderWithTheme(

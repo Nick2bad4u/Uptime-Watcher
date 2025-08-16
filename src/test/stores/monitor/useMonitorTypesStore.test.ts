@@ -22,7 +22,7 @@ const mockElectronAPI = {
 };
 
 // Mock the global window object
-global.window = {
+globalThis.window = {
     electronAPI: mockElectronAPI,
 } as never;
 

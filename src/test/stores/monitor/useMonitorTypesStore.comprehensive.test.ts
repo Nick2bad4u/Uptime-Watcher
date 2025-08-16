@@ -56,7 +56,7 @@ const mockElectronAPI = {
     },
 };
 
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
@@ -419,7 +419,7 @@ describe("useMonitorTypesStore", () => {
                         "http",
                         originalDetails
                     );
-                } catch (error) {
+                } catch {
                     // Expected to throw
                 }
             });
