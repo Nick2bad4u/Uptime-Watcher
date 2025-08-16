@@ -694,5 +694,7 @@
     "stylelint.reportNeedlessDisables": true,
     "stylelint.reportInvalidScopeDisables": true,
     "stylelint.snippet": ["css", "postcss", "scss"],
-    "css.validate": false
+    "css.validate": false,
+    "css.customData": [],
+    "css.lint.unknownAtRules": "ignore"
 }
