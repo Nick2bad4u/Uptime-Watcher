@@ -1,13 +1,17 @@
 {
     "$schema": "https://www.schemastore.org/lintstagedrc.schema.json",
     "*.md": [
-        "markdownlint --fix"
+        "markdownlint --fix --cache"
     ],
-    "*.{js,jsx,ts,tsx,css,scss,md,json,yaml,yml}": [
-        "prettier --write --cache",
-        "eslint --fix --cache"
+    "*.{js,jsx,ts,tsx}": [
+        "eslint --fix --cache --max-warnings=0",
+        "prettier --write --cache"
     ],
     "*.{css,scss}": [
-        "stylelint --fix --cache"
+        "stylelint --fix --cache",
+        "prettier --write --cache"
+    ],
+    "*.{json,yaml,yml}": [
+        "prettier --write --cache"
     ]
 }

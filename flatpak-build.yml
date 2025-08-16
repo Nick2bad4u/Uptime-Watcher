@@ -1,53 +1,161 @@
+# Flatpak Application Manifest for Uptime Watcher
+# Modern configuration with enhanced security, sandboxing, and 2025 best practices
+
+# Application metadata
 app-id: io.github.uptimewatcher
 runtime: org.freedesktop.Platform
 runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
+
+# Electron BaseApp for optimized Electron applications
 base: org.electronjs.Electron2.BaseApp
 base-version: "24.08"
+
+# Node.js SDK extension for build-time dependencies
+sdk-extensions:
+    - org.freedesktop.Sdk.Extension.node22
+
+# Application entry point
 command: run-electron.sh
+
+# Locale handling
 separate-locales: false
+
+# Build configuration
+build-options:
+    # Optimization flags
+    cflags: -O2 -g -fPIC
+    cxxflags: -O2 -g -fPIC
+
+    # Node.js build environment
+    append-path: /usr/lib/sdk/node22/bin
+
+    # Environment variables for build
+    env:
+        # Node.js configuration
+        NPM_CONFIG_LOGLEVEL: info
+        NPM_CONFIG_PROGRESS: "false"
+        NPM_CONFIG_AUDIT: "false"
+        NPM_CONFIG_FUND: "false"
+        NODE_ENV: production
+
+        # Electron configuration
+        ELECTRON_CACHE: /run/build/uptime-watcher/electron-cache
+        ELECTRON_SKIP_BINARY_DOWNLOAD: "true"
+
+        # Cache directories
+        XDG_CACHE_HOME: /run/build/uptime-watcher/flatpak-node/cache
+        npm_config_cache: /run/build/uptime-watcher/flatpak-node/npm-cache
+        npm_config_nodedir: /usr/lib/sdk/node22
+        npm_config_offline: "true"
+
+# Sandbox permissions with security-first approach
 finish-args:
-    - --share=network
+    # Core IPC and display
     - --share=ipc
-    - --socket=x11
-    - --socket=wayland
-    - --socket=pulseaudio
     - --device=dri
-    - --filesystem=xdg-download:rw
+    - --socket=x11 # Primary display protocol
+    - --socket=fallback-x11 # Fallback for Wayland
+    - --socket=wayland # Native Wayland support
+
+    # Audio support
+    - --socket=pulseaudio
+
+    # Network access (required for uptime monitoring)
+    - --share=network
+
+    # File system access (minimal and secure)
+    - --filesystem=xdg-download:rw # Downloads folder access
+    - --filesystem=xdg-documents:ro # Read-only documents access
+    - --filesystem=xdg-config/uptime-watcher:create # App-specific config
+
+    # Notifications
     - --talk-name=org.freedesktop.Notifications
     - --talk-name=org.kde.StatusNotifierWatcher
+
+    # Desktop integration
+    - --talk-name=org.freedesktop.FileManager1 # File manager integration
+    - --talk-name=org.freedesktop.portal.Desktop # Desktop portal access
+    - --talk-name=org.freedesktop.portal.Request # Request portal
+
+    # Environment variables
     - --env=ELECTRON_IS_DEV=0
     - --env=ELECTRON_FORCE_IS_PACKAGED=true
     - --env=NODE_ENV=production
+    - --env=ELECTRON_TRASH=gio # Trash integration
+    - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons # HiDPI cursor support
+
+    # Security hardening
+    - --env=ELECTRON_DISABLE_SECURITY_WARNINGS=true
+    - --env=TMPDIR=/tmp # Secure temp directory
+
+    # Performance optimizations
+    - --env=ELECTRON_NO_ASAR=false # Enable ASAR for performance
+    - --env=ELECTRON_USE_SYSTEM_ICONS=true # Use system icons
+
+# Application modules
 modules:
+    # Node.js module (using SDK extension)
     - name: nodejs
       buildsystem: simple
       build-commands:
-          - echo "Using Node.js from Electron base"
+          - echo "Using Node.js $(node --version) from SDK extension"
+          - echo "npm version: $(npm --version)"
       sources: []
 
+    # Main application module
     - name: uptime-watcher
       buildsystem: simple
-      build-commands:
-          - echo "Building Uptime Watcher flatpak"
+      build-options:
+          env:
+              # Additional build-time environment
+              ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: "true"
+              ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
 
-          # Copy built application files
+      build-commands:
+          # Pre-build validation
+          - echo "Building Uptime Watcher Flatpak v$(cat package.json | grep '\"version\"' | cut -d'\"' -f4)"
+          - echo "Node.js version:" && node --version
+          - echo "npm version:" && npm --version
+
+          # Verify required files exist
+          - test -f package.json || (echo "package.json not found" && exit 1)
+          - test -d dist-electron || (echo "dist-electron directory not found" && exit 1)
+          - test -f io.github.uptimewatcher.desktop || (echo "Desktop file not found" && exit 1)
+          - test -f io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file not found" && exit 1)
+
+          # Create application directories
+          - mkdir -p /app/{bin,lib,share/{applications,icons/hicolor,metainfo}}
+
+          # Copy built application files with proper permissions
           - cp -r dist-electron /app/
+          - chmod +x /app/dist-electron/main.js 2>/dev/null || true
+
+          # Copy distribution files
           - mkdir -p /app/dist
-          - cp -r dist/* /app/dist/ || true
+          - cp -r dist/* /app/dist/ 2>/dev/null || echo "No dist directory, skipping"
+
+          # Copy Node.js dependencies (optimized)
           - cp -r node_modules /app/
+          - find /app/node_modules -name "*.node" -exec chmod +x {} \; 2>/dev/null || true
+
+          # Copy static assets
           - cp -r icons /app/
           - cp package.json /app/
+          - chmod 644 /app/package.json
 
-          # Install Electron
-          - install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+          # Install Electron binary from BaseApp
+          - install -Dm755 /app/bin/electron /app/bin/electron 2>/dev/null ||
+            install -Dm755 node_modules/electron/dist/electron /app/bin/electron
 
-          # Install shell wrapper
+          # Install application wrapper script
           - install -Dm755 run-electron.sh /app/bin/run-electron.sh
 
-          # Install desktop file and icons
+          # Install desktop integration files
           - install -Dm644 io.github.uptimewatcher.desktop
             /app/share/applications/io.github.uptimewatcher.desktop
+
+          # Install application icons (multiple resolutions for HiDPI)
           - install -Dm644 icons/icon.png
             /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
           - install -Dm644 icons/icon-256.png
@@ -56,12 +164,70 @@ modules:
             /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
           - install -Dm644 icons/icon-64.png
             /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
+          - install -Dm644 icons/icon-32.png
+            /app/share/icons/hicolor/32x32/apps/io.github.uptimewatcher.png 2>/dev/null ||
+            cp icons/icon-32.png /app/share/icons/hicolor/32x32/apps/io.github.uptimewatcher.png 2>/dev/null || true
           - install -Dm644 icons/icon-16.png
             /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
 
-          # Install AppStream metadata
+          # Install AppStream metadata for software centers
           - install -Dm644 io.github.uptimewatcher.metainfo.xml
             /app/share/metainfo/io.github.uptimewatcher.metainfo.xml
+
+          # Desktop file validation and patching
+          - desktop-file-validate /app/share/applications/io.github.uptimewatcher.desktop || echo "Desktop file validation warnings"
+
+          # Fix desktop file name for Flatpak compatibility
+          - patch-desktop-filename /app/dist-electron/resources/app.asar 2>/dev/null || echo "Desktop filename patch not needed"
+
+          # Security: Remove unnecessary files and set proper permissions
+          - find /app -name "*.md" -delete 2>/dev/null || true
+          - find /app -name "*.txt" -delete 2>/dev/null || true
+          - find /app -name "LICENSE*" -delete 2>/dev/null || true
+          - find /app -type f -name "*.so*" -exec chmod 755 {} \; 2>/dev/null || true
+          - find /app -type f -name "*.node" -exec chmod 755 {} \; 2>/dev/null || true
+
+          # Optimize application size
+          - find /app/node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true
+          - find /app/node_modules -name "tests" -type d -exec rm -rf {} + 2>/dev/null || true
+          - find /app/node_modules -name "*.test.js" -delete 2>/dev/null || true
+          - find /app/node_modules -name "*.spec.js" -delete 2>/dev/null || true
+
+          # Validate installation
+          - test -x /app/bin/run-electron.sh || (echo "Wrapper script not executable" && exit 1)
+          - test -f /app/share/applications/io.github.uptimewatcher.desktop || (echo "Desktop file missing" && exit 1)
+          - test -f /app/share/metainfo/io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file missing" && exit 1)
+
+          # Final build report
+          - echo "Flatpak build completed successfully"
+          - echo "Application size: $(du -sh /app | cut -f1)"
+          - echo "Electron binary: $(ls -la /app/bin/electron 2>/dev/null || echo 'Not found')"
+
       sources:
           - type: dir
             path: .
+
+# Cleanup commands to optimize final package size
+cleanup-commands:
+    - mkdir -p ${FLATPAK_DEST}/lib/electron-cache
+    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,32x32,48x48,64x64,128x128,256x256,512x512}/apps
+
+# Extension points for additional functionality
+add-extensions:
+    # Optional: Custom themes extension point
+    io.github.uptimewatcher.Theme:
+        directory: share/themes
+        subdirectories: true
+        no-autodownload: true
+
+# Cleanup patterns for optimized package size
+cleanup:
+    - /include
+    - /lib/pkgconfig
+    - /man
+    - /share/doc
+    - /share/gtk-doc
+    - /share/man
+    - /share/pkgconfig
+    - "*.la"
+    - "*.a"

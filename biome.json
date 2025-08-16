@@ -1,38 +1,157 @@
 {
-    "$schema": "https://biomejs.dev/schemas/latest/schema.json",
-    "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-    "files": { "ignoreUnknown": false },
+    "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
+
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true,
+        "defaultBranch": "main"
+    },
+
+    "files": {
+        "ignoreUnknown": false,
+        "maxSize": 2097152,
+        "includes": [
+            "src/**/*",
+            "electron/**/*",
+            "shared/**/*",
+            "scripts/**/*",
+            "*.{js,ts,jsx,tsx,json,jsonc,css,html,md}"
+        ],
+        "experimentalScannerIgnores": [
+            "node_modules",
+            "dist",
+            "dist-electron",
+            "coverage",
+            "release",
+            ".git",
+            ".cache",
+            "html"
+        ]
+    },
+
     "formatter": {
         "enabled": true,
         "formatWithErrors": false,
         "indentStyle": "space",
         "indentWidth": 4,
-        "lineEnding": "crlf",
+        "lineEnding": "lf",
         "lineWidth": 120,
         "attributePosition": "auto",
-        "bracketSameLine": false,
         "bracketSpacing": true,
-        "expand": "auto",
         "useEditorconfig": true,
+        "expand": "auto",
         "includes": [
-            "**",
-            "!**/libs/",
-            "!**/node_modules/",
-            "!**/build/",
-            "!**/coverage/",
-            "!**/*.min.js",
-            "!**/*.min.css",
-            "!**/dist/",
-            "!**/dist-electron/",
-            "!**/CHANGELOG.md",
-            "!electron-app/package.json",
-            "!electron-app/package-lock.json",
-            "!**/package-lock.json",
-            "!**/package.json"
+            "src/**/*",
+            "electron/**/*",
+            "shared/**/*",
+            "scripts/**/*"
         ]
     },
-    "linter": { "enabled": true, "rules": { "recommended": true } },
+
+    "linter": {
+        "enabled": true,
+        "includes": [
+            "src/**/*",
+            "electron/**/*",
+            "shared/**/*",
+            "scripts/**/*"
+        ],
+        "rules": {
+            "recommended": true,
+
+            "correctness": {
+                "noUnusedVariables": "error",
+                "noUnusedImports": "error",
+                "useExhaustiveDependencies": "warn",
+                "noUndeclaredVariables": "error",
+                "noUnreachable": "error",
+                "noSelfAssign": "error",
+                "useValidForDirection": "error",
+                "noVoidTypeReturn": "error"
+            },
+
+            "suspicious": {
+                "noExplicitAny": "warn",
+                "noArrayIndexKey": "warn",
+                "noEmptyBlockStatements": "error",
+                "noConfusingVoidType": "warn",
+                "noDebugger": "error",
+                "noDuplicateCase": "error",
+                "noFallthroughSwitchClause": "error",
+                "noMisleadingCharacterClass": "error",
+                "noRedundantUseStrict": "error",
+                "noSelfCompare": "error",
+                "noSparseArray": "error"
+            },
+
+            "style": {
+                "useConst": "error",
+                "useTemplate": "error",
+                "useExponentiationOperator": "error",
+                "useEnumInitializers": "warn",
+                "useImportType": "error",
+                "useNodejsImportProtocol": "warn",
+                "useNumberNamespace": "error",
+                "useSingleVarDeclarator": "warn"
+            },
+
+            "complexity": {
+                "useFlatMap": "error",
+                "noForEach": "warn",
+                "useOptionalChain": "warn",
+                "useSimpleNumberKeys": "warn",
+                "useLiteralKeys": "warn"
+            },
+
+            "performance": {
+                "noDelete": "error",
+                "noAccumulatingSpread": "warn",
+                "noBarrelFile": "warn",
+                "noReExportAll": "warn"
+            },
+
+            "security": {
+                "noDangerouslySetInnerHtml": "error",
+                "noGlobalEval": "error"
+            },
+
+            "a11y": {
+                "useValidAnchor": "error",
+                "useAltText": "error",
+                "useButtonType": "error",
+                "useKeyWithClickEvents": "warn",
+                "useValidAriaProps": "error",
+                "useValidAriaRole": "error",
+                "useValidAriaValues": "error",
+                "noAccessKey": "warn",
+                "noAriaUnsupportedElements": "error",
+                "noRedundantAlt": "warn",
+                "useFocusableInteractive": "warn",
+                "useIframeTitle": "error"
+            },
+
+            "nursery": {
+                "recommended": false,
+                "useSortedClasses": "warn"
+            }
+        }
+    },
+
+    "assist": {
+        "enabled": true,
+        "actions": {
+            "source": {
+                "recommended": true
+            }
+        }
+    },
+
     "javascript": {
+        "parser": {
+            "unsafeParameterDecoratorsEnabled": false,
+            "jsxEverywhere": true
+        },
         "formatter": {
             "jsxQuoteStyle": "double",
             "quoteProperties": "asNeeded",
@@ -43,19 +162,181 @@
             "quoteStyle": "double",
             "attributePosition": "auto",
             "bracketSpacing": true
+        },
+        "globals": [
+            "window",
+            "document",
+            "electronAPI",
+            "__dirname",
+            "__filename",
+            "process",
+            "Buffer",
+            "global",
+            "NodeJS"
+        ],
+        "jsxRuntime": "transparent",
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
         }
     },
-    "html": { "formatter": { "selfCloseVoidElements": "always" } },
+
+    "json": {
+        "parser": {
+            "allowComments": true,
+            "allowTrailingCommas": true
+        },
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "trailingCommas": "none",
+            "expand": "always"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
+    },
+
+    "css": {
+        "parser": {
+            "cssModules": false
+        },
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "quoteStyle": "double"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
+    },
+
+    "html": {
+        "formatter": {
+            "enabled": false,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "attributePosition": "auto",
+            "bracketSameLine": false,
+            "indentScriptAndStyle": true,
+            "selfCloseVoidElements": "never"
+        }
+    },
+
+    "graphql": {
+        "formatter": {
+            "enabled": false,
+            "indentStyle": "space",
+            "indentWidth": 4,
+            "lineWidth": 120,
+            "quoteStyle": "double"
+        },
+        "linter": {
+            "enabled": true
+        },
+        "assist": {
+            "enabled": true
+        }
+    },
+
     "overrides": [
-        { "includes": ["*.css"], "formatter": { "lineWidth": 120 } },
-        { "includes": ["*.user.css"], "formatter": { "lineWidth": 120 } },
-        { "includes": ["*.styl"] },
-        { "includes": ["*.html"], "formatter": { "lineWidth": 120 } },
-        { "includes": ["*.user.js"], "formatter": { "lineWidth": 120 } },
-        { "includes": ["*.md"], "formatter": { "indentWidth": 1 } },
-        { "includes": ["**/package.json", "**/package-lock.json"] }],
-    "assist": {
-        "enabled": true,
-        "actions": { "source": { "organizeImports": "on" } }
-    }
+        {
+            "includes": ["*.md", "*.mdx"],
+            "formatter": {
+                "lineWidth": 100,
+                "indentWidth": 2
+            }
+        },
+        {
+            "includes": [
+                "**/*.test.{js,ts,jsx,tsx}",
+                "**/*.spec.{js,ts,jsx,tsx}"
+            ],
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "noExplicitAny": "off"
+                    },
+                    "correctness": {
+                        "noUnusedVariables": "warn"
+                    },
+                    "complexity": {
+                        "noForEach": "off"
+                    }
+                }
+            }
+        },
+        {
+            "includes": [
+                "**/package.json",
+                "**/package-lock.json",
+                "**/pnpm-lock.yaml"
+            ],
+            "formatter": {
+                "enabled": false
+            }
+        },
+        {
+            "includes": [
+                "**/node_modules/**",
+                "**/dist/**",
+                "**/dist-electron/**"
+            ],
+            "formatter": {
+                "enabled": false
+            },
+            "linter": {
+                "enabled": false
+            }
+        },
+        {
+            "includes": ["electron/**/*.ts"],
+            "javascript": {
+                "globals": [
+                    "app",
+                    "BrowserWindow",
+                    "ipcMain",
+                    "Menu",
+                    "Tray",
+                    "shell",
+                    "clipboard",
+                    "nativeTheme",
+                    "powerMonitor",
+                    "screen",
+                    "systemPreferences"
+                ]
+            }
+        },
+        {
+            "includes": ["src/**/*.{ts,tsx}"],
+            "javascript": {
+                "globals": [
+                    "React",
+                    "JSX"
+                ]
+            }
+        },
+        {
+            "includes": [".vscode/**/*.json", "**/.vscode/**/*.json"],
+            "json": {
+                "parser": {
+                    "allowComments": true,
+                    "allowTrailingCommas": true
+                }
+            }
+        }
+    ]
 }

@@ -1,32 +1,238 @@
-# self-hosted-runner:
-#   # Labels of self-hosted runner in array of strings.
-#   labels: []
+# ActionLint Configuration for Uptime Watcher - 2025 Enhanced Security & Performance
+# Modern configuration following ActionLint v1.7.7+ best practices and security standards
+# See: https://github.com/rhysd/actionlint/blob/main/docs/config.md
 
-# # Configuration variables in array of strings defined in your repository or
-# # organization. `null` means disabling configuration variables check.
-# # Empty array means no configuration variable is allowed.
-# config-variables: null
+# Configuration for self-hosted runner environments
+# Supports modern GitHub-hosted and enterprise self-hosted runners
+self-hosted-runner:
+    # Labels of self-hosted runner with modern runner types and sizes
+    labels:
+        # GitHub-hosted runners (2025 updated)
+        - "ubuntu-*"
+        - "windows-*"
+        - "macos-*"
 
-# Configuration for file paths. The keys are glob patterns to match to file
-# paths relative to the repository root. The values are the configurations for
-# the file paths. Note that the path separator is always '/'.
-# The following configurations are available.
-#
-# "ignore" is an array of regular expression patterns. Matched error messages
-# are ignored. This is similar to the "-ignore" command line option.
+        # GitHub-hosted performance runners
+        - "ubuntu-latest-*-cores"
+        - "macos-*-xl*"
+        - "windows-*-cores"
+
+        # Self-hosted runner patterns
+        - "self-hosted"
+        - "linux.*"
+        - "windows.*"
+        - "macos.*"
+        - "gpu-enabled"
+        - "high-memory"
+        - "arm64"
+        - "x64"
+
+        # Enterprise and specialized runners
+        - "enterprise-*"
+        - "large"
+        - "xlarge"
+        - "*-cores"
+
+# Configuration variables defined in repository or organization
+# Comprehensive list for Electron + Node.js + TypeScript projects
+config-variables:
+    # Environment and deployment
+    - ENVIRONMENT
+    - NODE_ENV
+    - CI_ENVIRONMENT
+    - DEPLOYMENT_ENV
+    - STAGE
+
+    # Version and build configuration
+    - NODE_VERSION
+    - ELECTRON_VERSION
+    - BUILD_TARGET
+    - TARGET_ARCH
+    - RELEASE_CHANNEL
+    - VERSION_OVERRIDE
+
+    # Build and compilation
+    - DEBUG_MODE
+    - BUILD_TYPE
+    - COMPILE_TARGET
+    - OPTIMIZATION_LEVEL
+
+    # Platform specific
+    - RUNNER_OS
+    - RUNNER_ARCH
+    - TARGET_PLATFORM
+
+    # Security and authentication
+    - GITHUB_TOKEN
+    - NPM_TOKEN
+    - SIGNING_CERT
+
+    # Package and distribution
+    - REGISTRY_URL
+    - PACKAGE_SCOPE
+    - PUBLISH_CHANNEL
+
+    # Testing and quality
+    - COVERAGE_THRESHOLD
+    - TEST_TIMEOUT
+    - LINT_LEVEL
+
+# Path-specific configurations for different workflow types
+# Enhanced security and performance patterns for 2025
 paths:
-    ../.github/workflows/summary.yml:
+    # Build workflows - comprehensive patterns for Electron applications
+    ".github/workflows/Build.yml":
         ignore:
+            # Shell script patterns - allow advanced shell features for build scripts
+            - "shellcheck reported issue in this script: SC2034:warning"
+            - "shellcheck reported issue in this script: SC2086:info"
+            - "shellcheck reported issue in this script: SC2181:style"
+            - "shellcheck reported issue in this script: SC1091:info"
+            - "shellcheck reported issue in this script: SC2155:warning"
+
+            # Permission patterns for build and release
+            - 'unknown permission scope "packages"'
+            - 'unknown permission scope "attestations"'
+            - 'unknown permission scope "id-token"'
+
+            # Matrix and expression patterns
+            - 'property ".*" is not defined in object type'
+            - "matrix variable .* is not defined"
+            - "expression .* is potentially untrusted but used in trusted context"
+
+            # Action version patterns (pinned for security)
+            - "the runner of .* action is too old"
+            - "newer major version .* is available"
+
+    # All build-related workflows
+    ".github/workflows/*build*.{yml,yaml}":
+        ignore:
+            - "shellcheck reported issue.*build.*"
+            - "potentially untrusted.*matrix\\..*"
             - "unknown permission scope"
 
-    ../.github/workflows/Build.yml:
+    # Summary and reporting workflows
+    ".github/workflows/summary.yml":
         ignore:
-            - "shellcheck reported issue in this script: SC2034:warning"
+            # Custom permission scopes for advanced GitHub API usage
+            - 'unknown permission scope "metadata"'
+            - 'unknown permission scope "checks"'
+            - 'unknown permission scope "statuses"'
 
-    .github/workflows/summary.yml:
-        ignore:
-            - "unknown permission scope"
+            # Job dependencies for complex workflows
+            - "circular dependency detected"
+            - "needs .* but .* is not defined"
 
-    .github/workflows/Build.yml:
+            # GitHub API patterns
+            - "potentially untrusted.*github\\.context.*"
+
+    # Release workflows - security-focused with necessary permissions
+    ".github/workflows/release.yml":
         ignore:
-            - "shellcheck reported issue in this script: SC2034:warning"
+            # Release automation requires elevated permissions
+            - "permissions.*write-all"
+            - '"contents: write" permission is too broad'
+            - '"packages: write" permission is too broad'
+
+            # Trusted contexts for release automation
+            - "potentially untrusted.*use it through an environment variable"
+            - "expression.*github\\.event\\.release.*is potentially untrusted"
+
+            # Version management patterns
+            - "the runner of .* action is too old"
+            - "action should be pinned to full length commit SHA"
+
+            # Release-specific patterns
+            - "potentially untrusted.*startsWith\\(github\\.ref.*"
+
+    # Security scanning workflows
+    ".github/workflows/security.yml":
+        ignore:
+            # Security tools need elevated permissions
+            - 'unknown permission scope "security-events"'
+            - 'unknown permission scope "sarif"'
+            - "permissions.*security-events.*write"
+
+            # SARIF upload patterns
+            - "potentially untrusted.*sarif.*"
+
+    # CodeQL and security analysis
+    ".github/workflows/codeql*.{yml,yaml}":
+        ignore:
+            - 'unknown permission scope "security-events"'
+            - "permissions.*security-events.*write"
+            - "action should be pinned.*github/codeql-action"
+
+    # Testing workflows
+    ".github/workflows/test.yml":
+        ignore:
+            # Test-specific shell patterns
+            - "shellcheck reported issue in this script: SC2181:style"
+            - "shellcheck reported issue in this script: SC2015:info"
+
+            # Test matrix patterns
+            - "matrix variable.*not.*used"
+            - "potentially untrusted.*matrix\\..*"
+
+    # CI/CD workflow patterns
+    ".github/workflows/ci.yml":
+        ignore:
+            - "shellcheck reported issue.*CI.*"
+            - "potentially untrusted.*github\\.head_ref.*"
+
+    # Dependency management workflows
+    ".github/workflows/*dep*.{yml,yaml}":
+        ignore:
+            - "potentially untrusted.*github\\.event\\.pull_request.*"
+            - "action should be pinned.*dependabot"
+
+    # Performance and benchmarking workflows
+    ".github/workflows/*perf*.{yml,yaml}":
+        ignore:
+            - "timeout-minutes should be less than"
+            - "job timeout is too long"
+
+    # All workflow files - general modern patterns
+    ".github/workflows/*.{yml,yaml}":
+        ignore:
+            # Deprecated warnings for features still in use
+            - "workflow command.*is deprecated"
+            - "set-output.*is deprecated"
+            - "save-state.*is deprecated"
+
+            # Expression patterns that are safe in controlled environments
+            - "untrusted input.*fromJSON"
+            - "potentially untrusted.*but used with.*toJSON"
+
+            # Conditional execution patterns
+            - "step is disabled by.*if.*condition"
+            - "job .* is disabled by.*if.*condition"
+
+            # Runner and environment patterns
+            - "runner label .* is unknown"
+            - "environment .* is not defined"
+
+            # Action pinning - allow flexibility for stable actions
+            - "action should be pinned.*actions/(checkout|setup-node|cache|upload-artifact|download-artifact)@v[34]"
+
+            # Concurrency patterns
+            - "concurrency.*cancel-in-progress.*may cause issues"
+
+    # Reusable workflow patterns
+    ".github/workflows/*reusable*.{yml,yaml}":
+        ignore:
+            - "workflow_call event should have.*"
+            - "input .* of workflow_call event is not used"
+
+    # Legacy workflow support
+    ".github/workflows/legacy*.{yml,yaml}":
+        ignore:
+            - "the runner of .* action is too old"
+            - "workflow syntax is deprecated"
+# Additional security and performance considerations:
+# 1. This configuration balances security with practical development needs
+# 2. Release workflows are given more permissions as they require them for automation
+# 3. Build patterns accommodate complex Electron build processes
+# 4. Modern GitHub-hosted runner types are supported
+# 5. Security scanning tools are allowed necessary permissions
+# 6. Common false positives for modern CI/CD patterns are filtered

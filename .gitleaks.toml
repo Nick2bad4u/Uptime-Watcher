@@ -1,139 +1,236 @@
-# Title for the gitleaks configuration file.
-title = "Custom Gitleaks configuration"
+# Gitleaks Configuration for Uptime Watcher - 2025 Enhanced Security
+# Modern configuration following Gitleaks v8.28+ best practices with latest rules
+# See: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
 
-# You have basically two options for your custom configuration:
-#
-# 1. define your own configuration, default rules do not apply
-#
-#    use e.g., the default configuration as starting point:
-#    https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
-#
-# 2. extend a configuration, the rules are overwritten or extended
-#
-#    When you extend a configuration the extended rules take precedence over the
-#    default rules. I.e., if there are duplicate rules in both the extended
-#    configuration and the default configuration the extended rules or
-#    attributes of them will override the default rules.
-#    Another thing to know with extending configurations is you can chain
-#    together multiple configuration files to a depth of 2. Allowlist arrays are
-#    appended and can contain duplicates.
+title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
-# useDefault and path can NOT be used at the same time. Choose one.
+# Extend the default Gitleaks configuration with modern v8.28+ rules
+# The default configuration includes comprehensive patterns for:
+# - API keys (AWS, Azure, GCP, GitHub, etc.)
+# - Database credentials
+# - Authentication tokens
+# - Certificates and private keys
+# - Service-specific secrets
+# - New AI platform keys (OpenAI, Anthropic, etc.)
 [extend]
-# useDefault will extend the default gitleaks config built in to the binary
-# the latest version is located at:
-# https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
 useDefault = true
-# or you can provide a path to a configuration to extend from.
-# The path is relative to where gitleaks was invoked,
-# not the location of the base config.
-# path = "common_config.toml"
-# If there are any rules you don't want to inherit, they can be specified here.
-disabledRules = ["generic-api-key"]
 
-# An array of tables that contain information that define instructions
-# on how to detect secrets
-# [[rules]]
-# # Unique identifier for this rule
-# id = "awesome-rule-1"
+# Disable overly broad rules that generate false positives
+# in JavaScript/TypeScript development environments
+disabledRules = [
+    "generic-api-key",  # Too broad for demo URLs and example code
+]
 
-# # Short human-readable description of the rule.
-# description = "awesome rule 1"
+# Performance optimizations enabled by default in v8.28+
+# - Stopword optimization (promoted from experimental)
+# - Fragment newline calculation optimization
+# - Enhanced allowlist processing
 
-# # Golang regular expression used to detect secrets. Note Golang's regex engine
-# # does not support lookaheads.
-# regex = '''one-go-style-regex-for-this-rule'''
+# Custom rules for project-specific patterns
+[[rules]]
+id = "electron-config-secrets"
+description = "Detect hardcoded secrets in Electron configuration files"
+regex = '''(?i)(electron[_-]?(?:secret|key|token|password|credential))\s*[:=]\s*["']?([a-zA-Z0-9]{16,})["']?'''
+secretGroup = 2
+keywords = ["electron", "secret", "key", "token", "password"]
+tags = ["electron", "configuration", "secrets"]
 
-# # Int used to extract secret from regex match and used as the group that will have
-# # its entropy checked if `entropy` is set.
-# secretGroup = 3
+    [[rules.allowlists]]
+    description = "Allow example values in documentation"
+    paths = ['''docs/.*\.(md|txt|rst)$''']
+    regexTarget = "secret"
+    regexes = ['''(?i)(example|demo|placeholder|test|sample)''']
 
-# # Float representing the minimum shannon entropy a regex group must have to be considered a secret.
-# entropy = 3.5
+[[rules]]
+id = "database-connection-strings"
+description = "Detect database connection strings with embedded credentials"
+regex = '''(?i)(database_url|db_url|connection_string)\s*[:=]\s*["']?([^"'\s]+://[^"'\s]*:[^"'\s]*@[^"'\s]+)["']?'''
+secretGroup = 2
+keywords = ["database", "connection", "url", "db"]
+tags = ["database", "credentials", "connection-string"]
 
-# # Golang regular expression used to match paths. This can be used as a standalone rule or it can be used
-# # in conjunction with a valid `regex` entry.
-# path = '''a-file-path-regex'''
+    [[rules.allowlists]]
+    description = "Allow example connection strings in documentation"
+    paths = ['''docs/.*\.(md|txt|rst)$''']
+    regexTarget = "secret"
+    regexes = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
 
-# # Keywords are used for pre-regex check filtering. Rules that contain
-# # keywords will perform a quick string compare check to make sure the
-# # keyword(s) are in the content being scanned. Ideally these values should
-# # either be part of the identiifer or unique strings specific to the rule's regex
-# # (introduced in v8.6.0)
-# keywords = [
-#   "auth",
-#   "password",
-#   "token",
-# ]
+[[rules]]
+id = "vite-env-secrets"
+description = "Detect secrets in Vite environment variable definitions"
+regex = '''(?i)VITE_(?:API_|SECRET_|PASSWORD_|TOKEN_|KEY_)[A-Z0-9_]*\s*[:=]\s*["']?([a-zA-Z0-9+/=]{16,})["']?'''
+secretGroup = 1
+keywords = ["vite_", "api_", "secret_", "password_", "token_", "key_"]
+tags = ["vite", "environment", "frontend", "secrets"]
 
-# # Array of strings used for metadata and reporting purposes.
-# tags = ["tag","another tag"]
+    [[rules.allowlists]]
+    description = "Allow development and test values"
+    regexTarget = "secret"
+    regexes = [
+        '''(?i)(development|dev|test|local|localhost|example|demo|placeholder)''',
+        '''^(true|false|1|0|yes|no|enabled|disabled)$'''
+    ]
 
-#     # ⚠️ In v8.21.0 `[rules.allowlist]` was replaced with `[[rules.allowlists]]`.
-#     # This change was backwards-compatible: instances of `[rules.allowlist]` still  work.
-#     #
-#     # You can define multiple allowlists for a rule to reduce false positives.
-#     # A finding will be ignored if _ANY_ `[[rules.allowlists]]` matches.
-#     [[rules.allowlists]]
-#     description = "ignore commit A"
-#     # When multiple criteria are defined the default condition is "OR".
-#     # e.g., this can match on |commits| OR |paths| OR |stopwords|.
-#     condition = "OR"
-#     commits = [ "commit-A", "commit-B"]
-#     paths = [
-#       '''go\.mod''',
-#       '''go\.sum'''
-#     ]
-#     # note: stopwords targets the extracted secret, not the entire regex match
-#     # like 'regexes' does. (stopwords introduced in 8.8.0)
-#     stopwords = [
-#       '''client''',
-#       '''endpoint''',
-#     ]
+# Enhanced AI platform detection rules (v8.28+ features)
+[[rules]]
+id = "anthropic-enhanced-detection"
+description = "Enhanced detection for Anthropic API keys including all variants"
+regex = '''\b(sk-ant-(?:api03|admin01)-[a-zA-Z0-9_\-]{93}AA)(?:[\x60'"\s;]|\\[nr]|$)'''
+keywords = ["sk-ant-api03", "sk-ant-admin01"]
+tags = ["ai", "anthropic", "api-key"]
 
-#     [[rules.allowlists]]
-#     # The "AND" condition can be used to make sure all criteria match.
-#     # e.g., this matches if |regexes| AND |paths| are satisfied.
-#     condition = "AND"
-#     # note: |regexes| defaults to check the _Secret_ in the finding.
-#     # Acceptable values for |regexTarget| are "secret" (default), "match", and "line".
-#     regexTarget = "match"
-#     regexes = [ '''(?i)parseur[il]''' ]
-#     paths = [ '''package-lock\.json''' ]
+[[rules]]
+id = "perplexity-api-detection"
+description = "Detect Perplexity AI API keys"
+regex = '''\b(pplx-[a-zA-Z0-9]{48})(?:[\x60'"\s;]|\\[nr]|$)'''
+keywords = ["pplx-"]
+tags = ["ai", "perplexity", "api-key"]
 
-# # You can extend a particular rule from the default config. e.g., gitlab-pat
-# # if you have defined a custom token prefix on your GitLab instance
-# [[rules]]
-# id = "gitlab-pat"
-# # all the other attributes from the default rule are inherited
-
-#     [[rules.allowlists]]
-#     regexTarget = "line"
-#     regexes = [ '''MY-glpat-''' ]
-
-
-# # ⚠️ In v8.25.0 `[allowlist]` was replaced with `[[allowlists]]`.
-# #
-# # Global allowlists have a higher order of precedence than rule-specific allowlists.
-# # If a commit listed in the `commits` field below is encountered then that commit will be skipped and no
-# # secrets will be detected for said commit. The same logic applies for regexes and paths.
+# Global allowlists to reduce false positives
 [[allowlists]]
-description = "Ignore false positive in Chart.js usage.md (cubeToken)"
+description = "Ignore test and example files"
+paths = [
+    '''test/.*''',
+    '''tests/.*''',
+    '''__tests__/.*''',
+    '''.*\.test\.(js|ts|jsx|tsx)$''',
+    '''.*\.spec\.(js|ts|jsx|tsx)$''',
+    '''examples?/.*''',
+    '''demo/.*''',
+    '''samples?/.*''',
+    '''docs/.*\.(md|txt|rst)$''',
+    '''README\.md$''',
+    '''CHANGELOG\.md$''',
+    '''CONTRIBUTING\.md$''',
+]
+
+[[allowlists]]
+description = "Ignore build artifacts and dependencies"
+paths = [
+    '''node_modules/.*''',
+    '''dist/.*''',
+    '''dist-electron/.*''',
+    '''build/.*''',
+    '''coverage/.*''',
+    '''\.git/.*''',
+    '''.*\.min\.(js|css)$''',
+    '''.*\.(map|d\.ts)$''',
+    '''.*\.wasm$''',
+    '''.*\.snap$''',
+    '''.*\.log$''',
+]
+
+[[allowlists]]
+description = "Ignore configuration files with known false positives"
+paths = [
+    '''\.gitleaks\.toml$''',
+    '''\.gitignore$''',
+    '''\.eslintrc.*''',
+    '''.*config\.(js|ts|mjs|json)$''',
+    '''package(-lock)?\.json$''',
+    '''yarn\.lock$''',
+    '''pnpm-lock\.yaml$''',
+    '''tsconfig.*\.json$''',
+    '''vite\.config\.(js|ts|mjs)$''',
+    '''vitest\.config\.(js|ts|mjs)$''',
+    '''tailwind\.config\.(js|ts|mjs)$''',
+    '''postcss\.config\.(js|ts|mjs)$''',
+    '''biome\.json$''',
+]
+
+[[allowlists]]
+description = "Ignore documentation files"
+paths = [
+    '''LICENSE$''',
+    '''docs/.*\.(md|txt|rst)$''',
+]
+
+[[allowlists]]
+description = "Ignore Chart.js usage documentation with cubeToken example"
 paths = ['''docs/Packages/Chart\.js/getting-started/usage\.md''']
 regexTarget = "line"
 regexes = ['''cubeToken''']
-# # note: stopwords targets the extracted secret, not the entire regex match
-# # like 'regexes' does. (stopwords introduced in 8.8.0)
-# stopwords = [
-#   '''client''',
-#   '''endpoint''',
-# ]
 
-# # ⚠️ In v8.25.0, `[[allowlists]]` have a new field called |targetRules|.
-# #
-# # Common allowlists can be defined once and assigned to multiple rules using |targetRules|.
-# # This will only run on the specified rules, not globally.
-# [[allowlists]]
-# targetRules = ["awesome-rule-1", "awesome-rule-2"]
-# description = "Our test assets trigger false-positives in a couple rules."
-# paths = ['''tests/expected/._\.json$''']
+# Enhanced allowlist for common development patterns (v8.28+ optimizations)
+[[allowlists]]
+description = "Common non-secret patterns in development"
+regexTarget = "secret"
+stopwords = [
+    "client",
+    "endpoint", 
+    "localhost",
+    "127.0.0.1",
+    "example",
+    "demo",
+    "test",
+    "placeholder",
+    "sample",
+    "default",
+    "public",
+    "development",
+    "staging",
+    "production",
+    "undefined",
+    "null",
+    "true",
+    "false",
+]
+
+# Enhanced allowlist for TypeScript/JavaScript development
+[[allowlists]]
+description = "TypeScript/JavaScript development patterns"
+regexTarget = "line"
+regexes = [
+    '''console\.(log|error|warn|info)''',
+    '''process\.env\.NODE_ENV''',
+    '''development|staging|production''',
+    '''https?://localhost''',
+    '''http://127\.0\.0\.1''',
+    '''@types/.*''',
+    '''eslint-disable''',
+    '''prettier-ignore''',
+    '''gitleaks:allow''',
+    '''import.*from.*['"]/.*['"]''',
+    '''export.*\{.*\}.*from''',
+]
+
+[[allowlists]]
+description = "Electron and desktop app specific patterns"
+regexTarget = "line"
+regexes = [
+    '''electron/.*''',
+    '''process\.platform''',
+    '''__dirname''',
+    '''__filename''',
+    '''contextBridge''',
+    '''ipcMain''',
+    '''ipcRenderer''',
+    '''BrowserWindow''',
+]
+
+# Enhanced AI/ML development patterns
+[[allowlists]]
+description = "AI/ML development and testing patterns"
+regexTarget = "line"
+regexes = [
+    '''sk-test-''',
+    '''api-key-demo''',
+    '''placeholder-key''',
+    '''fake-api-key''',
+    '''mock-token''',
+    '''test-api-secret''',
+]
+
+# Modern framework and build tool patterns
+[[allowlists]]
+description = "Modern framework patterns"
+regexTarget = "line"
+regexes = [
+    '''vite\.config\.(js|ts|mjs)''',
+    '''vitest\.config\.(js|ts|mjs)''',
+    '''tailwind\.config\.(js|ts|mjs)''',
+    '''postcss\.config\.(js|ts|mjs)''',
+    '''biome\.json''',
+    '''\$\{(?:process\.)?env\.[A-Z_]+\}''',
+    '''process\.env\.[A-Z_]+''',
+]

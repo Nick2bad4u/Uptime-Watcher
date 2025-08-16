@@ -1,24 +1,308 @@
+# Pre-commit Configuration for Uptime Watcher - 2025 Enhanced
+# Modern configuration following latest pre-commit best practices
+# Optimized for Electron + React + TypeScript development
+# Based on comprehensive 2025 pre-commit guide: https://gatlenculp.medium.com/effortless-code-quality-the-ultimate-pre-commit-hooks-guide-for-2025-57ca501d9835
+
 $schema: "https://www.schemastore.org/pre-commit-config.json"
+
+# Global configuration
+fail_fast: true # Stop on first failure for faster feedback
+default_language_version:
+    python: python3
+    node: "20.11.0" # LTS version for consistency
+
+# Exclude patterns for files that shouldn't be checked
+exclude: |
+    (?x)^(
+        node_modules/.*|        # Dependencies
+        dist/.*|               # Build output (Vite)
+        dist-electron/.*|      # Electron build output
+        coverage/.*|           # Test coverage reports
+        \.git/.*|              # Git internals
+        .*\.min\.(js|css)$|    # Minified files
+        .*\.(map|d\.ts)$|      # Source maps and type definitions
+        .*\.wasm$|             # WebAssembly files
+        .*\.snap$|             # Jest snapshots
+        .*\.log$|              # Log files
+        release/.*|            # Release artifacts
+        html/.*|               # Generated HTML
+        docs/.*\.md$|          # Documentation files (handled separately)
+        \.vscode/.*|           # VS Code settings
+        \.cache/.*|            # Various cache directories
+        .*/cache/.*|           # Any cache subdirectories
+    )$
+
+# Hook repositories
 repos:
+    # ===================================================================
+    #                         🔒 SECURITY SCANNING
+    # ===================================================================
     - repo: https://github.com/gitleaks/gitleaks
       rev: v8.28.0
       hooks:
           - id: gitleaks
+            name: "🔒 security · Detect hardcoded secrets"
+            description: "Scan for API keys, passwords, and other secrets"
+
+    # ===================================================================
+    #                       🧹 CODE FORMATTING & QUALITY
+    # ===================================================================
+
+    # Biome for JavaScript/TypeScript formatting and linting
+    - repo: https://github.com/biomejs/pre-commit
+      rev: "v0.9.1"
+      hooks:
+          - id: biome-check
+            name: "🟨 typescript/react · Format, lint & safe fixes"
+            additional_dependencies: ["@biomejs/biome@1.9.4"]
+            args: ["--write", "--unsafe"]
+            types_or: [ts, tsx, js, jsx, json, jsonc]
+
+    # ===================================================================
+    #                      📋 CONFIGURATION VALIDATION
+    # ===================================================================
+
+    # JSON Schema validation for configuration files
+    - repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: 0.31.1
+      hooks:
+          - id: check-github-workflows
+            name: "🐙 github-actions · Validate workflow files"
+            args: ["--verbose"]
+
+          - id: check-jsonschema
+            name: "✅ config · Validate package.json"
+            files: "^package\\.json$"
+            args: ["--schemafile", "https://json.schemastore.org/package.json"]
+
+          - id: check-jsonschema
+            name: "✅ config · Validate tsconfig files"
+            files: "^tsconfig.*\\.json$"
+            args: ["--schemafile", "https://json.schemastore.org/tsconfig.json"]
+
+    # ===================================================================
+    #                      📝 DOCUMENTATION & MARKDOWN
+    # ===================================================================
+
+    # Markdown formatting
+    - repo: https://github.com/hukkin/mdformat
+      rev: 0.7.21
+      hooks:
+          - id: mdformat
+            name: "📝 markdown · Format markdown files"
+            additional_dependencies:
+                - mdformat-gfm # GitHub-Flavored Markdown
+                - mdformat-frontmatter # YAML frontmatter
+            args: ["--wrap", "80"]
+            exclude: |
+                (?x)^(
+                    CHANGELOG\.md$|
+                    \.github/.*\.md$
+                )$
+
+    # Markdown linting
+    - repo: https://github.com/markdownlint/markdownlint
+      rev: v0.15.0
+      hooks:
+          - id: markdownlint
+            name: "📝 markdown · Lint markdown files"
+            args: ["--style", ".markdownlint.yml"]
+            exclude: |
+                (?x)^(
+                    CHANGELOG\.md$|
+                    \.github/.*\.md$
+                )$
+
+    # ===================================================================
+    #                       📁 FILESYSTEM HYGIENE
+    # ===================================================================
 
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v5.0.0
       hooks:
+          # File system checks
           - id: check-added-large-files
-          - id: check-merge-conflict
-          - id: end-of-file-fixer
-          - id: trailing-whitespace
-          - id: check-json
-          - id: check-yaml
-          - id: check-toml
-          - id: check-xml
-          - id: check-illegal-windows-names
+            name: "📁 filesystem · Block large file commits"
+            args: ["--maxkb=5000", "--enforce-all"]
+
           - id: check-case-conflict
+            name: "📁 filesystem · Check case sensitivity"
+
+          - id: check-illegal-windows-names
+            name: "📁 filesystem · Validate Windows filenames"
+
           - id: check-symlinks
+            name: "📁 filesystem · Check symlink validity"
+
           - id: destroyed-symlinks
+            name: "📁 filesystem · Detect broken symlinks"
+
+          - id: check-executables-have-shebangs
+            name: "📁 filesystem · Verify shebang presence"
+
+          - id: check-shebang-scripts-are-executable
+            name: "📁 filesystem · Verify script permissions"
+
+          # Git workflow checks
+          - id: check-merge-conflict
+            name: "🌳 git · Detect conflict markers"
+
+          - id: no-commit-to-branch
+            name: "🌳 git · Protect main branches"
+            args:
+                [
+                    "--branch",
+                    "main",
+                    "--branch",
+                    "master",
+                    "--branch",
+                    "develop",
+                ]
+
+          # File format validation
+          - id: check-json
+            name: "✅ format · Validate JSON files"
+
+          - id: check-yaml
+            name: "✅ format · Validate YAML files"
+            args: ["--unsafe"] # Allow custom YAML tags
+
+          - id: check-toml
+            name: "✅ format · Validate TOML files"
+
+          - id: check-xml
+            name: "✅ format · Validate XML files"
+
+          # Code hygiene
+          - id: end-of-file-fixer
+            name: "🧹 cleanup · Fix end-of-file"
+            exclude: |
+                (?x)^(
+                    .*\.min\.(js|css)$|
+                    .*\.wasm$
+                )$
+
+          - id: trailing-whitespace
+            name: "🧹 cleanup · Remove trailing whitespace"
+            args: ["--markdown-linebreak-ext=md"]
+            exclude: |
+                (?x)^(
+                    .*\.min\.(js|css)$|
+                    .*\.wasm$
+                )$
+
+          # Security checks
           - id: detect-private-key
-          - id: check-docstring-first
+            name: "🔒 security · Detect private keys"
+
+    # ===================================================================
+    #                        🎨 ADDITIONAL FILE TYPES
+    # ===================================================================
+
+    # CSS/SCSS formatting with Prettier
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v4.0.0-alpha.8
+      hooks:
+          - id: prettier
+            name: "✨ styling · Format CSS/SCSS files"
+            types_or: [css, scss]
+            additional_dependencies:
+                - prettier@3.4.2
+
+    # ===================================================================
+    #                         🖼️ ASSET OPTIMIZATION
+    # ===================================================================
+
+    # PNG optimization
+    - repo: https://github.com/shssoichiro/oxipng
+      rev: v9.1.3
+      hooks:
+          - id: oxipng
+            name: "🖼️ images · Optimize PNG files"
+            args: [
+                    "-o",
+                    "4", # Optimization level
+                    "--strip",
+                    "safe", # Strip metadata safely
+                    "--alpha", # Optimize alpha channel
+                ]
+
+    # ===================================================================
+    #                      🧪 TESTING & TYPE CHECKING
+    # ===================================================================
+
+    # Local hooks for TypeScript and testing
+    - repo: local
+      hooks:
+          # TypeScript type checking
+          - id: typescript-check
+            name: "🔍 typescript · Type check all files"
+            entry: npx tsc
+            language: node
+            args: ["--noEmit"]
+            files: '\.(ts|tsx)$'
+            pass_filenames: false
+            require_serial: true
+
+          # Electron TypeScript type checking
+          - id: typescript-check-electron
+            name: "🔍 electron · Type check electron files"
+            entry: npx tsc
+            language: node
+            args: ["--project", "tsconfig.electron.json", "--noEmit"]
+            files: '^electron/.*\.(ts|tsx)$'
+            pass_filenames: false
+            require_serial: true
+
+          # Vite build check (without output)
+          - id: vite-build-check
+            name: "⚡ vite · Validate build configuration"
+            entry: npx vite
+            language: node
+            args: ["build", "--mode", "development", "--emptyOutDir", "false"]
+            files: '^(src/|vite\.config\.|tsconfig\.json|package\.json)'
+            pass_filenames: false
+            require_serial: true
+
+          # Package.json script validation
+          - id: package-scripts-check
+            name: "📦 npm · Validate package.json scripts"
+            entry: node
+            language: node
+            args:
+                [
+                    "-e",
+                    "const pkg = require('./package.json'); console.log('✅ Package.json is valid')",
+                ]
+            files: '^package\.json$'
+            pass_filenames: false
+
+    # ===================================================================
+    #                    💬 COMMIT MESSAGE VALIDATION
+    # ===================================================================
+
+    # Commitizen for conventional commit messages
+    - repo: https://github.com/commitizen-tools/commitizen
+      rev: v4.1.0
+      hooks:
+          - id: commitizen
+            name: "💬 commit · Validate commit message format"
+            stages: [commit-msg]
+
+# Default hook types to install
+default_install_hook_types:
+    - pre-commit
+    - commit-msg
+
+# CI configuration
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit hooks
+
+        for more information, see https://pre-commit.ci
+    autofix_prs: true
+    autoupdate_branch: ""
+    autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+    autoupdate_schedule: weekly
+    skip: []
+    submodules: false

@@ -1,15 +1,18 @@
 # Codecov configuration for Uptime Watcher
 # See: https://docs.codecov.com/docs/codecov-yaml
 # Optimized for Electron + React + TypeScript architecture with domain-driven design
+# Updated for 2025 Codecov best practices
 
 codecov:
     require_ci_to_pass: true
     notify:
         wait_for_ci: true
+        manual_trigger: false # Explicit setting for modern CI/CD pipelines
+        notify_error: true # Show upload failures in comments
     branch: main
-    max_report_age: 24 # Reject reports older than 24 hours
+    max_report_age: "24h" # Modern syntax - reject reports older than 24 hours
     archive:
-        uploads: true # Keep historical data
+        uploads: true # Keep historical data for analytics
 
 coverage:
     precision: 2
@@ -161,21 +164,27 @@ flags:
             - "shared/test/**/*"
     # The shared flag covers all files in shared/ and is used for both status and component tracking. If you add new subfolders, update this path and the shared_core component above.
 
-# @deprecated: https://docs.codecov.com/docs/github-checks
+# Modern GitHub integration (replaces deprecated github_checks)
 github_checks:
     annotations: true
 
+# Modern Slack integration
+slack_app: false # Set to true to enable Codecov Slack App notifications
+
 parsers:
     javascript:
-        enable_partials: yes # default yes
+        enable_partials: true # Enhanced for modern JS/TS projects
     v1:
         include_full_missed_files: true # Show files with 0% coverage
     gcov:
         branch_detection:
-            conditional: yes # Track if/else branches
-            loop: yes # Track loop branches
-            method: no # Don't track method entry/exit
-            macro: no # Don't track macro expansions
+            conditional: true # Track if/else branches
+            loop: true # Track loop branches
+            method: false # Don't track method entry/exit
+            macro: false # Don't track macro expansions
+    cobertura:
+        partials_as_hits: false # Default setting for Cobertura reports
+        handle_missing_conditions: true # Better error handling
 
 # Enhanced component management with domain-driven design principles
 component_management:

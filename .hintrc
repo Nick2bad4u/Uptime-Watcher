@@ -1,13 +1,18 @@
 {
-  "$schema": "https://raw.githubusercontent.com/webhintio/hint/refs/heads/main/packages/hint/src/lib/config/config-schema.json",
   "extends": [
     "development"
   ],
+  "connector": "local",
   "browserslist": [
+    "electron >= 28.0.0",
     "defaults",
     "not ie 11",
     "not firefox <= 115",
     "not ios_saf <= 15.8"
+  ],
+  "formatters": [
+    "stylish",
+    "summary"
   ],
   "hints": {
     "no-inline-styles": "off",
@@ -16,6 +21,31 @@
       {
         "select-name": "off"
       }
-    ]
-  }
+    ],
+    "typescript-config/is-valid": "error",
+    "typescript-config/no-comments": "warning",
+    "typescript-config/strict": "error",
+    "babel-config/is-valid": "error",
+    "webpack-config/is-valid": "error",
+    "manifest-exists": "off",
+    "manifest-app-name": "off",
+    "meta-viewport": "warning",
+    "no-vulnerable-javascript-libraries": "error",
+    "no-protocol-relative-urls": "error",
+    "sri": "warning",
+    "x-content-type-options": "error",
+    "validate-set-cookie-header": "error",
+    "highest-available-document-mode": "error",
+    "disown-opener": "error",
+    "button-type": "error",
+    "leading-dot-classlist": "error",
+    "create-element-svg": "error"
+  },
+  "hintsTimeout": 30000,
+  "ignoredUrls": [
+    {
+      "domain": ".*\\.wasm$",
+      "hints": ["*"]
+    }
+  ]
 }

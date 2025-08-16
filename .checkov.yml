@@ -1,5 +1,69 @@
+# Checkov configuration for GitHub Actions security scans
+# Configuration follows modern best practices for 2025
+# See: https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
+
+# Output format for better integration with CI/CD
+output: cli,sarif
+output-file-path: console,checkov-results.sarif
+
+# Framework selection - only scan relevant frameworks for this project
+framework:
+    - github_actions
+    - github_configuration
+    - dockerfile
+    - secrets
+    - yaml
+    - json
+
+# Enable evaluation of variables for better accuracy
+evaluate-variables: true
+
+# Compact output to reduce noise
+compact: true
+
+# Custom tool name for better SARIF integration
+custom-tool-name: "Checkov-UptimeWatcher"
+
+# Skip specific checks with detailed justifications
 skip-check:
-    - CKV_GHA_1
-    - CKV_GHA_7
-    - CKV2_GHA_1
-    - CKV_GHA_6
+    # GitHub Actions Permission Checks
+    - CKV_GHA_1 # Require job permissions write-all to be set to false
+      # Justification: Electron app build process requires write access for artifact uploads and releases
+
+    - CKV2_GHA_1 # Ensure top-level permissions are not set to write-all
+      # Justification: Desktop app build workflow needs comprehensive permissions for secure artifact management
+
+    # GitHub Actions Pinning Checks
+    - CKV_GHA_6 # Require checkout action to be pinned to SHA version
+      # Justification: Using semantic versioning (@v4) for official actions provides better maintainability
+      # and security updates while maintaining readability. Risk is mitigated by using only official actions.
+
+    # Workflow Input Checks
+    - CKV_GHA_7 # Ensure workflow_dispatch inputs are NOT empty/blank
+      # Justification: Manual trigger workflows without inputs are legitimate for this desktop application
+      # where simple build/test triggers don't require parameters
+
+# Security enhancements
+# Enable secret scanning for all file types
+enable-secret-scan-all-files: true
+
+# Scan secrets in git history
+scan-secrets-history: false # Disabled to avoid performance impact in CI
+
+# Soft fail on low severity issues
+soft-fail-on: LOW
+
+# Hard fail on high and critical issues
+hard-fail-on: HIGH,CRITICAL
+
+# Skip paths that don't need security scanning
+skip-path:
+    - node_modules/
+    - dist/
+    - dist-electron/
+    - coverage/
+    - .vscode/
+    - docs/assets/
+    - icons/
+    - html/
+    - release/

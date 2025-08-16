@@ -118,9 +118,9 @@ commit_preprocessors = [
 commit_parsers = [
   # Project-specific emoji-based commit types
   { message = "^✨.*\\[feat\\]", group = "<!-- 0 -->✨ Features" },
-  { message = "^🛠️.*\\[fix\\]", group = "<!-- 1 -->�️ Bug Fixes" },
+  { message = "^🛠️.*\\[fix\\]", group = "<!-- 1 -->🛠️ Bug Fixes" },
   { message = "^🚜.*\\[refactor\\]", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^📝.*\\[docs\\]", group = "<!-- 3 -->� Documentation" },
+  { message = "^📝.*\\[docs\\]", group = "<!-- 3 -->📝 Documentation" },
   { message = "^⚡.*\\[perf\\]", group = "<!-- 4 -->⚡ Performance" },
   { message = "^🎨.*\\[style\\]", group = "<!-- 5 -->🎨 Styling" },
   { message = "^🧪.*\\[test\\]", group = "<!-- 6 -->🧪 Testing" },
@@ -139,18 +139,20 @@ commit_parsers = [
   { message = "^test", group = "<!-- 6 -->🧪 Testing" },
   { message = "^build", group = "<!-- 9 -->🔧 Build System" },
   { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
-  { message = "^chore\\(release\\): prepare for", group = "<!-- 7 -->🧹 Chores" },
-  { message = "^chore\\(deps\\.\\*\\)", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^chore\\(pr\\)", group = "<!-- 7 -->🧹 Chores" },
-  { message = "^chore\\(pull\\)", group = "<!-- 7 -->🧹 Chores" },
+  
+  # Skip noisy commit types
+  { message = "^chore\\(release\\): prepare for", skip = true },
+  { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^chore\\(pr\\)", skip = true },
+  { message = "^chore\\(pull\\)", skip = true },
   { message = "^chore", group = "<!-- 7 -->🧹 Chores" },
 
-  # Dependency-related commits
+  # Dependency-related commits (improved patterns)
   { message = "^\\[dependency\\]", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^bump the.*group", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bump the.*group", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bumps.*", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bump the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bumps the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
   { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 11 -->📦 Dependencies" },
+  { message = "^Bumps \\[.*\\]", group = "<!-- 11 -->📦 Dependencies" },
   { message = ".*npm-all.*", group = "<!-- 11 -->📦 Dependencies" },
   { message = ".*dependabot.*", group = "<!-- 11 -->📦 Dependencies" },
 
@@ -158,12 +160,20 @@ commit_parsers = [
   { body = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
   { message = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
 
+  # Revert commits
   { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
-  { message = "^Merge branch", group = "<!-- 13 -->🔀 Merge Commits" },
-  { message = "^merge branch", group = "<!-- 13 -->🔀 Merge Commits" },
-  { message = ".*\\.yml", group = "<!-- 8 -->� CI/CD" },
-  { message = ".*", group = "<!-- 14 -->💼 Other", body = ".*" },
-  { message = ".*", group = "<!-- 14 -->💼 Other" },
+  
+  # Skip merge commits unless explicitly needed
+  { message = "^Merge branch", skip = true },
+  { message = "^merge branch", skip = true },
+  { message = "^Merge pull request", skip = true },
+  
+  # CI/CD file changes
+  { message = ".*\\.ya?ml", group = "<!-- 8 -->👷 CI/CD" },
+  { message = ".*workflow.*", group = "<!-- 8 -->� CI/CD" },
+  
+  # Catch-all for miscellaneous changes
+  { message = ".*", group = "<!-- 13 -->� Other Changes" },
 ]
 # filter out the commits that are not matched by commit parsers
 filter_commits = false
@@ -172,8 +182,10 @@ topo_order = true
 # sort the commits inside sections by oldest/newest order
 # possible values: "oldest" (chronological order) or "newest" (reverse chronological order)
 sort_commits = "newest"
+
+# GitHub integration for better changelog links
 # [remote.github]
-# owner = "nick2bad4u"
+# owner = "Nick2bad4u"
 # repo = "Uptime-Watcher"
 # api_url = "https://api.github.com"
 # native_tls = false

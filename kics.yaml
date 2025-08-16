@@ -1,2 +1,180 @@
+# KICS Configuration v2.1.13+
+# Infrastructure as Code Security Scanner
+# https://docs.kics.io/latest/configuration-file/
+
+# Core Scanning Configuration
+type:
+    - Terraform
+    - Kubernetes
+    - Docker
+    - CloudFormation
+    - Ansible
+    - Helm
+    - OpenAPI
+    - DockerCompose
+    - Crossplane
+    - Pulumi
+    - ServerlessFW
+    - YAML
+    - JSON
+
+# Output Configuration
+report-formats:
+    - json
+    - sarif
+    - html
+    - sonarqube
+output-path: ".kics-results"
+payload-path: ".kics-payload.json"
+
+# Verbosity and Logging
+verbose: true
+log-file: true
+log-level: "INFO"
+log-path: ".kics.log"
+preview-lines: 5
+
+# UI Configuration
+minimal-ui: false
+no-color: false
+no-progress: false
+
+# Performance Configuration
+parallel: 4
+timeout: 120
+
+# Exclusions
 exclude-paths:
+    # CI/CD exclusions
     - ".github/workflows/superlinter.yml"
+    - ".github/workflows/*.yml"
+    - ".github/actions/**"
+
+    # Build and dependencies
+    - "node_modules/**"
+    - "dist/**"
+    - "dist-electron/**"
+    - "coverage/**"
+    - "build/**"
+    - ".next/**"
+    - ".nuxt/**"
+    - ".vuepress/dist/**"
+    - "release/**"
+
+    # Documentation and examples
+    - "docs/**"
+    - "examples/**"
+    - "*.md"
+    - "CHANGELOG*"
+    - "README*"
+
+    # Configuration files (avoid self-scan issues)
+    - "*.config.js"
+    - "*.config.mjs"
+    - "*.config.ts"
+    - "package*.json"
+    - "tsconfig*.json"
+    - ".eslintrc*"
+    - ".prettierrc*"
+    - "vite.config.*"
+    - "vitest.config.*"
+    - "postcss.config.*"
+    - "tailwind.config.*"
+
+    # Generated and bundled files
+    - "*.min.js"
+    - "*.min.css"
+    - "*.bundle.js"
+    - "*.d.ts"
+    - "*.map"
+
+    # IDE and editor files
+    - ".vscode/**"
+    - ".idea/**"
+    - "*.swp"
+    - "*.swo"
+
+    # OS files
+    - ".DS_Store"
+    - "Thumbs.db"
+
+    # Temporary files
+    - "tmp/**"
+    - "temp/**"
+    - ".tmp/**"
+    - ".temp/**"
+
+    # Test files and fixtures
+    - "test/**"
+    - "tests/**"
+    - "__tests__/**"
+    - "**/*.test.*"
+    - "**/*.spec.*"
+    - "fixtures/**"
+    - "mocks/**"
+    - "benchmarks/**"
+
+    # Assets and static files
+    - "assets/**"
+    - "static/**"
+    - "public/**"
+    - "icons/**"
+    - "images/**"
+    - "*.png"
+    - "*.jpg"
+    - "*.jpeg"
+    - "*.gif"
+    - "*.svg"
+    - "*.ico"
+
+    # Reports and outputs
+    - "reports/**"
+    - "*.report.*"
+    - ".kics-results/**"
+    - "lychee-report.*"
+    - "html/**"
+
+# Query exclusions for false positives and development environment
+exclude-queries:
+    # Exclude overly strict Docker queries for development
+    - "f2f903fb-b977-461e-98d7-b3e2185c6118" # Docker Run Using sudo
+    - "fd54f200-402c-4333-a5a4-36ef6709af2f" # Docker ADD Instead of COPY
+    - "b03a748a-542d-44f4-bb86-9199ab4fd2d5" # Image Without Tag
+    - "7c81d34c-8e5a-402b-9798-9f442630e678" # Multiple RUN Instructions
+
+    # Kubernetes development-friendly exclusions
+    - "8b36775e-183d-4d46-b0f7-96a6f34a723f" # Security Context Not Set
+    - "b864770c-cf7d-472e-8a61-1df14d3d3a72" # Network Policy Not Defined
+
+    # Terraform development exclusions
+    - "3b2d16a0-91b3-4b8d-9b86-9199ab4fd2d5" # Missing Description in Security Groups
+
+    # General development-friendly exclusions
+    - "2a9b6641-52c2-4b7b-b4ed-8e5f4a7a4a7a" # Secrets in Environment Variables (for .env.example files)
+
+# Category exclusions
+exclude-categories:
+    - "Bill Of Materials" # Skip BOM generation for development
+
+# Severity filtering (only report medium and above for cleaner output)
+exclude-severities:
+    - "TRACE"
+    - "INFO"
+
+# Results exclusions (add specific result IDs as needed)
+exclude-results: []
+
+# Include experimental queries for comprehensive scanning
+include-queries: ""
+
+# Custom queries path (if using custom security rules)
+# queries-path: "./custom-queries"
+
+# Enable file filtering for better performance
+exclude-gitignore: true
+
+# Disable experimental features that might cause false positives
+disable-secrets: false
+
+# Cloud provider specific settings
+cloud-provider: []

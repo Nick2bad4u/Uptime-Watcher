@@ -1,4 +1,18 @@
 {
     "$schema": "https://www.schemastore.org/djlint.json",
-    "exclude": "electron-app/index.html"
+    "profile": "html",
+    "extension": "html,htm",
+    "indent": 2,
+    "max_line_length": 120,
+    "exclude": "dist/**/*,dist-electron/**/*,node_modules/**/*,coverage/**/*,release/**/*,docs/**/*,.vscode/**/*,.cache/**/*,.next/**/*,.nuxt/**/*,.svelte-kit/**/*,build/**/*,out/**/*",
+    "ignore": "H006,H013,H020,H025,H030,H031",
+    "require_pragma": false,
+    "preserve_leading_space": false,
+    "preserve_blank_lines": true,
+    "max_blank_lines": 2,
+    "blank_line_after_tag": "true",
+    "blank_line_before_tag": "true",
+    "format_css": true,
+    "format_js": true,
+    "use_gitignore": true
 }

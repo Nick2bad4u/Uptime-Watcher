@@ -8,6 +8,8 @@
         "cacheStrategy": "metadata",
         "useCache": true
     },
+    "useGitignore": true,
+    "gitignoreRoot": "./",
     "dictionaries": [
         "aws",
         "bash",
@@ -34,45 +36,163 @@
         "public-licenses",
         "softwareTerms",
         "typescript",
+        "electron",
+        "react",
+        "tailwindcss",
         "Uptime-Watcher Folder Dictionary",
         "Uptime-Watcher Project Dictionary",
         "Uptime-Watcher User Dictionary"
     ],
     "dictionaryDefinitions": [
         {
-            "description": "Words used in the Uptime-Watcher project",
             "name": "Uptime-Watcher Project Dictionary",
-            "path": "custom-words.txt",
-            "scope": "workspace",
-            "addWords": true
+            "path": "./custom-words.txt",
+            "description": "Words used in the Uptime-Watcher project",
+            "addWords": true,
+            "scope": "folder"
         },
         {
-            "description": "Words used in the Uptime-Watcher project",
             "name": "Uptime-Watcher User Dictionary",
-            "path": "custom-words.txt",
-            "scope": "user",
-            "addWords": true
+            "path": "./custom-words.txt",
+            "description": "User-specific words for Uptime-Watcher",
+            "addWords": true,
+            "scope": "user"
         },
         {
-            "description": "Words used in the Uptime-Watcher project",
             "name": "Uptime-Watcher Folder Dictionary",
-            "path": "custom-words.txt",
-            "scope": "folder",
-            "addWords": true
+            "path": "./custom-words.txt",
+            "description": "VSCode workspace dictionary",
+            "addWords": true,
+            "scope": "folder"
         }
     ],
     "ignorePaths": [
+        "**/test/**",
+        "scripts",
         "**CHANGELOG.md",
         "dist-electron",
+        "knip.json",
+        "package.json",
+        "repomix.config.json",
+        "vite.config.ts",
         "dist",
         "docs",
         "node_modules",
-        "release"
+        "release",
+        "coverage",
+        "*.min.js",
+        "*.min.css",
+        "**/*.map",
+        "package-lock.json",
+        "yarn.lock",
+        "pnpm-lock.yaml",
+        "*.log",
+        "**/*.wasm",
+        "**/*.snap",
+        "**/.git/**",
+        "**/build/**",
+        "**/out/**",
+        "**/tmp/**",
+        "**/.next/**",
+        "**/.nuxt/**",
+        "**/.svelte-kit/**",
+        "**/target/**",
+        "**/.cache/**",
+        "**/.vscode/settings.json",
+        "**/tsconfig.*.tsbuildinfo",
+        "**/*.d.ts.map",
+        "**/*.js.map",
+        "**/*.css.map"
     ],
     "ignoreWords": [],
     "import": [],
     "words": [],
     "allowCompoundWords": true,
     "numSuggestions": 10,
-    "suggestionsTimeout": 800
+    "suggestionsTimeout": 800,
+    "minWordLength": 3,
+    "maxNumberOfProblems": 100,
+    "maxDuplicateProblems": 5,
+    "validateDirectives": true,
+    "enableFiletypes": [
+        "typescript",
+        "javascript",
+        "json",
+        "jsonc",
+        "yaml",
+        "yml",
+        "toml",
+        "markdown",
+        "html",
+        "css",
+        "scss",
+        "less"
+    ],
+    "languageSettings": [
+        {
+            "languageId": "typescript,javascript,typescriptreact,javascriptreact",
+            "allowCompoundWords": true,
+            "caseSensitive": false,
+            "ignoreRegExpList": [
+                "/\\w*[A-Z]{2,}\\w*/g",
+                "/import\\s+.*?from\\s+['\"][^'\"]*['\"];?/g",
+                "/console\\.(log|warn|error|info)\\s*\\([^)]*\\)/g",
+                "/\\/\\*\\s*cspell:.*?\\*\\//gi",
+                "/\\/\\/\\s*cspell:.*$/gm",
+                "/class\\s+[A-Z][a-zA-Z0-9]*\\s*{/g",
+                "/interface\\s+[A-Z][a-zA-Z0-9]*\\s*{/g",
+                "/type\\s+[A-Z][a-zA-Z0-9]*\\s*=/g"
+            ]
+        },
+        {
+            "languageId": "json,jsonc",
+            "ignoreRegExpList": [
+                "/\"[^\"]*\"\\s*:/g",
+                "/\"\\$schema\"\\s*:\\s*\"[^\"]*\"/g"
+            ]
+        },
+        {
+            "languageId": "markdown",
+            "ignoreRegExpList": [
+                "/\\[.*?\\]\\(.*?\\)/g",
+                "/!\\[.*?\\]\\(.*?\\)/g",
+                "/```[\\s\\S]*?```/g",
+                "/`[^`]*`/g",
+                "/#{1,6}\\s+.+$/gm",
+                "/^\\s*[-*+]\\s+/gm"
+            ]
+        },
+        {
+            "languageId": "css,scss,sass,less",
+            "ignoreRegExpList": [
+                "/@[a-z-]+/g",
+                "/\\.[a-z-]+[a-z0-9-]*/gi",
+                "/#[a-z-]+[a-z0-9-]*/gi",
+                "/--[a-z-]+[a-z0-9-]*/gi"
+            ]
+        },
+        {
+            "languageId": "html",
+            "ignoreRegExpList": [
+                "/<[^>]*>/g",
+                "/class=\"[^\"]*\"/g",
+                "/id=\"[^\"]*\"/g",
+                "/data-[a-z-]+=\"[^\"]*\"/g"
+            ]
+        }
+    ],
+    "patterns": [
+        {
+            "name": "camelCase",
+            "pattern": "/\\b[a-z][a-zA-Z0-9]*\\b/g"
+        },
+        {
+            "name": "kebab-case",
+            "pattern": "/\\b[a-z][a-z0-9-]*\\b/g"
+        },
+        {
+            "name": "CONSTANTS",
+            "pattern": "/\\b[A-Z][A-Z0-9_]*\\b/g"
+        }
+    ]
 }

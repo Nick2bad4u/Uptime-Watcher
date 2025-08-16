@@ -1,10 +1,25 @@
 [Desktop Entry]
-Name=Uptime Watcher
-Comment=Monitor website uptime and performance
-Exec=run-electron.sh %U
-Icon=io.github.uptimewatcher
+Version=1.5
 Type=Application
-Categories=Network;Monitor;System;
-Keywords=uptime;monitoring;website;performance;network;
+Name=Uptime Watcher
+GenericName=Website Monitor
+Comment=Monitor website uptime and performance with real-time notifications
+Exec=uptime-watcher %U
+TryExec=uptime-watcher
+Icon=io.github.uptimewatcher
 StartupNotify=true
+NoDisplay=false
+Hidden=false
+Terminal=false
+Categories=Network;Monitor;System;GTK;
+Keywords=uptime;monitoring;website;performance;network;availability;downtime;
 MimeType=application/x-uptime-watcher;
+Actions=new-monitor;settings;
+
+[Desktop Action new-monitor]
+Name=Add New Monitor
+Exec=uptime-watcher --new-monitor
+
+[Desktop Action settings]
+Name=Settings
+Exec=uptime-watcher --settings
