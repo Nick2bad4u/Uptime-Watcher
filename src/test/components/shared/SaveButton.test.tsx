@@ -510,7 +510,7 @@ describe("SaveButton", () => {
         });
 
         it("should handle undefined aria-label gracefully", () => {
-            render(<SaveButton {...defaultProps} aria-label={undefined} />);
+            render(<SaveButton {...defaultProps} />);
 
             expect(screen.getByTestId("themed-button")).toHaveAttribute(
                 "aria-label",

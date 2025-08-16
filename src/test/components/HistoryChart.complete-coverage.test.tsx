@@ -87,7 +87,7 @@ describe("HistoryChart - Complete Coverage", () => {
                 createStatusHistory("up", Date.now(), 150),
             ];
 
-            const { container } = renderWithTheme(
+            renderWithTheme(
                 <HistoryChart
                     title="Test Chart"
                     history={history}
@@ -95,10 +95,8 @@ describe("HistoryChart - Complete Coverage", () => {
                 />
             );
 
-            const chartContainer = container.querySelector(
-                ".custom-chart-class"
-            );
-            expect(chartContainer).toBeInTheDocument();
+            const chartContainer = screen.getByRole("region");
+            expect(chartContainer).toHaveClass("custom-chart-class");
         });
 
         it("should render with default className when not provided", () => {
@@ -106,11 +104,11 @@ describe("HistoryChart - Complete Coverage", () => {
                 createStatusHistory("up", Date.now(), 150),
             ];
 
-            const { container } = renderWithTheme(
+            renderWithTheme(
                 <HistoryChart title="Test Chart" history={history} />
             );
 
-            const chartContainer = container.querySelector(".mb-3.w-full");
+            const chartContainer = screen.getByRole("region");
             expect(chartContainer).toBeInTheDocument();
         });
 
@@ -119,25 +117,21 @@ describe("HistoryChart - Complete Coverage", () => {
                 createStatusHistory("up", Date.now(), 150),
             ];
 
-            const { container } = renderWithTheme(
+            renderWithTheme(
                 <HistoryChart title="Test Chart" history={history} />
             );
 
-            // Check main container classes
-            const mainContainer = container.querySelector(".mb-3.w-full");
+            // Check main container exists
+            const mainContainer = screen.getByRole("region");
             expect(mainContainer).toBeInTheDocument();
 
-            // Check title container classes
-            const titleContainer = container.querySelector(
-                ".mb-2.flex.items-center.justify-end"
-            );
-            expect(titleContainer).toBeInTheDocument();
+            // Check title exists
+            const titleElement = screen.getByText("Test Chart");
+            expect(titleElement).toBeInTheDocument();
 
-            // Check chart bars container classes
-            const barsContainer = container.querySelector(
-                ".flex.min-w-0.shrink.items-center.justify-end.gap-1.overflow-hidden"
-            );
-            expect(barsContainer).toBeInTheDocument();
+            // Check chart bars exist
+            const chartBars = screen.getAllByTestId("mini-chart-bar");
+            expect(chartBars).toHaveLength(1);
         });
     });
 

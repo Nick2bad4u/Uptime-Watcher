@@ -690,7 +690,7 @@ describe("Component Coverage Boost", () => {
 
             const siteMonitoringLogic = {
                 shouldShowSiteMonitoringButton: (
-                    props: ActionButtonGroupProps
+                    _props: ActionButtonGroupProps
                 ) => {
                     return true; // Always shows SiteMonitoringButton
                 },

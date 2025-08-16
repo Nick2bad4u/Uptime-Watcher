@@ -666,10 +666,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     mockHandler
                 );
 
-                expect(result.metadata?.duration).toBeGreaterThanOrEqual(
+                expect(result.metadata?.['duration']).toBeGreaterThanOrEqual(
                     delay - 10
                 );
-                expect(result.metadata?.duration).toBeLessThan(delay + 100);
+                expect(result.metadata?.['duration']).toBeLessThan(delay + 100);
             });
         });
 
@@ -800,7 +800,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     []
                 );
 
-                expect(result.metadata?.duration).toBeGreaterThanOrEqual(
+                expect(result.metadata?.['duration']).toBeGreaterThanOrEqual(
                     delay - 10
                 );
             });

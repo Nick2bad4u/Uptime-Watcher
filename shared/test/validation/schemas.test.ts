@@ -22,10 +22,6 @@ import {
 import type { ValidationResult } from "../../types/validation";
 import {
     createValidBaseMonitor,
-    createValidHttpMonitor,
-    createValidPortMonitor,
-    createValidPingMonitor,
-    createValidSite,
 } from "./testHelpers";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
@@ -1024,7 +1020,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             // Test that types are correctly inferred
             const httpMonitor: HttpMonitor = {
                 checkInterval: 30_000,
-                history: [],
                 id: "http-test",
                 monitoring: true,
                 responseTime: 200,

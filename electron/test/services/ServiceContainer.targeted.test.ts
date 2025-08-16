@@ -131,11 +131,9 @@ vi.mock("../../managers/ConfigurationManager", () => ({
 }));
 
 // Mock SiteManager
-let mockSiteEventBus;
 vi.mock("../../managers/SiteManager", () => ({
-    SiteManager: vi.fn().mockImplementation((dependencies) => {
+    SiteManager: vi.fn().mockImplementation((_dependencies) => {
         // Store the event bus passed to the constructor so ServiceContainer can use it
-        mockSiteEventBus = dependencies.eventEmitter;
 
         return {
             initialize: vi.fn().mockResolvedValue(undefined),

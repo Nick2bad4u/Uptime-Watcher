@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { MonitorStatus, SiteForStatus, SiteStatus } from "../../types";
+import type { MonitorStatus, SiteForStatus, SiteStatus } from "@shared/types";
 
 import {
     calculateSiteMonitoringStatus,

@@ -52,7 +52,6 @@ describe("History Manipulation Utilities", () => {
     let mockDb: Database;
     let mockLogger: any;
     let mockIsDev: any;
-    let mockInterpolateLogTemplate: any;
 
     const sampleStatusHistory: StatusHistory = {
         timestamp: Date.now(),
@@ -76,9 +75,7 @@ describe("History Manipulation Utilities", () => {
         const logTemplatesModule = await import(
             "../../../../../shared/utils/logTemplates"
         );
-        mockInterpolateLogTemplate = vi.mocked(
-            logTemplatesModule.interpolateLogTemplate
-        );
+        vi.mocked(logTemplatesModule.interpolateLogTemplate);
 
         // Create mock database
         mockDb = {
@@ -278,16 +275,16 @@ describe("History Manipulation Utilities", () => {
             expect(mockStmt.run).toHaveBeenCalledTimes(3);
             expect(mockStmt.run).toHaveBeenNthCalledWith(1, [
                 monitorId,
-                historyEntries[0].timestamp,
-                historyEntries[0].status,
-                historyEntries[0].responseTime,
+                historyEntries[0]?.timestamp,
+                historyEntries[0]?.status,
+                historyEntries[0]?.responseTime,
                 "First entry",
             ]);
             expect(mockStmt.run).toHaveBeenNthCalledWith(2, [
                 monitorId,
-                historyEntries[1].timestamp,
-                historyEntries[1].status,
-                historyEntries[1].responseTime,
+                historyEntries[1]?.timestamp,
+                historyEntries[1]?.status,
+                historyEntries[1]?.responseTime,
                 null,
             ]);
 

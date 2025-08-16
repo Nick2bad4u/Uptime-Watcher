@@ -12,7 +12,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "../../utils/siteStatus";
-import type { SiteStatus } from "../../utils/siteStatus";
+import type { SiteStatus } from "../../../shared/types";
 
 describe("Frontend siteStatus re-exports", () => {
     describe("Function re-exports", () => {

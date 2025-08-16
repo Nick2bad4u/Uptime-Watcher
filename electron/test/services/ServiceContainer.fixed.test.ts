@@ -353,7 +353,6 @@ describe("ServiceContainer - Fixed Tests", () => {
 
             // Create all services first to get their instances
             const databaseManager = container.getDatabaseManager();
-            const siteManager = container.getSiteManager();
             const orchestrator = container.getUptimeOrchestrator();
             const ipcService = container.getIpcService();
 

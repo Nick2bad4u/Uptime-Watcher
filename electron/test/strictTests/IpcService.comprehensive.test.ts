@@ -101,7 +101,7 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
 
 // Mock shared validation
 vi.mock("@shared/validation/schemas", () => ({
-    validateMonitorData: vi.fn((type: string, data: unknown) => ({
+    validateMonitorData: vi.fn((type: string, _data: unknown) => ({
         success: type !== "invalid",
         errors: type === "invalid" ? ["Unsupported monitor type: invalid"] : [],
         warnings: type === "warning" ? ["Warning message"] : [],
@@ -851,7 +851,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
 
             // Reset the mock to ensure clean state
-            const mockWindow = BrowserWindow.getAllWindows()[0];
+            const mockWindow = BrowserWindow.getAllWindows()[0]!;
             vi.mocked(mockWindow.webContents.send).mockClear();
 
             const result = await handler(mockIpcEvent);

@@ -18,7 +18,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
-import React from "react";
+
 
 // Mock the dependencies
 vi.mock("../../stores/ui/useUiStore");
@@ -116,9 +116,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                         inverse: "#ffffff",
                     },
                     border: {
+                        focus: "#94a3b8",
                         primary: "#e2e8f0",
                         secondary: "#cbd5e1",
-                        tertiary: "#94a3b8",
                     },
                     surface: {
                         base: "#ffffff",
@@ -128,8 +128,32 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                     status: {
                         up: "#22c55e",
                         down: "#ef4444",
-                        loading: "#f59e0b",
-                        error: "#ef4444",
+                        mixed: "#f59e0b",
+                        paused: "#6b7280",
+                        pending: "#f59e0b",
+                        unknown: "#6b7280",
+                    },
+                    error: "#ef4444",
+                    errorAlert: "#fca5a5",
+                    info: "#3b82f6",
+                    success: "#22c55e",
+                    warning: "#f59e0b",
+                    hover: {
+                        dark: "#1e293b",
+                        light: "#f8fafc",
+                        medium: "#64748b",
+                    },
+                    primary: {
+                        50: "#f8fafc",
+                        100: "#f1f5f9",
+                        200: "#e2e8f0",
+                        300: "#cbd5e1",
+                        400: "#94a3b8",
+                        500: "#64748b",
+                        600: "#475569",
+                        700: "#334155",
+                        800: "#1e293b",
+                        900: "#0f172a",
                     },
                 },
                 spacing: {
@@ -138,6 +162,42 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                     md: "1rem",
                     lg: "1.5rem",
                     xl: "2rem",
+                    "2xl": "3rem",
+                    "3xl": "4rem",
+                },
+                shadows: {
+                    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+                    inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+                },
+                typography: {
+                    fontFamily: {
+                        sans: ["Inter", "system-ui", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    },
+                    fontSize: {
+                        xs: "0.75rem",
+                        sm: "0.875rem",
+                        base: "1rem",
+                        lg: "1.125rem",
+                        xl: "1.25rem",
+                        "2xl": "1.5rem",
+                        "3xl": "1.875rem",
+                        "4xl": "2.25rem",
+                    },
+                    fontWeight: {
+                        normal: "400",
+                        medium: "500",
+                        semibold: "600",
+                        bold: "700",
+                    },
+                    lineHeight: {
+                        tight: "1.25",
+                        normal: "1.5",
+                        relaxed: "1.75",
+                    },
                 },
             },
             toggleTheme: vi.fn(),

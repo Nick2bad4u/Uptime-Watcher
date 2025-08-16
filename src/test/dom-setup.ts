@@ -28,7 +28,6 @@ beforeAll(() => {
         rootMargin = "";
         thresholds = [];
 
-        constructor() {}
         observe() {}
         unobserve() {}
         disconnect() {}
@@ -39,7 +38,6 @@ beforeAll(() => {
 
     // Mock ResizeObserver for responsive component testing
     globalThis.ResizeObserver = class MockResizeObserver {
-        constructor() {}
         observe() {}
         unobserve() {}
         disconnect() {}

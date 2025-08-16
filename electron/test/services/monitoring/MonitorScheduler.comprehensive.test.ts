@@ -39,7 +39,25 @@ vi.mock("../../utils/logger", () => ({
 
 // Import after mocking
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import { MIN_CHECK_INTERVAL } from "../../../services/monitoring/constants";
+import type { Monitor } from "../../../../shared/types";
+
+// Helper function to create complete Monitor objects
+function createValidMonitor(overrides: Partial<Monitor> = {}): Monitor {
+    return {
+        id: "monitor1",
+        type: "http",
+        url: "https://example.com",
+        checkInterval: 60_000,
+        monitoring: true,
+        history: [],
+        responseTime: 100,
+        retryAttempts: 3,
+        status: "up",
+        timeout: 30,
+        lastChecked: new Date(),
+        ...overrides,
+    };
+}
 
 describe("MonitorScheduler - Comprehensive Coverage", () => {
     let scheduler: MonitorScheduler;
@@ -109,13 +127,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should start monitoring for a valid monitor", () => {
-            const monitor = {
-                id: "monitor1",
-                type: "http",
-                url: "https://example.com",
-                checkInterval: 60_000,
-                monitoring: true,
-            };
+            const monitor = createValidMonitor();
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -126,12 +138,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should return false for monitor without ID", () => {
-            const monitor = {
-                type: "http",
-                url: "https://example.com",
-                checkInterval: 60_000,
-                monitoring: true,
-            };
+            const monitor = createValidMonitor({ id: undefined as any });
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -140,13 +147,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should allow starting monitor even with monitoring disabled (startMonitor doesn't check monitoring flag)", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: false, // startMonitor method doesn't check this flag
-            };
+            });
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -155,13 +162,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should use minimum check interval when interval is too low", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 1000, // Below minimum
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -171,13 +178,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should execute check callback at specified intervals", async () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
 
@@ -188,22 +195,22 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle multiple intervals correctly", () => {
-            const monitor1 = {
+            const monitor1 = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
-            const monitor2 = {
+            const monitor2 = createValidMonitor({
                 id: "monitor2",
                 type: "port",
                 host: "localhost",
                 port: 3000,
                 checkInterval: 30_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor1);
             scheduler.startMonitor("site1", monitor2);
@@ -222,13 +229,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should stop monitoring for an active monitor", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
@@ -247,13 +254,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle stopping monitor that is already stopped", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
             scheduler.stopMonitor("site1", "monitor1");
@@ -271,13 +278,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should restart monitoring for existing monitor", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
 
@@ -288,13 +295,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should start monitoring for non-active monitor", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.restartMonitor("site1", monitor);
 
@@ -303,12 +310,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should return false for monitor without ID", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
+                id: undefined as any,
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.restartMonitor("site1", monitor);
 
@@ -323,27 +331,25 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should start monitoring for all site monitors", () => {
             const site: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
-                    {
+                    }),
+                    createValidMonitor({
                         id: "monitor2",
                         type: "port",
                         host: "localhost",
                         port: 3000,
                         checkInterval: 30_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
@@ -356,10 +362,8 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should handle site with no monitors", () => {
             const site: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [],
             };
@@ -370,19 +374,17 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should handle site with disabled monitors", () => {
             const site: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
                         checkInterval: 60_000,
                         monitoring: false,
-                    },
+                    }),
                 ],
             };
 
@@ -399,27 +401,25 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should stop all monitors for a site", () => {
             const site: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
-                    {
+                    }),
+                    createValidMonitor({
                         id: "monitor2",
                         type: "port",
                         host: "localhost",
                         port: 3000,
                         checkInterval: 30_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
@@ -439,36 +439,32 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should only stop monitors for specified site", () => {
             const site1: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site 1",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
             const site2: Site = {
-                id: "site2",
                 identifier: "site2",
                 name: "Test Site 2",
-                url: "https://test.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor2",
                         type: "http",
                         url: "https://test.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
@@ -491,36 +487,32 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
 
         it("should stop all active monitoring", () => {
             const site1: Site = {
-                id: "site1",
                 identifier: "site1",
                 name: "Test Site 1",
-                url: "https://example.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor1",
                         type: "http",
                         url: "https://example.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
             const site2: Site = {
-                id: "site2",
                 identifier: "site2",
                 name: "Test Site 2",
-                url: "https://test.com",
                 monitoring: true,
                 monitors: [
-                    {
+                    createValidMonitor({
                         id: "monitor2",
                         type: "http",
                         url: "https://test.com",
                         checkInterval: 60_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
@@ -582,13 +574,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
                 .mockRejectedValue(new Error("Scheduled check failed"));
             scheduler.setCheckCallback(errorCallback);
 
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
 
@@ -601,13 +593,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle monitor with zero check interval", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 0,
                 monitoring: true,
-            };
+            });
 
             // Should use default check interval when 0 is specified (0 means use default)
             const result = scheduler.startMonitor("site1", monitor);
@@ -616,13 +608,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle monitor with negative check interval", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: -1000,
                 monitoring: true,
-            };
+            });
 
             // Should throw error for invalid interval
             expect(() => scheduler.startMonitor("site1", monitor)).toThrow(
@@ -631,13 +623,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle very large check intervals", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: Number.MAX_SAFE_INTEGER,
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -646,13 +638,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle empty string site identifier", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.startMonitor("", monitor);
 
@@ -661,13 +653,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle empty string monitor ID by returning false", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             const result = scheduler.startMonitor("site1", monitor);
 
@@ -682,13 +674,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should test createIntervalKey through public methods", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
 
@@ -697,13 +689,13 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should test getEffectiveInterval through monitoring behavior", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 1000, // Below minimum
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor);
 
@@ -718,21 +710,21 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle restarting monitor with different interval", () => {
-            const monitor1 = {
+            const monitor1 = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
-            const monitor2 = {
+            const monitor2 = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 30_000, // Different interval
                 monitoring: true,
-            };
+            });
 
             scheduler.startMonitor("site1", monitor1);
             expect(scheduler.isMonitoring("site1", "monitor1")).toBe(true);
@@ -743,22 +735,22 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         });
 
         it("should handle concurrent operations correctly", () => {
-            const monitor1 = {
+            const monitor1 = createValidMonitor({
                 id: "monitor1",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
-            };
+            });
 
-            const monitor2 = {
+            const monitor2 = createValidMonitor({
                 id: "monitor2",
                 type: "port",
                 host: "localhost",
                 port: 3000,
                 checkInterval: 30_000,
                 monitoring: true,
-            };
+            });
 
             // Start both monitors
             scheduler.startMonitor("site1", monitor1);

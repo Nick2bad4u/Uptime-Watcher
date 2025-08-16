@@ -204,7 +204,7 @@ describe("FormErrorAlert", () => {
         });
 
         it("should handle undefined className", () => {
-            render(<FormErrorAlert {...defaultProps} className={undefined} />);
+            render(<FormErrorAlert {...defaultProps} />);
 
             expect(screen.getByTestId("themed-box")).toHaveClass("error-alert");
         });

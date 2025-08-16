@@ -186,7 +186,7 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
-    default: ({ monitorType }: any) => (
+    default: ({ monitorType: _monitorType }: any) => (
         <div data-testid="dynamic-monitor-fields">
             <input data-testid="host" />
             <input data-testid="port" type="number" />
@@ -313,7 +313,7 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
     it("should cover success callback execution with onSuccess prop", async () => {
         // Mock handleSubmit to call the onSuccess callback
         vi.mocked(handleSubmit).mockImplementation(
-            async (event, properties) => {
+            async (_event, properties) => {
                 // Simulate successful submission - call the onSuccess callback
                 properties.onSuccess?.();
             }

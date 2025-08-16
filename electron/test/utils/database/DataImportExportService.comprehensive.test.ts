@@ -20,7 +20,7 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
-import type { Site, StatusHistory } from "../../../../shared/types.js";
+import type { Site } from "../../../../shared/types.js";
 import type { Database } from "node-sqlite3-wasm";
 
 import { DataImportExportService } from "../../../utils/database/DataImportExportService";
@@ -491,9 +491,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     type: "http" as const,
                     url: "https://example.com",
                     status: "up" as const,
-                    lastChecked: Date.now(),
+                    lastChecked: new Date(),
                     responseTime: 100,
                     checkInterval: 5000,
+                    monitoring: true,
+                    retryAttempts: 3,
+                    timeout: 5000,
                     history: [
                         {
                             status: "up" as const,
@@ -510,9 +513,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     type: "http" as const,
                     url: "https://example.com",
                     status: "up" as const,
-                    lastChecked: Date.now(),
+                    lastChecked: new Date(),
                     responseTime: 100,
                     checkInterval: 5000,
+                    monitoring: true,
+                    retryAttempts: 3,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
@@ -813,7 +820,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             // The type guard is passed to safeJsonParse, so we test it indirectly
             (safeJsonParse as MockedFunction<any>).mockImplementation(
-                (jsonData, guardFunction) => {
+                (_jsonData: any, guardFunction: any) => {
                     // Test the type guard with valid data
                     const validData = {
                         sites: [{ identifier: "test" }],
@@ -912,9 +919,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     name: "Complex Site",
                     monitors: [
                         {
+                            id: "http-monitor",
                             type: "http" as const,
                             url: "https://api.example.com",
                             checkInterval: 30_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
                             history: Array.from({ length: 5 }, (_, i) => ({
                                 status:
                                     i % 2 === 0
@@ -925,9 +938,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                             })),
                         },
                         {
+                            id: "port-monitor",
                             type: "port" as const,
                             url: "database.example.com",
                             port: 5432,
+                            checkInterval: 60_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
                             history: [],
                         },
                     ],
@@ -956,7 +976,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ]);
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation) => {
+                async (operation: any) => {
                     return await operation();
                 }
             );
@@ -965,7 +985,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith(
                 "complex-site",
-                complexSites[0].monitors
+                complexSites[0]!.monitors
             );
             expect(
                 mockRepositories.history.addEntryInternal
@@ -987,12 +1007,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 await service.exportAllData();
             } catch (error) {
                 expect(error).toBeInstanceOf(SiteLoadingError);
-                expect(error.message).toContain(
+                expect((error as Error).message).toContain(
                     "Failed to export data: Original database error"
                 );
                 // SiteLoadingError preserves stack trace but doesn't set cause property
-                expect(error.stack).toContain("Original database error");
-                expect(error.stack).toContain("Caused by:");
+                expect((error as Error).stack).toContain("Original database error");
+                expect((error as Error).stack).toContain("Caused by:");
             }
         });
     });

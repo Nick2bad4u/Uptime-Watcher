@@ -68,7 +68,6 @@ describe("Monitor Type Guards", () => {
         retryAttempts: 3,
         status: "pending" as const,
         timeout: 30_000,
-        lastChecked: undefined,
         ...overrides,
     });
 

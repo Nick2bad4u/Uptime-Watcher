@@ -31,7 +31,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Mock all external dependencies at module level
 vi.mock("../../../utils/database/interfaces", () => ({
     SiteLoadingError: class extends Error {
-        constructor(message, cause) {
+        constructor(message: string, cause?: Error) {
             super(message);
             this.name = "SiteLoadingError";
             if (cause) this.cause = cause;
@@ -126,7 +126,7 @@ describe("DataImportExportService", () => {
         // Spy on withDatabaseOperation function using vi.mocked
         const mockWithDatabaseOperation = vi.mocked(withDatabaseOperation);
         mockWithDatabaseOperation.mockImplementation(async (operation: any) => {
-            return await operation();
+            return await (operation as () => Promise<void>)();
         });
 
         // Setup mock database
@@ -291,7 +291,7 @@ describe("DataImportExportService", () => {
             const endTime = Date.now();
 
             const callArgs = vi.mocked(safeJsonStringifyWithFallback).mock
-                .calls[0][0] as any;
+                .calls?.[0]?.[0] as any;
             const exportTime = new Date(callArgs.exportedAt).getTime();
             expect(exportTime).toBeGreaterThanOrEqual(startTime);
             expect(exportTime).toBeLessThanOrEqual(endTime);
@@ -530,18 +530,19 @@ describe("DataImportExportService", () => {
                 monitors: [
                     {
                         id: "monitor1",
-                        siteId: "site1",
                         type: "http",
                         url: "https://test.com",
-                        config: { timeout: 5000 },
-                        isActive: true,
+                        monitoring: true,
+                        checkInterval: 60_000,
+                        responseTime: 0,
+                        retryAttempts: 3,
+                        status: "pending" as const,
+                        timeout: 5000,
                         history: [
                             {
-                                id: "history1",
-                                monitorId: "monitor1",
                                 status: "up",
                                 responseTime: 200,
-                                timestamp: "2023-01-01T01:00:00.000Z",
+                                timestamp: 1_672_531_200_000,
                             },
                         ],
                     },
@@ -561,6 +562,13 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
@@ -614,7 +622,7 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
+                async (callback: (db: any) => Promise<void>) => {
                     return await callback(mockDatabase);
                 }
             );
@@ -634,7 +642,7 @@ describe("DataImportExportService", () => {
 
         it("should call withDatabaseOperation correctly", async () => {
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
+                async (callback: (db: any) => Promise<void>) => {
                     return await callback(mockDatabase);
                 }
             );
@@ -659,11 +667,18 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
+                async (callback: (db: any) => Promise<void>) => {
                     return await callback(mockDatabase);
                 }
             );
@@ -673,7 +688,7 @@ describe("DataImportExportService", () => {
 
             expect(mockMonitorRepository.bulkCreate).toHaveBeenCalledWith(
                 "site1",
-                sampleSites[0].monitors
+                sampleSites[0]?.monitors
             );
             expect(mockHistoryRepository.addEntryInternal).toHaveBeenCalledWith(
                 mockDatabase,
@@ -681,7 +696,7 @@ describe("DataImportExportService", () => {
                 {
                     status: "up",
                     responseTime: 200,
-                    timestamp: "2023-01-01T01:00:00.000Z",
+                    timestamp: 1_672_531_200_000,
                 },
                 ""
             );
@@ -696,8 +711,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
 
@@ -719,8 +734,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
 
@@ -733,8 +748,8 @@ describe("DataImportExportService", () => {
             const monitorError = new Error("Monitor creation failed");
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
             mockMonitorRepository.bulkCreate.mockRejectedValue(monitorError);
@@ -765,7 +780,14 @@ describe("DataImportExportService", () => {
                         {
                             id: "monitor1",
                             type: "http",
-                            isActive: true,
+                            url: "https://example.com",
+                            checkInterval: 60_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
+                            history: [],
                         },
                     ],
                 },
@@ -777,12 +799,19 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
@@ -803,7 +832,13 @@ describe("DataImportExportService", () => {
                         {
                             id: "monitor1",
                             type: "http",
-                            isActive: true,
+                            url: "https://example.com",
+                            checkInterval: 60_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
                             history: [],
                         },
                     ],
@@ -816,12 +851,19 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
@@ -843,17 +885,22 @@ describe("DataImportExportService", () => {
                             id: "monitor1",
                             type: "http",
                             url: "https://test.com",
-                            port: undefined,
+                            checkInterval: 60_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
                             history: [
                                 {
                                     status: "up",
                                     responseTime: 200,
-                                    timestamp: "2023-01-01T01:00:00.000Z",
+                                    timestamp: 1_672_531_200_000,
                                 },
                                 {
                                     status: "down",
                                     responseTime: 0,
-                                    timestamp: "2023-01-01T02:00:00.000Z",
+                                    timestamp: 1_672_534_800_000,
                                 },
                             ],
                         },
@@ -867,11 +914,18 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
+                async (callback: (db: any) => Promise<void>) => {
                     return await callback(mockDatabase);
                 }
             );
@@ -891,7 +945,7 @@ describe("DataImportExportService", () => {
                 {
                     status: "up",
                     responseTime: 200,
-                    timestamp: "2023-01-01T01:00:00.000Z",
+                    timestamp: 1_672_531_200_000,
                 },
                 ""
             );
@@ -904,7 +958,7 @@ describe("DataImportExportService", () => {
                 {
                     status: "down",
                     responseTime: 0,
-                    timestamp: "2023-01-01T02:00:00.000Z",
+                    timestamp: 1_672_534_800_000,
                 },
                 ""
             );
@@ -920,11 +974,17 @@ describe("DataImportExportService", () => {
                             type: "http",
                             url: "https://test.com",
                             port: 8080,
+                            checkInterval: 60_000,
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending" as const,
+                            timeout: 5000,
                             history: [
                                 {
                                     status: "up",
                                     responseTime: 200,
-                                    timestamp: "2023-01-01T01:00:00.000Z",
+                                    timestamp: 1_672_531_200_000,
                                 },
                             ],
                         },
@@ -938,11 +998,18 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: 8080,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
+                async (callback: (db: any) => Promise<void>) => {
                     return await callback(mockDatabase);
                 }
             );
@@ -956,7 +1023,7 @@ describe("DataImportExportService", () => {
                 {
                     status: "up",
                     responseTime: 200,
-                    timestamp: "2023-01-01T01:00:00.000Z",
+                    timestamp: 1_672_531_200_000,
                 },
                 ""
             );
@@ -968,12 +1035,19 @@ describe("DataImportExportService", () => {
                     type: "http",
                     url: "https://test.com",
                     port: undefined,
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(
@@ -993,12 +1067,19 @@ describe("DataImportExportService", () => {
                     id: "1",
                     type: "http",
                     url: "https://test.com",
+                    checkInterval: 60_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    history: [],
                 },
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback) => {
-                    return await callback(mockDatabase);
+                async (callback: () => Promise<void>) => {
+                    return await callback();
                 }
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);

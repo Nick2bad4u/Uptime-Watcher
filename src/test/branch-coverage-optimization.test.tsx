@@ -6,13 +6,14 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import React from "react";
 
 // Import components with low branch coverage
 import { StatusBadge } from "../components/common/StatusBadge";
 import { SiteCardHistory } from "../components/Dashboard/SiteCard/SiteCardHistory";
 import ThemeProvider from "../theme/components/ThemeProvider";
+import { createValidMonitor } from "./shared/testHelpers";
 
 // Mock dependencies
 vi.mock("../hooks/useMonitorTypes", () => ({
@@ -180,7 +181,7 @@ describe("Branch Coverage Optimization Tests", () => {
         });
 
         it("should handle monitor with type not found in options", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "test-1",
                 type: "unknown" as any,
                 url: "https://example.com",
@@ -190,7 +191,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
-            };
+            });
 
             render(
                 <SiteCardHistory
@@ -206,7 +207,7 @@ describe("Branch Coverage Optimization Tests", () => {
         });
 
         it("should handle HTTP monitor with URL", () => {
-            const monitor = {
+            const monitor = createValidMonitor({
                 id: "test-1",
                 type: "http" as const,
                 url: "https://example.com",
@@ -216,7 +217,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
-            };
+            });
 
             render(
                 <SiteCardHistory
@@ -242,6 +243,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             render(
@@ -267,6 +269,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             render(
@@ -384,6 +387,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             const { rerender } = render(
@@ -416,6 +420,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             const monitor2 = {
@@ -453,6 +458,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             const portMonitor = {
@@ -466,6 +472,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             const { rerender } = render(
@@ -498,6 +505,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             const monitor2 = {
@@ -536,6 +544,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);
@@ -556,6 +565,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);
@@ -586,6 +596,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 status: "up" as const,
                 responseTime: 100,
                 monitoring: true,
+                history: [],
             };
 
             render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);

@@ -48,19 +48,19 @@ describe("ErrorAlert - Complete Coverage", () => {
         });
 
         it("should render with custom className", () => {
-            const { container } = render(
+            render(
                 <ErrorAlert
                     message="Test message"
                     className="custom-error-class"
                 />
             );
 
-            const alertElement = container.querySelector(".custom-error-class");
-            expect(alertElement).toBeInTheDocument();
+            const alertElement = screen.getByRole("alert");
+            expect(alertElement).toHaveClass("custom-error-class");
         });
 
         it("should render with default className when not provided", () => {
-            const { container } = render(<ErrorAlert message="Test message" />);
+            const { container: _container } = render(<ErrorAlert message="Test message" />);
 
             const alertElement = screen.getByRole("alert");
             expect(alertElement).toHaveClass(
@@ -186,7 +186,7 @@ describe("ErrorAlert - Complete Coverage", () => {
         });
 
         it("should render default icon for undefined variant", () => {
-            render(<ErrorAlert message="Default" variant={undefined} />);
+            render(<ErrorAlert message="Default" />);
 
             const icon = screen.getByTestId("alert-circle-icon");
             expect(icon).toBeInTheDocument();
@@ -393,7 +393,7 @@ describe("ErrorAlert - Complete Coverage", () => {
     describe("Edge Cases", () => {
         it("should handle undefined onDismiss gracefully", () => {
             render(
-                <ErrorAlert message="Undefined dismiss" onDismiss={undefined} />
+                <ErrorAlert message="Undefined dismiss" />
             );
 
             expect(

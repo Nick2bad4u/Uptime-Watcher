@@ -538,7 +538,7 @@ describe("ScreenshotThumbnail", () => {
                 value: 600,
                 writable: true,
             });
-            fireEvent(globalThis, new Event("resize"));
+            fireEvent(globalThis as any, new Event("resize"));
 
             // Portal should still exist and be functional
             await waitFor(() => {

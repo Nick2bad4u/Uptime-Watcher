@@ -74,22 +74,26 @@ describe("SiteService", () => {
         const mockMonitors: Monitor[] = [
             {
                 id: "monitor-1",
-                siteIdentifier: mockSiteIdentifier,
-                name: "Monitor 1",
                 url: "https://example.com",
                 type: "http",
-                interval: 300,
-                enabled: true,
+                checkInterval: 300_000,
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
                 history: [],
             },
             {
                 id: "monitor-2",
-                siteIdentifier: mockSiteIdentifier,
-                name: "Monitor 2",
                 url: "https://example2.com",
                 type: "http",
-                interval: 600,
-                enabled: true,
+                checkInterval: 600_000,
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
                 history: [],
             },
         ];
@@ -255,12 +259,14 @@ describe("SiteService", () => {
         const mockMonitors: Monitor[] = [
             {
                 id: "monitor-1",
-                siteIdentifier: mockSiteIdentifier,
-                name: "Monitor 1",
                 url: "https://example.com",
                 type: "http",
-                interval: 300,
-                enabled: true,
+                checkInterval: 300_000,
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
                 history: [],
             },
         ];
@@ -298,7 +304,15 @@ describe("SiteService", () => {
                 monitoring: true,
                 monitors: [
                     {
-                        ...mockMonitors[0],
+                        id: "monitor-1",
+                        url: "https://example.com",
+                        type: "http",
+                        checkInterval: 300_000,
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 3,
+                        status: "pending",
+                        timeout: 5000,
                         history: mockHistory,
                     },
                 ],
@@ -408,45 +422,43 @@ describe("SiteService", () => {
             const multipleMonitors: Monitor[] = [
                 {
                     id: "monitor-1",
-                    siteIdentifier: mockSiteIdentifier,
-                    name: "Monitor 1",
                     url: "https://example.com",
                     type: "http",
-                    interval: 300,
-                    enabled: true,
+                    checkInterval: 300_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending",
+                    timeout: 5000,
                     history: [],
                 },
                 {
                     id: "monitor-2",
-                    siteIdentifier: mockSiteIdentifier,
-                    name: "Monitor 2",
                     url: "https://example2.com",
                     type: "http",
-                    interval: 600,
-                    enabled: true,
+                    checkInterval: 600_000,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending",
+                    timeout: 5000,
                     history: [],
                 },
             ];
 
-            const history1: HistoryEntry[] = [
+            const history1: StatusHistory[] = [
                 {
-                    id: "history-1",
-                    monitorId: "monitor-1",
                     status: "up",
                     responseTime: 150,
-                    timestamp: new Date(),
-                    errorMessage: null,
+                    timestamp: Date.now(),
                 },
             ];
 
-            const history2: HistoryEntry[] = [
+            const history2: StatusHistory[] = [
                 {
-                    id: "history-2",
-                    monitorId: "monitor-2",
                     status: "down",
                     responseTime: 0,
-                    timestamp: new Date(),
-                    errorMessage: "Connection timeout",
+                    timestamp: Date.now(),
                 },
             ];
 
@@ -469,8 +481,8 @@ describe("SiteService", () => {
                 );
 
             expect(result?.monitors).toHaveLength(2);
-            expect(result?.monitors[0].history).toEqual(history1);
-            expect(result?.monitors[1].history).toEqual(history2);
+            expect(result?.monitors[0]!.history).toEqual(history1);
+            expect(result?.monitors[1]!.history).toEqual(history2);
             expect(mockHistoryRepository.findByMonitorId).toHaveBeenCalledTimes(
                 2
             );
@@ -511,24 +523,23 @@ describe("SiteService", () => {
         const mockMonitors1: Monitor[] = [
             {
                 id: "monitor-1",
-                siteIdentifier: "site-1",
-                name: "Monitor 1",
                 url: "https://example.com",
                 type: "http",
-                interval: 300,
-                enabled: true,
+                checkInterval: 300_000,
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
                 history: [],
             },
         ];
 
-        const mockHistory1: HistoryEntry[] = [
+        const mockHistory1: StatusHistory[] = [
             {
-                id: "history-1",
-                monitorId: "monitor-1",
                 status: "up",
                 responseTime: 150,
-                timestamp: new Date(),
-                errorMessage: null,
+                timestamp: Date.now(),
             },
         ];
 
@@ -593,8 +604,8 @@ describe("SiteService", () => {
             const result = await siteService.getAllWithDetails();
 
             expect(result).toHaveLength(2);
-            expect(result[0].monitors).toEqual([]);
-            expect(result[1].monitors).toEqual([]);
+            expect(result[0]!.monitors).toEqual([]);
+            expect(result[1]!.monitors).toEqual([]);
             expect(
                 mockHistoryRepository.findByMonitorId
             ).not.toHaveBeenCalled();
@@ -617,7 +628,7 @@ describe("SiteService", () => {
 
             const result = await siteService.getAllWithDetails();
 
-            expect(result[0].monitoring).toBe(false);
+            expect(result[0]!.monitoring).toBe(false);
         });
 
         it("should log debug and info messages", async () => {

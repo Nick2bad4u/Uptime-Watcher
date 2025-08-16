@@ -15,7 +15,6 @@ import {
     rowsToHistoryEntries,
     rowToHistoryEntry,
     rowToHistoryEntryOrUndefined,
-    type HistoryRow,
 } from "../../../../services/database/utils/historyMapper";
 import { logger } from "../../../../utils/logger";
 
@@ -334,7 +333,6 @@ describe("historyMapper utilities", () => {
                 status: "up",
                 timestamp: TEST_TIMESTAMP,
                 responseTime: 150,
-                details: undefined,
             };
 
             const result = rowToHistoryEntry(row);
@@ -592,9 +590,9 @@ describe("historyMapper utilities", () => {
             const entries = rowsToHistoryEntries(rows);
 
             expect(entries).toHaveLength(2);
-            expect(entries[0].status).toBe("up");
-            expect(entries[1].status).toBe("down");
-            expect(entries[1].details).toBe("Timeout");
+            expect(entries[0]!.status).toBe("up");
+            expect(entries[1]!.status).toBe("down");
+            expect(entries[1]!.details).toBe("Timeout");
         });
     });
 });

@@ -345,7 +345,7 @@ describe("useSiteSync", () => {
                 { id: "site-2", name: "Site 2" },
             ];
 
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites as any);
 
             await syncActions.syncSitesFromBackend();
 

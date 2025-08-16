@@ -105,7 +105,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
 
         it("should handle undefined lastChecked", () => {
-            const monitor = createValidBaseMonitor({ lastChecked: undefined });
+            const monitor = createValidBaseMonitor({});
 
             expect(monitor.lastChecked).toBeUndefined();
         });
@@ -396,7 +396,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
         });
 
         it("should handle undefined details", () => {
-            const history = createValidStatusHistory({ details: undefined });
+            const history = createValidStatusHistory({});
 
             expect(history.details).toBeUndefined();
         });

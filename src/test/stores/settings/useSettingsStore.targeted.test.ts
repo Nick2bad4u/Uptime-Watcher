@@ -113,7 +113,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             );
 
             // Create a spy to track the actual sync operation
-            const originalSyncFn = vi.fn();
+            vi.fn();
 
             // Test the error path by calling the sync function directly
             await act(async () => {

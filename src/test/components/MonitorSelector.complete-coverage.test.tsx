@@ -9,6 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import ThemeProvider from "../../theme/components/ThemeProvider";
 import type { Monitor } from "../../../shared/types";
+import { createValidMonitor } from "../shared/testHelpers";
 
 // Mock ThemedSelect
 vi.mock("../../theme/components/ThemedSelect", () => ({
@@ -37,19 +38,13 @@ const createMockMonitor = (
     id: string,
     type: "http" | "port" | "ping",
     options: { url?: string; port?: number; host?: string } = {}
-): Monitor => ({
+): Monitor => createValidMonitor({
     id,
     type,
-    url: options.url,
-    port: options.port,
-    host: options.host,
-    checkInterval: 30_000,
-    timeout: 5000,
-    retryAttempts: 0,
     status: "pending",
     monitoring: false,
     responseTime: 0,
-    history: [],
+    ...options,
 });
 
 const defaultProps = {
@@ -261,7 +256,7 @@ describe("MonitorSelector - Complete Coverage", () => {
         it("should re-render when props change", () => {
             const { rerender } = renderMonitorSelector();
 
-            const originalOptions = screen.getAllByRole("option");
+            screen.getAllByRole("option");
 
             // Rerender with different monitors
             const newMonitors = [

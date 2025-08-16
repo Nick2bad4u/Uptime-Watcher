@@ -347,7 +347,7 @@ describe("Header Component", () => {
             // Unknown status should not be counted in any specific category
             // Use more specific selectors to avoid ambiguity
             const upBadge = screen.getByText("Up").closest("div");
-            expect(upBadge).toContainElement(screen.getAllByText("1")[0]); // Up count
+            expect(upBadge).toContainElement(screen.getAllByText("1")[0]!); // Up count
             expect(screen.getByText("50%")).toBeInTheDocument(); // 1 up out of 2 total
         });
     });

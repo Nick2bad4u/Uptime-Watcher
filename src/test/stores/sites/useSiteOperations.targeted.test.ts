@@ -5,7 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type Monitor, type Site } from "../../../../shared/types";
+import { type Site } from "../../../../shared/types";
 import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
@@ -47,7 +47,7 @@ vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
-            return await fn().then((result) => {
+            return await fn().then((result: any) => {
                 handlers.setLoading?.(false);
                 return result;
             });
@@ -66,7 +66,7 @@ vi.mock("../../../stores/sites/utils/fileDownload", () => ({
 }));
 
 vi.mock("../../../utils/safeExtractIpcData", () => ({
-    safeExtractIpcData: vi.fn((response, defaultValue) => {
+    safeExtractIpcData: vi.fn((response, _defaultValue) => {
         if (response.success) {
             return response.data;
         }
@@ -118,7 +118,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     const mockSiteWithSingleMonitor: Site = {
         ...mockSiteWithMultipleMonitors,
         identifier: "test-site-single",
-        monitors: [mockSiteWithMultipleMonitors.monitors[0]],
+        monitors: [mockSiteWithMultipleMonitors.monitors[0]!],
     };
 
     beforeEach(() => {
@@ -249,7 +249,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await expect(
                 actions.removeMonitorFromSite(
                     mockSiteWithSingleMonitor.identifier,
-                    mockSiteWithSingleMonitor.monitors[0].id
+                    mockSiteWithSingleMonitor.monitors[0]!.id
                 )
             ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
@@ -271,7 +271,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             // Monitor removal should still succeed despite stop monitoring failure
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0].id
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
 
             // Verify logger.warn was called for the failed stop operation (lines 214-215)
@@ -285,7 +285,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             // Verify monitor removal still proceeded
             expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0].id
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
         });
 
@@ -296,7 +296,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[1].id
+                mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
             // Verify logger.warn was called with Error wrapper (lines 216-219)
@@ -313,18 +313,18 @@ describe("useSiteOperations - Targeted Coverage", () => {
         it("should handle successful monitor removal with successful stop monitoring", async () => {
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0].id
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0].id
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
             expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0].id
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
         });
 
@@ -332,12 +332,12 @@ describe("useSiteOperations - Targeted Coverage", () => {
             // Site with exactly 2 monitors should allow removal
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[1].id
+                mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
             expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[1].id
+                mockSiteWithMultipleMonitors.monitors[1]!.id
             );
         });
     });

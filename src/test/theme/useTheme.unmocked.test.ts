@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { renderHook, waitFor, act } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import {
     useTheme,
     useAvailabilityColors,
@@ -307,7 +307,7 @@ describe("useTheme - Complete Coverage", () => {
             const { result: statusResult } = renderHook(() =>
                 useStatusColors()
             );
-            const { result: classesResult } = renderHook(() =>
+            const { result: _classesResult } = renderHook(() =>
                 useThemeClasses()
             );
 
@@ -375,9 +375,9 @@ describe("useTheme - Complete Coverage", () => {
             const { result } = renderHook(() => useTheme());
 
             expect(() =>
-                result.current.getStatusColor("invalid")
+                result.current.getStatusColor("invalid" as any)
             ).not.toThrow();
-            expect(() => result.current.getStatusColor("")).not.toThrow();
+            expect(() => result.current.getStatusColor("" as any)).not.toThrow();
         });
     });
 });

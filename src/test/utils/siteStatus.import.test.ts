@@ -13,7 +13,7 @@ import {
     getSiteStatusVariant,
 } from "../../utils/siteStatus";
 
-import type { SiteStatus } from "../../utils/siteStatus";
+import type { SiteStatus } from "../../../shared/types";
 
 describe("siteStatus re-exports", () => {
     it("should re-export calculateSiteMonitoringStatus function", () => {

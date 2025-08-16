@@ -4,7 +4,6 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import React from "react";
-import ReactDOM from "react-dom/client";
 
 // Mock ReactDOM.createRoot properly
 const mockRender = vi.fn();
@@ -56,7 +55,7 @@ describe("main.tsx - Application Entry Point", () => {
             document.body.innerHTML = "";
 
             // Import and execute main.tsx - it should handle the error gracefully
-            const mainModule = await import("../main");
+            await import("../main");
 
             // Since main.tsx wraps in try-catch, we expect console.error to be called
             expect(console.error).toHaveBeenCalledWith(

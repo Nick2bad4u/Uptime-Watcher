@@ -4,7 +4,7 @@
  * @file Src/test/hooks/site/useSiteDetails.test.ts
  */
 
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
@@ -31,7 +31,7 @@ vi.mock("../../../utils/errorHandling", () => ({
 
 // Mock validation utilities
 vi.mock("../../../utils/monitorValidation", () => ({
-    validateMonitorFieldClientSide: vi.fn((type, field, value) => {
+    validateMonitorFieldClientSide: vi.fn((_type, field, value) => {
         if (
             field === "checkInterval" &&
             (value < 10_000 || value > 86_400_000)
@@ -471,7 +471,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         });
 
         // Reset withUtilityErrorHandling mock
-        (withUtilityErrorHandling as any).mockImplementation((fn, _context) => {
+        (withUtilityErrorHandling as any).mockImplementation((fn: any, _context: any) => {
             return async (...args: any[]) => {
                 try {
                     return await fn(...args);

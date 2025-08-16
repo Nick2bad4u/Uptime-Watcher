@@ -218,7 +218,7 @@ describe("ThemedTooltip", () => {
         });
 
         it("should handle undefined className", () => {
-            render(<ThemedTooltip {...defaultProps} className={undefined} />);
+            render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer =
                 screen.getByText("Hover me").parentElement!;

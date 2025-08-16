@@ -238,57 +238,66 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
         formatMonitorDetail: async (
             type: string,
             details: string
-        ): Promise<string> => {
-            const state = get();
-
-            return withErrorHandling(async () => {
-                logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
-                    type,
-                });
-
-                const response =
-                    await window.electronAPI.monitorTypes.formatMonitorDetail(
+        ): Promise<string> =>
+            withErrorHandling(
+                async () => {
+                    logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
                         type,
-                        details
-                    );
-                logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
-                    success: true,
-                    type,
-                });
+                    });
 
-                return safeExtractIpcData<string>(response, details);
-            }, state);
-        },
+                    const response =
+                        await window.electronAPI.monitorTypes.formatMonitorDetail(
+                            type,
+                            details
+                        );
+                    logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
+                        success: true,
+                        type,
+                    });
+
+                    return safeExtractIpcData<string>(response, details);
+                },
+                {
+                    clearError: get().clearError,
+                    setError: get().setError,
+                    setLoading: get().setLoading,
+                }
+            ),
+
         formatMonitorTitleSuffix: async (
             type: string,
             monitor: Monitor
-        ): Promise<string> => {
-            const state = get();
-
-            return withErrorHandling(async () => {
-                logStoreAction(
-                    "MonitorTypesStore",
-                    "formatMonitorTitleSuffix",
-                    { type }
-                );
-
-                const response =
-                    await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
-                        type,
-                        monitor
+        ): Promise<string> =>
+            withErrorHandling(
+                async () => {
+                    logStoreAction(
+                        "MonitorTypesStore",
+                        "formatMonitorTitleSuffix",
+                        { type }
                     );
-                logStoreAction(
-                    "MonitorTypesStore",
-                    "formatMonitorTitleSuffix",
-                    {
-                        success: true,
-                        type,
-                    }
-                );
 
-                return safeExtractIpcData<string>(response, "");
-            }, state);
-        },
+                    const response =
+                        await window.electronAPI.monitorTypes.formatMonitorTitleSuffix(
+                            type,
+                            monitor
+                        );
+                    logStoreAction(
+                        "MonitorTypesStore",
+                        "formatMonitorTitleSuffix",
+                        {
+                            success: true,
+                            type,
+                        }
+                    );
+
+                    return safeExtractIpcData<string>(response, "");
+                },
+                {
+                    clearError: get().clearError,
+                    setError: get().setError,
+                    setLoading: get().setLoading,
+                }
+            ),
         getFieldConfig: (
             type: MonitorType
         ): MonitorTypeConfig["fields"] | undefined => {
@@ -310,34 +319,43 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                 return;
             }
 
-            await withErrorHandling(async () => {
-                logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
+            await withErrorHandling(
+                async () => {
+                    logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
 
-                const response =
-                    await window.electronAPI.monitorTypes.getMonitorTypes();
-                const configs = safeExtractIpcData<MonitorTypeConfig[]>(
-                    response,
-                    []
-                );
+                    const response =
+                        await window.electronAPI.monitorTypes.getMonitorTypes();
+                    const configs = safeExtractIpcData<MonitorTypeConfig[]>(
+                        response,
+                        []
+                    );
 
-                // Build field configs map
-                const fieldMap: Record<string, MonitorTypeConfig["fields"]> =
-                    {};
-                for (const config of configs) {
-                    fieldMap[config.type] = config.fields;
+                    // Build field configs map
+                    const fieldMap: Record<
+                        string,
+                        MonitorTypeConfig["fields"]
+                    > = {};
+                    for (const config of configs) {
+                        fieldMap[config.type] = config.fields;
+                    }
+
+                    set({
+                        fieldConfigs: fieldMap,
+                        isLoaded: true,
+                        monitorTypes: configs,
+                    });
+
+                    logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
+                        success: true,
+                        typesCount: configs.length,
+                    });
+                },
+                {
+                    clearError: get().clearError,
+                    setError: get().setError,
+                    setLoading: get().setLoading,
                 }
-
-                set({
-                    fieldConfigs: fieldMap,
-                    isLoaded: true,
-                    monitorTypes: configs,
-                });
-
-                logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
-                    success: true,
-                    typesCount: configs.length,
-                });
-            }, state);
+            );
         },
 
         monitorTypes: [],
@@ -368,37 +386,41 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
         validateMonitorData: async (
             type: string,
             data: unknown
-        ): Promise<ValidationResult> => {
-            const state = get();
-
-            return withErrorHandling(async () => {
-                logStoreAction("MonitorTypesStore", "validateMonitorData", {
-                    type,
-                });
-
-                const result =
-                    await window.electronAPI.monitorTypes.validateMonitorData(
+        ): Promise<ValidationResult> =>
+            withErrorHandling(
+                async () => {
+                    logStoreAction("MonitorTypesStore", "validateMonitorData", {
                         type,
-                        data
-                    );
+                    });
 
-                // Transform result to ensure all required properties are
-                // present
-                const validationResult: ValidationResult = {
-                    data: result.data,
-                    errors: result.errors,
-                    metadata: result.metadata ?? {},
-                    success: result.success,
-                    warnings: result.warnings ?? [],
-                };
+                    const result =
+                        await window.electronAPI.monitorTypes.validateMonitorData(
+                            type,
+                            data
+                        );
 
-                logStoreAction("MonitorTypesStore", "validateMonitorData", {
-                    errorCount: validationResult.errors.length,
-                    success: validationResult.success,
-                    type,
-                });
+                    // Transform result to ensure all required properties are
+                    // present
+                    const validationResult: ValidationResult = {
+                        data: result.data,
+                        errors: result.errors,
+                        metadata: result.metadata ?? {},
+                        success: result.success,
+                        warnings: result.warnings ?? [],
+                    };
 
-                return validationResult;
-            }, state);
-        },
+                    logStoreAction("MonitorTypesStore", "validateMonitorData", {
+                        errorCount: validationResult.errors.length,
+                        success: validationResult.success,
+                        type,
+                    });
+
+                    return validationResult;
+                },
+                {
+                    clearError: get().clearError,
+                    setError: get().setError,
+                    setLoading: get().setLoading,
+                }
+            ),
     }));

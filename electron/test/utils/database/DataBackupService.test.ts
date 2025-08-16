@@ -245,10 +245,10 @@ describe("DataBackupService", () => {
                 expect.fail("Should have thrown SiteLoadingError");
             } catch (error) {
                 expect(error).toBeInstanceOf(SiteLoadingError);
-                expect(error.message).toBe(
+                expect((error as SiteLoadingError).message).toBe(
                     "Failed to load sites: Failed to download backup: Original error"
                 );
-                expect(error.stack).toContain("Caused by:");
+                expect((error as SiteLoadingError).stack).toContain("Caused by:");
             }
         });
 

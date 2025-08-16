@@ -9,7 +9,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     ipcMain,
-    BrowserWindow,
     type IpcMainInvokeEvent,
     type IpcMainEvent,
 } from "electron";
@@ -105,7 +104,7 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 
 // Mock shared validation
 vi.mock("../../../../shared/validation/schemas", () => ({
-    validateMonitorData: vi.fn((type: string, data: unknown) => ({
+    validateMonitorData: vi.fn((type: string, _data: unknown) => ({
         success: type !== "invalid",
         errors: type === "invalid" ? ["Invalid monitor type"] : [],
         warnings: type === "warning" ? ["Warning message"] : [],

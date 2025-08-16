@@ -7,12 +7,11 @@
  *   logic, and all code paths for maximum coverage.
  */
 
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { RenderResult } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
-import React from "react";
 
 // Component imports
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
@@ -29,24 +28,13 @@ import { useDelayedButtonLoading } from "../../../hooks/useDelayedButtonLoading"
 // Get the mocked functions
 const mockUseAddSiteForm = vi.mocked(useAddSiteForm);
 const mockUseErrorStore = vi.mocked(useErrorStore);
-const mockUseSitesStore = vi.mocked(useSitesStore);
-const mockUseMonitorTypesStore = vi.mocked(useMonitorTypesStore);
+vi.mocked(useSitesStore);
+vi.mocked(useMonitorTypesStore);
 const mockUseMonitorTypes = vi.mocked(useMonitorTypes);
 const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText);
-const mockUseDelayedButtonLoading = vi.mocked(useDelayedButtonLoading);
+vi.mocked(useDelayedButtonLoading);
 
 // Mock data
-const mockFormData = {
-    siteName: "",
-    siteUrl: "",
-    monitorType: "http",
-    interval: 60,
-    timeout: 30,
-    retries: 3,
-    description: "",
-    tags: [],
-};
-
 const mockMonitorTypes = [
     {
         type: "http",
@@ -837,7 +825,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should clear errors on field focus", async () => {
             const clearError = vi.fn();
-            const errors = { siteName: "Site name is required" };
 
             mockUseErrorStore.mockReturnValue({
                 clearError,
@@ -1056,8 +1043,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
         it("should display help text for fields", () => {
             mockUseDynamicHelpText.mockReturnValue({
                 primary: "Enter the URL of the site you want to monitor",
-                secondary: undefined,
-                error: undefined,
                 isLoading: false,
             });
 
@@ -1066,7 +1051,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             // Help text is displayed in the help section at the bottom of the form
             // Look for partial text match to handle the bullet point formatting
             expect(
-                screen.getByText((content, element) => {
+                screen.getByText((content, _element) => {
                     return content.includes(
                         "Enter the URL of the site you want to monitor"
                     );
@@ -1076,9 +1061,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should handle help text loading state", () => {
             mockUseDynamicHelpText.mockReturnValue({
-                primary: undefined,
-                secondary: undefined,
-                error: undefined,
                 isLoading: true,
             });
 
@@ -1088,8 +1070,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
         it("should handle help text error state", () => {
             mockUseDynamicHelpText.mockReturnValue({
-                primary: undefined,
-                secondary: undefined,
                 error: "Failed to load help text",
                 isLoading: false,
             });

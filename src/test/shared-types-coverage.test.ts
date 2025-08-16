@@ -310,12 +310,12 @@ describe("Shared Types Coverage", () => {
                 },
                 applyTheme: (themeName: string) => {
                     // Mock theme application
-                    document.documentElement.dataset.theme = themeName;
+                    document.documentElement.dataset["theme"] = themeName;
                 },
             };
 
             expect(themeUtils.getColorByStatus("up")).toBe("#10b981");
-            expect(themeUtils.getColorByStatus("invalid")).toBe("#6b7280");
+            expect(themeUtils.getColorByStatus("invalid" as any)).toBe("#6b7280");
             expect(themeUtils.getSpacingValue("lg")).toBe(24);
             expect(themeUtils.getSpacingValue("invalid")).toBe(16);
         });

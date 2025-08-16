@@ -7,7 +7,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-import type { MonitorType } from "../../../types";
+import type { MonitorType } from "@shared/types";
 import {
     ConditionalResponseTime,
     DetailLabel,

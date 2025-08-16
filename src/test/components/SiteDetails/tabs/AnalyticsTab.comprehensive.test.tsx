@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import type { ChartOptions } from "chart.js";
 
 import {
     AnalyticsTab,
@@ -11,7 +12,6 @@ import type {
     StatusBarChartData,
     UptimeChartData,
 } from "../../../../services/chartConfig";
-import type { ChartOptions } from "../../../../services/chartSetup";
 
 // Mock all external dependencies
 vi.mock("../../../../services/logger", () => ({

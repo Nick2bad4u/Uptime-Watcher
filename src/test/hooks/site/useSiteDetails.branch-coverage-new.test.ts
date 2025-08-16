@@ -29,7 +29,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
     const mockSite = {
         identifier: "test-site",
         name: "Test Site",
-        monitoring: false,
+        monitoring: true,
         monitors: [
             {
                 id: "monitor-1",
@@ -39,6 +39,9 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 retryAttempts: 3,
                 url: "https://example.com",
                 monitoring: false,
+                history: [],
+                responseTime: 100,
+                status: "up" as const,
             },
         ],
     };
@@ -75,6 +78,22 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
     };
 
     const mockAnalytics = {
+        avgResponseTime: 100,
+        downCount: 0,
+        downtimePeriods: [],
+        fastestResponse: 50,
+        filteredHistory: [],
+        incidentCount: 0,
+        mttr: 0,
+        p50: 90,
+        p95: 150,
+        p99: 200,
+        slowestResponse: 200,
+        totalChecks: 100,
+        totalDowntime: 0,
+        upCount: 100,
+        uptime: "100.0%",
+        uptimeRaw: 100,
         chartData: [],
         isLoading: false,
         error: null,
@@ -399,7 +418,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                         retryAttempts: 3,
                         url: "https://example.com",
                         monitoring: false,
-                        // No type property
+                        history: [],
+                        responseTime: 100,
+                        status: "up" as const,
+                        type: "http" as const, // Adding type for TypeScript compliance
                     },
                 ],
             };

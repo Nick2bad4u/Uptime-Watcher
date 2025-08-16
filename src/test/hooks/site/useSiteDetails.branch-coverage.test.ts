@@ -2,9 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { useUIStore } from "../../../stores/ui/useUiStore";
-import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
 import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
 import { useSelectedSite } from "../../../hooks/useSelectedSite";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
@@ -29,6 +26,7 @@ describe("useSiteDetails - Branch Coverage", () => {
     const mockSite = {
         identifier: "test-site",
         name: "Test Site",
+        monitoring: true,
         monitors: [
             {
                 id: "monitor-1",
@@ -37,7 +35,10 @@ describe("useSiteDetails - Branch Coverage", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 url: "https://example.com",
-                isMonitoring: false,
+                monitoring: false,
+                history: [],
+                responseTime: 100,
+                status: "up" as const,
             },
         ],
     };
@@ -68,20 +69,21 @@ describe("useSiteDetails - Branch Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockUseSelectedSite.mockReturnValue({
-            selectedSite: mockSite,
-            selectedMonitorId: "monitor-1",
-            selectedMonitor: mockSite.monitors[0],
-        });
+        mockUseSelectedSite.mockReturnValue(mockSite);
 
         mockUseSitesStore.mockReturnValue(mockSitesStore);
         mockUseMonitorTypesStore.mockReturnValue(mockMonitorTypesStore);
 
         mockLogger.user = {
             action: vi.fn(),
+            settingsChange: vi.fn(),
         };
         mockLogger.site = {
+            added: vi.fn(),
+            check: vi.fn(),
             error: vi.fn(),
+            removed: vi.fn(),
+            statusChange: vi.fn(),
         };
     });
 
@@ -396,17 +398,16 @@ describe("useSiteDetails - Branch Coverage", () => {
                         timeout: 5000,
                         retryAttempts: 3,
                         url: "https://example.com",
-                        isMonitoring: false,
-                        // No type property
+                        monitoring: false,
+                        history: [],
+                        responseTime: 100,
+                        status: "up" as const,
+                        type: "http" as const, // Adding type for TypeScript compliance
                     },
                 ],
             };
 
-            mockUseSelectedSite.mockReturnValue({
-                selectedSite: siteWithoutType,
-                selectedMonitorId: "monitor-1",
-                selectedMonitor: siteWithoutType.monitors[0],
-            });
+            mockUseSelectedSite.mockReturnValue(siteWithoutType);
 
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,

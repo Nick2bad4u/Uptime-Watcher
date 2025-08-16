@@ -330,8 +330,8 @@ describe("DataImportExportService - Corrected Implementation", () => {
                 mockDb,
                 expect.arrayContaining([
                     expect.objectContaining({
-                        identifier: mockSites[0].identifier,
-                        name: mockSites[0].name,
+                        identifier: mockSites[0]?.identifier,
+                        name: mockSites[0]?.name,
                         monitoring: true,
                     }),
                 ])

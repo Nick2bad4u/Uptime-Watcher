@@ -779,7 +779,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
             for (const prop of actionProperties) {
                 expect(result.current).toHaveProperty(prop);
-                expect(typeof result.current[prop]).toBe("function");
+                expect(typeof (result.current as any)[prop]).toBe("function");
             }
         });
     });

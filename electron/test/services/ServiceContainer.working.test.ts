@@ -26,7 +26,7 @@ const mockSiteManager = vi.hoisted(() => {
     };
 
     // Create a constructor function that returns the mock object
-    function MockSiteManager(options: any) {
+    function MockSiteManager(_options: any) {
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),

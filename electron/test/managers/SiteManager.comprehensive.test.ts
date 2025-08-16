@@ -351,14 +351,11 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should handle background loading error", async () => {
             const mockCache = siteManager["sitesCache"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
 
             // Mock cache.get to return undefined (cache miss)
             mockCache.get = vi.fn().mockReturnValue(undefined);
             // Mock getSitesFromDatabase to throw error
-            mockSiteRepositoryService.getSitesFromDatabase = vi
-                .fn()
+            vi.mocked(mockSiteRepositoryServiceInstance.getSitesFromDatabase)
                 .mockRejectedValue(new Error("DB error"));
 
             const result = siteManager.getSiteFromCache("site-1");
@@ -368,7 +365,7 @@ describe("SiteManager - Comprehensive", () => {
 
             expect(result).toBeUndefined();
             expect(
-                mockSiteRepositoryService.getSitesFromDatabase
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).toHaveBeenCalled();
             await new Promise((resolve) => setTimeout(resolve, 10));
         });
@@ -395,8 +392,6 @@ describe("SiteManager - Comprehensive", () => {
         });
 
         it("should handle database errors", async () => {
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockRejectedValue(new Error("DB error"));
@@ -549,13 +544,10 @@ describe("SiteManager - Comprehensive", () => {
         it("should update site successfully", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
-
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
 
-            mockCache.get
+            vi.mocked(mockCache.get)
                 .mockReturnValueOnce(mockSite) // First call to get original site
                 .mockReturnValueOnce(updatedSite); // Second call after refresh
             vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
@@ -603,8 +595,6 @@ describe("SiteManager - Comprehensive", () => {
         it("should handle monitor updates with new monitors", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
 
             const newMonitor = createMockMonitor({
                 id: "monitor-2",
@@ -649,8 +639,6 @@ describe("SiteManager - Comprehensive", () => {
         it("should handle site not found after refresh", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
 
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
@@ -731,8 +719,6 @@ describe("SiteManager - Comprehensive", () => {
         it("should throw error when setupNewMonitors called without monitoring operations", async () => {
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
 
             const newMonitor = createMockMonitor({
                 id: "monitor-2",
@@ -851,8 +837,6 @@ describe("SiteManager - Comprehensive", () => {
 
         it("should load site in background successfully", async () => {
             const mockCache = siteManager["sitesCache"];
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
 
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
@@ -868,9 +852,6 @@ describe("SiteManager - Comprehensive", () => {
         });
 
         it("should handle site not found during background loading", async () => {
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
-
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockResolvedValue([]);
@@ -886,9 +867,6 @@ describe("SiteManager - Comprehensive", () => {
         });
 
         it("should handle database error during background loading", async () => {
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
-
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockRejectedValue(new Error("DB error"));
@@ -1012,8 +990,6 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
 
             // Initialize
-            const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockResolvedValue([]);

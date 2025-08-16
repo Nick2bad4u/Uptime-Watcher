@@ -31,7 +31,7 @@ vi.mock("../utils", () => ({
                 errorHandling.setLoading(true);
             }
 
-            return await fn().then((result) => {
+            return await fn().then((result: any) => {
                 if (errorHandling?.setLoading) {
                     errorHandling.setLoading(false);
                 }

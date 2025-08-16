@@ -496,8 +496,7 @@ describe("WindowService", () => {
                 const window = testWindowService.createMainWindow();
 
                 // Mock waitForViteServer to succeed but then simulate window destruction check
-                const waitForViteServerSpy = vi
-                    .spyOn(testWindowService as any, "waitForViteServer")
+                vi.spyOn(testWindowService as any, "waitForViteServer")
                     .mockResolvedValue(undefined);
 
                 // Simulate window being destroyed after server is ready but before load

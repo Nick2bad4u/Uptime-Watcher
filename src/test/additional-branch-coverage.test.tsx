@@ -4,9 +4,8 @@
  * Targeting remaining files with low branch coverage to achieve 90%+ threshold.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, fireEvent, screen, waitFor } from "@testing-library/react";
-import React from "react";
+import { describe, expect, it, vi } from "vitest";
+import { render, fireEvent, screen } from "@testing-library/react";
 
 // Import components and utilities needing branch coverage
 import RadioGroup from "../components/AddSiteForm/RadioGroup";

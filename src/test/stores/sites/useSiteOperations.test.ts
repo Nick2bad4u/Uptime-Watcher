@@ -10,8 +10,8 @@ import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
 
 import {
     createSiteOperationsActions,
-    type SiteOperationsDependencies,
 } from "../../../stores/sites/useSiteOperations";
+import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 
 // Mock external dependencies
 vi.mock("../../../services/logger");
@@ -32,7 +32,7 @@ vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
-            return await fn().then((result) => {
+            return await fn().then((result: any) => {
                 handlers.setLoading?.(false);
                 return result;
             });
@@ -67,7 +67,7 @@ vi.mock("../../types/ipc", () => ({
 }));
 
 // Access the global electronAPI mock
-const mockElectronAPI = globalThis.electronAPI as any;
+const mockElectronAPI = (globalThis as any).electronAPI;
 
 describe("createSiteOperationsActions", () => {
     let mockDeps: SiteOperationsDependencies;

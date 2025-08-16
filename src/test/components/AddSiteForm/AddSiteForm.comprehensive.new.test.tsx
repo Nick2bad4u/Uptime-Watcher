@@ -3,18 +3,13 @@
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import React from "react";
 
 // Import constants
 import {
-    ARIA_LABEL,
-    TRANSITION_ALL,
-    CHECK_INTERVALS,
     DEFAULT_CHECK_INTERVAL,
-    FALLBACK_MONITOR_TYPE_OPTIONS,
 } from "../../../constants";
 
 // Mock all dependencies with proper interfaces

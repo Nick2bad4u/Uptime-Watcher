@@ -223,8 +223,8 @@ describe("historyQuery utilities", () => {
             );
 
             // Verify results maintain the order from the database
-            expect(result[0].timestamp).toBe(TEST_TIMESTAMP_2);
-            expect(result[1].timestamp).toBe(TEST_TIMESTAMP);
+            expect(result[0]!.timestamp).toBe(TEST_TIMESTAMP_2);
+            expect(result[1]!.timestamp).toBe(TEST_TIMESTAMP);
         });
     });
 

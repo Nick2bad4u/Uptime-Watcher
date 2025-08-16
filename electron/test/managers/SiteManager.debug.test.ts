@@ -2,7 +2,7 @@
  * Debug SiteManager mocking to verify our setup works correctly
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
 
 // Mock logger first

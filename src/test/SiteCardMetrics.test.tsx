@@ -27,16 +27,16 @@ describe("SiteCardMetrics", () => {
         );
         const cards = screen.getAllByTestId("metric-card");
         expect(
-            cards.find((card) => card.dataset.label === "Status")
+            cards.find((card) => card.dataset["label"] === "Status")
         ).toHaveAttribute("data-value", "UP");
         expect(
-            cards.find((card) => card.dataset.label === "Uptime")
+            cards.find((card) => card.dataset["label"] === "Uptime")
         ).toHaveAttribute("data-value", "99.5%");
         expect(
-            cards.find((card) => card.dataset.label === "Response")
+            cards.find((card) => card.dataset["label"] === "Response")
         ).toHaveAttribute("data-value", "123 ms");
         expect(
-            cards.find((card) => card.dataset.label === "Checks")
+            cards.find((card) => card.dataset["label"] === "Checks")
         ).toHaveAttribute("data-value", "42");
     });
 
@@ -44,7 +44,7 @@ describe("SiteCardMetrics", () => {
         render(<SiteCardMetrics status="down" uptime={0} checkCount={0} />);
         const cards = screen.getAllByTestId("metric-card");
         expect(
-            cards.find((card) => card.dataset.label === "Response")
+            cards.find((card) => card.dataset["label"] === "Response")
         ).toHaveAttribute("data-value", "-");
     });
 
@@ -52,7 +52,7 @@ describe("SiteCardMetrics", () => {
         render(<SiteCardMetrics status="" uptime={100} checkCount={1} />);
         const cards = screen.getAllByTestId("metric-card");
         expect(
-            cards.find((card) => card.dataset.label === "Status")
+            cards.find((card) => card.dataset["label"] === "Status")
         ).toHaveAttribute("data-value", "UNKNOWN");
     });
 
@@ -79,7 +79,7 @@ describe("SiteCardMetrics", () => {
         );
         const cards = screen.getAllByTestId("metric-card");
         expect(
-            cards.find((card) => card.dataset.label === "Uptime")
+            cards.find((card) => card.dataset["label"] === "Uptime")
         ).toHaveAttribute("data-value", "87.7%");
     });
 });

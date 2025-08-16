@@ -60,10 +60,6 @@ import {
     ServiceContainer,
     type ServiceContainerConfig,
 } from "../../services/ServiceContainer";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import { UptimeOrchestrator } from "../../UptimeOrchestrator";
-// Import SiteManager to trigger the mock
-import { SiteManager } from "../../managers/SiteManager";
 
 vi.mock("../../managers/ConfigurationManager", () => ({
     ConfigurationManager: function MockConfigurationManager() {
@@ -824,7 +820,6 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
         it("should handle setHistoryLimit operation successfully", async () => {
             // Test that the container can access monitoring operations through SiteManager
-            const siteManager = container.getSiteManager();
             const databaseManager = container.getDatabaseManager();
 
             // Mock the database manager method

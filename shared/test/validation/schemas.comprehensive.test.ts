@@ -897,7 +897,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
-                history: [],
             };
 
             expect(httpMonitor.type).toBe("http");
@@ -916,7 +915,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
-                history: [],
             };
 
             expect(portMonitor.type).toBe("port");
@@ -935,7 +933,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
-                history: [],
             };
 
             expect(pingMonitor.type).toBe("ping");
@@ -953,7 +950,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 monitoring: true,
                 status: "pending",
                 responseTime: -1,
-                history: [],
             };
 
             expect(monitor.type).toBe("http");
@@ -975,7 +971,6 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                         monitoring: true,
                         status: "pending",
                         responseTime: -1,
-                        history: [],
                     },
                 ],
             };

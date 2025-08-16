@@ -17,6 +17,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import type { Site, Monitor } from "../../../../../shared/types";
+import { createValidMonitor } from "../../../shared/testHelpers";
 
 // Unmock the theme module to test the actual implementation
 vi.unmock("../../../../theme/useTheme");
@@ -336,20 +337,19 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                     ...mockSite,
                     monitors: [
                         // HTTP monitor with URL
-                        {
-                            ...mockSite.monitors[0],
+                        createValidMonitor({
+                            id: "monitor-1",
                             type: "http",
                             url: "https://api.example.com",
-                        },
+                        }),
                         // Ping monitor with host only
-                        {
-                            ...mockSite.monitors[1],
+                        createValidMonitor({
+                            id: "monitor-2",
                             type: "ping",
                             host: "ping.example.com",
-                            url: undefined,
-                        },
+                        }),
                         // Port monitor with host and port
-                        {
+                        createValidMonitor({
                             id: "monitor-3",
                             type: "port",
                             host: "port.example.com",
@@ -359,11 +359,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                             retryAttempts: 1,
                             monitoring: true,
                             status: "up",
-                            url: undefined,
                             lastChecked: new Date("2023-01-01"),
                             responseTime: 50,
-                            history: [],
-                        } as Monitor,
+                        }),
                     ],
                 },
             };
@@ -497,17 +495,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 site: {
                     ...mockSite,
                     monitors: [
-                        {
-                            ...mockSite.monitors[0],
+                        createValidMonitor({
+                            id: "monitor-1",
                             monitoring: true,
                             status: "up",
-                        },
-                        {
-                            ...mockSite.monitors[1],
+                        }),
+                        createValidMonitor({
+                            id: "monitor-2",
                             monitoring: false,
                             status: "down",
-                        },
-                        {
+                        }),
+                        createValidMonitor({
                             id: "monitor-3",
                             type: "port",
                             host: "test.com",
@@ -519,8 +517,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                             status: "pending",
                             lastChecked: new Date("2023-01-01"),
                             responseTime: 200,
-                            history: [],
-                        } as Monitor,
+                        }),
                     ],
                 },
             };
@@ -563,18 +560,16 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             const siteWithFastResponse = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createValidMonitor({
+                        id: "monitor-1",
                         history: [
                             {
-                                id: "history-1",
-                                monitorId: "monitor-1",
                                 status: "up" as const,
                                 timestamp: Date.now(),
                                 responseTime: 150, // Fast response
                             },
                         ],
-                    },
+                    }),
                 ],
             };
 
@@ -592,18 +587,16 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             const siteWithMediumResponse = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createValidMonitor({
+                        id: "monitor-1",
                         history: [
                             {
-                                id: "history-1",
-                                monitorId: "monitor-1",
                                 status: "up" as const,
                                 timestamp: Date.now(),
                                 responseTime: 500, // Medium response
                             },
                         ],
-                    },
+                    }),
                 ],
             };
 
@@ -619,18 +612,16 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             const siteWithSlowResponse = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createValidMonitor({
+                        id: "monitor-1",
                         history: [
                             {
-                                id: "history-1",
-                                monitorId: "monitor-1",
                                 status: "up" as const,
                                 timestamp: Date.now(),
                                 responseTime: 2000, // Slow response
                             },
                         ],
-                    },
+                    }),
                 ],
             };
 
@@ -648,47 +639,37 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             const siteWithLowUptime = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createValidMonitor({
+                        id: "monitor-1",
                         history: [
                             // Add multiple down entries to create low uptime that triggers danger variant
                             {
-                                id: "history-1",
-                                monitorId: "monitor-1",
                                 status: "down" as const,
                                 timestamp: Date.now() - 4000,
                                 responseTime: 0,
                             },
                             {
-                                id: "history-2",
-                                monitorId: "monitor-1",
                                 status: "down" as const,
                                 timestamp: Date.now() - 3000,
                                 responseTime: 0,
                             },
                             {
-                                id: "history-3",
-                                monitorId: "monitor-1",
                                 status: "down" as const,
                                 timestamp: Date.now() - 2000,
                                 responseTime: 0,
                             },
                             {
-                                id: "history-4",
-                                monitorId: "monitor-1",
                                 status: "down" as const,
                                 timestamp: Date.now() - 1000,
                                 responseTime: 0,
                             },
                             {
-                                id: "history-5",
-                                monitorId: "monitor-1",
                                 status: "up" as const,
                                 timestamp: Date.now(),
                                 responseTime: 200,
                             },
                         ],
-                    },
+                    }),
                 ],
             };
 
@@ -722,16 +703,14 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             const siteWithPartialRunning = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createValidMonitor({
                         id: "monitor-1",
                         monitoring: true,
-                    },
-                    {
-                        ...mockSite.monitors[0],
+                    }),
+                    createValidMonitor({
                         id: "monitor-2",
                         monitoring: false,
-                    },
+                    }),
                 ],
             };
 

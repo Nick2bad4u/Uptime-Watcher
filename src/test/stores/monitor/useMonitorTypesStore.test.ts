@@ -51,7 +51,7 @@ describe("useMonitorTypesStore", () => {
                 fields: [
                     {
                         name: "url",
-                        type: "string",
+                        type: "url",
                         required: true,
                         label: "URL",
                     },
@@ -76,8 +76,8 @@ describe("useMonitorTypesStore", () => {
 
         expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
         expect(result.current.isLoaded).toBe(true);
-        expect(result.current.fieldConfigs.http).toEqual([
-            { name: "url", type: "string", required: true, label: "URL" },
+        expect(result.current.fieldConfigs["http"]).toEqual([
+            { name: "url", type: "url", required: true, label: "URL" },
         ]);
     });
 
