@@ -97,10 +97,13 @@ export function useTheme(): UseThemeReturn {
 
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary
     // re-renders
-    const getCurrentTheme = useCallback(
-        (): Theme => themeManager.getTheme(settings.theme),
-        [settings.theme]
-    );
+    const getCurrentTheme = useCallback((): Theme => {
+        if (settings.theme === "system") {
+            // Use component's systemTheme state for consistency with useEffect dependency
+            return themeManager.getTheme(systemTheme);
+        }
+        return themeManager.getTheme(settings.theme);
+    }, [settings.theme, systemTheme]);
 
     const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
 
@@ -132,6 +135,7 @@ export function useTheme(): UseThemeReturn {
                 clearTimeout(updateTimeoutId);
             };
         },
+        // eslint-disable-next-line react-hooks-addons/no-unused-deps -- systemTheme is used by getCurrentTheme when settings.theme === "system"
         [settings.theme, systemTheme, updateCurrentTheme]
     );
 
@@ -167,6 +171,7 @@ export function useTheme(): UseThemeReturn {
                 });
             };
         },
+        // systemTheme is not needed as dependency since this effect only sets up listeners
         [updateSystemTheme]
     );
 

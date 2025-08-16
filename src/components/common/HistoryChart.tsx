@@ -66,7 +66,10 @@ export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
         const displayedHistory = history.slice(0, maxItems).toReversed();
 
         return (
-            <div className={`mb-3 w-full ${className}`}>
+            <section
+                aria-label={`${title} history chart`}
+                className={`mb-3 w-full ${className}`}
+            >
                 <div className="mb-2 flex items-center justify-end">
                     <ThemedText size="xs" variant="secondary">
                         {title}
@@ -82,6 +85,6 @@ export const HistoryChart: React.NamedExoticComponent<HistoryChartProps> =
                         />
                     ))}
                 </div>
-            </div>
+            </section>
         );
     });

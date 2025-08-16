@@ -164,7 +164,8 @@ export const ScreenshotThumbnail = ({
             }
             return (): void => {};
         },
-        [hovered, siteName, updateOverlayPosition, url]
+        // siteName and url are not used in effect body, only hovered state matters
+        /* effect dep */ [hovered, updateOverlayPosition]
     );
 
     // Debounced hover handlers to prevent rapid state changes

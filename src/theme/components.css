@@ -741,7 +741,282 @@
     color: var(--color-error);
 }
 
-/* Professional Container Animations */
+/* Update Alert - Enhanced */
+.update-alert {
+    position: relative;
+    border-radius: var(--border-radius-lg);
+    animation: slideInRight var(--transition-normal) ease-out;
+    backdrop-filter: blur(10px);
+    background-color: var(--color-background-secondary);
+    box-shadow: var(--shadow-elevation-3);
+    border: 1px solid var(--color-border-primary);
+    transition: all var(--transition-normal);
+
+    &::before {
+        position: absolute;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--color-primary-500) 50%,
+            transparent 100%
+        );
+        block-size: 2px;
+        content: "";
+        inset-block-start: 0;
+        inset-inline: 0;
+        opacity: 0.7;
+        transition: opacity var(--transition-normal);
+    }
+}
+
+.update-alert--available::before {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-primary-500) 50%,
+        transparent 100%
+    );
+}
+
+.update-alert--downloading::before {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-warning) 50%,
+        transparent 100%
+    );
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.update-alert--downloaded::before {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-success) 50%,
+        transparent 100%
+    );
+}
+
+.update-alert--error {
+    border-color: var(--color-error);
+    
+    &::before {
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--color-error) 50%,
+            transparent 100%
+        );
+    }
+}
+
+.update-alert__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    line-height: 1;
+    transition: transform var(--transition-normal);
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.update-alert__action {
+    transition: all var(--transition-normal);
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-elevation-2);
+    }
+
+    &:active {
+        transform: translateY(0);
+        transition: all var(--transition-fast);
+    }
+}
+
+/* Site Card - Enhanced */
+.site-card {
+    position: relative;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-elevation-3);
+    }
+
+    &:active {
+        transform: translateY(-1px);
+        transition: all var(--transition-fast);
+    }
+}
+
+/* Header Components - Enhanced */
+.header-title-accent {
+    background: linear-gradient(
+        135deg,
+        var(--color-primary-600) 0%,
+        var(--color-primary-700) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    transition: all var(--transition-normal);
+
+    &:hover {
+        background: linear-gradient(
+            135deg,
+            var(--color-primary-500) 0%,
+            var(--color-primary-600) 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+.health-dot {
+    transition: all var(--transition-normal);
+    box-shadow: 0 0 0 2px var(--color-background-primary);
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 8px 2px currentcolor;
+    }
+}
+
+.health-text {
+    transition: color var(--transition-normal);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Success Alert - Enhanced */
+.success-alert {
+    border: 1px solid var(--color-success);
+    background: linear-gradient(
+        135deg,
+        var(--color-background-secondary) 0%,
+        rgb(34 197 94 / 5%) 100%
+    );
+    box-shadow: 0 2px 8px rgb(34 197 94 / 10%);
+    transition: all var(--transition-normal);
+
+    &::before {
+        position: absolute;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--color-success) 50%,
+            transparent 100%
+        );
+        block-size: 2px;
+        content: "";
+        inset-block-start: 0;
+        inset-inline: 0;
+        opacity: 0.7;
+    }
+
+    &:hover {
+        box-shadow: 0 4px 12px rgb(34 197 94 / 15%);
+        transform: translateY(-1px);
+    }
+}
+
+/* Site Details Header Components */
+.site-details-header-accent {
+    background: linear-gradient(
+        135deg,
+        var(--color-primary-600) 0%,
+        var(--color-primary-700) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all var(--transition-normal);
+}
+
+.site-details-status-indicator {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-secondary);
+    border: 1px solid var(--color-border-primary);
+    transition: all var(--transition-normal);
+
+    &:hover {
+        box-shadow: var(--shadow-elevation-2);
+        transform: translateY(-1px);
+    }
+}
+
+/* Error Alert Content */
+.error-alert__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* Setting Control */
+.setting-control {
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+/* Theme-based Error Classes */
+.border-error-default {
+    border-color: var(--color-error);
+}
+
+.bg-error-muted {
+    background-color: rgb(239 68 68 / 10%);
+}
+
+.text-error-default {
+    color: var(--color-error);
+}
+
+.bg-error-default {
+    background-color: var(--color-error);
+}
+
+.text-primary-inverse {
+    color: var(--color-text-inverse);
+}
+
+.bg-error-muted\/50 {
+    background-color: rgb(239 68 68 / 5%);
+}
+
+/* Tailwind-style arbitrary value classes for borders */
+.border-primary\/20 {
+    border-color: rgb(59 130 246 / 20%);
+}
+
+.border-error\/30 {
+    border-color: rgb(239 68 68 / 30%);
+}
+
+.bg-error\/5 {
+    background-color: rgb(239 68 68 / 5%);
+}
+
+.bg-overlay-default\/10 {
+    background-color: rgb(0 0 0 / 10%);
+}
+
+@media (prefers-color-scheme: dark) {
+    .bg-overlay-default\/10 {
+        background-color: rgb(255 255 255 / 10%);
+    }
+}/* Professional Container Animations */
 .container-fade-in {
     animation: fadeInUp var(--transition-slow) ease-out;
 
