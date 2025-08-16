@@ -60,14 +60,13 @@ interface StatusHistoryData {
  *
  * @returns Valid monitor object that passes baseMonitorSchema validation
  */
-export const createValidBaseMonitor = (
+export function createValidBaseMonitor(
     overrides: Partial<BaseMonitorData> = {}
-): BaseMonitorData => {
-    return {
+): BaseMonitorData {
+    const result = {
         checkInterval: 30_000,
         history: [], // Required field that was missing in many tests
         id: "test-monitor",
-        lastChecked: new Date(),
         monitoring: true,
         responseTime: 200,
         retryAttempts: 3,
@@ -76,7 +75,15 @@ export const createValidBaseMonitor = (
         type: "http" as const,
         ...overrides,
     };
-};
+
+    // Include lastChecked by default only when called with no arguments
+    // When called with any arguments (even empty object), don't include unless explicit
+    if (arguments.length === 0) {
+        (result as any).lastChecked = new Date();
+    }
+
+    return result as BaseMonitorData;
+}
 
 /**
  * Creates a valid HTTP monitor object with all required fields
@@ -88,7 +95,7 @@ export const createValidBaseMonitor = (
 export const createValidHttpMonitor = (
     overrides: Partial<HttpMonitorData> = {}
 ): HttpMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "http" });
+    const baseMonitor = createValidBaseMonitor({ type: "http", lastChecked: new Date() });
     return {
         ...baseMonitor,
         url: "https://example.com",
@@ -107,7 +114,7 @@ export const createValidHttpMonitor = (
 export const createValidPortMonitor = (
     overrides: Partial<PortMonitorData> = {}
 ): PortMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "port" });
+    const baseMonitor = createValidBaseMonitor({ type: "port", lastChecked: new Date() });
     return {
         ...baseMonitor,
         host: "example.com",
@@ -127,7 +134,7 @@ export const createValidPortMonitor = (
 export const createValidPingMonitor = (
     overrides: Partial<PingMonitorData> = {}
 ): PingMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "ping" });
+    const baseMonitor = createValidBaseMonitor({ type: "ping", lastChecked: new Date() });
     return {
         ...baseMonitor,
         host: "example.com",
@@ -164,14 +171,21 @@ export const createValidSite = (
  *
  * @returns Valid status history entry
  */
-export const createValidStatusHistory = (
+export function createValidStatusHistory(
     overrides: Partial<StatusHistoryData> = {}
-): StatusHistoryData => {
-    return {
+): StatusHistoryData {
+    const result = {
         responseTime: 150,
         status: "up" as const,
         timestamp: Date.now(),
-        details: "Response successful",
         ...overrides,
     };
-};
+
+    // Include details by default only when called with no arguments
+    // When called with any arguments (even empty object), don't include unless explicit
+    if (arguments.length === 0) {
+        (result as any).details = "Response successful";
+    }
+
+    return result as StatusHistoryData;
+}

@@ -283,7 +283,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     // Named event handlers for monitoring events
-    private readonly handleMonitorStartedEvent = (): void => {
+    private readonly handleMonitorStartedEvent = (eventData: {
+        identifier: string;
+        monitorId?: string;
+        operation: "started";
+        timestamp: number;
+    }): void => {
         void (async (): Promise<void> => {
             try {
                 const sites = this.siteManager.getSitesFromCache();
@@ -297,6 +302,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     siteCount: sites.length,
                     timestamp: Date.now(),
                 });
+
+                // Emit cache invalidation to trigger frontend state refresh
+                await this.emitTyped("cache:invalidated", {
+                    identifier: eventData.identifier,
+                    reason: "update",
+                    timestamp: Date.now(),
+                    type: "site",
+                });
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:started:",
@@ -306,17 +319,32 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
-    private readonly handleMonitorStoppedEvent = (): void => {
+    private readonly handleMonitorStoppedEvent = (eventData: {
+        identifier: string;
+        monitorId?: string;
+        operation: "stopped";
+        reason: string;
+        timestamp: number;
+    }): void => {
         void (async (): Promise<void> => {
             try {
-                const activeMonitors = this.monitorManager.isMonitoringActive()
-                    ? this.monitorManager.getActiveMonitorCount()
-                    : 0;
+                // Always get the actual active monitor count from scheduler
+                // instead of relying on global monitoring state flag
+                const activeMonitors =
+                    this.monitorManager.getActiveMonitorCount();
 
                 await this.emitTyped("monitoring:stopped", {
                     activeMonitors,
                     reason: "user" as const,
                     timestamp: Date.now(),
+                });
+
+                // Emit cache invalidation to trigger frontend state refresh
+                await this.emitTyped("cache:invalidated", {
+                    identifier: eventData.identifier,
+                    reason: "update",
+                    timestamp: Date.now(),
+                    type: "site",
                 });
             } catch (error) {
                 logger.error(
@@ -603,7 +631,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             await this.siteManager.initialize();
             logger.info("[UptimeOrchestrator] Site manager initialized");
 
-            // Step 3: Validate that managers are properly initialized
+            // Step 3: Resume monitoring for sites that were monitoring before app restart
+            await this.resumePersistentMonitoring();
+            logger.info("[UptimeOrchestrator] Persistent monitoring resumed");
+
+            // Step 4: Validate that managers are properly initialized
             this.validateInitialization();
 
             logger.info(
@@ -893,6 +925,81 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         updates: Partial<Site>
     ): Promise<Site> {
         return this.siteManager.updateSite(identifier, updates);
+    }
+
+    /**
+     * Resumes monitoring for sites that were actively monitoring before app
+     * restart.
+     *
+     * @remarks
+     * During app startup, sites marked as `monitoring: true` in the database
+     * need to be registered with the MonitorScheduler. Without this, the
+     * scheduler has no knowledge of pre-existing running monitors, causing stop
+     * operations to fail silently.
+     *
+     * @returns Promise that resolves when all persistent monitoring is resumed
+     */
+    private async resumePersistentMonitoring(): Promise<void> {
+        try {
+            // Get all sites from cache (loaded during site manager initialization)
+            const sites = this.siteManager.getSitesFromCache();
+            const sitesToResume = sites.filter((site) => site.monitoring);
+
+            if (sitesToResume.length === 0) {
+                logger.info(
+                    "[UptimeOrchestrator] No sites require monitoring resumption"
+                );
+                return;
+            }
+
+            logger.info(
+                `[UptimeOrchestrator] Resuming monitoring for ${sitesToResume.length} sites`
+            );
+
+            // Resume monitoring for each site
+            const resumePromises = sitesToResume.map(async (site) => {
+                try {
+                    const success =
+                        await this.monitorManager.startMonitoringForSite(
+                            site.identifier
+                        );
+
+                    if (success) {
+                        logger.debug(
+                            `[UptimeOrchestrator] Successfully resumed monitoring for site: ${site.identifier}`
+                        );
+                    } else {
+                        logger.warn(
+                            `[UptimeOrchestrator] Failed to resume monitoring for site: ${site.identifier}`
+                        );
+                    }
+
+                    return success;
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Error resuming monitoring for site ${site.identifier}:`,
+                        error
+                    );
+                    return false;
+                }
+            });
+
+            // Wait for all to complete (use allSettled to handle failures gracefully)
+            const results = await Promise.allSettled(resumePromises);
+            const successCount = results.filter(
+                (result) => result.status === "fulfilled" && result.value
+            ).length;
+
+            logger.info(
+                `[UptimeOrchestrator] Monitoring resumption completed: ${successCount}/${sitesToResume.length} sites`
+            );
+        } catch (error) {
+            logger.error(
+                "[UptimeOrchestrator] Critical error during monitoring resumption:",
+                error
+            );
+            // Don't throw - allow app initialization to continue
+        }
     }
 
     /**

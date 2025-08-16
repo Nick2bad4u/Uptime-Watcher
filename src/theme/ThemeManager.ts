@@ -21,6 +21,9 @@ export class ThemeManager {
     /** Singleton instance */
     private static instance: ThemeManager | undefined;
 
+    /** Track current applied theme to prevent unnecessary re-applications */
+    private currentAppliedTheme: Theme | undefined;
+
     /**
      * Get the singleton instance of ThemeManager. Creates the instance if it
      * doesn't exist.
@@ -33,10 +36,18 @@ export class ThemeManager {
     }
 
     /**
-     * Apply theme to document
+     * Apply theme to document - only if different from currently applied theme
      */
     public applyTheme(theme: Theme): void {
         if (typeof document === "undefined") {
+            return;
+        }
+
+        // Skip if same theme is already applied
+        if (
+            this.currentAppliedTheme &&
+            this.isSameTheme(this.currentAppliedTheme, theme)
+        ) {
             return;
         }
 
@@ -48,6 +59,21 @@ export class ThemeManager {
         this.applyShadows(root, theme.shadows);
         this.applyBorderRadius(root, theme.borderRadius);
         this.applyThemeClasses(theme);
+
+        // Remember the applied theme
+        this.currentAppliedTheme = theme;
+    }
+
+    /**
+     * Check if two themes are the same (deep comparison of essential
+     * properties)
+     */
+    private isSameTheme(theme1: Theme, theme2: Theme): boolean {
+        return (
+            theme1.name === theme2.name &&
+            theme1.isDark === theme2.isDark &&
+            JSON.stringify(theme1.colors) === JSON.stringify(theme2.colors)
+        );
     }
 
     /**
@@ -323,6 +349,9 @@ export class ThemeManager {
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
         if (typeof colors === "object" && colors !== null) {
+            // Batch all style changes to prevent multiple repaints
+            const properties: Array<[string, string]> = [];
+
             for (const [category, colorValue] of Object.entries(colors)) {
                 if (typeof colorValue === "object" && colorValue !== null) {
                     // Type-safe access to color values - colorValue is a
@@ -330,17 +359,19 @@ export class ThemeManager {
                     for (const [key, value] of Object.entries(
                         colorValue as Record<string, string>
                     )) {
-                        root.style.setProperty(
-                            `--color-${category}-${key}`,
-                            value
-                        );
+                        properties.push([`--color-${category}-${key}`, value]);
                     }
                 } else {
-                    root.style.setProperty(
+                    properties.push([
                         `--color-${category}`,
-                        colorValue as string
-                    );
+                        colorValue as string,
+                    ]);
                 }
+            }
+
+            // Apply all properties at once to prevent flickering
+            for (const [property, value] of properties) {
+                root.style.setProperty(property, value);
             }
         }
     }
@@ -372,7 +403,8 @@ export class ThemeManager {
      *
      * @remarks
      * Safely removes old theme classes and applies new ones. Includes safety
-     * checks for SSR and non-browser environments.
+     * checks for SSR and non-browser environments. Optimized to prevent
+     * flickering by only removing classes that need to be removed.
      *
      * @param theme - Theme to apply classes for
      */
@@ -383,19 +415,28 @@ export class ThemeManager {
 
         const root = document.documentElement;
         const availableThemes = Object.keys(themes);
+        const targetThemeClass = `theme-${theme.name}`;
 
-        // Remove existing theme classes precisely
+        // Only remove theme classes that are different from the target
         for (const themeName of availableThemes) {
-            document.body.classList.remove(`theme-${themeName}`);
+            const themeClass = `theme-${themeName}`;
+            if (
+                themeClass !== targetThemeClass &&
+                document.body.classList.contains(themeClass)
+            ) {
+                document.body.classList.remove(themeClass);
+            }
         }
 
-        // Add current theme class
-        document.body.classList.add(`theme-${theme.name}`);
+        // Add current theme class (no-op if already present)
+        document.body.classList.add(targetThemeClass);
 
-        // Set dark mode class for Tailwind CSS
+        // Set dark mode class for Tailwind CSS (optimized to prevent unnecessary changes)
         if (theme.isDark) {
-            root.classList.add("dark");
-        } else {
+            if (!root.classList.contains("dark")) {
+                root.classList.add("dark");
+            }
+        } else if (root.classList.contains("dark")) {
             root.classList.remove("dark");
         }
     }

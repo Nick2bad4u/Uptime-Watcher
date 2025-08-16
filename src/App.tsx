@@ -113,6 +113,9 @@ const App = (): JSX.Element => {
     const [showLoadingOverlay, setShowLoadingOverlay] =
         useState<boolean>(false);
 
+    // Track if initial app initialization is complete to prevent loading overlay flash
+    const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
 
@@ -125,34 +128,43 @@ const App = (): JSX.Element => {
     }, []);
 
     /**
-     * Only show loading overlay if loading takes more than 100ms This prevents
-     * flash for quick operations while still providing feedback for longer
-     * ones
+     * Only show loading overlay if loading takes more than 100ms and app is
+     * initialized. This prevents flash for quick operations and during initial
+     * app startup.
      */
     useEffect(
-        function handleLoadingOverlayCleanup(): (() => void) | undefined {
-            if (!isLoading) {
-                // Use timeout to defer state update to avoid direct call in
-                // useEffect
-                const clearTimeoutId = setTimeout(
-                    clearLoadingOverlay,
-                    UI_DELAYS.STATE_UPDATE_DEFER
+        function handleLoadingOverlay(): (() => void) | undefined {
+            // Only proceed if app is initialized
+            if (isInitialized) {
+                if (!isLoading) {
+                    // Use timeout to defer state update to avoid direct call in
+                    // useEffect
+                    const clearTimeoutId = setTimeout(
+                        clearLoadingOverlay,
+                        UI_DELAYS.STATE_UPDATE_DEFER
+                    );
+                    return (): void => {
+                        clearTimeout(clearTimeoutId);
+                    };
+                }
+
+                const timeoutId = setTimeout(
+                    showLoadingOverlayCallback,
+                    UI_DELAYS.LOADING_OVERLAY
                 );
+
                 return (): void => {
-                    clearTimeout(clearTimeoutId);
+                    clearTimeout(timeoutId);
                 };
             }
-
-            const timeoutId = setTimeout(
-                showLoadingOverlayCallback,
-                UI_DELAYS.LOADING_OVERLAY
-            );
-
-            return (): void => {
-                clearTimeout(timeoutId);
-            };
+            return () => {};
         },
-        [clearLoadingOverlay, isLoading, showLoadingOverlayCallback]
+        [
+            clearLoadingOverlay,
+            isInitialized,
+            isLoading,
+            showLoadingOverlayCallback,
+        ]
     );
 
     /**
@@ -173,11 +185,9 @@ const App = (): JSX.Element => {
         const sitesStore = useSitesStore.getState();
         const settingsStore = useSettingsStore.getState();
 
-        // Initialize both stores
-        await Promise.all([
-            sitesStore.initializeSites(),
-            settingsStore.initializeSettings(),
-        ]);
+        // Initialize stores sequentially to avoid state conflicts during startup
+        await settingsStore.initializeSettings();
+        await sitesStore.initializeSites();
 
         // Set up cache synchronization with backend and store cleanup
         // function
@@ -195,6 +205,9 @@ const App = (): JSX.Element => {
                 );
             }
         });
+
+        // Mark initialization as complete to enable loading overlay for future operations
+        setIsInitialized(true);
     }, []);
 
     const cleanupApp = useCallback(() => {

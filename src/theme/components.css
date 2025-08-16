@@ -744,12 +744,12 @@
 /* Update Alert - Enhanced */
 .update-alert {
     position: relative;
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-lg);
     animation: slideInRight var(--transition-normal) ease-out;
     backdrop-filter: blur(10px);
     background-color: var(--color-background-secondary);
     box-shadow: var(--shadow-elevation-3);
-    border: 1px solid var(--color-border-primary);
     transition: all var(--transition-normal);
 
     &::before {
@@ -779,13 +779,13 @@
 }
 
 .update-alert--downloading::before {
+    animation: pulse-glow 2s ease-in-out infinite;
     background: linear-gradient(
         90deg,
         transparent 0%,
         var(--color-warning) 50%,
         transparent 100%
     );
-    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .update-alert--downloaded::before {
@@ -827,8 +827,8 @@
     transition: all var(--transition-normal);
 
     &:hover {
-        transform: translateY(-1px);
         box-shadow: var(--shadow-elevation-2);
+        transform: translateY(-1px);
     }
 
     &:active {
@@ -840,12 +840,12 @@
 /* Site Card - Enhanced */
 .site-card {
     position: relative;
-    transition: all var(--transition-normal);
     cursor: pointer;
+    transition: all var(--transition-normal);
 
     &:hover {
-        transform: translateY(-2px);
         box-shadow: var(--shadow-elevation-3);
+        transform: translateY(-2px);
     }
 
     &:active {
@@ -862,10 +862,8 @@
         var(--color-primary-700) 100%
     );
     background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     color: transparent;
+    -webkit-text-fill-color: transparent;
     transition: all var(--transition-normal);
 
     &:hover {
@@ -875,24 +873,23 @@
             var(--color-primary-600) 100%
         );
         background-clip: text;
-        -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 }
 
 .health-dot {
-    transition: all var(--transition-normal);
     box-shadow: 0 0 0 2px var(--color-background-primary);
+    transition: all var(--transition-normal);
 
     &:hover {
-        transform: scale(1.1);
         box-shadow: 0 0 8px 2px currentcolor;
+        transform: scale(1.1);
     }
 }
 
 .health-text {
-    transition: color var(--transition-normal);
     font-weight: var(--font-weight-semibold);
+    transition: color var(--transition-normal);
 }
 
 /* Success Alert - Enhanced */
@@ -935,7 +932,6 @@
         var(--color-primary-700) 100%
     );
     background-clip: text;
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: all var(--transition-normal);
 }
@@ -945,9 +941,9 @@
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-md);
     background: var(--color-background-secondary);
-    border: 1px solid var(--color-border-primary);
     transition: all var(--transition-normal);
 
     &:hover {
@@ -967,7 +963,7 @@
 /* Setting Control */
 .setting-control {
     flex-shrink: 0;
-    min-width: fit-content;
+    min-inline-size: fit-content;
 }
 
 /* Theme-based Error Classes */
@@ -1010,13 +1006,13 @@
 
 .bg-overlay-default\/10 {
     background-color: rgb(0 0 0 / 10%);
-}
 
-@media (prefers-color-scheme: dark) {
-    .bg-overlay-default\/10 {
+    @media (prefers-color-scheme: dark) {
         background-color: rgb(255 255 255 / 10%);
     }
-} /* Professional Container Animations */
+}
+
+/* Professional Container Animations */
 .container-fade-in {
     animation: fadeInUp var(--transition-slow) ease-out;
 
@@ -1487,7 +1483,6 @@
     block-size: 32px;
     cursor: pointer;
     inline-size: 8px;
-    transition: all 0.2s ease-in-out;
     transition: all var(--transition-normal);
 }
 

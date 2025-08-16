@@ -9,11 +9,10 @@ import {
     type MonitorStatus,
     type SiteStatus,
 } from "@shared/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Theme, ThemeName } from "./types";
 
-import { UI_DELAYS } from "../constants";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { themeManager, type ThemeManager } from "./ThemeManager";
 
@@ -84,16 +83,16 @@ interface UseThemeReturn {
     themeManager: ThemeManager;
     /** Current theme name */
     themeName: ThemeName;
-    /** Theme version for forcing re-renders */
-    themeVersion: number;
     /** Toggle between light and dark themes */
     toggleTheme: () => void;
 }
 
 export function useTheme(): UseThemeReturn {
     const { settings, updateSettings } = useSettingsStore();
-    const [systemTheme, setSystemTheme] = useState<"dark" | "light">("light");
-    const [themeVersion, setThemeVersion] = useState(0); // Force re-renders
+    const [systemTheme, setSystemTheme] = useState<"dark" | "light">(
+        // Initialize with actual system preference to avoid flashing
+        () => themeManager.getSystemThemePreference()
+    );
 
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary
     // re-renders
@@ -105,70 +104,37 @@ export function useTheme(): UseThemeReturn {
         return themeManager.getTheme(settings.theme);
     }, [settings.theme, systemTheme]);
 
-    const [currentTheme, setCurrentTheme] = useState<Theme>(getCurrentTheme);
-
-    // Create stable callbacks to avoid direct setState in useEffect
-    const updateCurrentTheme = useCallback(() => {
-        const newTheme = getCurrentTheme();
-        setCurrentTheme(newTheme);
-        themeManager.applyTheme(newTheme);
-        setThemeVersion((previous) => previous + 1); // Force re-render of all themed components
+    // Compute theme directly during render - no useEffect needed for theme application
+    const currentTheme = useMemo(() => {
+        const theme = getCurrentTheme();
+        // Apply theme to DOM immediately during render
+        // This ensures consistency without useEffect timing issues
+        themeManager.applyTheme(theme);
+        return theme;
     }, [getCurrentTheme]);
 
     const updateSystemTheme = useCallback(
         (newSystemTheme: "dark" | "light") => {
-            setSystemTheme(newSystemTheme);
+            // Only update if the theme actually changed to prevent unnecessary re-renders
+            setSystemTheme((current) =>
+                current === newSystemTheme ? current : newSystemTheme
+            );
         },
         []
-    );
-
-    // Update theme when settings or systemTheme change
-    useEffect(
-        function handleThemeUpdate() {
-            // Use timeout to defer state update to avoid direct call in
-            // useEffect
-            const updateTimeoutId = setTimeout(
-                updateCurrentTheme,
-                UI_DELAYS.STATE_UPDATE_DEFER
-            );
-            return (): void => {
-                clearTimeout(updateTimeoutId);
-            };
-        },
-        // eslint-disable-next-line react-hooks-addons/no-unused-deps -- systemTheme is used by getCurrentTheme when settings.theme === "system"
-        [settings.theme, systemTheme, updateCurrentTheme]
     );
 
     // Listen for system theme changes
     useEffect(
         function handleSystemThemeChanges() {
-            const timeoutIds: NodeJS.Timeout[] = [];
-
             const cleanup = themeManager.onSystemThemeChange((isDark) => {
                 const newSystemTheme = isDark ? "dark" : "light";
-                // Use timeout to defer state update to avoid direct call in
-                // useEffect
-                const timeoutId = setTimeout(() => {
-                    updateSystemTheme(newSystemTheme);
-                }, UI_DELAYS.STATE_UPDATE_DEFER);
-                timeoutIds.push(timeoutId);
+                // Apply change immediately without timeout to reduce flashing
+                updateSystemTheme(newSystemTheme);
             });
 
-            // Set initial system theme using timeout
-            const initialTheme: "dark" | "light" =
-                themeManager.getSystemThemePreference();
-            // eslint-disable-next-line @eslint-react/web-api/no-leaked-timeout -- Timeout is explicitly tracked in timeoutIds array and cleared in cleanup function below
-            const initialTimeoutId = setTimeout(() => {
-                updateSystemTheme(initialTheme);
-            }, UI_DELAYS.STATE_UPDATE_DEFER);
-            timeoutIds.push(initialTimeoutId);
-
+            // No need to set initial theme here since we initialize state with actual preference
             return (): void => {
                 cleanup();
-                // Clean up all pending timeouts
-                timeoutIds.forEach((timeoutId) => {
-                    clearTimeout(timeoutId);
-                });
             };
         },
         // systemTheme is not needed as dependency since this effect only sets up listeners
@@ -306,8 +272,6 @@ export function useTheme(): UseThemeReturn {
         themeManager,
         /** Current theme name */
         themeName: settings.theme,
-        /** Theme version for forcing re-renders */
-        themeVersion,
         /** Toggle between light and dark themes */
         toggleTheme,
     };

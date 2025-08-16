@@ -62,7 +62,6 @@
 .health-badge {
     border-width: 1px;
     border-color: var(--color-success-border, rgb(16 185 129 / 33%));
-    background-color: rgb(16 185 129 / 10%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
     box-shadow: 0 0 0 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
     transition:
@@ -84,7 +83,6 @@
 }
 
 .health-badge:hover {
-    background-color: rgb(16 185 129 / 18%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
     box-shadow: 0 4px 18px 0 var(--color-success-shadow, rgb(16 185 129 / 33%));
     filter: brightness(1.04) saturate(1.1);
@@ -92,7 +90,6 @@
 }
 
 .status-up-badge:hover {
-    background-color: rgb(16 185 129 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-success-shadow, rgb(16 185 129 / 22%));
     filter: brightness(1.03) saturate(1.08);
@@ -100,7 +97,6 @@
 }
 
 .status-down-badge:hover {
-    background-color: rgb(239 68 68 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-error-shadow, rgb(239 68 68 / 22%));
     filter: brightness(1.03) saturate(1.08);
@@ -108,7 +104,6 @@
 }
 
 .status-pending-badge:hover {
-    background-color: rgb(251 191 36 / 12%); /* Fallback color */
     background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-warning-shadow, rgb(251 191 36 / 22%));
     filter: brightness(1.03) saturate(1.08);
@@ -116,7 +111,6 @@
 }
 
 .status-paused-badge:hover {
-    background-color: rgb(156 163 175 / 12%); /* Fallback color */
     background-color: color-mix(
         in srgb,
         var(--color-status-paused) 12%,

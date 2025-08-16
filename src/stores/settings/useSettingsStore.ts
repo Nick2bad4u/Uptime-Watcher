@@ -131,15 +131,18 @@ export const useSettingsStore: UseBoundStore<
                             DEFAULT_HISTORY_LIMIT
                         );
 
-                        // Update local state with backend values, keeping
-                        // defaults for others
+                        // Get current settings to preserve user preferences
+                        const currentSettings = get().settings;
+
+                        // Update local state with backend values while preserving
+                        // user preferences like theme choice
                         const updatedSettings = {
                             ...defaultSettings,
+                            ...currentSettings, // Preserve persisted user preferences
                             historyLimit, // Use actual backend value
                         };
 
-                        // Force update the state to ensure it overrides any
-                        // persisted values
+                        // Update state while preserving user preferences
                         set({ settings: updatedSettings });
 
                         return {
