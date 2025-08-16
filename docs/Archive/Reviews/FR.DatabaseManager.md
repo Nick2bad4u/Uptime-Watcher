@@ -167,6 +167,7 @@ class ImportDataCommand implements IDatabaseCommand {
 ### 📝 **Areas for Improvement:**
 
 1. **Missing `@throws` documentation**:
+
    - `setHistoryLimit()` - documents throws in code but not in TSDoc
    - `initialize()` - should document initialization failure scenarios
 

@@ -262,12 +262,14 @@ export * from "@shared/types"; // No documentation
 ### ✅ Phase 1: Critical Type Safety Fixes - COMPLETED
 
 1. **✅ Removed Duplicate Global Declarations**
+
    - Removed the first, undocumented global interface declaration in types.ts
    - Kept only the comprehensive TSDoc version with complete API documentation
    - Verified all event type imports are properly used in the remaining declaration
    - **Result**: Eliminated type conflicts and improved maintainability
 
 2. **✅ Fixed CSS Browser Compatibility**
+
    - Replaced `&:hover` with standard `::-webkit-scrollbar-thumb:hover` selectors
    - Changed `text-size-adjust` to `-webkit-text-size-adjust` with proper vendor prefix
    - Added stylelint disable comment for necessary vendor prefix
@@ -281,12 +283,14 @@ export * from "@shared/types"; // No documentation
 ### ✅ Phase 2: Performance & Documentation Improvements - COMPLETED
 
 4. **✅ Optimized Element Selection**
+
    - Replaced `querySelector("#root")` with `document.getElementById("root")`
    - Added performance optimization comment with ESLint disable
    - Enhanced error handling documentation
    - **Result**: Minor performance improvement for DOM element lookup
 
 5. **✅ Standardized TSDoc Documentation**
+
    - Converted all comments in constants.ts to proper TSDoc format
    - Added comprehensive `@remarks`, `@example`, and descriptive text
    - Enhanced documentation with usage context and constraints
@@ -301,6 +305,7 @@ export * from "@shared/types"; // No documentation
 ### ✅ Phase 3: Code Quality & Consistency Improvements - COMPLETED
 
 7. **✅ Fixed Status Color Inconsistency**
+
    - Updated `themed-status-paused` to use `--color-status-paused` variable
    - Ensured consistent pattern across all status classes
    - **Result**: Consistent theming approach for all status indicators
@@ -336,6 +341,7 @@ During the comprehensive review, several additional issues were discovered:
 #### **🟡 Medium Priority Issues Identified:**
 
 9. **Constants Organization Gaps**
+
    - Related timeout constants scattered across file
    - Color definitions in CSS not systematically ordered
    - Some constants could be better grouped by functional domain
