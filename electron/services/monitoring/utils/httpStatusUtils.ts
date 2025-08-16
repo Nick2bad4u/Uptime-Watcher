@@ -36,8 +36,8 @@ function isValidHttpStatus(httpStatus: number): boolean {
  * @remarks
  * - 1xx–4xx: "up" (site is responding)
  * - 5xx: "down" (server error)
- * - <100 or >599: "down" (invalid code) Used by monitoring services to classify
- *   site health.
+ * - `<100` or `>599`: "down" (invalid code) Used by monitoring services to
+ *   classify site health.
  *
  * @example
  *

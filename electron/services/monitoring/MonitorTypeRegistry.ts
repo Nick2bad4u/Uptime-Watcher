@@ -84,8 +84,10 @@ export interface BaseMonitorConfig {
          * "Response Code: 200")
          */
         formatDetail?: (details: string) => string;
-        /** Function to format title suffix for history charts (e.g., "
-(https://example.com)") */
+        /**
+         * Function to format title suffix for history charts (e.g., "
+         * (https://example.com)")
+         */
         formatTitleSuffix?: (monitor: Monitor) => string;
         /** Help text for form fields */
         helpTexts?: {

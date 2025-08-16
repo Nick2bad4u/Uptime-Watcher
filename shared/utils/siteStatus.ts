@@ -106,12 +106,6 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
  *
  * @remarks
  * This is the primary function for determining the status to display in the UI.
- * - Returns `"unknown"` if there are no monitors.
- *
- * - Returns `"paused"` if no monitors are actively monitoring.
- * - Returns `"mixed"` if monitoring is partial (some monitors running, some not).
- *   - Otherwise, returns the operational status as determined by
- *   {@link calculateSiteStatus}.
  *
  * @example
  *
@@ -123,6 +117,13 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
  * @param site - The {@link SiteForStatus} object representing the site to
  *   evaluate.
  *
+ * @returns `"unknown"` if there are no monitors.
+ * @returns `"paused"` if no monitors are actively monitoring.
+ * @returns `"mixed"` if monitoring is partial (some monitors running, some
+ *   not).
+ *
+ *   - Otherwise, returns the operational status as determined by
+ *       {@link calculateSiteStatus}.
  * @returns The display status as a {@link SiteStatus} value.
  */
 export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {

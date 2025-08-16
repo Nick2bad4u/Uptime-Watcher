@@ -55,7 +55,7 @@ export function isArray(value: unknown): value is unknown[] {
  * Safely checks if an unknown value is a record (object with string keys).
  *
  * @remarks
- * Type guard function for Record<string, unknown> types. Use this to validate
+ * Type guard function for `Record<string, unknown>` types. Use this to validate
  * objects before accessing their properties.
  *
  * @param value - Value to check

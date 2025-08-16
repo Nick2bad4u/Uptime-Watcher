@@ -370,8 +370,8 @@ export const SiteAnalyticsUtils = {
      * Get availability status based on uptime percentage
      *
      * @remarks
-     * Thresholds: ≥99.9% = excellent, ≥99% = good, ≥95% = warning, <95% =
-     * critical
+     * Thresholds: `≥99.9%` = excellent, `≥99%` = good, `≥95%` = warning, `<95%`
+     * = critical
      *
      * @param uptime - Uptime percentage (0-100)
      *
@@ -395,8 +395,8 @@ export const SiteAnalyticsUtils = {
      * Get performance status based on response time
      *
      * @remarks
-     * Thresholds: ≤200ms = excellent, ≤500ms = good, ≤1000ms = warning, >1000ms
-     * = critical
+     * Thresholds: `≤200ms` = excellent, `≤500ms` = good, `≤1000ms` = warning,
+     * `>1000ms` = critical
      *
      * @param responseTime - Average response time in milliseconds
      *
