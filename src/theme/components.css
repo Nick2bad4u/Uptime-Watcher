@@ -823,6 +823,7 @@
     }
 }
 
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .update-alert__action {
     transition: all var(--transition-normal);
 
@@ -967,14 +968,17 @@
 }
 
 /* Theme-based Error Classes */
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .border-error-default {
     border-color: var(--color-error);
 }
 
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .bg-error-muted {
     background-color: rgb(239 68 68 / 10%);
 }
 
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .text-error-default {
     color: var(--color-error);
 }
@@ -983,6 +987,7 @@
     background-color: var(--color-error);
 }
 
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .text-primary-inverse {
     color: var(--color-text-inverse);
 }
@@ -1000,6 +1005,7 @@
     border-color: rgb(239 68 68 / 30%);
 }
 
+/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .bg-error\/5 {
     background-color: rgb(239 68 68 / 5%);
 }
@@ -1075,20 +1081,23 @@
     align-items: center;
     gap: 1rem;
 
-    & > * {
+    & > :nth-child(1) {
         animation: slideInRight var(--transition-normal) ease-out;
+    }
 
-        &:nth-child(2) {
-            animation-delay: 0.1s;
-        }
+    & > :nth-child(2) {
+        animation: slideInRight var(--transition-normal) ease-out;
+        animation-delay: 0.1s;
+    }
 
-        &:nth-child(3) {
-            animation-delay: 0.2s;
-        }
+    & > :nth-child(3) {
+        animation: slideInRight var(--transition-normal) ease-out;
+        animation-delay: 0.2s;
+    }
 
-        &:nth-child(4) {
-            animation-delay: 0.3s;
-        }
+    & > :nth-child(4) {
+        animation: slideInRight var(--transition-normal) ease-out;
+        animation-delay: 0.3s;
     }
 }
 
@@ -1411,11 +1420,11 @@
 /* Site Card Hover */
 
 /* Dividers */
-.divider-y > * + * {
+.divider-y > :not(:first-child) {
     border-block-start: 1px solid var(--color-border-primary);
 }
 
-.divider-y.dark > * + * {
+.divider-y.dark > :not(:first-child) {
     border-block-start-color: var(--color-primary-500);
 }
 
@@ -1448,7 +1457,7 @@
 }
 
 .mt-4,
-.space-y-4 > * + * {
+.space-y-4 > :not(:first-child) {
     margin-block-start: 1rem;
 }
 
@@ -1610,19 +1619,19 @@
     justify-content: space-between;
 }
 
-.space-x-1 > * + * {
+.space-x-1 > :not(:first-child) {
     margin-inline-start: 0.25rem;
 }
 
-.space-x-2 > * + * {
+.space-x-2 > :not(:first-child) {
     margin-inline-start: 0.5rem;
 }
 
-.space-x-3 > * + * {
+.space-x-3 > :not(:first-child) {
     margin-inline-start: 0.75rem;
 }
 
-.space-y-6 > * + * {
+.space-y-6 > :not(:first-child) {
     margin-block-start: 1.5rem;
 }
 
@@ -1657,7 +1666,7 @@
 }
 
 .mt-1,
-.space-y-1 > * + * {
+.space-y-1 > :not(:first-child) {
     margin-block-start: 0.25rem;
 }
 
@@ -1666,7 +1675,7 @@
 }
 
 .ml-4,
-.space-x-4 > * + * {
+.space-x-4 > :not(:first-child) {
     margin-inline-start: 1rem;
 }
 

@@ -6,8 +6,20 @@
  * - Component rendering with different site configurations
  * - Monitor status calculations and display
  * - Site-level statistics and aggregations
- * - Theme integration and color calculations
- * - User interaction handling (start/stop monitoring, remove site)
+ * - Theme integration and color calculat                        createValidMonitor({
+                            id: "monitor-3",
+                            type: "port",
+                            host: "example.com",
+                            port: 443,
+                            // Port monitors don't have URLs - omit this property
+                            checkInterval: 30000,
+                            timeout: 5000,
+                            retryAttempts: 3,
+                            monitoring: true,
+                            status: "up",
+                            lastChecked: new Date(),
+                            responseTime: 50,
+                        }),r interaction handling (start/stop monitoring, remove site)
  * - Edge cases and error conditions
  * - Accessibility and UI state management
  *
@@ -136,7 +148,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("PING Monitor")).toBeInTheDocument();
             expect(screen.getByText("https://example.com")).toBeInTheDocument();
             expect(
-                screen.getByText("example.com:undefined")
+                screen.getByText("example.com")
             ).toBeInTheDocument(); // ping monitor display
         });
 
@@ -343,25 +355,31 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                             url: "https://api.example.com",
                         }),
                         // Ping monitor with host only
-                        createValidMonitor({
-                            id: "monitor-2",
-                            type: "ping",
-                            host: "ping.example.com",
-                        }),
+                        (() => {
+                            const { url, port, ...pingMonitor } = createValidMonitor({
+                                id: "monitor-2",
+                                type: "ping",
+                                host: "example.com",
+                            });
+                            return pingMonitor as Monitor;
+                        })(),
                         // Port monitor with host and port
-                        createValidMonitor({
-                            id: "monitor-3",
-                            type: "port",
-                            host: "port.example.com",
-                            port: 443,
-                            checkInterval: 30_000,
-                            timeout: 5000,
-                            retryAttempts: 1,
-                            monitoring: true,
-                            status: "up",
-                            lastChecked: new Date("2023-01-01"),
-                            responseTime: 50,
-                        }),
+                        (() => {
+                            const { url, ...portMonitor } = createValidMonitor({
+                                id: "monitor-3",
+                                type: "port",
+                                host: "port.example.com",
+                                port: 443,
+                                checkInterval: 30_000,
+                                timeout: 5000,
+                                retryAttempts: 1,
+                                monitoring: true,
+                                status: "up",
+                                lastChecked: new Date("2023-01-01"),
+                                responseTime: 50,
+                            });
+                            return portMonitor as Monitor;
+                        })(),
                     ],
                 },
             };
@@ -376,7 +394,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 screen.getByText("https://api.example.com")
             ).toBeInTheDocument();
             expect(
-                screen.getByText("ping.example.com:undefined")
+                screen.getByText("example.com")
             ).toBeInTheDocument();
             expect(
                 screen.getByText("port.example.com:443")

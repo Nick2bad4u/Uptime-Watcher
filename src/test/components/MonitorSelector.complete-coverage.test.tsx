@@ -123,7 +123,7 @@ describe("MonitorSelector - Complete Coverage", () => {
         it("should format ping monitor without additional details", () => {
             renderMonitorSelector();
 
-            const option = screen.getByText("PING");
+            const option = screen.getByText("PING: example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -134,7 +134,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("HTTP");
+            const option = screen.getByText("HTTP: https://example.com");
             expect(option).toBeInTheDocument();
         });
 
@@ -148,7 +148,8 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("HTTP");
+            // For non-standard types, component falls back to port then URL
+            const option = screen.getByText("HTTP: 80");
             expect(option).toBeInTheDocument();
         });
 
@@ -162,7 +163,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const option = screen.getByText("HTTP: 3000");
+            const option = screen.getByText("HTTP: https://example.com");
             expect(option).toBeInTheDocument();
         });
     });
@@ -378,7 +379,7 @@ describe("MonitorSelector - Complete Coverage", () => {
                 screen.getByText("HTTP: https://test.com")
             ).toBeInTheDocument();
             expect(screen.getByText("PORT: 443")).toBeInTheDocument();
-            expect(screen.getByText("PING")).toBeInTheDocument();
+            expect(screen.getByText("PING: example.com")).toBeInTheDocument();
         });
 
         it("should format monitor options consistently", () => {
@@ -397,7 +398,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             // Check that each option has expected format
             expect(options[0]).toHaveTextContent(/^HTTP:/);
             expect(options[1]).toHaveTextContent(/^PORT:/);
-            expect(options[2]).toHaveTextContent(/^PING$/);
+            expect(options[2]).toHaveTextContent(/^PING:/);
         });
     });
 

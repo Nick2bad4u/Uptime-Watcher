@@ -45,9 +45,25 @@ import { DataImportExportService } from "../../utils/database/DataImportExportSe
 
 // Mock DatabaseServiceFactory
 vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
-    DatabaseServiceFactory: {
-        createDatabaseCommandExecutor: vi.fn(),
-    },
+    DatabaseServiceFactory: vi.fn().mockImplementation(() => ({
+        createBackupService: vi.fn().mockReturnValue({
+            downloadDatabaseBackup: vi.fn().mockResolvedValue({
+                buffer: Buffer.from("test"),
+                fileName: "test.db"
+            })
+        }),
+        createImportExportService: vi.fn().mockReturnValue({
+            exportAllData: vi.fn().mockResolvedValue("{}"),
+            importDataFromJson: vi.fn().mockResolvedValue({
+                settings: {},
+                sites: []
+            }),
+            persistImportedData: vi.fn().mockResolvedValue(undefined)
+        }),
+        createSiteRepositoryService: vi.fn().mockReturnValue({
+            getSitesFromDatabase: vi.fn().mockResolvedValue([])
+        })
+    }))
 }));
 
 // Mock database commands
@@ -130,7 +146,7 @@ const createDataImportExportServiceMock = (overrides = {}) => ({
     ...overrides,
 });
 
-describe.skip("DatabaseManager - Comprehensive Error Coverage", () => {
+describe("DatabaseManager - Comprehensive Error Coverage", () => {
     let databaseManager: DatabaseManager;
     let mockDeps: DatabaseManagerDependencies;
 
