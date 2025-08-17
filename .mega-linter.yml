@@ -39,13 +39,21 @@ YAML_YAMLLINT_CONFIG_FILE: .yamllint.yaml
 DISABLE_LINTERS:
     - CSS_STYLELINT # Using project stylelint config
     - TYPESCRIPT_STANDARD # Using ESLint + Prettier
-    - JAVASCRIPT_PRETTIER # Handled by lint-staged
-    - JSON_PRETTIER # Handled by lint-staged
-    - YAML_PRETTIER # Handled by lint-staged
+    - JAVASCRIPT_PRETTIER
+    - JSON_PRETTIER
+    - YAML_PRETTIER
     - TYPESCRIPT_ES # Using ESLint + Prettier
+    - JAVASCRIPT_ES # Using ESLint + Prettier
     - JSX_ESLINT # Using ESLint + Prettier
     - CREDENTIALS_SECRETLINT # Using secretlint
+    - REPOSITORY_SECRETLINT # Using secretlint
     - TSX_ESLINT # Using ESLint + Prettier
+    - TYPESCRIPT_PRETTIER
+    - JSON_PRETTIER
+    - JSON_JSONLINT
+    - JSON_ESLINT_PLUGIN_JSONC
+
+JSON_V8R_FILTER_REGEX_EXCLUDE: .jscpd.json
 
 # Error handling for specific linters
 JSON_PRETTIER_DISABLE_ERRORS: true

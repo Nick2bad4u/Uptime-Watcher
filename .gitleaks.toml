@@ -231,3 +231,9 @@ regexes = [
     '''\$\{(?:process\.)?env\.[A-Z_]+\}''',
     '''process\.env\.[A-Z_]+''',
 ]
+
+[[allowlists]]
+description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
+paths = [
+    '''\.secretlintrc\.json$'''
+]

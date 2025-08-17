@@ -68,7 +68,7 @@ Always have meaningful metadata that aligns with the project.
 - Use `vi.bench()` for benchmarks.
 - Isolate benchmarks.
 - Use `vi.fn()` for mock functions in benchmarks.
-- [Vitest Benchmarking](https://vitest.dev/guide/benchmarking.html)
+- [Vitest Benchmarking](https://vitest.dev/config/#benchmark)
 
 #### Test Snapshotting
 

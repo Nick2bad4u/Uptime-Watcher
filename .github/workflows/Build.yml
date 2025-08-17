@@ -855,7 +855,7 @@ jobs:
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
                   # Add all CHANGELOG.md files
-                  git add ./**/CHANGELOG.md ./CHANGELOG.md
+                  git add ./CHANGELOG.md
                   # Check if there are any changes to commit
                   if git diff --staged --quiet; then
                     echo "No changelog changes to commit"
@@ -864,6 +864,7 @@ jobs:
                     git push origin ${{ github.event.inputs.branch || github.ref_name }}
                     echo "Changelogs updated and pushed to repository"
                   fi
+              continue-on-error: true
 
             - name: Update Check Run - Changelogs Generated
               if: success()

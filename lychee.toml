@@ -1,269 +1,140 @@
-# Lychee Link Checker Configuration 2025
-# Fast, async, stream-based link checker written in Rust
-# https://lychee.cli.rs/usage/config/
-
 #############################  Display  #############################
 
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
 verbose = "info"
 
-# Don't show interactive progress bar while checking links
+# Don't show interactive progress bar while checking links.
 no_progress = false
 
-# Path to summary output file for CI/CD integration
-output = "lychee-report.md"
-
-# Format for the output report
-# Possible values: compact, detailed, json, markdown, raw
-format = "markdown"
+# Path to summary output file.
+output = ".config.dummy.report.md"
 
 #############################  Cache  ###############################
 
-# Enable link caching for performance optimization
-# This can be helpful to avoid checking the same links on multiple runs
+# Enable link caching. This can be helpful to avoid checking the same links on
+# multiple runs.
 cache = true
 
-# Discard all cached requests older than this duration
-# Reduced from 30d to 7d for more frequent validation
-max_cache_age = "7d"
-
-# Cache exclusion for dynamic content status codes
-cache_exclude_status = ["429", "500..=599"]
+# Discard all cached requests older than this duration.
+max_cache_age = "2d"
 
 #############################  Runtime  #############################
 
-# Number of threads to utilize
-# Optimized for modern multi-core systems
-threads = 4
+# Number of threads to utilize.
+# Defaults to number of cores available to the system if omitted.
+threads = 2
 
-# Maximum number of allowed redirects
-# Increased for modern web practices
-max_redirects = 20
+# Maximum number of allowed redirects.
+max_redirects = 10
 
-# Maximum number of allowed retries before a link is declared dead
-# Increased for better reliability
-max_retries = 5
+# Maximum number of allowed retries before a link is declared dead.
+max_retries = 2
 
-# Maximum number of concurrent link checks
-# Optimized for performance while respecting rate limits
-max_concurrency = 8
+# Maximum number of concurrent link checks.
+max_concurrency = 14
 
 #############################  Requests  ############################
 
-# User agent to send with each request
-# Updated to modern user agent string
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 lychee/0.15"
+# User agent to send with each request.
+user_agent = "curl/7.83. 1"
 
-# Website timeout from connect to response finished
-# Increased for slower connections and modern SPAs
-timeout = 30
+# Website timeout from connect to response finished.
+timeout = 20
 
-# Minimum wait time in seconds between retries of failed requests
-# Optimized for rate limiting compliance
-retry_wait_time = 5
+# Minimum wait time in seconds between retries of failed requests.
+retry_wait_time = 2
 
-# Comma-separated list of accepted status codes for valid links
-# Extended to include modern status codes
-accept = ["200..=299", "429", "403", "401"]
+# Comma-separated list of accepted status codes for valid links.
+# Supported values are:
+#
+# accept = ["200..=204", "429"]
+# accept = "200..=204, 429"
+# accept = ["200", "429"]
+# accept = "200, 429"
+accept = ["200", "429"]
 
-# Proceed for server connections considered insecure (invalid TLS)
-# Set to false for security best practices in 2025
+# Proceed for server connections considered insecure (invalid TLS).
 insecure = false
 
-# Only test links with the given schemes
-# Focused on secure protocols
-scheme = ["https", "http", "mailto"]
+# Only test links with the given schemes (e.g. https).
+# Omit to check links with any other scheme.
+# At the moment, we support http, https, file, and mailto.
+scheme = ["https"]
 
-# When links are available using HTTPS, treat HTTP links as errors
-# Enabled for security best practices
-require_https = true
+# When links are available using HTTPS, treat HTTP links as errors.
+require_https = false
 
 # Request method
 method = "get"
 
-# Custom request headers for modern web compatibility
-[header]
-# Accept modern content types
-"Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-# Accept modern encoding
-"Accept-Encoding" = "gzip, deflate, br"
-# Security headers
-"DNT" = "1"
-"Upgrade-Insecure-Requests" = "1"
-# Reduce bot detection
-"Accept-Language" = "en-US,en;q=0.9"
-# GitHub API token support (set via environment variable GITHUB_TOKEN)
-# "Authorization" = "token ${GITHUB_TOKEN}"
+# Custom request headers
+header = { "accept" = "text/html", "x-custom-header" = "value" }
 
-# Remap URI matching pattern to different URI for testing
-# remap = ["https://old-domain.com https://new-domain.com"]
+# Remap URI matching pattern to different URI.
+remap = ["https://example.com http://example.invalid"]
 
-# Fallback extensions to apply when a URL does not specify one
-# Common in documentation tools that cross-reference files
-fallback_extensions = ["md", "html", "htm", "txt"]
+# Fallback extensions to apply when a URL does not specify one.
+# This is common in documentation tools that cross-reference files without extensions.
+fallback_extensions = ["md", "html"]
 
-# Base URL for relative link resolution
-# Updated for Uptime-Watcher repository
-base_url = "https://github.com/Nick2bad4u/Uptime-Watcher"
+# Base URL or website root directory to check relative URLs.
+base_url = "https://example.com"
 
-# Enable the checking of fragments in links for comprehensive validation
+# Root path to use when checking absolute local links, must be an absolute path
+root_dir = "/dist"
+
+# HTTP basic auth support. This will be the username and password passed to the
+# authorization HTTP header. See
+# <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization>
+basic_auth = ["example.com user:pwd"]
+
+# Enable the checking of fragments in links.
 include_fragments = true
 
 #############################  Exclusions  ##########################
 
-# Skip missing input files (default is to error if they don't exist)
+# Skip missing input files (default is to error if they don't exist).
 skip_missing = false
 
-# Check links inside `<code>` and `<pre>` blocks as well as Markdown code blocks
+# Check links inside `<code>` and `<pre>` blocks as well as Markdown code
+# blocks.
 include_verbatim = false
 
-# Ignore case of paths when matching glob patterns
-glob_ignore_case = true
+# Ignore case of paths when matching glob patterns.
+glob_ignore_case = false
 
-# Exclude URLs and mail addresses from checking (supports regex)
+# Exclude URLs and mail addresses from checking. The values are treated as regular expressions
 exclude = [
-    # Social media and dynamic content
-    '^https://www\.linkedin\.com',
-    '^https://twitter\.com',
-    '^https://x\.com',
-    '^https://facebook\.com',
-    '^https://instagram\.com',
-    
-    # Archive and CDN services
-    '^https://web\.archive\.org/web/',
-    '^https://archive\.org',
-    '^https://cdn\.jsdelivr\.net',
-    '^https://unpkg\.com',
-    
-    # GitHub patterns (API and private repos)
-    '^https://api\.github\.com',
-    '^https://raw\.githubusercontent\.com/.*/(private|internal)/',
-    
-    # Email addresses (privacy protection)
-    '^mailto:.*@users\.noreply\.github\.com',
-    '^mailto:.*@github\.com',
-    '^mailto:bot@.*',
-    '^mailto:github-actions@.*',
-    
-    # Development and testing URLs
-    '^https://localhost',
-    '^https://127\.0\.0\.1',
-    '^https://.*\.local',
-    '^https://.*\.test',
-    '^https://.*\.dev(?!/)',
-    
-    # Package registries and APIs
-    '^https://registry\.npmjs\.org',
-    '^https://pypi\.org/simple/',
-    '^https://crates\.io/api/',
-    
-    # Analytics and tracking
-    '^https://.*analytics.*',
-    '^https://.*tracking.*',
-    '^https://.*metrics.*',
-    '^https://views\..*',
-    
-    # CI/CD and automation
-    '^https://.*jenkins.*',
-    '^https://.*travis.*',
-    '^https://.*appveyor.*',
-    '^https://.*circleci.*',
-    
-    # Documentation generators (often internal)
-    '^https://.*\.gitbook\.io/private/',
-    '^https://.*\.notion\.so/private/',
-    
-    # Temporary or placeholder URLs
-    '^https://example\.com',
-    '^https://.*\.example$',
-    '^https://placeholder\..*',
-    '^https://dummy\..*',
+    '^https://example\.com/home$',                    # specific URL
+    '^https?://example\.com',                         # match both HTTP and HTTPS
+    '^https://(www\.)?linkedin\.com',                 # optional subdomains
+    '^https://(.*\.)?github(usercontent)?\.(com|io)', # exclude common GitHub URLs
 ]
 
-# Exclude these filesystem paths from getting checked
+# Exclude paths from getting checked. The values are treated as regular expressions
 exclude_path = [
-    # Build and dependency directories
-    "node_modules/",
-    "dist/",
-    "dist-electron/",
-    "coverage/",
-    "build/",
-    ".next/",
-    ".nuxt/",
-    ".vuepress/dist/",
-    
-    # Configuration and lock files
-    "package.json",
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    "Cargo.lock",
-    "poetry.lock",
-    
-    # IDE and editor files
-    ".vscode/",
-    ".idea/",
-    "*.swp",
-    "*.swo",
-    
-    # CI/CD directories
-    ".github/workflows/",
-    ".gitlab-ci/",
-    ".circleci/",
-    
-    # Documentation build artifacts
-    "docs/_build/",
-    "docs/site/",
-    
-    # Test directories that may contain mock URLs
-    "test/fixtures/",
-    "tests/mocks/",
-    "__tests__/fixtures/",
-    
-    # Legacy and archived content
-    "archive/",
-    "legacy/",
-    "deprecated/",
+    "\\.txt$",      # skip .txt extensions
+    "(^|/)test/",   # skip directories named "test"
+    "[aeiouAEIOU]", # exclude paths containing vowels
 ]
 
-# URLs to include despite exclusions (supports regex)
-# Has preference over all excludes
-include = [
-    # Include important GitHub repository links
-    'github\.com/Nick2bad4u/Uptime-Watcher',
-    # Include documentation sites
-    'docs\..*\.com',
-    # Include official project websites
-    '.*\.official\..*',
-]
+# URLs to check (supports regex). Has preference over all excludes.
+include = ['gist\.github\.com.*']
 
-# Network exclusions for security and performance
+# Exclude all private IPs from checking.
+# Equivalent to setting `exclude_private`, `exclude_link_local`, and
+# `exclude_loopback` to true.
+exclude_all_private = false
 
-# Exclude all private IPs from checking
-# Equivalent to setting exclude_private, exclude_link_local, and exclude_loopback to true
-exclude_all_private = true
+# Exclude private IP address ranges from checking.
+exclude_private = false
 
-# Exclude private IP address ranges from checking (RFC 1918)
-exclude_private = true
+# Exclude link-local IP address range from checking.
+exclude_link_local = false
 
-# Exclude link-local IP address range from checking (169.254.0.0/16)
-exclude_link_local = true
+# Exclude loopback IP address range and localhost from checking.
+exclude_loopback = false
 
-# Exclude loopback IP address range and localhost from checking
-exclude_loopback = true
-
-# Email validation configuration
+# Check mail addresses
 include_mail = true
-
-# GitHub API token support (set via environment variable)
-# Helps avoid rate limiting when checking GitHub links
-# Set GITHUB_TOKEN environment variable for authenticated requests
-
-# Security and compliance settings
-
-# Require valid TLS certificates
-require_https = true
-
-# Don't follow insecure redirects
-insecure = false

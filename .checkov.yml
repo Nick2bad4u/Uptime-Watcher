@@ -67,3 +67,6 @@ skip-path:
     - icons/
     - html/
     - release/
+    - .secretlint.json
+    - docs/
+    - shared/test/validation/schemas.test.ts
