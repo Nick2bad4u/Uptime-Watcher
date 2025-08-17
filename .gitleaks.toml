@@ -18,7 +18,7 @@ useDefault = true
 # Disable overly broad rules that generate false positives
 # in JavaScript/TypeScript development environments
 disabledRules = [
-    "generic-api-key",  # Too broad for demo URLs and example code
+    "generic-api-key", # Too broad for demo URLs and example code
 ]
 
 # Performance optimizations enabled by default in v8.28+
@@ -35,11 +35,11 @@ secretGroup = 2
 keywords = ["electron", "secret", "key", "token", "password"]
 tags = ["electron", "configuration", "secrets"]
 
-    [[rules.allowlists]]
-    description = "Allow example values in documentation"
-    paths = ['''docs/.*\.(md|txt|rst)$''']
-    regexTarget = "secret"
-    regexes = ['''(?i)(example|demo|placeholder|test|sample)''']
+[[rules.allowlists]]
+description = "Allow example values in documentation"
+paths = ['''docs/.*\.(md|txt|rst)$''']
+regexTarget = "secret"
+regexes = ['''(?i)(example|demo|placeholder|test|sample)''']
 
 [[rules]]
 id = "database-connection-strings"
@@ -49,11 +49,11 @@ secretGroup = 2
 keywords = ["database", "connection", "url", "db"]
 tags = ["database", "credentials", "connection-string"]
 
-    [[rules.allowlists]]
-    description = "Allow example connection strings in documentation"
-    paths = ['''docs/.*\.(md|txt|rst)$''']
-    regexTarget = "secret"
-    regexes = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
+[[rules.allowlists]]
+description = "Allow example connection strings in documentation"
+paths = ['''docs/.*\.(md|txt|rst)$''']
+regexTarget = "secret"
+regexes = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
 
 [[rules]]
 id = "vite-env-secrets"
@@ -63,13 +63,13 @@ secretGroup = 1
 keywords = ["vite_", "api_", "secret_", "password_", "token_", "key_"]
 tags = ["vite", "environment", "frontend", "secrets"]
 
-    [[rules.allowlists]]
-    description = "Allow development and test values"
-    regexTarget = "secret"
-    regexes = [
-        '''(?i)(development|dev|test|local|localhost|example|demo|placeholder)''',
-        '''^(true|false|1|0|yes|no|enabled|disabled)$'''
-    ]
+[[rules.allowlists]]
+description = "Allow development and test values"
+regexTarget = "secret"
+regexes = [
+    '''(?i)(development|dev|test|local|localhost|example|demo|placeholder)''',
+    '''^(true|false|1|0|yes|no|enabled|disabled)$''',
+]
 
 # Enhanced AI platform detection rules (v8.28+ features)
 [[rules]]
@@ -140,10 +140,7 @@ paths = [
 
 [[allowlists]]
 description = "Ignore documentation files"
-paths = [
-    '''LICENSE$''',
-    '''docs/.*\.(md|txt|rst)$''',
-]
+paths = ['''LICENSE$''', '''docs/.*\.(md|txt|rst)$''']
 
 [[allowlists]]
 description = "Ignore Chart.js usage documentation with cubeToken example"
@@ -157,7 +154,7 @@ description = "Common non-secret patterns in development"
 regexTarget = "secret"
 stopwords = [
     "client",
-    "endpoint", 
+    "endpoint",
     "localhost",
     "127.0.0.1",
     "example",

@@ -322,7 +322,13 @@ export default [
         languageOptions: {
             parser: htmlParser,
         },
-        files: ["**/*.html", "**/*.htm", "*.html", "*.htm", "*.xhtml"],
+        files: [
+            "**/*.html",
+            "**/*.htm",
+            "*.html",
+            "*.htm",
+            "*.xhtml",
+        ],
         ignores: ["docs/docusaurus/**", "report/**"],
         rules: {
             ...html.configs["flat/recommended"].rules,

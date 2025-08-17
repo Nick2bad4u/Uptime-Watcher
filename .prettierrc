@@ -3,8 +3,11 @@
     "arrowParens": "always",
     "bracketSameLine": false,
     "bracketSpacing": true,
+    "checkIgnorePragma": false,
     "embeddedLanguageFormatting": "auto",
     "endOfLine": "auto",
+    "experimentalOperatorPosition": "end",
+    "experimentalTernaries": false,
     "htmlWhitespaceSensitivity": "css",
     "insertPragma": false,
     "jsdocCapitalizeDescription": true,
@@ -20,7 +23,9 @@
     "jsonRecursiveSort": false,
     "jsonSortOrder": "{\"*\": \"numeric\"}",
     "jsxSingleQuote": false,
+    "language": "sqlite",
     "multilineArraysWrapThreshold": 4,
+    "objectWrap": "preserve",
     "overrides": [
         {
             "files": "*.css",
@@ -86,17 +91,19 @@
         "prettier-plugin-packagejson",
         "prettier-plugin-properties",
         "prettier-plugin-ini",
-        "prettier-plugin-embed",
-        "prettier-plugin-interpolated-html-tags",
         "prettier-plugin-sort-json",
-        "prettier-plugin-jsdoc",
-        "prettier-plugin-multiline-arrays",
+        "prettier-plugin-interpolated-html-tags",
         "@awmottaz/prettier-plugin-void-html",
-        "prettier-plugin-tailwindcss"
+        "prettier-plugin-sql",
+        "prettier-plugin-multiline-arrays",
+        "prettier-plugin-jsdoc",
+        "prettier-plugin-tailwindcss",
+        "prettier-plugin-merge"
     ],
     "printWidth": 80,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",
+    "requirePragma": false,
     "semi": true,
     "singleAttributePerLine": false,
     "singleQuote": false,
@@ -109,5 +116,6 @@
     "tailwindStylesheet": "./src/index.css",
     "trailingComma": "es5",
     "tsdoc": true,
-    "useTabs": false
+    "useTabs": false,
+    "vueIndentScriptAndStyle": false
 }
