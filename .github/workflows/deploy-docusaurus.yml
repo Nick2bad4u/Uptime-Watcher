@@ -54,6 +54,11 @@ jobs:
             - name: Install dependencies
               run: npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
 
+            - name: Build Electron files before TypeDoc
+              run: |
+                  # Build Electron files to dist-electron so TypeDoc can find shared modules
+                  npm run build:electron-vite
+
             - name: Generate TypeDoc API documentation
               run: |
                   # Generate TypeDoc for Electron API
