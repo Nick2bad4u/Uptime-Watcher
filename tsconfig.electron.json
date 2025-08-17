@@ -24,11 +24,13 @@
         "node_modules",
         "shared/**/*.spec.ts",
         "shared/**/*.test.ts",
+        "shared/test/**/*",
         "**/scripts/**"
     ],
     "include": [
         "electron/**/*.css",
         "electron/**/*.ts",
+        "shared/**/*",
         "electron/**/*.tsx",
         "shared/**/*.css",
         "shared/**/*.ts",

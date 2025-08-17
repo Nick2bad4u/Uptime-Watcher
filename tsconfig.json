@@ -126,6 +126,7 @@
         "shared/**/*.ts",
         "shared/**/*.tsx",
         "shared/events.ts",
+        "shared/**/*",
         "src/**/*.css",
         "src/**/*.css",
         "src/**/*.ts",

@@ -99,6 +99,13 @@ modules:
     - name: nodejs
       buildsystem: simple
       build-commands:
+          # Ensure Node.js SDK extension is installed
+          - |
+              if ! flatpak info org.freedesktop.Sdk.Extension.node22 >/dev/null 2>&1; then
+                echo "ERROR: Required Flatpak extension org.freedesktop.Sdk.Extension.node22 is not installed."
+                echo "Install it with: flatpak install flathub org.freedesktop.Sdk.Extension.node22//24.08"
+                exit 1
+              fi
           - echo "Using Node.js $(node --version) from SDK extension"
           - echo "npm version: $(npm --version)"
       sources: []

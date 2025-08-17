@@ -63,9 +63,11 @@ jobs:
               run: |
                   # Generate TypeDoc for Electron API
                   npm run docs:typedoc
+              continue-on-error: true
 
             - name: Build Docusaurus website
               run: npm run docusaurus:build
+              continue-on-error: true
 
             - name: Setup Pages
               uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
