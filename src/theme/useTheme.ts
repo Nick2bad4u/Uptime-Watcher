@@ -106,14 +106,16 @@ export function useTheme(): UseThemeReturn {
         return themeManager.getTheme(settings.theme);
     }, [settings.theme, systemTheme]);
 
-    // Compute theme directly during render - no useEffect needed for theme application
-    const currentTheme = useMemo(() => {
-        const theme = getCurrentTheme();
-        // Apply theme to DOM immediately during render
-        // This ensures consistency without useEffect timing issues
-        themeManager.applyTheme(theme);
-        return theme;
-    }, [getCurrentTheme]);
+    // Compute current theme
+    const currentTheme = useMemo(() => getCurrentTheme(), [getCurrentTheme]);
+
+    // Apply theme to DOM in useEffect to avoid side effects in render
+    useEffect(
+        function applyCurrentTheme() {
+            themeManager.applyTheme(currentTheme);
+        },
+        [currentTheme]
+    );
 
     // Calculate theme version based on current theme and settings
     const themeVersion = useMemo(
@@ -124,8 +126,8 @@ export function useTheme(): UseThemeReturn {
     const updateSystemTheme = useCallback(
         (newSystemTheme: "dark" | "light") => {
             // Only update if the theme actually changed to prevent unnecessary re-renders
-            setSystemTheme((current) =>
-                current === newSystemTheme ? current : newSystemTheme
+            setSystemTheme((prev) =>
+                prev === newSystemTheme ? prev : newSystemTheme
             );
         },
         []
