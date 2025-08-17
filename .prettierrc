@@ -83,6 +83,11 @@
         }
     ],
     "plugins": [
+        "prettier-plugin-packagejson",
+        "prettier-plugin-properties",
+        "prettier-plugin-ini",
+        "prettier-plugin-embed",
+        "prettier-plugin-interpolated-html-tags",
         "prettier-plugin-sort-json",
         "prettier-plugin-jsdoc",
         "prettier-plugin-multiline-arrays",

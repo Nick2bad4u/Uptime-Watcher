@@ -94,7 +94,13 @@ export default defineConfig(({}) => {
         esbuild: {
             // Transpile all files with ESBuild to remove comments from code coverage.
             // Required for `test.coverage.ignoreEmptyLines` to work:
-            include: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.ts", "**/*.tsx"],
+            include: [
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.mjs",
+                "**/*.ts",
+                "**/*.tsx",
+            ],
 
             // More aggressive transformation to help coverage parsing
             keepNames: true, // Preserve function names for better coverage reports
@@ -291,7 +297,10 @@ export default defineConfig(({}) => {
                                 try {
                                     // 1. Validate WASM magic bytes (0x00 0x61 0x73 0x6D)
                                     const wasmMagic = Buffer.from([
-                                        0x00, 0x61, 0x73, 0x6d,
+                                        0x00,
+                                        0x61,
+                                        0x73,
+                                        0x6d,
                                     ]);
                                     const isValidWasm = contents
                                         .subarray(0, 4)

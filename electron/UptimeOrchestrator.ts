@@ -937,52 +937,75 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * scheduler has no knowledge of pre-existing running monitors, causing stop
      * operations to fail silently.
      *
+     * This method only resumes monitoring for individual monitors that were
+     * actively monitoring before the restart (monitor.monitoring === true), not
+     * for paused monitors.
+     *
      * @returns Promise that resolves when all persistent monitoring is resumed
      */
     private async resumePersistentMonitoring(): Promise<void> {
         try {
             // Get all sites from cache (loaded during site manager initialization)
             const sites = this.siteManager.getSitesFromCache();
-            const sitesToResume = sites.filter((site) => site.monitoring);
 
-            if (sitesToResume.length === 0) {
+            // Find all monitors that were actively monitoring before restart
+            const monitorsToResume: Array<{ monitor: Monitor; site: Site }> =
+                [];
+
+            for (const site of sites) {
+                // Only consider sites where monitoring is enabled
+                if (site.monitoring) {
+                    // Find monitors within this site that were actively monitoring
+                    const activeMonitors = site.monitors.filter(
+                        (monitor) => monitor.monitoring
+                    );
+                    for (const monitor of activeMonitors) {
+                        monitorsToResume.push({ monitor, site });
+                    }
+                }
+            }
+
+            if (monitorsToResume.length === 0) {
                 logger.info(
-                    "[UptimeOrchestrator] No sites require monitoring resumption"
+                    "[UptimeOrchestrator] No monitors require monitoring resumption"
                 );
                 return;
             }
 
             logger.info(
-                `[UptimeOrchestrator] Resuming monitoring for ${sitesToResume.length} sites`
+                `[UptimeOrchestrator] Resuming monitoring for ${monitorsToResume.length} monitors across ${sites.filter((s) => s.monitoring).length} sites`
             );
 
-            // Resume monitoring for each site
-            const resumePromises = sitesToResume.map(async (site) => {
-                try {
-                    const success =
-                        await this.monitorManager.startMonitoringForSite(
-                            site.identifier
-                        );
+            // Resume monitoring for each monitor individually
+            const resumePromises = monitorsToResume.map(
+                async ({ monitor, site }) => {
+                    try {
+                        const success =
+                            await this.monitorManager.startMonitoringForSite(
+                                site.identifier,
+                                monitor.id
+                            );
 
-                    if (success) {
-                        logger.debug(
-                            `[UptimeOrchestrator] Successfully resumed monitoring for site: ${site.identifier}`
+                        if (success) {
+                            logger.debug(
+                                `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                            );
+                        } else {
+                            logger.warn(
+                                `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
+                            );
+                        }
+
+                        return success;
+                    } catch (error) {
+                        logger.error(
+                            `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
+                            error
                         );
-                    } else {
-                        logger.warn(
-                            `[UptimeOrchestrator] Failed to resume monitoring for site: ${site.identifier}`
-                        );
+                        return false;
                     }
-
-                    return success;
-                } catch (error) {
-                    logger.error(
-                        `[UptimeOrchestrator] Error resuming monitoring for site ${site.identifier}:`,
-                        error
-                    );
-                    return false;
                 }
-            });
+            );
 
             // Wait for all to complete (use allSettled to handle failures gracefully)
             const results = await Promise.allSettled(resumePromises);
@@ -991,7 +1014,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             ).length;
 
             logger.info(
-                `[UptimeOrchestrator] Monitoring resumption completed: ${successCount}/${sitesToResume.length} sites`
+                `[UptimeOrchestrator] Monitoring resumption completed: ${successCount}/${monitorsToResume.length} monitors`
             );
         } catch (error) {
             logger.error(
