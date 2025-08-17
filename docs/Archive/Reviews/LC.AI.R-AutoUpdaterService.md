@@ -76,6 +76,7 @@ Private fields should be documented to explain their purpose and lifecycle, espe
 ### 1. **Add Comprehensive TSDoc for All Missing Items**
 
 ````typescript
+
 /**
  * Service responsible for handling application auto-updates. Manages update
  * checking, downloading, and installation.

@@ -475,11 +475,10 @@ public getSiteManager(): SiteManager {
 ### 5. **Testing and Documentation Utilities**
 
 ````typescript
-/**
- * Reset the singleton container for testing purposes.
- *
- * @remarks
- * **Testing Utility**: Clears the singleton instance to allow clean test isolation.
+
+
+
+/** * Reset the singleton container for testing purposes. * * @remarks * **Testing Utility**: Clears the singleton instance to allow clean test isolation.
  *
  * **Usage Pattern:**
  * ```typescript

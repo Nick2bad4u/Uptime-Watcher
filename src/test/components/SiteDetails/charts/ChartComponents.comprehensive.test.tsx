@@ -39,11 +39,23 @@ vi.mock("react-chartjs-2", () => ({
 describe("ChartComponents", () => {
     describe("ResponseTimeChart", () => {
         const mockResponseTimeData: ResponseTimeChartData = {
-            labels: ["10:00", "10:15", "10:30", "10:45", "11:00"],
+            labels: [
+                "10:00",
+                "10:15",
+                "10:30",
+                "10:45",
+                "11:00",
+            ],
             datasets: [
                 {
                     label: "Response Time",
-                    data: [120, 110, 130, 105, 125],
+                    data: [
+                        120,
+                        110,
+                        130,
+                        105,
+                        125,
+                    ],
                     borderColor: "rgb(75, 192, 192)",
                     backgroundColor: "rgba(75, 192, 192, 0.1)",
                     tension: 0.1,
@@ -123,11 +135,23 @@ describe("ChartComponents", () => {
 
         it("should handle complex dataset configurations", () => {
             const complexData: ResponseTimeChartData = {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+                labels: [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                ],
                 datasets: [
                     {
                         label: "Average Response Time",
-                        data: [120, 110, 130, 105, 125],
+                        data: [
+                            120,
+                            110,
+                            130,
+                            105,
+                            125,
+                        ],
                         borderColor: "rgb(75, 192, 192)",
                         backgroundColor: "rgba(75, 192, 192, 0.1)",
                         tension: 0.1,
@@ -135,7 +159,13 @@ describe("ChartComponents", () => {
                     },
                     {
                         label: "Max Response Time",
-                        data: [200, 180, 220, 190, 210],
+                        data: [
+                            200,
+                            180,
+                            220,
+                            190,
+                            210,
+                        ],
                         borderColor: "rgb(255, 99, 132)",
                         backgroundColor: "rgba(255, 99, 132, 0.1)",
                         tension: 0.1,

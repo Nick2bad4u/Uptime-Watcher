@@ -188,11 +188,10 @@ public notifyMonitorUp(site: Site, monitorId: string): void {
 ### 2. **Enhanced Documentation for updateConfig**
 
 ````typescript
-/**
- * Update the notification configuration.
- *
- * @param config - Partial configuration object with settings to update
- *
+
+
+
+/** * Update the notification configuration. * * @param config - Partial configuration object with settings to update *
  * @remarks
  * Allows runtime modification of notification behavior without creating
  * a new service instance.
@@ -227,6 +226,7 @@ public updateConfig(config: Partial<NotificationConfig>): void {
 ### 3. **Enhanced Class-Level Documentation with Thread Safety**
 
 ````typescript
+
 /**
  * Service responsible for handling system notifications for monitor status
  * changes.

@@ -22,6 +22,7 @@ as a title for the example. Otherwise, the documentation tool can index the exam
 For this code sample, the generated titles might be **"Example"** and **"Example 2"**:
 
 ````ts
+
 /**
  * Adds two numbers together.
  *
@@ -47,6 +48,7 @@ export function add(x: number, y: number): number {}
 For this code sample, the generated title might be **"Example: Parsing a basic JSON file"**:
 
 ````ts
+
 /**
  * Parses a JSON file.
  *

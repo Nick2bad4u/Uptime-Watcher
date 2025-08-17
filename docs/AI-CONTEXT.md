@@ -878,19 +878,19 @@ describe("useSitesStore", () => {
 **Component Testing**:
 
 ```typescript
-describe('SiteCard', () => {
-    it('should render site information correctly', () => {
-        render(<SiteCard site={mockSite} />);
-        expect(screen.getByText(mockSite.name)).toBeInTheDocument();
-    });
+describe("SiteCard", () => {
+ it("should render site information correctly", () => {
+  render(<SiteCard site={mockSite} />);
+  expect(screen.getByText(mockSite.name)).toBeInTheDocument();
+ });
 
-    it('should handle monitoring toggle', async () => {
-        const user = userEvent.setup();
-        render(<SiteCard site={mockSite} />);
+ it("should handle monitoring toggle", async () => {
+  const user = userEvent.setup();
+  render(<SiteCard site={mockSite} />);
 
-        await user.click(screen.getByRole('button', { name: /toggle monitoring/i }));
-        // Assert monitoring state change
-    });
+  await user.click(screen.getByRole("button", { name: /toggle monitoring/i }));
+  // Assert monitoring state change
+ });
 });
 ```
 
@@ -1113,7 +1113,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct database access
    const result = db.prepare("SELECT * FROM sites").all();
-
+   
    // ✅ CORRECT - Repository pattern
    const sites = await siteRepository.getAllSites();
    ```
@@ -1123,7 +1123,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Untyped IPC
    ipcRenderer.invoke("some-operation", data);
-
+   
    // ✅ CORRECT - Typed IPC
    window.electronAPI.sites.addSite(siteData);
    ```
@@ -1133,7 +1133,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct mutation
    store.sites.push(newSite);
-
+   
    // ✅ CORRECT - Store actions
    store.addSite(newSite);
    ```
@@ -1147,7 +1147,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    } catch (error) {
     console.log(error);
    }
-
+   
    // ✅ CORRECT - Proper error handling
    await withErrorHandling(() => operation(), {
     logger,

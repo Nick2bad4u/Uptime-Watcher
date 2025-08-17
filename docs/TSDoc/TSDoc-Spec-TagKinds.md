@@ -26,6 +26,7 @@ appearing prior to the first block tag is interpreted as the special
 **Examples of block tags:**
 
 ````ts
+
 /**
  * This is the special summary section.
  *

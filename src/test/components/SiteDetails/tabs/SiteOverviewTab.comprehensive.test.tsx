@@ -6,20 +6,12 @@
  * - Component rendering with different site configurations
  * - Monitor status calculations and display
  * - Site-level statistics and aggregations
- * - Theme integration and color calculat                        createValidMonitor({
-                            id: "monitor-3",
-                            type: "port",
-                            host: "example.com",
-                            port: 443,
-                            // Port monitors don't have URLs - omit this property
-                            checkInterval: 30000,
-                            timeout: 5000,
-                            retryAttempts: 3,
-                            monitoring: true,
-                            status: "up",
-                            lastChecked: new Date(),
-                            responseTime: 50,
-                        }),r interaction handling (start/stop monitoring, remove site)
+ * - Theme integration and color calculat createValidMonitor({ id: "monitor-3",
+ *   type: "port", host: "example.com", port: 443, // Port monitors don't have
+ *   URLs - omit this property checkInterval: 30000, timeout: 5000,
+ *   retryAttempts: 3, monitoring: true, status: "up", lastChecked: new Date(),
+ *   responseTime: 50, }),r interaction handling (start/stop monitoring, remove
+ *   site)
  * - Edge cases and error conditions
  * - Accessibility and UI state management
  *
@@ -147,9 +139,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
             expect(screen.getByText("PING Monitor")).toBeInTheDocument();
             expect(screen.getByText("https://example.com")).toBeInTheDocument();
-            expect(
-                screen.getByText("example.com")
-            ).toBeInTheDocument(); // ping monitor display
+            expect(screen.getByText("example.com")).toBeInTheDocument(); // ping monitor display
         });
 
         it("should show correct monitor status badges", () => {
@@ -356,11 +346,12 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                         }),
                         // Ping monitor with host only
                         (() => {
-                            const { url, port, ...pingMonitor } = createValidMonitor({
-                                id: "monitor-2",
-                                type: "ping",
-                                host: "example.com",
-                            });
+                            const { url, port, ...pingMonitor } =
+                                createValidMonitor({
+                                    id: "monitor-2",
+                                    type: "ping",
+                                    host: "example.com",
+                                });
                             return pingMonitor as Monitor;
                         })(),
                         // Port monitor with host and port
@@ -393,9 +384,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(
                 screen.getByText("https://api.example.com")
             ).toBeInTheDocument();
-            expect(
-                screen.getByText("example.com")
-            ).toBeInTheDocument();
+            expect(screen.getByText("example.com")).toBeInTheDocument();
             expect(
                 screen.getByText("port.example.com:443")
             ).toBeInTheDocument();

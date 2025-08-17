@@ -164,7 +164,14 @@ describe("performSinglePortCheck", () => {
 
         it("should convert port number to string in details", async () => {
             // Test different port numbers
-            const ports = [22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange
@@ -356,7 +363,15 @@ describe("performSinglePortCheck", () => {
         });
 
         it("should handle edge case port numbers", async () => {
-            const ports = [1, 22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                1,
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange

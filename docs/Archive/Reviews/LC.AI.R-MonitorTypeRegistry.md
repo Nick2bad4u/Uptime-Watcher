@@ -109,6 +109,7 @@ This could lose stack traces and detailed error information.
 ### 1. **Add Comprehensive Interface Documentation**
 
 ````typescript
+
 export interface BaseMonitorConfig {
  /** Description of what this monitor checks */
  readonly description: string;
@@ -188,6 +189,7 @@ export interface BaseMonitorConfig {
 ### 2. **Add Missing Function Documentation**
 
 ````typescript
+
 /**
  * Simple monitor type validation for internal use.
  *

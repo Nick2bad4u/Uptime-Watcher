@@ -533,12 +533,10 @@ describe("DatabaseCommands", () => {
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             };
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi
-                    .fn()
-                    .mockResolvedValue([
-                        createTestSite("test1"),
-                        createTestSite("test2"),
-                    ]),
+                getSitesFromDatabase: vi.fn().mockResolvedValue([
+                    createTestSite("test1"),
+                    createTestSite("test2"),
+                ]),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
                 mockImportExportService
@@ -704,12 +702,10 @@ describe("DatabaseCommands", () => {
 
         beforeEach(() => {
             mockSiteRepositoryService = {
-                getSitesFromDatabase: vi
-                    .fn()
-                    .mockResolvedValue([
-                        createTestSite("loaded1"),
-                        createTestSite("loaded2"),
-                    ]),
+                getSitesFromDatabase: vi.fn().mockResolvedValue([
+                    createTestSite("loaded1"),
+                    createTestSite("loaded2"),
+                ]),
             };
             mockServiceFactory.createSiteRepositoryService.mockReturnValue(
                 mockSiteRepositoryService

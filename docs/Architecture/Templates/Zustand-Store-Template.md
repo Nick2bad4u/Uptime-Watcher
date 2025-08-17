@@ -7,6 +7,7 @@ Use this template when creating new Zustand stores for frontend state management
 For stores with straightforward state that don't require modular composition:
 
 ````typescript
+
 /**
  * [DESCRIPTION] store for managing [DOMAIN] state and interactions.
  *
@@ -20,16 +21,16 @@ For stores with straightforward state that don't require modular composition:
  * @example
  *
  * ```typescript
- * import { useExampleStore } from './stores/useExampleStore';
+ * import { useExampleStore } from "./stores/useExampleStore";
  *
  * function MyComponent() {
- *   const { exampleValue, setExampleValue } = useExampleStore();
+ *  const { exampleValue, setExampleValue } = useExampleStore();
  *
- *   return (
- *     <button onClick={() => setExampleValue('new value')}>
- *       Update Example
- *     </button>
- *   );
+ *  return (
+ *   <button onClick={() => setExampleValue("new value")}>
+ *    Update Example
+ *   </button>
+ *  );
  * }
  * ```
  *

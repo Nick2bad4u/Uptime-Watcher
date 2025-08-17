@@ -141,13 +141,25 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(mockFs.readFile).toHaveBeenCalledWith(specialPath);
         });
         it("should preserve buffer content integrity", async () => {
-            const binaryData = Buffer.from([0x00, 0xff, 0xab, 0xcd, 0xef]);
+            const binaryData = Buffer.from([
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
+            ]);
             mockFs.readFile.mockResolvedValue(binaryData);
 
             const result = await createDatabaseBackup(testDbPath);
 
             expect(result.buffer).toStrictEqual(binaryData);
-            expect([...result.buffer]).toEqual([0x00, 0xff, 0xab, 0xcd, 0xef]);
+            expect([...result.buffer]).toEqual([
+                0x00,
+                0xff,
+                0xab,
+                0xcd,
+                0xef,
+            ]);
         });
     });
     describe("createDatabaseBackup - Error scenarios", () => {
@@ -367,7 +379,13 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 Buffer.alloc(1, 0), // Single zero byte
                 Buffer.alloc(1, 255), // Single max byte
                 Buffer.from("test"), // String buffer
-                Buffer.from([1, 2, 3, 4, 5]), // Array buffer
+                Buffer.from([
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                ]), // Array buffer
             ];
 
             for (const testCase of testCases) {

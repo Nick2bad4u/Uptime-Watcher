@@ -164,7 +164,13 @@ describe("IPC Types", () => {
         });
 
         it("should support array data types", () => {
-            const arrayData = [1, 2, 3, 4, 5];
+            const arrayData = [
+                1,
+                2,
+                3,
+                4,
+                5,
+            ];
 
             const response: IpcResponse<number[]> = {
                 success: true,

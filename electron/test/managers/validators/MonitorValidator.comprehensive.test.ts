@@ -210,7 +210,13 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
         });
 
         it("should handle monitors with different responseTime values", () => {
-            const responseTimes = [-1, 0, 100, 1000, 5000];
+            const responseTimes = [
+                -1,
+                0,
+                100,
+                1000,
+                5000,
+            ];
 
             for (const responseTime of responseTimes) {
                 const monitor = createMockMonitor({

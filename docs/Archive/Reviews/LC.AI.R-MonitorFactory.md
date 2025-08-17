@@ -154,11 +154,10 @@ public static getMonitor(type: MonitorType, config?: MonitorConfig): IMonitorSer
 ### 3. **Improve Global Configuration Method**
 
 ````typescript
-/**
- * Update configuration for all monitor types.
- *
- * @param config - Monitor configuration object containing settings to apply
- *
+
+
+
+/** * Update configuration for all monitor types. * * @param config - Monitor configuration object containing settings to apply *
  * @remarks
  * Applies the provided configuration to ALL currently initialized monitor instances.
  * This ensures consistent configuration across all monitor types.

@@ -417,7 +417,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should validate valid ports", () => {
-            const validPorts = [1, 80, 443, 8080, 3000, 65_535];
+            const validPorts = [
+                1,
+                80,
+                443,
+                8080,
+                3000,
+                65_535,
+            ];
 
             for (const port of validPorts) {
                 const validData = {

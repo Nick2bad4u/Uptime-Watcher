@@ -19,7 +19,13 @@ import { ThemeName } from "../theme/types";
 vi.mock("../constants", () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 100,
-    HISTORY_LIMIT_OPTIONS: [50, 100, 200, 500, 1000],
+    HISTORY_LIMIT_OPTIONS: [
+        50,
+        100,
+        200,
+        500,
+        1000,
+    ],
     TRANSITION_ALL: "all 0.2s ease-in-out",
     UI_DELAYS: {
         LOADING_BUTTON: 100,

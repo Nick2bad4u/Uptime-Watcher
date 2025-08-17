@@ -196,7 +196,7 @@ interface IManagerValidator {
    ```typescript
    // Current
    export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents>
-
+   
    // Improved
    /**
     * @template TEvents - Event interface defining all events this orchestrator can emit

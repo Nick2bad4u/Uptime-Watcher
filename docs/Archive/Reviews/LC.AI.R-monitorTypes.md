@@ -112,6 +112,7 @@ export function isBaseMonitorType(type: string): type is MonitorType {
 ### 2. **Add Comprehensive TSDoc**
 
 ````typescript
+
 /**
  * @remarks
  * This file provides utilities for working with BASE monitor types only. The

@@ -159,6 +159,7 @@ Always follow this order to minimize breaking changes:
 ### Component Structure
 
 ````tsx
+
 /**
  * Component description following TSDoc guidelines
  *
@@ -555,6 +556,7 @@ test("useSiteActions provides correct handlers", () => {
 Follow the base tag guidelines in `docs/TSDoc/`:
 
 ````tsx
+
 /**
  * Brief component description.
  *

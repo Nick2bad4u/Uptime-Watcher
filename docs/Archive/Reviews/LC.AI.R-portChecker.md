@@ -36,6 +36,7 @@ Reviewed 1 low confidence AI claim for portChecker.ts. **The claim is VALID** an
 ### 1. **Add Comprehensive TSDoc**
 
 ````typescript
+
 /**
  * Perform a single port check attempt without retry logic.
  *

@@ -373,7 +373,13 @@ describe("Time Utilities", () => {
         });
 
         it("should have correct types for all keys", () => {
-            const periods: TimePeriod[] = ["1h", "12h", "24h", "7d", "30d"];
+            const periods: TimePeriod[] = [
+                "1h",
+                "12h",
+                "24h",
+                "7d",
+                "30d",
+            ];
 
             for (const period of periods) {
                 expect(TIME_PERIOD_LABELS[period]).toBeDefined();

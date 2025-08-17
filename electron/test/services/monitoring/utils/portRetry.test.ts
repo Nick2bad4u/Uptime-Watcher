@@ -376,7 +376,14 @@ describe("performPortCheckWithRetry", () => {
         });
 
         it("should handle different port numbers", async () => {
-            const ports = [22, 80, 443, 3000, 8080, 65_535];
+            const ports = [
+                22,
+                80,
+                443,
+                3000,
+                8080,
+                65_535,
+            ];
 
             for (const port of ports) {
                 // Arrange

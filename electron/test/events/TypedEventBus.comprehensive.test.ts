@@ -420,12 +420,24 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle arrays correctly", async () => {
             eventBus.onTyped("array-event", mockListener);
 
-            const testArray = [1, 2, 3, 4, 5];
+            const testArray = [
+                1,
+                2,
+                3,
+                4,
+                5,
+            ];
             await eventBus.emitTyped("array-event", testArray);
 
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBe(true);
-            expect(receivedData).toEqual([1, 2, 3, 4, 5]);
+            expect(receivedData).toEqual([
+                1,
+                2,
+                3,
+                4,
+                5,
+            ]);
             expect(receivedData._meta).toEqual(expect.any(Object));
 
             // Verify _meta is non-enumerable

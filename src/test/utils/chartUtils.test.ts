@@ -537,7 +537,15 @@ describe("Chart Utilities", () => {
         });
 
         it("should handle all function combinations with invalid inputs", () => {
-            const invalidInputs = [null, undefined, "", 0, false, [], {}];
+            const invalidInputs = [
+                null,
+                undefined,
+                "",
+                0,
+                false,
+                [],
+                {},
+            ];
 
             for (const input of invalidInputs) {
                 expect(hasScales(input)).toBe(

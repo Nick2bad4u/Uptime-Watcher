@@ -475,7 +475,15 @@ describe("SiteCard Component Coverage Tests", () => {
 
         describe("SiteCard Performance", () => {
             it("should handle response time metrics", () => {
-                const responseTimes = [50, 100, 150, 200, 250, 500, 1000];
+                const responseTimes = [
+                    50,
+                    100,
+                    150,
+                    200,
+                    250,
+                    500,
+                    1000,
+                ];
 
                 for (const time of responseTimes) {
                     expect(typeof time).toBe("number");
@@ -489,7 +497,13 @@ describe("SiteCard Component Coverage Tests", () => {
             });
 
             it("should handle uptime calculations", () => {
-                const uptimeValues = [95.5, 99.9, 100, 0, 50];
+                const uptimeValues = [
+                    95.5,
+                    99.9,
+                    100,
+                    0,
+                    50,
+                ];
 
                 for (const uptime of uptimeValues) {
                     expect(typeof uptime).toBe("number");

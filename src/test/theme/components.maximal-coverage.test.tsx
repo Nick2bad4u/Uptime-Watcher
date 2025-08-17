@@ -53,7 +53,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all padding variants", () => {
-            const paddings = ["xs", "sm", "md", "lg", "xl"] as const;
+            const paddings = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             for (const padding of paddings) {
                 const { unmount } = render(
@@ -108,7 +114,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle rounded prop", () => {
-            const roundedOptions = ["none", "sm", "md", "lg", "full"] as const;
+            const roundedOptions = [
+                "none",
+                "sm",
+                "md",
+                "lg",
+                "full",
+            ] as const;
 
             for (const rounded of roundedOptions) {
                 const { unmount } = render(
@@ -123,7 +135,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle shadow prop", () => {
-            const shadowOptions = ["sm", "md", "lg", "xl", "inner"] as const;
+            const shadowOptions = [
+                "sm",
+                "md",
+                "lg",
+                "xl",
+                "inner",
+            ] as const;
 
             for (const shadow of shadowOptions) {
                 const { unmount } = render(
@@ -209,7 +227,13 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl",
+            ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(

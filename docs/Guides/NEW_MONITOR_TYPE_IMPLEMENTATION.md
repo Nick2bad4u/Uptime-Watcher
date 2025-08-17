@@ -196,6 +196,7 @@ Every monitor type must support these standardized fields from the `Monitor` int
 New monitor types automatically integrate with the repository pattern through the Enhanced Monitoring System:
 
 ````typescript
+
 // Required imports for DNS monitor example
 import type { Site } from "@shared/types";
 import type { MonitorType } from "@shared/types";
@@ -460,6 +461,7 @@ export class DnsMonitor implements IMonitorService {
 **PRODUCTION REQUIREMENT**: Use the centralized Zod validation system for consistent, secure validation:
 
 ````typescript
+
 import { z } from "zod";
 import validator from "validator";
 import { withErrorHandling } from "shared/utils/errorHandling";
@@ -501,9 +503,18 @@ export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema.extend({
  type: z.literal("dns"),
  // Use the reusable host validation schema (already defined in schemas.ts)
  hostname: hostValidationSchema,
- recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
-  errorMap: () => ({ message: "Must select a valid DNS record type" }),
- }),
+ recordType: z.enum(
+  [
+   "A",
+   "AAAA",
+   "MX",
+   "CNAME",
+   "TXT",
+  ],
+  {
+   errorMap: () => ({ message: "Must select a valid DNS record type" }),
+  }
+ ),
  expectedValue: z.string().optional(),
  // Optional: Add DNS-specific timeout if different from base timeout
  dnsTimeout: z.number().min(1000).max(30000).optional(),
@@ -569,11 +580,11 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     async check(monitor: Site["monitors"][0]): Promise<MonitorCheckResult> {
      // Implementation must return standardized result
     }
-
+   
     updateConfig(config: Partial<MonitorConfig>): void {
      // Runtime configuration updates
     }
-
+   
     getType(): Site["monitors"][0]["type"] {
      return "your-type";
     }
@@ -689,9 +700,18 @@ export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema.extend({
  type: z.literal("dns"),
  // Use the existing reusable host validation schema for consistency
  hostname: hostValidationSchema,
- recordType: z.enum(["A", "AAAA", "MX", "CNAME", "TXT"], {
-  errorMap: () => ({ message: "Must select a valid DNS record type" }),
- }),
+ recordType: z.enum(
+  [
+   "A",
+   "AAAA",
+   "MX",
+   "CNAME",
+   "TXT",
+  ],
+  {
+   errorMap: () => ({ message: "Must select a valid DNS record type" }),
+  }
+ ),
  expectedValue: z.string().optional(),
 });
 
@@ -728,11 +748,10 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 **Production Template Structure**:
 
 ````typescript
-/**
- * DNS monitoring service with production-grade reliability and error handling.
- *
- * @remarks
- * Implements the IMonitorService interface with comprehensive error handling,
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling,
  * operation correlation for race condition prevention, and proper resource
  * management following ADR-003 error handling strategy.
  *

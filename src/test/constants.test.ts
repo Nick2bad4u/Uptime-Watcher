@@ -321,7 +321,13 @@ describe("Application Constants", () => {
         });
 
         it("should have valid chart time periods", () => {
-            const expectedPeriods = ["1h", "12h", "24h", "7d", "30d"];
+            const expectedPeriods = [
+                "1h",
+                "12h",
+                "24h",
+                "7d",
+                "30d",
+            ];
             for (const period of expectedPeriods) {
                 expect(CHART_TIME_PERIODS).toHaveProperty(period);
                 expect(

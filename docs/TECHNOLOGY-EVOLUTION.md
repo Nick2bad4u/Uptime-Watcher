@@ -160,16 +160,16 @@ export class SiteRepository {
 const SitesContext = createContext<SitesContextType | undefined>(undefined);
 
 export const SitesProvider: React.FC = ({ children }) => {
-  const [sites, setSites] = useState<Site[]>([]);
-  const [loading, setLoading] = useState(false);
+ const [sites, setSites] = useState<Site[]>([]);
+ const [loading, setLoading] = useState(false);
 
-  // Complex reducer logic...
+ // Complex reducer logic...
 
-  return (
-    <SitesContext.Provider value={{ sites, setSites, loading, setLoading }}>
-      {children}
-    </SitesContext.Provider>
-  );
+ return (
+  <SitesContext.Provider value={{ sites, setSites, loading, setLoading }}>
+   {children}
+  </SitesContext.Provider>
+ );
 };
 ```
 

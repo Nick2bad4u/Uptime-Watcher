@@ -178,8 +178,7 @@ sed -i 's/logger\.warn(\"Operation \${operationId} timed out, cancelling\")/logg
    const TEMPLATE_REPLACEMENTS = [
     {
      pattern: /logger\.info\("\[ApplicationService\] Starting cleanup"\)/g,
-     replacement:
-      "logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_START)",
+     replacement: "logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_START)",
     },
     // ... 95 more patterns
    ];

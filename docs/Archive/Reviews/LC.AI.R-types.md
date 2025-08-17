@@ -91,6 +91,7 @@ import type { Site } from "../../types";
 ### 2. **Add Explicit Examples to Interface Documentation**
 
 ````typescript
+
 /**
  * Result of a monitor check operation.
  *
@@ -205,6 +206,7 @@ export interface MonitorCheckResult {
 ### 3. **Clarify MonitorConfig Scope and Usage**
 
 ````typescript
+
 /**
  * Configuration for monitor check behavior.
  *

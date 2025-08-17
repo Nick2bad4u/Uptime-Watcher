@@ -59,6 +59,7 @@ The code correctly calculates `totalAttempts = maxRetries + 1` but the naming is
 ### 1. **Fix Parameter Naming and Documentation**
 
 ````typescript
+
 /**
  * Perform port check with sophisticated retry logic and exponential backoff.
  *

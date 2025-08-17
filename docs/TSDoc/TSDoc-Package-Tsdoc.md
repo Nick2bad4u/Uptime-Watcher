@@ -76,6 +76,7 @@ document its own APIs!)
 **input example 4:**
 
 ````ts
+
 /**
  * Returns `true` if a comment string contains the
  * {@link http://tsdoc.org/pages/tags/internal | @internal tag}.
@@ -112,6 +113,7 @@ Here's how we might implement `isApiInternal()` using the
 **@microsoft/tsdoc** engine:
 
 ````ts
+
 import { TSDocParser, ParserContext } from "@microsoft/tsdoc";
 
 function isApiInternal(docComment: string): boolean {

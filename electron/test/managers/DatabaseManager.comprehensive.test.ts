@@ -49,21 +49,21 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
         createBackupService: vi.fn().mockReturnValue({
             downloadDatabaseBackup: vi.fn().mockResolvedValue({
                 buffer: Buffer.from("test"),
-                fileName: "test.db"
-            })
+                fileName: "test.db",
+            }),
         }),
         createImportExportService: vi.fn().mockReturnValue({
             exportAllData: vi.fn().mockResolvedValue("{}"),
             importDataFromJson: vi.fn().mockResolvedValue({
                 settings: {},
-                sites: []
+                sites: [],
             }),
-            persistImportedData: vi.fn().mockResolvedValue(undefined)
+            persistImportedData: vi.fn().mockResolvedValue(undefined),
         }),
         createSiteRepositoryService: vi.fn().mockReturnValue({
-            getSitesFromDatabase: vi.fn().mockResolvedValue([])
-        })
-    }))
+            getSitesFromDatabase: vi.fn().mockResolvedValue([]),
+        }),
+    })),
 }));
 
 // Mock database commands

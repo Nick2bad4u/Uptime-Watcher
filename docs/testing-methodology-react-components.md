@@ -58,26 +58,26 @@ vi.mocked(useAddSiteForm).mockReturnValue({
 
 ```typescript
 // RadioGroup with invalid options for validation testing
-vi.mock('../FormFields/RadioGroup', () => ({
-  default: ({ value, onChange, options }: any) => (
-    <div data-testid="radio-group">
-      {options.map((option: any) => (
-        <button
-          key={option.value}
-          data-testid={`radio-option-${option.value}`}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
-      <button
-        data-testid="radio-option-invalid"
-        onClick={() => onChange('invalid')}
-      >
-        Invalid Option
-      </button>
-    </div>
-  )
+vi.mock("../FormFields/RadioGroup", () => ({
+ default: ({ value, onChange, options }: any) => (
+  <div data-testid="radio-group">
+   {options.map((option: any) => (
+    <button
+     key={option.value}
+     data-testid={`radio-option-${option.value}`}
+     onClick={() => onChange(option.value)}
+    >
+     {option.label}
+    </button>
+   ))}
+   <button
+    data-testid="radio-option-invalid"
+    onClick={() => onChange("invalid")}
+   >
+    Invalid Option
+   </button>
+  </div>
+ ),
 }));
 ```
 
@@ -85,18 +85,18 @@ vi.mock('../FormFields/RadioGroup', () => ({
 
 ```typescript
 // Test invalid monitor type validation
-test('should cover error logging when invalid monitor type is set', async () => {
-  render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
+test("should cover error logging when invalid monitor type is set", async () => {
+ render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
 
-  const invalidOption = screen.getByTestId('radio-option-invalid');
-  fireEvent.click(invalidOption);
+ const invalidOption = screen.getByTestId("radio-option-invalid");
+ fireEvent.click(invalidOption);
 
-  await waitFor(() => {
-    expect(logger.error).toHaveBeenCalledWith(
-      'Invalid monitor type selected',
-      expect.objectContaining({ monitorType: 'invalid' })
-    );
-  });
+ await waitFor(() => {
+  expect(logger.error).toHaveBeenCalledWith(
+   "Invalid monitor type selected",
+   expect.objectContaining({ monitorType: "invalid" })
+  );
+ });
 });
 ```
 
@@ -113,24 +113,24 @@ fireEvent.click(radioButton);
 ## Test Structure Template
 
 ```typescript
-describe('ComponentName Uncovered Lines Coverage', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // Setup common mocks
+describe("ComponentName Uncovered Lines Coverage", () => {
+ beforeEach(() => {
+  vi.clearAllMocks();
+  // Setup common mocks
+ });
+
+ test("should cover specific validation error path", async () => {
+  // Arrange - Setup component with specific props/state
+  render(<Component {...props} />);
+
+  // Act - Trigger specific interaction to reach uncovered code
+  fireEvent.click(screen.getByTestId("target-element"));
+
+  // Assert - Verify the uncovered code was executed
+  await waitFor(() => {
+   expect(mockFunction).toHaveBeenCalledWith(expectedArgs);
   });
-
-  test('should cover specific validation error path', async () => {
-    // Arrange - Setup component with specific props/state
-    render(<Component {...props} />);
-
-    // Act - Trigger specific interaction to reach uncovered code
-    fireEvent.click(screen.getByTestId('target-element'));
-
-    // Assert - Verify the uncovered code was executed
-    await waitFor(() => {
-      expect(mockFunction).toHaveBeenCalledWith(expectedArgs);
-    });
-  });
+ });
 });
 ```
 

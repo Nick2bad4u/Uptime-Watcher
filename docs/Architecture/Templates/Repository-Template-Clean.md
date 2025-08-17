@@ -13,6 +13,7 @@ Repository classes manage data persistence using the dual-method pattern:
 ## Template Structure
 
 ````typescript
+
 import { Database } from "node-sqlite3-wasm";
 import { logger } from "@shared/utils/logger";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";

@@ -95,7 +95,10 @@ export function createValidBaseMonitor(
 export const createValidHttpMonitor = (
     overrides: Partial<HttpMonitorData> = {}
 ): HttpMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "http", lastChecked: new Date() });
+    const baseMonitor = createValidBaseMonitor({
+        type: "http",
+        lastChecked: new Date(),
+    });
     return {
         ...baseMonitor,
         url: "https://example.com",
@@ -114,7 +117,10 @@ export const createValidHttpMonitor = (
 export const createValidPortMonitor = (
     overrides: Partial<PortMonitorData> = {}
 ): PortMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "port", lastChecked: new Date() });
+    const baseMonitor = createValidBaseMonitor({
+        type: "port",
+        lastChecked: new Date(),
+    });
     return {
         ...baseMonitor,
         host: "example.com",
@@ -134,7 +140,10 @@ export const createValidPortMonitor = (
 export const createValidPingMonitor = (
     overrides: Partial<PingMonitorData> = {}
 ): PingMonitorData => {
-    const baseMonitor = createValidBaseMonitor({ type: "ping", lastChecked: new Date() });
+    const baseMonitor = createValidBaseMonitor({
+        type: "ping",
+        lastChecked: new Date(),
+    });
     return {
         ...baseMonitor,
         host: "example.com",

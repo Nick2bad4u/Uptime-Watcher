@@ -425,7 +425,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
             );
             expect(mockFallbacks.getFallbackArray(null)).toEqual([]);
             expect(mockFallbacks.getFallbackArray([1, 2, 3])).toEqual([
-                1, 2, 3,
+                1,
+                2,
+                3,
             ]);
         });
     });

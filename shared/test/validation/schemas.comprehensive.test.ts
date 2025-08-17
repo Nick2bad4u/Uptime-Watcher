@@ -307,7 +307,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should accept valid port ranges", () => {
-            const validPorts = [0, 1, 80, 443, 8080, 65_535]; // 0 is valid for validator.js
+            const validPorts = [
+                0,
+                1,
+                80,
+                443,
+                8080,
+                65_535,
+            ]; // 0 is valid for validator.js
 
             for (const port of validPorts) {
                 const monitor = {

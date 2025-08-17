@@ -236,27 +236,27 @@ await eventBus.emitTyped("sites:added", {
 ### React Components
 
 ```typescript
-import { useSitesStore } from '../stores/useSitesStore';
+import { useSitesStore } from "../stores/useSitesStore";
 
 function SiteManager() {
-  const { sites, addSite, updateSite, removeSite } = useSitesStore();
+ const { sites, addSite, updateSite, removeSite } = useSitesStore();
 
-  const handleCreateSite = async (siteData: SiteCreationData) => {
-    try {
-      const newSite = await window.electronAPI.sites.create(siteData);
-      addSite(newSite); // Update local state
-    } catch (error) {
-      console.error('Failed to create site:', error);
-    }
-  };
+ const handleCreateSite = async (siteData: SiteCreationData) => {
+  try {
+   const newSite = await window.electronAPI.sites.create(siteData);
+   addSite(newSite); // Update local state
+  } catch (error) {
+   console.error("Failed to create site:", error);
+  }
+ };
 
-  return (
-    <div>
-      {sites.map(site => (
-        <SiteCard key={site.id} site={site} />
-      ))}
-    </div>
-  );
+ return (
+  <div>
+   {sites.map((site) => (
+    <SiteCard key={site.id} site={site} />
+   ))}
+  </div>
+ );
 }
 ```
 

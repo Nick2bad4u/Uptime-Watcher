@@ -20,7 +20,15 @@ describe("Value Converters Utility", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            const values: DbValue[] = [null, 123, "string", 0, -1, 3.14, ""];
+            const values: DbValue[] = [
+                null,
+                123,
+                "string",
+                0,
+                -1,
+                3.14,
+                "",
+            ];
 
             expect(values).toHaveLength(7);
             expect(values[0]).toBeNull();

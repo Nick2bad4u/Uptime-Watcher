@@ -220,7 +220,14 @@ describe("FormData Types", () => {
         });
 
         it("should enforce port number constraints", () => {
-            const commonPorts = [80, 443, 22, 3389, 3306, 5432];
+            const commonPorts = [
+                80,
+                443,
+                22,
+                3389,
+                3306,
+                5432,
+            ];
 
             for (const port of commonPorts) {
                 const portData: PortFormData = {

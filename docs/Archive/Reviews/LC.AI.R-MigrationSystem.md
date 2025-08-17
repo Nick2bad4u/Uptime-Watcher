@@ -206,6 +206,7 @@ private compareVersions(a: string, b: string): number {
 ### 4. **Add Comprehensive TSDoc**
 
 ````typescript
+
 /**
  * Registry for monitor type migrations.
  *

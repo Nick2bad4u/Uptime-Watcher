@@ -107,7 +107,14 @@ describe("Port Error Handling", () => {
         });
 
         it("should validate error result with different port numbers", () => {
-            const ports = ["22", "80", "443", "3000", "8080", "65535"];
+            const ports = [
+                "22",
+                "80",
+                "443",
+                "3000",
+                "8080",
+                "65535",
+            ];
 
             for (const port of ports) {
                 const errorResult: PortCheckErrorResult = {

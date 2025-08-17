@@ -769,7 +769,16 @@ const isFormValid = useCallback(() => {
   validator.validateMonitorFields(monitorType, fields),
   validator.validateTypeSpecific(monitorType, url, host, port),
  ].every(Boolean);
-}, [addMode, selectedExistingSite, name, monitorType, fields, url, host, port]);
+}, [
+ addMode,
+ selectedExistingSite,
+ name,
+ monitorType,
+ fields,
+ url,
+ host,
+ port,
+]);
 ```
 
 ---
