@@ -139,7 +139,7 @@ commit_parsers = [
   { message = "^test", group = "<!-- 6 -->🧪 Testing" },
   { message = "^build", group = "<!-- 9 -->🔧 Build System" },
   { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
-  
+
   # Skip noisy commit types
   { message = "^chore\\(release\\): prepare for", skip = true },
   { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
@@ -162,16 +162,16 @@ commit_parsers = [
 
   # Revert commits
   { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
-  
+
   # Skip merge commits unless explicitly needed
   { message = "^Merge branch", skip = true },
   { message = "^merge branch", skip = true },
   { message = "^Merge pull request", skip = true },
-  
+
   # CI/CD file changes
   { message = ".*\\.ya?ml", group = "<!-- 8 -->👷 CI/CD" },
   { message = ".*workflow.*", group = "<!-- 8 -->� CI/CD" },
-  
+
   # Catch-all for miscellaneous changes
   { message = ".*", group = "<!-- 13 -->� Other Changes" },
 ]

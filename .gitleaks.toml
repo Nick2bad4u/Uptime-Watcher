@@ -234,6 +234,4 @@ regexes = [
 
 [[allowlists]]
 description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
-paths = [
-    '''\.secretlintrc\.json$'''
-]
+paths = ['''\.secretlintrc\.json$''']

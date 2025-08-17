@@ -8,7 +8,9 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
+import { isDevelopment, isProduction } from "@shared/utils/environment";
 import App from "../App";
+import logger from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
@@ -17,6 +19,11 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import { useTheme } from "../theme/useTheme";
 
 // Mock modules with specific focus on coverage lines
+vi.mock("@shared/utils/environment", () => ({
+    isDevelopment: vi.fn().mockReturnValue(false),
+    isProduction: vi.fn().mockReturnValue(true),
+}));
+
 vi.mock("./hooks/useBackendFocusSync", () => ({
     useBackendFocusSync: vi.fn(),
 }));
@@ -98,12 +105,6 @@ vi.mock("./stores/sites/useSitesStore");
 vi.mock("./stores/ui/useUiStore");
 vi.mock("./stores/updates/useUpdatesStore");
 vi.mock("./theme/useTheme");
-
-// Mock environment functions
-vi.mock("@shared/utils/environment", () => ({
-    isDevelopment: vi.fn(() => false),
-    isProduction: vi.fn(() => true),
-}));
 
 describe("App Additional Coverage Tests", () => {
     const mockUseErrorStore = vi.mocked(useErrorStore);
@@ -401,5 +402,101 @@ describe("App Additional Coverage Tests", () => {
 
         expect(setUpdateStatusMock).toHaveBeenCalledWith("idle");
         expect(setUpdateErrorMock).toHaveBeenCalledWith(undefined);
+    });
+
+    it("should execute development logging in status updates callback", async () => {
+        // Mock isDevelopment to return true to enable development logging
+        vi.mocked(isDevelopment).mockReturnValue(true);
+
+        const subscribeToStatusUpdatesMock = vi.fn();
+
+        // Mock useSitesStore.getState() to return our mock
+        const mockSitesStoreState = {
+            initializeSites: vi.fn().mockResolvedValue(undefined),
+            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
+            unsubscribeFromStatusUpdates: vi.fn(),
+        };
+
+        mockUseSitesStore.getState = vi.fn().mockReturnValue(mockSitesStoreState);
+
+        // Mock logger.debug
+        const debugSpy = vi.spyOn(logger, "debug");
+
+        render(<App />);
+
+        // Wait for initialization to complete
+        await waitFor(
+            () => {
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+            },
+            { timeout: 1000 }
+        );
+
+        // Get the callback function passed to subscribeToStatusUpdates
+        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+
+        // Create a mock status update
+        const mockUpdate = {
+            site: { identifier: "test-site-id" },
+            siteIdentifier: "fallback-site-id",
+        };
+
+        // Call the callback to trigger development logging
+        statusUpdateCallback(mockUpdate);
+
+        // Verify that logger.debug was called
+        expect(debugSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: test-site-id/)
+        );
+
+        debugSpy.mockRestore();
+    });
+
+    it("should use fallback siteIdentifier when site.identifier is undefined", async () => {
+        // Mock isDevelopment to return true to enable development logging
+        vi.mocked(isDevelopment).mockReturnValue(true);
+
+        const subscribeToStatusUpdatesMock = vi.fn();
+
+        // Mock useSitesStore.getState() to return our mock
+        const mockSitesStoreState = {
+            initializeSites: vi.fn().mockResolvedValue(undefined),
+            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
+            unsubscribeFromStatusUpdates: vi.fn(),
+        };
+
+        mockUseSitesStore.getState = vi.fn().mockReturnValue(mockSitesStoreState);
+
+        // Mock logger.debug
+        const debugSpy = vi.spyOn(logger, "debug");
+
+        render(<App />);
+
+        // Wait for initialization to complete
+        await waitFor(
+            () => {
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+            },
+            { timeout: 1000 }
+        );
+
+        // Get the callback function passed to subscribeToStatusUpdates
+        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+
+        // Create a mock status update with undefined site.identifier
+        const mockUpdate = {
+            site: { identifier: undefined },
+            siteIdentifier: "fallback-site-id",
+        };
+
+        // Call the callback to trigger development logging with fallback
+        statusUpdateCallback(mockUpdate);
+
+        // Verify that logger.debug was called with fallback identifier
+        expect(debugSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: fallback-site-id/)
+        );
+
+        debugSpy.mockRestore();
     });
 });

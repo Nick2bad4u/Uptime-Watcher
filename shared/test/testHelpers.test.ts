@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { Monitor, MonitorStatus, MonitorType } from "../types";
+import type { MonitorStatus, MonitorType } from "../types";
 import { createValidMonitor, createValidStatusHistory, createValidMonitors } from "./testHelpers";
 
 describe("testHelpers", () => {
@@ -70,13 +70,18 @@ describe("testHelpers", () => {
         });
 
         it("should handle optional properties", () => {
-            const monitor = createValidMonitor({
-                lastChecked: undefined,
-                activeOperations: undefined,
+            const monitor = createValidMonitor();
+
+            // Test with a monitor where optional properties are explicitly omitted
+            const minimalMonitor = createValidMonitor({
+                host: "minimal.example.com",
+                url: "https://minimal.example.com",
             });
 
-            expect(monitor.lastChecked).toBeUndefined();
-            expect(monitor.activeOperations).toBeUndefined();
+            expect(monitor.lastChecked).toBeInstanceOf(Date);
+            expect(monitor.activeOperations).toEqual([]);
+            expect(minimalMonitor.host).toBe("minimal.example.com");
+            expect(minimalMonitor.url).toBe("https://minimal.example.com");
         });
 
         it("should handle complex overrides", () => {
@@ -195,12 +200,12 @@ describe("testHelpers", () => {
         it("should handle different hosts for each monitor", () => {
             const monitors = createValidMonitors(3, { type: "port" });
 
-            expect(monitors[0].url).toBe("https://example-0.com");
-            expect(monitors[1].url).toBe("https://example-1.com");
-            expect(monitors[2].url).toBe("https://example-2.com");
-            expect(monitors[0].id).toBe("test-monitor-0");
-            expect(monitors[1].id).toBe("test-monitor-1");
-            expect(monitors[2].id).toBe("test-monitor-2");
+            expect(monitors[0]!.url).toBe("https://example-0.com");
+            expect(monitors[1]!.url).toBe("https://example-1.com");
+            expect(monitors[2]!.url).toBe("https://example-2.com");
+            expect(monitors[0]!.id).toBe("test-monitor-0");
+            expect(monitors[1]!.id).toBe("test-monitor-1");
+            expect(monitors[2]!.id).toBe("test-monitor-2");
         });
 
         it("should combine base overrides with indexed properties", () => {
@@ -213,17 +218,17 @@ describe("testHelpers", () => {
                 expect(monitor.type).toBe("port");
                 expect(monitor.monitoring).toBe(false);
             }
-            expect(monitors[0].url).toBe("https://example-0.com");
-            expect(monitors[1].url).toBe("https://example-1.com");
+            expect(monitors[0]!.url).toBe("https://example-0.com");
+            expect(monitors[1]!.url).toBe("https://example-1.com");
         });
 
         it("should handle indexed URLs properly", () => {
             const monitors = createValidMonitors(2);
 
-            expect(monitors[0].url).toBe("https://example-0.com");
-            expect(monitors[1].url).toBe("https://example-1.com");
-            expect(monitors[0].id).toBe("test-monitor-0");
-            expect(monitors[1].id).toBe("test-monitor-1");
+            expect(monitors[0]!.url).toBe("https://example-0.com");
+            expect(monitors[1]!.url).toBe("https://example-1.com");
+            expect(monitors[0]!.id).toBe("test-monitor-0");
+            expect(monitors[1]!.id).toBe("test-monitor-1");
         });
 
         it("should handle base overrides that affect all monitors", () => {
@@ -237,9 +242,9 @@ describe("testHelpers", () => {
                 expect(monitor.port).toBe(8080);
             }
             // URLs should still be indexed
-            expect(monitors[0].url).toBe("https://example-0.com");
-            expect(monitors[1].url).toBe("https://example-1.com");
-            expect(monitors[2].url).toBe("https://example-2.com");
+            expect(monitors[0]!.url).toBe("https://example-0.com");
+            expect(monitors[1]!.url).toBe("https://example-1.com");
+            expect(monitors[2]!.url).toBe("https://example-2.com");
         });
 
         it("should handle negative count gracefully", () => {
@@ -250,11 +255,11 @@ describe("testHelpers", () => {
         it("should create independent objects", () => {
             const monitors = createValidMonitors(2);
 
-            monitors[0].host = "modified.com";
-            monitors[0].activeOperations?.push("test-operation");
+            monitors[0]!.host = "modified.com";
+            monitors[0]!.activeOperations?.push("test-operation");
 
-            expect(monitors[0].host).toBe("modified.com");
-            expect(monitors[1].host).toBe("example.com");
+            expect(monitors[0]!.host).toBe("modified.com");
+            expect(monitors[1]!.host).toBe("example.com");
         });
 
         it("should handle large numbers efficiently", () => {
@@ -321,7 +326,7 @@ describe("testHelpers", () => {
                 
                 for (const [index, monitor] of monitors.entries()) {
                     expect(monitor.status).toBe(status);
-                    expect(history[index].status).toBe(validHistoryStatus);
+                    expect(history[index]!.status).toBe(validHistoryStatus);
                 }
             }
         });

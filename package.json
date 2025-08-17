@@ -227,7 +227,7 @@
     "lint:unused-exports:electron": "ts-unused-exports electron/main.ts",
     "lint:vuln": "grype . -c .grype.yaml --name Uptime-Watcher",
     "lint:vulnerability": "grype . -c .grype.yaml --name Uptime-Watcher",
-    "lint:yaml": "eslint --cache \"**/*.{yml,yaml}\" --parser yaml-eslint-parser",
+    "lint:yaml": "yamllint -c .\\.yamllint ./** -f colored",
     "madge:circular": "madge --circular --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ shared/ --exclude \"(^|[\\\\/])(test|dist|dist-electron|node_modules)($|[\\\\/])\"",
     "madge:leaves": "madge --leaves --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ shared/ --exclude \"(^|[\\\\/])(test|dist|dist-electron|node_modules)($|[\\\\/])\"",
     "madge:orphans": "madge --orphans --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ shared/ --exclude \"(^|[\\\\/])(test|dist|dist-electron|node_modules)($|[\\\\/])\"",

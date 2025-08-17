@@ -63,33 +63,29 @@ search:
 
 # Comprehensive ignore rules with VEX support for modern vulnerability management
 ignore:
-    # VEX-based ignore rules (requires VEX documents)
-    # Example VEX ignore patterns:
-    # - vex-status: not_affected
-    #   vex-justification: vulnerable_code_not_present
-    #   reason: "VEX: Vulnerable code not present in execution path"
-
-    # - vex-status: not_affected
-    #   vex-justification: vulnerable_code_not_in_execute_path
-    #   reason: "VEX: Vulnerable code exists but not in execution path"
-
-    # Traditional ignore rules for non-VEX scenarios
-    # - vulnerability: CVE-2008-4318
-    #   fix-state: unknown
-    #   package:
-    #     name: libcurl
-    #     version: 1.5.1
-    #     type: npm
-    #     location: "/usr/local/lib/node_modules/**"
-    #   reason: "Legacy CVE - code path verified safe in our implementation"
-
-    # EPSS-based filtering considerations (implement via JSON output processing)
-    # - vulnerability: CVE-2023-*
-    #   reason: "Low exploitation probability per EPSS analysis (<10% percentile)"
-
-    # Business-justified severity filtering
-    # - severity: Low
-    #   reason: "Business decision - low severity risks accepted per security policy"
+# VEX-based ignore rules (requires VEX documents)
+# Example VEX ignore patterns:
+# - vex-status: not_affected
+#   vex-justification: vulnerable_code_not_present
+#   reason: "VEX: Vulnerable code not present in execution path"
+# - vex-status: not_affected
+#   vex-justification: vulnerable_code_not_in_execute_path
+#   reason: "VEX: Vulnerable code exists but not in execution path"
+# Traditional ignore rules for non-VEX scenarios
+# - vulnerability: CVE-2008-4318
+#   fix-state: unknown
+#   package:
+#     name: libcurl
+#     version: 1.5.1
+#     type: npm
+#     location: "/usr/local/lib/node_modules/**"
+#   reason: "Legacy CVE - code path verified safe in our implementation"
+# EPSS-based filtering considerations (implement via JSON output processing)
+# - vulnerability: CVE-2023-*
+#   reason: "Low exploitation probability per EPSS analysis (<10% percentile)"
+# Business-justified severity filtering
+# - severity: Low
+#   reason: "Business decision - low severity risks accepted per security policy"
 
 # Comprehensive exclusion patterns for modern development environments
 exclude:
@@ -262,10 +258,10 @@ registry:
 
 # VEX (Vulnerability Exploitability eXchange) configuration for modern vulnerability management
 vex-documents: []
-    # Example VEX document configurations:
-    # - path: "./security/vex.json"           # OpenVEX document path
-    # - path: "./security/csaf-vex.json"      # CSAF VEX document path
-    # - url: "https://vendor.com/vex.json"    # Remote VEX document URL
+# Example VEX document configurations:
+# - path: "./security/vex.json"           # OpenVEX document path
+# - path: "./security/csaf-vex.json"      # CSAF VEX document path
+# - url: "https://vendor.com/vex.json"    # Remote VEX document URL
 
 # VEX behavior configuration
 vex-add: [] # VEX statuses to consider as ignored rules

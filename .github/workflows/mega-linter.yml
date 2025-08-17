@@ -44,6 +44,9 @@ jobs:
               uses: oxsecurity/megalinter@e08c2b05e3dbc40af4c23f41172ef1e068a7d651 # v8.8.0
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  APPLY_FIXES: all
+                  APPLY_FIXES_EVENT: all
+                  APPLY_FIXES_MODE: pull_request
 
             # Upload MegaLinter artifacts
             - name: Archive production artifacts
@@ -54,4 +57,6 @@ jobs:
                   path: |
                       megalinter-reports
                       mega-linter.log
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               continue-on-error: true

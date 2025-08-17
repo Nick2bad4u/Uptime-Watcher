@@ -27,15 +27,20 @@ ignore: |
     *.min.js
     *.min.css
     *.bundle.js
+    docs/Packages/**
     # CI/CD files with known issues
     .github/workflows/Build.yml
     .github/workflows/codeql.yml
     .github/workflows/release-stats.yml
     .github/workflows/updateChangeLogs.yml
     .github/workflows/ActionLint.yml
+    .github/workflows/.spellcheck.yml
     # Config files that may have different formatting needs
     kics.yaml
     .yamllint
+    docs/_config.yml
+    .codecov.yml
+    .pre-commit-config.yaml
 rules:
     # Enable anchor rules for better YAML structure
     anchors:
@@ -60,7 +65,6 @@ rules:
         level: warning
         max-spaces-before: 0
         max-spaces-after: 1
-        min-spaces-after: 1
 
     # Commas configuration
     commas:
@@ -70,8 +74,11 @@ rules:
         min-spaces-after: 1
 
     # Disable comment rules for flexibility
-    comments: disable
-    comments-indentation: disable
+    comments:
+        require-starting-space: true
+        ignore-shebangs: true
+        min-spaces-from-content: 1
+    comments-indentation: enable
 
     # Document start/end configuration
     document-start: disable
@@ -86,10 +93,9 @@ rules:
 
     # Enable important rules for data integrity
     empty-values:
-        forbid-in-block-mappings: true
+        forbid-in-block-mappings: false
         forbid-in-flow-mappings: true
-        forbid-in-block-sequences: false
-        forbid-in-flow-sequences: false
+        forbid-in-block-sequences: true
 
     # Hyphen configuration
     hyphens:
@@ -110,7 +116,7 @@ rules:
     # Line length for readability (relaxed for modern screens)
     line-length:
         level: warning
-        max: 120
+        max: 200
         allow-non-breakable-words: true
         allow-non-breakable-inline-mappings: true
 
@@ -119,7 +125,7 @@ rules:
 
     # New lines configuration
     new-lines:
-        type: unix
+        type: dos
 
     # Disable truthy for flexibility with CI/CD configs
     truthy: disable

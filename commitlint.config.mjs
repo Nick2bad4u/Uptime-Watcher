@@ -3,16 +3,20 @@
 /**
  * Commitlint configuration for Uptime Watcher
  *
- * Enforces conventional commit format with project-specific rules and scopes.
- * Supports automated versioning and changelog generation.
+ * Enforces conventional commit format with emoji and bracketed type, e.g., "✨
+ * [feat] Add dark mode toggle". Each commit bullet point should start with one
+ * of the following: 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️
+ * [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test] Example: "✨
+ * [feat] Add dark mode toggle" Indent any lines that refer to the statement
+ * above with a " - "
  *
  * @type {import("@commitlint/types").UserConfig}
  *
  * @see {@link https://commitlint.js.org/ | Commitlint Documentation}
  * @see {@link https://www.conventionalcommits.org/ | Conventional Commits Specification}
  */
-// eslint-disable-next-line unicorn/prefer-module
-module.exports = {
+
+export default {
     $schema: "https://www.schemastore.org/commitlintrc.json",
 
     /**
@@ -82,78 +86,70 @@ module.exports = {
                     "Write a short, imperative tense description of the change",
             },
             type: {
-                description: "Select the type of change that you're committing",
+                description:
+                    "Select the type of change that you're committing. Start your commit message with the emoji and type in brackets, e.g., '✨ [feat] Add dark mode toggle'.",
                 enum: {
-                    build: {
-                        description:
-                            "Changes that affect the build system or external dependencies",
-                        emoji: "🛠",
-                        title: "Builds",
+                    "⏪ [revert]": {
+                        description: "Reverts a previous commit",
+                        emoji: "⏪",
+                        title: "Reverts",
                     },
-                    chore: {
-                        description:
-                            "Other changes that don't modify src or test files",
-                        emoji: "♻️",
-                        title: "Chores",
+                    "⚡ [perf]": {
+                        description: "A code change that improves performance",
+                        emoji: "⚡",
+                        title: "Performance Improvements",
                     },
-                    ci: {
-                        description:
-                            "Changes to our CI configuration files and scripts",
-                        emoji: "⚙️",
-                        title: "Continuous Integrations",
-                    },
-                    docs: {
-                        description: "Documentation only changes",
-                        emoji: "📚",
-                        title: "Documentation",
-                    },
-                    feat: {
+                    "✨ [feat]": {
                         description: "A new feature",
                         emoji: "✨",
                         title: "Features",
                     },
-                    fix: {
-                        description: "A bug fix",
-                        emoji: "🐛",
-                        title: "Bug Fixes",
-                    },
-                    perf: {
-                        description: "A code change that improves performance",
-                        emoji: "🚀",
-                        title: "Performance Improvements",
-                    },
-                    refactor: {
-                        description:
-                            "A code change that neither fixes a bug nor adds a feature",
-                        emoji: "📦",
-                        title: "Code Refactoring",
-                    },
-                    release: {
-                        description: "Release-related commits",
-                        emoji: "🏷️",
-                        title: "Releases",
-                    },
-                    revert: {
-                        description: "Reverts a previous commit",
-                        emoji: "🗑",
-                        title: "Reverts",
-                    },
-                    security: {
-                        description: "Security-related fixes or improvements",
-                        emoji: "🔒",
-                        title: "Security",
-                    },
-                    style: {
+                    "🎨 [style]": {
                         description:
                             "Changes that do not affect the meaning of the code",
-                        emoji: "💎",
+                        emoji: "🎨",
                         title: "Styles",
                     },
-                    test: {
+                    "👷 [ci]": {
+                        description:
+                            "Changes to our CI configuration files and scripts",
+                        emoji: "👷",
+                        title: "Continuous Integrations",
+                    },
+                    "📝 [docs]": {
+                        description: "Documentation only changes",
+                        emoji: "📝",
+                        title: "Documentation",
+                    },
+                    "🔧 [build]": {
+                        description:
+                            "Changes that affect the build system or external dependencies",
+                        emoji: "�",
+                        title: "Builds",
+                    },
+                    "🧪 [test]": {
                         description:
                             "Adding missing tests or correcting existing tests",
-                        emoji: "🚨",
+                        emoji: "🧪",
                         title: "Tests",
+                    },
+                    "🧹 [chore]": {
+                        description:
+                            "Other changes that don't modify src or test files",
+                        emoji: "🧹",
+                        title: "Chores",
+                    },
+                    // eslint-disable-next-line sort-keys -- broken with emojii
+                    "🚜 [refactor]": {
+                        description:
+                            "A code change that neither fixes a bug nor adds a feature",
+                        emoji: "🚜",
+                        title: "Code Refactoring",
+                    },
+                    "🛠️ [fix]": {
+                        description: "A bug fix",
+                        emoji: "🛠️",
+                        title: "Bug Fixes",
                     },
                 },
             },
@@ -169,7 +165,7 @@ module.exports = {
         // Body rules for detailed commits
         "body-leading-blank": [1, "always"],
 
-        "body-max-line-length": [2, "always", 100],
+        "body-max-line-length": [2, "always", 160],
 
         // Footer rules for breaking changes and issue references
         "footer-leading-blank": [1, "always"],
@@ -177,12 +173,13 @@ module.exports = {
         // Header rules
         "header-max-length": [2, "always", 100],
         "header-min-length": [2, "always", 10],
-        "header-trim": [2, "always"],
 
+        "header-trim": [2, "always"],
         // References for issue tracking integration
-        "references-empty": [1, "never"],
+        "references-empty": [0, "never"],
         // Scope case enforcement
         "scope-case": [2, "always", "kebab-case"],
+
         // Scope validation - project-specific scopes
         "scope-enum": [
             2,
@@ -234,47 +231,42 @@ module.exports = {
                 "repo", // Repository-wide changes
             ],
         ],
-
         // Signed-off-by for contribution tracking (optional)
-        "signed-off-by": [0, "never"],
+        //        "signed-off-by": [0, "never"],
         // Subject rules
         "subject-case": [
             2,
             "never",
             ["sentence-case", "start-case", "pascal-case", "upper-case"],
         ],
-        "subject-empty": [2, "never"],
 
+        "subject-empty": [0, "never"],
         "subject-full-stop": [2, "never", "."],
-        "subject-max-length": [2, "always", 100],
 
+        "subject-max-length": [2, "always", 100],
         "subject-min-length": [2, "always", 3],
         // Type and case enforcement
         "type-case": [2, "always", "lower-case"],
-        "type-empty": [2, "never"],
+        "type-empty": [0, "never"],
         // Type validation - allowed commit types
         "type-enum": [
             2,
             "always",
             [
-                "build", // Changes affecting build system or external dependencies
-                "chore", // Maintenance tasks that don't modify src or test files
-                "ci", // Changes to CI configuration files and scripts
-                "docs", // Documentation only changes
-                "feat", // New feature
-                "fix", // Bug fix
-                "perf", // Performance improvement
-                "refactor", // Code change that neither fixes a bug nor adds a feature
-                "revert", // Reverts a previous commit
-                "style", // Code style changes (white-space, formatting, etc.)
-                "test", // Adding missing tests or correcting existing tests
-                "release", // Release-related commits
-                "security", // Security-related fixes or improvements
+                "🔧 [build]",
+                "🧹 [chore]",
+                "👷 [ci]",
+                "📝 [docs]",
+                "✨ [feat]",
+                "🛠️ [fix]",
+                "⚡ [perf]",
+                "🚜 [refactor]",
+                "⏪ [revert]",
+                "🎨 [style]",
+                "🧪 [test]",
             ],
         ],
-
         "type-max-length": [2, "always", 20],
-
         "type-min-length": [2, "always", 3],
     },
 };

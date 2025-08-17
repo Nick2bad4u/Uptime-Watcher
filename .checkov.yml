@@ -28,20 +28,19 @@ custom-tool-name: "Checkov-UptimeWatcher"
 skip-check:
     # GitHub Actions Permission Checks
     - CKV_GHA_1 # Require job permissions write-all to be set to false
-      # Justification: Electron app build process requires write access for artifact uploads and releases
-
+    # Justification: Electron app build process requires write access for artifact uploads and releases
     - CKV2_GHA_1 # Ensure top-level permissions are not set to write-all
-      # Justification: Desktop app build workflow needs comprehensive permissions for secure artifact management
+    # Justification: Desktop app build workflow needs comprehensive permissions for secure artifact management
 
     # GitHub Actions Pinning Checks
     - CKV_GHA_6 # Require checkout action to be pinned to SHA version
-      # Justification: Using semantic versioning (@v4) for official actions provides better maintainability
-      # and security updates while maintaining readability. Risk is mitigated by using only official actions.
+    # Justification: Using semantic versioning (@v4) for official actions provides better maintainability
+    # and security updates while maintaining readability. Risk is mitigated by using only official actions.
 
     # Workflow Input Checks
     - CKV_GHA_7 # Ensure workflow_dispatch inputs are NOT empty/blank
-      # Justification: Manual trigger workflows without inputs are legitimate for this desktop application
-      # where simple build/test triggers don't require parameters
+    # Justification: Manual trigger workflows without inputs are legitimate for this desktop application
+    # where simple build/test triggers don't require parameters
 
 # Security enhancements
 # Enable secret scanning for all file types
@@ -67,6 +66,6 @@ skip-path:
     - icons/
     - html/
     - release/
-    - .secretlint.json
+    - .secretlintrc.json
     - docs/
     - shared/test/validation/schemas.test.ts

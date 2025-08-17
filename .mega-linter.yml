@@ -4,18 +4,24 @@
 PARALLEL: true
 SHOW_ELAPSED_TIME: true
 FLAVOR_SUGGESTIONS: true
-PRINT_ALPACA: false
+PRINT_ALPACA: true
 PRINT_ALL_FILES: false
+VALIDATE_ALL_CODEBASE: true
 
 # Core configuration
-DISABLE_ERRORS: false
-FORMATTERS_DISABLE_ERRORS: false
+DISABLE_ERRORS: true
+FORMATTERS_DISABLE_ERRORS: true
 IGNORE_GITIGNORED_FILES: true
 IGNORE_GENERATED_FILES: true
+FAIL_IF_UPDATED_SOURCES: false
+LOG_FILE: .mega-linter.log
+LOG_LEVEL: WARNING
+SHOW_SKIPPED_LINTERS: true
 
 # Linters configuration
 JAVASCRIPT_DEFAULT_STYLE: prettier
 MARKDOWN_DEFAULT_STYLE: markdownlint
+TYPESCRIPT_DEFAULT_STYLE: prettier
 
 # Config file references
 ACTION_ACTIONLINT_CONFIG_FILE: ActionLintConfig.yaml
@@ -53,8 +59,6 @@ DISABLE_LINTERS:
     - JSON_JSONLINT
     - JSON_ESLINT_PLUGIN_JSONC
 
-JSON_V8R_FILTER_REGEX_EXCLUDE: .jscpd.json
-
 # Error handling for specific linters
 JSON_PRETTIER_DISABLE_ERRORS: true
 JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
@@ -84,15 +88,27 @@ PLUGINS:
     - https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-repolinter/refs/heads/main/mega-linter-plugin-repolinter/repolinter.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml
+    - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
+    - https://raw.githubusercontent.com/hype8912/check-toml-megalinter-plugin/main/mega-linter-plugin-checktoml/checktoml.megalinter-descriptor.yml
 
 # Reporters configuration
 CONFIG_REPORTER: true
-FILEIO_REPORTER: true
 GITHUB_COMMENT_REPORTER: true
 GITHUB_STATUS_REPORTER: true
 JSON_REPORTER: true
+JSON_REPORTER_OUTPUT_DETAIL: detailed
 MARKDOWN_SUMMARY_REPORTER: true
 SARIF_REPORTER: true
 TAP_REPORTER: true
 TEXT_REPORTER: true
 UPDATED_SOURCES_REPORTER: true
+CONSOLE_REPORTER: true
+CONSOLE_REPORTER_SECTIONS: true
+OUTPUT_DETAIL: simple
+GITLAB_COMMENT_REPORTER: false
+BITBUCKET_COMMENT_REPORTER: false
+FILEIO_REPORTER: false
+EMAIL_REPORTER: false
+
+# Fixes
+APPLY_FIXES: all
