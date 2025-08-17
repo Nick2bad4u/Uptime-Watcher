@@ -22,12 +22,12 @@ export default {
         "stylelint-use-nesting",
         "stylelint-prettier",
         "stylelint-high-performance-animation",
-        // "stylelint-a11y", -- no Stylelint 16 Support
-        // "stylelint-csstree-validator", -- Disabled due to media query parsing issues
+        // "stylelint-a11y", // Disabled: Not supported in Stylelint 16. See https://github.com/YozhikM/stylelint-a11y/issues/186 for future updates or consider using postcss-a11y or other accessibility tools.
+        // "stylelint-csstree-validator", // Disabled due to media query parsing issues: see https://github.com/csstree/stylelint-validator/issues/27 for details and future updates.
         "stylelint-order",
         "stylelint-declaration-block-no-ignored-properties",
         "stylelint-declaration-strict-value",
-        // "stylelint-no-indistinguishable-colors", -- Disabled: Conflicts with intentional Tailwind color variations
+        // "stylelint-no-indistinguishable-colors", // Disabled: Tailwind intentionally uses subtle color variations for design flexibility, which may reduce strict color distinguishability. Accessibility concerns (e.g., sufficient contrast) should be addressed via design review and dedicated contrast checking tools rather than enforced by this rule.
         // "stylelint-value-no-unknown-custom-properties", - No Tailwind Support
         "stylelint-group-selectors",
     ],
@@ -48,7 +48,7 @@ export default {
         // Declaration rules
         "declaration-no-important": true,
 
-        // "csstools/value-no-unknown-custom-properties": true, - No Tailwind Support
+        // "csstools/value-no-unknown-custom-properties": true, // Disabled: Tailwind's dynamic class generation and custom properties are not compatible with this rule. See https://github.com/tailwindlabs/tailwindcss/issues/9602 for details.
 
         "declaration-property-value-no-unknown": true,
         // Font rules

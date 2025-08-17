@@ -8,13 +8,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
-import App from "./App";
-import { useErrorStore } from "./stores/error/useErrorStore";
-import { useSettingsStore } from "./stores/settings/useSettingsStore";
-import { useSitesStore } from "./stores/sites/useSitesStore";
-import { useUIStore } from "./stores/ui/useUiStore";
-import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
-import { useTheme } from "./theme/useTheme";
+import App from "../App";
+import { useErrorStore } from "../stores/error/useErrorStore";
+import { useSettingsStore } from "../stores/settings/useSettingsStore";
+import { useSitesStore } from "../stores/sites/useSitesStore";
+import { useUIStore } from "../stores/ui/useUiStore";
+import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
+import { useTheme } from "../theme/useTheme";
 
 // Mock modules with specific focus on coverage lines
 vi.mock("./hooks/useBackendFocusSync", () => ({

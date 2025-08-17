@@ -44,7 +44,7 @@
     "build": "npm run build:electron-vite",
     "postbuild": "cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist-electron/ --flat",
     "build:electron-main": "tsc -p tsconfig.electron.json && npm run postbuild",
-    "build:electron-vite": "vite build --config ./vite.config.ts && npx tsc -p ./tsconfig.electron.json && npm run postbuild",
+    "build:electron-vite": "vite build --config ./vite.config.ts && npm run postbuild",
     "build:prepublish": "npm run lint && npm run test && npm run build",
     "check-types": "npm run check:electron && npm run check:frontend",
     "check-types:all": "npm run check:electron && npm run check:frontend && npm run check:electron:test && npm run check:frontend:test",
@@ -354,7 +354,9 @@
       "prettier": "$prettier",
       "stylelint": "$stylelint",
       "typescript": "$typescript",
-      "tsx": "$tsx"
+      "tsx": "$tsx",
+      "typedoc": "$typedoc",
+      "vitest": "$vitest"
     },
     "eslint-etc": {
       "eslint": "$eslint"
@@ -726,7 +728,7 @@
     "type-fest": "^4.41.0",
     "typedoc": "^0.28.10",
     "typedoc-plugin-coverage": "^4.0.1",
-    "typedoc-plugin-dt-links": "^2.0.14",
+    "typedoc-plugin-dt-links": "^2.0.15",
     "typedoc-plugin-external-package-links": "^0.1.0",
     "typedoc-plugin-extras": "^4.0.1",
     "typedoc-plugin-markdown": "^4.8.1",

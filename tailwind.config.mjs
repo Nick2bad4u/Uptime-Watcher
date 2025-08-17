@@ -17,12 +17,10 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
         "./electron/**/*.{js,ts}",
-        // Exclude test files for better performance
-        "!./src/**/*.test.{js,ts,jsx,tsx}",
-        "!./electron/test/**/*",
-        "!./src/test/**/*",
+        // Test files are not excluded here; handle exclusion via your build tool (e.g., Vite config or Vitest config) if needed
     ],
-    // Tailwind v4: CSS-first configuration eliminates the need for JS config
+    // Tailwind v4: While most customization is done in CSS, this minimal JS config is still required
+    // For specifying content paths so Tailwind can scan files for class usage and integrate with build tools.
     // Dark mode, themes, and all customization handled in index.css
     plugins: [
         // Tailwind v4 uses CSS-first configuration - no plugins needed here

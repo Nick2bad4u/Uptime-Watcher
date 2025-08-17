@@ -12,8 +12,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import BaseFormField from "./BaseFormField";
-import type { AriaProperties } from "./BaseFormField";
+import BaseFormField from "../../../components/AddSiteForm/BaseFormField";
+import type { AriaProperties } from "../../../components/AddSiteForm/BaseFormField";
 
 describe("BaseFormField - Additional Coverage", () => {
     it("should handle undefined error and undefined helpText (lines 97-98 false branches)", () => {

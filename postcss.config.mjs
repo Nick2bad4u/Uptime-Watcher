@@ -17,16 +17,29 @@
  * - Duplicate selector combining for smaller bundles
  * - Production minification with cssnano (advanced preset)
  * - Development reporting and debugging
+ *
+ * Asset Directory Structure:
+ *
+ * - Place SVG icons in './icons' (project root).
+ * - Place other assets in './src/assets' (project root).
+ * - Ensure both directories exist for PostCSS plugins to resolve assets
+ *   correctly.
  */
 
 const isProduction = process.env.NODE_ENV === "production";
 
 export default {
+    /**
+     * @file $schema provides JSON schema hints for editor integration and
+     *   validation. It helps IDEs offer autocomplete and error checking for
+     *   PostCSS config files.
+     */
     $schema: "https://www.schemastore.org/postcssrc.json",
     plugins: {
         // Import handling - resolve @import statements first
+        // "node_modules" is resolved automatically by PostCSS; only "src" is needed here for custom imports.
         "postcss-import": {
-            path: ["src", "node_modules"],
+            path: ["src"],
             plugins: [], // Additional plugins to run on imported files
         },
 
@@ -40,6 +53,8 @@ export default {
         },
 
         // CSS normalization for consistent base styles
+        // NOTE: forceImport: false disables automatic injection of normalize.css.
+        // If you rely on normalization, ensure normalize.css is imported manually in your main CSS entrypoint (e.g., src/styles/index.css).
         "postcss-normalize": {
             browsers: [
                 "> 1%",
@@ -106,7 +121,9 @@ export default {
             removeStroke: false, // Keep stroke for consistency
         },
 
-        // Optimization plugins for production builds
+        // NOTE: All optimization plugins must be listed after functional plugins.
+        // This ordering prevents unexpected side effects and ensures correct processing.
+        // Optimization plugins for production builds:
         ...(isProduction && {
             // Combine duplicate selectors for smaller bundles
             "postcss-combine-duplicated-selectors": {
@@ -153,6 +170,8 @@ export default {
         }),
 
         // Development and debugging plugins (non-production)
+        // Development-only plugins: "postcss-reporter" provides build reporting and debugging information during development.
+        // It is excluded from production builds for performance reasons and to avoid unnecessary output.
         ...(!isProduction && {
             // Reporter for development builds
             "postcss-reporter": {
