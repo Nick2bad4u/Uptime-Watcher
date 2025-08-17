@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import ThemeProvider from "../../theme/components/ThemeProvider";
 import type { Monitor } from "../../../shared/types";
-import { createValidMonitor } from "../shared/testHelpers";
+import { createValidMonitor } from "../../../shared/test/testHelpers";
 
 // Mock ThemedSelect
 vi.mock("../../theme/components/ThemedSelect", () => ({

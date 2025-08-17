@@ -318,7 +318,7 @@ The test environment uses an in-memory SQLite database:
 
 ```bash
 # Run all tests
-npm test
+npm run test:all
 
 # Run tests in watch mode
 npm run test:watch
@@ -326,13 +326,14 @@ npm run test:watch
 # Run specific test suites
 npm run test:electron  # Backend tests
 npm run test:frontend  # Frontend tests
+npm run test:shared     # Shared utility tests
 ```
 
 ### Coverage Reports
 
 ```bash
 # Generate coverage reports
-npm run test:coverage
+npm run test:all:coverage
 
 # View coverage reports
 open coverage/index.html          # macOS

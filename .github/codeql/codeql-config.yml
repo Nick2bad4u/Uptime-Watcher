@@ -1,0 +1,28 @@
+analysis:
+    # keep languages in sync with your workflow matrix
+    languages:
+        - javascript
+        - typescript
+
+    # add any packs you want to include explicitly (example shown commented)
+    # add-packs:
+    #   - codeql/javascript-all
+
+    # default query sets to run (can be overridden in workflow)
+    queries:
+        - security-and-quality
+
+# Repository-wide exclude patterns (helps reduce noise / speed up analysis)
+exclude:
+    - node_modules/**
+    - dist/**
+    - dist-electron/**
+    - coverage/**
+    - public/**
+    - "**/*.test.*"
+    - "**/*.spec.*"
+    - "**/test/**"
+    - "**/tests/**"
+    - "**/__tests__/**"
+# Optional: customize additional settings in future (e.g., packs, path prefixes)
+# See: https://codeql.github.com/docs/codeql-cli/configuration/

@@ -57,16 +57,29 @@ jobs:
                   rm -f coverage/electron/lcov.info
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
 
+            # Run shared tests with coverage
+            - name: Run shared tests
+              id: test-shared
+              continue-on-error: true
+              run: |
+                  mkdir -p coverage/shared
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/shared/lcov.info
+                  npx vitest run --config vitest.shared.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/shared/shared-test-report.junit.xml
+
             # Verify coverage files exist
             - name: Verify coverage files
               run: |
                   echo "=== Checking coverage files ==="
                   ls -la coverage/ || echo "No coverage directory"
                   ls -la coverage/electron/ || echo "No electron coverage directory"
+                  ls -la coverage/shared/ || echo "No shared coverage directory"
                   echo "=== Frontend coverage files ==="
-                  find coverage/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
+                  find coverage/ -maxdepth 1 -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
                   echo "=== Electron coverage files ==="
                   find coverage/electron/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/electron/"
+                  echo "=== Shared coverage files ==="
+                  find coverage/shared/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/shared/"
                   echo "=== Test report files ==="
                   find coverage/ -name "*.junit.xml" || echo "No junit files"
             - name: Run codacy-coverage-reporter
@@ -74,4 +87,4 @@ jobs:
               with:
                   project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
                   api-token: ${{ secrets.CODACY_API_TOKEN }}
-                  coverage-reports: ./coverage/electron/lcov.info,./coverage/lcov.info
+                  coverage-reports: ./coverage/lcov.info,./coverage/electron/lcov.info,./coverage/shared/lcov.info

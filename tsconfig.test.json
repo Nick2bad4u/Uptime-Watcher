@@ -43,7 +43,6 @@
         "src/test/**/*.tsx",
         "tailwind.config.mjs",
         "vitest.config.ts",
-        "src/test/**/*.ts",
-        "src/test/**/*.tsx"
+        "vitest.shared.config.ts"
     ]
 }

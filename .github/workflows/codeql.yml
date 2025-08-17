@@ -1,3 +1,47 @@
+# -----------------------------------------------
+# CodeQL Workflow Review & Suggestions
+#
+# Step-by-step review:
+# - Trigger Conditions:
+#   - Triggers on push, pull_request, workflow_dispatch, and weekly schedule.
+#   - Paths to ignore: docs, tests, assets, etc.
+# - Permissions:
+#   - contents: read, security-events: write (standard for CodeQL).
+# - Job Configuration:
+#   - Runs on ubuntu-latest, 120-min timeout.
+#   - Concurrency cancels in-progress runs for same ref.
+#   - Matrix: javascript, typescript (matches stack).
+# - Steps:
+#   - Harden runner (security best practice).
+#   - Checkout repo (full history, no credential persistence).
+#   - Initialize CodeQL for matrix languages.
+#   - Setup Node.js v20 (current LTS).
+#   - Cache node_modules for faster builds.
+#   - Install dependencies with npm ci --force (robust for CI).
+#   - Build Electron Vite project (matches architecture).
+#   - Package/upload CodeQL DBs for debugging (optional, non-fatal).
+#   - Perform CodeQL analysis.
+#
+# Suggestions / Missing Items:
+# - Build Step:
+#   - Confirm npm run build:electron-vite builds both main/renderer for full analysis.
+#   - Include native/custom build steps if needed.
+# - Artifacts:
+#   - CodeQL DBs uploaded for debugging. SARIF results are default for GitHub Security tab.
+# - Node Modules Cache:
+#   - Consider caching .vite or other build artifacts if builds are slow.
+# - Security:
+#   - step-security/harden-runner used for outbound call auditing.
+# - Languages:
+#   - Only javascript/typescript included. Add others (e.g., Python) if needed.
+# - Custom Queries:
+#   - Add custom queries to Initialize CodeQL step if desired.
+# - Notifications:
+#   - No notification step for failures (Slack/email). Add if needed.
+# - Dependency Installation:
+#   - continue-on-error: true for npm ci/build means analysis runs even if install/build fails (may be incomplete).
+# -----------------------------------------------
+
 # For most projects, this workflow file will not need changing; you simply need
 # to commit it to your repository.
 #
@@ -13,18 +57,44 @@ name: "CodeQL"
 
 on:
     push:
+        branches: [main]
+        paths-ignore:
+            - ".github/**"
+            - "**/docs/**"
+            - "**/test/**"
+            - "**/tests/**"
+            - "**/benchmarks/**"
+            - "**/icons/**"
+            - "**/scripts/**"
+            - "**/public/**"
+            - "**/assets/**"
+            - "**/.vscode/**"
     pull_request:
+        branches: [main]
+        paths-ignore:
+            - ".github/**"
+            - "**/docs/**"
+            - "**/test/**"
+            - "**/tests/**"
+            - "**/benchmarks/**"
+            - "**/icons/**"
+            - "**/scripts/**"
+            - "**/public/**"
+            - "**/assets/**"
+            - "**/.vscode/**"
     workflow_dispatch:
     schedule:
         - cron: "44 2 * * 4" # run once a week on Thursday at 2:44 AM UTC
 
 permissions:
     contents: read
+    security-events: write
 
 jobs:
     analyze:
         name: Analyze
         runs-on: ubuntu-latest
+        timeout-minutes: 120
         permissions:
             actions: read
             contents: read
@@ -32,7 +102,7 @@ jobs:
 
         concurrency:
             group: codeql-${{ github.ref }}
-            cancel-in-progress: false
+            cancel-in-progress: true
 
         strategy:
             fail-fast: false
@@ -49,16 +119,18 @@ jobs:
 
             - name: Checkout repository
               uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
 
             # Initializes the CodeQL tools for scanning.
             - name: Initialize CodeQL
               uses: github/codeql-action/init@51f77329afa6477de8c49fc9c7046c15b9a4e79d # v3.29.5
               with:
                   languages: ${{ matrix.language }}
-                  # If you wish to specify custom queries, you can do so here or in a config file.
-                  # By default, queries listed here will override any specified in a config file.
-                  # Prefix the list here with "+" to use these queries and those in the config file.
                   source-root: .
+                  # keep the default useful packs/queries
+                  queries: security-and-quality
 
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -83,15 +155,28 @@ jobs:
               run: npm run build:electron-vite
               continue-on-error: true
 
+            # Optional: package any generated CodeQL DBs for debugging (non-fatal)
+            - name: Package CodeQL DBs (debug)
+              run: |
+                set -e
+                # create tarballs if CodeQL DB folders exist (Linux/macOS runner)
+                if [ -d "./codeql-databases" ]; then tar -czf codeql-databases.tgz ./codeql-databases || true; fi
+                if [ -d "./codeql-db" ]; then tar -czf codeql-db.tgz ./codeql-db || true; fi
+              shell: bash
+              continue-on-error: true
+              
+            - name: Upload CodeQL DBs (debug)
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: codeql-databases-${{ matrix.language }}
+                  path: |
+                      codeql-databases.tgz
+                      codeql-db.tgz
+              continue-on-error: true
+
             # ℹ️ Command-line programs to run using the OS shell.
             # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-
-            #   If the Autobuild fails above, remove it and uncomment the following three lines.
-            #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
-
-            # - run: |
-            #   echo "Run, Build Application using script"
-            #   ./location_of_script_within_repo/buildscript.sh
 
             - name: Perform CodeQL Analysis
               uses: github/codeql-action/analyze@51f77329afa6477de8c49fc9c7046c15b9a4e79d # v3.29.5

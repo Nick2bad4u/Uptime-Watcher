@@ -826,7 +826,7 @@ npm run test:electron:watch     # Watch mode
 # Combined
 npm run test:all                # Run all tests
 npm run test:all:coverage       # All tests with coverage
-npm run test:codecov            # Codecov reporting
+npm run test:all:coverage      # All tests with coverage reporting
 ```
 
 **Coverage Integration**:

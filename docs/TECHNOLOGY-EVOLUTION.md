@@ -357,10 +357,11 @@ export class CustomMonitorService implements IMonitorService {
 
 ```bash
 # Current testing capabilities
-npm test              # All tests
-npm run test:electron # Backend tests
-npm run test:frontend # Frontend tests
-npm run test:coverage # Coverage reports
+npm run test:all              # All tests (frontend + electron + shared)
+npm run test:electron         # Backend tests
+npm run test:frontend         # Frontend tests
+npm run test:shared           # Shared utility tests
+npm run test:all:coverage     # Coverage reports (all configurations)
 ```
 
 ## 📚 Documentation Evolution

@@ -21,7 +21,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import type { Site, Monitor } from "../../../../../shared/types";
-import { createValidMonitor } from "../../../shared/testHelpers";
+import { createValidMonitor } from "../../../../../shared/test/testHelpers";
 
 // Unmock the theme module to test the actual implementation
 vi.unmock("../../../../theme/useTheme");

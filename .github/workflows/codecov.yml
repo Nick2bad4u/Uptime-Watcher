@@ -67,16 +67,31 @@ jobs:
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+            # Run shared tests with coverage
+            - name: Run shared tests
+              id: test-shared
+              run: |
+                  mkdir -p coverage/shared
+                  # Clean any existing coverage to avoid conflicts
+                  rm -f coverage/shared/lcov.info
+                  npx vitest run --config vitest.shared.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/shared/shared-test-report.junit.xml
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
             # Verify coverage files exist
             - name: Verify coverage files
               run: |
                   echo "=== Checking coverage files ==="
                   ls -la coverage/ || echo "No coverage directory"
                   ls -la coverage/electron/ || echo "No electron coverage directory"
+                  ls -la coverage/shared/ || echo "No shared coverage directory"
                   echo "=== Frontend coverage files ==="
-                  find coverage/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
+                  find coverage/ -maxdepth 1 -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/"
                   echo "=== Electron coverage files ==="
                   find coverage/electron/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/electron/"
+                  echo "=== Shared coverage files ==="
+                  find coverage/shared/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/shared/"
                   echo "=== Test report files ==="
                   find coverage/ -name "*.junit.xml" || echo "No junit files"
               continue-on-error: true
@@ -119,6 +134,25 @@ jobs:
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+            # Upload shared coverage to Codecov
+            - name: Upload shared coverage to Codecov
+              id: upload-shared-coverage
+              uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  slug: Nick2bad4u/Uptime-Watcher
+                  files: ./coverage/shared/lcov.info
+                  flags: shared
+                  name: shared-coverage
+                  verbose: true
+                  fail_ci_if_error: false
+                  disable_search: true
+                  directory: ./coverage/shared
+                  root_dir: ./
+                  working-directory: ./
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
             # Upload test results
             - name: Upload frontend test results to Codecov
               id: upload-frontend-test-results
@@ -142,6 +176,20 @@ jobs:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   flags: electron-tests
                   name: electron-test-results
+                  verbose: true
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_VERBOSE: true
+
+            - name: Upload shared test results to Codecov
+              id: upload-shared-test-results
+              uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+              with:
+                  files: ./coverage/shared/shared-test-report.junit.xml
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  flags: shared-tests
+                  name: shared-test-results
                   verbose: true
               continue-on-error: true
               env:

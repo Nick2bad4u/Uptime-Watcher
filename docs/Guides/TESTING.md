@@ -46,11 +46,11 @@ The project has two separate Vitest configurations:
 ### Commands
 
 ```bash
-# Run both suites sequentially (electron first, then frontend)
-npm run test
+# Run all tests (frontend + electron + shared)
+npm run test:all
 
-# Run only a small subset of frontend tests (quick smoke set)
-npm run test:src
+# Run frontend tests only
+npm run test:frontend
 
 # Run frontend tests with coverage
 npm run test:coverage
@@ -61,24 +61,27 @@ npm run test:electron
 # Run electron tests with coverage
 npm run test:electron:coverage
 
-# Run both frontend and electron tests (full suites)
-npm run test:all
+# Run shared utility tests only
+npm run test:shared
 
-# Run both test suites with coverage (recommended for Codecov)
+# Run shared tests with coverage
+npm run test:shared:coverage
+
+# Run all test suites with coverage (recommended for Codecov)
 npm run test:all:coverage
-npm run test:codecov
 
 # Interactive testing
 npm run test:ui              # Frontend tests UI
 npm run test:electron:ui     # Electron tests UI
+npm run test:shared:ui       # Shared tests UI
 npm run test:watch           # Frontend tests in watch mode
 npm run test:electron:watch  # Electron tests in watch mode
+npm run test:shared:watch    # Shared tests in watch mode
 ```
 
 Notes:
 
-- `npm run test` executes electron tests followed by all frontend tests.
-- `npm run test:src` runs a targeted subset of frontend tests for fast feedback.
+- `npm run test:all` executes all three test configurations: shared, electron, and frontend tests sequentially.
 
 ### Coverage Reports
 

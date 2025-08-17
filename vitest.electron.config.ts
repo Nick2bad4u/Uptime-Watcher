@@ -43,8 +43,8 @@ const vitestConfig = defineConfig({
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
             include: [
-                "electron/**/*.ts", // Include all electron source files
-                "shared/**/*.ts", // Include shared files when testing electron
+                "electron/**/*.ts", // Include all electron source files only
+                // Shared files now have their own dedicated coverage config
             ],
 
             provider: "istanbul" as const,
@@ -78,7 +78,11 @@ const vitestConfig = defineConfig({
             requireAssertions: true,
         },
         globals: true, // Enable global test functions (describe, it, expect)
-        include: ["electron/**/*.test.ts", "electron/**/*.spec.ts"],
+        include: [
+            "electron/**/*.test.ts",
+            "electron/**/*.spec.ts",
+            // Shared tests now have their own dedicated config (vitest.shared.config.ts)
+        ],
         name: {
             color: "magenta",
             label: "Backend",
@@ -90,7 +94,7 @@ const vitestConfig = defineConfig({
         poolOptions: {
             threads: {
                 isolate: true, // Isolate tests for better reliability
-                maxThreads: 16, // Limit concurrent threads for electron tests
+                maxThreads: 24, // Limit concurrent threads for electron tests
                 minThreads: 1, // Ensure at least one thread
                 singleThread: false, // Enable multi-threading
                 useAtomics: true,

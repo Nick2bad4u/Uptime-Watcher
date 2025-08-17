@@ -13,7 +13,7 @@ import React from "react";
 import { StatusBadge } from "../components/common/StatusBadge";
 import { SiteCardHistory } from "../components/Dashboard/SiteCard/SiteCardHistory";
 import ThemeProvider from "../theme/components/ThemeProvider";
-import { createValidMonitor } from "./shared/testHelpers";
+import { createValidMonitor } from "../../shared/test/testHelpers";
 
 // Mock dependencies
 vi.mock("../hooks/useMonitorTypes", () => ({

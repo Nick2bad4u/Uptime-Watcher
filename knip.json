@@ -5,7 +5,8 @@
         "electron/preload.ts",
         "vite.config.ts",
         "vitest.config.ts",
-        "vitest.electron.config.ts"
+        "vitest.electron.config.ts",
+        "vitest.shared.config.ts"
     ],
     "ignore": [
         "shared/types/monitorTypes.ts",

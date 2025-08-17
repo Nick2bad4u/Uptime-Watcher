@@ -552,8 +552,7 @@ export default defineConfig(({}) => {
             globals: true, // Enable global test functions (describe, it, expect)
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "shared/**/*.test.ts",
-                "shared/**/*.spec.ts",
+                // Shared tests now have their own dedicated config (vitest.shared.config.ts)
             ],
             name: {
                 color: "cyan",
@@ -573,7 +572,11 @@ export default defineConfig(({}) => {
                     useAtomics: true,
                 },
             },
-            projects: ["vitest.config.ts", "vitest.electron.config.ts"],
+            projects: [
+                "vitest.config.ts",
+                "vitest.electron.config.ts",
+                "vitest.shared.config.ts",
+            ],
             // Improve test output
             reporters: [
                 "default",

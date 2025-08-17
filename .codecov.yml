@@ -93,6 +93,7 @@ coverage:
         - "vite.config.ts"
         - "vitest.config.ts"
         - "vitest.electron.config.ts"
+        - "vitest.shared.config.ts"
         - "tsconfig*.json"
         - "eslint.config.mjs"
         - "tailwind.config.mjs"
@@ -162,7 +163,6 @@ flags:
             - "shared/**/*.test.*"
             - "shared/**/*.spec.*"
             - "shared/test/**/*"
-    # The shared flag covers all files in shared/ and is used for both status and component tracking. If you add new subfolders, update this path and the shared_core component above.
 
 # Modern GitHub integration (replaces deprecated github_checks)
 github_checks:

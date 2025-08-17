@@ -49,8 +49,10 @@
     transition:
         background 0.3s var(--ease-in-out),
         opacity 0.3s var(--ease-in-out);
+}
 
-    @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+    .site-details-header-overlay {
         background: linear-gradient(
             120deg,
             color-mix(

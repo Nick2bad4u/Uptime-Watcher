@@ -42,6 +42,10 @@ DISABLE_LINTERS:
     - JAVASCRIPT_PRETTIER # Handled by lint-staged
     - JSON_PRETTIER # Handled by lint-staged
     - YAML_PRETTIER # Handled by lint-staged
+    - TYPESCRIPT_ES # Using ESLint + Prettier
+    - JSX_ESLINT # Using ESLint + Prettier
+    - CREDENTIALS_SECRETLINT # Using secretlint
+    - TSX_ESLINT # Using ESLint + Prettier
 
 # Error handling for specific linters
 JSON_PRETTIER_DISABLE_ERRORS: true
