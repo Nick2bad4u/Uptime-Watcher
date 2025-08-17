@@ -1,6 +1,6 @@
 /**
- * Edge case tests for dataValidation.ts to achieve 100% coverage
- * Specifically targeting line 48 (catch block in safeGetHostname)
+ * Edge case tests for dataValidation.ts to achieve 100% coverage Specifically
+ * targeting line 48 (catch block in safeGetHostname)
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -34,7 +34,7 @@ describe("DataValidation - Complete Coverage", () => {
         it("should handle URL constructor throwing for edge case URLs", () => {
             // Create a scenario where isValidUrl might pass but URL constructor fails
             const originalURL = globalThis.URL;
-            
+
             // Mock URL to throw for specific inputs but work for others
             const mockURL = vi.fn((url: string) => {
                 if (url.includes("edge-case")) {
@@ -42,14 +42,14 @@ describe("DataValidation - Complete Coverage", () => {
                 }
                 return new originalURL(url);
             }) as any;
-            
+
             globalThis.URL = mockURL;
 
             try {
                 // This should trigger the catch block
                 const result = safeGetHostname("https://edge-case.com");
                 expect(result).toBe("");
-                
+
                 // Verify the mock was called
                 expect(mockURL).toHaveBeenCalledWith("https://edge-case.com");
             } finally {
@@ -60,7 +60,7 @@ describe("DataValidation - Complete Coverage", () => {
 
         it("should handle different types of URL constructor errors", () => {
             const originalURL = globalThis.URL;
-            
+
             // Test different error types
             const testCases = [
                 { url: "error1", error: new Error("Generic error") },
@@ -73,7 +73,7 @@ describe("DataValidation - Complete Coverage", () => {
                 const mockURL = vi.fn(() => {
                     throw error;
                 }) as any;
-                
+
                 globalThis.URL = mockURL;
 
                 try {
@@ -87,11 +87,11 @@ describe("DataValidation - Complete Coverage", () => {
 
         it("should handle URL constructor throwing with complex error objects", () => {
             const originalURL = globalThis.URL;
-            
+
             const mockURL = vi.fn(() => {
                 throw { message: "Complex error object", code: 500 };
             }) as any;
-            
+
             globalThis.URL = mockURL;
 
             try {

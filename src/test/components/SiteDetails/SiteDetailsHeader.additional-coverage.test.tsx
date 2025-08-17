@@ -1,6 +1,6 @@
 /**
  * Additional coverage tests for SiteDetailsHeader component
- * 
+ *
  * Targets uncovered line 72 in the openExternal call
  */
 
@@ -64,17 +64,8 @@ vi.mock("../../../theme/components", () => ({
             {children}
         </span>
     ),
-    ThemedIconButton: ({
-        onClick,
-        children,
-        ariaLabel,
-        ...props
-    }: any) => (
-        <button
-            onClick={onClick}
-            aria-label={ariaLabel}
-            {...props}
-        >
+    ThemedIconButton: ({ onClick, children, ariaLabel, ...props }: any) => (
+        <button onClick={onClick} aria-label={ariaLabel} {...props}>
             {children}
         </button>
     ),
@@ -132,13 +123,15 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             // Verify openExternal was called with correct URL (targeting line 72)
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
-            expect(mockOpenExternal).toHaveBeenCalledWith("https://test-coverage.com", {
-                siteName: "Coverage Test Site",
-            });
+            expect(mockOpenExternal).toHaveBeenCalledWith(
+                "https://test-coverage.com",
+                {
+                    siteName: "Coverage Test Site",
+                }
+            );
         });
 
         it("should call openExternal with empty URL when monitor has no URL", async () => {
-            
             // Create a monitor with empty URL (edge case coverage)
             const httpMonitorNoUrl: Monitor = {
                 id: "coverage-monitor-no-url",
@@ -164,15 +157,15 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 />
             );
 
-            // With empty URL, there should be no link element since the condition 
+            // With empty URL, there should be no link element since the condition
             // `selectedMonitor.url` is falsy, so just clicking the title itself
             // should trigger the logic if we can directly test the click handler
-            
+
             // Since there's no link when URL is empty, we need to test this differently
             // We can verify that no link exists (which is the correct behavior)
             const links = screen.queryAllByRole("link");
             expect(links).toHaveLength(0);
-            
+
             // This test verifies the logic path where empty URL prevents link creation
             // The actual line 72 (openExternal call) won't be reached without a link to click
             // This is the correct behavior - no link means no accidental external opens
@@ -180,7 +173,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
         it("should call openExternal when clicking link with different site names", async () => {
             const user = userEvent.setup();
-            
+
             // Test with a site that has special characters in name
             const httpMonitorSpecial: Monitor = {
                 id: "coverage-monitor-special",
@@ -220,9 +213,12 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             // Verify openExternal was called with correct URL (targeting line 72)
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
-            expect(mockOpenExternal).toHaveBeenCalledWith("https://special-chars.com", {
-                siteName: "Test Site & Co. #1",
-            });
+            expect(mockOpenExternal).toHaveBeenCalledWith(
+                "https://special-chars.com",
+                {
+                    siteName: "Test Site & Co. #1",
+                }
+            );
         });
     });
 });

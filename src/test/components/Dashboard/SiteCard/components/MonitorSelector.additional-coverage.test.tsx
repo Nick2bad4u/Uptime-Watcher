@@ -6,14 +6,18 @@ import { describe, expect, it, vi } from "vitest";
 import ThemeProvider from "../../../../../theme/components/ThemeProvider";
 import { createValidMonitor } from "../../../../shared/testHelpers";
 
-import { MonitorSelector, type MonitorSelectorProperties } from "../../../../../components/Dashboard/SiteCard/components/MonitorSelector";
+import {
+    MonitorSelector,
+    type MonitorSelectorProperties,
+} from "../../../../../components/Dashboard/SiteCard/components/MonitorSelector";
 
 /**
  * MonitorSelector Additional Coverage Tests
- * 
+ *
  * Tests specifically designed to cover uncovered lines 90-93:
+ *
  * - Default case in switch statement for unknown monitor types
- * - Fallback to port for unknown types 
+ * - Fallback to port for unknown types
  * - Fallback to URL for unknown types
  * - Default empty return for unknown types with no port/url
  */
@@ -52,7 +56,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             });
 
             // Should display the unknown type with port
-            expect(screen.getByDisplayValue("CUSTOM-UNKNOWN-TYPE: 8080")).toBeInTheDocument();
+            expect(
+                screen.getByDisplayValue("CUSTOM-UNKNOWN-TYPE: 8080")
+            ).toBeInTheDocument();
         });
 
         it("should use url for unknown monitor type with url property (line 92-93)", () => {
@@ -80,7 +86,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             });
 
             // Should display the unknown type with URL
-            expect(screen.getByDisplayValue("WEIRD-TYPE: https://example.com")).toBeInTheDocument();
+            expect(
+                screen.getByDisplayValue("WEIRD-TYPE: https://example.com")
+            ).toBeInTheDocument();
         });
 
         it("should return empty string for unknown monitor type with no port or url (line 94)", () => {
@@ -102,7 +110,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             });
 
             // Should display just the type name with no additional details
-            expect(screen.getByDisplayValue("MYSTERY-TYPE")).toBeInTheDocument();
+            expect(
+                screen.getByDisplayValue("MYSTERY-TYPE")
+            ).toBeInTheDocument();
         });
 
         it("should prioritize port over url for unknown monitor type with both properties", () => {
@@ -123,7 +133,9 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             });
 
             // Should display the port, not the URL (port has priority)
-            expect(screen.getByDisplayValue("DUAL-TYPE: 3000")).toBeInTheDocument();
+            expect(
+                screen.getByDisplayValue("DUAL-TYPE: 3000")
+            ).toBeInTheDocument();
         });
 
         it("should handle multiple unknown monitor types in the same selector", () => {
@@ -187,9 +199,15 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             });
 
             // Check all options are present with correct formatting
-            expect(screen.getByRole("option", { name: "TYPE-A: 1234" })).toBeInTheDocument();
-            expect(screen.getByRole("option", { name: "TYPE-B: https://test.com" })).toBeInTheDocument();
-            expect(screen.getByRole("option", { name: "TYPE-C" })).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "TYPE-A: 1234" })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "TYPE-B: https://test.com" })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole("option", { name: "TYPE-C" })
+            ).toBeInTheDocument();
         });
     });
 });

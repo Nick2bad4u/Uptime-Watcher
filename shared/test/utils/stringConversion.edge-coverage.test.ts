@@ -17,7 +17,7 @@ describe("String Conversion - Complete Coverage", () => {
             expect(safeStringify({})).toBe("{}");
             expect(safeStringify("test")).toBe("test");
             expect(safeStringify(Symbol("test"))).toContain("Symbol");
-            
+
             // Test early returns
             expect(safeStringify(null)).toBe("");
             expect(safeStringify(undefined)).toBe("");
@@ -26,28 +26,41 @@ describe("String Conversion - Complete Coverage", () => {
         it("should attempt to reach unreachable code paths through type manipulation", () => {
             // The undefined case in the switch is unreachable due to early return
             // The default case is unreachable in normal JS
-            
+
             // Create an object that might confuse the type system
-            
+
             // Mock typeof to return unexpected values
-            
+
             // Create a proxy that might behave oddly
-            const proxyValue = new Proxy({}, {
-                get() { return undefined; },
-                has() { return false; },
-                ownKeys() { return []; }
-            });
-            
+            const proxyValue = new Proxy(
+                {},
+                {
+                    get() {
+                        return undefined;
+                    },
+                    has() {
+                        return false;
+                    },
+                    ownKeys() {
+                        return [];
+                    },
+                }
+            );
+
             // Test with proxy
             const proxyResult = safeStringify(proxyValue);
             expect(typeof proxyResult).toBe("string");
-            
+
             // Test with object that has custom toString/valueOf
             const customObject = {
-                toString() { throw new Error("toString error"); },
-                valueOf() { throw new Error("valueOf error"); }
+                toString() {
+                    throw new Error("toString error");
+                },
+                valueOf() {
+                    throw new Error("valueOf error");
+                },
             };
-            
+
             const customResult = safeStringify(customObject);
             expect(typeof customResult).toBe("string");
         });
@@ -57,16 +70,16 @@ describe("String Conversion - Complete Coverage", () => {
             expect(safeStringify(String("test"))).toContain("test");
             expect(safeStringify(Number(123))).toContain("123");
             expect(safeStringify(Boolean(true))).toContain("true");
-            
+
             // Test with null prototype objects
             const nullProtoObj = Object.create(null);
             nullProtoObj.test = "value";
             expect(typeof safeStringify(nullProtoObj)).toBe("string");
-            
+
             // Test with frozen objects
             const frozenObj = Object.freeze({ test: "frozen" });
             expect(typeof safeStringify(frozenObj)).toBe("string");
-            
+
             // Test with circular references (handled by safeJsonStringifyWithFallback)
             const circularObj: any = { prop: "test" };
             circularObj.circular = circularObj;
@@ -85,7 +98,7 @@ describe("String Conversion - Complete Coverage", () => {
             // Test different function types
             expect(safeStringify(function named() {})).toBe("[Function]");
             expect(safeStringify(() => {})).toBe("[Function]");
-            expect(safeStringify(async function() {})).toBe("[Function]");
+            expect(safeStringify(async function () {})).toBe("[Function]");
             expect(safeStringify(function* generator() {})).toBe("[Function]");
             // Test class with method for test coverage
             const TestClass = class {
@@ -98,7 +111,9 @@ describe("String Conversion - Complete Coverage", () => {
             // Test different bigint values
             expect(safeStringify(BigInt(0))).toBe("0");
             expect(safeStringify(BigInt(-123))).toBe("-123");
-            expect(safeStringify(BigInt("999999999999999999"))).toBe("999999999999999999");
+            expect(safeStringify(BigInt("999999999999999999"))).toBe(
+                "999999999999999999"
+            );
         });
 
         it("should test number edge cases for complete coverage", () => {

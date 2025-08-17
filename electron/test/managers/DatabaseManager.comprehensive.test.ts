@@ -10,24 +10,30 @@ const { DatabaseCommandExecutor } = vi.hoisted(() => {
     const mockExecutor = vi.fn().mockImplementation(() => {
         const executeMethod = vi.fn().mockImplementation((command) => {
             // Return appropriate values based on command type
-            if (command && command.constructor.name === 'ImportDataCommand') {
+            if (command && command.constructor.name === "ImportDataCommand") {
                 return Promise.resolve(true);
-            } else if (command && command.constructor.name === 'DownloadBackupCommand') {
+            } else if (
+                command &&
+                command.constructor.name === "DownloadBackupCommand"
+            ) {
                 return Promise.resolve("/path/to/backup.json");
-            } else if (command && command.constructor.name === 'ExportDataCommand') {
+            } else if (
+                command &&
+                command.constructor.name === "ExportDataCommand"
+            ) {
                 return Promise.resolve('{"sites": [], "settings": []}');
             }
             return Promise.resolve(undefined);
         });
-        
+
         return {
             execute: executeMethod,
             rollbackAll: vi.fn().mockResolvedValue(undefined),
         };
     });
-    
+
     return {
-        DatabaseCommandExecutor: mockExecutor
+        DatabaseCommandExecutor: mockExecutor,
     };
 });
 
@@ -324,7 +330,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Failed to load sites",
                 }),
             });
-            
+
             // Direct property assignment since vi.mock doesn't intercept constructor calls
             (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
 
@@ -351,7 +357,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            
+
             // Direct property assignment since vi.mock doesn't intercept constructor calls
             (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
 
@@ -535,7 +541,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             const mockSetInternal = vi.fn().mockImplementation(() => {
                 throw new Error("Failed to set limit");
             });
-            
+
             // Use direct property assignment for repositories
             (databaseManager as any).dependencies.repositories.settings = {
                 ...mockSettingsRepository,
@@ -641,7 +647,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .fn()
                     .mockRejectedValue(new Error("Database connection failed")),
             });
-            
+
             // Direct property assignment since vi.mock doesn't intercept constructor calls
             (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
 
@@ -655,7 +661,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     describe("Import/Export Operations", () => {
         it("should handle downloadBackup successfully", async () => {
             // Mock the command executor directly on the instance
-            const mockExecute = vi.fn().mockResolvedValue("/path/to/backup.json");
+            const mockExecute = vi
+                .fn()
+                .mockResolvedValue("/path/to/backup.json");
             (databaseManager as any).commandExecutor = {
                 execute: mockExecute,
                 rollbackAll: vi.fn().mockResolvedValue(undefined),
@@ -678,7 +686,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
         it("should handle downloadBackup with file system errors", async () => {
             // Mock the command executor directly on the instance to throw error
-            const mockExecute = vi.fn().mockRejectedValue(new Error("File system error"));
+            const mockExecute = vi
+                .fn()
+                .mockRejectedValue(new Error("File system error"));
             (databaseManager as any).commandExecutor = {
                 execute: mockExecute,
                 rollbackAll: vi.fn().mockResolvedValue(undefined),
@@ -712,7 +722,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Mock the repository methods that are actually called by the utility
             const mockSetInternal = vi.fn();
             const mockPruneAllHistoryInternal = vi.fn();
-            
+
             // Use direct property assignment for repositories
             (databaseManager as any).dependencies.repositories.settings = {
                 ...mockSettingsRepository,
@@ -764,7 +774,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Mock the repository methods that are actually called by the utility
             const mockSetInternal = vi.fn();
             const mockPruneAllHistoryInternal = vi.fn();
-            
+
             // Use direct property assignment for repositories
             (databaseManager as any).dependencies.repositories.settings = {
                 ...mockSettingsRepository,
@@ -804,7 +814,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             const mockSetInternal = vi.fn().mockImplementation(() => {
                 throw new Error("Database write error");
             });
-            
+
             // Use direct property assignment for repositories
             (databaseManager as any).dependencies.repositories.settings = {
                 ...mockSettingsRepository,
@@ -867,9 +877,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             ).mockReturnValue(undefined as any);
 
             // Should throw error when trying to access maxLimit of undefined
-            await expect(
-                databaseManager.setHistoryLimit(300)
-            ).rejects.toThrow("Cannot read properties of undefined");
+            await expect(databaseManager.setHistoryLimit(300)).rejects.toThrow(
+                "Cannot read properties of undefined"
+            );
         });
 
         it("should handle concurrent database operations", async () => {
@@ -885,7 +895,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Mock the repository methods that are actually called by the utility
             const mockSetInternal = vi.fn();
             const mockPruneAllHistoryInternal = vi.fn();
-            
+
             // Use direct property assignment for repositories
             (databaseManager as any).dependencies.repositories.settings = {
                 ...mockSettingsRepository,

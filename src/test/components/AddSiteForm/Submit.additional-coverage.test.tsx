@@ -12,9 +12,21 @@ import type { Logger } from "../../../services/logger";
 // Mock the validation functions
 vi.mock("../../../utils/monitorValidation", () => ({
     validateMonitorFormData: vi.fn(),
-    validateMonitorFieldClientSide: vi.fn(() => ({ success: true, errors: [], warnings: [] })),
-    validateNumericField: vi.fn(() => ({ success: true, errors: [], warnings: [] })),
-    validateRequiredField: vi.fn(() => ({ success: true, errors: [], warnings: [] })),
+    validateMonitorFieldClientSide: vi.fn(() => ({
+        success: true,
+        errors: [],
+        warnings: [],
+    })),
+    validateNumericField: vi.fn(() => ({
+        success: true,
+        errors: [],
+        warnings: [],
+    })),
+    validateRequiredField: vi.fn(() => ({
+        success: true,
+        errors: [],
+        warnings: [],
+    })),
     validateUrl: vi.fn(() => ({ success: true, errors: [], warnings: [] })),
 }));
 
@@ -79,7 +91,9 @@ beforeEach(() => {
 });
 
 describe("Submit.tsx - Additional Coverage Tests", () => {
-    const createMockProperties = (overrides: Partial<FormSubmitProperties> = {}): FormSubmitProperties => ({
+    const createMockProperties = (
+        overrides: Partial<FormSubmitProperties> = {}
+    ): FormSubmitProperties => ({
         addMode: "new",
         checkInterval: 300_000,
         formError: undefined,
@@ -90,7 +104,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
         selectedExistingSite: "",
         siteId: "test-site-id",
         url: "https://example.com",
-        
+
         setFormError: vi.fn(),
         addMonitorToSite: vi.fn(),
         clearError: vi.fn(),
@@ -109,7 +123,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 host: "example.com",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -134,7 +149,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 port: "80",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -157,7 +173,9 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 monitorType: "unknown" as any,
             });
 
-            const { validateMonitorFormData } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData } = await import(
+                "../../../utils/monitorValidation"
+            );
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -165,7 +183,9 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             });
 
             // Expect this to throw an error
-            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow("Unsupported monitor type: unknown");
+            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
+                "Unsupported monitor type: unknown"
+            );
         });
     });
 
@@ -177,7 +197,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 selectedExistingSite: "", // Empty string should trigger validation error
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -206,7 +227,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 host: "example.com",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -233,7 +255,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 port: "80",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData, validateMonitorFieldClientSide } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -258,7 +281,9 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 monitorType: "unsupported" as any,
             });
 
-            const { validateMonitorFormData } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData } = await import(
+                "../../../utils/monitorValidation"
+            );
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -266,7 +291,9 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             });
 
             // Expect this to throw an error for unsupported monitor type
-            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow("Unsupported monitor type: unsupported");
+            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
+                "Unsupported monitor type: unsupported"
+            );
         });
     });
 
@@ -277,7 +304,9 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 createSite: vi.fn().mockResolvedValue(undefined), // Returns undefined
             });
 
-            const { validateMonitorFormData } = await import("../../../utils/monitorValidation");
+            const { validateMonitorFormData } = await import(
+                "../../../utils/monitorValidation"
+            );
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],

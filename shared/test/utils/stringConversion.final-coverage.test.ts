@@ -11,7 +11,7 @@ describe("String Conversion - Final Coverage", () => {
         it("should handle undefined values through the switch statement", () => {
             // This should hit the "undefined" case in the switch statement (lines 86-87)
             expect(safeStringify(undefined)).toBe("");
-            
+
             // Test different undefined scenarios
             let undefinedVar;
             expect(safeStringify(undefinedVar)).toBe("");
@@ -21,13 +21,17 @@ describe("String Conversion - Final Coverage", () => {
         it("should test the default case by creating an object with unusual typeof behavior", () => {
             // While we can't easily make typeof return an unknown value in normal JavaScript,
             // we can at least ensure our default case is structured correctly
-            
+
             // Create a mock object that might simulate unusual typeof behavior
             const mockValue = {
-                valueOf: () => { throw new Error("Unusual value conversion"); },
-                toString: () => { throw new Error("Unusual string conversion"); }
+                valueOf: () => {
+                    throw new Error("Unusual value conversion");
+                },
+                toString: () => {
+                    throw new Error("Unusual string conversion");
+                },
             };
-            
+
             // Test that our function handles complex objects safely
             const result = safeStringify(mockValue);
             expect(typeof result).toBe("string");
@@ -40,7 +44,7 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify(false)).toBe("false");
             expect(safeStringify("")).toBe("");
             expect(safeStringify(Number.NaN)).toBe("NaN");
-            
+
             // These should reach the switch statement's undefined case
             expect(safeStringify(undefined)).toBe("");
         });

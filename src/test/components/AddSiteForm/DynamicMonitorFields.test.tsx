@@ -151,7 +151,7 @@ describe("DynamicMonitorFields", () => {
 
     it("should call loadMonitorTypes when not loaded and no error", () => {
         const loadMonitorTypesMock = vi.fn();
-        
+
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [],
             isLoaded: false,
@@ -204,7 +204,7 @@ describe("DynamicMonitorFields", () => {
         // Check that fields are rendered with default values
         const urlField = screen.getByDisplayValue("");
         const timeoutField = screen.getByDisplayValue("0");
-        
+
         expect(urlField).toBeInTheDocument();
         expect(timeoutField).toBeInTheDocument();
     });
@@ -239,14 +239,14 @@ describe("DynamicMonitorFields", () => {
         // Check that fields are disabled when loading
         const urlField = screen.getByLabelText("URL (required)");
         const timeoutField = screen.getByLabelText("Timeout");
-        
+
         expect(urlField).toBeDisabled();
         expect(timeoutField).toBeDisabled();
     });
 
     it("should not call loadMonitorTypes when already loaded", () => {
         const loadMonitorTypesMock = vi.fn();
-        
+
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [
                 {
@@ -281,7 +281,7 @@ describe("DynamicMonitorFields", () => {
 
     it("should not call loadMonitorTypes when there is an error", () => {
         const loadMonitorTypesMock = vi.fn();
-        
+
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [],
             isLoaded: false,

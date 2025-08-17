@@ -207,11 +207,11 @@ describe("ThemeManager", () => {
         it("should apply all theme properties", () => {
             // Reset mocks and ensure they're properly set up
             vi.clearAllMocks();
-            
+
             // Get mock references
-            
+
             const lightTheme = themeManager.getTheme("light");
-            
+
             // Apply theme and verify it doesn't throw
             expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
 

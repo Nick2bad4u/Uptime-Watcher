@@ -1,6 +1,6 @@
 /**
- * Additional coverage tests for App.tsx component
- * Targets specific uncovered lines for imports, constants, and error handling paths
+ * Additional coverage tests for App.tsx component Targets specific uncovered
+ * lines for imports, constants, and error handling paths
  */
 
 import { render, screen, waitFor } from "@testing-library/react";
@@ -77,12 +77,12 @@ vi.mock("./components/SiteDetails/SiteDetails", () => ({
 }));
 
 vi.mock("./components/common/ErrorAlert/ErrorAlert", () => ({
-    ErrorAlert: ({ 
-        message, 
-        onDismiss 
-    }: { 
-        message: string; 
-        onDismiss: () => void; 
+    ErrorAlert: ({
+        message,
+        onDismiss,
+    }: {
+        message: string;
+        onDismiss: () => void;
     }) => (
         <div data-testid="error-alert">
             <span>{message}</span>
@@ -185,7 +185,7 @@ describe("App Additional Coverage Tests", () => {
 
     it("should use all imported modules and constants", () => {
         render(<App />);
-        
+
         // Verify that components are rendered (covers imports lines 11-16)
         expect(screen.getByTestId("header")).toBeInTheDocument();
         expect(screen.getByTestId("site-list")).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check that UI_MESSAGES constants are used (covers lines 42-44, 48-49, 54-55)
         expect(screen.getByText("Monitored Sites (1)")).toBeInTheDocument();
     });
@@ -214,13 +214,18 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Wait for initialization and loading overlay timeout
-        await waitFor(() => {
-            expect(screen.getByText("Loading...")).toBeInTheDocument();
-        }, { timeout: 200 });
-        
-        expect(screen.getByLabelText("Loading application")).toBeInTheDocument();
+        await waitFor(
+            () => {
+                expect(screen.getByText("Loading...")).toBeInTheDocument();
+            },
+            { timeout: 200 }
+        );
+
+        expect(
+            screen.getByLabelText("Loading application")
+        ).toBeInTheDocument();
     });
 
     it("should display error alert when lastError exists", async () => {
@@ -232,11 +237,11 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Verify error alert is displayed
         expect(screen.getByTestId("error-alert")).toBeInTheDocument();
         expect(screen.getByText("Test error message")).toBeInTheDocument();
-        
+
         // Test error dismissal
         const closeButton = screen.getByText("Close Error");
         await userEvent.click(closeButton);
@@ -253,7 +258,7 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check update error alert uses UI_MESSAGES fallback
         expect(screen.getByText("Update failed error")).toBeInTheDocument();
         expect(screen.getByText("Dismiss")).toBeInTheDocument();
@@ -269,7 +274,7 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check update error fallback message
         expect(screen.getByText("Update failed.")).toBeInTheDocument();
     });
@@ -284,9 +289,11 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check update available message
-        expect(screen.getByText("A new update is available. Downloading...")).toBeInTheDocument();
+        expect(
+            screen.getByText("A new update is available. Downloading...")
+        ).toBeInTheDocument();
         expect(screen.getByText("⬇️")).toBeInTheDocument();
     });
 
@@ -300,9 +307,11 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check update downloading message
-        expect(screen.getByText("Update is downloading...")).toBeInTheDocument();
+        expect(
+            screen.getByText("Update is downloading...")
+        ).toBeInTheDocument();
         expect(screen.getByText("⏬")).toBeInTheDocument();
     });
 
@@ -317,12 +326,14 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Check update downloaded message and restart button
-        expect(screen.getByText("Update downloaded! Restart to apply.")).toBeInTheDocument();
+        expect(
+            screen.getByText("Update downloaded! Restart to apply.")
+        ).toBeInTheDocument();
         expect(screen.getByText("✅")).toBeInTheDocument();
         expect(screen.getByText("Restart Now")).toBeInTheDocument();
-        
+
         // Test restart button click
         const restartButton = screen.getByText("Restart Now");
         await userEvent.click(restartButton);
@@ -338,7 +349,7 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         expect(screen.getByTestId("settings")).toBeInTheDocument();
     });
 
@@ -365,7 +376,7 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         const appContainer = document.querySelector(".app-container");
         expect(appContainer).toHaveClass("dark");
     });
@@ -373,7 +384,7 @@ describe("App Additional Coverage Tests", () => {
     it("should handle update action dismiss when status is not downloaded", async () => {
         const setUpdateStatusMock = vi.fn();
         const setUpdateErrorMock = vi.fn();
-        
+
         mockUseUpdatesStore.mockReturnValue({
             applyUpdate: vi.fn(),
             setUpdateError: setUpdateErrorMock,
@@ -383,11 +394,11 @@ describe("App Additional Coverage Tests", () => {
         });
 
         render(<App />);
-        
+
         // Click dismiss button
         const dismissButton = screen.getByText("Dismiss");
         await userEvent.click(dismissButton);
-        
+
         expect(setUpdateStatusMock).toHaveBeenCalledWith("idle");
         expect(setUpdateErrorMock).toHaveBeenCalledWith(undefined);
     });

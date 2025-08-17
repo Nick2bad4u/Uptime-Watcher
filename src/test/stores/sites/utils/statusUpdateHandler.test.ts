@@ -390,8 +390,11 @@ describe("StatusUpdateHandler", () => {
             mockGetSites.mockReturnValue([originalSite]);
 
             // Mock applyMonitorStatusUpdate to return empty array (simulate site removal)
-            const originalApplyMethod = (manager as any).applyMonitorStatusUpdate;
-            (manager as any).applyMonitorStatusUpdate = vi.fn().mockReturnValue([]);
+            const originalApplyMethod = (manager as any)
+                .applyMonitorStatusUpdate;
+            (manager as any).applyMonitorStatusUpdate = vi
+                .fn()
+                .mockReturnValue([]);
 
             const monitorStatusEvent = {
                 siteId: "site1",
@@ -401,10 +404,10 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            
+
             // onUpdate should not be called since updated site wasn't found in the result
             expect(mockOnUpdate).not.toHaveBeenCalled();
-            
+
             // Restore original method
             (manager as any).applyMonitorStatusUpdate = originalApplyMethod;
         });
@@ -416,16 +419,22 @@ describe("StatusUpdateHandler", () => {
                 getSites: mockGetSites,
                 fullSyncFromBackend: mockFullSyncFromBackend,
             };
-            const managerWithoutCallback = new StatusUpdateManager(optionsWithoutCallback);
-            
+            const managerWithoutCallback = new StatusUpdateManager(
+                optionsWithoutCallback
+            );
+
             mockElectronAPI.events.onMonitorStatusChanged.mockImplementation(
                 (callback: any) => {
                     statusChangedCallback = callback;
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
 
             managerWithoutCallback.subscribe();
 
@@ -438,7 +447,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
             expect(mockSetSites).toHaveBeenCalled();
-            
+
             managerWithoutCallback.unsubscribe();
         });
     });
@@ -549,14 +558,18 @@ describe("StatusUpdateHandler", () => {
                     return () => {};
                 }
             );
-            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(() => {});
-            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(() => {});
+            mockElectronAPI.events.onMonitoringStarted.mockReturnValue(
+                () => {}
+            );
+            mockElectronAPI.events.onMonitoringStopped.mockReturnValue(
+                () => {}
+            );
         });
 
         it("should log debug messages in development mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             // Test site not found branch with development logging
@@ -570,14 +583,16 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.default.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Site nonexistent-site not found in store")
+                expect.stringContaining(
+                    "Site nonexistent-site not found in store"
+                )
             );
         });
 
         it("should log debug messages for monitor not found in development mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             const monitorStatusEvent = {
@@ -596,7 +611,7 @@ describe("StatusUpdateHandler", () => {
         it("should log debug messages for successful updates in development mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             const monitorStatusEvent = {
@@ -615,13 +630,15 @@ describe("StatusUpdateHandler", () => {
         it("should log warning for invalid data in development mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             const invalidData = { invalid: "data" };
             await statusChangedCallback(invalidData);
             expect(logger.default.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Invalid monitor status changed event data"),
+                expect.stringContaining(
+                    "Invalid monitor status changed event data"
+                ),
                 invalidData
             );
         });
@@ -629,7 +646,7 @@ describe("StatusUpdateHandler", () => {
         it("should not log debug messages in production mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
-            
+
             manager.subscribe();
 
             // Test site not found branch without development logging
@@ -843,7 +860,7 @@ describe("StatusUpdateHandler", () => {
         it("should handle invalid event data and log warning in development mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             // Create invalid event data
@@ -864,7 +881,9 @@ describe("StatusUpdateHandler", () => {
 
             // Should have logged warning in development mode
             expect(logger.default.warn).toHaveBeenCalledWith(
-                expect.stringContaining("Invalid monitor status changed event data"),
+                expect.stringContaining(
+                    "Invalid monitor status changed event data"
+                ),
                 invalidEvent
             );
         });
@@ -872,11 +891,11 @@ describe("StatusUpdateHandler", () => {
         it("should not log warning for invalid data in production mode", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
-            
+
             manager.subscribe();
 
             const invalidEvent = {
-                incomplete: "data"
+                incomplete: "data",
             } as any;
 
             await statusChangedCallback(invalidEvent);
@@ -889,7 +908,7 @@ describe("StatusUpdateHandler", () => {
         it("should cover development mode debug log for successful update", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
-            
+
             manager.subscribe();
 
             const validEvent = {
@@ -913,11 +932,14 @@ describe("StatusUpdateHandler", () => {
             // Mock setSites to actually call the provided function to set state
             let storedSites: any[] = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
-            mockSetSites.mockImplementation((siteSetter: any[] | ((arg0: any[]) => any[])) => {
-                storedSites = typeof siteSetter === 'function' 
-                    ? siteSetter(storedSites) 
-                    : siteSetter;
-            });
+            mockSetSites.mockImplementation(
+                (siteSetter: any[] | ((arg0: any[]) => any[])) => {
+                    storedSites =
+                        typeof siteSetter === "function"
+                            ? siteSetter(storedSites)
+                            : siteSetter;
+                }
+            );
 
             const event = {
                 siteId: "site1",
@@ -942,25 +964,25 @@ describe("StatusUpdateHandler", () => {
             const siteWithMultipleMonitors = {
                 ...createMockSite("site1", "monitor1"),
                 monitors: [
-                    { 
-                        id: "monitor1", 
+                    {
+                        id: "monitor1",
                         status: "up" as const,
                         type: "http" as const,
                         name: "Monitor 1",
                         config: {},
                         createdAt: "2023-01-01T00:00:00Z",
-                        updatedAt: "2023-01-01T00:00:00Z"
+                        updatedAt: "2023-01-01T00:00:00Z",
                     },
-                    { 
-                        id: "monitor2", 
+                    {
+                        id: "monitor2",
                         status: "up" as const,
                         type: "http" as const,
                         name: "Monitor 2",
                         config: {},
                         createdAt: "2023-01-01T00:00:00Z",
-                        updatedAt: "2023-01-01T00:00:00Z"
-                    }
-                ]
+                        updatedAt: "2023-01-01T00:00:00Z",
+                    },
+                ],
             };
 
             mockGetSites.mockReturnValue([siteWithMultipleMonitors]);
@@ -977,17 +999,21 @@ describe("StatusUpdateHandler", () => {
             // Should have updated the sites with the new monitor status
             expect(mockSetSites).toHaveBeenCalled();
             const updatedSitesArray = mockSetSites.mock.calls[0][0];
-            
+
             // Find the updated site and verify the monitor status was changed
-            const updatedSite = updatedSitesArray.find((s: any) => s.identifier === "site1");
-            const updatedMonitor = updatedSite?.monitors.find((m: any) => m.id === "monitor2");
+            const updatedSite = updatedSitesArray.find(
+                (s: any) => s.identifier === "site1"
+            );
+            const updatedMonitor = updatedSite?.monitors.find(
+                (m: any) => m.id === "monitor2"
+            );
             expect(updatedMonitor?.status).toBe("down");
         });
 
         it("should test production mode branch by not logging in production", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false); // Production mode
-            
+
             manager.subscribe();
 
             // Test site not found in production mode (should not log)
@@ -1000,7 +1026,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(event);
-            
+
             // Should trigger full sync but not log debug messages
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
             expect(logger.default.debug).not.toHaveBeenCalled();
@@ -1012,11 +1038,14 @@ describe("StatusUpdateHandler", () => {
 
             let storedSites = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
-            mockSetSites.mockImplementation((siteSetter: Site[] | ((arg0: Site[]) => Site[])) => {
-                storedSites = typeof siteSetter === 'function' 
-                    ? siteSetter(storedSites) 
-                    : siteSetter;
-            });
+            mockSetSites.mockImplementation(
+                (siteSetter: Site[] | ((arg0: Site[]) => Site[])) => {
+                    storedSites =
+                        typeof siteSetter === "function"
+                            ? siteSetter(storedSites)
+                            : siteSetter;
+                }
+            );
 
             const event = {
                 siteId: "site1",
@@ -1033,7 +1062,7 @@ describe("StatusUpdateHandler", () => {
                     monitorId: "monitor1",
                     siteIdentifier: "site1",
                     status: "down",
-                    previousStatus: "up"
+                    previousStatus: "up",
                 })
             );
         });
@@ -1041,7 +1070,7 @@ describe("StatusUpdateHandler", () => {
         it("should not log debug messages in production mode for successful update", async () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
-            
+
             manager.subscribe();
 
             const validEvent = {

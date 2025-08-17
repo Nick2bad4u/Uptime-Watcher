@@ -1,8 +1,9 @@
 /**
  * Additional test coverage for BaseFormField component.
- * 
+ *
  * @remarks
  * This test file targets specific uncovered lines to improve coverage:
+ *
  * - Lines 92-98: Conditional spread operators for error and helpText props
  * - Testing all combinations of error and helpText prop scenarios
  * - Verifying proper ARIA attribute generation and FormField prop spreading
@@ -40,7 +41,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Verify ARIA properties
         expect(input).toHaveAttribute("aria-label", "Test Label");
         expect(input).not.toHaveAttribute("aria-describedby");
@@ -70,7 +71,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Verify ARIA properties
         expect(input).toHaveAttribute("aria-label", "Test Label (required)");
         expect(input).toHaveAttribute("aria-describedby", "test-field-error");
@@ -100,7 +101,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Verify ARIA properties
         expect(input).toHaveAttribute("aria-label", "Test Label");
         expect(input).toHaveAttribute("aria-describedby", "test-field-help");
@@ -131,7 +132,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Verify ARIA properties - error takes precedence
         expect(input).toHaveAttribute("aria-label", "Test Label (required)");
         expect(input).toHaveAttribute("aria-describedby", "test-field-error");
@@ -161,7 +162,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Empty string error means helpText should be used for aria-describedby
         expect(input).toHaveAttribute("aria-label", "Test Label");
         expect(input).toHaveAttribute("aria-describedby", "test-field-help");
@@ -191,7 +192,7 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        
+
         // Empty string helpText means no aria-describedby should be set
         expect(input).toHaveAttribute("aria-label", "Test Label");
         expect(input).not.toHaveAttribute("aria-describedby");
@@ -200,7 +201,10 @@ describe("BaseFormField - Additional Coverage", () => {
     it("should properly spread conditional props to FormField", () => {
         // Testing that the conditional spread operators work correctly for FormField props
         const childrenSpy = (ariaProps: AriaProperties) => (
-            <div data-testid="test-child" data-aria-props={JSON.stringify(ariaProps)} />
+            <div
+                data-testid="test-child"
+                data-aria-props={JSON.stringify(ariaProps)}
+            />
         );
 
         render(
@@ -218,12 +222,12 @@ describe("BaseFormField - Additional Coverage", () => {
         // Check that FormField receives the correct props by looking at the DOM structure
         const formField = screen.getByTestId("test-child").parentElement;
         expect(formField).toBeInTheDocument();
-        
+
         // Verify the child receives correct ARIA props
         const childElement = screen.getByTestId("test-child");
-        const ariaPropsData = childElement.dataset['ariaProps'];
+        const ariaPropsData = childElement.dataset["ariaProps"];
         const ariaProps = JSON.parse(ariaPropsData || "{}");
-        
+
         expect(ariaProps["aria-label"]).toBe("Test Label (required)");
         expect(ariaProps["aria-describedby"]).toBe("test-field-error");
     });
@@ -249,6 +253,9 @@ describe("BaseFormField - Additional Coverage", () => {
         );
 
         const input = screen.getByTestId("test-input");
-        expect(input).toHaveAttribute("aria-label", "Complex Label: With Symbols & Numbers (123) (required)");
+        expect(input).toHaveAttribute(
+            "aria-label",
+            "Complex Label: With Symbols & Numbers (123) (required)"
+        );
     });
 });

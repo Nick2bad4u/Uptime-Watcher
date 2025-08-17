@@ -159,7 +159,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 remove: vi.fn(),
                 contains: vi.fn().mockImplementation((className: string) => {
                     // Simulate that body contains 'theme-dark' initially
-                    return className === 'theme-dark';
+                    return className === "theme-dark";
                 }),
                 toggle: vi.fn(),
             };
@@ -169,17 +169,17 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
             const mockDocumentElementClassList = {
                 add: vi.fn().mockImplementation((className: string) => {
-                    if (className === 'dark') {
+                    if (className === "dark") {
                         hasDarkClass = true;
                     }
                 }),
                 remove: vi.fn().mockImplementation((className: string) => {
-                    if (className === 'dark') {
+                    if (className === "dark") {
                         hasDarkClass = false;
                     }
                 }),
                 contains: vi.fn().mockImplementation((className: string) => {
-                    if (className === 'dark') {
+                    if (className === "dark") {
                         return hasDarkClass;
                     }
                     return false;
@@ -228,22 +228,22 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             const mockContains = vi.fn().mockReturnValue(true); // Simulate existing classes
 
             Object.defineProperty(document, "body", {
-                value: { 
-                    classList: { 
-                        add: mockAdd, 
-                        remove: mockRemove, 
-                        contains: mockContains 
-                    } 
+                value: {
+                    classList: {
+                        add: mockAdd,
+                        remove: mockRemove,
+                        contains: mockContains,
+                    },
                 },
                 writable: true,
             });
 
             Object.defineProperty(document, "documentElement", {
                 value: {
-                    classList: { 
-                        add: vi.fn(), 
+                    classList: {
+                        add: vi.fn(),
                         remove: vi.fn(),
-                        contains: vi.fn().mockReturnValue(true)
+                        contains: vi.fn().mockReturnValue(true),
                     },
                     style: { setProperty: vi.fn() },
                 },

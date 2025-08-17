@@ -1,8 +1,8 @@
 /**
  * StatusBadge Additional Coverage Tests
- * 
- * This test file specifically targets uncovered lines in StatusBadge.tsx
- * to improve test coverage to 90%+ as required.
+ *
+ * This test file specifically targets uncovered lines in StatusBadge.tsx to
+ * improve test coverage to 90%+ as required.
  */
 
 import { render, screen } from "@testing-library/react";
@@ -16,12 +16,12 @@ describe("StatusBadge - Additional Coverage", () => {
     it("should handle the default case in getIndicatorSize switch statement", () => {
         // This test is designed to cover line 126 - the default case in the getIndicatorSize function
         // We need to create a situation where an unexpected size value is passed
-        
+
         // Create a component that uses an invalid size to trigger the default case
         const TestStatusBadgeWithInvalidSize = () => {
             // Cast to bypass TypeScript checking to test runtime behavior
             const invalidSize = "invalid" as any;
-            
+
             return (
                 <StatusBadge
                     label="Test"
@@ -44,10 +44,15 @@ describe("StatusBadge - Additional Coverage", () => {
 
     it("should handle edge cases for size mapping completeness", () => {
         // Test all documented sizes to ensure complete coverage
-        const sizes: Array<NonNullable<StatusBadgeProperties['size']>> = [
-            "2xl", "3xl", "4xl", "xl", // Should map to "lg"
-            "base", "lg",              // Should map to "md"
-            "sm", "xs"                 // Should map to "sm"
+        const sizes: Array<NonNullable<StatusBadgeProperties["size"]>> = [
+            "2xl",
+            "3xl",
+            "4xl",
+            "xl", // Should map to "lg"
+            "base",
+            "lg", // Should map to "md"
+            "sm",
+            "xs", // Should map to "sm"
         ];
 
         for (const size of sizes) {
@@ -81,13 +86,15 @@ describe("StatusBadge - Additional Coverage", () => {
             </ThemeProvider>
         );
 
-        expect(screen.getByText("Test Undefined Size: down")).toBeInTheDocument();
+        expect(
+            screen.getByText("Test Undefined Size: down")
+        ).toBeInTheDocument();
     });
 
     it("should test the switch statement branch coverage completely", () => {
         // This is an integration test to ensure the getIndicatorSize function
         // handles all possible code paths including the default case
-        
+
         interface TestCase {
             size: any;
             expectedIndicatorSize: "lg" | "md" | "sm";
@@ -99,20 +106,20 @@ describe("StatusBadge - Additional Coverage", () => {
             { size: "3xl", expectedIndicatorSize: "lg" },
             { size: "4xl", expectedIndicatorSize: "lg" },
             { size: "xl", expectedIndicatorSize: "lg" },
-            
+
             // Medium sizes -> "md"
             { size: "base", expectedIndicatorSize: "md" },
             { size: "lg", expectedIndicatorSize: "md" },
-            
+
             // Small sizes -> "sm"
             { size: "sm", expectedIndicatorSize: "sm" },
             { size: "xs", expectedIndicatorSize: "sm" },
-            
+
             // Default case -> "sm"
             { size: "unknown", expectedIndicatorSize: "sm" },
             { size: null, expectedIndicatorSize: "sm" },
             { size: "", expectedIndicatorSize: "sm" },
-            { size: 123, expectedIndicatorSize: "sm" }
+            { size: 123, expectedIndicatorSize: "sm" },
         ];
 
         for (const [index, { size }] of testCases.entries()) {
@@ -135,7 +142,7 @@ describe("StatusBadge - Additional Coverage", () => {
 
     it("should handle all formatter edge cases", () => {
         // Test custom formatter function
-        const customFormatter = (label: string, status: string) => 
+        const customFormatter = (label: string, status: string) =>
             `${label.toUpperCase()}: ${status.toUpperCase()}`;
 
         render(
@@ -177,7 +184,7 @@ describe("StatusBadge - Additional Coverage", () => {
             </ThemeProvider>
         );
 
-        const container = screen.getByText("Class Test: up").closest('div');
-        expect(container).toHaveClass('custom-class');
+        const container = screen.getByText("Class Test: up").closest("div");
+        expect(container).toHaveClass("custom-class");
     });
 });

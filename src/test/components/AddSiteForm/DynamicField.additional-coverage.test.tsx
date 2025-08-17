@@ -1,7 +1,8 @@
 /**
  * Additional coverage tests for DynamicField component.
- * 
+ *
  * Targets uncovered lines:
+ *
  * - Line 134: Default case for unsupported field types
  * - Line 188: Logger error call for invalid numeric input
  */
@@ -36,7 +37,7 @@ describe("DynamicField - Additional Coverage", () => {
     describe("Unsupported field types (Line 134)", () => {
         it("should display error message for unsupported field type", () => {
             vi.clearAllMocks();
-            
+
             const mockField: MonitorFieldDefinition = {
                 name: "unsupported",
                 label: "Unsupported Field",
@@ -55,8 +56,10 @@ describe("DynamicField - Additional Coverage", () => {
             );
 
             // Should display error message for unsupported field type
-            expect(screen.getByText("Unsupported field type: invalid-type")).toBeInTheDocument();
-            
+            expect(
+                screen.getByText("Unsupported field type: invalid-type")
+            ).toBeInTheDocument();
+
             // Should not call onChange
             expect(mockOnChange).not.toHaveBeenCalled();
         });
@@ -65,12 +68,12 @@ describe("DynamicField - Additional Coverage", () => {
     describe("Invalid numeric input handling (Line 188)", () => {
         it("should handle numeric input with direct simulation", () => {
             vi.clearAllMocks();
-            
+
             // Directly test the handleNumericChange logic by simulating it
             const mockOnChange = vi.fn();
-            
+
             const testValues = ["abc", "123abc", "!@#$", "."];
-            
+
             for (const val of testValues) {
                 const numericValue = Number(val);
                 if (val === "" || !Number.isNaN(numericValue)) {
@@ -81,19 +84,27 @@ describe("DynamicField - Additional Coverage", () => {
             }
 
             // Should log errors for all invalid inputs
-            expect(mockLogger.error).toHaveBeenCalledWith("Invalid numeric input: abc");
-            expect(mockLogger.error).toHaveBeenCalledWith("Invalid numeric input: 123abc");
-            expect(mockLogger.error).toHaveBeenCalledWith("Invalid numeric input: !@#$");
-            expect(mockLogger.error).toHaveBeenCalledWith("Invalid numeric input: .");
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Invalid numeric input: abc"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Invalid numeric input: 123abc"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Invalid numeric input: !@#$"
+            );
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Invalid numeric input: ."
+            );
         });
     });
 
     describe("Valid input handling", () => {
         it("should handle empty numeric input correctly", async () => {
             vi.clearAllMocks();
-            
+
             const user = userEvent.setup();
-            
+
             const mockField: MonitorFieldDefinition = {
                 name: "port",
                 label: "Port",
@@ -112,7 +123,7 @@ describe("DynamicField - Additional Coverage", () => {
             );
 
             const input = screen.getByLabelText("Port (required)");
-            
+
             // Clear the input - this should call onChange with 0
             await user.clear(input);
 
@@ -122,9 +133,9 @@ describe("DynamicField - Additional Coverage", () => {
 
         it("should handle valid numeric input", async () => {
             vi.clearAllMocks();
-            
+
             const user = userEvent.setup();
-            
+
             const mockField: MonitorFieldDefinition = {
                 name: "port",
                 label: "Port",
@@ -143,7 +154,7 @@ describe("DynamicField - Additional Coverage", () => {
             );
 
             const input = screen.getByLabelText("Port (required)");
-            
+
             await user.clear(input);
             await user.type(input, "3000");
 
@@ -154,9 +165,9 @@ describe("DynamicField - Additional Coverage", () => {
 
         it("should handle text field input correctly", async () => {
             vi.clearAllMocks();
-            
+
             const user = userEvent.setup();
-            
+
             const mockField: MonitorFieldDefinition = {
                 name: "hostname",
                 label: "Hostname",
@@ -175,7 +186,7 @@ describe("DynamicField - Additional Coverage", () => {
             );
 
             const input = screen.getByLabelText("Hostname");
-            
+
             // Type text value
             await user.type(input, "example.com");
 
@@ -185,7 +196,7 @@ describe("DynamicField - Additional Coverage", () => {
 
         it("should handle disabled field", () => {
             vi.clearAllMocks();
-            
+
             const mockField: MonitorFieldDefinition = {
                 name: "port",
                 label: "Port",

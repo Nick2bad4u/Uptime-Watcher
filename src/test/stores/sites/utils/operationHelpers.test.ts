@@ -152,7 +152,10 @@ describe("OperationHelpers", () => {
     describe("updateMonitorAndSave", () => {
         it("should update monitor and save successfully", async () => {
             const updates = { timeout: 10_000 };
-            const updatedSite = { ...mockSites[0]!, monitors: [{ ...mockSites[0]!.monitors[0]!, ...updates }] };
+            const updatedSite = {
+                ...mockSites[0]!,
+                monitors: [{ ...mockSites[0]!.monitors[0]!, ...updates }],
+            };
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
 
             await updateMonitorAndSave("site1", "monitor1", updates, mockDeps);
@@ -198,7 +201,12 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const params = { siteId: "site1" };
 
-            await withSiteOperation("testOperation", mockOperation, params, mockDeps);
+            await withSiteOperation(
+                "testOperation",
+                mockOperation,
+                params,
+                mockDeps
+            );
 
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
@@ -261,7 +269,12 @@ describe("OperationHelpers", () => {
             mockWithErrorHandling.mockRejectedValue(operationError);
 
             await expect(
-                withSiteOperation("testOperation", mockOperation, params, mockDeps)
+                withSiteOperation(
+                    "testOperation",
+                    mockOperation,
+                    params,
+                    mockDeps
+                )
             ).rejects.toThrow("Operation failed");
 
             expect(mockLogStoreAction).toHaveBeenCalledWith(
@@ -275,7 +288,9 @@ describe("OperationHelpers", () => {
         it("should handle sync errors", async () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSitesFromBackend = vi.fn().mockRejectedValue(syncError);
+            mockDeps.syncSitesFromBackend = vi
+                .fn()
+                .mockRejectedValue(syncError);
             const params = { siteId: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -284,7 +299,12 @@ describe("OperationHelpers", () => {
             });
 
             await expect(
-                withSiteOperation("testOperation", mockOperation, params, mockDeps)
+                withSiteOperation(
+                    "testOperation",
+                    mockOperation,
+                    params,
+                    mockDeps
+                )
             ).rejects.toThrow("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
@@ -377,7 +397,12 @@ describe("OperationHelpers", () => {
             mockWithErrorHandling.mockRejectedValue(operationError);
 
             await expect(
-                withSiteOperationReturning("testOperation", mockOperation, params, mockDeps)
+                withSiteOperationReturning(
+                    "testOperation",
+                    mockOperation,
+                    params,
+                    mockDeps
+                )
             ).rejects.toThrow("Operation failed");
 
             expect(mockLogStoreAction).toHaveBeenCalledWith(
@@ -392,7 +417,9 @@ describe("OperationHelpers", () => {
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSitesFromBackend = vi.fn().mockRejectedValue(syncError);
+            mockDeps.syncSitesFromBackend = vi
+                .fn()
+                .mockRejectedValue(syncError);
             const params = { siteId: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -401,7 +428,12 @@ describe("OperationHelpers", () => {
             });
 
             await expect(
-                withSiteOperationReturning("testOperation", mockOperation, params, mockDeps)
+                withSiteOperationReturning(
+                    "testOperation",
+                    mockOperation,
+                    params,
+                    mockDeps
+                )
             ).rejects.toThrow("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
@@ -509,11 +541,18 @@ describe("OperationHelpers", () => {
 
             const updatedSite = {
                 ...mockSites[0]!,
-                monitors: [{ ...mockSites[0]!.monitors[0]!, ...complexUpdates }],
+                monitors: [
+                    { ...mockSites[0]!.monitors[0]!, ...complexUpdates },
+                ],
             };
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
 
-            await updateMonitorAndSave("site1", "monitor1", complexUpdates, mockDeps);
+            await updateMonitorAndSave(
+                "site1",
+                "monitor1",
+                complexUpdates,
+                mockDeps
+            );
 
             expect(mockUpdateMonitorInSite).toHaveBeenCalledWith(
                 mockSites[0]!,
@@ -530,7 +569,12 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
 
-            await withSiteOperation("emptyParamsOp", mockOperation, {}, mockDeps);
+            await withSiteOperation(
+                "emptyParamsOp",
+                mockOperation,
+                {},
+                mockDeps
+            );
 
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
@@ -560,7 +604,12 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
 
-            await withSiteOperation("complexParamsOp", mockOperation, complexParams, mockDeps);
+            await withSiteOperation(
+                "complexParamsOp",
+                mockOperation,
+                complexParams,
+                mockDeps
+            );
 
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SitesStore",

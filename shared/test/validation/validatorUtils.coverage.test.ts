@@ -1,6 +1,6 @@
 /**
- * Additional tests for validatorUtils.ts to achieve complete coverage
- * Targeting specific uncovered lines: 203, 250-253
+ * Additional tests for validatorUtils.ts to achieve complete coverage Targeting
+ * specific uncovered lines: 203, 250-253
  */
 
 import { describe, it, expect } from "vitest";
@@ -25,11 +25,11 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost("127.0.0.1")).toBe(true);
             expect(isValidHost("192.168.1.1")).toBe(true);
             expect(isValidHost("::1")).toBe(true);
-            
+
             // Valid FQDNs
             expect(isValidHost("example.com")).toBe(true);
             expect(isValidHost("sub.domain.com")).toBe(true);
-            
+
             // Localhost special case
             expect(isValidHost("localhost")).toBe(true);
         });
@@ -64,7 +64,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(443)).toBe(true);
             expect(isValidPort(3000)).toBe(true);
             expect(isValidPort(65_535)).toBe(true);
-            
+
             // Invalid number ports
             expect(isValidPort(0)).toBe(false);
             expect(isValidPort(-1)).toBe(false);
@@ -77,7 +77,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort("443")).toBe(true);
             expect(isValidPort("3000")).toBe(true);
             expect(isValidPort("65535")).toBe(true);
-            
+
             // Invalid string ports
             expect(isValidPort("0")).toBe(false);
             expect(isValidPort("-1")).toBe(false);
@@ -100,15 +100,23 @@ describe("ValidatorUtils - Complete Coverage", () => {
         it("should handle objects that might coerce to strings/numbers", () => {
             // Objects with custom toString/valueOf
             const customStringObj = {
-                toString() { return "80"; },
-                valueOf() { return 80; }
+                toString() {
+                    return "80";
+                },
+                valueOf() {
+                    return 80;
+                },
             };
-            
+
             const customNumberObj = {
-                toString() { return "invalid"; },
-                valueOf() { return 80; }
+                toString() {
+                    return "invalid";
+                },
+                valueOf() {
+                    return 80;
+                },
             };
-            
+
             // These should still return false because they're objects, not strings/numbers
             expect(isValidPort(customStringObj)).toBe(false);
             expect(isValidPort(customNumberObj)).toBe(false);

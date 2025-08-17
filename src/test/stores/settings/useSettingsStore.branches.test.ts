@@ -1,6 +1,6 @@
 /**
- * @fileoverview Branch coverage tests for useSettingsStore
- * Testing conditional branches and error handling paths to achieve 90%+ branch coverage
+ * @file Branch coverage tests for useSettingsStore Testing conditional branches
+ *   and error handling paths to achieve 90%+ branch coverage
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -93,40 +93,44 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         );
 
         // Setup withErrorHandling to execute function properly
-        mockWithErrorHandling.mockImplementation(async (fn: any, handlers: any) => {
-            try {
-                handlers?.setLoading?.(true);
-                handlers?.clearError?.();
-                return await fn();
-            } catch (error) {
-                handlers?.setLoading?.(false);
-                handlers?.setError?.(error);
-                throw error;
-            } finally {
-                handlers?.setLoading?.(false);
+        mockWithErrorHandling.mockImplementation(
+            async (fn: any, handlers: any) => {
+                try {
+                    handlers?.setLoading?.(true);
+                    handlers?.clearError?.();
+                    return await fn();
+                } catch (error) {
+                    handlers?.setLoading?.(false);
+                    handlers?.setError?.(error);
+                    throw error;
+                } finally {
+                    handlers?.setLoading?.(false);
+                }
             }
-        });
+        );
     });
 
     describe("syncSettingsAfterRehydration branches", () => {
         it("should handle null state parameter (first branch)", async () => {
             // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration
             // We need to test it via the rehydration mechanism since it's not a public method
-            
+
             // Clear any persisted state first
             useSettingsStore.persist.clearStorage();
-            
+
             // The function is called as part of onRehydrateStorage callback
             // When state is null (first load), it should exit early
             renderHook(() => useSettingsStore());
-            
+
             // Force rehydration with empty state (simulates null state scenario)
             await act(async () => {
                 await useSettingsStore.persist.rehydrate();
             });
-            
+
             // Should not make API calls when state is null/empty during first load
-            expect(mockElectronAPI.settings.getHistoryLimit).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle successful API response in async rehydration", async () => {
@@ -137,7 +141,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             });
 
             const { result } = renderHook(() => useSettingsStore());
-            
+
             // Set up some state first
             act(() => {
                 result.current.updateSettings({ historyLimit: 1000 });
@@ -147,7 +151,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await act(async () => {
                 await useSettingsStore.persist.rehydrate();
                 // Wait for the setTimeout delay and async operation
-                await new Promise(resolve => setTimeout(resolve, 150));
+                await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
@@ -156,7 +160,9 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
         it("should handle API failure in catch block", async () => {
             // Mock console.warn to avoid noise in test output
-            const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            const consoleSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             // Make the API call reject to trigger catch block
             mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
@@ -164,7 +170,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             );
 
             const { result } = renderHook(() => useSettingsStore());
-            
+
             // Set up some state first
             act(() => {
                 result.current.updateSettings({ historyLimit: 1000 });
@@ -174,7 +180,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await act(async () => {
                 await useSettingsStore.persist.rehydrate();
                 // Wait for the setTimeout delay and async operation to fail
-                await new Promise(resolve => setTimeout(resolve, 150));
+                await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
             expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
