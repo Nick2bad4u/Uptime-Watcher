@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 import {
     createTemplateLogger,
     interpolateLogTemplate,
-} from "../../../../shared/utils/logTemplates";
+} from "../../utils/logTemplates";
 
 // Mock the logger to capture log calls
 const mockLogger = {

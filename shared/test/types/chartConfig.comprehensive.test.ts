@@ -2,7 +2,7 @@
  * Comprehensive tests for chartConfig utilities
  */
 import { describe, it, expect } from "vitest";
-import { hasPlugins, hasScales } from "../../../../shared/types/chartConfig";
+import { hasPlugins, hasScales } from "../../types/chartConfig";
 
 describe("chartConfig utilities", () => {
     describe("hasPlugins", () => {
@@ -122,8 +122,8 @@ describe("chartConfig utilities", () => {
 
             if (hasPlugins(config)) {
                 // TypeScript should now know config has plugins property
-                expect(config.plugins).toBeDefined();
-                expect(typeof config.plugins).toBe("object");
+                expect((config as any).plugins).toBeDefined();
+                expect(typeof (config as any).plugins).toBe("object");
             }
         });
 
@@ -273,8 +273,8 @@ describe("chartConfig utilities", () => {
 
             if (hasScales(config)) {
                 // TypeScript should now know config has scales property
-                expect(config.scales).toBeDefined();
-                expect(typeof config.scales).toBe("object");
+                expect((config as any).scales).toBeDefined();
+                expect(typeof (config as any).scales).toBe("object");
             }
         });
 

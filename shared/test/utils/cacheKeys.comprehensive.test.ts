@@ -8,7 +8,7 @@ import {
     isStandardizedCacheKey,
     parseCacheKey,
     type StandardizedCacheKey,
-} from "../../../../shared/utils/cacheKeys";
+} from "../../utils/cacheKeys";
 
 describe("cacheKeys utilities - Backend Coverage", () => {
     describe("CacheKeys.config", () => {

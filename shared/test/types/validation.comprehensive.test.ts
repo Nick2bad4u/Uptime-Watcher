@@ -7,7 +7,7 @@ import {
     type BaseValidationResult,
     type ValidationMetadata,
     type ValidationResult,
-} from "../../../../shared/types/validation";
+} from "../../types/validation";
 
 describe("Validation Types and Utilities", () => {
     describe("createFailureResult", () => {

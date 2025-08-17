@@ -8,13 +8,13 @@ import type {
     PingFormData,
     PortFormData,
     SiteFormData,
-} from "../../../../shared/types/formData";
+} from "../../types/formData";
 import {
     DEFAULT_FORM_DATA,
     isHttpFormData,
     isPingFormData,
     isPortFormData,
-} from "../../../../shared/types/formData";
+} from "../../types/formData";
 
 describe("FormData Types", () => {
     describe("SiteFormData", () => {
@@ -512,7 +512,7 @@ describe("FormData Types", () => {
                 required: true,
                 min: 60_000,
                 max: 3_600_000,
-                validator: (value) => {
+                validator: (value: any) => {
                     if (typeof value !== "number") return "Must be a number";
                     if (value < 60_000) return "Minimum interval is 60 seconds";
                     if (value > 3_600_000) return "Maximum interval is 1 hour";
@@ -618,7 +618,7 @@ describe("FormData Types", () => {
                     }
                     default: {
                         // TypeScript should catch this at compile time
-                        const _exhaustive: never = monitor;
+                        const _exhaustive: never = monitor as never;
                         throw new Error(
                             `Unhandled monitor type: ${_exhaustive}`
                         );

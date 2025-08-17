@@ -15,13 +15,13 @@ import type {
     PortMonitorConfig,
     MonitorConfig,
     MonitorConfigTemplate,
-} from "../../../../shared/types/monitorConfig";
+} from "../../types/monitorConfig";
 import {
     isHttpMonitorConfig,
     isPingMonitorConfig,
     isPortMonitorConfig,
     DEFAULT_MONITOR_CONFIG,
-} from "../../../../shared/types/monitorConfig";
+} from "../../types/monitorConfig";
 
 describe("Monitor Configuration Types", () => {
     describe("AdvancedMonitorConfig", () => {

@@ -11,7 +11,7 @@ import type {
     MonitorStatus,
     MonitorType,
     StatusHistory,
-} from "../../../shared/types";
+} from "../types";
 
 /**
  * Creates a complete Monitor object with all required properties filled.

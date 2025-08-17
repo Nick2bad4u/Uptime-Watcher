@@ -7,7 +7,7 @@ import {
     SERVICE_LOGS,
     WARNING_LOGS,
     type LogTemplatesInterface,
-} from "../../../../shared/utils/logTemplates";
+} from "../../utils/logTemplates";
 
 describe("Log Templates", () => {
     describe("SERVICE_LOGS", () => {
@@ -39,7 +39,7 @@ describe("Log Templates", () => {
             const serviceLogValues = Object.values(SERVICE_LOGS);
 
             // Most service logs should start with a bracketed service name
-            const logWithPrefix = serviceLogValues.filter((msg) =>
+            const logWithPrefix = serviceLogValues.filter((msg: string) =>
                 msg.startsWith("[")
             );
 

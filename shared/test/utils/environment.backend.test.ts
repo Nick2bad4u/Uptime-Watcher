@@ -12,7 +12,7 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
-} from "../../../../shared/utils/environment";
+} from "../../utils/environment";
 
 describe("environment utilities - Backend Coverage", () => {
     let originalEnv: NodeJS.ProcessEnv;

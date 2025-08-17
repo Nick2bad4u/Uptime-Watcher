@@ -5,7 +5,7 @@ import { describe, it, expect } from "vitest";
 import {
     formatErrorMessage,
     isKnownErrorMessage,
-} from "../../../../shared/utils/errorCatalog";
+} from "../../utils/errorCatalog";
 
 describe("errorCatalog utilities", () => {
     describe("formatErrorMessage", () => {

@@ -7,7 +7,7 @@ import {
     withErrorHandling,
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
-} from "../../../../shared/utils/errorHandling";
+} from "../../utils/errorHandling";
 
 describe("Error Handling Utils", () => {
     beforeEach(() => {

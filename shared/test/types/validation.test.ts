@@ -15,7 +15,7 @@ import {
     createFailureResult,
     createSuccessResult,
     isValidationResult,
-} from "../../../../shared/types/validation";
+} from "../../types/validation";
 
 describe("Validation Types and Functions", () => {
     describe("createFailureResult", () => {

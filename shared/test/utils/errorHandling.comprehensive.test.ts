@@ -8,8 +8,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
     ErrorHandlingBackendContext,
     ErrorHandlingFrontendStore,
-} from "../../../../shared/utils/errorHandling";
-import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+} from "../../utils/errorHandling";
+import { withErrorHandling } from "../../utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
     let mockStore: ErrorHandlingFrontendStore;

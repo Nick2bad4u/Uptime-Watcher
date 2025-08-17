@@ -116,6 +116,7 @@
         "release",
         "shared/**/*.spec.ts",
         "shared/**/*.test.ts",
+        "shared/test/**/*",
         "src/**/*.test.ts",
         "src/**/*.test.tsx"
     ],

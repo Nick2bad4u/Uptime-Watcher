@@ -22,12 +22,12 @@ import type {
     ThemeConfigWithModes,
     ThemeOverride,
     TypographyConfig,
-} from "../../../../shared/types/themeConfig";
+} from "../../types/themeConfig";
 import {
     DEFAULT_THEME_CONFIG,
     isColorPalette,
     isThemeConfig,
-} from "../../../../shared/types/themeConfig";
+} from "../../types/themeConfig";
 
 describe("Theme Config Types - Comprehensive Coverage", () => {
     describe("AnimationConfig Interface", () => {
