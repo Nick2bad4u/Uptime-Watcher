@@ -147,9 +147,16 @@ export const HistoryTab = ({
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
     // available history)
     const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [10, 25, 50, 100, 250, 500, 1000, 10_000].filter(
-        (opt) => opt <= maxShow
-    );
+    const showOptions = [
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        1000,
+        10_000,
+    ].filter((opt) => opt <= maxShow);
 
     // Always include 'All' if there are fewer than backendLimit
     if (

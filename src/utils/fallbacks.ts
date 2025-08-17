@@ -121,7 +121,11 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
         "port",
-        (monitor): string | undefined =>
+        (
+            monitor
+        ):
+            | string
+            | undefined =>
             monitor.host && monitor.port
                 ? `${monitor.host}:${monitor.port}`
                 : undefined,
