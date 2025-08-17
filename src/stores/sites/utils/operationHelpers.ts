@@ -28,7 +28,8 @@ export const getSiteById = (
     siteId: string,
     deps: SiteOperationsDependencies
 ): Site => {
-    const site = deps.getSites().find((s) => s.identifier === siteId);
+    const sites = deps.getSites() as Array<null | Site | undefined>;
+    const site = sites.find((s) => s && s.identifier === siteId);
     if (!site) {
         throw new Error(ERROR_CATALOG.sites.NOT_FOUND as string);
     }

@@ -245,9 +245,13 @@ export function isValidHost(value: unknown): value is string {
  */
 export function isValidPort(value: unknown): boolean {
     if (typeof value === "number") {
+        // Exclude port 0 as it's reserved and not suitable for user configuration
+        if (value === 0) return false;
         return validator.isPort(value.toString());
     }
     if (typeof value === "string") {
+        // Exclude port "0" as it's reserved and not suitable for user configuration
+        if (value === "0") return false;
         return validator.isPort(value);
     }
     return false;

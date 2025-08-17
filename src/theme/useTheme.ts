@@ -83,6 +83,8 @@ interface UseThemeReturn {
     themeManager: ThemeManager;
     /** Current theme name */
     themeName: ThemeName;
+    /** Version counter that increments when theme changes */
+    themeVersion: number;
     /** Toggle between light and dark themes */
     toggleTheme: () => void;
 }
@@ -112,6 +114,12 @@ export function useTheme(): UseThemeReturn {
         themeManager.applyTheme(theme);
         return theme;
     }, [getCurrentTheme]);
+
+    // Calculate theme version based on current theme and settings
+    const themeVersion = useMemo(
+        () => `${currentTheme.name}-${systemTheme}`.length,
+        [currentTheme.name, systemTheme]
+    );
 
     const updateSystemTheme = useCallback(
         (newSystemTheme: "dark" | "light") => {
@@ -272,6 +280,8 @@ export function useTheme(): UseThemeReturn {
         themeManager,
         /** Current theme name */
         themeName: settings.theme,
+        /** Version counter that increments when theme changes */
+        themeVersion,
         /** Toggle between light and dark themes */
         toggleTheme,
     };
