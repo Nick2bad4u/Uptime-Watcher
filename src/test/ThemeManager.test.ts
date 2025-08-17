@@ -35,16 +35,17 @@ describe("ThemeManager", () => {
             classList: {
                 add: vi.fn(),
                 remove: vi.fn(),
+                contains: vi.fn().mockReturnValue(false),
             },
         };
 
-        // Mock document.body
+        // Mock document.body with proper classList
         mockBodyClassList = {
-            add: vi.fn(),
-            remove: vi.fn(),
             classList: {
                 add: vi.fn(),
                 remove: vi.fn(),
+                contains: vi.fn().mockReturnValue(false),
+                toggle: vi.fn(),
             },
         };
 

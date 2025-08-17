@@ -308,13 +308,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
         it("should accept valid port ranges", () => {
             const validPorts = [
-                0,
                 1,
                 80,
                 443,
                 8080,
                 65_535,
-            ]; // 0 is valid for validator.js
+            ]; // Port 0 is excluded as it's reserved and invalid for monitoring
 
             for (const port of validPorts) {
                 const monitor = {
@@ -336,7 +335,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should reject invalid ports", () => {
-            const invalidPorts = [-1, 65_536, 100_000]; // 0 is valid for validator.js
+            const invalidPorts = [0, -1, 65_536, 100_000]; // Port 0 is now correctly rejected as invalid
 
             for (const port of invalidPorts) {
                 const monitor = {

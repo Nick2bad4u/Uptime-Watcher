@@ -927,7 +927,6 @@ describe("UptimeOrchestrator", () => {
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
             expect(mockMonitorManager.getActiveMonitorCount).toHaveBeenCalled();
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "monitoring:stopped",
@@ -941,8 +940,8 @@ describe("UptimeOrchestrator", () => {
         it("should handle monitor stopped events when monitoring is inactive", async () => {
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             vi.mocked(
-                mockMonitorManager.isMonitoringActive
-            ).mockReturnValueOnce(false);
+                mockMonitorManager.getActiveMonitorCount
+            ).mockReturnValueOnce(0);
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:stopped", {
@@ -955,7 +954,7 @@ describe("UptimeOrchestrator", () => {
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
+            expect(mockMonitorManager.getActiveMonitorCount).toHaveBeenCalled();
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "monitoring:stopped",
                 expect.objectContaining({
@@ -967,7 +966,7 @@ describe("UptimeOrchestrator", () => {
 
         it("should handle monitor stopped events with errors", async () => {
             vi.mocked(
-                mockMonitorManager.isMonitoringActive
+                mockMonitorManager.getActiveMonitorCount
             ).mockImplementationOnce(() => {
                 throw new Error("Monitor error");
             });
@@ -984,7 +983,7 @@ describe("UptimeOrchestrator", () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             // Should not throw, but should log error
-            expect(mockMonitorManager.isMonitoringActive).toHaveBeenCalled();
+            expect(mockMonitorManager.getActiveMonitorCount).toHaveBeenCalled();
         });
 
         it("should handle start monitoring requests successfully", async () => {

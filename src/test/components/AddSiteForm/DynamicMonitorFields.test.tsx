@@ -7,6 +7,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import DynamicMonitorFields from "../../../components/AddSiteForm/DynamicMonitorFields";
+import logger from "../../../services/logger";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Mock the monitor types store
@@ -42,14 +43,14 @@ describe("DynamicMonitorFields", () => {
                     type: "http",
                     fields: [
                         {
-                            key: "url",
+                            name: "url",
                             label: "URL",
                             type: "text",
                             required: true,
                             placeholder: "https://example.com",
                         },
                         {
-                            key: "timeout",
+                            name: "timeout",
                             label: "Timeout",
                             type: "number",
                             required: false,
@@ -146,5 +147,157 @@ describe("DynamicMonitorFields", () => {
         expect(
             screen.getByText("Unknown monitor type: http")
         ).toBeInTheDocument();
+    });
+
+    it("should call loadMonitorTypes when not loaded and no error", () => {
+        const loadMonitorTypesMock = vi.fn();
+        
+        vi.mocked(useMonitorTypesStore).mockReturnValue({
+            monitorTypes: [],
+            isLoaded: false,
+            lastError: null,
+            loadMonitorTypes: loadMonitorTypesMock,
+            getMonitorTypeConfig: vi.fn(),
+            validateMonitorData: vi.fn(),
+            validateMonitorField: vi.fn(),
+            formatMonitorDetail: vi.fn(),
+            getTitleSuffix: vi.fn(),
+            clearError: vi.fn(),
+        });
+
+        render(<DynamicMonitorFields {...defaultProps} />);
+
+        expect(loadMonitorTypesMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle missing onChange handler and log error", () => {
+        // Use props without onChange handler for one field
+        const propsWithMissingHandler = {
+            monitorType: "http",
+            values: { url: "https://example.com", timeout: 5000 },
+            onChange: {
+                // Missing timeout handler intentionally
+                url: vi.fn(),
+            },
+        };
+
+        render(<DynamicMonitorFields {...propsWithMissingHandler} />);
+
+        // Verify that the error logger was called for missing handler
+        expect(logger.error).toHaveBeenCalledWith(
+            "Missing onChange handler for field: timeout"
+        );
+    });
+
+    it("should use default values for fields with no values", () => {
+        const propsWithMissingValues = {
+            monitorType: "http",
+            values: {}, // No values provided
+            onChange: {
+                url: vi.fn(),
+                timeout: vi.fn(),
+            },
+        };
+
+        render(<DynamicMonitorFields {...propsWithMissingValues} />);
+
+        // Check that fields are rendered with default values
+        const urlField = screen.getByDisplayValue("");
+        const timeoutField = screen.getByDisplayValue("0");
+        
+        expect(urlField).toBeInTheDocument();
+        expect(timeoutField).toBeInTheDocument();
+    });
+
+    it("should use defaultOnChange when no onChange handler provided", () => {
+        // Props with no onChange handlers
+        const propsWithNoHandlers = {
+            monitorType: "http",
+            values: { url: "https://example.com", timeout: 5000 },
+            onChange: {}, // No onChange handlers
+        };
+
+        render(<DynamicMonitorFields {...propsWithNoHandlers} />);
+
+        // Both fields should use defaultOnChange which logs errors
+        expect(logger.error).toHaveBeenCalledWith(
+            "Missing onChange handler for field: url"
+        );
+        expect(logger.error).toHaveBeenCalledWith(
+            "Missing onChange handler for field: timeout"
+        );
+    });
+
+    it("should render fields with isLoading disabled state", () => {
+        const propsWithLoading = {
+            ...defaultProps,
+            isLoading: true,
+        };
+
+        render(<DynamicMonitorFields {...propsWithLoading} />);
+
+        // Check that fields are disabled when loading
+        const urlField = screen.getByLabelText("URL (required)");
+        const timeoutField = screen.getByLabelText("Timeout");
+        
+        expect(urlField).toBeDisabled();
+        expect(timeoutField).toBeDisabled();
+    });
+
+    it("should not call loadMonitorTypes when already loaded", () => {
+        const loadMonitorTypesMock = vi.fn();
+        
+        vi.mocked(useMonitorTypesStore).mockReturnValue({
+            monitorTypes: [
+                {
+                    type: "http",
+                    fields: [
+                        {
+                            name: "url",
+                            label: "URL",
+                            type: "text",
+                            required: true,
+                            placeholder: "https://example.com",
+                        },
+                    ],
+                },
+            ],
+            isLoaded: true, // Already loaded
+            lastError: null,
+            loadMonitorTypes: loadMonitorTypesMock,
+            getMonitorTypeConfig: vi.fn(),
+            validateMonitorData: vi.fn(),
+            validateMonitorField: vi.fn(),
+            formatMonitorDetail: vi.fn(),
+            getTitleSuffix: vi.fn(),
+            clearError: vi.fn(),
+        });
+
+        render(<DynamicMonitorFields {...defaultProps} />);
+
+        // Should not call loadMonitorTypes when already loaded
+        expect(loadMonitorTypesMock).not.toHaveBeenCalled();
+    });
+
+    it("should not call loadMonitorTypes when there is an error", () => {
+        const loadMonitorTypesMock = vi.fn();
+        
+        vi.mocked(useMonitorTypesStore).mockReturnValue({
+            monitorTypes: [],
+            isLoaded: false,
+            lastError: "Some error", // Has error
+            loadMonitorTypes: loadMonitorTypesMock,
+            getMonitorTypeConfig: vi.fn(),
+            validateMonitorData: vi.fn(),
+            validateMonitorField: vi.fn(),
+            formatMonitorDetail: vi.fn(),
+            getTitleSuffix: vi.fn(),
+            clearError: vi.fn(),
+        });
+
+        render(<DynamicMonitorFields {...defaultProps} />);
+
+        // Should not call loadMonitorTypes when there is an error
+        expect(loadMonitorTypesMock).not.toHaveBeenCalled();
     });
 });
