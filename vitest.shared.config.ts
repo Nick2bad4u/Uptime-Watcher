@@ -99,16 +99,11 @@ const vitestConfig = defineConfig({
                 useAtomics: true,
             },
         },
-        reporters: [
-            "default",
-            "json",
-            "verbose",
-            "hanging-process",
-        ],
+        reporters: ["default", "json", "verbose", "hanging-process"],
         testTimeout: 10_000, // 10 second timeout for shared tests
-        typecheck: { 
-            enabled: true, 
-            tsconfig: "./tsconfig.json" 
+        typecheck: {
+            enabled: true,
+            tsconfig: "./tsconfig.json",
         },
     },
 });

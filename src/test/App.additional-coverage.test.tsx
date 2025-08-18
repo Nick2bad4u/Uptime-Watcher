@@ -417,7 +417,9 @@ describe("App Additional Coverage Tests", () => {
             unsubscribeFromStatusUpdates: vi.fn(),
         };
 
-        mockUseSitesStore.getState = vi.fn().mockReturnValue(mockSitesStoreState);
+        mockUseSitesStore.getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState);
 
         // Mock logger.debug
         const debugSpy = vi.spyOn(logger, "debug");
@@ -433,7 +435,8 @@ describe("App Additional Coverage Tests", () => {
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0][0];
 
         // Create a mock status update
         const mockUpdate = {
@@ -446,7 +449,9 @@ describe("App Additional Coverage Tests", () => {
 
         // Verify that logger.debug was called
         expect(debugSpy).toHaveBeenCalledWith(
-            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: test-site-id/)
+            expect.stringMatching(
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: test-site-id/
+            )
         );
 
         debugSpy.mockRestore();
@@ -465,7 +470,9 @@ describe("App Additional Coverage Tests", () => {
             unsubscribeFromStatusUpdates: vi.fn(),
         };
 
-        mockUseSitesStore.getState = vi.fn().mockReturnValue(mockSitesStoreState);
+        mockUseSitesStore.getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState);
 
         // Mock logger.debug
         const debugSpy = vi.spyOn(logger, "debug");
@@ -481,7 +488,8 @@ describe("App Additional Coverage Tests", () => {
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0][0];
 
         // Create a mock status update with undefined site.identifier
         const mockUpdate = {
@@ -494,7 +502,9 @@ describe("App Additional Coverage Tests", () => {
 
         // Verify that logger.debug was called with fallback identifier
         expect(debugSpy).toHaveBeenCalledWith(
-            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: fallback-site-id/)
+            expect.stringMatching(
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: fallback-site-id/
+            )
         );
 
         debugSpy.mockRestore();

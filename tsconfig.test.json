@@ -1,25 +1,25 @@
 {
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-        "composite": true,
         "tsBuildInfoFile": "./dist-electron/tsconfig.test.tsbuildinfo",
         "paths": {
-            "@shared/*": [
-                "shared/*"
+            "@app/*": [
+                "src/*"
             ],
             "@electron/*": [
                 "electron/*"
             ],
-            "@app/*": [
-                "src/*"
+            "@shared/*": [
+                "shared/*"
             ]
         },
+        "composite": true,
         "incremental": true
     },
     "exclude": [
         "electron/**/*.test.ts",
         "electron/**/*.test.tsx"
     ],
-    "extends": "./tsconfig.json",
     "include": [
         "*.config.js",
         "*.config.mjs",

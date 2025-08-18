@@ -339,7 +339,7 @@ export default [
             ],
             "@html-eslint/no-extra-spacing-attrs": [
                 "error",
-                { enforceBeforeSelfClose : true },
+                { enforceBeforeSelfClose: true },
             ],
         },
     },

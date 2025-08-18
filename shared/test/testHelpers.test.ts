@@ -1,14 +1,19 @@
 /**
  * Comprehensive test suite for testHelpers.ts utilities
- * 
+ *
  * @remarks
- * This test file provides 100% test coverage for all functions in testHelpers.ts,
- * including edge cases, type safety, and performance considerations.
+ * This test file provides 100% test coverage for all functions in
+ * testHelpers.ts, including edge cases, type safety, and performance
+ * considerations.
  */
 
 import { describe, expect, it } from "vitest";
 import type { MonitorStatus, MonitorType } from "../types";
-import { createValidMonitor, createValidStatusHistory, createValidMonitors } from "./testHelpers";
+import {
+    createValidMonitor,
+    createValidStatusHistory,
+    createValidMonitors,
+} from "./testHelpers";
 
 describe("testHelpers", () => {
     describe("createValidMonitor", () => {
@@ -56,7 +61,12 @@ describe("testHelpers", () => {
         });
 
         it("should handle all monitor statuses", () => {
-            for (const status of ["up", "down", "pending", "paused"] as MonitorStatus[]) {
+            for (const status of [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as MonitorStatus[]) {
                 const monitor = createValidMonitor({ status });
                 expect(monitor.status).toBe(status);
             }
@@ -86,8 +96,16 @@ describe("testHelpers", () => {
 
         it("should handle complex overrides", () => {
             const customHistory = [
-                { timestamp: Date.now(), status: "up" as const, responseTime: 100 },
-                { timestamp: Date.now() - 1000, status: "down" as const, responseTime: -1 },
+                {
+                    timestamp: Date.now(),
+                    status: "up" as const,
+                    responseTime: 100,
+                },
+                {
+                    timestamp: Date.now() - 1000,
+                    status: "down" as const,
+                    responseTime: -1,
+                },
             ];
             const customOperations = ["test-operation"];
 
@@ -175,7 +193,7 @@ describe("testHelpers", () => {
 
         it("should create monitors with unique IDs", () => {
             const monitors = createValidMonitors(5);
-            const ids = new Set(monitors.map(m => m.id));
+            const ids = new Set(monitors.map((m) => m.id));
 
             expect(ids.size).toBe(5);
             for (const [index, monitor] of monitors.entries()) {
@@ -184,7 +202,7 @@ describe("testHelpers", () => {
         });
 
         it("should apply base overrides to all monitors", () => {
-            const monitors = createValidMonitors(3, { 
+            const monitors = createValidMonitors(3, {
                 type: "ping",
                 status: "down",
                 port: 22,
@@ -209,9 +227,9 @@ describe("testHelpers", () => {
         });
 
         it("should combine base overrides with indexed properties", () => {
-            const monitors = createValidMonitors(2, { 
-                type: "port", 
-                monitoring: false 
+            const monitors = createValidMonitors(2, {
+                type: "port",
+                monitoring: false,
             });
 
             for (const monitor of monitors) {
@@ -232,7 +250,7 @@ describe("testHelpers", () => {
         });
 
         it("should handle base overrides that affect all monitors", () => {
-            const monitors = createValidMonitors(3, { 
+            const monitors = createValidMonitors(3, {
                 host: "shared-host.com",
                 port: 8080,
             });
@@ -271,7 +289,7 @@ describe("testHelpers", () => {
             expect(end - start).toBeLessThan(1000); // Should complete quickly
 
             // Verify all have unique IDs
-            const ids = new Set(monitors.map(m => m.id));
+            const ids = new Set(monitors.map((m) => m.id));
             expect(ids.size).toBe(1000);
         });
     });
@@ -286,9 +304,11 @@ describe("testHelpers", () => {
             }
 
             // Create history for each monitor
-            const histories = monitors.map(() => createValidStatusHistory({ 
-                timestamp: Date.now() - Math.random() * 100_000 
-            }));
+            const histories = monitors.map(() =>
+                createValidStatusHistory({
+                    timestamp: Date.now() - Math.random() * 100_000,
+                })
+            );
 
             expect(histories).toHaveLength(3);
             for (const history of histories) {
@@ -299,7 +319,7 @@ describe("testHelpers", () => {
 
         it("should handle different monitor types", () => {
             const httpMonitors = createValidMonitors(2, { type: "http" });
-            const pingMonitors = createValidMonitors(2, { type: "ping" });  
+            const pingMonitors = createValidMonitors(2, { type: "ping" });
             const portMonitors = createValidMonitors(2, { type: "port" });
 
             for (const monitor of httpMonitors) {
@@ -316,14 +336,22 @@ describe("testHelpers", () => {
         });
 
         it("should handle complex scenarios with various statuses", () => {
-            const allStatuses: MonitorStatus[] = ["up", "down", "pending", "paused"];
-            
+            const allStatuses: MonitorStatus[] = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ];
+
             for (const status of allStatuses) {
                 const monitors = createValidMonitors(2, { status });
                 // Only use valid StatusHistory statuses
-                const validHistoryStatus = status === "up" || status === "down" ? status : "down";
-                const history = monitors.map(() => createValidStatusHistory({ status: validHistoryStatus }));
-                
+                const validHistoryStatus =
+                    status === "up" || status === "down" ? status : "down";
+                const history = monitors.map(() =>
+                    createValidStatusHistory({ status: validHistoryStatus })
+                );
+
                 for (const [index, monitor] of monitors.entries()) {
                     expect(monitor.status).toBe(status);
                     expect(history[index]!.status).toBe(validHistoryStatus);

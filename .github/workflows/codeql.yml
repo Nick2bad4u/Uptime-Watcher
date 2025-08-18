@@ -158,13 +158,13 @@ jobs:
             # Optional: package any generated CodeQL DBs for debugging (non-fatal)
             - name: Package CodeQL DBs (debug)
               run: |
-                set -e
-                # create tarballs if CodeQL DB folders exist (Linux/macOS runner)
-                if [ -d "./codeql-databases" ]; then tar -czf codeql-databases.tgz ./codeql-databases || true; fi
-                if [ -d "./codeql-db" ]; then tar -czf codeql-db.tgz ./codeql-db || true; fi
+                  set -e
+                  # create tarballs if CodeQL DB folders exist (Linux/macOS runner)
+                  if [ -d "./codeql-databases" ]; then tar -czf codeql-databases.tgz ./codeql-databases || true; fi
+                  if [ -d "./codeql-db" ]; then tar -czf codeql-db.tgz ./codeql-db || true; fi
               shell: bash
               continue-on-error: true
-              
+
             - name: Upload CodeQL DBs (debug)
               if: always()
               uses: actions/upload-artifact@v4

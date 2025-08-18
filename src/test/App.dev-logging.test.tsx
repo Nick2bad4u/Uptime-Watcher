@@ -1,6 +1,6 @@
 /**
- * Test for App.tsx development logging coverage
- * Targets specific uncovered lines 201-218 in App.tsx
+ * Test for App.tsx development logging coverage Targets specific uncovered
+ * lines 201-218 in App.tsx
  */
 
 import { render, waitFor } from "@testing-library/react";
@@ -130,7 +130,7 @@ describe("App Development Logging Coverage", () => {
             unsubscribeFromStatusUpdates: vi.fn(),
         });
 
-        // Mock settings store  
+        // Mock settings store
         vi.mocked(useSettingsStore).mockReturnValue({
             initializeSettings: vi.fn().mockResolvedValue(undefined),
         });
@@ -168,7 +168,8 @@ describe("App Development Logging Coverage", () => {
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0][0];
 
         // Create a mock status update
         const mockUpdate = {
@@ -181,7 +182,9 @@ describe("App Development Logging Coverage", () => {
 
         // Verify that logger.debug was called
         expect(logger.debug).toHaveBeenCalledWith(
-            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: test-site-id/)
+            expect.stringMatching(
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: test-site-id/
+            )
         );
     });
 
@@ -206,7 +209,8 @@ describe("App Development Logging Coverage", () => {
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0][0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0][0];
 
         // Create a mock status update with undefined site.identifier
         const mockUpdate = {
@@ -219,7 +223,9 @@ describe("App Development Logging Coverage", () => {
 
         // Verify that logger.debug was called with fallback identifier
         expect(logger.debug).toHaveBeenCalledWith(
-            expect.stringMatching(/\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: fallback-site-id/)
+            expect.stringMatching(
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: fallback-site-id/
+            )
         );
     });
 });
