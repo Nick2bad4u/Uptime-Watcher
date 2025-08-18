@@ -24,6 +24,7 @@ const vitestConfig = defineConfig({
                 "**/*.config.*",
                 "**/*.d.ts",
                 "**/dist/**",
+                "**/dist-shared/**",
                 "**/docs/**",
                 "**/index.ts", // Exclude barrel export files
                 "**/index.tsx",
@@ -103,7 +104,7 @@ const vitestConfig = defineConfig({
         testTimeout: 10_000, // 10 second timeout for shared tests
         typecheck: {
             enabled: true,
-            tsconfig: "./tsconfig.json",
+            tsconfig: "./tsconfig.shared.json",
         },
     },
 });

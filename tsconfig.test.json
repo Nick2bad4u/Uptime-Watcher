@@ -29,12 +29,6 @@
         "**/*.config.ts",
         "eslint.config.mjs",
         "postcss.config.js",
-        "shared/**/*.spec.ts",
-        "shared/**/*.test.ts",
-        "shared/**/*.ts",
-        "shared/**/*.tsx",
-        "shared/test/**/*.ts",
-        "shared/test/**/*.tsx",
         "src/**/*.spec.ts",
         "src/**/*.test.ts",
         "src/**/*.ts",
@@ -44,5 +38,10 @@
         "tailwind.config.mjs",
         "vitest.config.ts",
         "vitest.shared.config.ts"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.shared.json"
+        }
     ]
 }

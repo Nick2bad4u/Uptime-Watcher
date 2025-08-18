@@ -36,13 +36,16 @@
         "electron/test/**/*",
         "eslint.config.mjs",
         "postcss.config.js",
-        "shared/**/*.spec.ts",
-        "shared/**/*.test.ts",
-        "shared/**/*.ts",
-        "shared/**/*.tsx",
-        "shared/test/**/*",
         "tailwind.config.mjs",
         "vitest.config.ts",
         "vitest.electron.config.ts"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.shared.json"
+        },
+        {
+            "path": "./tsconfig.electron.json"
+        }
     ]
 }

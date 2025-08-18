@@ -30,12 +30,13 @@
     "include": [
         "electron/**/*.css",
         "electron/**/*.ts",
-        "shared/**/*",
         "electron/**/*.tsx",
-        "shared/**/*.css",
-        "shared/**/*.ts",
-        "shared/**/*.tsx",
         "vite/client",
         "vitest.electron.config.ts"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.shared.json"
+        }
     ]
 }

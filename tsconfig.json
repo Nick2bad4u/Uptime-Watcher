@@ -8,7 +8,7 @@
         "moduleResolution": "bundler",
         "outDir": "dist",
         "target": "ES2024",
-        "tsBuildInfoFile": "./dist-electron/tsconfig.tsbuildinfo",
+        "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         "lib": [
             "DOM.Iterable",
             "DOM",
@@ -109,24 +109,18 @@
         "coverage",
         "dist-electron",
         "dist",
+        "dist-shared",
         "electron",
+        "shared",
         "node_modules",
         "node_modules/**/*",
         "out",
         "release",
-        "shared/**/*.spec.ts",
-        "shared/**/*.test.ts",
-        "shared/test/**/*",
         "src/**/*.test.ts",
         "src/**/*.test.tsx"
     ],
     "include": [
         "global.d.ts",
-        "shared/**/*.css",
-        "shared/**/*.ts",
-        "shared/**/*.tsx",
-        "shared/events.ts",
-        "shared/**/*",
         "src/**/*.css",
         "src/**/*.css",
         "src/**/*.ts",
@@ -142,6 +136,9 @@
         "tailwind.config.mjs"
     ],
     "references": [
+        {
+            "path": "./tsconfig.shared.json"
+        },
         {
             "path": "./tsconfig.electron.json"
         }

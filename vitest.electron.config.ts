@@ -34,6 +34,7 @@ const vitestConfig = defineConfig({
                 "**/types.tsx", // Exclude type definition files with JSX
                 "coverage/**",
                 "dist-electron/**",
+                "dist-shared/**",
                 "dist/**",
                 "src/**", // Exclude all src files from electron coverage
                 "index.ts", // Barrel export file at root

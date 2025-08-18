@@ -33,7 +33,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * and main/preload processes.
  */
 
-export default defineConfig(() => {
+export default defineConfig(({}) => {
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     return {
         base: "./", // Ensures relative asset paths for Electron

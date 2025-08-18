@@ -1,0 +1,34 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist-shared",
+        "tsBuildInfoFile": "./dist-shared/tsconfig.shared.tsbuildinfo",
+        "paths": {
+            "@shared/*": [
+                "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
+            ]
+        },
+        "composite": true,
+        "incremental": true
+    },
+    "exclude": [
+        "shared/**/*.spec.ts",
+        "shared/**/*.test.ts",
+        "shared/test/**/*",
+        "node_modules",
+        "electron/**/*",
+        "src/**/*",
+        "**/scripts/**"
+    ],
+    "include": [
+        "shared/**/*.css",
+        "shared/**/*.ts",
+        "shared/**/*.tsx"
+    ]
+}
