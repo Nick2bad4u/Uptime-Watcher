@@ -1,6 +1,6 @@
 /**
- * Test specifically targeting the default case in stringConversion.ts lines 86-89
- * The default case handles any unexpected typeof values
+ * Test specifically targeting the default case in stringConversion.ts lines
+ * 86-89 The default case handles any unexpected typeof values
  */
 
 import { describe, expect, it } from "vitest";
@@ -11,14 +11,14 @@ describe("String Conversion - Default Case Coverage", () => {
         // Create an object that will fool the typeof operator
         // This is a bit of a hack to reach the default case
         const mockValue = Object.create(null);
-        
+
         // Override the valueOf method to create confusion
-        Object.defineProperty(mockValue, 'valueOf', {
+        Object.defineProperty(mockValue, "valueOf", {
             value: () => {
                 throw new Error("Custom error");
-            }
+            },
         });
-        
+
         // Create a proxy that intercepts typeof operations
         const proxyValue = new Proxy(mockValue, {
             get(target, prop) {
@@ -28,40 +28,46 @@ describe("String Conversion - Default Case Coverage", () => {
                     };
                 }
                 return target[prop];
-            }
+            },
         });
-        
+
         // Test that safeStringify handles edge cases gracefully
         const result = safeStringify(proxyValue);
         expect(typeof result).toBe("string");
     });
-    
+
     it("should test safeStringify with unusual values", () => {
         // Test with various edge cases that might hit default
         const testCases = [
-            Symbol.for("test"),  // Symbol case
-            undefined,           // Undefined case
-            new Proxy({}, {      // Proxy object
-                get() { return undefined; }
-            })
+            Symbol.for("test"), // Symbol case
+            undefined, // Undefined case
+            new Proxy(
+                {},
+                {
+                    // Proxy object
+                    get() {
+                        return undefined;
+                    },
+                }
+            ),
         ];
-        
+
         for (const testCase of testCases) {
             const result = safeStringify(testCase);
             expect(typeof result).toBe("string");
         }
     });
-    
+
     it("should handle edge case type coercion attempts", () => {
         // Try to create a situation where typeof might return something unexpected
         const weirdObject = Object.create(null);
-        
+
         // Add custom properties that might interfere
-        Object.defineProperty(weirdObject, 'constructor', {
+        Object.defineProperty(weirdObject, "constructor", {
             value: null,
-            configurable: true
+            configurable: true,
         });
-        
+
         const result = safeStringify(weirdObject);
         expect(typeof result).toBe("string");
     });

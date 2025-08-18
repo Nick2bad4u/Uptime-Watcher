@@ -478,11 +478,10 @@ public getSiteManager(): SiteManager {
 
 
 
-/** * Reset the singleton container for testing purposes. * * @remarks * **Testing Utility**: Clears the singleton instance to allow clean test isolation.
- *
- * **Usage Pattern:**
- * ```typescript
- * // In test setup
+
+
+
+/** * Reset the singleton container for testing purposes. * * @remarks * **Testing Utility**: Clears the singleton instance to allow clean test isolation. * * **Usage Pattern:** * ```typescript * // In test setup
  * ServiceContainer.resetForTesting();
  *
  * // Create fresh container for test

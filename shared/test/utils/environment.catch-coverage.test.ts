@@ -22,16 +22,19 @@ describe("Environment - Catch Block Coverage", () => {
         const { getEnvVar } = await import("../../utils/environment");
 
         // Mock process.env to throw an error when accessed
-        Object.defineProperty(globalThis, 'process', {
+        Object.defineProperty(globalThis, "process", {
             value: {
                 ...process,
-                env: new Proxy({}, {
-                    get() {
-                        throw new Error("Mock process.env access error");
+                env: new Proxy(
+                    {},
+                    {
+                        get() {
+                            throw new Error("Mock process.env access error");
+                        },
                     }
-                })
+                ),
             },
-            configurable: true
+            configurable: true,
         });
 
         // This should hit the catch block and return undefined
@@ -44,12 +47,12 @@ describe("Environment - Catch Block Coverage", () => {
         const { getEnvVar } = await import("../../utils/environment");
 
         // Mock process.env to be null
-        Object.defineProperty(globalThis, 'process', {
+        Object.defineProperty(globalThis, "process", {
             value: {
                 ...process,
-                env: null
+                env: null,
             },
-            configurable: true
+            configurable: true,
         });
 
         // This should hit the catch block and return undefined
@@ -62,12 +65,12 @@ describe("Environment - Catch Block Coverage", () => {
         const { getEnvVar } = await import("../../utils/environment");
 
         // Mock process.env to be undefined
-        Object.defineProperty(globalThis, 'process', {
+        Object.defineProperty(globalThis, "process", {
             value: {
                 ...process,
-                env: undefined
+                env: undefined,
             },
-            configurable: true
+            configurable: true,
         });
 
         // This should hit the catch block and return undefined

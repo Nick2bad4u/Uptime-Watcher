@@ -197,6 +197,7 @@ New monitor types automatically integrate with the repository pattern through th
 
 ````typescript
 
+
 // Required imports for DNS monitor example
 import type { Site } from "@shared/types";
 import type { MonitorType } from "@shared/types";
@@ -461,6 +462,7 @@ export class DnsMonitor implements IMonitorService {
 **PRODUCTION REQUIREMENT**: Use the centralized Zod validation system for consistent, secure validation:
 
 ````typescript
+
 
 import { z } from "zod";
 import validator from "validator";
@@ -751,15 +753,8 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling,
- * operation correlation for race condition prevention, and proper resource
- * management following ADR-003 error handling strategy.
- *
- * Features:
- * - Operation correlation prevents race conditions
- * - Memory-safe resource management
- * - Comprehensive error handling with correlation IDs
- * - Production-grade validation and logging
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging
  *
  * @example
  * ```typescript

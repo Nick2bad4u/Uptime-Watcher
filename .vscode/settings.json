@@ -651,7 +651,6 @@
         "**/html/**": true,
         "**/report/**": true,
         "**/scripts/**": true
-
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
