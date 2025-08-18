@@ -40,12 +40,12 @@ describe("Monitor Types Utility", () => {
             expect(types2).not.toContain("fake");
         });
 
-    it("should return only base types (including dns)", () => {
+        it("should return only base types (including dns)", () => {
             const types = getBaseMonitorTypes();
 
             // Should only contain known base types
             for (const type of types) {
-        expect(["http", "port", "ping", "dns"]).toContain(type);
+                expect(["http", "port", "ping", "dns"]).toContain(type);
             }
         });
 
@@ -69,7 +69,7 @@ describe("Monitor Types Utility", () => {
             expect(isBaseMonitorType("port")).toBe(true);
         });
 
-    it("should return false for invalid monitor types", () => {
+        it("should return false for invalid monitor types", () => {
             expect(isBaseMonitorType("invalid")).toBe(false);
             expect(isBaseMonitorType("tcp")).toBe(false);
         });
@@ -190,7 +190,7 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-    it("should not include extended or dynamic types (excluding custom)", () => {
+        it("should not include extended or dynamic types (excluding custom)", () => {
             const baseTypes = getBaseMonitorTypes();
 
             // Should only include the core built-in types

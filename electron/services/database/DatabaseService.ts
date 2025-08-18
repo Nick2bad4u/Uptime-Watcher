@@ -6,6 +6,7 @@
  * transaction utilities for the application. Uses node-sqlite3-wasm for
  * database operations.
  */
+
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
@@ -131,19 +132,53 @@ export class DatabaseService {
     ): Promise<T> {
         const db = this.getDatabase();
 
+        // Check if we're already in a transaction (nested transaction scenario)
+        if (db.inTransaction) {
+            logger.debug(
+                "[DatabaseService] Already in transaction, executing operation without new transaction"
+            );
+            // If we're already in a transaction, just execute the operation
+            // without starting a new transaction (SQLite doesn't support nested transactions)
+            return operation(db);
+        }
+
         try {
             db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
-            // Execute operation and commit on success
+            logger.debug("[DatabaseService] Started new transaction");
+
+            // Execute operation, then commit and return in one expression
+            // This ensures operation completes before commit, fixing the race condition
             return await operation(db).then((result) => {
                 db.run(DATABASE_SERVICE_QUERIES.COMMIT);
+                logger.debug(
+                    "[DatabaseService] Successfully committed transaction"
+                );
                 return result;
             });
         } catch (error) {
+            // Enhanced error logging to understand what's causing transaction failures
+            logger.error(
+                "[DatabaseService] Transaction operation failed",
+                error
+            );
+
+            // Only attempt rollback if a transaction is actually active
+            // This prevents "cannot rollback - no transaction is active" errors
             try {
-                db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- node-sqlite3-wasm.Database.inTransaction is a valid runtime property
+                if (db.inTransaction) {
+                    db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
+                    logger.debug(
+                        "[DatabaseService] Successfully rolled back transaction"
+                    );
+                } else {
+                    logger.debug(
+                        "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
+                    );
+                }
             } catch (rollbackError) {
                 logger.error(
-                    "[DatabaseService] Failed to rollback transaction",
+                    "[DatabaseService] Failed to rollback active transaction",
                     rollbackError
                 );
             }

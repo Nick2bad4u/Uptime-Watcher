@@ -63,6 +63,12 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
     if (typeof lastChecked === "number") {
         return lastChecked;
     }
+    // Log warning when discarding invalid data to help debugging
+    if (lastChecked !== null && lastChecked !== undefined) {
+        console.warn(
+            `Invalid lastChecked value discarded: ${safeStringify(lastChecked)} (type: ${typeof lastChecked})`
+        );
+    }
     return null;
 }
 
@@ -236,7 +242,15 @@ function convertSqlValue(
 ): unknown {
     switch (sqlType) {
         case "INTEGER": {
-            return Number(value);
+            const numValue = Number(value);
+            // Prevent NaN corruption in database
+            if (Number.isNaN(numValue)) {
+                console.warn(
+                    `Invalid numeric value for INTEGER conversion: ${String(value)}, using 0 as fallback`
+                );
+                return 0;
+            }
+            return numValue;
         }
         case "TEXT": {
             return safeStringify(value);
@@ -657,19 +671,39 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         ...(row.last_checked && { lastChecked: new Date(row.last_checked) }),
     };
 
-    // Dynamically map monitor type specific fields
-    const fieldDefs = generateDatabaseFieldDefinitions();
-    for (const fieldDef of fieldDefs) {
-        const value = row[fieldDef.columnName as keyof MonitorRow];
-        // Check if value exists (handles both null and undefined from SQLite)
-        if (value !== undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- Dynamic field assignment required for extensible monitor type system. fieldDef.sourceField is validated by generateDatabaseFieldDefinitions() from monitor type registry.
-            (monitor as any)[fieldDef.sourceField] = convertFromDatabase(
-                value,
-                fieldDef.sqlType
-            );
+    // Dynamically map monitor type specific fields ONLY for the current monitor type
+    const monitorTypeConfig = getAllMonitorTypeConfigs().find(
+        (config) => config.type === monitor.type
+    );
+
+    if (monitorTypeConfig) {
+        // Create a mutable version for dynamic field assignment
+        const mutableMonitor = monitor as unknown as Record<string, unknown>;
+
+        // Only add fields that are specifically defined for this monitor type
+        for (const field of monitorTypeConfig.fields) {
+            const columnName = toSnakeCase(field.name);
+            const value = row[columnName as keyof MonitorRow];
+
+            // Add field if value exists (dynamic fields from monitor type registry)
+            if (value !== undefined) {
+                // Type-safe dynamic field assignment using Record interface
+                // field.name is validated by monitor type configuration
+                mutableMonitor[field.name] = convertFromDatabase(
+                    value,
+                    getSqlTypeFromFieldType(field.type)
+                );
+            }
         }
+
+        // Return the monitor with type assertion back to Monitor interface
+        return mutableMonitor as unknown as Monitor;
     }
+
+    // Log warning if monitor type config is missing to prevent silent field loss
+    console.warn(
+        `Monitor type configuration not found for type '${monitor.type}', dynamic fields may be lost`
+    );
 
     return monitor;
 }

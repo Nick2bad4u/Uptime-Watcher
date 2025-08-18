@@ -28,6 +28,20 @@ import { CacheKeys } from "@shared/utils/cacheKeys";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
+
+/**
+ * Type guard to check if a cache value is a MonitorTypeConfig
+ */
+function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
+    return (
+        value !== null &&
+        typeof value === "object" &&
+        typeof (value as MonitorTypeConfig).type === "string" &&
+        typeof (value as MonitorTypeConfig).displayName === "string" &&
+        Array.isArray((value as MonitorTypeConfig).fields)
+    );
+}
+
 import { withUtilityErrorHandling } from "./errorHandling";
 import {
     getAvailableMonitorTypes,
@@ -52,10 +66,8 @@ async function getConfig(
     const cacheKey = CacheKeys.config.byName(`monitor-config-${monitorType}`);
 
     // Try to get from cache first
-    const cached = AppCaches.uiHelpers.get(cacheKey) as
-        | MonitorTypeConfig
-        | undefined;
-    if (cached) {
+    const cached = AppCaches.uiHelpers.get(cacheKey);
+    if (cached && isMonitorTypeConfig(cached)) {
         return cached;
     }
 

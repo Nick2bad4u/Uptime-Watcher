@@ -97,6 +97,31 @@ export interface PingMonitorFields extends BaseMonitorFields {
 }
 
 /**
+ * DNS monitor specific fields
+ */
+export interface DnsMonitorFields extends BaseMonitorFields {
+    /** Expected value for the DNS response (optional) */
+    expectedValue?: string;
+    /** Host to query */
+    host: string;
+    /** DNS record type to query */
+    recordType:
+        | "A"
+        | "AAAA"
+        | "ANY"
+        | "CAA"
+        | "CNAME"
+        | "MX"
+        | "NAPTR"
+        | "NS"
+        | "PTR"
+        | "SOA"
+        | "SRV"
+        | "TLSA"
+        | "TXT";
+}
+
+/**
  * Port monitor specific fields
  */
 export interface PortMonitorFields extends BaseMonitorFields {
@@ -112,6 +137,7 @@ export interface PortMonitorFields extends BaseMonitorFields {
  * Union type for all monitor field types
  */
 export type MonitorFormFields =
+    | DnsMonitorFields
     | HttpMonitorFields
     | PingMonitorFields
     | PortMonitorFields;
@@ -136,6 +162,14 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
     };
 
     switch (type) {
+        case "dns": {
+            return {
+                ...baseFields,
+                expectedValue: "",
+                host: "",
+                recordType: "A",
+            } satisfies DnsMonitorFields;
+        }
         case "http": {
             return {
                 ...baseFields,

@@ -73,6 +73,9 @@ export const MonitorSelector: React.NamedExoticComponent<MonitorSelectorProperti
             const getDetail = (): string => {
                 // Show details based on monitor type
                 switch (monitor.type) {
+                    case "dns": {
+                        return monitor.host ? `: ${monitor.host}` : "";
+                    }
                     case "http": {
                         return monitor.url ? `: ${monitor.url}` : "";
                     }

@@ -99,57 +99,179 @@ export function findMonitorInSite(
  * @returns Complete monitor object with validated and normalized fields
  */
 /**
- * Safely extract DNS-specific monitor properties from a partial monitor.
+ * Gets the allowed fields for a specific monitor type.
+ *
+ * @param type - The monitor type
+ *
+ * @returns Set of field names allowed for this monitor type
+ *
+ * @internal
  */
-function extractDnsProps(
-    type: MonitorType,
-    monitor: Partial<Monitor>
-): Partial<Monitor> {
-    if (type !== "dns") return {};
+function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
+    // Base fields that all monitors have
+    const baseFields = new Set([
+        "activeOperations",
+        "checkInterval",
+        "history",
+        "id",
+        "lastChecked",
+        "monitoring",
+        "responseTime",
+        "retryAttempts",
+        "status",
+        "timeout",
+        "type",
+    ]);
 
-    const props: Partial<Monitor> = {};
-    if (isNonEmptyString(monitor.recordType)) {
-        props.recordType = monitor.recordType as string;
+    // Add type-specific fields based on monitor type registry
+    switch (type) {
+        case "dns": {
+            baseFields.add("expectedValue");
+            baseFields.add("host");
+            baseFields.add("recordType");
+            break;
+        }
+        case "http": {
+            baseFields.add("url");
+            break;
+        }
+        case "ping": {
+            baseFields.add("host");
+            break;
+        }
+        case "port": {
+            baseFields.add("host");
+            baseFields.add("port");
+            break;
+        }
+        default: {
+            // For unknown types, only allow base fields
+            break;
+        }
     }
-    if (isNonEmptyString(monitor.expectedValue)) {
-        props.expectedValue = monitor.expectedValue as string;
+
+    return baseFields;
+}
+
+/**
+ * Filters monitor object to only include fields appropriate for its type.
+ *
+ * @param monitor - Monitor object to filter
+ * @param type - Monitor type to use for filtering
+ *
+ * @returns Filtered monitor object with only appropriate fields
+ *
+ * @internal
+ */
+function filterMonitorFieldsByType(
+    monitor: Partial<Monitor>,
+    type: MonitorType
+): Partial<Monitor> {
+    const allowedFields = getAllowedFieldsForMonitorType(type);
+    const filtered: Partial<Monitor> = {};
+
+    // Only include fields that are allowed for this monitor type
+    // Use type assertion to safely access monitor properties
+    const monitorRecord = monitor as Record<string, unknown>;
+    for (const [key, value] of Object.entries(monitorRecord)) {
+        if (allowedFields.has(key)) {
+            (filtered as Record<string, unknown>)[key] = value;
+        }
     }
-    return props;
+
+    return filtered;
+}
+
+/**
+ * Validates monitor input data before processing.
+ *
+ * @param monitor - Monitor data to validate
+ *
+ * @throws TypeError if monitor data is invalid
+ *
+ * @internal
+ */
+function validateMonitorInput(monitor: Partial<Monitor>): void {
+    if (Array.isArray(monitor)) {
+        throw new TypeError(
+            "Invalid monitor data: must be an object, not an array"
+        );
+    }
 }
 
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
-    const finalizedType = validateMonitorType(monitor.type);
-    const dnsProps = extractDnsProps(finalizedType, monitor);
+    // Validate input data
+    validateMonitorInput(monitor);
+
+    // Cast to unknown first to avoid strict type issues with Partial<Monitor>
+    const monitorData = monitor as unknown as Record<string, unknown>;
+    const finalizedType = validateMonitorType(monitorData["type"]);
+
+    // Filter the monitor data to only include fields appropriate for this type
+    const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
+
+    // Cast filtered monitor for safe access
+    const filteredData = filteredMonitor as unknown as Record<string, unknown>;
 
     return {
-        activeOperations: Array.isArray(monitor.activeOperations)
-            ? monitor.activeOperations
+        activeOperations: Array.isArray(filteredData["activeOperations"])
+            ? (filteredData["activeOperations"] as string[])
             : [],
-        checkInterval: safeInteger(monitor.checkInterval, 300_000, 5000),
-        history: Array.isArray(monitor.history) ? monitor.history : [],
-        id: monitor.id ?? crypto.randomUUID(),
-        monitoring: monitor.monitoring ?? true,
+        checkInterval: safeInteger(
+            filteredData["checkInterval"] as number | undefined,
+            300_000,
+            5000
+        ),
+        history: Array.isArray(filteredData["history"])
+            ? (filteredData["history"] as Monitor["history"])
+            : [],
+        id: (filteredData["id"] as string | undefined) ?? crypto.randomUUID(),
+        monitoring: (filteredData["monitoring"] as boolean | undefined) ?? true,
         responseTime:
-            typeof monitor.responseTime === "number"
-                ? monitor.responseTime
+            typeof filteredData["responseTime"] === "number"
+                ? filteredData["responseTime"]
                 : -1,
-        retryAttempts: safeInteger(monitor.retryAttempts, 3, 0, 10),
+        retryAttempts: safeInteger(
+            filteredData["retryAttempts"] as number | undefined,
+            3,
+            0,
+            10
+        ),
         status:
-            monitor.status && isMonitorStatus(monitor.status)
-                ? monitor.status
+            filteredData["status"] &&
+            isMonitorStatus(filteredData["status"] as string)
+                ? (filteredData["status"] as Monitor["status"])
                 : DEFAULT_MONITOR_STATUS,
-    timeout: safeInteger(monitor.timeout, 5000, 1000, 300_000),
-    type: finalizedType,
-        // Only add optional fields if they are explicitly provided and valid
-        ...(isValidUrl(monitor.url) && { url: monitor.url }),
-        ...(isNonEmptyString(monitor.host) && { host: monitor.host }),
-        ...(typeof monitor.port === "number" &&
-            monitor.port > 0 && { port: monitor.port }),
-        ...(monitor.lastChecked instanceof Date && {
-            lastChecked: monitor.lastChecked,
+        timeout: safeInteger(
+            filteredData["timeout"] as number | undefined,
+            5000,
+            1000,
+            300_000
+        ),
+        type: finalizedType,
+        // Only add optional fields if they are explicitly provided and valid after filtering
+        ...(isValidUrl(filteredData["url"] as string) && {
+            url: filteredData["url"] as string,
         }),
-    // Preserve DNS-specific fields when applicable
-    ...dnsProps,
+        ...(isNonEmptyString(filteredData["host"] as string) && {
+            host: filteredData["host"] as string,
+        }),
+        ...(typeof filteredData["port"] === "number" &&
+            filteredData["port"] > 0 && {
+                port: filteredData["port"],
+            }),
+        ...(filteredData["lastChecked"] instanceof Date && {
+            lastChecked: filteredData["lastChecked"],
+        }),
+        // Add DNS-specific fields if this is a DNS monitor and they are present after filtering
+        ...(finalizedType === "dns" &&
+            isNonEmptyString(filteredData["recordType"] as string) && {
+                recordType: filteredData["recordType"] as string,
+            }),
+        ...(finalizedType === "dns" &&
+            isNonEmptyString(filteredData["expectedValue"] as string) && {
+                expectedValue: filteredData["expectedValue"] as string,
+            }),
     };
 }
 
@@ -205,14 +327,26 @@ export function updateMonitorInSite(
         throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
 
+    // Validate updates before applying them
+    validateMonitorInput(updates);
+
     const updatedMonitors = site.monitors.map((monitor) => {
         if (monitor.id === monitorId) {
-            // Validate and normalize the updated monitor
-            const updatedMonitor = {
-                ...monitor,
-                ...updates,
-            };
-            return normalizeMonitor(updatedMonitor);
+            // Store original monitor for potential rollback
+            const originalMonitor = monitor;
+
+            try {
+                // Validate and normalize the updated monitor
+                const updatedMonitor = {
+                    ...monitor,
+                    ...updates,
+                };
+                return normalizeMonitor(updatedMonitor);
+            } catch (error) {
+                // Log error and return original monitor to prevent corruption
+                console.error(`Failed to update monitor ${monitorId}:`, error);
+                return originalMonitor;
+            }
         }
         return monitor;
     });

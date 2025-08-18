@@ -33,20 +33,24 @@ The DNS monitor implementation provided invaluable insights into the system arch
 Based on the DNS implementation, **every new monitor type must update ALL of these files**:
 
 #### **Backend (Electron)**
+
 - [ ] `electron/services/monitoring/[MonitorType]Monitor.ts` - Core monitor service
 - [ ] `electron/services/monitoring/MonitorTypeRegistry.ts` - Register new type with UI config
 
-#### **Shared Validation & Types**  
+#### **Shared Validation & Types**
+
 - [ ] `shared/validation/schemas.ts` - Add Zod schema for new monitor type
 - [ ] `shared/utils/validation.ts` - Add runtime validation functions
 - [ ] `shared/types.ts` - Update BASE_MONITOR_TYPES array
 
 #### **Frontend (React)**
+
 - [ ] `src/components/AddSiteForm/DynamicMonitorFields.tsx` - UI fields for new type
 - [ ] `src/components/AddSiteForm/Submit.tsx` - Form submission handling
 - [ ] `src/utils/monitorTitleFormatters.ts` - Title formatting for new type
 
 #### **Tests**
+
 - [ ] Update all tests that check BASE_MONITOR_TYPES count (critical!)
 - [ ] Add comprehensive tests for new monitor type
 
@@ -55,106 +59,141 @@ Based on the DNS implementation, **every new monitor type must update ALL of the
 #### **1. Field Name Inconsistency**
 
 **❌ Problem**: Using different field names in different layers
+
 ```typescript
 // Backend expects "host"
-dnsMonitorSchema.host
-// Frontend sends "hostname"  
-formData.hostname
+dnsMonitorSchema.host;
+// Frontend sends "hostname"
+formData.hostname;
 ```
 
 **✅ Solution**: Standardize on one field name across ALL layers
+
 ```typescript
 // All layers use "host"
 const dnsMonitorSchema = z.object({
-  host: z.string().min(1),
-  recordType: z.enum(DNS_RECORD_TYPES),
-  expectedValue: z.string().optional()
+ host: z.string().min(1),
+ recordType: z.enum(DNS_RECORD_TYPES),
+ expectedValue: z.string().optional(),
 });
 ```
 
 #### **2. Schema Synchronization Failures**
 
 **❌ Problem**: Adding new record types in one place but not others
+
 ```typescript
 // Only updated the schema enum
-const DNS_RECORD_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'ANY'] as const;
+const DNS_RECORD_TYPES = [
+ "A",
+ "AAAA",
+ "CNAME",
+ "MX",
+ "TXT",
+ "ANY",
+] as const;
 // Forgot to update the TypeScript union type
-type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'MX'; // Missing TXT, ANY
+type DnsRecordType = "A" | "AAAA" | "CNAME" | "MX"; // Missing TXT, ANY
 ```
 
 **✅ Solution**: Update ALL type definitions simultaneously
+
 ```typescript
 // Update schema enum
-const DNS_RECORD_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA', 'PTR', 'NAPTR', 'SOA', 'TLSA', 'ANY'] as const;
+const DNS_RECORD_TYPES = [
+ "A",
+ "AAAA",
+ "CNAME",
+ "MX",
+ "TXT",
+ "NS",
+ "SRV",
+ "CAA",
+ "PTR",
+ "NAPTR",
+ "SOA",
+ "TLSA",
+ "ANY",
+] as const;
 // Update TypeScript union
-type DnsRecordType = typeof DNS_RECORD_TYPES[number];
+type DnsRecordType = (typeof DNS_RECORD_TYPES)[number];
 // Update validation functions
 export function validateDnsRecordType(type: string): type is DnsRecordType {
-  return DNS_RECORD_TYPES.includes(type as DnsRecordType);
+ return DNS_RECORD_TYPES.includes(type as DnsRecordType);
 }
 ```
 
 #### **3. Special Semantics Handling**
 
 **❌ Problem**: Not handling special behaviors (like DNS ANY)
+
 ```typescript
 // ANY record type should not have "Expected Value" in UI
 // But form shows it anyway, causing user confusion
 ```
 
 **✅ Solution**: Implement conditional UI behavior
+
 ```typescript
 // In DynamicMonitorFields.tsx
-const isAnyRecord = formData.recordType === 'ANY';
+const isAnyRecord = formData.recordType === "ANY";
 <TextField
-  label="Expected Value"
-  disabled={isAnyRecord}
-  helpText={isAnyRecord ? "Expected Value is not used for ANY records" : undefined}
-/>
+ label="Expected Value"
+ disabled={isAnyRecord}
+ helpText={
+  isAnyRecord ? "Expected Value is not used for ANY records" : undefined
+ }
+/>;
 
 // In Submit.tsx - handle ANY semantics
 const submitData = {
-  ...formData,
-  // Omit expectedValue for ANY records
-  ...(formData.recordType === 'ANY' ? {} : { expectedValue: safeTrim(formData.expectedValue) })
+ ...formData,
+ // Omit expectedValue for ANY records
+ ...(formData.recordType === "ANY"
+  ? {}
+  : { expectedValue: safeTrim(formData.expectedValue) }),
 };
 ```
 
 #### **4. Unsafe String Handling**
 
 **❌ Problem**: Calling `.trim()` on potentially undefined values
+
 ```typescript
 // This crashes if formData.expectedValue is undefined
 const trimmed = formData.expectedValue.trim();
 ```
 
 **✅ Solution**: Use safe trimming utility
+
 ```typescript
 // Create utility function
-const safeTrim = (value: string | undefined): string | undefined => 
-  value?.trim() || undefined;
+const safeTrim = (value: string | undefined): string | undefined =>
+ value?.trim() || undefined;
 
 // Use throughout form handling
 const submitData = {
-  host: safeTrim(formData.host),
-  expectedValue: safeTrim(formData.expectedValue)
+ host: safeTrim(formData.host),
+ expectedValue: safeTrim(formData.expectedValue),
 };
 ```
 
 #### **5. Test Count Assumptions**
 
 **❌ Problem**: Tests assume fixed number of base monitor types
+
 ```typescript
 // This breaks when DNS is added
 expect(baseMonitorTypes).toHaveLength(3); // Now should be 4
 ```
 
 **✅ Solution**: Update all affected tests
+
 ```typescript
 // Update to new count
 expect(baseMonitorTypes).toHaveLength(4);
 // Or make test dynamic
-expect(baseMonitorTypes).toContain('dns');
+expect(baseMonitorTypes).toContain("dns");
 ```
 
 ### **🎯 Implementation Order (Critical!)**
@@ -162,7 +201,7 @@ expect(baseMonitorTypes).toContain('dns');
 Follow this exact order to avoid integration issues:
 
 1. **Backend Service**: Implement monitor service first
-2. **Shared Types**: Add to BASE_MONITOR_TYPES array  
+2. **Shared Types**: Add to BASE_MONITOR_TYPES array
 3. **Shared Schemas**: Add Zod validation schema
 4. **Shared Validation**: Add runtime validation functions
 5. **MonitorTypeRegistry**: Register with UI configuration
@@ -176,7 +215,7 @@ Follow this exact order to avoid integration issues:
 After implementation, verify these work correctly:
 
 - [ ] Form shows appropriate fields for new monitor type
-- [ ] Form validation prevents invalid data submission  
+- [ ] Form validation prevents invalid data submission
 - [ ] Monitor service can perform checks successfully
 - [ ] Title formatting displays correctly in UI
 - [ ] All tests pass (especially base type count tests)
@@ -363,7 +402,6 @@ Every monitor type must support these standardized fields from the `Monitor` int
 New monitor types automatically integrate with the repository pattern through the Enhanced Monitoring System:
 
 ````typescript
-
 
 // Required imports for DNS monitor example
 import type { Site } from "@shared/types";
@@ -629,7 +667,6 @@ export class DnsMonitor implements IMonitorService {
 **PRODUCTION REQUIREMENT**: Use the centralized Zod validation system for consistent, secure validation:
 
 ````typescript
-
 
 import { z } from "zod";
 import validator from "validator";
@@ -921,11 +958,10 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging
- *
- * @example
- * ```typescript
- * const monitor = new DnsMonitor();
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor();
  * const result = await monitor.check(dnsConfig);
  * // Automatically integrates with enhanced monitoring system
  * ```
@@ -2060,12 +2096,11 @@ describe("YourMonitor Integration", () => {
 
 Test the Zod schema thoroughly:
 
-```typescript
-```typescript
-describe("YourMonitor Schema Validation", () => {
- it("should validate correct monitor configuration", () => {
-  const validConfig = {
-   // Valid monitor configuration
+````typescript
+
+
+
+```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration
   };
 
   const result = yourMonitorSchema.safeParse(validConfig);
@@ -2110,7 +2145,7 @@ The DNS monitoring implementation has been **comprehensively verified** across a
 Based on the **real DNS implementation experience**, the following patterns are essential for any new monitor type:
 
 1. **Field Name Standardization** - Consistent naming across all layers prevents integration failures
-2. **Schema Synchronization** - Zod schemas, TypeScript unions, and validation must stay perfectly aligned  
+2. **Schema Synchronization** - Zod schemas, TypeScript unions, and validation must stay perfectly aligned
 3. **Special Semantics Handling** - Some monitor types require custom UI/backend behavior (like DNS ANY records)
 4. **Safe String Utilities** - Prevent undefined access errors with utilities like `safeTrim()`
 5. **Test Count Updates** - Base monitor type tests must be updated for new types
@@ -2149,6 +2184,6 @@ This guide has been updated with **real implementation insights** rather than th
 *Guide Status: Updated with real implementation experience and lessons learned*
  });
 });
-```
+````
 
 **The result is a production-ready monitoring system with enterprise-grade quality, comprehensive testing, and architectural excellence that scales reliably under load while maintaining code quality and developer productivity.**
