@@ -31,3 +31,6 @@ package.json
 **/**.prompt-copy.md
 **/**.prompt.**.md
 **/**.chatmode.md
+
+# Ignore Sonar properties (not compatible with prettier-ini parser)
+sonar-project.properties
