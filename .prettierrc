@@ -93,7 +93,6 @@
         "prettier-plugin-ini",
         "prettier-plugin-sort-json",
         "prettier-plugin-interpolated-html-tags",
-        "@awmottaz/prettier-plugin-void-html",
         "prettier-plugin-sql",
         "prettier-plugin-multiline-arrays",
         "prettier-plugin-jsdoc",

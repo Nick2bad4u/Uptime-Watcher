@@ -118,6 +118,7 @@ paths:
             - 'unknown permission scope "metadata"'
             - 'unknown permission scope "checks"'
             - 'unknown permission scope "statuses"'
+            - 'unknown permission scope "models"'
 
             # Job dependencies for complex workflows
             - "circular dependency detected"
