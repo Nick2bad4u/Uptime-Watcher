@@ -7,14 +7,198 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[dbd105d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)...
+[dbd105d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dbd105de469d68e10b956df1bd335614a5a0d940...dbd105de469d68e10b956df1bd335614a5a0d940))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.5.0 [`(dbd105d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)
+
+
+
+
+
+
+## [11.5.0] - 2025-08-18
+
+
+[[b104dcd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b104dcd897e2356be5ab67d3d7b218cc65f2dd30)...
+[bd71a12](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bd71a123f88adce0a9483c8249c109f5660f9031)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b104dcd897e2356be5ab67d3d7b218cc65f2dd30...bd71a123f88adce0a9483c8249c109f5660f9031))
+
+
+### ✨ Features
+
+- ✨ [feat] Add production-ready DNS monitor support
+
+- Implements full DNS record monitoring as a first-class monitor type, supporting all major DNS records (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY) with configurable timeout, retry, and detailed error handling
+- Updates UI, schemas, validation, type definitions, and registry to seamlessly integrate DNS monitoring with safe string handling, conditional form logic, and dynamic title formatting
+- Refactors documentation and developer patterns to reflect real DNS implementation experience for future extensibility
+- Expands test coverage and updates all monitor type counting logic to include DNS
+- Improves frontend form logic and backend normalization for DNS-specific fields
+- Fixes validation, code style, and field mapping issues for robust integration
+
+Relates to DNS monitoring feature rollout and architecture enhancement
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0dc69ae)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0dc69ae4614f8f0bb24b4ee1fd42d0eae2dac3c7)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.4.0 [`(6fd6f4b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fd6f4b050b5851de6752e322400dfbf7cdc57f9)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Enhance and standardize code documentation across app
+
+- Improves codebase maintainability by expanding, clarifying, and unifying documentation comments in all major modules, including backend, shared, and frontend areas
+- Adds detailed @remarks, @example usage, and @packageDocumentation tags, clarifying responsibilities, key features, contracts, and usage patterns
+- Refines docstring structure for better developer experience and onboarding, reducing ambiguity and duplication
+- Prioritizes type safety, error handling, and design rationale explanations in comments
+- No functional or logic changes; strictly documentation-focused
+
+Relates to internal documentation quality initiative
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(754b12a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/754b12ac1764817ab106cc94768f3dbde46096c3)
+
+
+- 📝 [docs] Update instructions and settings for clarity and coverage
+
+- Clarifies formatting by removing list styling from architecture, conventions, and prohibitions, improving readability and consistency across documentation.
+- Moves environment and thinking mode settings to a more relevant location for easier reference and alignment with other critical instructions.
+- Updates test coverage prompt to use more precise tool selection and adds additional test/check commands for comprehensive coverage, encouraging use of unlimited time and requests.
+- Removes outdated server references and redundant section headers to streamline guidelines and focus on actionable standards.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b104dcd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b104dcd897e2356be5ab67d3d7b218cc65f2dd30)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Increase coverage for edge cases and error handling
+
+- Adds targeted tests to cover error scenarios and default cases in utility functions, improving branch and catch-block coverage.
+- Refines test logic for string conversion, replacing array iteration with explicit loops for better clarity and robustness.
+- Mocks store hooks and theme dependencies more explicitly to prevent test contamination and improve isolation.
+- Updates exclusion patterns for editor search and static analysis to ignore additional generated and documentation directories.
+- Expands ESLint configuration to suppress implicit dependency warnings for a new module, reducing unnecessary lint errors.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2b7c241)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b7c241e9171583d806542851d3aff4f7299992d)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Standardize formatting and improve test robustness
+
+- Removes unnecessary blank lines and ensures consistent formatting across markdown, config, and test files for clarity and maintainability.
+- Refactors test cases to use double quotes and modernizes proxy/object setups for improved reliability and coverage.
+- Updates ESLint config for clearer implicit dependency handling and better readability.
+- Enhances documentation comment blocks for easier parsing and future editing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8faf3a9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8faf3a9768171e2591486eac8b3a5980a57e901a)
+
+
+
+
+
+
+## [11.4.0] - 2025-08-18
+
+
 [[2a11542](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a1154247aafe59d121971c88dea03618e632de7)...
-[2a11542](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a1154247aafe59d121971c88dea03618e632de7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2a1154247aafe59d121971c88dea03618e632de7...2a1154247aafe59d121971c88dea03618e632de7))
+[dc51463](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dc5146369ab47cff4342fd8182d9038af7cc6007)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2a1154247aafe59d121971c88dea03618e632de7...dc5146369ab47cff4342fd8182d9038af7cc6007))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 11.3.0 [`(2a11542)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a1154247aafe59d121971c88dea03618e632de7)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Remove Docusaurus API and component reference docs
+
+Removes generated API documentation and component reference files from the docs directory, including interfaces, functions, variables, and markdown indexes.
+
+This reduces repository size and avoids duplication of autogenerated documentation. Prepares for a streamlined or alternative documentation system.
+
+Also updates CI workflow to build Electron files before running TypeDoc for improved module resolution.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b80ec93)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b80ec93427ca72d75db1c21a04c82d28ba995554)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Enforce consistent self-closing HTML tags
+
+- Updates HTML formatting to require explicit self-closing tags and proper spacing in attributes for improved readability and consistency.
+- Removes unused HTML formatting plugin to streamline code style plugins and prevent redundancy.
+- Enhances linting rules to catch extra attribute spacing and missing closing tags, reducing potential markup errors.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(68dbe17)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/68dbe17038991c28fa5958a5e4c736e67a8aea78)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve formatting and coverage in shared and app tests
+
+- Enhances test readability and consistency by reformatting code and array/object literals.
+- Increases code coverage for unreachable and edge cases, especially in string conversion utilities and app status logging.
+- Refactors mock usage for greater clarity and correctness in test callbacks and assertions.
+- Removes unnecessary whitespace and ensures files end with newlines for better style compliance.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dc51463)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dc5146369ab47cff4342fd8182d9038af7cc6007)
+
+
+- 🧪 [test] Achieves 100% coverage for unreachable code paths
+
+- Adds new tests to explicitly cover previously unreachable branches and edge cases in utility and app modules, ensuring full coverage and branch testing.
+- Refactors existing tests for improved clarity and robustness, especially in type and undefined handling.
+- Enhances coverage for development-only logging code and status update callbacks, including fallback logic.
+- Improves configuration for linters, commit conventions, and CI workflow to support stricter standards, automated fixes, and better reporting.
+- Updates and cleans up project configuration files for consistency and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c47a49b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c47a49b786d7a057939c0fb064d224640376a2f3)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Update build config, dependencies, and docs for improved maintainability
+
+- Upgrades typedoc-plugin-dt-links for better documentation integration
+- Refines build scripts and removes redundant TypeScript compilation step for electron-vite
+- Clarifies asset and plugin configuration in PostCSS and Stylelint configs; enhances comments for future maintainers
+- Moves additional coverage tests to a dedicated test directory for better organization
+- Removes unnecessary test exclusions in Tailwind config; encourages handling via build tools
+- Cleans up sonar and Typedoc configs to optimize reporting and plugin usage
+- Adds new custom words to dictionary for improved spellcheck coverage
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(54e8b90)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/54e8b901312b65c44aa153dd26d095b6317592cf)
+
+
+- Update changelogs for v11.3.0 [skip ci] [`(5901d84)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5901d842f78422893dcbe09f28a14c403abc0bc3)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enforces Node.js SDK extension and broadens TypeScript include paths
+
+- Adds a check to require the necessary Node.js Flatpak extension during builds, preventing misconfigured environments and guiding users to install it if missing.
+- Expands TypeScript configuration to include all files under shared, improving coverage for development and type checking.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(96ddb95)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/96ddb95331a64dfdfaf6292a1c8fd8f30084472d)
 
 
 
