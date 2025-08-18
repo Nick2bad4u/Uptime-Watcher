@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Generate 100% Test Coverage"
 ---
 
@@ -12,10 +12,13 @@ description: "Generate 100% Test Coverage"
 2. Run and check current test errors and warnings:
    - `npm run test`
    - `npm run test:electron`
+   - `npm run test:shared`
+   - `npm run type-check:test`
 3. Ensure all tests pass with no errors or warnings.
 4. Check coverage and create tests for files below 90% (or 100% if above 90%):
    - `npm run test:coverage`
    - `npm run test:electron:coverage`
+   - `npm run test:shared:coverage`
 5. Scan source code to create intelligent tests for all branches and edge cases.
 6. Ensure comprehensive tests for all edge cases.
 7. Use unlimited requests and time as needed.
