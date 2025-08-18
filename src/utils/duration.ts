@@ -1,4 +1,12 @@
 /**
+ * Duration calculation utilities for monitoring operations.
+ *
+ * @remarks
+ * Provides functions for calculating monitoring check durations including
+ * timeout values, retry attempts, and exponential backoff scenarios.
+ */
+
+/**
  * Utility function to calculate the maximum duration for monitoring checks with
  * retry attempts and exponential backoff.
  *

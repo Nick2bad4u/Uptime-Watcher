@@ -1,23 +1,13 @@
 /**
- * @remarks
  * Type definitions for the Uptime Watcher frontend.
+ *
  * @remarks
- * - All core domain types are imported from shared/types.ts for consistency.
- * - This module provides a single import location for all frontend type
- *   definitions.
+ * All core domain types are imported from shared/types.ts for consistency. This
+ * module provides a single import location for all frontend type definitions.
  *
  * @packageDocumentation
  */
 
-/**
- * @remarks
- * Re-export monitor form-specific types for UI components.
- * @remarks
- * These types are used for form validation and UI state management in monitor
- * creation and editing workflows.
- *
- * @public
- */
 // Import types for global declarations
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
@@ -30,18 +20,24 @@ import type {
 } from "@shared/types/events";
 
 /**
- * @remarks
  * Re-export monitor form-specific types for UI components.
+ *
  * @remarks
  * These types are used for form validation and UI state management in monitor
  * creation and editing workflows.
  *
  * @public
  */
-// Import monitor form types directly from "./types/monitor-forms" if needed
 
-// Import monitor form functions directly from "./types/monitor-forms" if needed
-
+/**
+ * Re-export monitor form-specific types for UI components.
+ *
+ * @remarks
+ * These types are used for form validation and UI state management in monitor
+ * creation and editing workflows.
+ *
+ * @public
+ */
 /**
  * Shared domain type imports.
  *
@@ -49,9 +45,13 @@ import type {
  * Import shared domain types directly from "`@shared/types`".
  */
 
+// Import monitor form types directly from "./types/monitor-forms" if needed
+
+// Import monitor form functions directly from "./types/monitor-forms" if needed
+
 /**
- * @remarks
  * Electron API interface exposed to the renderer process.
+ *
  * @remarks
  * Provides secure communication between the React frontend and Electron main
  * process through the contextBridge. All backend operations are accessed

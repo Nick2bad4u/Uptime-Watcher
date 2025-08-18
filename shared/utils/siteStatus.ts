@@ -5,6 +5,8 @@
  * Provides comprehensive logic for determining overall site status based on
  * monitor states. This is the single source of truth for status calculations,
  * used by both frontend and backend.
+ *
+ * @packageDocumentation
  */
 
 import type { SiteForStatus, SiteStatus } from "@shared/types";
@@ -14,12 +16,12 @@ import type { SiteForStatus, SiteStatus } from "@shared/types";
  *
  * @remarks
  * The monitoring state reflects whether all, some, or none of the site's
- * monitors are actively monitoring. - Returns `"running"` if all monitors are
- * actively monitoring.
+ * monitors are actively monitoring.
  *
+ * - Returns `"running"` if all monitors are actively monitoring.
  * - Returns `"stopped"` if no monitors are actively monitoring or if there are no
- *   monitors. - Returns `"partial"` if some monitors are monitoring and some
- *   are not.
+ *   monitors.
+ * - Returns `"partial"` if some monitors are monitoring and some are not.
  *
  * @example
  *

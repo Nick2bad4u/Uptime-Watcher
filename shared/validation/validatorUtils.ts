@@ -25,7 +25,7 @@
  * // New: isValidIdentifierArray(arr)
  * ```
  *
- * @public
+ * @packageDocumentation
  *
  * @see {@link https://github.com/validatorjs/validator.js} - Validator.js documentation
  */

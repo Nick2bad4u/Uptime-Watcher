@@ -1,3 +1,14 @@
+/**
+ * Theme provider component for initializing and providing theme context.
+ *
+ * @remarks
+ * Wraps the application or components to provide theme context and initialize
+ * the theme system. This component ensures that theme settings are available
+ * throughout the component tree and handles theme initialization on mount.
+ *
+ * @packageDocumentation
+ */
+
 import type React from "react";
 
 import { useTheme } from "../useTheme";

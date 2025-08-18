@@ -1,7 +1,10 @@
 /**
  * Theme management hook providing theme state, controls, and utility functions.
+ *
+ * @remarks
  * Handles theme switching, system theme detection, and provides color/styling
- * utilities.
+ * utilities for components. Integrates with settings store for theme
+ * persistence.
  */
 
 import {

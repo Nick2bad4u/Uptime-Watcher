@@ -1,3 +1,12 @@
+/**
+ * Hook providing site action handlers for CRUD operations and monitoring
+ * control.
+ *
+ * @remarks
+ * Provides comprehensive site management functionality including monitor
+ * control, site deletion, and monitoring state management. All actions include
+ * error handling and user action logging.
+ */
 import type { Monitor, Site } from "@shared/types";
 
 import { useCallback } from "react";

@@ -1,4 +1,7 @@
 /**
+ * Site management service responsible for site CRUD operations and monitoring
+ * coordination.
+ *
  * @remarks
  * The SiteManager serves as the primary interface for all site-related
  * operations, providing a unified API for site creation, updates, deletion, and
@@ -8,13 +11,12 @@
  *
  * Key responsibilities:
  *
- * - **Site CRUD Operations**: Create, read, update, and delete site
- *   configurations - **Cache Management**: Maintain synchronized in-memory
- *   cache for performance - **Monitor Integration**: Coordinate with
- *   MonitorManager for monitoring operations - **Event Communication**: Emit
- *   typed events for frontend and internal coordination - **Data Persistence**:
- *   Ensure atomic database operations with transaction safety - **Error
- *   Handling**: Provide comprehensive error handling and recovery mechanisms
+ * - Site CRUD Operations: Create, read, update, and delete site configurations
+ * - Cache Management: Maintain synchronized in-memory cache for performance
+ * - Monitor Integration: Coordinate with MonitorManager for monitoring operations
+ * - Event Communication: Emit typed events for frontend and internal coordination
+ * - Data Persistence: Ensure atomic database operations with transaction safety
+ * - Error Handling: Provide comprehensive error handling and recovery mechanisms
  *
  * The manager uses dependency injection for testability and follows the
  * repository pattern for data access. All operations are designed to be atomic

@@ -1,6 +1,12 @@
 /**
- * Type-safe JSON parsing utilities. Provides safe alternatives to JSON.parse
- * with proper error handling and validation.
+ * Type-safe JSON parsing utilities.
+ *
+ * @remarks
+ * Provides safe alternatives to JSON.parse with proper error handling and
+ * validation. All parsing operations return a result object with success status
+ * and optional error information.
+ *
+ * @packageDocumentation
  */
 
 /**

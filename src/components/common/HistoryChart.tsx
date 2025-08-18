@@ -1,7 +1,9 @@
 /**
  * HistoryChart component for visualizing status history as mini chart bars.
+ *
+ * @remarks
  * Provides a compact, responsive chart for displaying historical
- * uptime/downtime data.
+ * uptime/downtime data using themed mini chart bar components.
  */
 
 import type { StatusHistory } from "@shared/types";

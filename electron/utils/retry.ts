@@ -1,13 +1,40 @@
 /**
  * Retry utility for handling transient failures in database and network
- * operations. Provides configurable retry logic with exponential backoff for
- * robust error handling.
+ * operations.
+ *
+ * @remarks
+ * Provides configurable retry logic with exponential backoff for robust error
+ * handling in backend operations. Useful for dealing with temporary network
+ * issues, database locks, or other transient failures.
+ *
+ * @example
+ *
+ * ```typescript
+ * // Simple retry with defaults
+ * const result = await withRetry(() => fetchData());
+ *
+ * // Retry with custom configuration
+ * const result = await withRetry(() => database.query(sql), {
+ *     maxRetries: 3,
+ *     delayMs: 1000,
+ *     operationName: "database query",
+ *     onError: (error, attempt) =>
+ *         logger.warn(`Attempt ${attempt} failed`),
+ * });
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import { dbLogger } from "./logger";
 
 /**
- * Generic retry utility with configurable parameters
+ * Generic retry utility with configurable parameters.
+ *
+ * @remarks
+ * Executes the provided operation with automatic retry logic on failure. Uses a
+ * simple delay between retries (not exponential backoff) for predictable
+ * timing. Collects all errors and reports them if all retries fail.
  *
  * @typeParam T - The return type of the async operation
  *

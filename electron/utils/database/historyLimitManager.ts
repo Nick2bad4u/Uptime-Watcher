@@ -1,7 +1,15 @@
-import type { DatabaseService } from "../../services/database/DatabaseService";
 /**
  * Utility for managing history limits in the database.
+ *
+ * @remarks
+ * Provides functions for setting and getting history retention limits with
+ * proper database consistency and validation. Handles limit enforcement,
+ * pruning of older entries, and integration with settings storage.
+ *
+ * @packageDocumentation
  */
+
+import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { Logger } from "../interfaces";

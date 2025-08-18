@@ -1,6 +1,9 @@
 /**
- * Theme system type definitions. Defines the structure and interfaces for the
- * application's theming system.
+ * Theme system type definitions.
+ *
+ * @remarks
+ * Defines the structure and interfaces for the application's theming system
+ * including colors, typography, spacing, and visual effects.
  */
 
 /**

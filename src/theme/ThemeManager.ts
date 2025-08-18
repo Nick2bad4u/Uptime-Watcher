@@ -1,6 +1,11 @@
 /**
- * ThemeManager class for handling theme selection, system preference detection,
- * and theme switching throughout the application.
+ * ThemeManager class for handling theme selection and system preference
+ * detection.
+ *
+ * @remarks
+ * Manages theme switching throughout the application including automatic
+ * detection of system preferences and manual theme overrides. Provides a
+ * singleton service for consistent theme management across components.
  *
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */

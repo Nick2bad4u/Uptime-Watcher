@@ -1,3 +1,16 @@
+/**
+ * Factory for creating and managing monitor service instances with
+ * configuration support.
+ *
+ * @remarks
+ * Provides singleton-pattern monitor service instances with configuration
+ * management. Validates monitor types against the registry and ensures only one
+ * instance per monitor type exists. Supports configuration updates and cache
+ * management for all registered monitor types.
+ *
+ * @packageDocumentation
+ */
+
 import type { MonitorType } from "@shared/types";
 
 import {

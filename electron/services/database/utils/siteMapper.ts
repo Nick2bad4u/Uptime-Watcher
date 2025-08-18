@@ -1,6 +1,9 @@
 /**
- * Site database row mapping utilities. Provides consistent data transformation
- * between database rows and Site objects.
+ * Site database row mapping utilities.
+ *
+ * @remarks
+ * Provides consistent data transformation between database rows and Site
+ * objects with proper type safety and error handling.
  */
 
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";

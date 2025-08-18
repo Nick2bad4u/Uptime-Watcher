@@ -1,3 +1,11 @@
+/**
+ * IPC service for secure communication between main and renderer processes.
+ *
+ * @remarks
+ * Handles all IPC channels for sites, monitors, data operations, settings, and
+ * system functions. Provides type-safe communication with proper error handling
+ * and validation.
+ */
 import type { Monitor, Site } from "@shared/types";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";

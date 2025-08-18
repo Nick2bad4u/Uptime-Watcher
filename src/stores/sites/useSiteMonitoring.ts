@@ -1,9 +1,9 @@
 /**
- * Site monitoring operations module. Handles monitoring start/stop operations
- * and manual checks.
+ * Site monitoring operations module.
  *
- * Uses centralized error store for consistent error handling across the
- * application.
+ * @remarks
+ * Handles monitoring start/stop operations and manual checks. Uses centralized
+ * error store for consistent error handling across the application.
  */
 
 import { withErrorHandling } from "@shared/utils/errorHandling";

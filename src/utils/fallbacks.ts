@@ -1,6 +1,45 @@
 /**
- * Centralized fallback and default value utilities. Provides type-safe fallback
- * handling across the application.
+ * Centralized fallback and default value utilities for robust error handling.
+ *
+ * @remarks
+ * Provides type-safe fallback handling across the application with consistent
+ * error handling, default value management, and UI state recovery patterns.
+ * This module ensures the application remains functional even when expected
+ * data is missing or invalid.
+ *
+ * Key features:
+ *
+ * - Type-safe null/undefined checking utilities
+ * - Async error handling wrappers for React event handlers
+ * - Consistent default value patterns for UI components
+ * - Graceful degradation strategies for missing data
+ * - Centralized fallback value definitions
+ *
+ * @example
+ *
+ * ```typescript
+ * import {
+ *     isNullOrUndefined,
+ *     withAsyncErrorHandling,
+ *     UiDefaults,
+ * } from "./fallbacks";
+ *
+ * // Safe null checking
+ * if (isNullOrUndefined(userInput)) {
+ *     return UiDefaults.EMPTY_STRING;
+ * }
+ *
+ * // Async event handler with error handling
+ * const handleClick = withAsyncErrorHandling(
+ *     async () => await saveData(),
+ *     "saveData"
+ * );
+ *
+ * // Use default values for missing data
+ * const displayName = siteName || UiDefaults.UNNAMED_SITE;
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor } from "@shared/types";

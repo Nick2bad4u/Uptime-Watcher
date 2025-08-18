@@ -1,5 +1,9 @@
 /**
  * Sites store types and interfaces.
+ *
+ * @remarks
+ * Defines the contract for sites store including actions, state, and
+ * dependencies for managing site data and operations.
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";

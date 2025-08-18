@@ -1,6 +1,11 @@
 /**
- * Shared validation utilities for monitors and sites. Provides consistent
- * validation logic across frontend and backend.
+ * Shared validation utilities for monitors and sites.
+ *
+ * @remarks
+ * Provides consistent validation logic across frontend and backend
+ * implementations, ensuring data integrity and type safety.
+ *
+ * @packageDocumentation
  */
 
 import {

@@ -1,6 +1,9 @@
 /**
- * Type-safe Chart.js configuration utilities. Provides type guards and safe
- * access to Chart.js configuration properties.
+ * Type-safe Chart.js configuration utilities.
+ *
+ * @remarks
+ * Provides type guards and safe access to Chart.js configuration properties
+ * with proper TypeScript support.
  *
  * @packageDocumentation
  */

@@ -1,3 +1,11 @@
+/**
+ * Core database service for SQLite operations and connection management.
+ *
+ * @remarks
+ * Provides centralized database initialization, connection management, and
+ * transaction utilities for the application. Uses node-sqlite3-wasm for
+ * database operations.
+ */
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";

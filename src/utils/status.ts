@@ -1,11 +1,11 @@
 /**
  * Status utility functions for consistent status handling across components.
- * Provides emoji icons and formatting for different status types.
  *
  * @remarks
- * This utility module centralizes status formatting logic to ensure consistent
- * display of monitor and site statuses throughout the application interface.
- * All status values are expected to be lowercase single-word strings.
+ * Provides emoji icons and formatting for different status types. This utility
+ * module centralizes status formatting logic to ensure consistent display of
+ * monitor and site statuses throughout the application interface. All status
+ * values are expected to be lowercase single-word strings.
  */
 /**
  * Get the emoji icon for a given status. Provides visual indicators for

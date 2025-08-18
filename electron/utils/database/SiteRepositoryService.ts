@@ -6,28 +6,6 @@
  * operations, separating business logic from infrastructure concerns. Designed
  * with the repository pattern and service layer architecture to enable
  * comprehensive testing and maintainable code organization.
- * @remarks
- * Provides pure data operations for site management without side effects,
- * enabling easy testing and clean separation of concerns. All methods are
- * designed to be deterministic and focused on data transformation and retrieval
- * operations.
- *
- * The service abstracts repository complexity and provides a clean interface
- * for higher-level components while maintaining transaction safety and
- * comprehensive error handling throughout all operations.
- *
- * @example
- *
- * ```typescript
- * const service = new SiteRepositoryService({
- *     repositories: { site, monitor, history, settings },
- *     logger,
- *     eventEmitter,
- * });
- *
- * const sites = await service.getSitesFromDatabase();
- * await service.loadSitesIntoCache(siteCache);
- * ```
  *
  * The service provides both data operations (SiteRepositoryService) and
  * orchestration logic (SiteLoadingOrchestrator) to handle complex workflows
@@ -43,11 +21,8 @@
  * });
  *
  * const sites = await service.getSitesFromDatabase();
+ * await service.loadSitesIntoCache(siteCache);
  * ```
- *
- * @public
- *
- * @beta * Service for handling site repository operations.
  *
  * @packageDocumentation
  *
@@ -55,9 +30,7 @@
  * @see {@link MonitorRepository} for monitor data operations
  * @see {@link HistoryRepository} for history data operations
  * @see {@link SettingsRepository} for settings data operations
- * This service is currently in beta and may undergo breaking changes.
  * @see {@link SiteLoadingOrchestrator} for orchestration logic
- * @see {@link SiteRepository} for data access patterns
  */
 
 import type { Site } from "@shared/types";

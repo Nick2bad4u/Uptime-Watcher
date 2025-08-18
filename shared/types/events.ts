@@ -4,6 +4,8 @@
  * @remarks
  * These interfaces replace generic `unknown` types, ensuring strict typing for
  * all event payloads exchanged between the Electron main process and renderer.
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, Site } from "@shared/types";

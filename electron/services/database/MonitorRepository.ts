@@ -1,7 +1,6 @@
-import type { Monitor, Site } from "@shared/types";
-import type { MonitorRow } from "@shared/types/database";
 /**
- * Database repository for monitor persistence and management.
+ * Database repository for monitor persistence and management using the
+ * repository pattern.
  *
  * @remarks
  * Handles CRUD operations for site monitoring configurations using the
@@ -9,8 +8,49 @@ import type { MonitorRow } from "@shared/types/database";
  * DatabaseService for transaction management. All mutations are atomic to
  * ensure data consistency and proper error handling.
  *
+ * Key features:
+ *
+ * - Type-safe monitor CRUD operations with comprehensive validation
+ * - Transaction support for atomic operations and rollback safety
+ * - Dynamic SQL generation for flexible queries and updates
+ * - Performance optimization through prepared statements and caching
+ * - Comprehensive error handling with operational hooks
+ * - Site-monitor relationship management and integrity constraints
+ * - Development mode debugging with detailed logging
+ *
+ * @example Basic monitor operations:
+ *
+ * ```typescript
+ * const monitorRepo = new MonitorRepository({ databaseService });
+ *
+ * // Create a monitor for a site
+ * const monitor = await monitorRepo.createMonitor({
+ *     siteId: "site123",
+ *     checkInterval: 60000,
+ *     retryAttempts: 3,
+ *     timeout: 30000,
+ * });
+ *
+ * // Get all monitors for a site
+ * const monitors = await monitorRepo.getMonitorsBySiteId("site123");
+ * ```
+ *
+ * @example Transaction usage:
+ *
+ * ```typescript
+ * await databaseService.executeTransaction(async (db) => {
+ *     const monitor1 = await monitorRepo.createMonitor(data1, db);
+ *     const monitor2 = await monitorRepo.createMonitor(data2, db);
+ *     // Both operations committed together
+ * });
+ * ```
+ *
+ * @packageDocumentation
+ *
  * @public
  */
+import type { Monitor, Site } from "@shared/types";
+import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import type { DatabaseService } from "./DatabaseService";

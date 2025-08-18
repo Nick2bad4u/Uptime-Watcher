@@ -1,7 +1,10 @@
 /**
  * Type-safe conversion utilities for handling user input and data
- * transformation. Provides safe alternatives to parseInt, parseFloat, Number(),
- * etc.
+ * transformation.
+ *
+ * @remarks
+ * Provides safe alternatives to parseInt, parseFloat, Number(), and other
+ * conversion functions with proper error handling and fallback values.
  */
 
 import { isNumber, isString } from "./typeGuards";

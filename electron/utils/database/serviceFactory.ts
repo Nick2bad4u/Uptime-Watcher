@@ -1,5 +1,12 @@
 /**
- * Factory functions to create services with proper dependency injection.
+ * Factory functions for creating services with proper dependency injection.
+ *
+ * @remarks
+ * Provides factory functions and adapter classes for creating database services
+ * with standardized configurations. Includes logger adapters and cache factory
+ * functions for consistent service instantiation across the application.
+ *
+ * @packageDocumentation
  */
 
 import type { Site } from "@shared/types";

@@ -1,10 +1,35 @@
 /**
- * Shared utilities for form field components. Provides helper functions for
- * accessibility and validation.
+ * Shared utilities for form field components in the AddSiteForm module.
  *
  * @remarks
- * These utilities ensure consistent accessibility patterns across all form
- * components.
+ * Provides helper functions for accessibility and validation patterns across
+ * all form components. These utilities ensure consistent accessibility patterns
+ * and reduce code duplication in form field implementations.
+ *
+ * Key features:
+ *
+ * - Accessibility label generation with required field indicators
+ * - ARIA attribute management for form fields
+ * - Consistent form validation patterns
+ * - Helper functions for error and help text handling
+ *
+ * @example
+ *
+ * ```typescript
+ * import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
+ *
+ * // Create accessible label
+ * const ariaLabel = createAriaLabel("Site Name", true); // "Site Name (required)"
+ *
+ * // Handle ARIA describedby for errors
+ * const describedBy = getAriaDescribedBy(
+ *     "field-id",
+ *     errorMessage,
+ *     helpText
+ * );
+ * ```
+ *
+ * @packageDocumentation
  */
 
 /** Suffix for required field accessibility labels */

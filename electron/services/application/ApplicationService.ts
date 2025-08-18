@@ -1,3 +1,50 @@
+/**
+ * Main application service that orchestrates all other services and coordinates
+ * application lifecycle across the Electron backend.
+ *
+ * @remarks
+ * Uses dependency injection through {@link ServiceContainer} to manage all
+ * services and their dependencies. Provides proper initialization order, event
+ * handler setup, and cleanup. Handles Electron app events and orchestrates
+ * service startup and shutdown.
+ *
+ * Key responsibilities:
+ *
+ * - Application lifecycle management (startup, shutdown, error handling)
+ * - Service container initialization and dependency injection
+ * - Event handler registration for Electron app events
+ * - Graceful shutdown coordination for all services
+ * - Error handling and recovery for application-level failures
+ * - Development vs production environment handling
+ * - Service health monitoring and status reporting
+ *
+ * @example Basic application service usage:
+ *
+ * ```typescript
+ * const appService = new ApplicationService();
+ *
+ * // Initialize all services
+ * await appService.initializeServices();
+ *
+ * // Start the application
+ * await appService.startApplication();
+ *
+ * // Shutdown gracefully
+ * await appService.shutdown();
+ * ```
+ *
+ * @example Service dependency access:
+ *
+ * ```typescript
+ * // Access services through the container
+ * const databaseManager = appService.getDatabaseManager();
+ * const monitorManager = appService.getMonitorManager();
+ * ```
+ *
+ * @packageDocumentation
+ *
+ * @public
+ */
 import { isDevelopment } from "@shared/utils/environment";
 import {
     interpolateLogTemplate,
@@ -8,27 +55,6 @@ import { app } from "electron";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
-/**
- * @remarks
- * Uses dependency injection through ServiceContainer to manage all services and
- * their dependencies. Provides proper initialization order and cleanup.
- *
- * @public
- * Main application service that orchestrates all other services.
- * Handles application lifecycle and service coordination.
- */
-/**
- * Main application service that orchestrates all other services and coordinates
- * application lifecycle.
- *
- * @remarks
- * Uses dependency injection through {@link ServiceContainer} to manage all
- * services and their dependencies. Provides proper initialization order, event
- * handler setup, and cleanup. Handles Electron app events and orchestrates
- * service startup and shutdown.
- *
- * @public
- */
 export class ApplicationService {
     /**
      * The container for all application services.

@@ -1,3 +1,11 @@
+/**
+ * Composite hook that combines all site-related functionality.
+ *
+ * @remarks
+ * Provides a unified interface for site actions, monitoring, and statistics.
+ * Aggregates functionality from multiple specialized hooks into a single
+ * convenient interface for components.
+ */
 import type { Site } from "@shared/types";
 
 import { useMemo } from "react";

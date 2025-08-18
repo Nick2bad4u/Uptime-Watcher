@@ -1,22 +1,20 @@
 /**
- * Header component providing global status overview and application controls
+ * Header component providing global status overview and application controls.
  *
- * This file exports the main Header component that displays:
+ * @remarks
+ * Displays application title, global uptime statistics, monitor counts, status
+ * indicators, theme toggle, and settings access. Integrates with Zustand stores
+ * for state management and provides responsive layout with accessibility
+ * support.
  *
- * - Application title and branding
+ * Features:
+ *
+ * - Application branding and title
  * - Global uptime statistics and monitor counts
  * - Status indicators for up/down/pending/paused monitors
  * - Theme toggle functionality
  * - Settings modal access
  * - Responsive layout with accessibility support
- *
- * The component integrates with the application's state management via Zustand
- * stores and provides a consistent navigation and status overview experience.
- */
-
-/**
- * Header component providing global status overview and application controls.
- * Displays uptime statistics, theme toggle, and settings access.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -33,7 +31,11 @@ import ThemedText from "../../theme/components/ThemedText";
 import "./Header.css";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 
-// Helper functions for monitor counting (reduces complexity by composition)
+/**
+ * Initializes a monitor counts object with all status counts set to zero.
+ *
+ * @returns Initial monitor counts object with all values set to 0
+ */
 const initializeMonitorCounts = (): {
     down: number;
     paused: number;
@@ -48,6 +50,13 @@ const initializeMonitorCounts = (): {
     up: 0,
 });
 
+/**
+ * Increments the appropriate count in the monitor counts object based on
+ * status.
+ *
+ * @param counts - The monitor counts object to modify
+ * @param status - The monitor status to count
+ */
 const incrementCountByStatus = (
     counts: ReturnType<typeof initializeMonitorCounts>,
     status: string
@@ -78,6 +87,13 @@ const incrementCountByStatus = (
     }
 };
 
+/**
+ * Counts all monitors in a site and categorizes them by status.
+ *
+ * @param site - The site containing monitors to count
+ *
+ * @returns Monitor counts object with status breakdown for the site
+ */
 const countMonitorsInSite = (
     site: Site
 ): ReturnType<typeof initializeMonitorCounts> => {
@@ -91,6 +107,13 @@ const countMonitorsInSite = (
     return counts;
 };
 
+/**
+ * Aggregates monitor counts across all sites.
+ *
+ * @param sites - Array of sites to aggregate monitor counts from
+ *
+ * @returns Total monitor counts object with combined status breakdown
+ */
 const aggregateMonitorCounts = (
     sites: Site[]
 ): ReturnType<typeof initializeMonitorCounts> => {

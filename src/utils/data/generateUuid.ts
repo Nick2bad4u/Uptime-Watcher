@@ -1,19 +1,16 @@
 /**
- * Utility function for generating unique identifiers. Uses crypto.randomUUID in
- * modern Electron/Node.js environments.
+ * Utility function for generating unique identifiers.
  *
  * @remarks
- * UUID generation utility with proper Node.js compatibility through explicit
- * crypto import.
+ * Uses crypto.randomUUID in modern Electron/Node.js environments with a
+ * fallback to a timestamp-based ID with random characters for older
+ * environments. The fallback ensures the function works in all environments.
+ *
+ * @packageDocumentation
  */
 
 /**
  * Generate a unique identifier string using crypto.randomUUID with fallback.
- *
- * @remarks
- * Tries to use the native randomUUID() method from crypto module. If
- * unavailable, falls back to a timestamp-based ID with random characters for
- * uniqueness. The fallback ensures the function works in all environments.
  *
  * @example
  *

@@ -1,6 +1,9 @@
 /**
- * Type-safe object manipulation utilities. Provides enhanced type safety for
- * Object.keys, Object.values, Object.entries operations.
+ * Type-safe object manipulation utilities.
+ *
+ * @remarks
+ * Provides enhanced type safety for Object.keys, Object.values, and
+ * Object.entries operations with proper type checking and validation.
  */
 
 import { isObject } from "./typeGuards";

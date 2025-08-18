@@ -1,8 +1,13 @@
 /**
- * Standardized cache system for all managers.
+ * Standardized cache system for all managers and services.
  *
+ * @remarks
  * Provides consistent caching behavior, event emission, statistics, and
- * invalidation strategies across the entire application.
+ * invalidation strategies across the entire application. Features TTL
+ * expiration, LRU eviction, bulk operations, and comprehensive metrics tracking
+ * for optimal performance monitoring.
+ *
+ * @packageDocumentation
  */
 
 import type { UptimeEvents } from "../../events/eventTypes";

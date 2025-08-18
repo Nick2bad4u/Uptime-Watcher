@@ -1,65 +1,130 @@
 /**
- * Unified caching utility for the application. Provides type-safe caching with
- * TTL support and proper cleanup.
+ * Unified, in-memory caching utilities with optional TTL (time-to-live)
+ * semantics and a simple LRU (least-recently-used) eviction strategy.
+ *
+ * @remarks
+ * This module provides a small, type-safe cache implementation backed by a
+ * {@link Map} and metadata objects that track creation and last-access times. It
+ * is intended for short-lived, in-memory caching of computed values and small
+ * objects. The eviction strategy scans entries for the oldest `lastAccessed`
+ * timestamp when `maxSize` is reached (O(n) selection).
+ *
+ * The module also exposes a set of preconfigured caches (`AppCaches`) and a
+ * helper (`getCachedOrFetch`) to compute and cache values on cache misses.
+ *
+ * @example
+ *
+ * ```ts
+ * import { AppCaches, getCachedOrFetch } from "./cache";
+ *
+ * // direct set/get
+ * AppCaches.general.set("user-preference", { theme: "dark" });
+ * const pref = AppCaches.general.get("user-preference");
+ *
+ * // compute-on-miss with TTL override
+ * const value = await getCachedOrFetch(
+ *     AppCaches.monitorTypes,
+ *     "config",
+ *     async () => fetchConfig(),
+ *     30_000
+ * );
+ * ```
+ *
+ * @public
  */
 
 import type { CacheValue } from "@shared/types/configTypes";
 
 /**
- * Interface for application cache collection.
+ * Predefined application cache collection interface.
+ *
+ * @remarks
+ * Each property is a reusable {@link TypedCache} instance configured for a
+ * specific domain within the application. Consumers should treat these as
+ * long-lived, shared caches.
+ *
+ * @public
  */
 interface AppCachesInterface {
-    /** General purpose cache for common values */
+    /**
+     * General-purpose cache used for miscellaneous computed values and small
+     * application artifacts.
+     */
     readonly general: TypedCache<string, CacheValue>;
-    /** Monitor type configurations and related data */
+
+    /**
+     * Cache reserved for monitor type configurations and metadata.
+     */
     readonly monitorTypes: TypedCache<string, CacheValue>;
-    /** UI helper data and component state */
+
+    /**
+     * Cache for UI helper values and component-level ephemeral data.
+     */
     readonly uiHelpers: TypedCache<string, CacheValue>;
 }
 
 /**
- * Internal cache entry structure with metadata.
+ * Internal structure representing a cached entry and its metadata.
+ *
+ * @remarks
+ * This type is internal to the module and captures timestamps required for TTL
+ * checks and LRU eviction. It is intentionally not exported.
  *
  * @internal
  */
 interface CacheEntry<T> {
-    /** Last accessed timestamp for LRU tracking */
+    /** Last-accessed epoch in milliseconds used for LRU selection. */
     lastAccessed: number;
-    /** Creation timestamp for TTL calculation */
+
+    /** Creation epoch in milliseconds used to evaluate TTL expiration. */
     timestamp: number;
-    /** Time to live in milliseconds (overrides default) */
+
+    /** Optional per-entry TTL (milliseconds) that overrides the cache default. */
     ttl: number | undefined;
-    /** Cached value */
+
+    /** Stored value for the cache entry. */
     value: T;
 }
 
 /**
- * Configuration options for cache instances.
+ * Configuration options for creating a {@link TypedCache} instance.
+ *
+ * @remarks
+ * Both properties are optional. When omitted, the cache uses a sensible default
+ * for `maxSize` and no default TTL (entries will not expire unless a TTL is
+ * provided at `set` time).
  *
  * @public
  */
 export interface CacheOptions {
-    /** Maximum number of entries */
+    /**
+     * Maximum number of entries the cache will retain before evicting the
+     * least-recently-used entries.
+     *
+     * @defaultValue 100
+     */
     maxSize?: number;
-    /** Time to live in milliseconds */
+
+    /**
+     * Default time-to-live in milliseconds applied to entries when no per-entry
+     * TTL is provided.
+     */
     ttl?: number;
 }
 
 /**
- * Generic cache implementation with TTL support and LRU eviction.
+ * Generic in-memory cache with optional TTL and LRU eviction.
  *
  * @remarks
- * This cache implementation provides:
+ * The implementation uses a {@link Map} to store entries and maintains
+ * `lastAccessed` timestamps for LRU eviction. When `maxSize` is reached a
+ * single entry is evicted (the one with the oldest `lastAccessed`). This
+ * selection is O(n) over the number of entries.
  *
- * - TTL (Time To Live) support for automatic expiration
- * - LRU (Least Recently Used) eviction when max size is reached
- * - Type-safe operations with generic key-value types
- * - Automatic cleanup of expired entries
+ * @typeParam K - Type of cache keys.
+ * @typeParam V - Type of cached values.
  *
- * Generic types:
- *
- * - K: Type of cache keys
- * - V: Type of cached values
+ * @public
  */
 export class TypedCache<K, V> {
     private readonly cache = new Map<K, CacheEntry<V>>();
@@ -69,9 +134,11 @@ export class TypedCache<K, V> {
     private readonly maxSize: number;
 
     /**
-     * Create a new TypedCache instance.
+     * Create a new cache instance.
      *
-     * @param options - Cache configuration options including maxSize and ttl
+     * @defaultValue An instance will use `maxSize` 100 and no default TTL when omitted.
+     *
+     * @param options - Optional cache configuration.
      */
     public constructor(options: CacheOptions = {}) {
         this.maxSize = options.maxSize ?? 100;
@@ -79,17 +146,24 @@ export class TypedCache<K, V> {
     }
 
     /**
-     * Get cache size.
+     * Current number of entries in the cache.
      *
-     * @returns Number of entries currently in the cache
+     * @returns Number of stored entries.
      */
     public get size(): number {
         return this.cache.size;
     }
 
     /**
-     * Clean up expired entries. Removes all entries that have exceeded their
-     * TTL.
+     * Remove entries that have exceeded their TTL from this cache instance.
+     *
+     * @remarks
+     * Iterates the underlying {@link Map} and deletes expired items. This is a
+     * best-effort maintenance operation and safe to call periodically (for
+     * example from a scheduled timer). It does not return which keys were
+     * removed.
+     *
+     * @public
      */
     public cleanup(): void {
         const now = Date.now();
@@ -102,30 +176,33 @@ export class TypedCache<K, V> {
     }
 
     /**
-     * Clear all cached entries. Removes all entries from the cache.
+     * Remove all entries from the cache.
+     *
+     * @remarks
+     * Clears the internal {@link Map} and resets the cache to empty.
      */
     public clear(): void {
         this.cache.clear();
     }
 
     /**
-     * Delete specific key.
+     * Delete a specific key from the cache.
      *
-     * @param key - The key to delete from the cache
+     * @param key - The cache key to remove.
      *
-     * @returns True if the key existed and was deleted, false otherwise
+     * @returns True if the key existed and was removed; false otherwise.
      */
     public delete(key: K): boolean {
         return this.cache.delete(key);
     }
 
     /**
-     * Get value from cache if not expired. Updates last accessed time for LRU
-     * tracking.
+     * Retrieve a value if present and not expired.
      *
-     * @param key - The key to retrieve from the cache
+     * @param key - The cache key to look up.
      *
-     * @returns The cached value if found and not expired, undefined otherwise
+     * @returns The cached value, or `undefined` when the key does not exist or
+     *   the entry has expired.
      */
     public get(key: K): undefined | V {
         const entry = this.cache.get(key);
@@ -133,38 +210,45 @@ export class TypedCache<K, V> {
             return undefined;
         }
 
-        // Check if expired
+        // Evaluate expiration using either per-entry TTL or default
         const ttl = entry.ttl ?? this.defaultTtl;
         if (ttl && Date.now() - entry.timestamp > ttl) {
+            // expired: remove and return undefined
             this.cache.delete(key);
             return undefined;
         }
 
-        // Update last accessed time for LRU tracking
+        // Update last accessed time for LRU bookkeeping
         entry.lastAccessed = Date.now();
 
         return entry.value;
     }
 
     /**
-     * Check if key exists and is not expired.
+     * Check whether a non-expired entry exists for the given key.
      *
-     * @param key - The key to check for existence
+     * @param key - The cache key to test.
      *
-     * @returns True if the key exists and has not expired, false otherwise
+     * @returns `true` when a valid (non-expired) value exists; `false`
+     *   otherwise.
      */
     public has(key: K): boolean {
         return this.get(key) !== undefined;
     }
 
     /**
-     * Set value in cache with optional TTL. Uses LRU eviction when max size is
-     * reached.
+     * Insert or update an entry in the cache and optionally specify a per-entry
+     * TTL that overrides the cache's default TTL.
      *
      * @remarks
-     * Current implementation uses O(n) iteration to find LRU entry. For large
-     * caches `(>1000 entries)`, consider using a more efficient LRU
-     * implementation with doubly-linked list for O(1) eviction.
+     * If the cache size would exceed {@link CacheOptions.maxSize} a single
+     * least-recently-used entry is evicted. LRU selection scans all entries and
+     * has O(n) cost.
+     *
+     * @param key - The cache key to set.
+     * @param value - The value to store under the provided key.
+     * @param ttl - Optional per-entry TTL in milliseconds; when omitted the
+     *   cache's `defaultTtl` (if any) will apply.
      */
     public set(key: K, value: V, ttl?: number): void {
         // Enforce max size by removing least recently used entries
@@ -173,8 +257,6 @@ export class TypedCache<K, V> {
             let oldestAccessTime = Number.POSITIVE_INFINITY;
 
             // Find the least recently used entry (O(n) operation)
-            // NOTE: For better performance with large caches, consider
-            // implementing doubly-linked list for O(1) LRU operations
             for (const [entryKey, entry] of this.cache.entries()) {
                 if (entry.lastAccessed < oldestAccessTime) {
                     oldestAccessTime = entry.lastAccessed;
@@ -199,8 +281,14 @@ export class TypedCache<K, V> {
 }
 
 /**
- * Predefined caches for common use cases. Provides pre-configured cache
- * instances for different application domains.
+ * Application-wide predefined cache instances used throughout the app.
+ *
+ * @remarks
+ * Each cache is tuned with conservative `maxSize` and `ttl` values suitable for
+ * its domain. Consumers can use these shared caches or create their own
+ * {@link TypedCache} instances when different characteristics are needed.
+ *
+ * @public
  */
 export const AppCaches: AppCachesInterface = {
     /** General purpose cache for common values */
@@ -223,8 +311,13 @@ export const AppCaches: AppCachesInterface = {
 } as const;
 
 /**
- * Run cleanup on all caches to remove expired entries. Iterates through all
- * predefined caches and removes expired items.
+ * Remove expired entries from all predefined application caches.
+ *
+ * @remarks
+ * Iterates the caches in {@link AppCaches} and calls {@link TypedCache.cleanup}
+ * on each. This is a convenience for scheduled maintenance tasks.
+ *
+ * @public
  */
 export function cleanupAllCaches(): void {
     const caches: Array<TypedCache<string, CacheValue>> = [
@@ -239,8 +332,13 @@ export function cleanupAllCaches(): void {
 }
 
 /**
- * Clear all application caches. Removes all entries from all predefined cache
- * instances.
+ * Clear all entries from the predefined application caches.
+ *
+ * @remarks
+ * This removes all data from the {@link AppCaches} instances. Use sparingly as
+ * it may cause increased computation or I/O until caches refill.
+ *
+ * @public
  */
 export function clearAllCaches(): void {
     const caches: Array<TypedCache<string, CacheValue>> = [
@@ -255,15 +353,43 @@ export function clearAllCaches(): void {
 }
 
 /**
- * Helper for async cache operations with fallback. Attempts to retrieve value
- * from cache first, falling back to fetcher function if not found.
+ * Retrieve a value from a cache or compute and store it on a cache miss.
  *
- * @param cache - The cache instance to use
- * @param key - The cache key to lookup
- * @param fetcher - Function to call if cache miss occurs
- * @param ttl - Optional TTL override for this operation
+ * @remarks
+ * The function first attempts to read from the supplied {@link TypedCache}. If
+ * the key is absent or expired it invokes `fetcher` to obtain the value, stores
+ * the result in the cache (honoring an optional `ttl`), and returns the value.
+ * Any exception thrown by `fetcher` is propagated to the caller and no value is
+ * cached in that case.
  *
- * @returns Promise resolving to cached or fetched value
+ * @example
+ *
+ * ```ts
+ * const value = await getCachedOrFetch(
+ *     AppCaches.general,
+ *     "user:123",
+ *     async () => {
+ *         const resp = await apiClient.get("/user/123");
+ *         return resp.data;
+ *     },
+ *     60_000
+ * );
+ * ```
+ *
+ * @typeParam T - Type of the cached value.
+ *
+ * @param cache - Cache instance to use for lookup and storage.
+ * @param key - Cache key to look up.
+ * @param fetcher - Async function that computes or fetches the value on a cache
+ *   miss.
+ * @param ttl - Optional per-entry TTL in milliseconds to apply when storing the
+ *   fetched value; when omitted the cache's default TTL (if any) applies.
+ *
+ * @returns A promise that resolves to the cached or freshly fetched value.
+ *
+ * @throws Any error thrown by `fetcher` is propagated to the caller.
+ *
+ * @public
  */
 export async function getCachedOrFetch<T>(
     cache: TypedCache<string, T>,

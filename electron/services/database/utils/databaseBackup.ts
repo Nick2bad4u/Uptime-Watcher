@@ -1,10 +1,3 @@
-import type { promises as fsPromises } from "node:fs";
-
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-
-import { BACKUP_DB_FILE_NAME } from "../../../constants";
-import { logger } from "../../../utils/logger";
-
 /**
  * Utilities for creating SQLite database backups.
  *
@@ -15,6 +8,12 @@ import { logger } from "../../../utils/logger";
  *
  * @public
  */
+import type { promises as fsPromises } from "node:fs";
+
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+
+import { BACKUP_DB_FILE_NAME } from "../../../constants";
+import { logger } from "../../../utils/logger";
 
 /**
  * Result interface for database backup operations.

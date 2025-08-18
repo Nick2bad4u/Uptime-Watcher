@@ -1,6 +1,10 @@
 /**
- * Main App component for Uptime Watcher application. Manages global state,
- * modals, notifications, and renders the main application layout.
+ * Main App component for Uptime Watcher application.
+ *
+ * @remarks
+ * Manages global state, modals, notifications, and renders the main application
+ * layout. Coordinates between different views and handles application-wide
+ * state management.
  */
 
 import type { JSX } from "react/jsx-runtime";
@@ -168,13 +172,17 @@ const App = (): JSX.Element => {
     );
 
     /**
-     * Initialize the application and set up status update subscriptions. This
-     * effect handles:
+     * Initializes the application by setting up stores, cache sync, and status
+     * update subscriptions.
      *
-     * - Development logging
-     * - App initialization
-     * - Status update subscription with smart incremental updates
-     * - Cleanup on component unmount
+     * @remarks
+     * This function performs sequential initialization to avoid state conflicts
+     * during startup. It also sets up cache synchronization with the backend
+     * and stores the cleanup function for later use during component unmount.
+     *
+     * @returns Promise that resolves when initialization is complete
+     *
+     * @throws Error When store initialization fails
      */
     const initializeApp = useCallback(async () => {
         if (isProduction()) {
@@ -210,6 +218,13 @@ const App = (): JSX.Element => {
         setIsInitialized(true);
     }, []);
 
+    /**
+     * Cleans up application resources when the component unmounts.
+     *
+     * @remarks
+     * Unsubscribes from status updates and cleans up cache synchronization to
+     * prevent memory leaks and background operations.
+     */
     const cleanupApp = useCallback(() => {
         const currentSitesStore = useSitesStore.getState();
         currentSitesStore.unsubscribeFromStatusUpdates();
@@ -229,7 +244,13 @@ const App = (): JSX.Element => {
 
     const selectedSite = useSelectedSite();
 
-    // Memoized handlers to prevent unnecessary re-renders
+    /**
+     * Handles update action based on current update status.
+     *
+     * @remarks
+     * If an update has been downloaded, applies the update. Otherwise, resets
+     * the update status to idle and clears any errors.
+     */
     const handleUpdateAction = useCallback(() => {
         if (updateStatus === "downloaded") {
             applyUpdate();
@@ -239,10 +260,16 @@ const App = (): JSX.Element => {
         }
     }, [applyUpdate, setUpdateError, setUpdateStatus, updateStatus]);
 
+    /**
+     * Handles closing the settings modal.
+     */
     const handleCloseSettings = useCallback(() => {
         setShowSettings(false);
     }, [setShowSettings]);
 
+    /**
+     * Handles closing the site details modal.
+     */
     const handleCloseSiteDetails = useCallback(() => {
         setShowSiteDetails(false);
     }, [setShowSiteDetails]);

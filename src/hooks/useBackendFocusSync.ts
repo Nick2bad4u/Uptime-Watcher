@@ -1,7 +1,12 @@
 /**
- * Hook for synchronizing data when the application window gains focus. Provides
- * functionality to automatically refresh data from the backend when users
- * return to the application after being away.
+ * Hook for synchronizing data when the application window gains focus.
+ *
+ * @remarks
+ * Provides functionality to automatically refresh data from the backend when
+ * users return to the application after being away. Uses window focus events to
+ * trigger full backend synchronization when enabled. Errors are handled
+ * internally by the store's error handling system through withErrorHandling, so
+ * the fire-and-forget void pattern is safe here.
  */
 
 import { useCallback, useEffect } from "react";
@@ -9,14 +14,7 @@ import { useCallback, useEffect } from "react";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 
 /**
- * Hook for synchronizing data when the application window gains focus. Provides
- * functionality to automatically refresh data from the backend when users
- * return to the application after being away.
- *
- * @remarks
- * Uses window focus events to trigger full backend synchronization when
- * enabled. Errors are handled internally by the store's error handling system
- * through withErrorHandling, so the fire-and-forget void pattern is safe here.
+ * Custom hook that synchronizes application data when the window gains focus.
  *
  * @example
  *

@@ -1,9 +1,11 @@
 /**
- * Environment detection utilities. Provides safe, testable environment
- * detection across the application.
+ * Environment detection utilities for safe, testable environment detection.
  *
+ * @remarks
  * These utilities abstract direct process.env access and provide consistent
  * environment detection patterns with proper error handling.
+ *
+ * @packageDocumentation
  */
 
 /**

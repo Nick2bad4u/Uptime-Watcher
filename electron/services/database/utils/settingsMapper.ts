@@ -1,6 +1,9 @@
 /**
- * Settings database row mapping utilities. Provides consistent data
- * transformation between database rows and Settings objects.
+ * Settings database row mapping utilities.
+ *
+ * @remarks
+ * Provides consistent data transformation between database rows and Settings
+ * objects with proper type safety and error handling.
  */
 
 import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database";

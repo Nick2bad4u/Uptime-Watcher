@@ -1,3 +1,10 @@
+/**
+ * Notification service for desktop system notifications.
+ *
+ * @remarks
+ * Manages system notifications for monitor status changes, providing user
+ * alerts for down/up events with configurable notification preferences.
+ */
 import type { Site } from "@shared/types";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";

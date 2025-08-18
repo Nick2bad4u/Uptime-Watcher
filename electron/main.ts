@@ -22,7 +22,16 @@ import { ApplicationService } from "./services/application/ApplicationService";
 import { logger } from "./utils/logger";
 
 // Configure electron-log for main process
-// Configure logging based on environment and command line arguments
+/**
+ * Configures logging levels based on environment and command line arguments.
+ *
+ * @remarks
+ * Analyzes command line flags and environment to determine appropriate logging
+ * levels for both console and file output. Supports debug, production, and info
+ * level configurations.
+ *
+ * @returns Object containing console and file logging levels
+ */
 const configureLogging = (): {
     consoleLevel: ElectronLogLevel;
     fileLevel: ElectronLogLevel;
@@ -107,7 +116,7 @@ log.transports.console.format = LOG_CONSOLE_FORMAT;
 // Hot reload for preload scripts (development only)
 if (isDev()) {
     /**
-     * Handle hot reload messages from vite-plugin-electron
+     * Handles hot reload messages from vite-plugin-electron.
      *
      * @param msg - Message from the plugin
      */
@@ -120,7 +129,7 @@ if (isDev()) {
         }
     };
     /**
-     * Clean up the hot reload listener on app quit
+     * Cleans up the hot reload listener on app quit.
      */
     const handleCleanup = (): void => {
         process.off("message", handleHotReload);
@@ -213,8 +222,12 @@ class Main {
     }
 
     /**
-     * Removes event listeners to prevent memory leaks. Called during
-     * application shutdown.
+     * Removes event listeners to prevent memory leaks.
+     *
+     * @remarks
+     * Called during application shutdown to clean up event listeners and
+     * prevent memory leaks. Removes both Node.js process and Electron app event
+     * listeners that were set up in the constructor.
      */
     public removeEventListeners(): void {
         process.off("beforeExit", this.handleProcessExit);

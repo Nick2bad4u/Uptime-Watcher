@@ -1,13 +1,12 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @metamask/design-tokens/color-no-hex */
 /**
- * Custom hook for theme-aware CSS-in-JS styles Provides consistent styling that
- * respects user's theme preference
+ * Custom hook for theme-aware CSS-in-JS styles.
  *
  * @remarks
- * This hook provides theme-aware styling with proper SSR support and runtime
- * theme change reactivity. It uses media query listeners to detect theme
- * changes and updates styles accordingly.
+ * Provides consistent styling that respects user's theme preference with proper
+ * SSR support and runtime theme change reactivity. Uses media query listeners
+ * to detect theme changes and updates styles accordingly.
  *
  * The hook handles:
  *

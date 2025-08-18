@@ -1,6 +1,12 @@
 /**
- * Database initialization utility. Handles database setup and site loading with
- * proper error handling.
+ * Database initialization utility for setup and site loading.
+ *
+ * @remarks
+ * Handles database setup and site loading with proper error handling, event
+ * emission, and transaction management. Provides a centralized initialization
+ * flow with comprehensive error recovery and logging.
+ *
+ * @packageDocumentation
  */
 
 import type { UptimeEvents } from "../../events/eventTypes";

@@ -1,20 +1,18 @@
 /**
  * Core uptime monitoring orchestrator that coordinates specialized managers.
  *
- * This class serves as a lightweight coordinator that delegates operations to:
- *
- * - SiteManager: Site CRUD operations and cache management
- * - MonitorManager: Monitoring operations and scheduling
- * - DatabaseManager: Database operations and data management
- *
- * Uses TypedEventBus to provide real-time updates to the renderer process with
- * type safety.
+ * @remarks
+ * Serves as a lightweight coordinator that delegates operations to specialized
+ * managers: SiteManager, MonitorManager, and DatabaseManager. Uses
+ * TypedEventBus to provide real-time updates to the renderer process with type
+ * safety.
  *
  * ## Architecture & Event-Driven Design
  *
  * The orchestrator uses an event-driven architecture for inter-manager
- * communication: - Internal events coordinate operations between managers
+ * communication:
  *
+ * - Internal events coordinate operations between managers
  * - Public events provide updates to the frontend renderer
  * - All events are strongly typed for compile-time safety
  * - Event handlers are organized by domain (site, database, monitoring)

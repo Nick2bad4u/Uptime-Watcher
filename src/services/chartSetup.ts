@@ -5,6 +5,8 @@
  * This file provides centralized registration of Chart.js components and
  * plugins to avoid duplication across components and ensure consistent chart
  * configuration. All Chart.js registrations should happen here.
+ *
+ * @packageDocumentation
  */
 
 import {

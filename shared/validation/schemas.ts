@@ -7,6 +7,8 @@
  * data integrity. Validation constraints are synchronized with UI constants in
  * {@link constants.ts}. All validation logic is centralized here for consistency
  * and maintainability.
+ *
+ * @packageDocumentation
  */
 
 import type {

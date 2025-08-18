@@ -1,13 +1,28 @@
 /**
- * Shared error handling utility for async operations. Provides a unified
- * pattern for error logging, reporting, and state management.
+ * Shared error handling utilities for async operations.
+ *
+ * @remarks
+ * Provides a unified pattern for error logging, reporting, and state management
+ * across frontend and backend code.
+ *
+ * @example
+ *
+ * Frontend usage:
  *
  * ```typescript
- * Usage (frontend): await withErrorHandling(() => doSomethingAsync(), store)
- *
- * Usage (backend): await withErrorHandling(() => doSomethingAsync(), { logger,
- * operationName: "operation" })
+ * await withErrorHandling(() => doSomethingAsync(), store);
  * ```
+ *
+ * Backend usage:
+ *
+ * ```typescript
+ * await withErrorHandling(() => doSomethingAsync(), {
+ *     logger,
+ *     operationName: "operation",
+ * });
+ * ```
+ *
+ * @packageDocumentation
  */
 
 export interface ErrorHandlingBackendContext {

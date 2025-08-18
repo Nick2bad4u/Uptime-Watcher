@@ -1,7 +1,24 @@
 /**
  * Dynamic UI utilities that use monitor registry for extensible UI behavior.
+ *
+ * @remarks
  * These utilities eliminate hardcoded monitor type checks throughout the
- * frontend.
+ * frontend by providing dynamic configuration-based helpers for UI behavior.
+ *
+ * All utilities support caching for optimal performance and include error
+ * handling.
+ *
+ * @example
+ *
+ * ```typescript
+ * // Check if a monitor type supports response time
+ * const hasResponseTime = await supportsResponseTime("http");
+ *
+ * // Get the default monitor ID from a list
+ * const defaultId = getDefaultMonitorId(["monitor-1", "monitor-2"]);
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -18,7 +35,16 @@ import {
 } from "./monitorTypeHelper";
 
 /**
- * Get monitor type configuration with caching
+ * Retrieves monitor type configuration with automatic caching.
+ *
+ * @remarks
+ * This function first checks the cache for the configuration. If not found, it
+ * fetches from the backend and caches the result for future use.
+ *
+ * @param monitorType - The monitor type to get configuration for
+ *
+ * @returns Promise resolving to the monitor type configuration or undefined if
+ *   not found
  */
 async function getConfig(
     monitorType: MonitorType
@@ -43,8 +69,12 @@ async function getConfig(
 }
 
 /**
- * Clear the configuration cache. Useful for testing or when monitor types
- * change.
+ * Clears the configuration cache.
+ *
+ * @remarks
+ * Removes all cached monitor type configurations. This is useful for testing
+ * scenarios or when monitor types change and the cache needs to be
+ * invalidated.
  */
 export function clearConfigCache(): void {
     AppCaches.uiHelpers.clear();

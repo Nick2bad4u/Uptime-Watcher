@@ -1,7 +1,20 @@
 /**
  * SiteCard component displaying comprehensive monitoring information for a
- * single site. Composed of multiple sub-components for maintainability and
- * reusability.
+ * single site.
+ *
+ * @remarks
+ * Composed of multiple sub-components for maintainability and reusability. This
+ * component provides a complete overview of site monitoring status, metrics,
+ * and controls in a card-based layout. Uses composition pattern to break down
+ * complex UI into manageable, focused sub-components.
+ *
+ * @example
+ *
+ * ```tsx
+ * <SiteCard site={siteData} />;
+ * ```
+ *
+ * @packageDocumentation
  */
 
 import type { Site } from "@shared/types";
@@ -28,8 +41,13 @@ export interface SiteCardProperties {
 
 /**
  * Main site card component using composition of smaller, focused
- * sub-components. Provides a complete overview of site monitoring status,
- * metrics, and controls.
+ * sub-components.
+ *
+ * @remarks
+ * Provides a complete overview of site monitoring status, metrics, and
+ * controls. Uses the composition pattern to break down complex UI into
+ * manageable pieces. Memoized to prevent unnecessary re-renders when parent
+ * updates.
  *
  * Features:
  *
@@ -38,9 +56,6 @@ export interface SiteCardProperties {
  * - Monitor management controls
  * - Performance metrics display
  * - Click-to-expand details
- *
- * Much cleaner and more maintainable than a monolithic component approach.
- * Memoized to prevent unnecessary re-renders when parent updates.
  *
  * @param props - SiteCard component props
  *

@@ -1,5 +1,9 @@
 /**
- * SaveButton component for consistent save actions
+ * SaveButton component for consistent save actions across the application.
+ *
+ * @remarks
+ * Provides a standardized save button with loading states, theming, and
+ * accessibility support. Used throughout forms and settings interfaces.
  */
 
 import React, { useMemo } from "react";

@@ -1,6 +1,9 @@
 /**
- * Action button group component for site monitoring operations. Provides a
- * unified interface for site check, start/stop monitoring actions.
+ * Action button group component for site monitoring operations.
+ *
+ * @remarks
+ * Provides a unified interface for site check, start/stop monitoring actions
+ * with consistent theming and accessibility support.
  */
 
 import React, { useCallback } from "react";

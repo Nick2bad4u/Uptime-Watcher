@@ -8,16 +8,6 @@
  *
  * @packageDocumentation
  */
-/**
- * Shared type definitions for Uptime Watcher (frontend & backend).
- *
- * @remarks
- * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both
- * frontend and backend must import from this file for consistency. Event types
- * are separate to avoid circular dependencies.
- *
- * @packageDocumentation
- */
 
 /**
  * Status values for monitors.
