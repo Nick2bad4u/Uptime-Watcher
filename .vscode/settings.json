@@ -644,7 +644,14 @@
         "**/dist-electron/**": true,
         "**/dist/**": true,
         "**/node_modules/**": true,
-        "**/release/**": true
+        "**/release/**": true,
+        "**/docs/Packages/**": true,
+        "**/docs/Archive/**": true,
+        "**/docs/docusaurus/**": true,
+        "**/html/**": true,
+        "**/report/**": true,
+        "**/scripts/**": true
+
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",

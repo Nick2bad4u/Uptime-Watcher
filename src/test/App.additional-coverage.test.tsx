@@ -99,12 +99,24 @@ vi.mock("./components/common/ErrorAlert/ErrorAlert", () => ({
 }));
 
 // Mock stores
-vi.mock("./stores/error/useErrorStore");
-vi.mock("./stores/settings/useSettingsStore");
-vi.mock("./stores/sites/useSitesStore");
-vi.mock("./stores/ui/useUiStore");
-vi.mock("./stores/updates/useUpdatesStore");
-vi.mock("./theme/useTheme");
+vi.mock("./stores/error/useErrorStore", () => ({
+    useErrorStore: vi.fn(),
+}));
+vi.mock("./stores/settings/useSettingsStore", () => ({
+    useSettingsStore: vi.fn(),
+}));
+vi.mock("./stores/sites/useSitesStore", () => ({
+    useSitesStore: vi.fn(),
+}));
+vi.mock("./stores/ui/useUiStore", () => ({
+    useUIStore: vi.fn(),
+}));
+vi.mock("./stores/updates/useUpdatesStore", () => ({
+    useUpdatesStore: vi.fn(),
+}));
+vi.mock("./theme/useTheme", () => ({
+    useTheme: vi.fn(),
+}));
 
 describe("App Additional Coverage Tests", () => {
     const mockUseErrorStore = vi.mocked(useErrorStore);
@@ -450,7 +462,7 @@ describe("App Additional Coverage Tests", () => {
         // Verify that logger.debug was called
         expect(debugSpy).toHaveBeenCalledWith(
             expect.stringMatching(
-                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: test-site-id/
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: test-site-id/
             )
         );
 
@@ -503,7 +515,7 @@ describe("App Additional Coverage Tests", () => {
         // Verify that logger.debug was called with fallback identifier
         expect(debugSpy).toHaveBeenCalledWith(
             expect.stringMatching(
-                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: fallback-site-id/
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: fallback-site-id/
             )
         );
 

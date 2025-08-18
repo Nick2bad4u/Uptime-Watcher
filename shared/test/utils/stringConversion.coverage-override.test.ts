@@ -94,7 +94,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             { value: /regex/, expected: "/regex/" },
         ];
 
-        testCases.forEach(({ value, expected }, index) => {
+        for (const [index, { value, expected }] of testCases.entries()) {
             try {
                 const result = safeStringify(value);
                 // For objects and complex types, just ensure we get a string back
@@ -106,12 +106,12 @@ describe("String Conversion - 100% Coverage Override", () => {
                 } else {
                     expect(result).toBe(expected);
                 }
-            } catch (error) {
+            } catch {
                 // If there's an error, ensure we still get a string
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
             }
-        });
+        }
     });
 
     it("should ensure circular reference handling", () => {
@@ -137,10 +137,10 @@ describe("String Conversion - 100% Coverage Override", () => {
             ["undefined", undefined],
         ];
 
-        typeTests.forEach(([expectedType, value]) => {
+        for (const [expectedType, value] of typeTests) {
             expect(typeof value).toBe(expectedType);
             const result = safeStringify(value);
             expect(typeof result).toBe("string");
-        });
+        }
     });
 });

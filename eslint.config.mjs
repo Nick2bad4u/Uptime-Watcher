@@ -1068,7 +1068,7 @@ export default [
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
-                { ignore: ["@shared", "electron-devtools-installer"] },
+                { ignore: ["@shared", "electron-devtools-installer", "electron"] },
             ],
 
             "observers/no-missing-unobserve-or-disconnect": "error",
@@ -2248,7 +2248,7 @@ export default [
 
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "error",
-                { ignore: ["@shared", "electron-devtools-installer"] },
+                { ignore: ["@shared", "electron-devtools-installer", "electron"] },
             ],
 
             "observers/no-missing-unobserve-or-disconnect": "error",
