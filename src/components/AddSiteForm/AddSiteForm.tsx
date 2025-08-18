@@ -123,20 +123,24 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         const {
             addMode,
             checkInterval,
+            expectedValue,
             formError,
             host,
             monitorType,
             name,
             port,
+            recordType,
             resetForm,
             selectedExistingSite,
             setAddMode,
             setCheckInterval,
+            setExpectedValue,
             setFormError,
             setHost,
             setMonitorType,
             setName,
             setPort,
+            setRecordType,
             setSelectedExistingSite,
             setUrl,
             siteId,
@@ -179,27 +183,47 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
             () => ({
+                expectedValue: (value: number | string): void => {
+                    setExpectedValue(String(value));
+                },
                 host: (value: number | string): void => {
                     setHost(String(value));
                 },
                 port: (value: number | string): void => {
                     setPort(String(value));
                 },
+                recordType: (value: number | string): void => {
+                    setRecordType(String(value));
+                },
                 url: (value: number | string): void => {
                     setUrl(String(value));
                 },
             }),
-            [setHost, setPort, setUrl]
+            [
+                setExpectedValue,
+                setHost,
+                setPort,
+                setRecordType,
+                setUrl,
+            ]
         );
 
         // Dynamic monitor field values
         const dynamicFieldValues = useMemo(
             () => ({
+                expectedValue: expectedValue,
                 host: host,
                 port: port,
+                recordType: recordType,
                 url: url,
             }),
-            [host, port, url]
+            [
+                expectedValue,
+                host,
+                port,
+                recordType,
+                url,
+            ]
         );
 
         // Delayed loading state for button spinner (managed by custom hook)
@@ -223,6 +247,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                         checkInterval,
                         clearError,
                         createSite,
+                        expectedValue,
                         formError,
                         generateUuid,
                         host,
@@ -231,6 +256,7 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                         name,
                         onSuccess: handleSuccess,
                         port,
+                        recordType,
                         selectedExistingSite,
                         setFormError,
                         siteId,
@@ -247,12 +273,14 @@ export const AddSiteForm: React.NamedExoticComponent<AddSiteFormProperties> =
                 checkInterval,
                 clearError,
                 createSite,
+                expectedValue,
                 formError,
                 handleSuccess,
                 host,
                 monitorType,
                 name,
                 port,
+                recordType,
                 selectedExistingSite,
                 setFormError,
                 siteId,

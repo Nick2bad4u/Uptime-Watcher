@@ -61,6 +61,7 @@ import {
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
 } from "./constants";
+import { DnsMonitor } from "./DnsMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import { PingMonitor } from "./PingMonitor";
 import { PortMonitor } from "./PortMonitor";
@@ -254,6 +255,8 @@ export interface EnhancedMonitorCheckConfig {
  */
 export class EnhancedMonitorChecker {
     private readonly config: EnhancedMonitorCheckConfig;
+
+    private readonly dnsMonitor: DnsMonitor;
 
     private readonly httpMonitor: HttpMonitor;
 
@@ -831,6 +834,9 @@ export class EnhancedMonitorChecker {
         monitor: Monitor
     ): Promise<ServiceMonitorCheckResult> {
         switch (monitor.type) {
+            case "dns": {
+                return this.performMonitorCheck(this.dnsMonitor, monitor);
+            }
             case "http": {
                 return this.performMonitorCheck(this.httpMonitor, monitor);
             }
@@ -976,6 +982,7 @@ export class EnhancedMonitorChecker {
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;
         // Initialize monitor services
+        this.dnsMonitor = new DnsMonitor({});
         this.httpMonitor = new HttpMonitor({});
         this.pingMonitor = new PingMonitor({});
         this.portMonitor = new PortMonitor({});

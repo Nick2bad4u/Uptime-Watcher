@@ -68,6 +68,8 @@ export interface AddSiteFormActions {
     setAddMode: (value: FormMode) => void;
     /** Set check interval */
     setCheckInterval: (value: number) => void;
+    /** Set expected value field value */
+    setExpectedValue: (value: string) => void;
     /** Set form error message */
     setFormError: (error: string | undefined) => void;
     /** Set host field value */
@@ -78,6 +80,8 @@ export interface AddSiteFormActions {
     setName: (value: string) => void;
     /** Set port field value */
     setPort: (value: string) => void;
+    /** Set record type field value */
+    setRecordType: (value: string) => void;
     /** Set selected existing site */
     setSelectedExistingSite: (value: string) => void;
     /** Set site ID */
@@ -101,9 +105,11 @@ export interface AddSiteFormState {
     addMode: FormMode;
     /** Check interval in milliseconds */
     checkInterval: number;
+    /** Expected DNS record value field for DNS monitors */
+    expectedValue: string;
     /** Current form validation error */
     formError: string | undefined;
-    /** Host/IP field for port monitors */
+    /** Host/IP field for port and DNS monitors */
     host: string;
     /** Selected monitor type */
     monitorType: MonitorType;
@@ -111,6 +117,8 @@ export interface AddSiteFormState {
     name: string;
     /** Port number field for port monitors */
     port: string;
+    /** DNS record type field for DNS monitors */
+    recordType: string;
     /** Selected existing site ID when adding to existing */
     selectedExistingSite: string;
     /** Generated site identifier */
@@ -129,8 +137,10 @@ export type FormMode = "existing" | "new";
 const resetFieldsForMonitorType = (
     currentFieldNames: Set<string>,
     setters: {
+        setExpectedValue: (value: string) => void;
         setHost: (value: string) => void;
         setPort: (value: string) => void;
+        setRecordType: (value: string) => void;
         setUrl: (value: string) => void;
     }
 ): void => {
@@ -143,6 +153,12 @@ const resetFieldsForMonitorType = (
     }
     if (!currentFieldNames.has("port")) {
         setters.setPort("");
+    }
+    if (!currentFieldNames.has("recordType")) {
+        setters.setRecordType("A");
+    }
+    if (!currentFieldNames.has("expectedValue")) {
+        setters.setExpectedValue("");
     }
 };
 
@@ -185,7 +201,13 @@ const validateFormFields = (
     name: string,
     selectedExistingSite: string,
     monitorType: MonitorType,
-    fieldValues: { host: string; port: string; url: string },
+    fieldValues: {
+        expectedValue: string;
+        host: string;
+        port: string;
+        recordType: string;
+        url: string;
+    },
     getFields: (type: MonitorType) => Array<{ name: string; required: boolean }>
 ): boolean => {
     // Basic validation for mode and name
@@ -229,6 +251,8 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
     const [url, setUrl] = useState("");
     const [host, setHost] = useState("");
     const [port, setPort] = useState("");
+    const [recordType, setRecordType] = useState("A");
+    const [expectedValue, setExpectedValue] = useState("");
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
@@ -257,8 +281,10 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         setPrevMonitorType(monitorType);
         setFormError(undefined);
         resetFieldsForMonitorType(currentFieldNames, {
+            setExpectedValue,
             setHost,
             setPort,
+            setRecordType,
             setUrl,
         });
     }
@@ -279,16 +305,18 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
                 name,
                 selectedExistingSite,
                 monitorType,
-                { host, port, url },
+                { expectedValue, host, port, recordType, url },
                 getFields
             ),
         [
             addMode,
+            expectedValue,
             getFields,
             host,
             monitorType,
             name,
             port,
+            recordType,
             selectedExistingSite,
             url,
         ]
@@ -299,6 +327,8 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         setUrl("");
         setHost("");
         setPort("");
+        setRecordType("A");
+        setExpectedValue("");
         setName("");
         setMonitorType("http");
         setCheckInterval(DEFAULT_CHECK_INTERVAL);
@@ -312,21 +342,25 @@ export function useAddSiteForm(): AddSiteFormActions & AddSiteFormState {
         // State
         addMode,
         checkInterval,
+        expectedValue,
         formError,
         host,
         isFormValid,
         monitorType,
         name,
         port,
+        recordType,
         resetForm,
         selectedExistingSite,
         setAddMode,
         setCheckInterval,
+        setExpectedValue,
         setFormError,
         setHost,
         setMonitorType,
         setName,
         setPort,
+        setRecordType,
         setSelectedExistingSite,
         setSiteId,
         setUrl,

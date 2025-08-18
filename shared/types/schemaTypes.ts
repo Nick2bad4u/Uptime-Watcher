@@ -31,6 +31,7 @@ export type BaseMonitorSchemaType = z.ZodObject<{
     }>;
     timeout: z.ZodNumber;
     type: z.ZodEnum<{
+        dns: "dns";
         http: "http";
         ping: "ping";
         port: "port";
@@ -119,6 +120,39 @@ export type MonitorSchemaType = z.ZodDiscriminatedUnion<
             timeout: z.ZodNumber;
             type: z.ZodLiteral<"ping">;
         }>,
+        z.ZodObject<{
+            checkInterval: z.ZodNumber;
+            expectedValue: z.ZodOptional<z.ZodString>;
+            host: z.ZodString;
+            id: z.ZodString;
+            lastChecked: z.ZodOptional<z.ZodDate>;
+            monitoring: z.ZodBoolean;
+            recordType: z.ZodEnum<{
+                A: "A";
+                AAAA: "AAAA";
+                ANY: "ANY";
+                CAA: "CAA";
+                CNAME: "CNAME";
+                MX: "MX";
+                NAPTR: "NAPTR";
+                NS: "NS";
+                PTR: "PTR";
+                SOA: "SOA";
+                SRV: "SRV";
+                TLSA: "TLSA";
+                TXT: "TXT";
+            }>;
+            responseTime: z.ZodNumber;
+            retryAttempts: z.ZodNumber;
+            status: z.ZodEnum<{
+                down: "down";
+                paused: "paused";
+                pending: "pending";
+                up: "up";
+            }>;
+            timeout: z.ZodNumber;
+            type: z.ZodLiteral<"dns">;
+        }>,
     ]
 >;
 
@@ -143,6 +177,45 @@ export type PingMonitorSchemaType = z.ZodObject<{
     }>;
     timeout: z.ZodNumber;
     type: z.ZodLiteral<"ping">;
+}>;
+
+/**
+ * Type definition for DNS monitor schema.
+ *
+ * @public
+ */
+export type DnsMonitorSchemaType = z.ZodObject<{
+    checkInterval: z.ZodNumber;
+    expectedValue: z.ZodOptional<z.ZodString>;
+    host: z.ZodString;
+    id: z.ZodString;
+    lastChecked: z.ZodOptional<z.ZodDate>;
+    monitoring: z.ZodBoolean;
+    recordType: z.ZodEnum<{
+        A: "A";
+        AAAA: "AAAA";
+        ANY: "ANY";
+        CAA: "CAA";
+        CNAME: "CNAME";
+        MX: "MX";
+        NAPTR: "NAPTR";
+        NS: "NS";
+        PTR: "PTR";
+        SOA: "SOA";
+        SRV: "SRV";
+        TLSA: "TLSA";
+        TXT: "TXT";
+    }>;
+    responseTime: z.ZodNumber;
+    retryAttempts: z.ZodNumber;
+    status: z.ZodEnum<{
+        down: "down";
+        paused: "paused";
+        pending: "pending";
+        up: "up";
+    }>;
+    timeout: z.ZodNumber;
+    type: z.ZodLiteral<"dns">;
 }>;
 
 /**
@@ -231,6 +304,39 @@ export type SiteSchemaType = z.ZodObject<{
                     }>;
                     timeout: z.ZodNumber;
                     type: z.ZodLiteral<"ping">;
+                }>,
+                z.ZodObject<{
+                    checkInterval: z.ZodNumber;
+                    expectedValue: z.ZodOptional<z.ZodString>;
+                    host: z.ZodString;
+                    id: z.ZodString;
+                    lastChecked: z.ZodOptional<z.ZodDate>;
+                    monitoring: z.ZodBoolean;
+                    recordType: z.ZodEnum<{
+                        A: "A";
+                        AAAA: "AAAA";
+                        ANY: "ANY";
+                        CAA: "CAA";
+                        CNAME: "CNAME";
+                        MX: "MX";
+                        NAPTR: "NAPTR";
+                        NS: "NS";
+                        PTR: "PTR";
+                        SOA: "SOA";
+                        SRV: "SRV";
+                        TLSA: "TLSA";
+                        TXT: "TXT";
+                    }>;
+                    responseTime: z.ZodNumber;
+                    retryAttempts: z.ZodNumber;
+                    status: z.ZodEnum<{
+                        down: "down";
+                        paused: "paused";
+                        pending: "pending";
+                        up: "up";
+                    }>;
+                    timeout: z.ZodNumber;
+                    type: z.ZodLiteral<"dns">;
                 }>,
             ]
         >

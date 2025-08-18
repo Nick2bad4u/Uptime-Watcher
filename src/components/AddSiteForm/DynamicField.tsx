@@ -47,10 +47,11 @@
 import type { MonitorFieldDefinition } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import logger from "../../services/logger";
 import ThemedText from "../../theme/components/ThemedText";
+import SelectField, { type SelectOption } from "./SelectField";
 import TextField from "./TextField";
 
 /**
@@ -144,6 +145,11 @@ const DynamicField = ({
         [handleChange]
     );
 
+    const selectOptions = useMemo(
+        () => (field.options ?? []) as SelectOption[],
+        [field.options]
+    );
+
     switch (field.type) {
         case "number": {
             return (
@@ -160,6 +166,23 @@ const DynamicField = ({
                     })}
                     required={field.required}
                     type="number"
+                    value={String(value)}
+                />
+            );
+        }
+        case "select": {
+            return (
+                <SelectField
+                    disabled={disabled}
+                    {...(field.helpText && { helpText: field.helpText })}
+                    id={field.name}
+                    label={field.label}
+                    onChange={handleStringChange}
+                    options={selectOptions}
+                    {...(field.placeholder && {
+                        placeholder: field.placeholder,
+                    })}
+                    required={field.required}
                     value={String(value)}
                 />
             );

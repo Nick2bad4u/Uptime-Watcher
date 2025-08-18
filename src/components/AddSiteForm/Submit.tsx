@@ -27,6 +27,13 @@ import {
 } from "../../utils/monitorValidation";
 
 /**
+ * Safely trims a string value. Returns empty string for non-strings.
+ */
+function safeTrim(value: unknown): string {
+    return typeof value === "string" ? value.trim() : "";
+}
+
+/**
  * Store actions interface for form submission operations.
  *
  * @remarks
@@ -91,7 +98,13 @@ export type FormSubmitProperties = AddSiteFormState &
  */
 function buildMonitorData(
     monitorType: MonitorType,
-    formData: { host: string; port: string; url: string }
+    formData: {
+        expectedValue: string;
+        host: string;
+        port: string;
+        recordType: string;
+        url: string;
+    }
 ): Partial<Monitor> {
     const baseData = {
         type: monitorType,
@@ -99,22 +112,32 @@ function buildMonitorData(
 
     // Build type-specific fields using discriminated unions
     switch (monitorType) {
+        case "dns": {
+            return {
+                ...baseData,
+                host: safeTrim(formData.host),
+                recordType: safeTrim(formData.recordType),
+                ...(safeTrim(formData.expectedValue) && {
+                    expectedValue: safeTrim(formData.expectedValue),
+                }),
+            };
+        }
         case "http": {
             return {
                 ...baseData,
-                url: formData.url.trim(),
+                url: safeTrim(formData.url),
             };
         }
         case "ping": {
             return {
                 ...baseData,
-                host: formData.host.trim(),
+                host: safeTrim(formData.host),
             };
         }
         case "port": {
             return {
                 ...baseData,
-                host: formData.host.trim(),
+                host: safeTrim(formData.host),
                 port: Number(formData.port),
             };
         }
@@ -129,11 +152,25 @@ function buildMonitorData(
  * assignment instead of dynamic field copying.
  */
 function createMonitor(properties: FormSubmitProperties): Monitor {
-    const { checkInterval, generateUuid, host, monitorType, port, url } =
-        properties;
+    const {
+        checkInterval,
+        expectedValue,
+        generateUuid,
+        host,
+        monitorType,
+        port,
+        recordType,
+        url,
+    } = properties;
 
     // Get type-specific monitor data
-    const specificData = buildMonitorData(monitorType, { host, port, url });
+    const specificData = buildMonitorData(monitorType, {
+        expectedValue,
+        host,
+        port,
+        recordType,
+        url,
+    });
 
     // Create monitor with all required fields and type-specific data
     return {
@@ -168,7 +205,7 @@ function validateAddMode(
 ): string[] {
     const errors: string[] = [];
 
-    if (addMode === "new" && !name.trim()) {
+    if (addMode === "new" && !safeTrim(name)) {
         errors.push("Site name is required");
     }
 
@@ -206,7 +243,7 @@ async function submitNewSite(
 ): Promise<void> {
     const { createSite, logger, name, siteId } = properties;
 
-    const trimmedName = name.trim();
+    const trimmedName = safeTrim(name);
     const siteData = {
         identifier: siteId,
         monitors: [monitor],
@@ -219,7 +256,7 @@ async function submitNewSite(
         identifier: siteId,
         monitorId: monitor.id,
         monitorType: monitor.type,
-        name: name.trim(),
+        name: trimmedName,
     });
 }
 
@@ -274,6 +311,9 @@ async function validateCheckInterval(checkInterval: number): Promise<string[]> {
  * @param url - URL for HTTP monitors
  * @param host - Hostname for monitors
  * @param port - Port for port monitors
+ * @param hostname - Hostname for DNS monitors
+ * @param recordType - Record type for DNS monitors
+ * @param expectedValue - Expected value for DNS monitors
  *
  * @returns Promise resolving to array of validation error messages
  */
@@ -281,7 +321,9 @@ async function validateMonitorType(
     monitorType: MonitorType,
     url: string,
     host: string,
-    port: string
+    port: string,
+    recordType: string,
+    expectedValue: string
 ): Promise<string[]> {
     // Build form data object with only the relevant fields
     const formData: Record<string, unknown> = {
@@ -290,16 +332,27 @@ async function validateMonitorType(
 
     // Add type-specific fields
     switch (monitorType) {
+        case "dns": {
+            formData["host"] = safeTrim(host);
+            formData["recordType"] = safeTrim(recordType);
+            if (
+                safeTrim(recordType).toUpperCase() !== "ANY" &&
+                safeTrim(expectedValue)
+            ) {
+                formData["expectedValue"] = safeTrim(expectedValue);
+            }
+            break;
+        }
         case "http": {
-            formData["url"] = url.trim();
+            formData["url"] = safeTrim(url);
             break;
         }
         case "ping": {
-            formData["host"] = host.trim();
+            formData["host"] = safeTrim(host);
             break;
         }
         case "port": {
-            formData["host"] = host.trim();
+            formData["host"] = safeTrim(host);
             formData["port"] = Number(port);
             break;
         }
@@ -353,12 +406,14 @@ export async function handleSubmit(
         addMode,
         checkInterval,
         clearError,
+        expectedValue,
         host,
         logger,
         monitorType,
         name,
         onSuccess,
         port,
+        recordType,
         selectedExistingSite,
         setFormError,
         url,
@@ -370,10 +425,11 @@ export async function handleSubmit(
     // Log submission start
     logger.debug("Form submission started", {
         addMode,
-        hasHost: Boolean(host.trim()),
-        hasName: Boolean(name.trim()),
-        hasPort: Boolean(port.trim()),
-        hasUrl: Boolean(url.trim()),
+        hasHost: Boolean(safeTrim(host)),
+        hasName: Boolean(safeTrim(name)),
+        hasPort: Boolean(safeTrim(port)),
+        hasRecordType: Boolean(safeTrim(recordType)),
+        hasUrl: Boolean(safeTrim(url)),
         monitorType,
         selectedExistingSite: Boolean(selectedExistingSite),
     });
@@ -381,7 +437,14 @@ export async function handleSubmit(
     // Collect all validation errors
     const validationErrors: string[] = [
         ...validateAddMode(addMode, name, selectedExistingSite),
-        ...(await validateMonitorType(monitorType, url, host, port)),
+        ...(await validateMonitorType(
+            monitorType,
+            url,
+            host,
+            port,
+            recordType,
+            expectedValue
+        )),
         ...(await validateCheckInterval(checkInterval)),
     ];
 
@@ -392,10 +455,12 @@ export async function handleSubmit(
             formData: {
                 addMode,
                 checkInterval,
+                expectedValue: truncateForLogging(expectedValue),
                 host: truncateForLogging(host),
                 monitorType,
                 name: truncateForLogging(name),
                 port,
+                recordType: truncateForLogging(recordType),
                 url: truncateForLogging(url),
             },
         });

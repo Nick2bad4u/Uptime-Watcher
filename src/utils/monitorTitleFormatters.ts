@@ -24,6 +24,10 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
  * @internal
  */
 const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
+    dns: (monitor: Monitor) => {
+        const { host, recordType } = monitor;
+        return host && recordType ? ` (${recordType} ${host})` : "";
+    },
     http: (monitor: Monitor) => {
         const { url } = monitor;
         return url ? ` (${url})` : "";

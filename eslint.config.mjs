@@ -1578,6 +1578,7 @@ export default [
             ],
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "init-declarations": "off",
             "@typescript-eslint/init-declarations": "warn",
             "@typescript-eslint/max-params": "off",
             "@typescript-eslint/member-ordering": "off",
@@ -2411,6 +2412,7 @@ export default [
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
 
             // Node.js specific
+            complexity: "off",
 
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
@@ -2710,6 +2712,7 @@ export default [
             ],
             "@typescript-eslint/explicit-member-accessibility": "warn",
             "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "init-declarations": "off",
             "@typescript-eslint/init-declarations": "warn",
             "@typescript-eslint/max-params": "off",
             "@typescript-eslint/member-ordering": "off",
@@ -3343,6 +3346,7 @@ export default [
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
             // Node.js specific
+            complexity: "off",
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "no-var": "error",
             "prefer-const": "error",

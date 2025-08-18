@@ -22,6 +22,7 @@ import { monitorSchemas } from "@shared/validation/schemas";
 import type { IMonitorService } from "./types";
 
 import { logger } from "../../utils/logger";
+import { DnsMonitor } from "./DnsMonitor";
 import { HttpMonitor } from "./HttpMonitor";
 import {
     createMigrationOrchestrator,
@@ -298,7 +299,7 @@ registerMonitorType({
             helpText: "Enter the full URL including http:// or https://",
             label: "Website URL",
             name: "url",
-            placeholder: "https://example.com",
+            placeholder: "example.com or 192.168.1.1",
             required: true,
             type: "url",
         },
@@ -430,11 +431,94 @@ registerMonitorType({
     version: "1.0.0",
 });
 
+registerMonitorType({
+    description: "Monitors DNS record resolution for domains",
+    displayName: "DNS (Domain Resolution)",
+    fields: [
+        {
+            helpText: "Enter a valid domain name",
+            label: "Host",
+            name: "host",
+            placeholder: "example.com",
+            required: true,
+            type: "text",
+        },
+        {
+            helpText: "DNS record type to monitor",
+            label: "Record Type",
+            name: "recordType",
+            options: [
+                { label: "A (IPv4 Address)", value: "A" },
+                { label: "AAAA (IPv6 Address)", value: "AAAA" },
+                { label: "ANY (All Records)", value: "ANY" },
+                {
+                    label: "CAA (Certificate Authority Authorization)",
+                    value: "CAA",
+                },
+                { label: "CNAME (Canonical Name)", value: "CNAME" },
+                { label: "MX (Mail Exchange)", value: "MX" },
+                {
+                    label: "NAPTR (Naming Authority Pointer)",
+                    value: "NAPTR",
+                },
+                { label: "NS (Name Server)", value: "NS" },
+                { label: "PTR (Pointer)", value: "PTR" },
+                { label: "SOA (Start of Authority)", value: "SOA" },
+                { label: "SRV (Service Record)", value: "SRV" },
+                { label: "TLSA (TLS Authentication)", value: "TLSA" },
+                { label: "TXT (Text Record)", value: "TXT" },
+            ],
+            placeholder: "Select record type",
+            required: true,
+            type: "select",
+        },
+        {
+            helpText:
+                "Expected value in DNS response (optional). Ignored for ANY.",
+            label: "Expected Value",
+            name: "expectedValue",
+            placeholder: "e.g., 192.168.1.1 or mail.example.com",
+            required: false,
+            type: "text",
+        },
+    ],
+    serviceFactory: () => new DnsMonitor(),
+    type: "dns",
+    uiConfig: {
+        detailFormats: {
+            analyticsLabel: "DNS Response Time",
+            historyDetail: (details: string) => `DNS: ${details}`,
+        },
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: false,
+        },
+        formatDetail: (details: string) => `DNS: ${details}`,
+        formatTitleSuffix: (monitor: Monitor) => {
+            if (monitor.type === "dns") {
+                return monitor.host && monitor.recordType
+                    ? ` (${monitor.recordType} ${monitor.host})`
+                    : "";
+            }
+            return "";
+        },
+        helpTexts: {
+            primary: "Enter a valid host (domain or IP)",
+            secondary: "Select the DNS record type to monitor",
+        },
+        supportsAdvancedAnalytics: true,
+        supportsResponseTime: true,
+    },
+    validationSchema: monitorSchemas.dns,
+    version: "1.0.0",
+});
+
 // Register example migrations for the migration system
 migrationRegistry.registerMigration("http", exampleMigrations.httpV1_0_to_1_1);
 migrationRegistry.registerMigration("port", exampleMigrations.portV1_0_to_1_1);
 
 // Set current versions for existing monitor types
+versionManager.setVersion("dns", "1.0.0");
 versionManager.setVersion("http", "1.0.0");
 versionManager.setVersion("ping", "1.0.0");
 versionManager.setVersion("port", "1.0.0");

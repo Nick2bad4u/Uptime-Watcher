@@ -144,9 +144,14 @@ const DynamicMonitorFields = ({
                 const fieldValue = values[field.name];
                 const defaultValue = field.type === "number" ? 0 : "";
 
+                const isDnsExpectedValueDisabled =
+                    monitorType === "dns" &&
+                    field.name === "expectedValue" &&
+                    String(values["recordType"]) === "ANY";
+
                 return (
                     <DynamicField
-                        disabled={isLoading}
+                        disabled={isLoading || isDnsExpectedValueDisabled}
                         field={field}
                         key={field.name}
                         onChange={fieldOnChange ?? defaultOnChange(field.name)}

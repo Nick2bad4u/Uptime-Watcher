@@ -525,7 +525,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             expect(result.success).toBe(true);
             expect(Array.isArray(result.data)).toBe(true);
-            expect(result.data).toHaveLength(3); // http, ping, port
+            expect(result.data).toHaveLength(4); // http, ping, port, dns
 
             // Check serialized config structure
             const httpConfig = result.data.find(

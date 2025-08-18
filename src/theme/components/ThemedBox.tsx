@@ -113,7 +113,7 @@ export interface ThemedBoxProperties {
     /**
      * Inline style object forwarded to the element.
      *
-     * @defaultValue { } (internal singleton)
+     * @defaultValue \{ \} (internal singleton)
      */
     readonly style?: React.CSSProperties;
 

@@ -33,6 +33,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     ): FormSubmitProperties => ({
         addMode: "new",
         checkInterval: 30_000,
+        expectedValue: "",
         formError: undefined,
         clearError: vi.fn(),
         generateUuid: vi.fn(() => "test-uuid"),
@@ -41,6 +42,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
         monitorType: "http",
         name: "Test Site",
         port: "",
+        recordType: "A",
         selectedExistingSite: "",
         setFormError: vi.fn(),
         siteId: "test-site-id",

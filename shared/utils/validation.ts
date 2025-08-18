@@ -20,7 +20,7 @@ import {
  * Validates monitor type.
  *
  * @remarks
- * Supports all monitor types: HTTP, port, and ping monitors.
+ * Supports all monitor types: HTTP, port, ping, and DNS monitors.
  *
  * @param type - Value to check as monitor type
  *
@@ -29,7 +29,10 @@ import {
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
         typeof type === "string" &&
-        (type === "http" || type === "port" || type === "ping")
+        (type === "http" ||
+            type === "port" ||
+            type === "ping" ||
+            type === "dns")
     );
 }
 
@@ -177,6 +180,52 @@ function validatePortMonitorFields(
 }
 
 /**
+ * Validates DNS monitor-specific fields.
+ *
+ * @remarks
+ * Checks that the hostname field is present and a string, and that recordType
+ * is a valid DNS record type. DNS monitors require hostname (not host) and
+ * recordType fields for proper DNS resolution.
+ *
+ * @param monitor - Partial monitor object to validate.
+ * @param errors - Array to collect validation error messages.
+ *
+ * @internal
+ */
+function validateDnsMonitorFields(
+    monitor: Partial<Monitor>,
+    errors: string[]
+): void {
+    if (!monitor.host || typeof monitor.host !== "string") {
+        errors.push("Host is required for DNS monitors");
+    }
+    if (!monitor.recordType || typeof monitor.recordType !== "string") {
+        errors.push("Record type is required for DNS monitors");
+    } else {
+        const validRecordTypes = [
+            "A",
+            "AAAA",
+            "ANY",
+            "CAA",
+            "CNAME",
+            "MX",
+            "NAPTR",
+            "NS",
+            "PTR",
+            "SOA",
+            "SRV",
+            "TLSA",
+            "TXT",
+        ];
+        if (!validRecordTypes.includes(monitor.recordType.toUpperCase())) {
+            errors.push(
+                `Invalid record type: ${monitor.recordType}. Valid types are: ${validRecordTypes.join(", ")}`
+            );
+        }
+    }
+}
+
+/**
  * Validates type-specific monitor fields by delegating to the appropriate field
  * validator.
  *
@@ -199,6 +248,10 @@ function validateTypeSpecificFields(
     }
 
     switch (monitor.type) {
+        case "dns": {
+            validateDnsMonitorFields(monitor, errors);
+            break;
+        }
         case "http": {
             validateHttpMonitorFields(monitor, errors);
             break;

@@ -98,7 +98,29 @@ export function findMonitorInSite(
  *
  * @returns Complete monitor object with validated and normalized fields
  */
+/**
+ * Safely extract DNS-specific monitor properties from a partial monitor.
+ */
+function extractDnsProps(
+    type: MonitorType,
+    monitor: Partial<Monitor>
+): Partial<Monitor> {
+    if (type !== "dns") return {};
+
+    const props: Partial<Monitor> = {};
+    if (isNonEmptyString(monitor.recordType)) {
+        props.recordType = monitor.recordType as string;
+    }
+    if (isNonEmptyString(monitor.expectedValue)) {
+        props.expectedValue = monitor.expectedValue as string;
+    }
+    return props;
+}
+
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
+    const finalizedType = validateMonitorType(monitor.type);
+    const dnsProps = extractDnsProps(finalizedType, monitor);
+
     return {
         activeOperations: Array.isArray(monitor.activeOperations)
             ? monitor.activeOperations
@@ -116,8 +138,8 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
             monitor.status && isMonitorStatus(monitor.status)
                 ? monitor.status
                 : DEFAULT_MONITOR_STATUS,
-        timeout: safeInteger(monitor.timeout, 5000, 1000, 300_000),
-        type: validateMonitorType(monitor.type),
+    timeout: safeInteger(monitor.timeout, 5000, 1000, 300_000),
+    type: finalizedType,
         // Only add optional fields if they are explicitly provided and valid
         ...(isValidUrl(monitor.url) && { url: monitor.url }),
         ...(isNonEmptyString(monitor.host) && { host: monitor.host }),
@@ -126,6 +148,8 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
         ...(monitor.lastChecked instanceof Date && {
             lastChecked: monitor.lastChecked,
         }),
+    // Preserve DNS-specific fields when applicable
+    ...dnsProps,
     };
 }
 

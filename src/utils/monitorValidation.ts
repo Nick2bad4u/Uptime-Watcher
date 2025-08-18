@@ -4,12 +4,6 @@
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
-import type {
-    HttpFormData,
-    MonitorFormData,
-    PingFormData,
-    PortFormData,
-} from "@shared/types/formData";
 import type { ValidationResult } from "@shared/types/validation";
 
 // Import shared validation functions for client-side validation
@@ -17,6 +11,14 @@ import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/schemas";
+
+import type {
+    DnsFormData,
+    HttpFormData,
+    MonitorFormData,
+    PingFormData,
+    PortFormData,
+} from "../types/monitorFormData";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { withUtilityErrorHandling } from "./errorHandling";
@@ -233,6 +235,59 @@ const validateHttpMonitorFormData = (data: Partial<HttpFormData>): string[] => {
     return errors;
 };
 
+/**
+ * Validates DNS monitor form data by checking required host and recordType
+ * fields, with optional expectedValue field.
+ *
+ * @remarks
+ * DNS monitors require host and recordType fields. The expectedValue field is
+ * optional and only validated if provided. Uses shared validation to ensure
+ * consistency with backend validation rules.
+ *
+ * @param data - Form data to validate
+ *
+ * @returns Array of validation error messages
+ */
+const validateDnsMonitorFormData = (data: Partial<DnsFormData>): string[] => {
+    const errors: string[] = [];
+
+    if (!data.host || typeof data.host !== "string") {
+        errors.push("Host is required for DNS monitors");
+    } else {
+        // Validate host field specifically
+        const hostResult = sharedValidateMonitorField("dns", "host", data.host);
+        errors.push(...hostResult.errors);
+    }
+
+    if (!data.recordType || typeof data.recordType !== "string") {
+        errors.push("Record type is required for DNS monitors");
+    } else {
+        // Validate recordType field specifically
+        const recordTypeResult = sharedValidateMonitorField(
+            "dns",
+            "recordType",
+            data.recordType
+        );
+        errors.push(...recordTypeResult.errors);
+    }
+
+    // Optional expectedValue validation
+    if (
+        data.expectedValue &&
+        typeof data.expectedValue === "string" &&
+        data.expectedValue.trim()
+    ) {
+        const expectedValueResult = sharedValidateMonitorField(
+            "dns",
+            "expectedValue",
+            data.expectedValue
+        );
+        errors.push(...expectedValueResult.errors);
+    }
+
+    return errors;
+};
+
 const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => {
     const errors: string[] = [];
 
@@ -301,6 +356,12 @@ const validateMonitorFormDataByType = (
 
     // Validate type-specific required fields only
     switch (type) {
+        case "dns": {
+            errors.push(
+                ...validateDnsMonitorFormData(data as Partial<DnsFormData>)
+            );
+            break;
+        }
         case "http": {
             errors.push(
                 ...validateHttpMonitorFormData(data as Partial<HttpFormData>)

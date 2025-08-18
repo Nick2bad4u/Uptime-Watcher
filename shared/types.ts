@@ -27,7 +27,7 @@ export type MonitorStatus = "down" | "paused" | "pending" | "up";
  *
  * @public
  */
-export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
+export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const;
 
 /**
  * Interface for monitor status constants.
@@ -97,12 +97,14 @@ export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 export interface Monitor {
     activeOperations?: string[];
     checkInterval: number;
+    expectedValue?: string; // Added for DNS monitoring
     history: StatusHistory[];
     host?: string;
     id: string;
     lastChecked?: Date;
     monitoring: boolean;
     port?: number;
+    recordType?: string; // Added for DNS monitoring
     responseTime: number;
     retryAttempts: number;
     status: MonitorStatus;
@@ -130,12 +132,14 @@ export interface MonitorFieldDefinition {
     min?: number;
     /** Field name (matches monitor property) */
     name: string;
+    /** Options for select fields */
+    options?: Array<{ label: string; value: string }>;
     /** Placeholder text */
     placeholder?: string;
     /** Whether field is required */
     required: boolean;
     /** Input type for form rendering */
-    type: "number" | "text" | "url";
+    type: "number" | "select" | "text" | "url";
 }
 
 export interface Site {

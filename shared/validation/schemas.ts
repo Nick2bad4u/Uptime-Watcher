@@ -13,6 +13,7 @@
 
 import type {
     BaseMonitorSchemaType,
+    DnsMonitorSchemaType,
     HttpMonitorSchemaType,
     MonitorSchemaType,
     PingMonitorSchemaType,
@@ -129,7 +130,7 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
                 VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
                 "Timeout cannot exceed 300 seconds"
             ),
-        type: z.enum(["http", "port", "ping"]),
+        type: z.enum(["http", "port", "ping", "dns"]),
     })
     .strict();
 
@@ -195,15 +196,46 @@ export const pingMonitorSchema: PingMonitorSchemaType = baseMonitorSchema
     .strict();
 
 /**
+ * Zod schema for DNS monitor fields.
+ *
+ * @remarks
+ * Extends {@link baseMonitorSchema} and adds DNS-specific fields for domain name
+ * resolution monitoring with support for different record types.
+ */
+export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema
+    .extend({
+        expectedValue: z.string().optional(),
+        host: hostValidationSchema,
+        recordType: z.enum([
+            "A",
+            "AAAA",
+            "ANY",
+            "CAA",
+            "CNAME",
+            "MX",
+            "NAPTR",
+            "NS",
+            "PTR",
+            "SOA",
+            "SRV",
+            "TLSA",
+            "TXT",
+        ]),
+        type: z.literal("dns"),
+    })
+    .strict();
+
+/**
  * Zod discriminated union schema for all monitor types.
  *
  * @remarks
- * Supports HTTP, port, and ping monitors.
+ * Supports HTTP, port, ping, and DNS monitors.
  */
 export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
     httpMonitorSchema,
     portMonitorSchema,
     pingMonitorSchema,
+    dnsMonitorSchema,
 ]);
 
 /**
@@ -233,6 +265,7 @@ export const siteSchema: SiteSchemaType = z
  * Interface for monitor schemas by type.
  */
 export interface MonitorSchemas {
+    readonly dns: typeof dnsMonitorSchema;
     readonly http: typeof httpMonitorSchema;
     readonly ping: typeof pingMonitorSchema;
     readonly port: typeof portMonitorSchema;
@@ -245,6 +278,7 @@ export interface MonitorSchemas {
  * Useful for dynamic schema selection.
  */
 export const monitorSchemas: MonitorSchemas = {
+    dns: dnsMonitorSchema,
     http: httpMonitorSchema,
     ping: pingMonitorSchema,
     port: portMonitorSchema,
@@ -258,7 +292,14 @@ export const monitorSchemas: MonitorSchemas = {
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 
 /**
- * Type representing a validated monitor (HTTP, port, or ping).
+ * Type representing a validated DNS monitor.
+ *
+ * @see {@link dnsMonitorSchema}
+ */
+export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
+
+/**
+ * Type representing a validated monitor (HTTP, port, ping, or DNS).
  *
  * @see {@link monitorSchema}
  */

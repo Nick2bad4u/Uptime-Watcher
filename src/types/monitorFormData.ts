@@ -68,9 +68,26 @@ export interface PortFormData extends BaseFormData {
 }
 
 /**
+ * Form data for DNS monitors.
+ */
+export interface DnsFormData extends BaseFormData {
+    /** Expected value for DNS record (optional) */
+    expectedValue?: string;
+    /** Target host to resolve */
+    host: string;
+    /** DNS record type to query */
+    recordType: string;
+    type: "dns";
+}
+
+/**
  * Union type for all supported monitor form data types.
  */
-export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
+export type MonitorFormData =
+    | DnsFormData
+    | HttpFormData
+    | PingFormData
+    | PortFormData;
 
 /**
  * Create default form data for a specific monitor type.
@@ -80,6 +97,7 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
  * @returns Default form data for the specified type
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
+export function createDefaultFormData(type: "dns"): Partial<DnsFormData>;
 export function createDefaultFormData(type: "http"): Partial<HttpFormData>;
 export function createDefaultFormData(type: "ping"): Partial<PingFormData>;
 export function createDefaultFormData(type: "port"): Partial<PortFormData>;
@@ -105,6 +123,23 @@ export function isHttpFormData(
     data: Partial<MonitorFormData>
 ): data is HttpFormData {
     return data.type === "http" && typeof data.url === "string";
+}
+
+/**
+ * Type guard to check if form data is for DNS monitor.
+ *
+ * @param data - Form data to check
+ *
+ * @returns True if data is DNS form data
+ */
+export function isDnsFormData(
+    data: Partial<MonitorFormData>
+): data is DnsFormData {
+    return (
+        data.type === "dns" &&
+        typeof data.host === "string" &&
+        typeof data.recordType === "string"
+    );
 }
 
 /**
@@ -142,6 +177,7 @@ export function isPortFormData(
  * enable dynamic validation.
  */
 const FORM_DATA_VALIDATORS = {
+    dns: isDnsFormData,
     http: isHttpFormData,
     ping: isPingFormData,
     port: isPortFormData,
