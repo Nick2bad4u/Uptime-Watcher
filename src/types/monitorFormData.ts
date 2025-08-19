@@ -122,7 +122,7 @@ export function createDefaultFormData(type: string): Partial<BaseFormData> {
 export function isHttpFormData(
     data: Partial<MonitorFormData>
 ): data is HttpFormData {
-    return data.type === "http" && typeof data.url === "string";
+    return data.type === "http" && typeof data.url === "string" && data.url.trim() !== "";
 }
 
 /**
@@ -138,7 +138,9 @@ export function isDnsFormData(
     return (
         data.type === "dns" &&
         typeof data.host === "string" &&
-        typeof data.recordType === "string"
+        data.host.trim() !== "" &&
+        typeof data.recordType === "string" &&
+        data.recordType.trim() !== ""
     );
 }
 
@@ -152,7 +154,7 @@ export function isDnsFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
-    return data.type === "ping" && typeof data.host === "string";
+    return data.type === "ping" && typeof data.host === "string" && data.host.trim() !== "";
 }
 
 /**
@@ -168,7 +170,10 @@ export function isPortFormData(
     return (
         data.type === "port" &&
         typeof data.host === "string" &&
-        typeof data.port === "number"
+        data.host.trim() !== "" &&
+        typeof data.port === "number" &&
+        data.port > 0 &&
+        data.port <= 65535
     );
 }
 

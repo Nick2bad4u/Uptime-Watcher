@@ -75,15 +75,21 @@
         "**/node_modules/**": true,
         "**/release/**": true,
         "**/.nyc_output/**": true,
-        "**/dist-shared/**": true
+        "**/dist-shared/**": true,
+        "**/html/**": true,
+        "**/report/**": true
     },
     "files.watcherExclude": {
+        "**/.husky/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true,
         "**/dist/**": true,
         "**/node_modules/**": true,
         "**/release/**": true,
-        "**/.nyc_output/**": true
+        "**/.nyc_output/**": true,
+        "**/dist-shared/**": true,
+        "**/html/**": true,
+        "**/report/**": true
     },
 
     "search.exclude": {

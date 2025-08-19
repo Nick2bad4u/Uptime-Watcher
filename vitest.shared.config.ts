@@ -29,7 +29,9 @@ const vitestConfig = defineConfig({
                 "**/index.ts", // Exclude barrel export files
                 "**/index.tsx",
                 "**/node_modules/**",
-                "**/types.ts", // Exclude type definition files
+                // NOTE: Don't exclude all types.ts files since shared/types.ts contains actual functions
+                "src/**/types.ts", // Only exclude frontend type definition files
+                "electron/**/types.ts", // Only exclude electron type definition files
                 "**/types.tsx",
                 "coverage/**",
                 "dist-electron/**",

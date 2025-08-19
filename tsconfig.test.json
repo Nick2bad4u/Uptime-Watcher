@@ -35,6 +35,10 @@
         "src/**/*.tsx",
         "src/test/**/*.ts",
         "src/test/**/*.tsx",
+        "shared/**/*.ts",
+        "shared/**/*.tsx",
+        "shared/test/**/*.ts",
+        "shared/test/**/*.tsx",
         "tailwind.config.mjs",
         "vitest.config.ts",
         "vitest.shared.config.ts"

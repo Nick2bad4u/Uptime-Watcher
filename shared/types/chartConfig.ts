@@ -379,7 +379,8 @@ export function hasPlugins(
         typeof config === "object" &&
         config !== null &&
         "plugins" in config &&
-        typeof (config as Record<string, unknown>)["plugins"] === "object"
+        typeof (config as Record<string, unknown>)["plugins"] === "object" &&
+        (config as Record<string, unknown>)["plugins"] !== null
     );
 }
 

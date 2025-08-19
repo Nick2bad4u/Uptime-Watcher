@@ -376,7 +376,7 @@ export default [
     // },
     {
         files: ["**/package.json"],
-        plugins: { "package-json": packageJson, publint: publint },
+        plugins: { "package-json": packageJson},
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
@@ -395,22 +395,6 @@ export default [
             "package-json/require-keywords": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
             "package-json/valid-local-dependency": "off",
-
-            /**
-             * The 'suggestion' type messages created by publint will cause
-             * eslint warns
-             */
-            "publint/suggestion": "warn",
-            /**
-             * The 'warning' type messages created by publint will cause eslint
-             * warns
-             */
-            "publint/warning": "warn",
-            /**
-             * The 'error' type messages created by publint will cause eslint
-             * errors
-             */
-            "publint/error": "error",
         },
     },
 
