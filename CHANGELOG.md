@@ -7,14 +7,66 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[0d814e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)...
-[0d814e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0d814e25cfcac55fc5f474c51288bef461b9165e...0d814e25cfcac55fc5f474c51288bef461b9165e))
+[[5ec35dd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)...
+[5ec35dd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5ec35ddd460c829c155c1f4da42ed4231583bc1d...5ec35ddd460c829c155c1f4da42ed4231583bc1d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.7.0 [`(5ec35dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)
+
+
+
+
+
+
+## [11.7.0] - 2025-08-19
+
+
+[[b33bbad](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b33bbad4d0403509562a872e204da245cac3cd64)...
+[834be2b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/834be2be3264793d52adeeede131a0edc2ab5d44)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b33bbad4d0403509562a872e204da245cac3cd64...834be2be3264793d52adeeede131a0edc2ab5d44))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 11.6.0 [`(0d814e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add comprehensive database and electron benchmarks
+
+Adds extensive benchmark suites for database and Electron operations, covering backup/restore, bulk transactions, connection pooling, data validation, index management, migration, query performance, transaction management, and Electron main-process services.
+
+Improves performance visibility, enables regression detection, and facilitates system optimization across core database and application layers.
+
+ - Enables granular measurement of operational characteristics and edge-case behaviors.
+ - Supports future performance tuning and reliability improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(63cdb3a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63cdb3a0bdb364bb8edbaa29aa4e6c9e635cb6a8)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v11.6.0 [skip ci] [`(821b2a3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/821b2a36a2ca1e96244b9bef931b8266121f5b37)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update devDeps, reorganize package fields
+
+- Streamlines devDependencies by merging previously optional dependencies into devDeps and removes unused optionalDependencies.
+- Adds bundleDependencies for improved packaging.
+- Updates versions for several dependencies for compatibility and latest features.
+- Enhances ESLint config with new package-json rules for improved package.json validation.
+- Refactors package structure for maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b33bbad)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b33bbad4d0403509562a872e204da245cac3cd64)
 
 
 
