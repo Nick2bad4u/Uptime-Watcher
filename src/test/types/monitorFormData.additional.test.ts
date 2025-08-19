@@ -1,5 +1,6 @@
 /**
- * Additional comprehensive tests for monitorFormData functions to achieve complete function coverage
+ * Additional comprehensive tests for monitorFormData functions to achieve
+ * complete function coverage
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -203,8 +204,13 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 headers: ["Content-Type: application/json"],
                 tags: ["api", "health"],
             };
-            expect(safeGetFormProperty(data, "headers", [])).toEqual(["Content-Type: application/json"]);
-            expect(safeGetFormProperty(data, "tags", [])).toEqual(["api", "health"]);
+            expect(safeGetFormProperty(data, "headers", [])).toEqual([
+                "Content-Type: application/json",
+            ]);
+            expect(safeGetFormProperty(data, "tags", [])).toEqual([
+                "api",
+                "health",
+            ]);
         });
 
         it("should return default for false-y values when no default provided", () => {
@@ -277,29 +283,48 @@ describe("monitorFormData functions - Additional Coverage", () => {
 
     describe("createDefaultFormData - Edge Cases", () => {
         it("should handle case variations", () => {
-            const result1 = (createDefaultFormData as (type: string) => Partial<BaseFormData>)("DNS");
+            const result1 = (
+                createDefaultFormData as (type: string) => Partial<BaseFormData>
+            )("DNS");
             expect(result1.type).toBe("DNS");
 
-            const result2 = (createDefaultFormData as (type: string) => Partial<BaseFormData>)("Http");
+            const result2 = (
+                createDefaultFormData as (type: string) => Partial<BaseFormData>
+            )("Http");
             expect(result2.type).toBe("Http");
         });
 
         it("should handle empty string type", () => {
-            const result = (createDefaultFormData as (type: string) => Partial<BaseFormData>)("");
+            const result = (
+                createDefaultFormData as (type: string) => Partial<BaseFormData>
+            )("");
             expect(result.type).toBe("");
         });
 
         it("should handle very long type names", () => {
-            const longType = "very-long-custom-monitor-type-that-is-not-recognized";
-            const result = (createDefaultFormData as (type: string) => Partial<BaseFormData>)(longType);
+            const longType =
+                "very-long-custom-monitor-type-that-is-not-recognized";
+            const result = (
+                createDefaultFormData as (type: string) => Partial<BaseFormData>
+            )(longType);
             expect(result.type).toBe(longType);
         });
 
         it("should create consistent base properties for all types", () => {
-            const types = ["dns", "http", "ping", "port", "custom"];
-            
+            const types = [
+                "dns",
+                "http",
+                "ping",
+                "port",
+                "custom",
+            ];
+
             for (const type of types) {
-                const result = (createDefaultFormData as (type: string) => Partial<BaseFormData>)(type);
+                const result = (
+                    createDefaultFormData as (
+                        type: string
+                    ) => Partial<BaseFormData>
+                )(type);
                 expect(result).toHaveProperty("checkInterval");
                 expect(result).toHaveProperty("timeout");
                 expect(result).toHaveProperty("retryAttempts");

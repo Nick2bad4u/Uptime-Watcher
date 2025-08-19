@@ -1,25 +1,20 @@
 /**
  * Complete test coverage for stringConversion.ts unreachable code paths This
- * test uses advanced techniques to reach    it("should handle all typeof results comprehensively", () => {
-        // This test ensures we exercise all possible typeof results
-        const testCases = [
-            ["boolean", true],
-            ["number", 42],
-            ["string", "test"],
-            ["symbol", Symbol("test")],
-            ["bigint", BigInt(123)],
-            ["function", () => {}],
-            ["object", {}],
-            ["object", null], // typeof null === "object"
-            ["undefined", undefined],
-        ];
-
-        for (const [expectedTypeName, value] of testCases) {
-            expect(typeof value).toBe(expectedTypeName);
-            const result = safeStringify(value);
-            expect(typeof result).toBe("string");
-        }
-    });nreachable code
+ * test uses advanced techniques to reach it("should handle all typeof results
+ * comprehensively", () => { // This test ensures we exercise all possible
+ * typeof results const testCases = [ ["boolean", true], ["number", 42],
+ * ["string", "test"], ["symbol", Symbol("test")], ["bigint", BigInt(123)],
+ * ["function", () => {}], ["object", {}], ["object", null], // typeof null ===
+ * "object" ["undefined", undefined], ];
+ *
+ * ```
+ *     for (const [expectedTypeName, value] of testCases) {
+ *         expect(typeof value).toBe(expectedTypeName);
+ *         const result = safeStringify(value);
+ *         expect(typeof result).toBe("string");
+ *     }
+ * });nreachable code
+ * ```
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";

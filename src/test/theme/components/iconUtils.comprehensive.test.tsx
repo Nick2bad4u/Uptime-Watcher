@@ -1,9 +1,13 @@
 /**
- * Comprehensive tests for iconUtils functions to achieve complete function coverage
+ * Comprehensive tests for iconUtils functions to achieve complete function
+ * coverage
  */
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
-import { getIconColorClass, renderColoredIcon } from "../../../theme/components/iconUtils";
+import {
+    getIconColorClass,
+    renderColoredIcon,
+} from "../../../theme/components/iconUtils";
 
 describe("iconUtils functions", () => {
     describe("getIconColorClass", () => {
@@ -26,7 +30,9 @@ describe("iconUtils functions", () => {
         });
 
         it("should return themed-icon--secondary for secondary color", () => {
-            expect(getIconColorClass("secondary")).toBe("themed-icon--secondary");
+            expect(getIconColorClass("secondary")).toBe(
+                "themed-icon--secondary"
+            );
         });
 
         it("should return themed-icon--success for success color", () => {
@@ -61,7 +67,7 @@ describe("iconUtils functions", () => {
         it("should wrap icon in span with color class for known colors", () => {
             const icon = <div>test-icon</div>;
             const result = renderColoredIcon(icon, "danger");
-            
+
             const { container } = render(result as React.ReactElement);
             const span = container.querySelector("span");
             expect(span).toHaveClass("themed-icon--error");
@@ -71,7 +77,7 @@ describe("iconUtils functions", () => {
         it("should wrap icon in span with inline style for custom colors", () => {
             const icon = <div>test-icon</div>;
             const result = renderColoredIcon(icon, "#ff0000");
-            
+
             const { container } = render(result as React.ReactElement);
             const span = container.querySelector("span");
             expect(span).toHaveStyle({ color: "#ff0000" });
@@ -80,8 +86,16 @@ describe("iconUtils functions", () => {
 
         it("should handle all known color types", () => {
             const icon = <div>test</div>;
-            const colors = ["danger", "error", "info", "primary", "secondary", "success", "warning"];
-            
+            const colors = [
+                "danger",
+                "error",
+                "info",
+                "primary",
+                "secondary",
+                "success",
+                "warning",
+            ];
+
             for (const color of colors) {
                 const result = renderColoredIcon(icon, color);
                 const { container } = render(result as React.ReactElement);

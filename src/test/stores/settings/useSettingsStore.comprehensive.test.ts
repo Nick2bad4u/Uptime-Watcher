@@ -344,7 +344,7 @@ describe("useSettingsStore", () => {
             await act(async () => {
                 result.current.updateSettings({ historyLimit: 200 });
                 // Wait long enough for any sync operations to complete
-                await new Promise(resolve => setTimeout(resolve, 150));
+                await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
             // Verify the initial state is set correctly

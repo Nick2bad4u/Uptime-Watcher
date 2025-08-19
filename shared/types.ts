@@ -236,7 +236,7 @@ export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
     if (!monitor || typeof monitor !== "object") {
         return false;
     }
-    
+
     return (
         typeof monitor.id === "string" &&
         typeof monitor.type === "string" &&

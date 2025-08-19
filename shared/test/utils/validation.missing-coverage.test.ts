@@ -1,6 +1,6 @@
 /**
- * Additional validation tests to achieve 100% function coverage
- * Focuses on previously untested functions and code paths
+ * Additional validation tests to achieve 100% function coverage Focuses on
+ * previously untested functions and code paths
  */
 
 import { describe, expect, it } from "vitest";
@@ -68,7 +68,9 @@ describe("Validation - Missing Coverage Tests", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Record type is required for DNS monitors");
+            expect(errors).toContain(
+                "Record type is required for DNS monitors"
+            );
         });
 
         it("should return errors for DNS monitor with invalid record type", () => {
@@ -84,13 +86,26 @@ describe("Validation - Missing Coverage Tests", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Invalid record type: INVALID. Valid types are: A, AAAA, ANY, CAA, CNAME, MX, NAPTR, NS, PTR, SOA, SRV, TLSA, TXT");
+            expect(errors).toContain(
+                "Invalid record type: INVALID. Valid types are: A, AAAA, ANY, CAA, CNAME, MX, NAPTR, NS, PTR, SOA, SRV, TLSA, TXT"
+            );
         });
 
         it("should accept all valid DNS record types", () => {
             const validRecordTypes = [
-                "A", "AAAA", "ANY", "CAA", "CNAME", "MX", 
-                "NAPTR", "NS", "PTR", "SOA", "SRV", "TLSA", "TXT"
+                "A",
+                "AAAA",
+                "ANY",
+                "CAA",
+                "CNAME",
+                "MX",
+                "NAPTR",
+                "NS",
+                "PTR",
+                "SOA",
+                "SRV",
+                "TLSA",
+                "TXT",
             ];
 
             for (const recordType of validRecordTypes) {
@@ -106,7 +121,9 @@ describe("Validation - Missing Coverage Tests", () => {
                 };
 
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors.filter(err => err.includes("Invalid record type"))).toHaveLength(0);
+                expect(
+                    errors.filter((err) => err.includes("Invalid record type"))
+                ).toHaveLength(0);
             }
         });
 
@@ -123,7 +140,9 @@ describe("Validation - Missing Coverage Tests", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors.filter(err => err.includes("Invalid record type"))).toHaveLength(0);
+            expect(
+                errors.filter((err) => err.includes("Invalid record type"))
+            ).toHaveLength(0);
         });
 
         it("should return errors for DNS monitor with non-string record type", () => {
@@ -139,7 +158,9 @@ describe("Validation - Missing Coverage Tests", () => {
             };
 
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Record type is required for DNS monitors");
+            expect(errors).toContain(
+                "Record type is required for DNS monitors"
+            );
         });
     });
 

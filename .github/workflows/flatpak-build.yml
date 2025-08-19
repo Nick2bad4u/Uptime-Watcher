@@ -47,10 +47,20 @@ jobs:
                   flatpak install -y --noninteractive --user flathub org.electronjs.Electron2.BaseApp//24.08
                   flatpak update -y --user
 
+            - name: Install Flatpak SDK extensions
+              run: |
+                  # Ensure the flathub remote exists and install the required SDK extensions
+                  flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+                  flatpak install -y --noninteractive --user flathub \
+                    org.freedesktop.Sdk.Extension.node24 \
+                    org.freedesktop.Sdk.Extension.typescript
+              env:
+                  CI: true
+
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
-                  node-version: "20"
+                  node-version: "latest"
 
             - name: Install dependencies
               run: |
@@ -60,6 +70,21 @@ jobs:
             - name: Build application
               run: |
                   npm run build
+
+            - name: Smoke-check build artifacts
+              run: |
+                  echo "Checking for dist-electron/main.js and sqlite wasm..."
+                  if [ ! -f "dist-electron/main.js" ]; then
+                    echo "Error: dist-electron/main.js not found"
+                    ls -la dist-electron || true
+                    exit 1
+                  fi
+                  if [ ! -f "dist-electron/node-sqlite3-wasm.wasm" ] && [ ! -f "dist-electron/node-sqlite3-wasm.wasm" ]; then
+                    # check typical wasm locations
+                    echo "Warning: node-sqlite3-wasm.wasm not found in dist-electron"
+                    ls -la dist-electron || true
+                    exit 1
+                  fi
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +108,8 @@ jobs:
                   cd .
                   ls -l
                   ls -l dist-electron
-                  flatpak build-bundle dist Uptime-Watcher.flatpak com.nick2bad4u.Uptime-Watcher
+                  # Use the dist-electron repo produced by flatpak-builder
+                  flatpak build-bundle dist-electron Uptime-Watcher.flatpak com.nick2bad4u.Uptime-Watcher
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   CI: true

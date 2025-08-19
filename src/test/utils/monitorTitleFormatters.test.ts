@@ -273,8 +273,17 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle various DNS record types", () => {
-                const recordTypes = ["A", "AAAA", "CNAME", "MX", "TXT", "NS", "PTR", "SOA"];
-                
+                const recordTypes = [
+                    "A",
+                    "AAAA",
+                    "CNAME",
+                    "MX",
+                    "TXT",
+                    "NS",
+                    "PTR",
+                    "SOA",
+                ];
+
                 for (const recordType of recordTypes) {
                     const monitor = createMockMonitor({
                         type: "dns",

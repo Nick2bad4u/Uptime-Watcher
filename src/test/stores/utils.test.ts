@@ -290,9 +290,9 @@ describe("Store Utils", () => {
         it("should throw error when electronAPI is not available after max attempts", async () => {
             // Use real timers for this test
             vi.useRealTimers();
-            
+
             // Mock window without electronAPI
-            vi.stubGlobal('window', {});
+            vi.stubGlobal("window", {});
 
             await expect(waitForElectronAPI(2, 10)).rejects.toThrow(
                 "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
@@ -306,9 +306,9 @@ describe("Store Utils", () => {
         it("should throw error when electronAPI exists but sites.getSites is not a function", async () => {
             // Use real timers for this test
             vi.useRealTimers();
-            
+
             // Mock window with invalid electronAPI
-            vi.stubGlobal('window', {
+            vi.stubGlobal("window", {
                 electronAPI: {
                     sites: { getSites: "not a function" },
                 },
@@ -326,9 +326,9 @@ describe("Store Utils", () => {
         it("should handle window.electronAPI access errors gracefully", async () => {
             // Use real timers for this test
             vi.useRealTimers();
-            
+
             // Mock window with getter that throws
-            vi.stubGlobal('window', {
+            vi.stubGlobal("window", {
                 get electronAPI() {
                     throw new Error("Access denied");
                 },

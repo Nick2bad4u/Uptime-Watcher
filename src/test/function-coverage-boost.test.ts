@@ -124,13 +124,9 @@ describe("Function Coverage Boost Tests", () => {
             expect(errors).toContain("Monitor id is required");
             expect(errors).toContain("Invalid monitor type");
             expect(errors).toContain("Invalid monitor status");
-            expect(errors).toContain(
-                "Check interval must be at least 1000ms"
-            );
+            expect(errors).toContain("Check interval must be at least 1000ms");
             expect(errors).toContain("Timeout must be a positive number");
-            expect(errors).toContain(
-                "Retry attempts must be between 0 and 10"
-            );
+            expect(errors).toContain("Retry attempts must be between 0 and 10");
 
             // Test type-specific validations
             const httpMonitorNoUrl = {
@@ -171,15 +167,19 @@ describe("Function Coverage Boost Tests", () => {
             };
             const dnsErrors = getMonitorValidationErrors(dnsMonitorInvalid);
             expect(dnsErrors).toContain("Host is required for DNS monitors");
-            expect(dnsErrors.some(error => error.includes("Invalid record type"))).toBe(true);
+            expect(
+                dnsErrors.some((error) => error.includes("Invalid record type"))
+            ).toBe(true);
         });
     });
 
     describe("Utility function coverage", () => {
         it("should test cache key generation functions", async () => {
             try {
-                const cacheModule = await import("../../shared/utils/cacheKeys");
-                
+                const cacheModule = await import(
+                    "../../shared/utils/cacheKeys"
+                );
+
                 // Test any exported functions that might exist
                 const moduleKeys = Object.keys(cacheModule);
                 for (const key of moduleKeys) {
@@ -197,8 +197,10 @@ describe("Function Coverage Boost Tests", () => {
 
         it("should test environment utility functions", async () => {
             try {
-                const envModule = await import("../../shared/utils/environment");
-                
+                const envModule = await import(
+                    "../../shared/utils/environment"
+                );
+
                 if (envModule.isDevelopment) {
                     const result = envModule.isDevelopment();
                     expect(typeof result).toBe("boolean");
@@ -214,41 +216,56 @@ describe("Function Coverage Boost Tests", () => {
                     expect(typeof result).toBe("boolean");
                 }
             } catch (error) {
-                console.log("Environment module not available for testing:", error);
+                console.log(
+                    "Environment module not available for testing:",
+                    error
+                );
             }
         });
 
         it("should test object safety utility functions", async () => {
             try {
-                const objectSafetyModule = await import("../../shared/utils/objectSafety");
-                
+                const objectSafetyModule = await import(
+                    "../../shared/utils/objectSafety"
+                );
+
                 const moduleKeys = Object.keys(objectSafetyModule);
                 for (const key of moduleKeys) {
                     const exportedValue = objectSafetyModule[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
-                        
+
                         // Test with safe inputs
                         try {
-                            if (key.includes("safe") || key.includes("validate")) {
+                            if (
+                                key.includes("safe") ||
+                                key.includes("validate")
+                            ) {
                                 const result = exportedValue({});
                                 expect(result).toBeDefined();
                             }
                         } catch {
                             // Some functions might require specific parameters
-                            console.log(`Function ${key} requires specific parameters`);
+                            console.log(
+                                `Function ${key} requires specific parameters`
+                            );
                         }
                     }
                 }
             } catch (error) {
-                console.log("Object safety module not available for testing:", error);
+                console.log(
+                    "Object safety module not available for testing:",
+                    error
+                );
             }
         });
 
         it("should test type helper functions", async () => {
             try {
-                const typeHelpersModule = await import("../../shared/utils/typeHelpers");
-                
+                const typeHelpersModule = await import(
+                    "../../shared/utils/typeHelpers"
+                );
+
                 const moduleKeys = Object.keys(typeHelpersModule);
                 for (const key of moduleKeys) {
                     const exportedValue = typeHelpersModule[key];
@@ -257,34 +274,48 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error) {
-                console.log("Type helpers module not available for testing:", error);
+                console.log(
+                    "Type helpers module not available for testing:",
+                    error
+                );
             }
         });
 
         it("should test type guard functions", async () => {
             try {
-                const typeGuardsModule = await import("../../shared/utils/typeGuards");
-                
+                const typeGuardsModule = await import(
+                    "../../shared/utils/typeGuards"
+                );
+
                 const moduleKeys = Object.keys(typeGuardsModule);
                 for (const key of moduleKeys) {
                     const exportedValue = typeGuardsModule[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
-                        
+
                         // Test type guards with various inputs
                         try {
                             expect(typeof exportedValue(null)).toBe("boolean");
-                            expect(typeof exportedValue(undefined)).toBe("boolean");
+                            expect(typeof exportedValue(undefined)).toBe(
+                                "boolean"
+                            );
                             expect(typeof exportedValue({})).toBe("boolean");
-                            expect(typeof exportedValue("string")).toBe("boolean");
+                            expect(typeof exportedValue("string")).toBe(
+                                "boolean"
+                            );
                             expect(typeof exportedValue(123)).toBe("boolean");
                         } catch {
-                            console.log(`Type guard ${key} may require specific parameters`);
+                            console.log(
+                                `Type guard ${key} may require specific parameters`
+                            );
                         }
                     }
                 }
             } catch (error) {
-                console.log("Type guards module not available for testing:", error);
+                console.log(
+                    "Type guards module not available for testing:",
+                    error
+                );
             }
         });
     });
@@ -292,14 +323,20 @@ describe("Function Coverage Boost Tests", () => {
     describe("Component helper function coverage", () => {
         it("should test monitor UI helper functions", async () => {
             try {
-                const monitorUiModule = await import("../utils/monitorUiHelpers");
-                
+                const monitorUiModule = await import(
+                    "../utils/monitorUiHelpers"
+                );
+
                 if (monitorUiModule.getTypesWithFeature) {
                     // Test with different feature types
-                    const responseTimeTypes = monitorUiModule.getTypesWithFeature("responseTime");
+                    const responseTimeTypes =
+                        monitorUiModule.getTypesWithFeature("responseTime");
                     expect(Array.isArray(responseTimeTypes)).toBe(true);
-                    
-                    const analyticsTypes = monitorUiModule.getTypesWithFeature("advancedAnalytics");
+
+                    const analyticsTypes =
+                        monitorUiModule.getTypesWithFeature(
+                            "advancedAnalytics"
+                        );
                     expect(Array.isArray(analyticsTypes)).toBe(true);
                 }
 
@@ -312,14 +349,17 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error) {
-                console.log("Monitor UI helpers module not available for testing:", error);
+                console.log(
+                    "Monitor UI helpers module not available for testing:",
+                    error
+                );
             }
         });
 
         it("should test fallback utility functions", async () => {
             try {
                 const fallbacksModule = await import("../utils/fallbacks");
-                
+
                 if (fallbacksModule.getMonitorDisplayIdentifier) {
                     // Test with different monitor types
                     const httpMonitor = {
@@ -328,8 +368,11 @@ describe("Function Coverage Boost Tests", () => {
                         url: "https://example.com",
                         status: "up",
                     };
-                    
-                    const result = fallbacksModule.getMonitorDisplayIdentifier(httpMonitor, "fallback");
+
+                    const result = fallbacksModule.getMonitorDisplayIdentifier(
+                        httpMonitor,
+                        "fallback"
+                    );
                     expect(typeof result).toBe("string");
                     expect(result.length).toBeGreaterThan(0);
 
@@ -339,8 +382,12 @@ describe("Function Coverage Boost Tests", () => {
                         host: "example.com",
                         status: "up",
                     };
-                    
-                    const pingResult = fallbacksModule.getMonitorDisplayIdentifier(pingMonitor, "fallback");
+
+                    const pingResult =
+                        fallbacksModule.getMonitorDisplayIdentifier(
+                            pingMonitor,
+                            "fallback"
+                        );
                     expect(typeof pingResult).toBe("string");
                     expect(pingResult.length).toBeGreaterThan(0);
                 }
@@ -354,21 +401,26 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error) {
-                console.log("Fallbacks module not available for testing:", error);
+                console.log(
+                    "Fallbacks module not available for testing:",
+                    error
+                );
             }
         });
 
         it("should test monitor validation helper functions", async () => {
             try {
-                const monitorValidationModule = await import("../utils/monitorValidation");
-                
+                const monitorValidationModule = await import(
+                    "../utils/monitorValidation"
+                );
+
                 // Test exported functions
                 const moduleKeys = Object.keys(monitorValidationModule);
                 for (const key of moduleKeys) {
                     const exportedValue = monitorValidationModule[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
-                        
+
                         // Test with monitor-like objects
                         try {
                             const testMonitor = {
@@ -377,16 +429,21 @@ describe("Function Coverage Boost Tests", () => {
                                 url: "https://example.com",
                                 status: "up",
                             };
-                            
+
                             const result = exportedValue(testMonitor);
                             expect(result).toBeDefined();
                         } catch {
-                            console.log(`Function ${key} requires specific parameters`);
+                            console.log(
+                                `Function ${key} requires specific parameters`
+                            );
                         }
                     }
                 }
             } catch (error) {
-                console.log("Monitor validation module not available for testing:", error);
+                console.log(
+                    "Monitor validation module not available for testing:",
+                    error
+                );
             }
         });
     });

@@ -376,7 +376,7 @@ export default [
     // },
     {
         files: ["**/package.json"],
-        plugins: { "package-json": packageJson},
+        plugins: { "package-json": packageJson },
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },

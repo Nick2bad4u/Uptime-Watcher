@@ -3,7 +3,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { hasPlugins, hasScales, DEFAULT_CHART_THEMES } from "../../types/chartConfig.js";
+import {
+    hasPlugins,
+    hasScales,
+    DEFAULT_CHART_THEMES,
+} from "../../types/chartConfig.js";
 
 describe("Chart Config Utilities", () => {
     describe("hasPlugins", () => {
@@ -11,8 +15,8 @@ describe("Chart Config Utilities", () => {
             const config = {
                 plugins: {
                     legend: { display: true },
-                    tooltip: { enabled: true }
-                }
+                    tooltip: { enabled: true },
+                },
             };
 
             expect(hasPlugins(config)).toBe(true);
@@ -21,7 +25,7 @@ describe("Chart Config Utilities", () => {
         it("should return false for object without plugins property", () => {
             const config = {
                 scales: {},
-                responsive: true
+                responsive: true,
             };
 
             expect(hasPlugins(config)).toBe(false);
@@ -43,7 +47,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return false for object with plugins as non-object", () => {
             const config = {
-                plugins: "not an object"
+                plugins: "not an object",
             };
 
             expect(hasPlugins(config)).toBe(false);
@@ -51,7 +55,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return false for object with plugins as null", () => {
             const config = {
-                plugins: null
+                plugins: null,
             };
 
             expect(hasPlugins(config)).toBe(false);
@@ -59,7 +63,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return true for object with empty plugins object", () => {
             const config = {
-                plugins: {}
+                plugins: {},
             };
 
             expect(hasPlugins(config)).toBe(true);
@@ -71,8 +75,8 @@ describe("Chart Config Utilities", () => {
             const config = {
                 scales: {
                     x: { type: "linear" },
-                    y: { type: "linear" }
-                }
+                    y: { type: "linear" },
+                },
             };
 
             expect(hasScales(config)).toBe(true);
@@ -81,7 +85,7 @@ describe("Chart Config Utilities", () => {
         it("should return false for object without scales property", () => {
             const config = {
                 plugins: {},
-                responsive: true
+                responsive: true,
             };
 
             expect(hasScales(config)).toBe(false);
@@ -103,7 +107,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return false for object with scales as non-object", () => {
             const config = {
-                scales: "not an object"
+                scales: "not an object",
             };
 
             expect(hasScales(config)).toBe(false);
@@ -111,7 +115,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return false for object with scales as null", () => {
             const config = {
-                scales: null
+                scales: null,
             };
 
             expect(hasScales(config)).toBe(false);
@@ -119,7 +123,7 @@ describe("Chart Config Utilities", () => {
 
         it("should return true for object with empty scales object", () => {
             const config = {
-                scales: {}
+                scales: {},
             };
 
             expect(hasScales(config)).toBe(true);
@@ -133,18 +137,18 @@ describe("Chart Config Utilities", () => {
                         display: true,
                         title: {
                             display: true,
-                            text: "Time"
-                        }
+                            text: "Time",
+                        },
                     },
                     y: {
                         type: "linear",
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: "Value"
-                        }
-                    }
-                }
+                            text: "Value",
+                        },
+                    },
+                },
             };
 
             expect(hasScales(config)).toBe(true);
@@ -156,23 +160,39 @@ describe("Chart Config Utilities", () => {
             expect(DEFAULT_CHART_THEMES.dark).toBeDefined();
             expect(DEFAULT_CHART_THEMES.dark.backgroundColors).toBeDefined();
             expect(DEFAULT_CHART_THEMES.dark.borderColors).toBeDefined();
-            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.backgroundColors)).toBe(true);
-            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)).toBe(true);
+            expect(
+                Array.isArray(DEFAULT_CHART_THEMES.dark.backgroundColors)
+            ).toBe(true);
+            expect(Array.isArray(DEFAULT_CHART_THEMES.dark.borderColors)).toBe(
+                true
+            );
         });
 
         it("should have light theme configuration", () => {
             expect(DEFAULT_CHART_THEMES.light).toBeDefined();
             expect(DEFAULT_CHART_THEMES.light.backgroundColors).toBeDefined();
             expect(DEFAULT_CHART_THEMES.light.borderColors).toBeDefined();
-            expect(Array.isArray(DEFAULT_CHART_THEMES.light.backgroundColors)).toBe(true);
-            expect(Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)).toBe(true);
+            expect(
+                Array.isArray(DEFAULT_CHART_THEMES.light.backgroundColors)
+            ).toBe(true);
+            expect(Array.isArray(DEFAULT_CHART_THEMES.light.borderColors)).toBe(
+                true
+            );
         });
 
         it("should have multiple colors in each theme", () => {
-            expect(DEFAULT_CHART_THEMES.dark.backgroundColors.length).toBeGreaterThan(0);
-            expect(DEFAULT_CHART_THEMES.dark.borderColors.length).toBeGreaterThan(0);
-            expect(DEFAULT_CHART_THEMES.light.backgroundColors.length).toBeGreaterThan(0);
-            expect(DEFAULT_CHART_THEMES.light.borderColors.length).toBeGreaterThan(0);
+            expect(
+                DEFAULT_CHART_THEMES.dark.backgroundColors.length
+            ).toBeGreaterThan(0);
+            expect(
+                DEFAULT_CHART_THEMES.dark.borderColors.length
+            ).toBeGreaterThan(0);
+            expect(
+                DEFAULT_CHART_THEMES.light.backgroundColors.length
+            ).toBeGreaterThan(0);
+            expect(
+                DEFAULT_CHART_THEMES.light.borderColors.length
+            ).toBeGreaterThan(0);
         });
 
         it("should have matching number of background and border colors", () => {
@@ -186,13 +206,13 @@ describe("Chart Config Utilities", () => {
 
         it("should have valid color strings", () => {
             const colorRegex = /^rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*[\d.]+)?\)$/;
-            
-            DEFAULT_CHART_THEMES.dark.backgroundColors.forEach(color => {
+
+            DEFAULT_CHART_THEMES.dark.backgroundColors.forEach((color) => {
                 expect(typeof color).toBe("string");
                 expect(color).toMatch(colorRegex);
             });
 
-            DEFAULT_CHART_THEMES.dark.borderColors.forEach(color => {
+            DEFAULT_CHART_THEMES.dark.borderColors.forEach((color) => {
                 expect(typeof color).toBe("string");
                 expect(color).toMatch(colorRegex);
             });
@@ -206,12 +226,12 @@ describe("Chart Config Utilities", () => {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: true },
-                    tooltip: { enabled: true }
+                    tooltip: { enabled: true },
                 },
                 scales: {
                     x: { type: "category" },
-                    y: { type: "linear" }
-                }
+                    y: { type: "linear" },
+                },
             };
 
             expect(hasPlugins(fullConfig)).toBe(true);
@@ -220,11 +240,11 @@ describe("Chart Config Utilities", () => {
 
         it("should handle partial configurations correctly", () => {
             const pluginsOnlyConfig = {
-                plugins: { legend: { display: false } }
+                plugins: { legend: { display: false } },
             };
 
             const scalesOnlyConfig = {
-                scales: { x: { type: "linear" } }
+                scales: { x: { type: "linear" } },
             };
 
             expect(hasPlugins(pluginsOnlyConfig)).toBe(true);

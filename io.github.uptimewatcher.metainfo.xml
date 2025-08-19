@@ -42,7 +42,8 @@
     <keyword>network</keyword>
   </keywords>
   <provides>
-    <binary>io.github.uptimewatcher</binary>
+  <binary>io.github.uptimewatcher</binary>
+  <binary>run-electron.sh</binary>
   </provides>
   <releases>
     <release version="1.0.0" date="2025-06-21">

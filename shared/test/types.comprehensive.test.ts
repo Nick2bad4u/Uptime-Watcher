@@ -1,5 +1,6 @@
 /**
- * Comprehensive tests for shared/types.ts functions to achieve complete function coverage
+ * Comprehensive tests for shared/types.ts functions to achieve complete
+ * function coverage
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -146,7 +147,10 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for monitor with invalid status", () => {
-            const invalidMonitor = { ...validMonitor, status: "invalid-status" };
+            const invalidMonitor = {
+                ...validMonitor,
+                status: "invalid-status",
+            };
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 

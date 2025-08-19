@@ -5,7 +5,8 @@
 app-id: io.github.uptimewatcher
 runtime: org.freedesktop.Platform
 runtime-version: "24.08"
-sdk: org.freedesktop.Sdk
+# Pin SDK to matching version
+sdk: org.freedesktop.Sdk//24.08
 
 # Electron BaseApp for optimized Electron applications
 base: org.electronjs.Electron2.BaseApp
@@ -13,7 +14,8 @@ base-version: "24.08"
 
 # Node.js SDK extension for build-time dependencies
 sdk-extensions:
-    - org.freedesktop.Sdk.Extension.node22
+    - org.freedesktop.Sdk.Extension.node24
+    - org.freedesktop.Sdk.Extension.typescript
 
 # Application entry point
 command: run-electron.sh
@@ -28,7 +30,7 @@ build-options:
     cxxflags: -O2 -g -fPIC
 
     # Node.js build environment
-    append-path: /usr/lib/sdk/node22/bin
+    append-path: /usr/lib/sdk/node24/bin
 
     # Environment variables for build
     env:
@@ -46,7 +48,7 @@ build-options:
         # Cache directories
         XDG_CACHE_HOME: /run/build/uptime-watcher/flatpak-node/cache
         npm_config_cache: /run/build/uptime-watcher/flatpak-node/npm-cache
-        npm_config_nodedir: /usr/lib/sdk/node22
+        npm_config_nodedir: /usr/lib/sdk/node24
         npm_config_offline: "true"
 
 # Sandbox permissions with security-first approach
@@ -101,9 +103,9 @@ modules:
       build-commands:
           # Ensure Node.js SDK extension is installed
           - |
-              if ! flatpak info org.freedesktop.Sdk.Extension.node22 >/dev/null 2>&1; then
-                echo "ERROR: Required Flatpak extension org.freedesktop.Sdk.Extension.node22 is not installed."
-                echo "Install it with: flatpak install flathub org.freedesktop.Sdk.Extension.node22//24.08"
+              if ! flatpak info org.freedesktop.Sdk.Extension.node24 >/dev/null 2>&1; then
+                echo "ERROR: Required Flatpak extension org.freedesktop.Sdk.Extension.node24 is not installed."
+                echo "Install it with: flatpak install flathub org.freedesktop.Sdk.Extension.node24//24.08"
                 exit 1
               fi
           - echo "Using Node.js $(node --version) from SDK extension"

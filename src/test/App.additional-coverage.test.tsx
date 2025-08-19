@@ -1,12 +1,17 @@
- 
- 
 /**
- * @fileoverview Additional comprehensive test coverage for App component
+ * @file Additional comprehensive test coverage for App component
  */
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi, type MockedFunction } from "vitest";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type MockedFunction,
+} from "vitest";
 import "@testing-library/jest-dom";
 
 import { isDevelopment } from "@shared/utils/environment";
@@ -119,7 +124,7 @@ let mockSitesStoreState = {
                     monitoring: true,
                     lastChecked: new Date().toISOString(),
                     history: [],
-                }
+                },
             ],
         },
     ],
@@ -297,18 +302,20 @@ describe("App Additional Coverage Tests", () => {
     // Declare mock functions that need to be shared across tests
     let initializeSitesMock: MockedFunction<() => Promise<void>>;
     let initializeSettingsMock: MockedFunction<() => Promise<void>>;
-    let subscribeToStatusUpdatesMock: MockedFunction<(callback: (update: any) => void) => void>;
+    let subscribeToStatusUpdatesMock: MockedFunction<
+        (callback: (update: any) => void) => void
+    >;
     let unsubscribeFromStatusUpdatesMock: MockedFunction<() => void>;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        
+
         // Create fresh mock functions for each test
         initializeSitesMock = vi.fn().mockResolvedValue(undefined);
         initializeSettingsMock = vi.fn().mockResolvedValue(undefined);
         subscribeToStatusUpdatesMock = vi.fn();
         unsubscribeFromStatusUpdatesMock = vi.fn();
-        
+
         // Reset all mock state to defaults
         Object.assign(mockUpdatesStoreState, {
             updateStatus: "idle" as const,
@@ -345,7 +352,7 @@ describe("App Additional Coverage Tests", () => {
                             monitoring: true,
                             lastChecked: new Date().toISOString(),
                             history: [],
-                        }
+                        },
                     ],
                 },
             ],
@@ -403,24 +410,36 @@ describe("App Additional Coverage Tests", () => {
 
         // Mock the store hooks to return the reactive state objects
         mockUseUpdatesStore.mockImplementation(() => mockUpdatesStoreState);
-        mockUseSitesStore.mockImplementation((selector: any) => selector ? selector(mockSitesStoreState) : mockSitesStoreState);
+        mockUseSitesStore.mockImplementation((selector: any) =>
+            selector ? selector(mockSitesStoreState) : mockSitesStoreState
+        );
         mockUseErrorStore.mockImplementation(() => mockErrorStoreState);
-        
+
         // Mock the getState method for useErrorStore (needed by createStoreErrorHandler)
-        (mockUseErrorStore as any).getState = vi.fn().mockReturnValue(mockErrorStoreState);
-        
+        (mockUseErrorStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockErrorStoreState);
+
         // Mock the getState method for useSitesStore (needed by App component cleanup)
-        (mockUseSitesStore as any).getState = vi.fn().mockReturnValue(mockSitesStoreState);
-        
+        (mockUseSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState);
+
         // Mock the getState method for useUpdatesStore (needed by App component)
-        (mockUseUpdatesStore as any).getState = vi.fn().mockReturnValue(mockUpdatesStoreState);
+        (mockUseUpdatesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockUpdatesStoreState);
 
         // Mock the getState method for useSettingsStore (needed by App component initialization)
-        (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue(mockSettingsStoreState);
-        
-        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(mockUIStoreState) : mockUIStoreState);
+        (mockUseSettingsStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSettingsStoreState);
+
+        mockUseUIStore.mockImplementation((selector: any) =>
+            selector ? selector(mockUIStoreState) : mockUIStoreState
+        );
         mockUseTheme.mockImplementation(() => mockThemeState);
-        
+
         // Mock useAvailabilityColors hook
         mockUseAvailabilityColors.mockImplementation(() => ({
             getAvailabilityColor: vi.fn().mockReturnValue("#00ff00"),
@@ -430,12 +449,22 @@ describe("App Additional Coverage Tests", () => {
 
         // Mock useThemeClasses hook
         mockUseThemeClasses.mockImplementation(() => ({
-            getBackgroundClass: vi.fn().mockReturnValue({ backgroundColor: "var(--color-background-primary)" }),
-            getBorderClass: vi.fn().mockReturnValue({ borderColor: "var(--color-border-primary)" }),
+            getBackgroundClass: vi.fn().mockReturnValue({
+                backgroundColor: "var(--color-background-primary)",
+            }),
+            getBorderClass: vi.fn().mockReturnValue({
+                borderColor: "var(--color-border-primary)",
+            }),
             getColor: vi.fn().mockReturnValue("#000000"),
-            getStatusClass: vi.fn().mockReturnValue({ color: "var(--color-status-up)" }),
-            getSurfaceClass: vi.fn().mockReturnValue({ backgroundColor: "var(--color-surface-base)" }),
-            getTextClass: vi.fn().mockReturnValue({ color: "var(--color-text-primary)" }),
+            getStatusClass: vi
+                .fn()
+                .mockReturnValue({ color: "var(--color-status-up)" }),
+            getSurfaceClass: vi.fn().mockReturnValue({
+                backgroundColor: "var(--color-surface-base)",
+            }),
+            getTextClass: vi
+                .fn()
+                .mockReturnValue({ color: "var(--color-text-primary)" }),
         }));
 
         // Mock environment as production by default
@@ -452,7 +481,9 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should use UI_MESSAGES constants for text content", () => {
-        mockSitesStoreState.sites = mockSitesStoreState.sites[0] ? [mockSitesStoreState.sites[0]] : [];
+        mockSitesStoreState.sites = mockSitesStoreState.sites[0]
+            ? [mockSitesStoreState.sites[0]]
+            : [];
 
         render(<App />);
 
@@ -473,10 +504,13 @@ describe("App Additional Coverage Tests", () => {
         const { rerender } = render(<App />);
 
         // Wait for initialization to complete first
-        await waitFor(() => {
-            // The app should be initialized 
-            expect(screen.getByRole("main")).toBeInTheDocument();
-        }, { timeout: 1000 });
+        await waitFor(
+            () => {
+                // The app should be initialized
+                expect(screen.getByRole("main")).toBeInTheDocument();
+            },
+            { timeout: 1000 }
+        );
 
         // Now trigger loading state AFTER initialization is complete
         mockUseErrorStore.mockImplementation(() => ({
@@ -488,11 +522,16 @@ describe("App Additional Coverage Tests", () => {
         rerender(<App />);
 
         // Wait for the loading overlay to appear after the 100ms delay
-        await waitFor(() => {
-            const loadingElement = screen.getByLabelText("Loading application");
-            expect(loadingElement).toBeInTheDocument();
-            expect(screen.getByText("Loading...")).toBeInTheDocument();
-        }, { timeout: 500 });
+        await waitFor(
+            () => {
+                const loadingElement = screen.getByLabelText(
+                    "Loading application"
+                );
+                expect(loadingElement).toBeInTheDocument();
+                expect(screen.getByText("Loading...")).toBeInTheDocument();
+            },
+            { timeout: 500 }
+        );
     });
 
     it("should display error alert when lastError exists", async () => {
@@ -624,7 +663,9 @@ describe("App Additional Coverage Tests", () => {
 
         // Set up spy on the logger
         const loggerModule = await import("../services/logger");
-        const debugSpy = vi.spyOn(loggerModule.default, "debug").mockImplementation(() => {});
+        const debugSpy = vi
+            .spyOn(loggerModule.default, "debug")
+            .mockImplementation(() => {});
 
         // Create fresh mock functions for this test
         const initializeSettingsMock = vi.fn().mockResolvedValue(undefined);
@@ -646,30 +687,40 @@ describe("App Additional Coverage Tests", () => {
         };
 
         // Mock getState to return our mock stores consistently
-        (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue(mockSettingsStore);
-        (mockUseSitesStore as any).getState = vi.fn().mockReturnValue(mockSitesStore);
+        (mockUseSettingsStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSettingsStore);
+        (mockUseSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStore);
 
         render(<App />);
 
         // Wait for initialization to complete including subscription
-        await waitFor(() => {
-            expect(initializeSettingsMock).toHaveBeenCalled();
-            expect(initializeSitesMock).toHaveBeenCalled();
-            expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
-        }, { timeout: 2000 });
+        await waitFor(
+            () => {
+                expect(initializeSettingsMock).toHaveBeenCalled();
+                expect(initializeSitesMock).toHaveBeenCalled();
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+            },
+            { timeout: 2000 }
+        );
 
         // Simulate the callback being called by getting it from the mock call
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
         if (statusUpdateCallback) {
             statusUpdateCallback({
                 site: { identifier: "test-site" },
-                siteIdentifier: "test-site-fallback"
+                siteIdentifier: "test-site-fallback",
             });
         }
 
         // Verify development logging was called
         expect(debugSpy).toHaveBeenCalledWith(
-            expect.stringContaining("Status update received for site: test-site")
+            expect.stringContaining(
+                "Status update received for site: test-site"
+            )
         );
 
         debugSpy.mockRestore();
@@ -681,7 +732,9 @@ describe("App Additional Coverage Tests", () => {
 
         // Set up spy on the logger
         const loggerModule = await import("../services/logger");
-        const debugSpy = vi.spyOn(loggerModule.default, "debug").mockImplementation(() => {});
+        const debugSpy = vi
+            .spyOn(loggerModule.default, "debug")
+            .mockImplementation(() => {});
 
         // Create fresh mock functions for this test
         const initializeSettingsMock = vi.fn().mockResolvedValue(undefined);
@@ -703,8 +756,12 @@ describe("App Additional Coverage Tests", () => {
         };
 
         // Mock getState to return our mock stores consistently
-        (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue(mockSettingsStore);
-        (mockUseSitesStore as any).getState = vi.fn().mockReturnValue(mockSitesStore);
+        (mockUseSettingsStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSettingsStore);
+        (mockUseSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStore);
 
         render(<App />);
 
@@ -716,17 +773,20 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Simulate the callback being called with an update that has no site.identifier
-        const statusUpdateCallback = subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
+        const statusUpdateCallback =
+            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
         if (statusUpdateCallback) {
             statusUpdateCallback({
                 site: undefined, // No site object
-                siteIdentifier: "fallback-site-id"
+                siteIdentifier: "fallback-site-id",
             });
         }
 
         // Verify development logging was called with the fallback identifier
         expect(debugSpy).toHaveBeenCalledWith(
-            expect.stringContaining("Status update received for site: fallback-site-id")
+            expect.stringContaining(
+                "Status update received for site: fallback-site-id"
+            )
         );
     });
 
@@ -751,7 +811,8 @@ describe("App Additional Coverage Tests", () => {
 
         // Add the missing functions to the mock store states
         mockSitesStoreState.initializeSites = initializeSitesMock;
-        mockSitesStoreState.subscribeToStatusUpdates = subscribeToStatusUpdatesMock;
+        mockSitesStoreState.subscribeToStatusUpdates =
+            subscribeToStatusUpdatesMock;
 
         // Create a mock settings store with initialize function
         const mockSettingsStoreGetState = vi.fn().mockReturnValue({
@@ -759,7 +820,9 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Mock the stores to use our mock data
-        (useSitesStore as any).getState = vi.fn().mockReturnValue(mockSitesStoreState);
+        (useSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState);
         (useSettingsStore as any).getState = mockSettingsStoreGetState;
 
         render(<App />);
@@ -804,8 +867,10 @@ describe("App Additional Coverage Tests", () => {
         const initializeSitesMock = vi.fn().mockResolvedValue(undefined);
 
         // Add the missing functions to the mock store states
-        mockSitesStoreState.subscribeToStatusUpdates = subscribeToStatusUpdatesMock;
-        mockSitesStoreState.unsubscribeFromStatusUpdates = unsubscribeFromStatusUpdatesMock;
+        mockSitesStoreState.subscribeToStatusUpdates =
+            subscribeToStatusUpdatesMock;
+        mockSitesStoreState.unsubscribeFromStatusUpdates =
+            unsubscribeFromStatusUpdatesMock;
         mockSitesStoreState.initializeSites = initializeSitesMock;
 
         // Create a mock settings store with initialize function
@@ -814,7 +879,9 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Mock the stores to use our mock data
-        (useSitesStore as any).getState = vi.fn().mockReturnValue(mockSitesStoreState);
+        (useSitesStore as any).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState);
         (useSettingsStore as any).getState = mockSettingsStoreGetState;
 
         const { unmount } = render(<App />);
@@ -844,19 +911,19 @@ describe("App Additional Coverage Tests", () => {
                         {
                             id: "monitor-2",
                             type: "http" as any,
-                        url: "https://test.com",
-                        checkInterval: 3000,
-                        timeout: 30_000,
-                        retryAttempts: 3,
-                        status: "down" as any,
-                        responseTime: 0,
-                        monitoring: false,
-                        lastChecked: new Date().toISOString(),
-                        history: [],
-                    }
-                ],
-            },
-        ];
+                            url: "https://test.com",
+                            checkInterval: 3000,
+                            timeout: 30_000,
+                            retryAttempts: 3,
+                            status: "down" as any,
+                            responseTime: 0,
+                            monitoring: false,
+                            lastChecked: new Date().toISOString(),
+                            history: [],
+                        },
+                    ],
+                },
+            ];
         }
 
         render(<App />);
@@ -905,15 +972,17 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         const dismissButton = screen.getByText("Dismiss");
-        
+
         // Test Enter key
         fireEvent.keyDown(dismissButton, { key: "Enter", code: "Enter" });
-        
+
         // Test Space key
         fireEvent.keyDown(dismissButton, { key: " ", code: "Space" });
 
         // The button should still be responsive to clicks
         await userEvent.click(dismissButton);
-        expect(mockUpdatesStoreState.setUpdateStatus).toHaveBeenCalledWith("idle");
+        expect(mockUpdatesStoreState.setUpdateStatus).toHaveBeenCalledWith(
+            "idle"
+        );
     });
 });
