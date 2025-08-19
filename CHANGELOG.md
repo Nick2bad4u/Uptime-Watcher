@@ -7,14 +7,154 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[0d814e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)...
+[0d814e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0d814e25cfcac55fc5f474c51288bef461b9165e...0d814e25cfcac55fc5f474c51288bef461b9165e))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.6.0 [`(0d814e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d814e25cfcac55fc5f474c51288bef461b9165e)
+
+
+
+
+
+
+## [11.6.0] - 2025-08-19
+
+
 [[dbd105d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)...
-[dbd105d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dbd105de469d68e10b956df1bd335614a5a0d940...dbd105de469d68e10b956df1bd335614a5a0d940))
+[3ba8232](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ba8232fa1887032f96bdd35adf80bad1fa58031)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dbd105de469d68e10b956df1bd335614a5a0d940...3ba8232fa1887032f96bdd35adf80bad1fa58031))
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improve form validation and build/test configs
+
+- Enhances form data validation to check for non-empty strings and valid port ranges, reducing user input errors.
+- Updates test and build scripts to clarify build dependencies and ensure shared code is included in tests.
+- Refines type exclusion in testing to avoid omitting functional files.
+- Cleans up ESLint config by removing redundant plugin and rules.
+- Improves workflow triggers and VS Code settings for better productivity and cleaner workspace.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2ea5866)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ea5866acbedf67207f892f6df2aa16bfbc21df8)
+
+
+- 🛠️ [fix] Improve monitor type field handling and DNS support
+
+- Updates monitor normalization and update logic to filter fields by monitor type, ensuring only allowed attributes are included and preventing type corruption.
+- Adds explicit DNS monitor type support throughout UI, forms, and data models for accurate field mapping and validation.
+- Enhances database transaction handling to avoid nested transaction errors and improve error logging and rollback reliability.
+- Improves dynamic schema utilities with warnings for invalid data and prevents NaN corruption for numeric conversions.
+- Refines test cases and UI helpers for better monitor type detection and extensibility.
+- Clarifies documentation with real-world implementation guidance and lessons learned.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(becb9be)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/becb9be18ed7a3a36f09e69d5ada24cf38d9e340)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 11.5.0 [`(dbd105d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dbd105de469d68e10b956df1bd335614a5a0d940)
+
+
+
+### � Other Changes
+
+- Add run-electron.sh and make executable for Flatpak [`(153ee47)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/153ee4741091c5c841361722e9e3baa41b2efd0c)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Expands multiline array formatting for consistency
+
+- Standardizes multiline array/object formatting across all code, tests, and configuration to improve readability and maintain consistency with formatting rules.
+- Updates Prettier threshold to trigger wrapping for arrays with two or more elements, ensuring uniform code style.
+- Refactors affected logic and test files to use expanded array/object formatting, without altering functional behavior.
+- Facilitates easier code reviews and future maintenance by aligning with formatting standards.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3ba8232)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ba8232fa1887032f96bdd35adf80bad1fa58031)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Achieves 90%+ function coverage and modernizes build configs
+
+- Adds comprehensive and precision-focused unit tests to target remaining uncovered logic, pushing function coverage above 90% threshold
+ - Refactors and expands test cases for edge scenarios, validation, and utility functions
+ - Updates workflows and configuration files for Flatpak and CI: moves to latest Node.js, upgrades SDK extensions, and improves smoke-checks for build artifacts
+ - Cleans up dependency management by moving many dev dependencies to optional, simplifying peer and dev lists
+ - Improves code style consistency and formatting in test files and config scripts
+ - Enhances error handling, validation, and site status logic coverage for maintainability and future-proofing
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(66dc4a7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66dc4a75b407a3400836e55f5ffef207632069bb)
+
+
+- 🧪 [test] Boost function coverage above 90%
+
+- Adds comprehensive and targeted tests for utility, validation, type guard, store, site status, configuration, error handling, and component helper functions to address remaining uncovered branches.
+- Expands existing suites and introduces new ones for edge cases, integration, async behaviors, and error scenarios, especially for monitor types, form data, and cache/electron API handling.
+- Refactors and enhances test structures for improved reliability and coverage accuracy, including additional DNS monitor logic and UI/component state transitions.
+- Motivated by coverage report analysis to ensure function coverage surpasses the 90% threshold.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8d18476)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8d18476bd7f79e305f1b63c834ef81387000002c)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v11.5.0 [skip ci] [`(f5d0334)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5d0334da92b52fc50591bdbbe60970e8c679516)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update lint setup and dependencies; refine build scripts
+
+- Integrates publint plugin for enhanced package.json linting and enables related rules.
+- Updates multiple dev dependencies to latest versions for ESLint, TypeScript, Electron, and React lint plugins.
+- Improves build and type-check scripts to ensure shared code is compiled and checked across all build targets.
+- Refactors cleaning script to remove shared distribution artifacts.
+- Enhances package manager config to support new plugin versions and resolves peer dependencies.
+
+Ensures better code quality, more robust builds, and easier maintenance.
+
+🔧 [build] Update lint plugins, build scripts, and dependency versions
+
+- Integrates publint for improved package.json linting and enables its rules to catch more issues early.
+- Upgrades ESLint, TypeScript, Electron, and React lint plugins to the latest versions for enhanced reliability and compatibility.
+- Refines build and type-check scripts to ensure shared code is properly compiled and checked across all targets, reducing risk of inconsistencies.
+- Adjusts cleaning script to remove shared distribution artifacts for cleaner builds.
+- Updates manager config to support new plugin versions and resolve peer dependencies, simplifying future maintenance.
+
+Ensures better code quality, more robust builds, and easier dependency management.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(50abf68)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50abf68b57e8d6c79ec1ca16a0e10613da289f7f)
+
+
+- 🔧 [build] Modularizes shared TypeScript config and updates references
+
+- Splits shared compilation settings into dedicated config files for improved maintainability and build isolation.
+- Refactors project references and include/exclude patterns for clearer separation between domain-specific and shared code.
+- Updates build artifact paths to ensure correct output directories and incremental builds.
+- Enhances test config to leverage new shared configuration and coverage exclusion for shared artifacts.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f455e06)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f455e06e9d6bcf4d93f72140300e7ea8e8fd1060)
+
+
+- 🔧 [build] Enhance linting config for shared/frontend/backend
+
+- Improves ESLint coverage and separation for shared, frontend, and backend code, adding granular rulesets for shared and test files.
+- Updates ignore patterns for build and config artifacts, including new dist-shared and Sonar config.
+- Refines plugin, parser, and resolver settings for TypeScript, React 19, and advanced code quality, accessibility, and security enforcement.
+- Increases rule specificity and disables aggressive or conflicting rules for tests and backend.
+- Optimizes code organization, maintainability, and future scalability across the project.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e209f49)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e209f496971b08c645605776c8f4721627af36fc)
 
 
 
