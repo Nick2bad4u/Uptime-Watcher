@@ -1,0 +1,70 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "extends": "./tsconfig.shared.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist-bench",
+        "tsBuildInfoFile": "./dist-bench/tsconfig.bench.tsbuildinfo",
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "allowJs": true,
+        "checkJs": false,
+        "declaration": false,
+        "declarationMap": false,
+        "sourceMap": true,
+        "removeComments": false,
+        "importHelpers": true,
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "useDefineForClassFields": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "paths": {
+            "@shared/*": [
+                "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
+            ]
+        },
+        "types": [
+            "node",
+            "vitest/globals"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable"
+        ]
+    },
+    "include": [
+        "benchmarks/**/*.ts",
+        "benchmarks/**/*.tsx",
+        "benchmarks/**/*.bench.ts",
+        "shared/types/**/*.ts",
+        "shared/interfaces/**/*.ts",
+        "shared/utils/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dist-*",
+        "coverage",
+        "**/*.d.ts",
+        "**/*.js",
+        "**/*.mjs"
+    ],
+    "ts-node": {
+        "esm": true,
+        "experimentalSpecifierResolution": "node"
+    }
+}

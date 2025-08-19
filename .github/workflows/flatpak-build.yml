@@ -51,9 +51,10 @@ jobs:
               run: |
                   # Ensure the flathub remote exists and install the required SDK extensions
                   flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+                  # Use explicit refs (//24.08) to avoid interactive selection when multiple versions exist
                   flatpak install -y --noninteractive --user flathub \
-                    org.freedesktop.Sdk.Extension.node24 \
-                    org.freedesktop.Sdk.Extension.typescript
+                    org.freedesktop.Sdk.Extension.node24//24.08 \
+                    org.freedesktop.Sdk.Extension.typescript//24.08
               env:
                   CI: true
 

@@ -224,7 +224,6 @@ export default [
             "**/release/**",
             "**/test/themeTypes.test.tsx",
             "**/test/types.test.tsx",
-            "benchmarks/**/*.ts", // Ignore all benchmark files
             "vite.config.ts", // Ignore vite config due to parsing issues
             "vitest.config.ts", // Ignore vitest config due to parsing issues
             "vitest.electron.config.ts", // Ignore vitest electron config
@@ -562,7 +561,6 @@ export default [
             "shared/**/*.test.{ts,tsx}",
             "shared/test/**/*.ts",
             "src/test/**/*.{ts,tsx}",
-            "benchmarks/**/*.ts", // Ignore benchmark files from TypeScript linting
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -3002,7 +3000,6 @@ export default [
             "shared/**/*.test.{ts,tsx}",
             "shared/test/**/*.ts",
             "src/test/**/*.{ts,tsx}",
-            "benchmarks/**/*.ts", // Ignore benchmark files from TypeScript linting
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4431,8 +4428,13 @@ export default [
         },
 
         rules: {
-            ...tseslint.configs.strict.rules,
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -4475,6 +4477,43 @@ export default [
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
+
+            "new-cap": "off", // Allow new-cap for class constructors
+            "no-throw-literal": "off",
+            "no-new": "off", // Allow new for class constructors
+            "prefer-destructuring": "off",
+            "init-declarations": "off",
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "max-depth": "off",
+            "no-shadow": "off",
+            "no-underscore-dangle": "off",
+            "func-names": "off",
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
         },
     },
 
@@ -4528,8 +4567,13 @@ export default [
             "loadable-imports": pluginLoadableImports,
         },
         rules: {
-            ...tseslint.configs.strict.rules,
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -4572,6 +4616,43 @@ export default [
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             // No Only Tests
             "no-only-tests/no-only-tests": "error",
+
+            "new-cap": "off", // Allow new-cap for class constructors
+            "no-throw-literal": "off",
+            "no-new": "off", // Allow new for class constructors
+            "prefer-destructuring": "off",
+            "init-declarations": "off",
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "max-depth": "off",
+            "no-shadow": "off",
+            "no-underscore-dangle": "off",
+            "func-names": "off",
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
         },
         settings: {
             vitest: {
@@ -4681,8 +4762,13 @@ export default [
         },
 
         rules: {
-            ...tseslint.configs.strict.rules,
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -4725,6 +4811,33 @@ export default [
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
+
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
         },
     },
 
@@ -4775,8 +4888,13 @@ export default [
             "loadable-imports": pluginLoadableImports,
         },
         rules: {
-            ...tseslint.configs.strict.rules,
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -4819,6 +4937,32 @@ export default [
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             // No Only Tests
             "no-only-tests/no-only-tests": "error",
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
         },
         settings: {
             vitest: {
@@ -4846,6 +4990,174 @@ export default [
                     project: ["tsconfig.electron.test.json"],
                 },
             },
+        },
+    },
+
+    // Benchmark files
+    {
+        files: ["benchmarks/**/*.bench.{ts,tsx}", "benchmarks/**/*.{ts,tsx}"],
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                project: ["tsconfig.bench.json"],
+                sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
+                ecmaFeatures: {
+                    jsx: true,
+                },
+                jsDocParsingMode: "all",
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                ...vitest.environments.env.globals,
+                afterAll: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                beforeEach: "readonly",
+                describe: "readonly",
+                expect: "readonly",
+                it: "readonly",
+                test: "readonly",
+                vi: "readonly",
+                bench: "readonly",
+                NodeJS: "readonly",
+            },
+        },
+        settings: {
+            vitest: {
+                typecheck: true,
+            },
+            react: { version: "19" },
+            n: {
+                allowModules: [
+                    "electron",
+                    "node",
+                    "electron-devtools-installer",
+                ],
+            },
+            "import-x/resolver": {
+                typescript: true,
+                node: true,
+                project: [
+                    "tsconfig.json",
+                    "tsconfig.test.json",
+                    "tsconfig.bench.json",
+                ],
+            },
+            "import/resolver": {
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: [
+                        "tsconfig.json",
+                        "tsconfig.test.json",
+                        "tsconfig.bench.json",
+                    ],
+                },
+            },
+        },
+        plugins: {
+            "@typescript-eslint": tseslint,
+            vitest: vitest,
+            "import-x": importX,
+            "unused-imports": pluginUnusedImports,
+            react: pluginReact,
+            "react-hooks": reactHooks,
+            n: nodePlugin,
+            "eslint-comments": pluginComments,
+            unicorn: pluginUnicorn,
+        },
+        rules: {
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
+            ...vitest.configs.recommended.rules,
+            ...pluginComments.configs.recommended.rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+
+            // Allow performance-focused code patterns in benchmarks
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ],
+            "unicorn/no-useless-undefined": "off",
+            "unicorn/consistent-function-scoping": "off",
+            "unicorn/no-unused-properties": "off",
+            "unicorn/no-null": "off",
+            "unicorn/no-await-expression-member": "off",
+            "unicorn/filename-case": "off", // Allow benchmark files to have any case
+            "unicorn/prevent-abbreviations": "off",
+            "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
+            "unicorn/prefer-spread": "off", // Benchmarks may test different patterns
+            "unicorn/prefer-set-has": "off", // Benchmarks may compare different approaches
+            "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
+
+            // Allow flexible patterns for benchmark mock implementations
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-empty-function": "off",
+            "@typescript-eslint/no-restricted-types": "off",
+            "@typescript-eslint/no-unsafe-function-type": "off",
+            "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
+            "@typescript-eslint/no-floating-promises": "off", // Benchmarks may not await all promises
+            "@typescript-eslint/no-misused-promises": "off",
+
+            // Import rules relaxed for mock implementations
+            "import-x/no-unused-modules": "off",
+            "import-x/no-extraneous-dependencies": "off",
+
+            // Allow large files and classes for comprehensive benchmarks
+            "max-lines": "off",
+            "max-lines-per-function": "off",
+            "max-classes-per-file": "off",
+
+            "new-cap": "off", // Allow new-cap for class constructors
+            "no-throw-literal": "off",
+            "no-new": "off", // Allow new for class constructors
+            "prefer-destructuring": "off",
+            "init-declarations": "off",
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "max-depth": "off",
+            "no-shadow": "off",
+            "no-underscore-dangle": "off",
+            "func-names": "off",
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "id-length": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
         },
     },
 
@@ -4949,6 +5261,7 @@ export default [
         },
         rules: {
             // TypeScript backend rules
+            ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.strictTypeChecked,
@@ -4975,6 +5288,43 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...arrayFunc.configs.all.rules,
+
+            "new-cap": "off", // Allow new-cap for class constructors
+            "no-throw-literal": "off",
+            "no-new": "off", // Allow new for class constructors
+            "prefer-destructuring": "off",
+            "init-declarations": "off",
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "max-depth": "off",
+            "no-shadow": "off",
+            "no-underscore-dangle": "off",
+            "func-names": "off",
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
 
             "n/no-unpublished-import": "off",
             "n/no-process-env": "off", // Allow process.env usage in Electron
@@ -5408,6 +5758,33 @@ export default [
             ...nodePlugin.configs["flat/recommended"].rules,
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
+
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
 
             "unicorn/no-keyword-prefix": [
                 "error",

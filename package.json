@@ -38,6 +38,8 @@
   "scripts": {
     "ai:context": "repomix --compress --include \"src/**,electron/**\" --ignore \"**/test/**\"",
     "bench": "vitest bench --run",
+    "bench:tsnode": "ts-node ./benchmarks/eventSystem.bench.ts",
+    "bench:tsnode:loader": "node --loader ts-node/esm ./benchmarks/eventSystem.bench.ts",
     "bench:compare": "vitest bench --run --compare",
     "bench:ui": "vitest bench --ui",
     "bench:watch": "vitest bench",
@@ -764,7 +766,6 @@
   "peerDependencies": {
     "react-scan": "^0.4.3"
   },
-  "optionalDependencies": {},
   "bundleDependencies": [
     "@shared/types",
     "@shared/utils",
