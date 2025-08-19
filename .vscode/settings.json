@@ -91,7 +91,6 @@
         "**/html/**": true,
         "**/report/**": true
     },
-
     "search.exclude": {
         "**/.husky/**": true,
         "**/coverage/**": true,

@@ -388,8 +388,11 @@ export default [
             "package-json/require-author": "warn",
             "package-json/require-bugs": "warn",
             "package-json/require-bundleDependencies": "off",
+            "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
+            "package-json/require-peerDependencies": "off",
             "package-json/require-dependencies": "warn",
             "package-json/require-devDependencies": "warn",
+            "package-json/restrict-dependency-ranges": "warn",
             "package-json/require-engines": "warn",
             "package-json/require-files": "off", // Not needed for Electron applications
             "package-json/require-keywords": "warn",

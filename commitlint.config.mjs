@@ -1,6 +1,4 @@
-/* eslint-disable max-lines */
-/* eslint-disable no-magic-numbers */
-/* eslint-disable no-inline-comments */
+/* eslint-disable max-lines, no-magic-numbers, no-inline-comments */
 /**
  * Commitlint configuration for Uptime Watcher
  *
