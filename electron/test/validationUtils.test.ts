@@ -282,9 +282,13 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidIdentifierArray(["test", "valid", "array"])).toBe(
-                true
-            );
+            expect(
+                isValidIdentifierArray([
+                    "test",
+                    "valid",
+                    "array",
+                ])
+            ).toBe(true);
             expect(isValidIdentifierArray(["test-123", "valid_name"])).toBe(
                 true
             );
@@ -294,7 +298,13 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(isValidIdentifierArray(["test", "", "invalid"])).toBe(false);
+            expect(
+                isValidIdentifierArray([
+                    "test",
+                    "",
+                    "invalid",
+                ])
+            ).toBe(false);
             expect(isValidIdentifierArray(["test", null as any])).toBe(false);
             expect(isValidIdentifierArray([123 as any])).toBe(false);
             expect(isValidIdentifierArray("not-array" as any)).toBe(false);

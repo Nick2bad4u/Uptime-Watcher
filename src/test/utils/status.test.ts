@@ -327,7 +327,12 @@ describe("Status Utilities", () => {
 
         it("should maintain consistency across different case variations", () => {
             const baseStatus = "up";
-            const variations = ["up", "UP", "Up", "uP"];
+            const variations = [
+                "up",
+                "UP",
+                "Up",
+                "uP",
+            ];
 
             // All variations should produce the same icon
             const expectedIcon = getStatusIcon(baseStatus);

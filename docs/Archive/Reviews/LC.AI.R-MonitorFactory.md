@@ -160,11 +160,10 @@ public static getMonitor(type: MonitorType, config?: MonitorConfig): IMonitorSer
 
 
 
-/** * Update configuration for all monitor types. * * @param config - Monitor configuration object containing settings to apply * * @remarks * Applies the provided configuration to ALL currently initialized monitor instances. * This ensures consistent configuration across all monitor types. *
- * The config object should contain settings applicable to all monitor types.
- * Type-specific settings may be ignored by monitors that don't support them.
- *
- * Note: Only affects already-created instances. Future instances created via
+
+
+
+/** * Update configuration for all monitor types. * * @param config - Monitor configuration object containing settings to apply * * @remarks * Applies the provided configuration to ALL currently initialized monitor instances. * This ensures consistent configuration across all monitor types. * * The config object should contain settings applicable to all monitor types. * Type-specific settings may be ignored by monitors that don't support them. * * Note: Only affects already-created instances. Future instances created via
  * {@link getMonitor} will need their configuration set explicitly.
  *
  * @example

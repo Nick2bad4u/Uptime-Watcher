@@ -168,7 +168,11 @@ function generateMonitorEvent(): MonitorEvent {
         monitor: {
             id: `monitor-${Math.floor(Math.random() * 1000)}`,
             siteIdentifier: `site-${Math.floor(Math.random() * 100)}`,
-            type: ["http", "ping", "port"][Math.floor(Math.random() * 3)],
+            type: [
+                "http",
+                "ping",
+                "port",
+            ][Math.floor(Math.random() * 3)],
             status: Math.random() > 0.05 ? "up" : "down",
         },
         timestamp: Date.now(),

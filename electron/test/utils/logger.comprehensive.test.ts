@@ -143,7 +143,11 @@ describe("Logger Utilities", () => {
             });
 
             it("should all be function objects with same interface", () => {
-                const loggers = [logger, dbLogger, monitorLogger];
+                const loggers = [
+                    logger,
+                    dbLogger,
+                    monitorLogger,
+                ];
 
                 for (const log of loggers) {
                     expect(typeof log.debug).toBe("function");

@@ -179,7 +179,12 @@ function main() {
     const format =
         args
             .find((arg) =>
-                ["--json", "--tree", "--flat", "--list"].includes(arg)
+                [
+                    "--json",
+                    "--tree",
+                    "--flat",
+                    "--list",
+                ].includes(arg)
             )
             ?.replace("--", "") || "list";
     const projectRoot = path.resolve(__dirname, "..");

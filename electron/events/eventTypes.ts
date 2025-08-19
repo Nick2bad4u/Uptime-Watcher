@@ -1028,7 +1028,11 @@ export const EVENT_CATEGORIES = {
         "site:updated",
         "sites:state-synchronized",
     ] as const,
-    SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
+    SYSTEM: [
+        "system:error",
+        "system:shutdown",
+        "system:startup",
+    ] as const,
 } as const;
 
 /**

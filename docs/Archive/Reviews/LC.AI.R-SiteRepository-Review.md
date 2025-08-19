@@ -30,7 +30,11 @@ Conducted comprehensive analysis of 19 unique claims (18 original + duplicates) 
 ```typescript
 // BEFORE (Inconsistent Defaults)
 // In bulkInsert:
-stmt.run([site.identifier, site.name ?? null, monitoringValue]); // null fallback
+stmt.run([
+ site.identifier,
+ site.name ?? null,
+ monitoringValue,
+]); // null fallback
 
 // In upsert:
 const name = site.name ?? "Unnamed Site"; // string fallback

@@ -311,7 +311,12 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             ).rejects.toThrow("Update failed");
         });
         it("should handle monitors with different status values", async () => {
-            const statuses = ["up", "down", "pending", "paused"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as const;
 
             for (const status of statuses) {
                 mockDatabase.run.mockReturnValue({ changes: 1 });

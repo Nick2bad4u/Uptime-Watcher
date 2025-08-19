@@ -49,7 +49,11 @@ import { stat, readdir, rmdir } from "node:fs/promises";
  * The absolute path to the project root directory where the script is executed.
  */
 const ROOT_DIR = process.cwd();
-const DEFAULT_TARGET_DIRS = ["electron", "src", "shared"];
+const DEFAULT_TARGET_DIRS = [
+    "electron",
+    "src",
+    "shared",
+];
 
 // Parse command line arguments
 import yargs from "yargs";
@@ -84,7 +88,11 @@ const argv = await yargs(hideBin(process.argv))
         type: "array",
         description:
             "Directories to exclude from search (comma-separated or multiple --exclude flags)",
-        default: [".git", "node_modules", ".vscode"],
+        default: [
+            ".git",
+            "node_modules",
+            ".vscode",
+        ],
         coerce: (excludes) => {
             const flattened = excludes.flatMap(
                 (/** @type {string} */ exclude) =>

@@ -27,7 +27,12 @@ export type MonitorStatus = "down" | "paused" | "pending" | "up";
  *
  * @public
  */
-export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const;
+export const BASE_MONITOR_TYPES = [
+    "http",
+    "port",
+    "ping",
+    "dns",
+] as const;
 
 /**
  * Interface for monitor status constants.
@@ -214,7 +219,12 @@ export function isComputedSiteStatus(
 }
 
 export function isMonitorStatus(status: string): status is MonitorStatus {
-    return ["down", "paused", "pending", "up"].includes(status);
+    return [
+        "down",
+        "paused",
+        "pending",
+        "up",
+    ].includes(status);
 }
 
 export function isSiteStatus(status: string): status is SiteStatus {

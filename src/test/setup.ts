@@ -423,7 +423,11 @@ const mockTheme = {
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         ...mockTheme,
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         currentTheme: mockTheme,
         getColor: vi.fn((path: string) => {
             const keys = path.split(".");
@@ -453,7 +457,11 @@ vi.mock("../theme/useTheme", () => ({
         themeManager: {
             getTheme: vi.fn(() => mockTheme),
             applyTheme: vi.fn(),
-            getAvailableThemes: vi.fn(() => ["light", "dark", "system"]),
+            getAvailableThemes: vi.fn(() => [
+                "light",
+                "dark",
+                "system",
+            ]),
             onSystemThemeChange: vi.fn(() => vi.fn()),
             getSystemThemePreference: vi.fn(() => "light"),
         },

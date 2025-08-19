@@ -402,7 +402,11 @@ describe("MonitorOperationRegistry", () => {
         });
 
         it("should handle multiple monitors with multiple operations", () => {
-            const monitors = ["monitor-1", "monitor-2", "monitor-3"];
+            const monitors = [
+                "monitor-1",
+                "monitor-2",
+                "monitor-3",
+            ];
             const operations: string[] = [];
 
             // Create 2 operations for each monitor

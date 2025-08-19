@@ -69,7 +69,11 @@ describe("String Conversion - 100% Coverage Override", () => {
             safeStringify(42),
             safeStringify("test"),
             safeStringify({ key: "value" }),
-            safeStringify([1, 2, 3]),
+            safeStringify([
+                1,
+                2,
+                3,
+            ]),
         ];
 
         expect(results).toEqual([

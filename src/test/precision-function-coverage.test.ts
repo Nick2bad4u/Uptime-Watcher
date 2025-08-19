@@ -135,7 +135,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
                 ],
                 2
             )
-        ).toEqual([[1, 2], [3, 4], [5]]);
+        ).toEqual([
+            [1, 2],
+            [3, 4],
+            [5],
+        ]);
         expect(
             chunk(
                 [
@@ -149,12 +153,38 @@ describe("Precision Function Coverage - Targeted Functions", () => {
                 3
             )
         ).toEqual([
-            [1, 2, 3],
-            [4, 5, 6],
+            [
+                1,
+                2,
+                3,
+            ],
+            [
+                4,
+                5,
+                6,
+            ],
         ]);
         expect(chunk([], 2)).toEqual([]);
-        expect(chunk([1, 2, 3], 0)).toEqual([]);
-        expect(chunk([1, 2, 3], -1)).toEqual([]);
+        expect(
+            chunk(
+                [
+                    1,
+                    2,
+                    3,
+                ],
+                0
+            )
+        ).toEqual([]);
+        expect(
+            chunk(
+                [
+                    1,
+                    2,
+                    3,
+                ],
+                -1
+            )
+        ).toEqual([]);
 
         // Test array deduplication utility
         const unique = <T>(array: T[]): T[] => {
@@ -170,7 +200,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
                 3,
                 3,
             ])
-        ).toEqual([1, 2, 3]);
+        ).toEqual([
+            1,
+            2,
+            3,
+        ]);
         expect(
             unique([
                 "a",
@@ -179,7 +213,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
                 "c",
                 "b",
             ])
-        ).toEqual(["a", "b", "c"]);
+        ).toEqual([
+            "a",
+            "b",
+            "c",
+        ]);
         expect(unique([])).toEqual([]);
         expect(unique([1])).toEqual([1]);
 
@@ -202,8 +240,20 @@ describe("Precision Function Coverage - Targeted Functions", () => {
                 undefined,
                 "d",
             ])
-        ).toEqual(["a", "b", "c", "d"]);
-        expect(filterValidItems([123, "valid", false, "test"])).toEqual([
+        ).toEqual([
+            "a",
+            "b",
+            "c",
+            "d",
+        ]);
+        expect(
+            filterValidItems([
+                123,
+                "valid",
+                false,
+                "test",
+            ])
+        ).toEqual([
             "valid",
             "test",
         ]);

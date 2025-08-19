@@ -74,7 +74,11 @@ const SiteDetailsHeader = ({
                 siteName: site.name,
             });
         },
-        [openExternal, selectedMonitor?.url, site.name]
+        [
+            openExternal,
+            selectedMonitor?.url,
+            site.name,
+        ]
     );
 
     return (

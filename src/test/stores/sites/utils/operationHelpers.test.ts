@@ -477,7 +477,11 @@ describe("OperationHelpers", () => {
             expect(booleanResult).toBe(true);
 
             // Test with array result
-            const arrayOperation = vi.fn().mockResolvedValue([1, 2, 3]);
+            const arrayOperation = vi.fn().mockResolvedValue([
+                1,
+                2,
+                3,
+            ]);
             const arrayResult = await withSiteOperationReturning(
                 "arrayOp",
                 arrayOperation,
@@ -485,7 +489,11 @@ describe("OperationHelpers", () => {
                 mockDeps,
                 false
             );
-            expect(arrayResult).toEqual([1, 2, 3]);
+            expect(arrayResult).toEqual([
+                1,
+                2,
+                3,
+            ]);
         });
 
         it("should handle null and undefined results", async () => {

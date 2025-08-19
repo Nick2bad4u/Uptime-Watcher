@@ -73,7 +73,11 @@ describe("testHelpers", () => {
         });
 
         it("should handle all monitor types", () => {
-            for (const type of ["http", "port", "ping"] as MonitorType[]) {
+            for (const type of [
+                "http",
+                "port",
+                "ping",
+            ] as MonitorType[]) {
                 const monitor = createValidMonitor({ type });
                 expect(monitor.type).toBe(type);
             }

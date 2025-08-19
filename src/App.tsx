@@ -258,7 +258,12 @@ const App = (): JSX.Element => {
             setUpdateStatus("idle");
             setUpdateError(undefined);
         }
-    }, [applyUpdate, setUpdateError, setUpdateStatus, updateStatus]);
+    }, [
+        applyUpdate,
+        setUpdateError,
+        setUpdateStatus,
+        updateStatus,
+    ]);
 
     /**
      * Handles closing the settings modal.

@@ -241,7 +241,12 @@ export const SettingsTab = ({
             siteId: currentSite.identifier,
         });
         await handleSaveName();
-    }, [currentSite.identifier, currentSite.name, handleSaveName, localName]);
+    }, [
+        currentSite.identifier,
+        currentSite.name,
+        handleSaveName,
+        localName,
+    ]);
 
     const loggedHandleSaveInterval = useCallback(() => {
         logger.user.action("Settings: Save check interval", {
@@ -265,7 +270,11 @@ export const SettingsTab = ({
             siteName: currentSite.name,
         });
         await handleRemoveSite();
-    }, [currentSite.identifier, currentSite.name, handleRemoveSite]);
+    }, [
+        currentSite.identifier,
+        currentSite.name,
+        handleRemoveSite,
+    ]);
 
     const loggedHandleSaveTimeout = useCallback(async () => {
         logger.user.action("Settings: Save timeout", {

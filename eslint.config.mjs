@@ -1398,7 +1398,12 @@ export default [
                         },
                         {
                             from: "hooks",
-                            allow: ["stores", "services", "types", "utils"],
+                            allow: [
+                                "stores",
+                                "services",
+                                "types",
+                                "utils",
+                            ],
                         },
                         {
                             from: "services",
@@ -1435,7 +1440,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -2545,7 +2554,12 @@ export default [
                         },
                         {
                             from: "managers",
-                            allow: ["services", "utils", "events", "types"],
+                            allow: [
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
                         },
                         {
                             from: "preload",
@@ -2553,7 +2567,11 @@ export default [
                         },
                         {
                             from: "services",
-                            allow: ["services", "utils", "types"],
+                            allow: [
+                                "services",
+                                "utils",
+                                "types",
+                            ],
                         },
                         { from: "types", allow: [] },
                         {
@@ -2584,7 +2602,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ],
@@ -3816,7 +3838,12 @@ export default [
                         },
                         {
                             from: "hooks",
-                            allow: ["stores", "services", "types", "utils"],
+                            allow: [
+                                "stores",
+                                "services",
+                                "types",
+                                "utils",
+                            ],
                         },
                         {
                             from: "services",
@@ -3853,7 +3880,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -4411,7 +4442,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -4511,7 +4546,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -4653,7 +4692,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -4750,7 +4793,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses
@@ -5000,7 +5047,12 @@ export default [
                         },
                         {
                             from: "managers",
-                            allow: ["services", "utils", "events", "types"],
+                            allow: [
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
                         },
                         {
                             from: "preload",
@@ -5008,7 +5060,11 @@ export default [
                         },
                         {
                             from: "services",
-                            allow: ["services", "utils", "types"],
+                            allow: [
+                                "services",
+                                "utils",
+                                "types",
+                            ],
                         },
                         { from: "types", allow: [] },
                         {
@@ -5039,7 +5095,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ],
@@ -5349,7 +5409,11 @@ export default [
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
-                    disallowedPrefixes: ["interface", "type", "enum"],
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
                     checkProperties: false,
                 },
             ], // Allow "class" prefix for className and other legitimate uses

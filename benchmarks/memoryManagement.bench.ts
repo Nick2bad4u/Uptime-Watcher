@@ -165,7 +165,11 @@ function generateMonitorData(
 
     return {
         id: `${siteId}-monitor-${monitorIndex}`,
-        type: ["http", "ping", "port"][monitorIndex % 3],
+        type: [
+            "http",
+            "ping",
+            "port",
+        ][monitorIndex % 3],
         url:
             monitorIndex % 3 === 0
                 ? `https://example${monitorIndex}.com`

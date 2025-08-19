@@ -397,7 +397,12 @@ describe("performSinglePortCheck", () => {
         });
 
         it("should handle different timeout values", async () => {
-            const timeouts = [100, 1000, 5000, 30_000];
+            const timeouts = [
+                100,
+                1000,
+                5000,
+                30_000,
+            ];
 
             for (const timeout of timeouts) {
                 // Arrange
@@ -530,7 +535,11 @@ describe("performSinglePortCheck", () => {
             expect(result2.responseTime).toBe(200); // 300 - 100 = 200
             expect(result3.responseTime).toBe(50); // 250 - 200 = 50
             expect(
-                [result1, result2, result3].every((r) => r.status === "up")
+                [
+                    result1,
+                    result2,
+                    result3,
+                ].every((r) => r.status === "up")
             ).toBe(true);
         });
 

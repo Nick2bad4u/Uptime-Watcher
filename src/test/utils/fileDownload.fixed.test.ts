@@ -223,7 +223,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
 
     describe("handleSQLiteBackupDownload Function", () => {
         it("should handle successful backup download", async () => {
-            const mockData = new Uint8Array([1, 2, 3, 4]);
+            const mockData = new Uint8Array([
+                1,
+                2,
+                3,
+                4,
+            ]);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
@@ -268,9 +273,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
 
         it("should throw TypeError for array instead of Uint8Array", async () => {
-            const mockDownloadFunction = vi
-                .fn()
-                .mockResolvedValue([1, 2, 3, 4]);
+            const mockDownloadFunction = vi.fn().mockResolvedValue([
+                1,
+                2,
+                3,
+                4,
+            ]);
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
@@ -290,7 +298,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
 
         it("should handle click errors with proper error message", async () => {
-            const mockData = new Uint8Array([1, 2, 3, 4]);
+            const mockData = new Uint8Array([
+                1,
+                2,
+                3,
+                4,
+            ]);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
@@ -303,7 +316,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
 
         it("should handle non-Error click failures", async () => {
-            const mockData = new Uint8Array([1, 2, 3, 4]);
+            const mockData = new Uint8Array([
+                1,
+                2,
+                3,
+                4,
+            ]);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
@@ -316,7 +334,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
 
         it("should clean up object URL even when click fails", async () => {
-            const mockData = new Uint8Array([1, 2, 3, 4]);
+            const mockData = new Uint8Array([
+                1,
+                2,
+                3,
+                4,
+            ]);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
@@ -335,7 +358,12 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         });
 
         it("should use correct filename format", async () => {
-            const mockData = new Uint8Array([1, 2, 3, 4]);
+            const mockData = new Uint8Array([
+                1,
+                2,
+                3,
+                4,
+            ]);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
             await handleSQLiteBackupDownload(mockDownloadFunction);

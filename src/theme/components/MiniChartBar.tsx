@@ -37,7 +37,11 @@ const MiniChartBar = ({
             height: "32px",
             width: "8px",
         }),
-        [currentTheme.borderRadius.sm, getStatusColor, status]
+        [
+            currentTheme.borderRadius.sm,
+            getStatusColor,
+            status,
+        ]
     );
     return (
         <div

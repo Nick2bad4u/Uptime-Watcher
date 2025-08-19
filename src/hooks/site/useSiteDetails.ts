@@ -330,7 +330,12 @@ export function useSiteDetails({
             undefined,
             false // Don't throw, handle gracefully
         );
-    }, [clearError, currentSite.identifier, currentSite.name, deleteSite]);
+    }, [
+        clearError,
+        currentSite.identifier,
+        currentSite.name,
+        deleteSite,
+    ]);
 
     // Handler for monitor removal
     const handleRemoveMonitor = useCallback(async () => {

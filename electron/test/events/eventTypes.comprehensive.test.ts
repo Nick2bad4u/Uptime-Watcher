@@ -89,7 +89,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 "component"
             );
 
-            const expectedPriorities = ["CRITICAL", "HIGH", "LOW", "MEDIUM"];
+            const expectedPriorities = [
+                "CRITICAL",
+                "HIGH",
+                "LOW",
+                "MEDIUM",
+            ];
             const actualPriorities = Object.keys(EVENT_PRIORITIES);
             expect(actualPriorities).toEqual(
                 expect.arrayContaining(expectedPriorities)
@@ -770,9 +775,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     const priority = getEventPriority(
                         eventName as keyof UptimeEvents
                     );
-                    expect(["CRITICAL", "HIGH", "LOW", "MEDIUM"]).toContain(
-                        priority
-                    );
+                    expect([
+                        "CRITICAL",
+                        "HIGH",
+                        "LOW",
+                        "MEDIUM",
+                    ]).toContain(priority);
                 }
             });
         });
@@ -821,9 +829,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 for (const event of testEvents) {
                     const priority = getEventPriority(event);
-                    expect(["CRITICAL", "HIGH", "LOW", "MEDIUM"]).toContain(
-                        priority
-                    );
+                    expect([
+                        "CRITICAL",
+                        "HIGH",
+                        "LOW",
+                        "MEDIUM",
+                    ]).toContain(priority);
                 }
             });
             it("should maintain consistency between constants and functions", async ({

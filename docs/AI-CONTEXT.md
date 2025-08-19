@@ -523,8 +523,17 @@ await withErrorHandling(
 ```typescript
 export const baseMonitorSchema = z.object({
  id: z.string().min(1),
- type: z.enum(["http", "port", "ping"]),
- status: z.enum(["up", "down", "pending", "paused"]),
+ type: z.enum([
+  "http",
+  "port",
+  "ping",
+ ]),
+ status: z.enum([
+  "up",
+  "down",
+  "pending",
+  "paused",
+ ]),
  monitoring: z.boolean(),
  checkInterval: z.number().min(5000).max(2_592_000_000), // 5s to 30 days
  timeout: z.number().min(1000).max(300_000), // 1s to 5min
@@ -782,7 +791,12 @@ export default defineConfig((configEnv) =>
     environment: "jsdom",
     coverage: {
      provider: "v8",
-     reporter: ["text", "json", "lcov", "html"],
+     reporter: [
+      "text",
+      "json",
+      "lcov",
+      "html",
+     ],
      reportsDirectory: "./coverage/",
     },
     setupFiles: ["src/test/setup.ts"],
@@ -800,7 +814,12 @@ export default defineConfig({
   environment: "node",
   coverage: {
    provider: "v8",
-   reporter: ["text", "json", "lcov", "html"],
+   reporter: [
+    "text",
+    "json",
+    "lcov",
+    "html",
+   ],
    reportsDirectory: "./coverage/electron/",
   },
   setupFiles: ["electron/test/setup.ts"],

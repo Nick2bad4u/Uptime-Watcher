@@ -136,14 +136,22 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             const result = insertWithReturning(
                 mockDb,
                 "INSERT INTO monitors (url, status, checkInterval) VALUES (?, ?, ?) RETURNING *",
-                ["https://example.com", "active", 60_000]
+                [
+                    "https://example.com",
+                    "active",
+                    60_000,
+                ]
             );
 
             // Assert
             expect(result).toEqual(mockResult);
             expect(mockGet).toHaveBeenCalledWith(
                 "INSERT INTO monitors (url, status, checkInterval) VALUES (?, ?, ?) RETURNING *",
-                ["https://example.com", "active", 60_000]
+                [
+                    "https://example.com",
+                    "active",
+                    60_000,
+                ]
             );
         });
         it("should throw error when INSERT returns no result", async ({
@@ -453,7 +461,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             const result = queryForIds(
                 mockDb,
                 "SELECT id FROM history WHERE timestamp BETWEEN ? AND ? AND status = ?",
-                [1_640_995_200_000, 1_641_081_600_000, "online"]
+                [
+                    1_640_995_200_000,
+                    1_641_081_600_000,
+                    "online",
+                ]
             );
 
             // Assert

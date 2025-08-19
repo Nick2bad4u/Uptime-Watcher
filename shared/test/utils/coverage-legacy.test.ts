@@ -568,7 +568,13 @@ describe("Shared Utils Coverage", () => {
             expect(stringUtils.safeToString(undefined)).toBe("undefined");
             expect(stringUtils.safeToString(123)).toBe("123");
             expect(stringUtils.safeToString(true)).toBe("true");
-            expect(stringUtils.safeToString([1, 2, 3])).toBe("[1,2,3]");
+            expect(
+                stringUtils.safeToString([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe("[1,2,3]");
             expect(stringUtils.truncateString("Very long string", 10)).toBe(
                 "Very lo..."
             );

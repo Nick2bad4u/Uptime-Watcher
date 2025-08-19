@@ -59,7 +59,11 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(error3.message).toBe(
                 "Validation failed: Error 1, Error 2, Error 3"
             );
-            expect(error3.errors).toEqual(["Error 1", "Error 2", "Error 3"]);
+            expect(error3.errors).toEqual([
+                "Error 1",
+                "Error 2",
+                "Error 3",
+            ]);
 
             // Test with converted types
             const error4 = new ValidationError([
@@ -80,7 +84,13 @@ describe("Utility Files - Missing Branch Coverage", () => {
             logger.info(String(null));
             logger.info(String(undefined));
             logger.info(JSON.stringify({ key: "value" }));
-            logger.info(JSON.stringify([1, 2, 3]));
+            logger.info(
+                JSON.stringify([
+                    1,
+                    2,
+                    3,
+                ])
+            );
 
             // Test with multiple parameters
             logger.error("Error:", new Error("test error"), {

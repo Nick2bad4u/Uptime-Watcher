@@ -503,7 +503,11 @@ describe("High-Impact Branch Coverage Tests", () => {
                         stringConversionModule.safeStringify({ key: "value" })
                     ).toContain("key");
                     expect(
-                        stringConversionModule.safeStringify([1, 2, 3])
+                        stringConversionModule.safeStringify([
+                            1,
+                            2,
+                            3,
+                        ])
                     ).toContain("1");
 
                     // Test circular references
@@ -557,7 +561,13 @@ describe("High-Impact Branch Coverage Tests", () => {
                         )
                     ).toContain("Map");
                     expect(
-                        stringConversionModule.safeStringify(new Set([1, 2, 3]))
+                        stringConversionModule.safeStringify(
+                            new Set([
+                                1,
+                                2,
+                                3,
+                            ])
+                        )
                     ).toContain("Set");
                     expect(
                         stringConversionModule.safeStringify(new WeakMap())

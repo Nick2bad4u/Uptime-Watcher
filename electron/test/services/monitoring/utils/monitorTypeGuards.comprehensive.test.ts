@@ -371,7 +371,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should return false for negative port numbers", () => {
-            const invalidPorts = [-1, -100, -65_535];
+            const invalidPorts = [
+                -1,
+                -100,
+                -65_535,
+            ];
 
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port });
@@ -381,7 +385,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should return false for port numbers greater than 65_535", () => {
-            const invalidPorts = [65_536, 70_000, 100_000];
+            const invalidPorts = [
+                65_536,
+                70_000,
+                100_000,
+            ];
 
             for (const port of invalidPorts) {
                 const monitor = createTestMonitor({ port });
@@ -447,7 +455,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should handle floating point numbers", () => {
-            const floatingPoints = [80.5, 443.1, 22.9];
+            const floatingPoints = [
+                80.5,
+                443.1,
+                22.9,
+            ];
 
             for (const port of floatingPoints) {
                 const monitor = createTestMonitor({ port });
@@ -478,7 +490,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should return false for negative retry attempts", () => {
-            const invalidRetryAttempts = [-1, -5, -100];
+            const invalidRetryAttempts = [
+                -1,
+                -5,
+                -100,
+            ];
 
             for (const retryAttempts of invalidRetryAttempts) {
                 const monitor = createTestMonitor({ retryAttempts });
@@ -523,7 +539,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should handle floating point retry attempts", () => {
-            const floatingPoints = [1.5, 3.7, 5.2];
+            const floatingPoints = [
+                1.5,
+                3.7,
+                5.2,
+            ];
 
             for (const retryAttempts of floatingPoints) {
                 const monitor = createTestMonitor({ retryAttempts });
@@ -576,7 +596,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should return false for negative timeout values", () => {
-            const invalidTimeouts = [-1, -1000, -5000];
+            const invalidTimeouts = [
+                -1,
+                -1000,
+                -5000,
+            ];
 
             for (const timeout of invalidTimeouts) {
                 const monitor = createTestMonitor({ timeout });
@@ -627,7 +651,11 @@ describe("Monitor Type Guards", () => {
         });
 
         it("should handle very small positive timeouts", () => {
-            const smallTimeouts = [0.1, 0.5, 0.001];
+            const smallTimeouts = [
+                0.1,
+                0.5,
+                0.001,
+            ];
 
             for (const timeout of smallTimeouts) {
                 const monitor = createTestMonitor({ timeout });

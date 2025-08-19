@@ -518,7 +518,12 @@ export default defineConfig(({}) => {
                 provider: "v8" as const, // Switch to V8 for better TypeScript support
                 experimentalAstAwareRemapping: true, // Enable AST-aware remapping for accurate coverage
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
-                reporter: ["text", "json", "lcov", "html"],
+                reporter: [
+                    "text",
+                    "json",
+                    "lcov",
+                    "html",
+                ],
                 reportOnFailure: true,
                 reportsDirectory: "./coverage",
                 skipFull: false, // Don't skip full coverage collection

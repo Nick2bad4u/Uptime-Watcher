@@ -116,7 +116,11 @@ export default {
         // SVG inlining with theming support
         "postcss-inline-svg": {
             encode: true, // URL encode the SVG
-            paths: ["./icons", "./assets", "./src/assets"],
+            paths: [
+                "./icons",
+                "./assets",
+                "./src/assets",
+            ],
             removeFill: true, // Remove fill for easier theming
             removeStroke: false, // Keep stroke for consistency
         },

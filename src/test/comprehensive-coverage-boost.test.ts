@@ -213,7 +213,12 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test SiteDetails navigation functionality (lines 88-389)
             const mockNavigationState = {
                 currentTab: "overview",
-                availableTabs: ["overview", "analytics", "history", "settings"],
+                availableTabs: [
+                    "overview",
+                    "analytics",
+                    "history",
+                    "settings",
+                ],
                 siteId: "123",
             };
 
@@ -231,7 +236,12 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test MonitorUiComponents.tsx functionality (lines 43-114)
             const mockMonitorComponents = {
                 statusIndicator: { color: "green", text: "Online" },
-                actionButtons: ["start", "stop", "edit", "delete"],
+                actionButtons: [
+                    "start",
+                    "stop",
+                    "edit",
+                    "delete",
+                ],
                 metrics: { uptime: 99.9, responseTime: 245 },
             };
 
@@ -345,10 +355,35 @@ describe("Comprehensive Coverage Boost Tests", () => {
         it("should test theme components edge cases", () => {
             // Test components.tsx uncovered lines (theme components)
             const mockThemeComponents = {
-                Button: { variants: ["primary", "secondary", "danger"] },
-                Input: { types: ["text", "email", "password", "url"] },
-                Card: { sizes: ["small", "medium", "large"] },
-                Modal: { positions: ["center", "top", "bottom"] },
+                Button: {
+                    variants: [
+                        "primary",
+                        "secondary",
+                        "danger",
+                    ],
+                },
+                Input: {
+                    types: [
+                        "text",
+                        "email",
+                        "password",
+                        "url",
+                    ],
+                },
+                Card: {
+                    sizes: [
+                        "small",
+                        "medium",
+                        "large",
+                    ],
+                },
+                Modal: {
+                    positions: [
+                        "center",
+                        "top",
+                        "bottom",
+                    ],
+                },
             };
 
             expect(mockThemeComponents.Button.variants).toContain("primary");
@@ -424,7 +459,13 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 "value"
             );
             expect(mockFallbacks.getFallbackArray(null)).toEqual([]);
-            expect(mockFallbacks.getFallbackArray([1, 2, 3])).toEqual([
+            expect(
+                mockFallbacks.getFallbackArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toEqual([
                 1,
                 2,
                 3,

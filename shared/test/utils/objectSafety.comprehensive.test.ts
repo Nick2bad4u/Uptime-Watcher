@@ -18,7 +18,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
         null: null,
         undefined: undefined,
         nested: { prop: "value" },
-        array: [1, 2, 3],
+        array: [
+            1,
+            2,
+            3,
+        ],
     };
 
     const symbolKey = Symbol("test");
@@ -368,7 +372,14 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(entries).toContainEqual(["null", null]);
             expect(entries).toContainEqual(["undefined", undefined]);
             expect(entries).toContainEqual(["nested", { prop: "value" }]);
-            expect(entries).toContainEqual(["array", [1, 2, 3]]);
+            expect(entries).toContainEqual([
+                "array",
+                [
+                    1,
+                    2,
+                    3,
+                ],
+            ]);
         });
 
         it("should handle empty objects", () => {
@@ -432,7 +443,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             expect(keys).toHaveLength(3);
             expect(keys).toEqual(
-                expect.arrayContaining(["first", "second", "third"])
+                expect.arrayContaining([
+                    "first",
+                    "second",
+                    "third",
+                ])
             );
         });
 
@@ -474,7 +489,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             expect(values).toHaveLength(3);
             expect(values).toEqual(
-                expect.arrayContaining(["one", "two", "three"])
+                expect.arrayContaining([
+                    "one",
+                    "two",
+                    "three",
+                ])
             );
         });
 
@@ -482,7 +501,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             const nestedObj = { prop: "value" };
             const testObject = {
                 nested: nestedObj,
-                array: [1, 2, 3],
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
             };
 
             const values = typedObjectValues(testObject);
@@ -546,10 +569,20 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(safeObj).toHaveProperty("metadata");
 
             expect(keys).toEqual(
-                expect.arrayContaining(["id", "name", "email", "isActive"])
+                expect.arrayContaining([
+                    "id",
+                    "name",
+                    "email",
+                    "isActive",
+                ])
             );
             expect(values).toEqual(
-                expect.arrayContaining([1, "John", "john@example.com", true])
+                expect.arrayContaining([
+                    1,
+                    "John",
+                    "john@example.com",
+                    true,
+                ])
             );
             expect(entries).toHaveLength(4);
         });

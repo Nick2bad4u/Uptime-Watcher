@@ -663,7 +663,11 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
         });
 
         it("should handle arrays as objects", () => {
-            const arrayParam = ["item1", "item2", "item3"];
+            const arrayParam = [
+                "item1",
+                "item2",
+                "item3",
+            ];
             const result = SiteHandlerValidators.addSite([arrayParam]);
             expect(isValidationFailure(result)).toBe(true);
         });
@@ -748,7 +752,13 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
                 {},
                 { simple: "value" },
                 { nested: { deep: { value: "test" } } },
-                { array: [1, 2, 3] },
+                {
+                    array: [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
                 {
                     mixed: {
                         string: "test",

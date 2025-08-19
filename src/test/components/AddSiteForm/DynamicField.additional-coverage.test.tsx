@@ -72,7 +72,12 @@ describe("DynamicField - Additional Coverage", () => {
             // Directly test the handleNumericChange logic by simulating it
             const mockOnChange = vi.fn();
 
-            const testValues = ["abc", "123abc", "!@#$", "."];
+            const testValues = [
+                "abc",
+                "123abc",
+                "!@#$",
+                ".",
+            ];
 
             for (const val of testValues) {
                 const numericValue = Number(val);

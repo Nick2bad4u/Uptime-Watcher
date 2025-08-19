@@ -154,7 +154,11 @@ function generateValidMonitorData(count: number): any[] {
         url: `https://example${i}.com`,
         timeout: 5000 + (i % 1000),
         retryAttempts: i % 5,
-        type: ["http", "ping", "port"][i % 3],
+        type: [
+            "http",
+            "ping",
+            "port",
+        ][i % 3],
     }));
 }
 

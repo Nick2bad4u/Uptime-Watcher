@@ -108,7 +108,13 @@ describe("chartConfig utilities", () => {
 
         it("should return false for array inputs", () => {
             expect(hasPlugins([])).toBe(false);
-            expect(hasPlugins([1, 2, 3])).toBe(false);
+            expect(
+                hasPlugins([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
             expect(hasPlugins([{ plugins: {} }])).toBe(false);
         });
 
@@ -130,7 +136,11 @@ describe("chartConfig utilities", () => {
             const config = {
                 type: "line",
                 data: {
-                    labels: ["Jan", "Feb", "Mar"],
+                    labels: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                    ],
                     datasets: [],
                 },
                 plugins: {
@@ -258,7 +268,13 @@ describe("chartConfig utilities", () => {
 
         it("should return false for array inputs", () => {
             expect(hasScales([])).toBe(false);
-            expect(hasScales([1, 2, 3])).toBe(false);
+            expect(
+                hasScales([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
             expect(hasScales([{ scales: {} }])).toBe(false);
         });
 
@@ -281,7 +297,11 @@ describe("chartConfig utilities", () => {
             const config = {
                 type: "bar",
                 data: {
-                    labels: ["A", "B", "C"],
+                    labels: [
+                        "A",
+                        "B",
+                        "C",
+                    ],
                     datasets: [],
                 },
                 plugins: {
@@ -342,7 +362,11 @@ describe("chartConfig utilities", () => {
             const config = {
                 type: "line",
                 data: {
-                    labels: ["Jan", "Feb", "Mar"],
+                    labels: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                    ],
                     datasets: [],
                 },
             };

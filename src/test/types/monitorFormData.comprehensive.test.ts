@@ -482,13 +482,25 @@ describe("Monitor Form Data Types", () => {
                 safeSetFormProperty(data, "string", "test");
                 safeSetFormProperty(data, "boolean", true);
                 safeSetFormProperty(data, "object", { nested: "value" });
-                safeSetFormProperty(data, "array", [1, 2, 3]);
+                safeSetFormProperty(
+                    data,
+                    "array",
+                    [
+                        1,
+                        2,
+                        3,
+                    ]
+                );
 
                 expect(data["number"]).toBe(123);
                 expect(data["string"]).toBe("test");
                 expect(data["boolean"]).toBe(true);
                 expect(data["object"]).toEqual({ nested: "value" });
-                expect(data["array"]).toEqual([1, 2, 3]);
+                expect(data["array"]).toEqual([
+                    1,
+                    2,
+                    3,
+                ]);
             });
         });
     });

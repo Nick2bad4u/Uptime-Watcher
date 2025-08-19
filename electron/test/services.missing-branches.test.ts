@@ -148,9 +148,21 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 { id: 1, name: "test" },
                 { id: null, name: undefined },
                 { id: "", name: "" },
-                [1, 2, 3],
-                ["a", "b", "c"],
-                [null, undefined, ""],
+                [
+                    1,
+                    2,
+                    3,
+                ],
+                [
+                    "a",
+                    "b",
+                    "c",
+                ],
+                [
+                    null,
+                    undefined,
+                    "",
+                ],
                 new Date(),
                 new Date("invalid"),
             ];

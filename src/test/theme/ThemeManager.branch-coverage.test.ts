@@ -251,7 +251,11 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             });
 
             // Apply multiple themes to test the remove logic for all theme types
-            const themes = ["light", "dark", "high-contrast"] as const;
+            const themes = [
+                "light",
+                "dark",
+                "high-contrast",
+            ] as const;
 
             for (const themeName of themes) {
                 const theme = themeManager.getTheme(themeName);

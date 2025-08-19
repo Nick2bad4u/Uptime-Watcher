@@ -137,7 +137,11 @@ export const DetailLabel = ({
                 isCancelled = true;
             };
         },
-        [details, fallback, monitorType]
+        [
+            details,
+            fallback,
+            monitorType,
+        ]
     );
 
     return <span>{formattedLabel}</span>;

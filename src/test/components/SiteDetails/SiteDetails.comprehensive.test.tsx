@@ -676,7 +676,11 @@ describe("SiteDetails", () => {
             renderSiteDetails();
 
             // Test available tabs based on the mocked navigation component
-            const availableTabs = ["overview", "history", "analytics"];
+            const availableTabs = [
+                "overview",
+                "history",
+                "analytics",
+            ];
 
             for (const tab of availableTabs) {
                 const button = screen.getByTestId(`${tab}-tab`);

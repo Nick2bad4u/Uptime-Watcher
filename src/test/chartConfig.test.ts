@@ -96,7 +96,11 @@ const mockTheme: Theme = {
     typography: {
         fontFamily: {
             mono: ["JetBrains Mono", "monospace"],
-            sans: ["Inter", "system-ui", "sans-serif"],
+            sans: [
+                "Inter",
+                "system-ui",
+                "sans-serif",
+            ],
         },
         fontSize: {
             "2xl": "1.5rem",

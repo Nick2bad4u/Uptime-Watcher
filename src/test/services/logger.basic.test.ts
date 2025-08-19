@@ -125,11 +125,22 @@ describe("Logger Service - Basic Coverage", () => {
         });
 
         it("should log silly messages with arguments", () => {
-            logger.silly("Test silly message", [1, 2, 3]);
+            logger.silly(
+                "Test silly message",
+                [
+                    1,
+                    2,
+                    3,
+                ]
+            );
 
             expect(mockSilly).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Test silly message",
-                [1, 2, 3]
+                [
+                    1,
+                    2,
+                    3,
+                ]
             );
         });
     });

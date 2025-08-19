@@ -24,13 +24,25 @@ describe("Type Guards - Comprehensive Coverage", () => {
         it("should return true when object has all specified properties", () => {
             const obj = { a: 1, b: 2, c: 3 };
             expect(hasProperties(obj, ["a", "b"])).toBe(true);
-            expect(hasProperties(obj, ["a", "b", "c"])).toBe(true);
+            expect(
+                hasProperties(obj, [
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBe(true);
             expect(hasProperties(obj, [])).toBe(true); // Empty array - vacuous truth
         });
 
         it("should return false when object is missing some properties", () => {
             const obj = { a: 1, b: 2 };
-            expect(hasProperties(obj, ["a", "b", "c"])).toBe(false);
+            expect(
+                hasProperties(obj, [
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBe(false);
             expect(hasProperties(obj, ["d"])).toBe(false);
         });
 
@@ -112,9 +124,27 @@ describe("Type Guards - Comprehensive Coverage", () => {
     describe("isArray", () => {
         it("should return true for arrays without validator", () => {
             expect(isArray([])).toBe(true);
-            expect(isArray([1, 2, 3])).toBe(true);
-            expect(isArray(["a", "b", "c"])).toBe(true);
-            expect(isArray([1, "mixed", true])).toBe(true);
+            expect(
+                isArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(true);
+            expect(
+                isArray([
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBe(true);
+            expect(
+                isArray([
+                    1,
+                    "mixed",
+                    true,
+                ])
+            ).toBe(true);
         });
 
         it("should return false for non-arrays", () => {
@@ -132,23 +162,77 @@ describe("Type Guards - Comprehensive Coverage", () => {
             const isNumber = (value: unknown): value is number =>
                 typeof value === "number";
 
-            expect(isArray(["a", "b", "c"], isString)).toBe(true);
-            expect(isArray([1, 2, 3], isNumber)).toBe(true);
+            expect(
+                isArray(
+                    [
+                        "a",
+                        "b",
+                        "c",
+                    ],
+                    isString
+                )
+            ).toBe(true);
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    isNumber
+                )
+            ).toBe(true);
             expect(isArray([], isString)).toBe(true); // Empty array passes any validator
 
             // Mixed arrays should fail type-specific validators
             expect(isArray([1, "mixed"], isString)).toBe(false);
             expect(isArray(["mixed", 1], isNumber)).toBe(false);
-            expect(isArray([1, 2, "not number"], isNumber)).toBe(false);
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        "not number",
+                    ],
+                    isNumber
+                )
+            ).toBe(false);
         });
 
         it("should handle complex validators", () => {
             const isPositiveNumber = (value: unknown): value is number =>
                 typeof value === "number" && value > 0;
 
-            expect(isArray([1, 2, 3], isPositiveNumber)).toBe(true);
-            expect(isArray([0, 1, 2], isPositiveNumber)).toBe(false); // 0 is not positive
-            expect(isArray([-1, 1, 2], isPositiveNumber)).toBe(false); // -1 is not positive
+            expect(
+                isArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    isPositiveNumber
+                )
+            ).toBe(true);
+            expect(
+                isArray(
+                    [
+                        0,
+                        1,
+                        2,
+                    ],
+                    isPositiveNumber
+                )
+            ).toBe(false); // 0 is not positive
+            expect(
+                isArray(
+                    [
+                        -1,
+                        1,
+                        2,
+                    ],
+                    isPositiveNumber
+                )
+            ).toBe(false); // -1 is not positive
         });
     });
 
@@ -384,7 +468,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
         it("should return false for arrays", () => {
             expect(isNonNullObject([])).toBe(false);
-            expect(isNonNullObject([1, 2, 3])).toBe(false);
+            expect(
+                isNonNullObject([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
         });
 
         it("should return false for primitives", () => {
@@ -465,7 +555,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
         it("should return false for arrays", () => {
             expect(isObject([])).toBe(false);
-            expect(isObject([1, 2, 3])).toBe(false);
+            expect(
+                isObject([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
         });
 
         it("should return false for primitives", () => {

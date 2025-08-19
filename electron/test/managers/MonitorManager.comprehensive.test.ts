@@ -423,7 +423,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             const siteWithNewMonitors = {
                 ...mockSite,
-                monitors: [...mockSite.monitors, newMonitor1, newMonitor2],
+                monitors: [
+                    ...mockSite.monitors,
+                    newMonitor1,
+                    newMonitor2,
+                ],
             };
 
             await manager.setupNewMonitors(siteWithNewMonitors, newMonitorIds);

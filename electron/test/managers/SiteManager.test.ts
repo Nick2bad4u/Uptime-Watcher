@@ -700,7 +700,11 @@ describe("SiteManager", () => {
         });
         describe("formatValidationErrors", () => {
             it("should format validation errors array", () => {
-                const errors = ["Error 1", "Error 2", "Error 3"];
+                const errors = [
+                    "Error 1",
+                    "Error 2",
+                    "Error 3",
+                ];
                 const formatted = manager["formatValidationErrors"](errors);
 
                 expect(formatted).toContain("Error 1");

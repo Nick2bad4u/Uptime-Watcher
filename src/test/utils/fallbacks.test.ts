@@ -172,7 +172,14 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle complex return types", () => {
-                const complexResult = { data: [1, 2, 3], status: "ok" };
+                const complexResult = {
+                    data: [
+                        1,
+                        2,
+                        3,
+                    ],
+                    status: "ok",
+                };
                 const operation = vi.fn().mockReturnValue(complexResult);
                 const fallback = { data: [], status: "error" };
 
@@ -183,7 +190,14 @@ describe("Fallback Utilities", () => {
                 );
 
                 expect(result).toBe(complexResult);
-                expect(result).toEqual({ data: [1, 2, 3], status: "ok" });
+                expect(result).toEqual({
+                    data: [
+                        1,
+                        2,
+                        3,
+                    ],
+                    status: "ok",
+                });
             });
 
             it("should handle operations returning falsy values", () => {

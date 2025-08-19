@@ -24,7 +24,7 @@
     "jsonSortOrder": "{\"*\": \"numeric\"}",
     "jsxSingleQuote": false,
     "language": "sqlite",
-    "multilineArraysWrapThreshold": 4,
+    "multilineArraysWrapThreshold": 2,
     "objectWrap": "preserve",
     "overrides": [
         {

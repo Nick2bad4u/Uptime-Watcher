@@ -93,7 +93,11 @@ const DynamicMonitorFields = ({
                 void loadMonitorTypes();
             }
         },
-        [isLoaded, lastError, loadMonitorTypes]
+        [
+            isLoaded,
+            lastError,
+            loadMonitorTypes,
+        ]
     );
 
     // Memoized default onChange handler to prevent new function creation on

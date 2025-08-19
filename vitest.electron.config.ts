@@ -49,7 +49,12 @@ const vitestConfig = defineConfig({
             ],
 
             provider: "istanbul" as const,
-            reporter: ["text", "json", "lcov", "html"],
+            reporter: [
+                "text",
+                "json",
+                "lcov",
+                "html",
+            ],
             reportOnFailure: true,
             reportsDirectory: "./coverage/electron",
             skipFull: false, // Don't skip full coverage collection

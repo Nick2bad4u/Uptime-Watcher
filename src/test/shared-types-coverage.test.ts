@@ -157,7 +157,12 @@ describe("Shared Types Coverage", () => {
 
             const validator: MonitorValidator = {
                 validateType: (type: string) =>
-                    ["http", "ping", "port", "dns"].includes(type),
+                    [
+                        "http",
+                        "ping",
+                        "port",
+                        "dns",
+                    ].includes(type),
                 validateInterval: (interval: number) =>
                     interval >= 30_000 && interval <= 3_600_000,
                 validateTimeout: (timeout: number) =>

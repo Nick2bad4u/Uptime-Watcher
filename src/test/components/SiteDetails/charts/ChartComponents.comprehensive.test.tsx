@@ -263,12 +263,28 @@ describe("ChartComponents", () => {
 
         it("should handle multiple datasets", () => {
             const multiDatasetData: UptimeChartData = {
-                labels: ["Up", "Down", "Pending"],
+                labels: [
+                    "Up",
+                    "Down",
+                    "Pending",
+                ],
                 datasets: [
                     {
-                        data: [85, 10, 5],
-                        backgroundColor: ["#10B981", "#EF4444", "#F59E0B"],
-                        borderColor: ["#059669", "#DC2626", "#D97706"],
+                        data: [
+                            85,
+                            10,
+                            5,
+                        ],
+                        backgroundColor: [
+                            "#10B981",
+                            "#EF4444",
+                            "#F59E0B",
+                        ],
+                        borderColor: [
+                            "#059669",
+                            "#DC2626",
+                            "#D97706",
+                        ],
                         borderWidth: 2,
                     },
                 ],
@@ -290,13 +306,29 @@ describe("ChartComponents", () => {
 
     describe("StatusChart", () => {
         const mockStatusData: StatusBarChartData = {
-            labels: ["Up", "Down", "Pending"],
+            labels: [
+                "Up",
+                "Down",
+                "Pending",
+            ],
             datasets: [
                 {
                     label: "Status Count",
-                    data: [150, 5, 2],
-                    backgroundColor: ["#10B981", "#EF4444", "#F59E0B"],
-                    borderColor: ["#059669", "#DC2626", "#D97706"],
+                    data: [
+                        150,
+                        5,
+                        2,
+                    ],
+                    backgroundColor: [
+                        "#10B981",
+                        "#EF4444",
+                        "#F59E0B",
+                    ],
+                    borderColor: [
+                        "#059669",
+                        "#DC2626",
+                        "#D97706",
+                    ],
                     borderWidth: 1,
                 },
             ],
@@ -393,20 +425,48 @@ describe("ChartComponents", () => {
 
         it("should handle stacked bar configuration", () => {
             const stackedData: StatusBarChartData = {
-                labels: ["Week 1", "Week 2", "Week 3"],
+                labels: [
+                    "Week 1",
+                    "Week 2",
+                    "Week 3",
+                ],
                 datasets: [
                     {
                         label: "Up",
-                        data: [40, 45, 50],
-                        backgroundColor: ["#10B981", "#10B981", "#10B981"],
-                        borderColor: ["#059669", "#059669", "#059669"],
+                        data: [
+                            40,
+                            45,
+                            50,
+                        ],
+                        backgroundColor: [
+                            "#10B981",
+                            "#10B981",
+                            "#10B981",
+                        ],
+                        borderColor: [
+                            "#059669",
+                            "#059669",
+                            "#059669",
+                        ],
                         borderWidth: 1,
                     },
                     {
                         label: "Down",
-                        data: [2, 1, 3],
-                        backgroundColor: ["#EF4444", "#EF4444", "#EF4444"],
-                        borderColor: ["#DC2626", "#DC2626", "#DC2626"],
+                        data: [
+                            2,
+                            1,
+                            3,
+                        ],
+                        backgroundColor: [
+                            "#EF4444",
+                            "#EF4444",
+                            "#EF4444",
+                        ],
+                        borderColor: [
+                            "#DC2626",
+                            "#DC2626",
+                            "#DC2626",
+                        ],
                         borderWidth: 1,
                     },
                 ],
@@ -507,11 +567,19 @@ describe("ChartComponents", () => {
         it("should accept proper chart data types", () => {
             // This test ensures that TypeScript types are working correctly
             const responseTimeData: ResponseTimeChartData = {
-                labels: ["1", "2", "3"],
+                labels: [
+                    "1",
+                    "2",
+                    "3",
+                ],
                 datasets: [
                     {
                         label: "Response Time",
-                        data: [100, 200, 300],
+                        data: [
+                            100,
+                            200,
+                            300,
+                        ],
                         borderColor: "blue",
                         backgroundColor: "lightblue",
                         fill: false,

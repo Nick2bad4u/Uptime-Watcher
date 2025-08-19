@@ -78,13 +78,21 @@ describe("Retry Utilities", () => {
                 const objectOperation = vi
                     .fn()
                     .mockResolvedValue({ key: "value" });
-                const arrayOperation = vi.fn().mockResolvedValue([1, 2, 3]);
+                const arrayOperation = vi.fn().mockResolvedValue([
+                    1,
+                    2,
+                    3,
+                ]);
 
                 expect(await withRetry(numberOperation)).toBe(42);
                 expect(await withRetry(objectOperation)).toEqual({
                     key: "value",
                 });
-                expect(await withRetry(arrayOperation)).toEqual([1, 2, 3]);
+                expect(await withRetry(arrayOperation)).toEqual([
+                    1,
+                    2,
+                    3,
+                ]);
             });
         });
 

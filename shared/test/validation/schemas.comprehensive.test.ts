@@ -335,7 +335,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should reject invalid ports", () => {
-            const invalidPorts = [0, -1, 65_536, 100_000]; // Port 0 is now correctly rejected as invalid
+            const invalidPorts = [
+                0,
+                -1,
+                65_536,
+                100_000,
+            ]; // Port 0 is now correctly rejected as invalid
 
             for (const port of invalidPorts) {
                 const monitor = {
@@ -1022,7 +1027,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should handle all valid status values", () => {
-            const statuses = ["up", "down", "pending", "paused"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as const;
 
             for (const status of statuses) {
                 const monitor = {
@@ -1172,7 +1182,11 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             it("should handle base schema fields for different monitor types", () => {
                 // Test base schema fields work for all monitor types
-                const types = ["http", "port", "ping"];
+                const types = [
+                    "http",
+                    "port",
+                    "ping",
+                ];
                 const baseFields = [
                     "id",
                     "type",

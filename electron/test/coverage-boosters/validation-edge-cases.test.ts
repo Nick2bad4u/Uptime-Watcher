@@ -392,11 +392,71 @@ describe("Validation Error Paths and Edge Cases", () => {
                 [3, 4],
                 [5],
             ]);
-            expect(chunkArray([1, 2, 3], 3)).toEqual([[1, 2, 3]]);
-            expect(chunkArray([1, 2, 3], 5)).toEqual([[1, 2, 3]]);
+            expect(
+                chunkArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    3
+                )
+            ).toEqual([
+                [
+                    1,
+                    2,
+                    3,
+                ],
+            ]);
+            expect(
+                chunkArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    5
+                )
+            ).toEqual([
+                [
+                    1,
+                    2,
+                    3,
+                ],
+            ]);
             expect(chunkArray([], 2)).toEqual([]);
-            expect(chunkArray([1, 2, 3], 0)).toEqual([[1, 2, 3]]);
-            expect(chunkArray([1, 2, 3], -1)).toEqual([[1, 2, 3]]);
+            expect(
+                chunkArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    0
+                )
+            ).toEqual([
+                [
+                    1,
+                    2,
+                    3,
+                ],
+            ]);
+            expect(
+                chunkArray(
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
+                    -1
+                )
+            ).toEqual([
+                [
+                    1,
+                    2,
+                    3,
+                ],
+            ]);
         });
     });
     describe("Date and time validation", () => {

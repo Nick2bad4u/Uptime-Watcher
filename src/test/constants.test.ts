@@ -371,7 +371,12 @@ describe("Application Constants", () => {
 
     describe("Type Definitions", () => {
         it("should have valid ChartTimeRange type", () => {
-            const validRanges: ChartTimeRange[] = ["1h", "24h", "7d", "30d"];
+            const validRanges: ChartTimeRange[] = [
+                "1h",
+                "24h",
+                "7d",
+                "30d",
+            ];
             for (const range of validRanges) {
                 expect(CHART_TIME_RANGES).toContain(range);
             }

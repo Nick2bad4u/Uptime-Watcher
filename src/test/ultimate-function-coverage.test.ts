@@ -65,7 +65,13 @@ describe("Ultimate Function Coverage - String Utilities", () => {
 
         // Test safeStringify with various data types
         expect(safeStringify({ key: "value" })).toBe('{"key":"value"}');
-        expect(safeStringify(["a", "b", "c"])).toBe('["a","b","c"]');
+        expect(
+            safeStringify([
+                "a",
+                "b",
+                "c",
+            ])
+        ).toBe('["a","b","c"]');
         expect(safeStringify("string")).toBe('"string"');
         expect(safeStringify(123)).toBe("123");
         expect(safeStringify(true)).toBe("true");
@@ -189,7 +195,12 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
         };
 
         const validateMonitorType = (type: string): boolean => {
-            const validTypes = ["http", "https", "tcp", "ping"];
+            const validTypes = [
+                "http",
+                "https",
+                "tcp",
+                "ping",
+            ];
             return validTypes.includes(type);
         };
 

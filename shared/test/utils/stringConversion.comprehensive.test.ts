@@ -46,7 +46,13 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
         });
 
         it("should serialize arrays", () => {
-            expect(safeStringify([1, 2, 3])).toBe("[1,2,3]");
+            expect(
+                safeStringify([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe("[1,2,3]");
             expect(safeStringify([])).toBe("[]");
             expect(safeStringify(["a", "b"])).toBe('["a","b"]');
         });
@@ -177,7 +183,11 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle Set objects", () => {
-            const set = new Set([1, 2, 3]);
+            const set = new Set([
+                1,
+                2,
+                3,
+            ]);
             const result = safeStringify(set);
             expect(result).toBeDefined();
         });

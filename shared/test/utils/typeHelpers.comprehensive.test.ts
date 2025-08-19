@@ -73,7 +73,13 @@ describe("Shared Type Helpers", () => {
             await annotate("Operation: Array Type Guard", "operation");
 
             expect(isArray([])).toBe(true);
-            expect(isArray([1, 2, 3])).toBe(true);
+            expect(
+                isArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(true);
             expect(isArray(["a", "b"])).toBe(true);
         });
 
@@ -265,7 +271,11 @@ describe("Shared Type Helpers", () => {
 
             const complexObject = {
                 user: { name: "test", age: 25 },
-                items: ["a", "b", "c"],
+                items: [
+                    "a",
+                    "b",
+                    "c",
+                ],
                 count: 123,
             };
 

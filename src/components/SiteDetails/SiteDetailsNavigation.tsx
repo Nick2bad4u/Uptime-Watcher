@@ -139,14 +139,22 @@ export const SiteDetailsNavigation = ({
         logTabChange("monitor-overview", {
             monitorId: selectedMonitorId,
         });
-    }, [logTabChange, selectedMonitorId, setActiveSiteDetailsTab]);
+    }, [
+        logTabChange,
+        selectedMonitorId,
+        setActiveSiteDetailsTab,
+    ]);
 
     const handleMonitorAnalyticsClick = useCallback(() => {
         setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
         logTabChange("monitor-analytics", {
             monitorId: selectedMonitorId,
         });
-    }, [logTabChange, selectedMonitorId, setActiveSiteDetailsTab]);
+    }, [
+        logTabChange,
+        selectedMonitorId,
+        setActiveSiteDetailsTab,
+    ]);
 
     const handleStopMonitoringClick = useCallback(() => {
         void handleStopMonitoring();

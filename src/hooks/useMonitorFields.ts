@@ -73,7 +73,11 @@ export function useMonitorFields(): UseMonitorFieldsResult {
                 void loadMonitorTypes();
             }
         },
-        [isLoaded, lastError, loadMonitorTypes]
+        [
+            isLoaded,
+            lastError,
+            loadMonitorTypes,
+        ]
     );
 
     const getFields = useCallback(

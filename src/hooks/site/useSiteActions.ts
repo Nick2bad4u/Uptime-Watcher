@@ -124,7 +124,12 @@ export function useSiteActions(
         } catch (error) {
             logger.site.error(site.identifier, ensureError(error));
         }
-    }, [monitor, site.identifier, site.name, startSiteMonitorMonitoring]);
+    }, [
+        monitor,
+        site.identifier,
+        site.name,
+        startSiteMonitorMonitoring,
+    ]);
 
     // Stop monitoring the site with proper logging
     const handleStopMonitoring = useCallback(() => {
@@ -151,7 +156,12 @@ export function useSiteActions(
         } catch (error) {
             logger.site.error(site.identifier, ensureError(error));
         }
-    }, [monitor, site.identifier, site.name, stopSiteMonitorMonitoring]);
+    }, [
+        monitor,
+        site.identifier,
+        site.name,
+        stopSiteMonitorMonitoring,
+    ]);
 
     // Start monitoring for all monitors in the site with proper logging
     const handleStartSiteMonitoring = useCallback((): void => {
@@ -167,7 +177,12 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [site.identifier, site.monitors.length, site.name, startSiteMonitoring]);
+    }, [
+        site.identifier,
+        site.monitors.length,
+        site.name,
+        startSiteMonitoring,
+    ]);
 
     // Stop monitoring for all monitors in the site with proper logging
     const handleStopSiteMonitoring = useCallback((): void => {
@@ -183,7 +198,12 @@ export function useSiteActions(
                 logger.site.error(site.identifier, ensureError(error));
             }
         })();
-    }, [site.identifier, site.monitors.length, site.name, stopSiteMonitoring]);
+    }, [
+        site.identifier,
+        site.monitors.length,
+        site.name,
+        stopSiteMonitoring,
+    ]);
 
     // Perform an immediate status check with enhanced logging
     const handleCheckNow = useCallback((): void => {
@@ -221,7 +241,12 @@ export function useSiteActions(
                 // Don't re-throw here since this is a fire-and-forget operation
             }
         })();
-    }, [checkSiteNow, monitor, site.identifier, site.name]);
+    }, [
+        checkSiteNow,
+        monitor,
+        site.identifier,
+        site.name,
+    ]);
 
     // Handle clicking on the site card to show details with navigation logging
     const handleCardClick = useCallback(() => {

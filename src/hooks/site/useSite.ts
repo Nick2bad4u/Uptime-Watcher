@@ -98,6 +98,11 @@ export function useSite(site: Site): UseSiteResult {
             ...actions,
             isLoading,
         }),
-        [actions, isLoading, monitorData, stats]
+        [
+            actions,
+            isLoading,
+            monitorData,
+            stats,
+        ]
     );
 }

@@ -12,7 +12,12 @@ import type { Monitor } from "../../../../../shared/types";
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
-    CHECK_INTERVALS: [30_000, 60_000, 300_000, 600_000],
+    CHECK_INTERVALS: [
+        30_000,
+        60_000,
+        300_000,
+        600_000,
+    ],
     TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000 },
     TRANSITION_ALL: "all 0.2s ease-in-out",
 }));

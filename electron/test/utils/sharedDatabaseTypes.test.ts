@@ -399,7 +399,11 @@ describe("Shared Database Types - Backend Coverage", () => {
                 numberProp: 123,
                 booleanProp: true,
                 objectProp: { nested: "value" },
-                arrayProp: [1, 2, 3],
+                arrayProp: [
+                    1,
+                    2,
+                    3,
+                ],
                 nullProp: null,
             };
 
@@ -411,7 +415,11 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
                 nested: "value",
             });
-            expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([1, 2, 3]);
+            expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([
+                1,
+                2,
+                3,
+            ]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
         });
         it("should handle empty row", async ({ task, annotate }) => {

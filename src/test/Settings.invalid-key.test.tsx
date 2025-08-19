@@ -70,7 +70,11 @@ const mockUseStore = {
 
 // Mock the theme hook
 const mockUseTheme = {
-    availableThemes: ["light", "dark", "system"] as ThemeName[],
+    availableThemes: [
+        "light",
+        "dark",
+        "system",
+    ] as ThemeName[],
     currentTheme: {
         colors: {
             background: {

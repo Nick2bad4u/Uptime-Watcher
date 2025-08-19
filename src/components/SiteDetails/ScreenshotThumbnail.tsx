@@ -108,7 +108,11 @@ export const ScreenshotThumbnail = ({
             event.preventDefault();
             openExternal(url, { siteName });
         },
-        [openExternal, siteName, url]
+        [
+            openExternal,
+            siteName,
+            url,
+        ]
     );
 
     const updateOverlayPosition = useCallback(() => {

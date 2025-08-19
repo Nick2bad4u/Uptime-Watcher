@@ -105,7 +105,12 @@ describe("Frontend siteStatus re-exports", () => {
             };
 
             const result = calculateSiteStatus(site);
-            expect(["up", "down", "mixed", "unknown"]).toContain(result);
+            expect([
+                "up",
+                "down",
+                "mixed",
+                "unknown",
+            ]).toContain(result);
         });
 
         it("should call re-exported getSiteDisplayStatus", () => {
@@ -135,7 +140,12 @@ describe("Frontend siteStatus re-exports", () => {
         });
 
         it("should call re-exported getSiteStatusVariant", () => {
-            const statuses: SiteStatus[] = ["up", "down", "mixed", "unknown"];
+            const statuses: SiteStatus[] = [
+                "up",
+                "down",
+                "mixed",
+                "unknown",
+            ];
 
             for (const status of statuses) {
                 const result = getSiteStatusVariant(status);
@@ -157,7 +167,11 @@ describe("Frontend siteStatus re-exports", () => {
             };
 
             const result = calculateSiteMonitoringStatus(site);
-            expect(["running", "stopped", "partial"]).toContain(result);
+            expect([
+                "running",
+                "stopped",
+                "partial",
+            ]).toContain(result);
         });
     });
 

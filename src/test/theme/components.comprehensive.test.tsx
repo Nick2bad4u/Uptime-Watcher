@@ -162,7 +162,11 @@ describe("Theme Components - Comprehensive Coverage", () => {
         });
 
         it("should render all button types", () => {
-            const types = ["button", "submit", "reset"] as const;
+            const types = [
+                "button",
+                "submit",
+                "reset",
+            ] as const;
 
             for (const type of types) {
                 const { unmount } = render(

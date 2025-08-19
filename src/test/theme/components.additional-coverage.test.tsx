@@ -178,7 +178,12 @@ describe("Theme Components - Missing Coverage", () => {
         });
 
         it("should render with different status values", () => {
-            const statuses = ["up", "down", "pending", "paused"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as const;
 
             for (const status of statuses) {
                 const { unmount } = render(
@@ -210,7 +215,11 @@ describe("Theme Components - Missing Coverage", () => {
         });
 
         it("should render with different size variants", () => {
-            const sizes = ["sm", "md", "lg"] as const;
+            const sizes = [
+                "sm",
+                "md",
+                "lg",
+            ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -238,7 +247,12 @@ describe("Theme Components - Missing Coverage", () => {
 
     describe("ThemedBadge - Additional Coverage", () => {
         it("should render with all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+            ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -273,7 +287,12 @@ describe("Theme Components - Missing Coverage", () => {
 
     describe("ThemedInput - Additional Coverage", () => {
         it("should render with different types", () => {
-            const types = ["text", "email", "password", "number"] as const;
+            const types = [
+                "text",
+                "email",
+                "password",
+                "number",
+            ] as const;
 
             for (const type of types) {
                 const { unmount } = render(<ThemedInput type={type} />);

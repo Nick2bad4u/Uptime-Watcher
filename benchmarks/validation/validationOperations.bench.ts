@@ -345,7 +345,11 @@ describe("Validation Operations Performance Benchmarks", () => {
                     "another string",
                     456,
                     false,
-                    [1, 2, 3],
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
                     { a: 1 },
                 ];
 

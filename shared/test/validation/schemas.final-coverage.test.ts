@@ -161,7 +161,12 @@ describe("Validation Schemas - Final Branch Coverage", () => {
 
     describe("Type-specific schema coverage", () => {
         it("should test all monitor types for complete coverage", () => {
-            const types = ["http", "port", "ping", "unknown"];
+            const types = [
+                "http",
+                "port",
+                "ping",
+                "unknown",
+            ];
 
             for (const type of types) {
                 const result = validateMonitorData(type, {});

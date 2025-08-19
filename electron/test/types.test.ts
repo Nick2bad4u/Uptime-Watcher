@@ -151,7 +151,11 @@ describe("Electron Types", () => {
                 "purpose"
             );
 
-            const validStatuses = ["up", "down", "pending"];
+            const validStatuses = [
+                "up",
+                "down",
+                "pending",
+            ];
 
             for (const status of validStatuses) {
                 const monitor: Monitor = {
@@ -166,7 +170,11 @@ describe("Electron Types", () => {
                     timeout: 0,
                 };
 
-                expect(["up", "down", "pending"]).toContain(monitor.status);
+                expect([
+                    "up",
+                    "down",
+                    "pending",
+                ]).toContain(monitor.status);
             }
         });
     });

@@ -640,7 +640,11 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             mockSitesCache.set("site1", site);
 
             // Start multiple operations concurrently
-            const [result1, result2, result3] = await Promise.all([
+            const [
+                result1,
+                result2,
+                result3,
+            ] = await Promise.all([
                 startAllMonitoring(config, false),
                 startMonitoringForSite(config, "site1"), // This returns false without callback
                 stopMonitoringForSite(config, "site1"), // This returns false without callback

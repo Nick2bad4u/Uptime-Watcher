@@ -77,7 +77,12 @@ export const SiteCardMetrics: React.NamedExoticComponent<SiteCardMetricsProperti
                     value: checkCount,
                 },
             ],
-            [checkCount, responseTime, status, uptime]
+            [
+                checkCount,
+                responseTime,
+                status,
+                uptime,
+            ]
         );
 
         return (

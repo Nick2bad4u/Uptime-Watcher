@@ -122,8 +122,16 @@ describe("Validation Types and Functions", () => {
             expect(numberResult.data).toBe(42);
 
             // Test with array
-            const arrayResult = createSuccessResult([1, 2, 3]);
-            expect(arrayResult.data).toEqual([1, 2, 3]);
+            const arrayResult = createSuccessResult([
+                1,
+                2,
+                3,
+            ]);
+            expect(arrayResult.data).toEqual([
+                1,
+                2,
+                3,
+            ]);
 
             // Test with boolean
             const booleanResult = createSuccessResult(true);

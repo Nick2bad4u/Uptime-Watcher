@@ -169,7 +169,11 @@ describe("Interfaces Utility", () => {
                 null,
                 undefined,
                 { object: "value" },
-                [1, 2, 3],
+                [
+                    1,
+                    2,
+                    3,
+                ],
                 new Date(),
                 Symbol("test"),
             ];

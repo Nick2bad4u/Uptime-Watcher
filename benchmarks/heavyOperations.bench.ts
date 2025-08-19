@@ -72,14 +72,32 @@ function generateSites(count: number, monitorsPerSite: number): Site[] {
 
             monitors.push({
                 id: `monitor-${i}-${j}`,
-                type: ["http", "ping", "port"][j % 3] as any,
+                type: [
+                    "http",
+                    "ping",
+                    "port",
+                ][j % 3] as any,
                 status: Math.random() > 0.05 ? "up" : "down",
                 responseTime: Math.floor(Math.random() * 500) + 10,
                 history,
                 monitoring: Math.random() > 0.1, // 90% active
-                checkInterval: [30, 60, 300][j % 3] * 1000,
-                timeout: [5, 10, 30][j % 3] * 1000,
-                retryAttempts: [1, 3, 5][j % 3],
+                checkInterval:
+                    [
+                        30,
+                        60,
+                        300,
+                    ][j % 3] * 1000,
+                timeout:
+                    [
+                        5,
+                        10,
+                        30,
+                    ][j % 3] * 1000,
+                retryAttempts: [
+                    1,
+                    3,
+                    5,
+                ][j % 3],
             });
         }
 

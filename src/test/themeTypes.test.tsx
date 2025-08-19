@@ -126,7 +126,11 @@ describe("Theme Types Module", () => {
         it("should create valid ThemeTypography object", () => {
             const typography: ThemeTypography = {
                 fontFamily: {
-                    sans: ["Inter", "system-ui", "sans-serif"],
+                    sans: [
+                        "Inter",
+                        "system-ui",
+                        "sans-serif",
+                    ],
                     mono: ["JetBrains Mono", "monospace"],
                 },
                 fontSize: {

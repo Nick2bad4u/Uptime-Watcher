@@ -822,7 +822,11 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             const complexData = {
                 nested: {
-                    data: ["item1", "item2", "item3"],
+                    data: [
+                        "item1",
+                        "item2",
+                        "item3",
+                    ],
                 },
             };
 

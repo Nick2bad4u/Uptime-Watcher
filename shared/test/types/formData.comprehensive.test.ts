@@ -275,7 +275,11 @@ describe("FormData Types", () => {
             };
 
             // All types should have base properties
-            for (const data of [httpData, pingData, portData]) {
+            for (const data of [
+                httpData,
+                pingData,
+                portData,
+            ]) {
                 expect(data).toHaveProperty("checkInterval");
                 expect(data).toHaveProperty("timeout");
                 expect(data).toHaveProperty("retryAttempts");

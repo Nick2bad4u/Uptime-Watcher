@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable no-magic-numbers */
 /* eslint-disable no-inline-comments */
 /**
@@ -160,25 +161,49 @@ export default {
      * Custom rules for enhanced commit message validation
      */
     rules: {
-        "body-case": [1, "always", "sentence-case"],
+        "body-case": [
+            1,
+            "always",
+            "sentence-case",
+        ],
 
         // Body rules for detailed commits
         "body-leading-blank": [1, "always"],
 
-        "body-max-line-length": [2, "always", 160],
+        "body-max-line-length": [
+            2,
+            "always",
+            160,
+        ],
 
         // Footer rules for breaking changes and issue references
         "footer-leading-blank": [1, "always"],
-        "footer-max-line-length": [2, "always", 100],
+        "footer-max-line-length": [
+            2,
+            "always",
+            100,
+        ],
         // Header rules
-        "header-max-length": [2, "always", 100],
-        "header-min-length": [2, "always", 10],
+        "header-max-length": [
+            2,
+            "always",
+            100,
+        ],
+        "header-min-length": [
+            2,
+            "always",
+            10,
+        ],
 
         "header-trim": [2, "always"],
         // References for issue tracking integration
         "references-empty": [0, "never"],
         // Scope case enforcement
-        "scope-case": [2, "always", "kebab-case"],
+        "scope-case": [
+            2,
+            "always",
+            "kebab-case",
+        ],
 
         // Scope validation - project-specific scopes
         "scope-enum": [
@@ -237,16 +262,37 @@ export default {
         "subject-case": [
             2,
             "never",
-            ["sentence-case", "start-case", "pascal-case", "upper-case"],
+            [
+                "sentence-case",
+                "start-case",
+                "pascal-case",
+                "upper-case",
+            ],
         ],
 
         "subject-empty": [0, "never"],
-        "subject-full-stop": [2, "never", "."],
+        "subject-full-stop": [
+            2,
+            "never",
+            ".",
+        ],
 
-        "subject-max-length": [2, "always", 100],
-        "subject-min-length": [2, "always", 3],
+        "subject-max-length": [
+            2,
+            "always",
+            100,
+        ],
+        "subject-min-length": [
+            2,
+            "always",
+            3,
+        ],
         // Type and case enforcement
-        "type-case": [2, "always", "lower-case"],
+        "type-case": [
+            2,
+            "always",
+            "lower-case",
+        ],
         "type-empty": [0, "never"],
         // Type validation - allowed commit types
         "type-enum": [
@@ -266,7 +312,15 @@ export default {
                 "🧪 [test]",
             ],
         ],
-        "type-max-length": [2, "always", 20],
-        "type-min-length": [2, "always", 3],
+        "type-max-length": [
+            2,
+            "always",
+            20,
+        ],
+        "type-min-length": [
+            2,
+            "always",
+            3,
+        ],
     },
 };

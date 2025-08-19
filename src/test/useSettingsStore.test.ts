@@ -356,7 +356,11 @@ describe("useSettingsStore", () => {
 
     describe("Type Safety", () => {
         it("should accept valid theme values", () => {
-            const validThemes = ["system", "light", "dark"] as const;
+            const validThemes = [
+                "system",
+                "light",
+                "dark",
+            ] as const;
 
             for (const theme of validThemes) {
                 useSettingsStore.getState().updateSettings({ theme });

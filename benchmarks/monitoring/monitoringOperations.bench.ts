@@ -46,9 +46,22 @@ function generateMonitorConfigs(count: number): MonitorConfig[] {
 
     for (let i = 0; i < count; i++) {
         configs.push({
-            timeout: [5000, 10000, 30000][i % 3],
-            retryAttempts: [1, 3, 5][i % 3],
-            checkInterval: [60, 300, 600][i % 3] * 1000,
+            timeout: [
+                5000,
+                10000,
+                30000,
+            ][i % 3],
+            retryAttempts: [
+                1,
+                3,
+                5,
+            ][i % 3],
+            checkInterval:
+                [
+                    60,
+                    300,
+                    600,
+                ][i % 3] * 1000,
         });
     }
 

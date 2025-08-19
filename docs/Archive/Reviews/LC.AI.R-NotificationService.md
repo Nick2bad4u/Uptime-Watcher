@@ -194,11 +194,10 @@ public notifyMonitorUp(site: Site, monitorId: string): void {
 
 
 
-/** * Update the notification configuration. * * @param config - Partial configuration object with settings to update * * @remarks * Allows runtime modification of notification behavior without creating * a new service instance. *
- * **Partial Update Behavior:**
- * - Only properties specified in the config parameter are updated
- * - Omitted properties retain their current values
- * - No properties are reset to default values
+
+
+
+/** * Update the notification configuration. * * @param config - Partial configuration object with settings to update * * @remarks * Allows runtime modification of notification behavior without creating * a new service instance. * * **Partial Update Behavior:** * - Only properties specified in the config parameter are updated * - Omitted properties retain their current values * - No properties are reset to default values
  * - Changes take effect immediately for subsequent notifications
  *
  * **Example:**

@@ -8,7 +8,11 @@ describe("AddSiteForm Component Coverage Tests", () => {
     describe("Component Logic Tests", () => {
         it("should validate add mode values", () => {
             const validModes = ["existing", "new"];
-            const invalidModes = ["invalid", "", "other"];
+            const invalidModes = [
+                "invalid",
+                "",
+                "other",
+            ];
 
             for (const mode of validModes) {
                 expect(validModes.includes(mode)).toBe(true);
@@ -262,7 +266,12 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
     describe("Constants", () => {
         it("should use correct check intervals", () => {
-            const CHECK_INTERVALS = [5000, 10_000, 30_000, 60_000];
+            const CHECK_INTERVALS = [
+                5000,
+                10_000,
+                30_000,
+                60_000,
+            ];
 
             expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);

@@ -259,7 +259,11 @@ describe("Monitor Forms Types Coverage Tests", () => {
     describe("Form Validation", () => {
         it("should validate required fields", () => {
             const requiredFields = ["url"];
-            const _optionalFields = ["name", "timeout", "checkInterval"];
+            const _optionalFields = [
+                "name",
+                "timeout",
+                "checkInterval",
+            ];
             void _optionalFields;
 
             const formData = {
@@ -350,7 +354,12 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should reject invalid HTTP methods", () => {
-            const invalidMethods = ["PATCH", "OPTIONS", "TRACE", "CONNECT"];
+            const invalidMethods = [
+                "PATCH",
+                "OPTIONS",
+                "TRACE",
+                "CONNECT",
+            ];
 
             for (const method of invalidMethods) {
                 const isValid = [

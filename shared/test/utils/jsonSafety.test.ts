@@ -291,7 +291,11 @@ describe("jsonSafety utilities", () => {
         });
 
         it("should successfully stringify arrays", () => {
-            const data = [1, 2, 3];
+            const data = [
+                1,
+                2,
+                3,
+            ];
             const result = safeJsonStringify(data);
 
             expect(result.success).toBe(true);

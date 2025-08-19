@@ -43,7 +43,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     3,
                     3,
                 ])
-            ).toEqual([1, 2, 3]);
+            ).toEqual([
+                1,
+                2,
+                3,
+            ]);
             expect(
                 chunk(
                     [
@@ -55,7 +59,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     ],
                     2
                 )
-            ).toEqual([[1, 2], [3, 4], [5]]);
+            ).toEqual([
+                [1, 2],
+                [3, 4],
+                [5],
+            ]);
         });
 
         it("should handle object operations", () => {
@@ -101,7 +109,12 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const formatBytes = (bytes: number) => {
                 if (bytes === 0) return "0 Bytes";
                 const k = 1024;
-                const sizes = ["Bytes", "KB", "MB", "GB"];
+                const sizes = [
+                    "Bytes",
+                    "KB",
+                    "MB",
+                    "GB",
+                ];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return (
                     Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +
@@ -242,7 +255,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }),
             ]);
 
-            expect(results).toEqual([1, 2, 3]);
+            expect(results).toEqual([
+                1,
+                2,
+                3,
+            ]);
         });
 
         it("should handle cache with expiration", () => {
@@ -353,7 +370,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 name: "Test",
                 nested: {
                     value: 42,
-                    array: [1, 2, 3],
+                    array: [
+                        1,
+                        2,
+                        3,
+                    ],
                 },
                 date: new Date(),
             };
@@ -429,7 +450,15 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 </ul>
             );
 
-            render(<ListComponent items={["Item 1", "Item 2", "Item 3"]} />);
+            render(
+                <ListComponent
+                    items={[
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                    ]}
+                />
+            );
             expect(screen.getByText("Item 1")).toBeInTheDocument();
             expect(screen.getByText("Item 2")).toBeInTheDocument();
             expect(screen.getByText("Item 3")).toBeInTheDocument();
@@ -618,7 +647,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 operation3(),
             ]);
 
-            expect(results).toEqual(["result1", "result2", "result3"]);
+            expect(results).toEqual([
+                "result1",
+                "result2",
+                "result3",
+            ]);
         });
 
         it("should handle race conditions", async () => {

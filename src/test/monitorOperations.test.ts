@@ -284,7 +284,11 @@ describe("monitorOperations", () => {
         });
 
         it("should validate all valid status values", () => {
-            const statusValues = ["pending", "up", "down"];
+            const statusValues = [
+                "pending",
+                "up",
+                "down",
+            ];
 
             for (const status of statusValues) {
                 const monitor = {
@@ -325,7 +329,11 @@ describe("monitorOperations", () => {
         });
 
         it("should preserve valid status values", () => {
-            const statusValues = ["pending", "up", "down"] as const;
+            const statusValues = [
+                "pending",
+                "up",
+                "down",
+            ] as const;
 
             for (const status of statusValues) {
                 const result = normalizeMonitor({ status });

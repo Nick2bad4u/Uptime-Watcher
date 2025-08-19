@@ -170,7 +170,11 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([record.id, record.name, record.createdAt]);
+    stmt.run([
+     record.id,
+     record.name,
+     record.createdAt,
+    ]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} records (internal)`

@@ -207,7 +207,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             it("should return error for array values with content", () => {
                 const result = IpcValidators.requiredObject(
-                    [1, 2, 3],
+                    [
+                        1,
+                        2,
+                        3,
+                    ],
                     "testParam"
                 );
                 expect(result).toBe("testParam must be a valid object");
@@ -355,7 +359,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             it("should handle complex metadata objects", () => {
                 const metadata = {
                     nested: { key: "value" },
-                    array: [1, 2, 3],
+                    array: [
+                        1,
+                        2,
+                        3,
+                    ],
                     timestamp: new Date().toISOString(),
                 };
                 const result = createErrorResponse(
@@ -459,12 +467,22 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle array data", () => {
-                const arrayData = [1, 2, 3, "test"];
+                const arrayData = [
+                    1,
+                    2,
+                    3,
+                    "test",
+                ];
                 const result = createSuccessResponse(arrayData);
 
                 expect(result).toEqual({
                     success: true,
-                    data: [1, 2, 3, "test"],
+                    data: [
+                        1,
+                        2,
+                        3,
+                        "test",
+                    ],
                 });
             });
         });

@@ -403,7 +403,12 @@ describe("performPortCheckWithRetry", () => {
         });
 
         it("should handle different timeout values", async () => {
-            const timeouts = [100, 1000, 5000, 30_000];
+            const timeouts = [
+                100,
+                1000,
+                5000,
+                30_000,
+            ];
 
             for (const timeout of timeouts) {
                 // Arrange

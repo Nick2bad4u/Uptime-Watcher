@@ -120,7 +120,11 @@ describe("main.ts - Electron Main Process", () => {
     });
     describe("Logging Configuration", () => {
         it("should configure debug logging when --debug flag is present", async () => {
-            process.argv = ["node", "main.js", "--debug"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--debug",
+            ];
 
             // Import main.ts to trigger initialization
             await import("../main");
@@ -130,7 +134,11 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.console.level).toBe("debug");
         });
         it("should configure production logging when --log-production flag is present", async () => {
-            process.argv = ["node", "main.js", "--log-production"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-production",
+            ];
 
             await import("../main");
 
@@ -138,7 +146,11 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.console.level).toBe("info");
         });
         it("should configure info logging when --log-info flag is present", async () => {
-            process.argv = ["node", "main.js", "--log-info"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-info",
+            ];
 
             await import("../main");
 
@@ -164,7 +176,11 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.console.level).toBe("info");
         });
         it("should handle --log-prod flag as alias for --log-production", async () => {
-            process.argv = ["node", "main.js", "--log-prod"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-prod",
+            ];
 
             await import("../main");
 
@@ -172,7 +188,11 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.console.level).toBe("info");
         });
         it("should handle --log-debug flag as alias for --debug", async () => {
-            process.argv = ["node", "main.js", "--log-debug"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-debug",
+            ];
 
             await import("../main");
 

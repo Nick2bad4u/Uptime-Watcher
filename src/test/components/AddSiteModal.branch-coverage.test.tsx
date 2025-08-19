@@ -173,7 +173,11 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 },
                 typography: {
                     fontFamily: {
-                        sans: ["Inter", "system-ui", "sans-serif"],
+                        sans: [
+                            "Inter",
+                            "system-ui",
+                            "sans-serif",
+                        ],
                         mono: ["JetBrains Mono", "monospace"],
                     },
                     fontSize: {

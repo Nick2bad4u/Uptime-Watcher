@@ -45,7 +45,12 @@ describe("Monitor Types Utility", () => {
 
             // Should only contain known base types
             for (const type of types) {
-                expect(["http", "port", "ping", "dns"]).toContain(type);
+                expect([
+                    "http",
+                    "port",
+                    "ping",
+                    "dns",
+                ]).toContain(type);
             }
         });
 

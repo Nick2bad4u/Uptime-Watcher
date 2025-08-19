@@ -28,7 +28,11 @@ describe("Monitor Configuration Types", () => {
         it("should define proper alerting structure", () => {
             const config: AdvancedMonitorConfig = {
                 alerting: {
-                    alertTypes: ["email", "slack", "webhook"],
+                    alertTypes: [
+                        "email",
+                        "slack",
+                        "webhook",
+                    ],
                     failureThreshold: 3,
                     messageTemplate: "Site {name} is down: {error}",
                     recoveryThreshold: 2,
@@ -465,7 +469,11 @@ describe("Monitor Configuration Types", () => {
                 name: "Web Server Monitor",
                 description: "Monitor a web server endpoint",
                 category: "Web Services",
-                tags: ["http", "web", "server"],
+                tags: [
+                    "http",
+                    "web",
+                    "server",
+                ],
                 config: {
                     type: "http",
                     method: "GET",
@@ -479,7 +487,11 @@ describe("Monitor Configuration Types", () => {
             expect(template.name).toBe("Web Server Monitor");
             expect(template.description).toBe("Monitor a web server endpoint");
             expect(template.category).toBe("Web Services");
-            expect(template.tags).toEqual(["http", "web", "server"]);
+            expect(template.tags).toEqual([
+                "http",
+                "web",
+                "server",
+            ]);
             expect(template.config.type).toBe("http");
         });
 
@@ -489,7 +501,11 @@ describe("Monitor Configuration Types", () => {
                 name: "Database Port Monitor",
                 description: "Monitor database port connectivity",
                 category: "Database",
-                tags: ["port", "database", "connectivity"],
+                tags: [
+                    "port",
+                    "database",
+                    "connectivity",
+                ],
                 config: {
                     type: "port",
                     port: 5432,
@@ -498,7 +514,11 @@ describe("Monitor Configuration Types", () => {
             };
 
             expect(template.category).toBe("Database");
-            expect(template.tags).toEqual(["port", "database", "connectivity"]);
+            expect(template.tags).toEqual([
+                "port",
+                "database",
+                "connectivity",
+            ]);
         });
     });
 

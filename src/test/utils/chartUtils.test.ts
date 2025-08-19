@@ -464,8 +464,21 @@ describe("Chart Utilities", () => {
             const complexConfig = {
                 type: "line",
                 data: {
-                    labels: ["Jan", "Feb", "Mar"],
-                    datasets: [{ label: "Sales", data: [10, 20, 30] }],
+                    labels: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                    ],
+                    datasets: [
+                        {
+                            label: "Sales",
+                            data: [
+                                10,
+                                20,
+                                30,
+                            ],
+                        },
+                    ],
                 },
                 options: {
                     responsive: true,

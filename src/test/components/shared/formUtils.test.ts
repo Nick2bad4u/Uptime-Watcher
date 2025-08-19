@@ -321,7 +321,12 @@ describe("Form Utilities", () => {
 
         describe("oneOfNumbers", () => {
             it("should create validator that accepts allowed numbers", () => {
-                const validator = validationPatterns.oneOfNumbers([1, 3, 5, 7]);
+                const validator = validationPatterns.oneOfNumbers([
+                    1,
+                    3,
+                    5,
+                    7,
+                ]);
 
                 expect(validator(1)).toBe(true);
                 expect(validator(3)).toBe(true);
@@ -330,7 +335,12 @@ describe("Form Utilities", () => {
             });
 
             it("should create validator that rejects non-allowed numbers", () => {
-                const validator = validationPatterns.oneOfNumbers([1, 3, 5, 7]);
+                const validator = validationPatterns.oneOfNumbers([
+                    1,
+                    3,
+                    5,
+                    7,
+                ]);
 
                 expect(validator(2)).toBe(false);
                 expect(validator(4)).toBe(false);

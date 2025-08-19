@@ -545,7 +545,11 @@ describe("Cache Utilities", () => {
             const complexObject = {
                 id: 1,
                 data: { nested: "value" },
-                array: [1, 2, 3],
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
             };
             const objectCache = new TypedCache<string, typeof complexObject>();
             mockFetcher.mockResolvedValue(complexObject);

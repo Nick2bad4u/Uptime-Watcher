@@ -119,7 +119,12 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
                 VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
                 "Retry attempts cannot exceed 10"
             ),
-        status: z.enum(["up", "down", "pending", "paused"]),
+        status: z.enum([
+            "up",
+            "down",
+            "pending",
+            "paused",
+        ]),
         timeout: z
             .number()
             .min(
@@ -130,7 +135,12 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
                 VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
                 "Timeout cannot exceed 300 seconds"
             ),
-        type: z.enum(["http", "port", "ping", "dns"]),
+        type: z.enum([
+            "http",
+            "port",
+            "ping",
+            "dns",
+        ]),
     })
     .strict();
 

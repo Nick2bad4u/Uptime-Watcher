@@ -80,13 +80,23 @@ describe("HTTP Status Utils", () => {
 
         it("should provide consistent behavior for common monitoring scenarios", () => {
             // Common success scenarios
-            const successCodes = [200, 201, 202, 204];
+            const successCodes = [
+                200,
+                201,
+                202,
+                204,
+            ];
             for (const code of successCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
             }
 
             // Common redirect scenarios
-            const redirectCodes = [301, 302, 307, 308];
+            const redirectCodes = [
+                301,
+                302,
+                307,
+                308,
+            ];
             for (const code of redirectCodes) {
                 expect(determineMonitorStatus(code)).toBe("up");
             }
@@ -104,7 +114,12 @@ describe("HTTP Status Utils", () => {
             }
 
             // Common server error scenarios (site is down/not responding properly)
-            const serverErrorCodes = [500, 502, 503, 504];
+            const serverErrorCodes = [
+                500,
+                502,
+                503,
+                504,
+            ];
             for (const code of serverErrorCodes) {
                 expect(determineMonitorStatus(code)).toBe("down");
             }

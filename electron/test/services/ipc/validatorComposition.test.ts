@@ -102,7 +102,11 @@ describe("Validator Composition Utilities", () => {
             const composed = composeValidators([validator1, validator2]);
             const result = composed(["test"]);
 
-            expect(result).toEqual(["Error 1", "Error 2", "Error 3"]);
+            expect(result).toEqual([
+                "Error 1",
+                "Error 2",
+                "Error 3",
+            ]);
         });
         it("should handle empty validators array", () => {
             const composed = composeValidators([]);

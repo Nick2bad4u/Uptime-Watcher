@@ -223,7 +223,11 @@ describe("Final 90% Function Coverage Push", () => {
                 { type: "A", value: 3 },
             ];
 
-            expect(unique(testArray)).toEqual([1, 2, 3]);
+            expect(unique(testArray)).toEqual([
+                1,
+                2,
+                3,
+            ]);
             expect(groupBy(testObjects, "type")).toHaveProperty("A");
             expect(groupBy(testObjects, "type")).toHaveProperty("B");
         });

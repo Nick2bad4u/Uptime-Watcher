@@ -104,7 +104,11 @@ describe("main.ts - Missing Branch Coverage", () => {
     });
     describe("Command Line Argument Processing", () => {
         it("should handle --debug flag", async () => {
-            process.argv = ["node", "main.js", "--debug"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--debug",
+            ];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
                 configurable: true,
@@ -119,7 +123,11 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.console.level).toBe("debug");
         });
         it("should handle --log-debug flag", async () => {
-            process.argv = ["node", "main.js", "--log-debug"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-debug",
+            ];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
                 configurable: true,
@@ -134,7 +142,11 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.console.level).toBe("debug");
         });
         it("should handle --log-production flag", async () => {
-            process.argv = ["node", "main.js", "--log-production"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-production",
+            ];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
                 configurable: true,
@@ -149,7 +161,11 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.console.level).toBe("info");
         });
         it("should handle --log-info flag", async () => {
-            process.argv = ["node", "main.js", "--log-info"];
+            process.argv = [
+                "node",
+                "main.js",
+                "--log-info",
+            ];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
                 configurable: true,

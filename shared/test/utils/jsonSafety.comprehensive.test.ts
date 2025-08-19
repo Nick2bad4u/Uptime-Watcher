@@ -91,7 +91,11 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const result = safeJsonParse("[1,2,3]", validator);
 
             expect(result.success).toBe(true);
-            expect(result.data).toEqual([1, 2, 3]);
+            expect(result.data).toEqual([
+                1,
+                2,
+                3,
+            ]);
         });
     });
 
@@ -174,7 +178,11 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
 
             expect(result.success).toBe(true);
-            expect(result.data).toEqual(["a", "b", "c"]);
+            expect(result.data).toEqual([
+                "a",
+                "b",
+                "c",
+            ]);
         });
     });
 
@@ -210,7 +218,12 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle arrays", () => {
-            const arr = [1, 2, 3, "test"];
+            const arr = [
+                1,
+                2,
+                3,
+                "test",
+            ];
             const result = safeJsonStringifyWithFallback(arr, "fallback");
             expect(result).toBe('[1,2,3,"test"]');
         });
@@ -242,7 +255,11 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             const complex = {
                 level1: {
                     level2: {
-                        array: [1, 2, { nested: true }],
+                        array: [
+                            1,
+                            2,
+                            { nested: true },
+                        ],
                         date: new Date("2023-01-01"),
                     },
                 },
@@ -392,7 +409,12 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
         });
 
         it("should stringify arrays successfully", () => {
-            const arr = [1, 2, 3, "test"];
+            const arr = [
+                1,
+                2,
+                3,
+                "test",
+            ];
             const result = safeJsonStringify(arr);
             expect(result.success).toBe(true);
             expect(result.data).toBe('[1,2,3,"test"]');

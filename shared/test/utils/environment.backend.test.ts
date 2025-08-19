@@ -62,7 +62,11 @@ describe("environment utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const envValues = ["development", "production", "test"] as const;
+            const envValues = [
+                "development",
+                "production",
+                "test",
+            ] as const;
 
             for (const env of envValues) {
                 process.env["NODE_ENV"] = env;
@@ -174,7 +178,11 @@ describe("environment utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const envValues = ["development", "production", "test"] as const;
+            const envValues = [
+                "development",
+                "production",
+                "test",
+            ] as const;
 
             for (const env of envValues) {
                 process.env["NODE_ENV"] = env;
@@ -386,7 +394,11 @@ describe("environment utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const environments = ["development", "production", "test"] as const;
+            const environments = [
+                "development",
+                "production",
+                "test",
+            ] as const;
 
             for (const env of environments) {
                 process.env["NODE_ENV"] = env;

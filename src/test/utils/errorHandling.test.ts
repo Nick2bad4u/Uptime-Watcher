@@ -158,7 +158,14 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should return complex object results", async () => {
-                const complexResult = { data: [1, 2, 3], status: "ok" };
+                const complexResult = {
+                    data: [
+                        1,
+                        2,
+                        3,
+                    ],
+                    status: "ok",
+                };
                 const operation = vi.fn().mockResolvedValue(complexResult);
 
                 const result = await withUtilityErrorHandling(

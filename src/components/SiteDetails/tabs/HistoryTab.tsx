@@ -261,7 +261,11 @@ export const HistoryTab = ({
                 totalRecords: historyLength,
             });
         },
-        [historyLength, selectedMonitor.id, selectedMonitor.type]
+        [
+            historyLength,
+            selectedMonitor.id,
+            selectedMonitor.type,
+        ]
     );
 
     const handleHistoryLimitChange = useCallback(
@@ -278,7 +282,11 @@ export const HistoryTab = ({
                 totalRecords: historyLength,
             });
         },
-        [backendLimit, historyLength, selectedMonitor.id]
+        [
+            backendLimit,
+            historyLength,
+            selectedMonitor.id,
+        ]
     );
 
     const filterIcon = useMemo(
@@ -299,7 +307,13 @@ export const HistoryTab = ({
                             Filter by status:
                         </ThemedText>
                         <div className="flex space-x-1">
-                            {(["all", "up", "down"] as const).map((filter) => (
+                            {(
+                                [
+                                    "all",
+                                    "up",
+                                    "down",
+                                ] as const
+                            ).map((filter) => (
                                 <ThemedButton
                                     className="capitalize"
                                     key={filter}

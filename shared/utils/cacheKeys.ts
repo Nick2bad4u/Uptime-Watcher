@@ -65,7 +65,11 @@ function createCacheKey(
     operation?: string
 ): string {
     if (operation) {
-        return [prefix, operation, identifier].join(KEY_SEPARATOR);
+        return [
+            prefix,
+            operation,
+            identifier,
+        ].join(KEY_SEPARATOR);
     }
     return [prefix, identifier].join(KEY_SEPARATOR);
 }
@@ -369,7 +373,11 @@ export function parseCacheKey(key: StandardizedCacheKey): {
         };
     }
 
-    const [prefix, operation, identifier] = parts;
+    const [
+        prefix,
+        operation,
+        identifier,
+    ] = parts;
 
     if (!prefix || !operation || !identifier) {
         throw new Error(`Invalid cache key format: ${key}`);

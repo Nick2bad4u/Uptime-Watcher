@@ -1004,7 +1004,11 @@ describe("Monitor Validation Utilities", () => {
         it("should handle multiple validation errors across functions", async () => {
             // Test that each function properly handles and propagates multiple errors
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
-                errors: ["Error 1", "Error 2", "Error 3"],
+                errors: [
+                    "Error 1",
+                    "Error 2",
+                    "Error 3",
+                ],
                 success: false,
                 warnings: ["Warning 1", "Warning 2"],
             });

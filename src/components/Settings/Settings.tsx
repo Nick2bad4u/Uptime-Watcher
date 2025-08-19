@@ -273,7 +273,11 @@ export const Settings = ({
                 }`
             );
         }
-    }, [clearError, downloadSQLiteBackup, setError]);
+    }, [
+        clearError,
+        downloadSQLiteBackup,
+        setError,
+    ]);
 
     // Click handlers for buttons
     const handleSyncNowClick = useCallback(() => {

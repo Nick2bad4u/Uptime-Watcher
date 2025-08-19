@@ -187,7 +187,11 @@ describe("shared/types type guards and validators", () => {
         it("should return false for monitor with invalid activeOperations", () => {
             const invalidMonitor = {
                 ...validMonitor,
-                activeOperations: ["valid", 123, "invalid"], // Contains non-string
+                activeOperations: [
+                    "valid",
+                    123,
+                    "invalid",
+                ], // Contains non-string
             };
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
@@ -195,7 +199,11 @@ describe("shared/types type guards and validators", () => {
         it("should return false for monitor with activeOperations containing empty strings", () => {
             const invalidMonitor = {
                 ...validMonitor,
-                activeOperations: ["valid", "", "   "], // Contains empty/whitespace strings
+                activeOperations: [
+                    "valid",
+                    "",
+                    "   ",
+                ], // Contains empty/whitespace strings
             };
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });

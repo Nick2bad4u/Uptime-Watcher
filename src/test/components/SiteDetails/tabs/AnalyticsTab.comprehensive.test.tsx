@@ -139,11 +139,19 @@ describe("AnalyticsTab", () => {
         overrides?: Partial<AnalyticsTabProperties>
     ): AnalyticsTabProperties => {
         const mockLineChartData: ResponseTimeChartData = {
-            labels: ["10:00", "10:15", "10:30"],
+            labels: [
+                "10:00",
+                "10:15",
+                "10:30",
+            ],
             datasets: [
                 {
                     label: "Response Time",
-                    data: [100, 120, 110],
+                    data: [
+                        100,
+                        120,
+                        110,
+                    ],
                     borderColor: "#3B82F6",
                     backgroundColor: "#3B82F6",
                     fill: false,

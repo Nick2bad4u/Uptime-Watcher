@@ -91,7 +91,12 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return the status when all monitors have the same status", () => {
-        const testCases: MonitorStatus[] = ["up", "down", "pending", "paused"];
+        const testCases: MonitorStatus[] = [
+            "up",
+            "down",
+            "pending",
+            "paused",
+        ];
 
         for (const status of testCases) {
             const site = createTestSite([
@@ -125,7 +130,12 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return single status for single monitor", () => {
-        const testCases: MonitorStatus[] = ["up", "down", "pending", "paused"];
+        const testCases: MonitorStatus[] = [
+            "up",
+            "down",
+            "pending",
+            "paused",
+        ];
 
         for (const status of testCases) {
             const site = createTestSite([{ monitoring: true, status }]);
@@ -170,7 +180,11 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should return operational status when all monitors are running", () => {
-        const testCases: MonitorStatus[] = ["up", "down", "pending"];
+        const testCases: MonitorStatus[] = [
+            "up",
+            "down",
+            "pending",
+        ];
 
         for (const status of testCases) {
             const site = createTestSite([
@@ -355,7 +369,11 @@ describe("Edge Cases and Complex Scenarios", () => {
     });
 
     it("should handle all monitors with same non-'up' status", () => {
-        const statuses: MonitorStatus[] = ["down", "pending", "paused"];
+        const statuses: MonitorStatus[] = [
+            "down",
+            "pending",
+            "paused",
+        ];
 
         for (const status of statuses) {
             const site = createTestSite([

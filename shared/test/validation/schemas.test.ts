@@ -134,7 +134,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should validate all status enums", () => {
-            const statuses = ["up", "down", "pending", "paused"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ] as const;
             for (const status of statuses) {
                 const validData = {
                     checkInterval: 30_000,
@@ -446,7 +451,12 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should reject invalid ports", () => {
-            const invalidPorts = [0, -1, 65_536, 100_000];
+            const invalidPorts = [
+                0,
+                -1,
+                65_536,
+                100_000,
+            ];
 
             for (const port of invalidPorts) {
                 const invalidData = {

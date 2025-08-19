@@ -37,7 +37,11 @@ const BASE_URL =
 // You can download Github Wiki Pages by appending ".md" to the wiki page URL.
 // @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
 // use "API.md" as the page name.
-const PAGES = ["examples/example.js", "examples/example2.html", "README.md"];
+const PAGES = [
+    "examples/example.js",
+    "examples/example2.html",
+    "README.md",
+];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format

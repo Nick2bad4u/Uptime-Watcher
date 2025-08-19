@@ -144,7 +144,11 @@ describe("Validation Types and Utilities", () => {
 
         it("should handle complex data objects", () => {
             const data = {
-                array: [1, 2, 3],
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
                 nested: {
                     deep: {
                         value: "test",
@@ -330,7 +334,11 @@ describe("Validation Types and Utilities", () => {
 
         it("should handle metadata with various data types", () => {
             const metadata: ValidationMetadata = {
-                array: [1, 2, 3],
+                array: [
+                    1,
+                    2,
+                    3,
+                ],
                 boolean: true,
                 null: null,
                 number: 42,

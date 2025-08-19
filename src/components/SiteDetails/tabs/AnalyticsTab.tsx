@@ -246,7 +246,11 @@ export const AnalyticsTab = ({
             });
             setSiteDetailsChartTimeRange(range);
         },
-        [monitorType, setSiteDetailsChartTimeRange, siteDetailsChartTimeRange]
+        [
+            monitorType,
+            setSiteDetailsChartTimeRange,
+            siteDetailsChartTimeRange,
+        ]
     );
 
     const handleAdvancedMetricsToggle = useCallback(() => {
@@ -258,7 +262,11 @@ export const AnalyticsTab = ({
             previousValue: previousValue,
         });
         setShowAdvancedMetrics(newValue);
-    }, [monitorType, setShowAdvancedMetrics, showAdvancedMetrics]);
+    }, [
+        monitorType,
+        setShowAdvancedMetrics,
+        showAdvancedMetrics,
+    ]);
 
     // Memoized icons to prevent unnecessary re-renders
     const analyticsIcon = useMemo(() => <MdAnalytics />, []);

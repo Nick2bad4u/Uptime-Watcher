@@ -108,7 +108,12 @@ describe("useUIStore", () => {
         it("should handle different tab names", () => {
             const { result } = renderHook(() => useUIStore());
 
-            const tabs = ["site-overview", "analytics", "history", "settings"];
+            const tabs = [
+                "site-overview",
+                "analytics",
+                "history",
+                "settings",
+            ];
 
             for (const tab of tabs) {
                 act(() => {
@@ -388,7 +393,12 @@ describe("useUIStore", () => {
         it("should handle all valid time ranges", () => {
             const { result } = renderHook(() => useUIStore());
 
-            const timeRanges = ["1h", "24h", "7d", "30d"] as const;
+            const timeRanges = [
+                "1h",
+                "24h",
+                "7d",
+                "30d",
+            ] as const;
 
             for (const range of timeRanges) {
                 act(() => {

@@ -110,9 +110,12 @@ describe("Component Coverage Boost", () => {
             const siteDetailsLogic = {
                 getTabKey: (tab: string, siteId: string) => `${tab}-${siteId}`,
                 isValidTab: (tab: string) =>
-                    ["overview", "analytics", "history", "settings"].includes(
-                        tab
-                    ),
+                    [
+                        "overview",
+                        "analytics",
+                        "history",
+                        "settings",
+                    ].includes(tab),
                 getDefaultTab: () => "overview",
                 handleTabChange: (
                     currentState: SiteDetailsState,

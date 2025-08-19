@@ -30,7 +30,11 @@ vi.mock("../../theme/ThemeManager", () => ({
         applyTheme: vi.fn(),
         onSystemThemeChange: vi.fn(() => vi.fn()),
         getSystemThemePreference: vi.fn(() => "light"),
-        getAvailableThemes: vi.fn(() => ["light", "dark", "system"]),
+        getAvailableThemes: vi.fn(() => [
+            "light",
+            "dark",
+            "system",
+        ]),
     },
 }));
 

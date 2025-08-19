@@ -50,7 +50,12 @@ const vitestConfig = defineConfig({
                 "!shared/test/**", // Exclude test directory
             ],
             provider: "v8" as const, // Use V8 provider for consistency
-            reporter: ["text", "json", "lcov", "html"],
+            reporter: [
+                "text",
+                "json",
+                "lcov",
+                "html",
+            ],
             reportOnFailure: true,
             reportsDirectory: "./coverage/shared",
             skipFull: false,
@@ -102,7 +107,12 @@ const vitestConfig = defineConfig({
                 useAtomics: true,
             },
         },
-        reporters: ["default", "json", "verbose", "hanging-process"],
+        reporters: [
+            "default",
+            "json",
+            "verbose",
+            "hanging-process",
+        ],
         testTimeout: 10_000, // 10 second timeout for shared tests
         typecheck: {
             enabled: true,

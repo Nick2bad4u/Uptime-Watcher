@@ -853,13 +853,22 @@ Based on analysis of the existing monitor implementations, here are **ALL** the 
 - **Current Implementation (only these 3 types are supported)**:
 
 ```typescript
-export const BASE_MONITOR_TYPES = ["http", "port", "ping"] as const;
+export const BASE_MONITOR_TYPES = [
+ "http",
+ "port",
+ "ping",
+] as const;
 ```
 
 - **Example for Adding New Type (DNS - fully implemented)**:
 
 ```typescript
-export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const; // Add 'dns'
+export const BASE_MONITOR_TYPES = [
+ "http",
+ "port",
+ "ping",
+ "dns",
+] as const; // Add 'dns'
 ```
 
 **⚠️ Important**: This must be done FIRST as other files depend on this type definition. The DNS implementation above is the actual working code.
@@ -961,11 +970,10 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor();
- * const result = await monitor.check(dnsConfig);
- * // Automatically integrates with enhanced monitoring system
- * ```
- *
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` *
  * @public
  */
 
@@ -1742,7 +1750,12 @@ Here's a complete example following the **exact implementation order**:
 
 ```typescript
 // shared/types.ts - MUST BE FIRST
-export const BASE_MONITOR_TYPES = ["http", "port", "ping", "dns"] as const;
+export const BASE_MONITOR_TYPES = [
+ "http",
+ "port",
+ "ping",
+ "dns",
+] as const;
 ```
 
 ### **Step 2: Add Validation Schema**
@@ -1754,7 +1767,12 @@ export const monitorSchemas = {
  dns: baseMonitorSchema.extend({
   type: z.literal("dns"),
   hostname: z.string().min(1, "Hostname is required"),
-  recordType: z.enum(["A", "AAAA", "MX", "CNAME"]),
+  recordType: z.enum([
+   "A",
+   "AAAA",
+   "MX",
+   "CNAME",
+  ]),
   expectedValue: z.string().optional(),
   // checkInterval, retryAttempts, timeout are inherited from baseMonitorSchema
  }),
@@ -2100,11 +2118,10 @@ Test the Zod schema thoroughly:
 
 
 
-```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration
-  };
 
-  const result = yourMonitorSchema.safeParse(validConfig);
-  expect(result.success).toBe(true);
+
+
+```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true);
  });
 
  it("should reject invalid configurations", () => {

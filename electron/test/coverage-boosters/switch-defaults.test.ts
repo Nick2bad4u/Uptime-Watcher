@@ -226,7 +226,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             };
 
             expect(processArray([])).toBe(-1);
-            expect(processArray([1, 2, 3])).toBe(3);
+            expect(
+                processArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(3);
             expect(processArray(null)).toBe(0);
             expect(processArray("not array")).toBe(0);
             expect(processArray({})).toBe(0);
@@ -314,13 +320,31 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 );
             };
 
-            expect(isStringArray(["a", "b", "c"])).toBe(true);
-            expect(isStringArray([1, 2, 3])).toBe(false);
+            expect(
+                isStringArray([
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBe(true);
+            expect(
+                isStringArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
             expect(isStringArray([])).toBe(true);
             expect(isStringArray("not array")).toBe(false);
             expect(isStringArray(["a", 1])).toBe(false);
 
-            expect(isNumberArray([1, 2, 3])).toBe(true);
+            expect(
+                isNumberArray([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(true);
             expect(isNumberArray(["a", "b"])).toBe(false);
             expect(isNumberArray([])).toBe(true);
             expect(isNumberArray([1, "a"])).toBe(false);

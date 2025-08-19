@@ -130,6 +130,10 @@ export function useDynamicHelpText(
             error,
             isLoading,
         }),
-        [error, helpTexts, isLoading]
+        [
+            error,
+            helpTexts,
+            isLoading,
+        ]
     );
 }

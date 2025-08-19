@@ -212,7 +212,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             await eventBus.emitTyped("string-event", "test");
 
-            expect(executionOrder).toEqual([1, 2, 3, 4]);
+            expect(executionOrder).toEqual([
+                1,
+                2,
+                3,
+                4,
+            ]);
             expect(middleware1).toHaveBeenCalledWith(
                 "string-event",
                 "test",
@@ -632,7 +637,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should preserve array indices and length", async () => {
             eventBus.onTyped("array-event", mockListener);
 
-            const sparseArray: number[] = [1, 2, 3]; // Regular array for type safety
+            const sparseArray: number[] = [
+                1,
+                2,
+                3,
+            ]; // Regular array for type safety
             sparseArray[10] = 10; // Add element at index 10
 
             await eventBus.emitTyped("array-event", sparseArray);
@@ -844,7 +853,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle array with non-enumerable properties", async () => {
             eventBus.onTyped("array-event", mockListener);
 
-            const arr: number[] = [1, 2, 3];
+            const arr: number[] = [
+                1,
+                2,
+                3,
+            ];
             Object.defineProperty(arr, "customProp", {
                 value: "test",
                 enumerable: false,

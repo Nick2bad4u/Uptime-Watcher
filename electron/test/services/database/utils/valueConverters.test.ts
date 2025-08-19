@@ -106,7 +106,11 @@ describe("Value Converters Utility", () => {
                 "isDisabled = ?",
                 "isActive = ?",
             ]);
-            expect(updateValues).toEqual([1, 0, 1]);
+            expect(updateValues).toEqual([
+                1,
+                0,
+                1,
+            ]);
         });
         it("should handle field names with special characters", async ({
             task,
@@ -127,7 +131,11 @@ describe("Value Converters Utility", () => {
                 "field-name = ?",
                 "fieldName123 = ?",
             ]);
-            expect(updateValues).toEqual([1, 0, 1]);
+            expect(updateValues).toEqual([
+                1,
+                0,
+                1,
+            ]);
         });
     });
     describe("addNumberField", () => {
@@ -236,7 +244,11 @@ describe("Value Converters Utility", () => {
                 "negInfinity = ?",
                 "nanValue = ?",
             ]);
-            expect(updateValues).toEqual([Infinity, -Infinity, Number.NaN]);
+            expect(updateValues).toEqual([
+                Infinity,
+                -Infinity,
+                Number.NaN,
+            ]);
         });
     });
     describe("addStringField", () => {
@@ -513,7 +525,13 @@ describe("Value Converters Utility", () => {
             await annotate("Component: Value Converters Utility", "component");
 
             expect(safeNumberConvert([42])).toBe(42);
-            expect(safeNumberConvert([1, 2, 3])).toBeUndefined(); // NaN case
+            expect(
+                safeNumberConvert([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBeUndefined(); // NaN case
             expect(safeNumberConvert({})).toBeUndefined(); // NaN case
             expect(safeNumberConvert({ valueOf: () => 42 })).toBe(42);
         });

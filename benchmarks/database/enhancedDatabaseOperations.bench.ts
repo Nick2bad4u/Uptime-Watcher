@@ -70,7 +70,11 @@ describe("Enhanced Database Performance Benchmarks", () => {
     }
 
     function generateMonitor(siteId: string, monitorId: number): Monitor {
-        const types = ["http", "ping", "port"] as const;
+        const types = [
+            "http",
+            "ping",
+            "port",
+        ] as const;
         const type = types[monitorId % types.length];
 
         return {
@@ -81,9 +85,24 @@ describe("Enhanced Database Performance Benchmarks", () => {
                 type === "http" ? `https://example${monitorId}.com` : undefined,
             host: type !== "http" ? `host${monitorId}.example.com` : undefined,
             port: type === "port" ? 8080 + (monitorId % 100) : undefined,
-            checkInterval: [30, 60, 300, 600][monitorId % 4] * 1000,
-            timeout: [5, 10, 30][monitorId % 3] * 1000,
-            retryAttempts: [1, 3, 5][monitorId % 3],
+            checkInterval:
+                [
+                    30,
+                    60,
+                    300,
+                    600,
+                ][monitorId % 4] * 1000,
+            timeout:
+                [
+                    5,
+                    10,
+                    30,
+                ][monitorId % 3] * 1000,
+            retryAttempts: [
+                1,
+                3,
+                5,
+            ][monitorId % 3],
             monitoring: Math.random() > 0.1, // 90% active
             status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
             responseTime: Math.floor(Math.random() * 500) + 10,

@@ -527,7 +527,11 @@ describe("History Manipulation Utilities", () => {
             await annotate("Priority: High", "priority");
 
             // Arrange
-            const excessEntries = [{ id: 10 }, { id: 11 }, { id: 12 }];
+            const excessEntries = [
+                { id: 10 },
+                { id: 11 },
+                { id: 12 },
+            ];
             mockDb.all = vi.fn().mockReturnValue(excessEntries);
             mockDb.run = vi.fn();
             mockIsDev.mockReturnValue(false);
@@ -543,7 +547,11 @@ describe("History Manipulation Utilities", () => {
 
             expect(mockDb.run).toHaveBeenCalledWith(
                 "DELETE FROM history WHERE id IN (?,?,?)",
-                [10, 11, 12]
+                [
+                    10,
+                    11,
+                    12,
+                ]
             );
         });
 
@@ -594,7 +602,11 @@ describe("History Manipulation Utilities", () => {
             // Assert - should only include valid positive finite integers
             expect(mockDb.run).toHaveBeenCalledWith(
                 "DELETE FROM history WHERE id IN (?,?,?)",
-                [1, 5.5, 3] // 5.5 would be included as it's finite, but 0, negative, null, undefined, Infinity, NaN are filtered out
+                [
+                    1,
+                    5.5,
+                    3,
+                ] // 5.5 would be included as it's finite, but 0, negative, null, undefined, Infinity, NaN are filtered out
             );
         });
 

@@ -52,7 +52,11 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 
 vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: () => ({
-        monitorTypes: ["http", "ping", "port"],
+        monitorTypes: [
+            "http",
+            "ping",
+            "port",
+        ],
         isLoading: false,
         hasError: false,
         error: undefined,

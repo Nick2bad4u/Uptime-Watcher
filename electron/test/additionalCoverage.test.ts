@@ -122,7 +122,11 @@ describe("Additional Coverage Tests", () => {
             expect(undefined).toBeUndefined();
 
             // Test array handling
-            const testArray = [1, 2, 3];
+            const testArray = [
+                1,
+                2,
+                3,
+            ];
             expect(testArray.length).toBe(3);
 
             // Test object handling

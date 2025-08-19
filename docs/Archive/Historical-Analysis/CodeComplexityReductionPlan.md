@@ -209,7 +209,11 @@ const isFormValid = useCallback(
   formValidators.validateSiteInfo(name, siteId) &&
   formValidators.validateMonitorConfig(monitorType, getMonitorConfig()) &&
   formValidators.validateRequiredFields(getFormData()),
- [name, siteId, monitorType /* other deps */]
+ [
+  name,
+  siteId,
+  monitorType /* other deps */,
+ ]
 );
 ```
 

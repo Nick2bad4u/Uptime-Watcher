@@ -80,7 +80,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             const dynamicData: Record<string, unknown> = {
                 knownField: "known",
                 unknownField: { nested: "object" },
-                arrayField: [1, 2, 3],
+                arrayField: [
+                    1,
+                    2,
+                    3,
+                ],
                 nullField: null,
                 undefinedField: undefined,
             };

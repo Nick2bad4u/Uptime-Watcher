@@ -258,7 +258,13 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         it("should reject array input", () => {
-            expect(isValidMonitorRow([1, 2, 3])).toBe(false);
+            expect(
+                isValidMonitorRow([
+                    1,
+                    2,
+                    3,
+                ])
+            ).toBe(false);
         });
 
         it("should reject empty object", () => {
@@ -574,7 +580,11 @@ describe("Shared Database Types - Complete Coverage", () => {
                 numberProp: 42,
                 booleanProp: true,
                 objectProp: { nested: "value" },
-                arrayProp: [1, 2, 3],
+                arrayProp: [
+                    1,
+                    2,
+                    3,
+                ],
                 nullProp: null,
                 zeroProp: 0,
                 falseProp: false,
@@ -589,7 +599,11 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(safeGetRowProperty(row, "objectProp", {})).toEqual({
                 nested: "value",
             });
-            expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([1, 2, 3]);
+            expect(safeGetRowProperty(row, "arrayProp", [])).toEqual([
+                1,
+                2,
+                3,
+            ]);
             expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
             expect(safeGetRowProperty(row, "zeroProp", 999)).toBe(0);
             expect(safeGetRowProperty(row, "falseProp", true)).toBe(false);
@@ -636,7 +650,14 @@ describe("Shared Database Types - Complete Coverage", () => {
         it("should work with complex default values", () => {
             const row = {};
             const complexDefault = {
-                nested: { array: [1, 2, 3], value: "test" },
+                nested: {
+                    array: [
+                        1,
+                        2,
+                        3,
+                    ],
+                    value: "test",
+                },
             };
 
             expect(

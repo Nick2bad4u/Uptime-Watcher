@@ -707,7 +707,12 @@ const handleSaveName = useCallback(async () => {
   undefined,
   false
  );
-}, [isValidToSave, clearError, saveSiteName, localName]);
+}, [
+ isValidToSave,
+ clearError,
+ saveSiteName,
+ localName,
+]);
 ```
 
 #### 4. useAddSiteForm Validation (Cyclomatic: 11)

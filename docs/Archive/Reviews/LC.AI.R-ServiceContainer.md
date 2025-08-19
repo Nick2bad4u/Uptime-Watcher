@@ -481,11 +481,10 @@ public getSiteManager(): SiteManager {
 
 
 
-/** * Reset the singleton container for testing purposes. * * @remarks * **Testing Utility**: Clears the singleton instance to allow clean test isolation. * * **Usage Pattern:** * ```typescript * // In test setup
- * ServiceContainer.resetForTesting();
- *
- * // Create fresh container for test
- * const container = ServiceContainer.getInstance({ enableDebugLogging: true });
+
+
+
+/** * Reset the singleton container for testing purposes. * * @remarks * **Testing Utility**: Clears the singleton instance to allow clean test isolation. * * **Usage Pattern:** * ```typescript * // In test setup * ServiceContainer.resetForTesting(); * * // Create fresh container for test * const container = ServiceContainer.getInstance({ enableDebugLogging: true });
  * ```
  *
  * **Important Notes:**

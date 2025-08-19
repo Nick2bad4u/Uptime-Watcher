@@ -37,7 +37,11 @@ describe("Settings Component Coverage Tests", () => {
                 "theme",
             ];
 
-            const invalidKeys = ["invalidKey", "anotherInvalid", "notAllowed"];
+            const invalidKeys = [
+                "invalidKey",
+                "anotherInvalid",
+                "notAllowed",
+            ];
 
             for (const key of validKeys) {
                 expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBe(true);
@@ -115,7 +119,11 @@ describe("Settings Component Coverage Tests", () => {
 
         it("should integrate with useTheme", () => {
             const theme = {
-                availableThemes: ["light", "dark", "system"],
+                availableThemes: [
+                    "light",
+                    "dark",
+                    "system",
+                ],
                 isDark: false,
                 setTheme: vi.fn(),
             };
@@ -301,18 +309,32 @@ describe("Settings Component Coverage Tests", () => {
 
     describe("Theme Handling", () => {
         it("should handle theme names", () => {
-            const themeNames = ["light", "dark", "system"];
+            const themeNames = [
+                "light",
+                "dark",
+                "system",
+            ];
 
             for (const theme of themeNames) {
                 expect(typeof theme).toBe("string");
-                expect(["light", "dark", "system"].includes(theme)).toBe(true);
+                expect(
+                    [
+                        "light",
+                        "dark",
+                        "system",
+                    ].includes(theme)
+                ).toBe(true);
             }
         });
 
         it("should handle theme selection", () => {
             const setTheme = vi.fn();
 
-            const themes = ["light", "dark", "system"];
+            const themes = [
+                "light",
+                "dark",
+                "system",
+            ];
             for (const theme of themes) {
                 setTheme(theme);
                 expect(setTheme).toHaveBeenCalledWith(theme);

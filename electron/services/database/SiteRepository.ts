@@ -429,7 +429,11 @@ export class SiteRepository {
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
                 const monitoringValue = monitoring ? 1 : 0;
 
-                stmt.run([site.identifier, name, monitoringValue]);
+                stmt.run([
+                    site.identifier,
+                    name,
+                    monitoringValue,
+                ]);
             }
 
             logger.debug(
@@ -515,7 +519,11 @@ export class SiteRepository {
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue = monitoring ? 1 : 0;
 
-        db.run(SITE_QUERIES.UPSERT, [identifier, name, monitoringValue]);
+        db.run(SITE_QUERIES.UPSERT, [
+            identifier,
+            name,
+            monitoringValue,
+        ]);
         logger.debug(
             `[SiteRepository] Upserted site (internal): ${identifier}`
         );

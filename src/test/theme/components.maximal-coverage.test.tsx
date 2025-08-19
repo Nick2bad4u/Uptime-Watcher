@@ -37,7 +37,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all surface variants", () => {
-            const surfaces = ["base", "elevated", "overlay"] as const;
+            const surfaces = [
+                "base",
+                "elevated",
+                "overlay",
+            ] as const;
 
             for (const surface of surfaces) {
                 const { unmount } = render(
@@ -83,7 +87,12 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different element types", () => {
-            const elements = ["div", "section", "article", "aside"] as const;
+            const elements = [
+                "div",
+                "section",
+                "article",
+                "aside",
+            ] as const;
 
             for (const as of elements) {
                 const { unmount } = render(
@@ -99,7 +108,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle variant prop", () => {
-            const variants = ["primary", "secondary", "tertiary"] as const;
+            const variants = [
+                "primary",
+                "secondary",
+                "tertiary",
+            ] as const;
 
             for (const variant of variants) {
                 const { unmount } = render(
@@ -339,7 +352,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different button types", () => {
-            const types = ["button", "submit", "reset"] as const;
+            const types = [
+                "button",
+                "submit",
+                "reset",
+            ] as const;
 
             for (const type of types) {
                 const { unmount } = render(
@@ -368,7 +385,12 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different input types", () => {
-            const types = ["text", "email", "password", "url"] as const;
+            const types = [
+                "text",
+                "email",
+                "password",
+                "url",
+            ] as const;
 
             for (const type of types) {
                 const { unmount } = render(
@@ -487,7 +509,12 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all weight variants", () => {
-            const weights = ["normal", "medium", "semibold", "bold"] as const;
+            const weights = [
+                "normal",
+                "medium",
+                "semibold",
+                "bold",
+            ] as const;
 
             for (const weight of weights) {
                 const { unmount } = render(
@@ -527,7 +554,12 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all text alignment", () => {
-            const alignments = ["left", "center", "right", "justify"] as const;
+            const alignments = [
+                "left",
+                "center",
+                "right",
+                "justify",
+            ] as const;
 
             for (const align of alignments) {
                 const { unmount } = render(
@@ -754,7 +786,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle all variants", () => {
-            const variants = ["primary", "secondary", "tertiary"] as const;
+            const variants = [
+                "primary",
+                "secondary",
+                "tertiary",
+            ] as const;
 
             for (const variant of variants) {
                 const { unmount } = render(
@@ -821,7 +857,12 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should apply all size variants", () => {
-            const sizes = ["xs", "sm", "md", "lg"] as const;
+            const sizes = [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+            ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -860,7 +901,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different sizes", () => {
-            const sizes = ["sm", "md", "lg"] as const;
+            const sizes = [
+                "sm",
+                "md",
+                "lg",
+            ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
@@ -884,7 +929,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different status values", () => {
-            const statuses = ["up", "down", "unknown"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "unknown",
+            ] as const;
 
             for (const status of statuses) {
                 const { unmount } = render(<StatusIndicator status={status} />);
@@ -922,7 +971,11 @@ describe("Theme Components - Complete Coverage", () => {
         });
 
         it("should handle different status values", () => {
-            const statuses = ["up", "down", "unknown"] as const;
+            const statuses = [
+                "up",
+                "down",
+                "unknown",
+            ] as const;
 
             for (const status of statuses) {
                 const { unmount } = render(

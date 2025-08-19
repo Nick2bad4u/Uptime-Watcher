@@ -62,7 +62,11 @@ describe("Environment Detection Utilities", () => {
         it("should handle all standard NODE_ENV values", async () => {
             const { getEnvironment } = await import("../../utils/environment");
 
-            const environments = ["development", "production", "test"];
+            const environments = [
+                "development",
+                "production",
+                "test",
+            ];
 
             for (const env of environments) {
                 globalThis.process = {
@@ -148,7 +152,11 @@ describe("Environment Detection Utilities", () => {
         it("should handle all standard NODE_ENV values", async () => {
             const { getNodeEnv } = await import("../../utils/environment");
 
-            const environments = ["development", "production", "test"];
+            const environments = [
+                "development",
+                "production",
+                "test",
+            ];
 
             for (const env of environments) {
                 globalThis.process = {
@@ -526,7 +534,11 @@ describe("Environment Detection Utilities", () => {
         it("should handle different falsy values for environment variables", async () => {
             const { getEnvVar } = await import("../../utils/environment");
 
-            const falsyValues = ["", "0", "false"];
+            const falsyValues = [
+                "",
+                "0",
+                "false",
+            ];
 
             for (const value of falsyValues) {
                 globalThis.process = {
