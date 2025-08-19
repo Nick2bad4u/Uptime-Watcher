@@ -31,12 +31,12 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for non-string values", () => {
-            expect(isComputedSiteStatus(null)).toBe(false);
-            expect(isComputedSiteStatus(undefined)).toBe(false);
-            expect(isComputedSiteStatus(123)).toBe(false);
-            expect(isComputedSiteStatus(true)).toBe(false);
-            expect(isComputedSiteStatus({})).toBe(false);
-            expect(isComputedSiteStatus([])).toBe(false);
+            expect(isComputedSiteStatus(null as any)).toBe(false);
+            expect(isComputedSiteStatus(undefined as any)).toBe(false);
+            expect(isComputedSiteStatus(123 as any)).toBe(false);
+            expect(isComputedSiteStatus(true as any)).toBe(false);
+            expect(isComputedSiteStatus({} as any)).toBe(false);
+            expect(isComputedSiteStatus([] as any)).toBe(false);
         });
     });
 
@@ -56,12 +56,12 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for non-string values", () => {
-            expect(isMonitorStatus(null)).toBe(false);
-            expect(isMonitorStatus(undefined)).toBe(false);
-            expect(isMonitorStatus(123)).toBe(false);
-            expect(isMonitorStatus(true)).toBe(false);
-            expect(isMonitorStatus({})).toBe(false);
-            expect(isMonitorStatus([])).toBe(false);
+            expect(isMonitorStatus(null as any)).toBe(false);
+            expect(isMonitorStatus(undefined as any)).toBe(false);
+            expect(isMonitorStatus(123 as any)).toBe(false);
+            expect(isMonitorStatus(true as any)).toBe(false);
+            expect(isMonitorStatus({} as any)).toBe(false);
+            expect(isMonitorStatus([] as any)).toBe(false);
         });
     });
 
@@ -82,12 +82,12 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for non-string values", () => {
-            expect(isSiteStatus(null)).toBe(false);
-            expect(isSiteStatus(undefined)).toBe(false);
-            expect(isSiteStatus(123)).toBe(false);
-            expect(isSiteStatus(true)).toBe(false);
-            expect(isSiteStatus({})).toBe(false);
-            expect(isSiteStatus([])).toBe(false);
+            expect(isSiteStatus(null as any)).toBe(false);
+            expect(isSiteStatus(undefined as any)).toBe(false);
+            expect(isSiteStatus(123 as any)).toBe(false);
+            expect(isSiteStatus(true as any)).toBe(false);
+            expect(isSiteStatus({} as any)).toBe(false);
+            expect(isSiteStatus([] as any)).toBe(false);
         });
     });
 
@@ -117,10 +117,8 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return true for valid monitor with undefined activeOperations", () => {
-            const monitorWithUndefinedOps = {
-                ...validMonitor,
-                activeOperations: undefined,
-            };
+            const monitorWithUndefinedOps = { ...validMonitor };
+            delete (monitorWithUndefinedOps as any).activeOperations;
             expect(validateMonitor(monitorWithUndefinedOps)).toBe(true);
         });
 
@@ -131,18 +129,18 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for monitor with invalid id type", () => {
-            const invalidMonitor = { ...validMonitor, id: 123 };
+            const invalidMonitor = { ...validMonitor, id: 123 } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with missing type", () => {
             const invalidMonitor = { ...validMonitor };
             delete (invalidMonitor as any).type;
-            expect(validateMonitor(invalidMonitor)).toBe(false);
+            expect(validateMonitor(invalidMonitor as any)).toBe(false);
         });
 
         it("should return false for monitor with invalid type", () => {
-            const invalidMonitor = { ...validMonitor, type: "invalid-type" };
+            const invalidMonitor = { ...validMonitor, type: "invalid-type" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
@@ -150,37 +148,37 @@ describe("shared/types type guards and validators", () => {
             const invalidMonitor = {
                 ...validMonitor,
                 status: "invalid-status",
-            };
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid monitoring type", () => {
-            const invalidMonitor = { ...validMonitor, monitoring: "true" };
+            const invalidMonitor = { ...validMonitor, monitoring: "true" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid responseTime type", () => {
-            const invalidMonitor = { ...validMonitor, responseTime: "150" };
+            const invalidMonitor = { ...validMonitor, responseTime: "150" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid checkInterval type", () => {
-            const invalidMonitor = { ...validMonitor, checkInterval: "60000" };
+            const invalidMonitor = { ...validMonitor, checkInterval: "60000" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid timeout type", () => {
-            const invalidMonitor = { ...validMonitor, timeout: "5000" };
+            const invalidMonitor = { ...validMonitor, timeout: "5000" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid retryAttempts type", () => {
-            const invalidMonitor = { ...validMonitor, retryAttempts: "3" };
+            const invalidMonitor = { ...validMonitor, retryAttempts: "3" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid history type", () => {
-            const invalidMonitor = { ...validMonitor, history: "[]" };
+            const invalidMonitor = { ...validMonitor, history: "[]" } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
@@ -192,7 +190,7 @@ describe("shared/types type guards and validators", () => {
                     123,
                     "invalid",
                 ], // Contains non-string
-            };
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
@@ -212,16 +210,16 @@ describe("shared/types type guards and validators", () => {
             const invalidMonitor = {
                 ...validMonitor,
                 activeOperations: "not-an-array",
-            };
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for completely invalid input", () => {
-            expect(validateMonitor(null)).toBe(false);
-            expect(validateMonitor(undefined)).toBe(false);
-            expect(validateMonitor({})).toBe(false);
-            expect(validateMonitor("not an object")).toBe(false);
-            expect(validateMonitor(123)).toBe(false);
+            expect(validateMonitor(null as any)).toBe(false);
+            expect(validateMonitor(undefined as any)).toBe(false);
+            expect(validateMonitor({} as any)).toBe(false);
+            expect(validateMonitor("not an object" as any)).toBe(false);
+            expect(validateMonitor(123 as any)).toBe(false);
         });
     });
 });

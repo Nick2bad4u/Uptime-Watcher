@@ -169,7 +169,7 @@ describe("Final 90% Function Coverage Push", () => {
             const formatDate = (timestamp: number) =>
                 new Date(timestamp).toISOString();
             const isValidDate = (timestamp: number) =>
-                !isNaN(timestamp) && timestamp > 0;
+                !Number.isNaN(timestamp) && timestamp > 0;
             const getTimeDiff = (start: number, end: number) => end - start;
 
             expect(formatDate(now)).toContain("T");
@@ -198,16 +198,17 @@ describe("Final 90% Function Coverage Push", () => {
         it("should test array utility functions", () => {
             // Test array utility functions
             const unique = <T>(arr: T[]) => [...new Set(arr)];
-            const groupBy = <T>(arr: T[], key: keyof T) =>
-                arr.reduce(
-                    (groups, item) => {
-                        const group = groups[item[key] as string] || [];
-                        group.push(item);
-                        groups[item[key] as string] = group;
-                        return groups;
-                    },
-                    {} as Record<string, T[]>
-                );
+            const groupBy = <T>(arr: T[], key: keyof T) => {
+                const groups: Record<string, T[]> = {};
+                for (const item of arr) {
+                    const groupKey = item[key] as string;
+                    if (!groups[groupKey]) {
+                        groups[groupKey] = [];
+                    }
+                    groups[groupKey].push(item);
+                }
+                return groups;
+            };
 
             const testArray = [
                 1,

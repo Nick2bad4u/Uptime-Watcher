@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 /**
  * Precision Function Coverage Test
@@ -222,12 +222,10 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(unique([1])).toEqual([1]);
 
         // Test array filtering with type guard
-        const isValidItem = (item: any): item is string => {
-            return typeof item === "string" && item.length > 0;
-        };
-
         const filterValidItems = (items: any[]): string[] => {
-            return items.filter(isValidItem);
+            return items.filter((item): item is string => {
+                return typeof item === "string" && item.length > 0;
+            });
         };
 
         expect(
@@ -264,8 +262,8 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         // Test date formatting utility
         const formatDate = (date: Date | string | number): string => {
             const d = new Date(date);
-            if (isNaN(d.getTime())) return "Invalid Date";
-            return d.toISOString().split("T")[0];
+            if (Number.isNaN(d.getTime())) return "Invalid Date";
+            return d.toISOString().split("T")[0] || "Invalid Date";
         };
 
         const now = new Date("2023-12-01T10:30:00Z");
@@ -408,7 +406,9 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         const wrapError = (error: unknown, context: string): Error => {
             if (error instanceof Error) {
                 const wrappedError = new Error(`${context}: ${error.message}`);
-                wrappedError.stack = error.stack;
+                if (error.stack) {
+                    wrappedError.stack = error.stack;
+                }
                 return wrappedError;
             }
             return new Error(`${context}: ${String(error)}`);

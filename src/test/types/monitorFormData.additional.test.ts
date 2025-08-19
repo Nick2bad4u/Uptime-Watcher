@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-    BaseFormData,
+    type BaseFormData,
     isDnsFormData,
     isPingFormData,
     isPortFormData,
@@ -231,7 +231,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "config", { ssl: true });
-            expect(data["config"]).toEqual({ ssl: true });
+            expect((data as any)["config"]).toEqual({ ssl: true });
             expect(data.name).toBe("Test");
         });
 
@@ -240,7 +240,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "tags", ["api", "health"]);
-            expect(data["tags"]).toEqual(["api", "health"]);
+            expect((data as any)["tags"]).toEqual(["api", "health"]);
             expect(data.name).toBe("Test");
         });
 
@@ -249,7 +249,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "ssl", true);
-            expect(data["ssl"]).toBe(true);
+            expect((data as any)["ssl"]).toBe(true);
             expect(data.name).toBe("Test");
         });
 
@@ -259,10 +259,10 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 existing: "value",
             };
             safeSetFormProperty(data, "nullValue", null);
-            expect(data["nullValue"]).toBeNull();
+            expect((data as any)["nullValue"]).toBeNull();
 
             safeSetFormProperty(data, "undefinedValue", undefined);
-            expect(data["undefinedValue"]).toBeUndefined();
+            expect((data as any)["undefinedValue"]).toBeUndefined();
         });
 
         it("should preserve all existing properties", () => {
@@ -277,36 +277,28 @@ describe("monitorFormData functions - Additional Coverage", () => {
             expect(data.timeout).toBe(5000);
             expect(data.ssl).toBe(true);
             expect(data.tags).toEqual(["api"]);
-            expect(data["newProp"]).toBe("newValue");
+            expect((data as any)["newProp"]).toBe("newValue");
         });
     });
 
     describe("createDefaultFormData - Edge Cases", () => {
         it("should handle case variations", () => {
-            const result1 = (
-                createDefaultFormData as (type: string) => Partial<BaseFormData>
-            )("DNS");
+            const result1 = (createDefaultFormData as any)("DNS");
             expect(result1.type).toBe("DNS");
 
-            const result2 = (
-                createDefaultFormData as (type: string) => Partial<BaseFormData>
-            )("Http");
+            const result2 = (createDefaultFormData as any)("Http");
             expect(result2.type).toBe("Http");
         });
 
         it("should handle empty string type", () => {
-            const result = (
-                createDefaultFormData as (type: string) => Partial<BaseFormData>
-            )("");
+            const result = (createDefaultFormData as any)("");
             expect(result.type).toBe("");
         });
 
         it("should handle very long type names", () => {
             const longType =
                 "very-long-custom-monitor-type-that-is-not-recognized";
-            const result = (
-                createDefaultFormData as (type: string) => Partial<BaseFormData>
-            )(longType);
+            const result = (createDefaultFormData as any)(longType);
             expect(result.type).toBe(longType);
         });
 
@@ -320,11 +312,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
             ];
 
             for (const type of types) {
-                const result = (
-                    createDefaultFormData as (
-                        type: string
-                    ) => Partial<BaseFormData>
-                )(type);
+                const result = (createDefaultFormData as any)(type);
                 expect(result).toHaveProperty("checkInterval");
                 expect(result).toHaveProperty("timeout");
                 expect(result).toHaveProperty("retryAttempts");

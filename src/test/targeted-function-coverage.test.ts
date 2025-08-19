@@ -39,24 +39,24 @@ describe("Targeted Function Coverage", () => {
         it("should test additional utility imports", async () => {
             try {
                 // Test shared utils that might not be fully covered
-                const typeHelpers = await import(
+                const helpers = await import(
                     "../../shared/utils/typeHelpers"
                 );
-                expect(typeof typeHelpers.castIpcResponse).toBe("function");
-                expect(typeof typeHelpers.isArray).toBe("function");
-                expect(typeof typeHelpers.isRecord).toBe("function");
-                expect(typeof typeHelpers.safePropertyAccess).toBe("function");
-                expect(typeof typeHelpers.validateAndConvert).toBe("function");
+                expect(typeof helpers.castIpcResponse).toBe("function");
+                expect(typeof helpers.isArray).toBe("function");
+                expect(typeof helpers.isRecord).toBe("function");
+                expect(typeof helpers.safePropertyAccess).toBe("function");
+                expect(typeof helpers.validateAndConvert).toBe("function");
 
                 // Execute functions to ensure coverage
-                expect(typeHelpers.isArray([])).toBe(true);
-                expect(typeHelpers.isArray("not array")).toBe(false);
-                expect(typeHelpers.isRecord({})).toBe(true);
-                expect(typeHelpers.isRecord(null)).toBe(false);
+                expect(helpers.isArray([])).toBe(true);
+                expect(helpers.isArray("not array")).toBe(false);
+                expect(helpers.isRecord({})).toBe(true);
+                expect(helpers.isRecord(null)).toBe(false);
                 expect(
-                    typeHelpers.safePropertyAccess({ test: "value" }, "test")
+                    helpers.safePropertyAccess({ test: "value" }, "test")
                 ).toBe("value");
-                expect(typeHelpers.safePropertyAccess({}, "missing")).toBe(
+                expect(helpers.safePropertyAccess({}, "missing")).toBe(
                     undefined
                 );
             } catch (error) {
@@ -66,7 +66,7 @@ describe("Targeted Function Coverage", () => {
 
         it("should test additional type guards", async () => {
             try {
-                const typeGuards = await import(
+                const guards = await import(
                     "../../shared/utils/typeGuards"
                 );
 
@@ -91,9 +91,9 @@ describe("Targeted Function Coverage", () => {
                 ];
 
                 for (const funcName of functions) {
-                    if (funcName in typeGuards) {
+                    if (funcName in guards) {
                         const func =
-                            typeGuards[funcName as keyof typeof typeGuards];
+                            guards[funcName as keyof typeof guards];
                         expect(typeof func).toBe("function");
 
                         // Execute with basic test values

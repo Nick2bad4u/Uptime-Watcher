@@ -25,13 +25,13 @@ describe("String Conversion - 100% Coverage Override", () => {
 
     beforeEach(() => {
         // Store the original typeof operator
-        originalTypeof = globalThis.typeof;
+        originalTypeof = (globalThis as any).typeof;
     });
 
     afterEach(() => {
         // Restore original typeof if we modified it
         if (originalTypeof) {
-            globalThis.typeof = originalTypeof;
+            (globalThis as any).typeof = originalTypeof;
         }
     });
 
@@ -112,7 +112,7 @@ describe("String Conversion - 100% Coverage Override", () => {
             { value: /regex/, expected: "/regex/" },
         ];
 
-        for (const [index, { value, expected }] of testCases.entries()) {
+        for (const [, { value, expected }] of testCases.entries()) {
             try {
                 const result = safeStringify(value);
                 // For objects and complex types, just ensure we get a string back

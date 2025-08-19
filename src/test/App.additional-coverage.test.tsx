@@ -528,10 +528,12 @@ describe("App Additional Coverage Tests", () => {
                     "Loading application"
                 );
                 expect(loadingElement).toBeInTheDocument();
-                expect(screen.getByText("Loading...")).toBeInTheDocument();
             },
             { timeout: 500 }
         );
+        
+        // Verify the loading text is also present
+        expect(screen.getByText("Loading...")).toBeInTheDocument();
     });
 
     it("should display error alert when lastError exists", async () => {
@@ -700,11 +702,13 @@ describe("App Additional Coverage Tests", () => {
         await waitFor(
             () => {
                 expect(initializeSettingsMock).toHaveBeenCalled();
-                expect(initializeSitesMock).toHaveBeenCalled();
-                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
             },
             { timeout: 2000 }
         );
+        
+        // Verify other initialization calls
+        expect(initializeSitesMock).toHaveBeenCalled();
+        expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
 
         // Simulate the callback being called by getting it from the mock call
         const statusUpdateCallback =
@@ -768,9 +772,11 @@ describe("App Additional Coverage Tests", () => {
         // Wait for initialization to complete including subscription
         await waitFor(() => {
             expect(initializeSettingsMock).toHaveBeenCalled();
-            expect(initializeSitesMock).toHaveBeenCalled();
-            expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
         });
+        
+        // Verify other initialization calls
+        expect(initializeSitesMock).toHaveBeenCalled();
+        expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
 
         // Simulate the callback being called with an update that has no site.identifier
         const statusUpdateCallback =
@@ -855,8 +861,10 @@ describe("App Additional Coverage Tests", () => {
         // Wait for initialization to complete - this should call both initialization functions
         await waitFor(() => {
             expect(initializeSettingsMock).toHaveBeenCalled();
-            expect(initializeSitesMock).toHaveBeenCalled();
         });
+        
+        // Verify sites initialization was called
+        expect(initializeSitesMock).toHaveBeenCalled();
     });
 
     it("should properly clean up subscriptions on unmount", () => {

@@ -3,7 +3,7 @@
  * Targets specific uncovered functions identified in coverage analysis
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {
@@ -46,10 +46,10 @@ describe("Function Coverage Boost Tests", () => {
 
             // Invalid cases
             expect(validateSite({})).toBe(false);
-            expect(validateSite(null)).toBe(false);
-            expect(validateSite(undefined)).toBe(false);
-            expect(validateSite("string")).toBe(false);
-            expect(validateSite(123)).toBe(false);
+            expect(validateSite(null as any)).toBe(false);
+            expect(validateSite(undefined as any)).toBe(false);
+            expect(validateSite("string" as any)).toBe(false);
+            expect(validateSite(123 as any)).toBe(false);
 
             // Missing required fields
             expect(validateSite({ identifier: "test" })).toBe(false);
@@ -81,7 +81,7 @@ describe("Function Coverage Boost Tests", () => {
                     name: "Test",
                     monitoring: "not-boolean",
                     monitors: [],
-                })
+                } as any)
             ).toBe(false);
 
             expect(
@@ -90,7 +90,7 @@ describe("Function Coverage Boost Tests", () => {
                     name: "Test",
                     monitoring: true,
                     monitors: "not-array",
-                })
+                } as any)
             ).toBe(false);
         });
 
@@ -118,7 +118,7 @@ describe("Function Coverage Boost Tests", () => {
                 checkInterval: 500, // too low
                 timeout: -1, // negative
                 retryAttempts: 15, // too high
-            };
+            } as any;
 
             const errors = getMonitorValidationErrors(invalidMonitor);
             expect(errors).toContain("Monitor id is required");
@@ -133,7 +133,7 @@ describe("Function Coverage Boost Tests", () => {
                 id: "test",
                 type: "http",
                 status: "up",
-            };
+            } as any;
             expect(getMonitorValidationErrors(httpMonitorNoUrl)).toContain(
                 "URL is required for HTTP monitors"
             );
@@ -142,7 +142,7 @@ describe("Function Coverage Boost Tests", () => {
                 id: "test",
                 type: "ping",
                 status: "up",
-            };
+            } as any;
             expect(getMonitorValidationErrors(pingMonitorNoHost)).toContain(
                 "Host is required for ping monitors"
             );
@@ -152,7 +152,7 @@ describe("Function Coverage Boost Tests", () => {
                 type: "port",
                 status: "up",
                 port: 99_999, // too high
-            };
+            } as any;
             const portErrors = getMonitorValidationErrors(portMonitorInvalid);
             expect(portErrors).toContain("Host is required for port monitors");
             expect(portErrors).toContain(
@@ -164,7 +164,7 @@ describe("Function Coverage Boost Tests", () => {
                 type: "dns",
                 status: "up",
                 recordType: "INVALID",
-            };
+            } as any;
             const dnsErrors = getMonitorValidationErrors(dnsMonitorInvalid);
             expect(dnsErrors).toContain("Host is required for DNS monitors");
             expect(
@@ -183,7 +183,7 @@ describe("Function Coverage Boost Tests", () => {
                 // Test any exported functions that might exist
                 const moduleKeys = Object.keys(cacheModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = cacheModule[key];
+                    const exportedValue = (cacheModule as any)[key];
                     if (typeof exportedValue === "function") {
                         // Test function exists and can be called safely
                         expect(typeof exportedValue).toBe("function");
@@ -231,7 +231,7 @@ describe("Function Coverage Boost Tests", () => {
 
                 const moduleKeys = Object.keys(objectSafetyModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = objectSafetyModule[key];
+                    const exportedValue = (objectSafetyModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
 
@@ -262,13 +262,13 @@ describe("Function Coverage Boost Tests", () => {
 
         it("should test type helper functions", async () => {
             try {
-                const typeHelpersModule = await import(
+                const helpersModule = await import(
                     "../../shared/utils/typeHelpers"
                 );
 
-                const moduleKeys = Object.keys(typeHelpersModule);
+                const moduleKeys = Object.keys(helpersModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = typeHelpersModule[key];
+                    const exportedValue = (helpersModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
                     }
@@ -283,13 +283,13 @@ describe("Function Coverage Boost Tests", () => {
 
         it("should test type guard functions", async () => {
             try {
-                const typeGuardsModule = await import(
+                const guardsModule = await import(
                     "../../shared/utils/typeGuards"
                 );
 
-                const moduleKeys = Object.keys(typeGuardsModule);
+                const moduleKeys = Object.keys(guardsModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = typeGuardsModule[key];
+                    const exportedValue = (guardsModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
 
@@ -343,7 +343,7 @@ describe("Function Coverage Boost Tests", () => {
                 // Test other exported functions
                 const moduleKeys = Object.keys(monitorUiModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = monitorUiModule[key];
+                    const exportedValue = (monitorUiModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
                     }
@@ -367,7 +367,7 @@ describe("Function Coverage Boost Tests", () => {
                         type: "http",
                         url: "https://example.com",
                         status: "up",
-                    };
+                    } as any;
 
                     const result = fallbacksModule.getMonitorDisplayIdentifier(
                         httpMonitor,
@@ -381,7 +381,7 @@ describe("Function Coverage Boost Tests", () => {
                         type: "ping",
                         host: "example.com",
                         status: "up",
-                    };
+                    } as any;
 
                     const pingResult =
                         fallbacksModule.getMonitorDisplayIdentifier(
@@ -395,7 +395,7 @@ describe("Function Coverage Boost Tests", () => {
                 // Test other exported functions
                 const moduleKeys = Object.keys(fallbacksModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = fallbacksModule[key];
+                    const exportedValue = (fallbacksModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
                     }
@@ -417,7 +417,7 @@ describe("Function Coverage Boost Tests", () => {
                 // Test exported functions
                 const moduleKeys = Object.keys(monitorValidationModule);
                 for (const key of moduleKeys) {
-                    const exportedValue = monitorValidationModule[key];
+                    const exportedValue = (monitorValidationModule as any)[key];
                     if (typeof exportedValue === "function") {
                         expect(typeof exportedValue).toBe("function");
 

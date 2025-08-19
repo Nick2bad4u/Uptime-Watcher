@@ -3,7 +3,7 @@
  * coverage
  */
 import { describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import {
     getIconColorClass,
     renderColoredIcon,
@@ -60,28 +60,24 @@ describe("iconUtils functions", () => {
 
         it("should return icon as-is when no color is provided", () => {
             const icon = <div>test-icon</div>;
-            const result = renderColoredIcon(icon);
-            expect(result).toBe(icon);
+            expect(renderColoredIcon(icon)).toBe(icon);
         });
 
         it("should wrap icon in span with color class for known colors", () => {
             const icon = <div>test-icon</div>;
-            const result = renderColoredIcon(icon, "danger");
-
-            const { container } = render(result as React.ReactElement);
-            const span = container.querySelector("span");
-            expect(span).toHaveClass("themed-icon--error");
-            expect(span).toContainHTML("<div>test-icon</div>");
+            render(renderColoredIcon(icon, "danger") as React.ReactElement);
+            // The span wraps the icon, so we find it by looking for its parent
+            const iconElement = screen.getByText("test-icon");
+            expect(iconElement.parentElement).toHaveClass("themed-icon--error");
+            expect(iconElement.parentElement?.tagName).toBe("SPAN");
         });
 
         it("should wrap icon in span with inline style for custom colors", () => {
             const icon = <div>test-icon</div>;
-            const result = renderColoredIcon(icon, "#ff0000");
-
-            const { container } = render(result as React.ReactElement);
-            const span = container.querySelector("span");
-            expect(span).toHaveStyle({ color: "#ff0000" });
-            expect(span).toContainHTML("<div>test-icon</div>");
+            render(renderColoredIcon(icon, "#ff0000") as React.ReactElement);
+            const iconElement = screen.getByText("test-icon");
+            expect(iconElement.parentElement).toHaveStyle({ color: "#ff0000" });
+            expect(iconElement.parentElement?.tagName).toBe("SPAN");
         });
 
         it("should handle all known color types", () => {
@@ -97,28 +93,26 @@ describe("iconUtils functions", () => {
             ];
 
             for (const color of colors) {
-                const result = renderColoredIcon(icon, color);
-                const { container } = render(result as React.ReactElement);
-                const span = container.querySelector("span");
-                expect(span).toBeTruthy();
-                expect(span).toContainHTML("<div>test</div>");
+                const { unmount } = render(renderColoredIcon(icon, color) as React.ReactElement);
+                const iconElement = screen.getByText("test");
+                expect(iconElement.parentElement?.tagName).toBe("SPAN");
+                expect(iconElement.parentElement).toBeTruthy();
+                unmount();
             }
         });
 
         it("should handle string icons with color classes", () => {
-            const result = renderColoredIcon("string-icon", "success");
-            const { container } = render(result as React.ReactElement);
-            const span = container.querySelector("span");
-            expect(span).toHaveClass("themed-icon--success");
-            expect(span).toHaveTextContent("string-icon");
+            render(renderColoredIcon("string-icon", "success") as React.ReactElement);
+            const iconElement = screen.getByText("string-icon");
+            expect(iconElement).toHaveClass("themed-icon--success");
+            expect(iconElement.tagName).toBe("SPAN");
         });
 
         it("should handle string icons with custom colors", () => {
-            const result = renderColoredIcon("string-icon", "#00ff00");
-            const { container } = render(result as React.ReactElement);
-            const span = container.querySelector("span");
-            expect(span).toHaveStyle({ color: "#00ff00" });
-            expect(span).toHaveTextContent("string-icon");
+            render(renderColoredIcon("string-icon", "#00ff00") as React.ReactElement);
+            const iconElement = screen.getByText("string-icon");
+            expect(iconElement).toHaveStyle({ color: "#00ff00" });
+            expect(iconElement.tagName).toBe("SPAN");
         });
     });
 });

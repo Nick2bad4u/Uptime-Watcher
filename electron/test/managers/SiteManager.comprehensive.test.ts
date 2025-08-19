@@ -706,7 +706,7 @@ describe("SiteManager - Comprehensive", () => {
             // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
             vi.mocked(
                 mockSiteWriterService.handleMonitorIntervalChanges
-            ).mockImplementation(async (_id, _orig, _monitors, config) => {
+            ).mockImplementation(async (_id: any, _orig: any, _monitors: any, config: any) => {
                 config.setHistoryLimit(100);
             });
 
