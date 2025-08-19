@@ -349,9 +349,34 @@ export default [
     },
 
     // Package.json Linting
+
+    // {
+    //     files: ["**/package.json"],
+    //     languageOptions: {
+    //         parser: publintParser,
+    //     },
+    //     plugins: { publint },
+    //     rules: {
+    //         /**
+    //          * The 'suggestion' type messages created by publint will cause
+    //          * eslint warns
+    //          */
+    //         "publint/suggestion": "warn",
+    //         /**
+    //          * The 'warning' type messages created by publint will cause eslint
+    //          * warns
+    //          */
+    //         "publint/warning": "warn",
+    //         /**
+    //          * The 'error' type messages created by publint will cause eslint
+    //          * errors
+    //          */
+    //         "publint/error": "error",
+    //     },
+    // },
     {
         files: ["**/package.json"],
-        plugins: { "package-json": packageJson },
+        plugins: { "package-json": packageJson, publint: publint },
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
@@ -370,6 +395,22 @@ export default [
             "package-json/require-keywords": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
             "package-json/valid-local-dependency": "off",
+
+            /**
+             * The 'suggestion' type messages created by publint will cause
+             * eslint warns
+             */
+            "publint/suggestion": "warn",
+            /**
+             * The 'warning' type messages created by publint will cause eslint
+             * warns
+             */
+            "publint/warning": "warn",
+            /**
+             * The 'error' type messages created by publint will cause eslint
+             * errors
+             */
+            "publint/error": "error",
         },
     },
 
@@ -526,10 +567,7 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: [
-            "src/**/*.ts",
-            "src/**/*.tsx",
-        ],
+        files: ["src/**/*.ts", "src/**/*.tsx"],
         ignores: [
             "**/*.spec.{ts,tsx}",
             "**/*.test.{ts,tsx}",
@@ -2945,29 +2983,9 @@ export default [
         },
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // TypeScript frontend files (React + Zustand)
     {
-        files: [
-            "shared/**/*.ts",
-            "shared/**/*.tsx",
-        ],
+        files: ["shared/**/*.ts", "shared/**/*.tsx"],
         ignores: [
             "**/*.spec.{ts,tsx}",
             "**/*.test.{ts,tsx}",
@@ -4310,26 +4328,6 @@ export default [
         },
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Test files (Frontend)
     {
         files: [
@@ -5394,28 +5392,6 @@ export default [
             react: { version: "19" },
         },
     },
-
-    // {
-    //     files: ["**/package.json"],
-    //     languageOptions: {
-    //         parser: publintParser,
-    //     },
-    //     plugins: { publint },
-    //     rules: {
-    //         /**
-    //          * The 'suggestion' type messages created by publint will cause eslint warns
-    //          */
-    //         "publint/suggestion": "warn",
-    //         /**
-    //          * The 'warning' type messages created by publint will cause eslint warns
-    //          */
-    //         "publint/warning": "warn",
-    //         /**
-    //          * The 'error' type messages created by publint will cause eslint errors
-    //          */
-    //         "publint/error": "error",
-    //     },
-    // },
 
     // Strategic overrides for @typescript-eslint/no-unsafe-type-assertion
     // These files/patterns require type assertions due to their nature
