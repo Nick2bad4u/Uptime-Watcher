@@ -137,7 +137,7 @@ async function withRetry<T>(
             }
 
             // Exponential backoff (simulated)
-            const delay = baseDelay * Math.pow(2, attempt);
+            const delay = baseDelay * 2**attempt;
             await new Promise((resolve) =>
                 setTimeout(resolve, Math.min(delay, 0.1))
             ); // Very short for benchmarking
@@ -168,21 +168,26 @@ function generateInvalidMonitorData(count: number): any[] {
 
         // Various types of invalid data
         switch (i % 5) {
-            case 0:
+            case 0: {
                 invalid.url = null;
                 break;
-            case 1:
+            }
+            case 1: {
                 invalid.timeout = -1;
                 break;
-            case 2:
+            }
+            case 2: {
                 invalid.retryAttempts = -5;
                 break;
-            case 3:
+            }
+            case 3: {
                 invalid.url = 123;
                 break;
-            case 4:
+            }
+            case 4: {
                 // Empty object
                 break;
+            }
         }
 
         return invalid;
@@ -192,19 +197,23 @@ function generateInvalidMonitorData(count: number): any[] {
 function generateErrors(count: number): Error[] {
     return Array.from({ length: count }, (_, i) => {
         switch (i % 4) {
-            case 0:
+            case 0: {
                 return new ValidationError(`Validation failed ${i}`, [
                     `Error ${i}`,
                 ]);
-            case 1:
+            }
+            case 1: {
                 return new NetworkError(`Network error ${i}`, 500 + (i % 100));
-            case 2:
+            }
+            case 2: {
                 return new DatabaseError(
                     `Database error ${i}`,
                     `SELECT * FROM table${i}`
                 );
-            default:
+            }
+            default: {
                 return new Error(`Generic error ${i}`);
+            }
         }
     });
 }
@@ -263,9 +272,7 @@ describe("Error Handling Performance Benchmarks", () => {
 
     // Error Recovery Benchmarks
     bench("Error recovery simulation - Immediate success", async () => {
-        const operations = Array.from({ length: 100 }, (_, i) => async () => {
-            return `Success ${i}`;
-        });
+        const operations = Array.from({ length: 100 }, (_, i) => async () => `Success ${i}`);
 
         await Promise.all(operations.map((op) => withRetry(op, 3, 10)));
     });

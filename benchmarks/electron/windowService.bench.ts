@@ -142,7 +142,7 @@ describe("Window Service Benchmarks", () => {
         enableLargerThanScreen: false,
         backgroundColor: '#ffffff',
         hasShadow: windowType !== 'splash',
-        opacity: windowType === 'splash' ? 0.95 : 1.0,
+        opacity: windowType === 'splash' ? 0.95 : 1,
         darkTheme: Math.random() > 0.5,
         transparent: windowType === 'splash',
         type: 'normal',
@@ -232,34 +232,41 @@ describe("Window Service Benchmarks", () => {
       
       // Apply state changes based on operation
       switch (operation) {
-        case 'show':
+        case 'show': {
           toState.isVisible = true;
           break;
-        case 'hide':
+        }
+        case 'hide': {
           toState.isVisible = false;
           toState.isFocused = false;
           break;
-        case 'minimize':
+        }
+        case 'minimize': {
           toState.isMinimized = true;
           toState.isFocused = false;
           break;
-        case 'maximize':
+        }
+        case 'maximize': {
           toState.isMaximized = true;
           toState.isMinimized = false;
           break;
-        case 'restore':
+        }
+        case 'restore': {
           toState.isMaximized = false;
           toState.isMinimized = false;
           toState.isFullScreen = false;
           break;
-        case 'focus':
+        }
+        case 'focus': {
           // Remove focus from all other windows
           windows.forEach(w => { w.isFocused = false; });
           toState.isFocused = true;
           break;
-        case 'blur':
+        }
+        case 'blur': {
           toState.isFocused = false;
           break;
+        }
       }
       
       // Simulate transition timing
@@ -389,35 +396,40 @@ describe("Window Service Benchmarks", () => {
       
       switch (coordinationType) {
         case 'broadcast_message':
-        case 'theme_update':
+        case 'theme_update': {
           // Affects all active windows
           affectedWindows = windowPool.filter(w => w.isActive).map(w => w.id);
           break;
-        case 'cascade_close':
+        }
+        case 'cascade_close': {
           // Affects a chain of dependent windows
           const chainLength = Math.floor(Math.random() * 5) + 2;
           affectedWindows = windowPool.slice(0, chainLength).map(w => w.id);
           break;
-        case 'focus_chain':
+        }
+        case 'focus_chain': {
           // Affects a subset of focusable windows
           affectedWindows = windowPool
             .filter(() => Math.random() > 0.5)
             .slice(0, Math.floor(Math.random() * 8) + 2)
             .map(w => w.id);
           break;
-        case 'modal_stack':
+        }
+        case 'modal_stack': {
           // Affects main window and modals
           affectedWindows = windowPool
             .filter(w => w.type === 'main' || w.type === 'dialog')
             .map(w => w.id);
           break;
-        default:
+        }
+        default: {
           // Random subset
           const subsetSize = Math.floor(Math.random() * 10) + 3;
           affectedWindows = windowPool
             .sort(() => Math.random() - 0.5)
             .slice(0, subsetSize)
             .map(w => w.id);
+        }
       }
       
       // Calculate execution time based on coordination complexity
@@ -493,41 +505,47 @@ describe("Window Service Benchmarks", () => {
       const operationType = operationTypes[Math.floor(Math.random() * operationTypes.length)];
       
       const oldBounds = { ...window.currentBounds };
-      let newBounds = { ...oldBounds };
+      const newBounds = { ...oldBounds };
       
       // Apply bounds changes based on operation type
       switch (operationType) {
-        case 'resize':
+        case 'resize': {
           newBounds.width = Math.max(window.constraints.minWidth, 
             Math.min(window.constraints.maxWidth, oldBounds.width + (Math.random() - 0.5) * 400));
           newBounds.height = Math.max(window.constraints.minHeight,
             Math.min(window.constraints.maxHeight, oldBounds.height + (Math.random() - 0.5) * 300));
           break;
-        case 'move':
+        }
+        case 'move': {
           newBounds.x = Math.max(0, Math.min(1920 - oldBounds.width, oldBounds.x + (Math.random() - 0.5) * 200));
           newBounds.y = Math.max(0, Math.min(1080 - oldBounds.height, oldBounds.y + (Math.random() - 0.5) * 150));
           break;
-        case 'move_and_resize':
+        }
+        case 'move_and_resize': {
           newBounds.x = Math.max(0, oldBounds.x + (Math.random() - 0.5) * 100);
           newBounds.y = Math.max(0, oldBounds.y + (Math.random() - 0.5) * 75);
           newBounds.width = Math.max(window.constraints.minWidth, oldBounds.width + (Math.random() - 0.5) * 200);
           newBounds.height = Math.max(window.constraints.minHeight, oldBounds.height + (Math.random() - 0.5) * 150);
           break;
-        case 'center':
+        }
+        case 'center': {
           newBounds.x = (1920 - newBounds.width) / 2;
           newBounds.y = (1080 - newBounds.height) / 2;
           break;
-        case 'snap_to_grid':
+        }
+        case 'snap_to_grid': {
           const gridSize = 20;
           newBounds.x = Math.round(newBounds.x / gridSize) * gridSize;
           newBounds.y = Math.round(newBounds.y / gridSize) * gridSize;
           break;
-        case 'fit_to_screen':
+        }
+        case 'fit_to_screen': {
           newBounds.x = 0;
           newBounds.y = 0;
           newBounds.width = 1920;
           newBounds.height = 1080;
           break;
+        }
       }
       
       // Simulate operation timing
@@ -617,7 +635,7 @@ describe("Window Service Benchmarks", () => {
       let memoryUsage = window?.resources || 0;
       
       switch (event) {
-        case 'create':
+        case 'create': {
           processingTime = Math.random() * 50 + 20; // 20-70ms
           resourcesAllocated = Math.floor(Math.random() * 100) + 50; // 50-150 units
           memoryUsage += resourcesAllocated;
@@ -626,7 +644,8 @@ describe("Window Service Benchmarks", () => {
             window.resources = memoryUsage;
           }
           break;
-        case 'show':
+        }
+        case 'show': {
           processingTime = Math.random() * 30 + 10; // 10-40ms
           resourcesAllocated = Math.floor(Math.random() * 20) + 10; // 10-30 units
           memoryUsage += resourcesAllocated;
@@ -635,7 +654,8 @@ describe("Window Service Benchmarks", () => {
             window.resources = memoryUsage;
           }
           break;
-        case 'hide':
+        }
+        case 'hide': {
           processingTime = Math.random() * 20 + 5; // 5-25ms
           resourcesFreed = Math.floor(Math.random() * 15) + 5; // 5-20 units
           memoryUsage = Math.max(0, memoryUsage - resourcesFreed);
@@ -644,8 +664,9 @@ describe("Window Service Benchmarks", () => {
             window.resources = memoryUsage;
           }
           break;
+        }
         case 'close':
-        case 'destroy':
+        case 'destroy': {
           processingTime = Math.random() * 40 + 15; // 15-55ms
           resourcesFreed = memoryUsage; // Free all resources
           memoryUsage = 0;
@@ -654,7 +675,8 @@ describe("Window Service Benchmarks", () => {
             window.resources = 0;
           }
           break;
-        default:
+        }
+        default: {
           processingTime = Math.random() * 15 + 3; // 3-18ms
           // Minor resource adjustments for other events
           const adjustment = (Math.random() - 0.5) * 10;
@@ -668,6 +690,7 @@ describe("Window Service Benchmarks", () => {
           if (window) {
             window.resources = memoryUsage;
           }
+        }
       }
       
       const lifecycleEvent: LifecycleEvent = {

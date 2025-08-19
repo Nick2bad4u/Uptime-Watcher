@@ -28,13 +28,11 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
         onChange: vi.fn(),
     };
 
-    const renderWithTheme = (props: MonitorSelectorProperties) => {
-        return render(
+    const renderWithTheme = (props: MonitorSelectorProperties) => render(
             <ThemeProvider>
                 <MonitorSelector {...props} />
             </ThemeProvider>
         );
-    };
 
     describe("Coverage for Lines 90-93 (default case in switch statement)", () => {
         it("should use port for unknown monitor type with port property (line 90-91)", () => {

@@ -81,12 +81,12 @@ describe("Database Performance Monitoring", () => {
       throughputTrend: "increasing" | "decreasing" | "stable";
       errorTrend: "increasing" | "decreasing" | "stable";
     };
-    anomalies: Array<{
+    anomalies: {
       timestamp: number;
       type: string;
       severity: string;
       description: string;
-    }>;
+    }[];
     recommendations: string[];
   }
 
@@ -106,15 +106,15 @@ describe("Database Performance Monitoring", () => {
       worstPerformance: number;
       bestPerformance: number;
     };
-    sections: Array<{
+    sections: {
       title: string;
       content: string;
-      charts: Array<{
+      charts: {
         type: string;
         data: any[];
         config: Record<string, any>;
-      }>;
-    }>;
+      }[];
+    }[];
     insights: string[];
     actionItems: string[];
   }
@@ -145,8 +145,8 @@ describe("Database Performance Monitoring", () => {
 
   const generatePerformanceThresholds = (count: number): PerformanceThreshold[] => {
     const metricTypes = ["query_time", "memory_usage", "cpu_usage", "connection_count", "throughput", "error_rate"];
-    const operators: Array<">" | "<" | "==" | ">=" | "<="> = [">", "<", "==", ">=", "<="];
-    const severities: Array<"low" | "medium" | "high" | "critical"> = ["low", "medium", "high", "critical"];
+    const operators: (">" | "<" | "==" | ">=" | "<=")[] = [">", "<", "==", ">=", "<="];
+    const severities: ("low" | "medium" | "high" | "critical")[] = ["low", "medium", "high", "critical"];
     
     return Array.from({ length: count }, (_, i) => ({
       id: `threshold-${i}`,
@@ -159,24 +159,21 @@ describe("Database Performance Monitoring", () => {
     }));
   };
 
-  const generateAlertRules = (count: number, thresholds: PerformanceThreshold[]): AlertRule[] => {
-    return Array.from({ length: count }, (_, i) => ({
+  const generateAlertRules = (count: number, thresholds: PerformanceThreshold[]): AlertRule[] => Array.from({ length: count }, (_, i) => ({
       id: `alert-rule-${i}`,
       name: `Alert Rule ${i}`,
       condition: `metric_value ${thresholds[i % thresholds.length]?.operator || ">"} ${Math.random() * 100}`,
       thresholds: thresholds.slice(i % 5, (i % 5) + 3),
-      cooldownPeriod: Math.floor(Math.random() * 3600000), // Up to 1 hour
+      cooldownPeriod: Math.floor(Math.random() * 3_600_000), // Up to 1 hour
       notificationChannels: [`email-${i}`, `slack-${i}`, `webhook-${i}`],
       enabled: Math.random() > 0.1,
       triggerCount: Math.floor(Math.random() * 100),
-      lastTriggered: Math.random() > 0.5 ? Date.now() - Math.random() * 86400000 : undefined,
+      lastTriggered: Math.random() > 0.5 ? Date.now() - Math.random() * 86_400_000 : undefined,
     }));
-  };
 
-  const generateMonitoringSessions = (count: number): MonitoringSession[] => {
-    return Array.from({ length: count }, (_, i) => {
-      const startTime = Date.now() - Math.random() * 86400000; // Random time in last 24 hours
-      const duration = Math.random() * 3600000; // Up to 1 hour
+  const generateMonitoringSessions = (count: number): MonitoringSession[] => Array.from({ length: count }, (_, i) => {
+      const startTime = Date.now() - Math.random() * 86_400_000; // Random time in last 24 hours
+      const duration = Math.random() * 3_600_000; // Up to 1 hour
       const endTime = startTime + duration;
       const metrics = generatePerformanceMetrics(50 + Math.floor(Math.random() * 200));
       const thresholds = generatePerformanceThresholds(10);
@@ -198,7 +195,6 @@ describe("Database Performance Monitoring", () => {
         },
       };
     });
-  };
 
   // Test data
   const performanceMetrics = generatePerformanceMetrics(1000);
@@ -232,7 +228,7 @@ describe("Database Performance Monitoring", () => {
   });
 
   bench("metrics aggregation - real-time processing", () => {
-    const aggregationWindows = [60000, 300000, 900000, 3600000]; // 1min, 5min, 15min, 1hour
+    const aggregationWindows = [60_000, 300_000, 900_000, 3_600_000]; // 1min, 5min, 15min, 1hour
     
     for (const windowSize of aggregationWindows) {
       const windowMetrics = performanceMetrics.filter(m => 
@@ -266,12 +262,12 @@ describe("Database Performance Monitoring", () => {
   });
 
   bench("threshold evaluation - real-time alerting", () => {
-    const evaluationResults: Array<{
+    const evaluationResults: {
       thresholdId: string;
       metric: PerformanceMetric;
       triggered: boolean;
       severity: string;
-    }> = [];
+    }[] = [];
     
     for (const metric of performanceMetrics) {
       const relevantThresholds = performanceThresholds.filter(t => 
@@ -282,21 +278,26 @@ describe("Database Performance Monitoring", () => {
         let triggered = false;
         
         switch (threshold.operator) {
-          case ">":
+          case ">": {
             triggered = metric.value > threshold.value;
             break;
-          case "<":
+          }
+          case "<": {
             triggered = metric.value < threshold.value;
             break;
-          case ">=":
+          }
+          case ">=": {
             triggered = metric.value >= threshold.value;
             break;
-          case "<=":
+          }
+          case "<=": {
             triggered = metric.value <= threshold.value;
             break;
-          case "==":
+          }
+          case "==": {
             triggered = metric.value === threshold.value;
             break;
+          }
         }
         
         if (triggered) {
@@ -368,14 +369,14 @@ describe("Database Performance Monitoring", () => {
   });
 
   bench("anomaly detection - statistical analysis", () => {
-    const anomalies: Array<{
+    const anomalies: {
       timestamp: number;
       metricType: string;
       value: number;
       expectedValue: number;
       deviation: number;
       severity: string;
-    }> = [];
+    }[] = [];
     
     // Group metrics by type for baseline calculation
     const metricsByType = performanceMetrics.reduce((groups, metric) => {
@@ -389,7 +390,7 @@ describe("Database Performance Monitoring", () => {
     for (const [metricType, metrics] of Object.entries(metricsByType)) {
       const values = metrics.map(m => m.value);
       const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      const variance = values.reduce((sum, val) => sum + (val - mean)**2, 0) / values.length;
       const stdDev = Math.sqrt(variance);
       
       // Detect anomalies (values beyond 2 standard deviations)
@@ -416,7 +417,7 @@ describe("Database Performance Monitoring", () => {
     
     for (let i = 0; i < 10; i++) {
       const timeRange = {
-        start: Date.now() - 86400000 * 7, // 7 days ago
+        start: Date.now() - 86_400_000 * 7, // 7 days ago
         end: Date.now(),
       };
       
@@ -484,13 +485,13 @@ describe("Database Performance Monitoring", () => {
 
   // Monitoring system overhead benchmarks
   bench("monitoring overhead - system impact", () => {
-    const overheadMetrics: Array<{
+    const overheadMetrics: {
       component: string;
       cpuUsage: number;
       memoryUsage: number;
       networkUsage: number;
       storageUsage: number;
-    }> = [];
+    }[] = [];
     
     const components = ["metrics_collector", "alerting_engine", "analysis_processor", "report_generator"];
     
@@ -523,12 +524,12 @@ describe("Database Performance Monitoring", () => {
   });
 
   bench("real-time dashboard updates", () => {
-    const dashboardUpdates: Array<{
+    const dashboardUpdates: {
       timestamp: number;
       widgetId: string;
       data: any;
       updateLatency: number;
-    }> = [];
+    }[] = [];
     
     const widgets = [
       "response_time_chart",
@@ -546,7 +547,7 @@ describe("Database Performance Monitoring", () => {
       for (const widgetId of widgets) {
         // Simulate data preparation
         const latestMetrics = performanceMetrics
-          .filter(m => m.timestamp >= Date.now() - 60000) // Last minute
+          .filter(m => m.timestamp >= Date.now() - 60_000) // Last minute
           .slice(0, 20);
         
         // Simulate data transformation for widget
@@ -577,12 +578,12 @@ describe("Database Performance Monitoring", () => {
       { dataType: "performance_reports", retentionDays: 365 },
     ];
     
-    const cleanupResults: Array<{
+    const cleanupResults: {
       dataType: string;
       recordsScanned: number;
       recordsDeleted: number;
       cleanupTime: number;
-    }> = [];
+    }[] = [];
     
     for (const policy of retentionPolicies) {
       const cutoffTime = Date.now() - (policy.retentionDays * 24 * 60 * 60 * 1000);

@@ -56,9 +56,7 @@ const createStatusHistory = (
 /**
  * Test wrapper with theme provider
  */
-const renderWithTheme = (ui: React.ReactElement) => {
-    return render(<ThemeProvider>{ui}</ThemeProvider>);
-};
+const renderWithTheme = (ui: React.ReactElement) => render(<ThemeProvider>{ui}</ThemeProvider>);
 
 describe("HistoryChart - Complete Coverage", () => {
     beforeEach(() => {

@@ -108,9 +108,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
         mockDatabaseService = {
             executeTransaction: vi
                 .fn()
-                .mockImplementation(async (callback: Function) => {
-                    return await callback(mockDatabase);
-                }),
+                .mockImplementation(async (callback: Function) => await callback(mockDatabase)),
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
         };
 
@@ -380,9 +378,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const mockSettings = { theme: "dark", historyLimit: "500" };
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, mockSettings);
@@ -440,9 +436,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ];
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -461,9 +455,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData([], {});
@@ -536,9 +528,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -574,9 +564,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ];
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -620,9 +608,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 .mockResolvedValueOnce([{ id: "456" }]); // Success for site2
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -681,9 +667,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -747,9 +731,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -796,9 +778,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -877,9 +857,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "../../../utils/operationalHooks"
             );
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await expect(service.persistImportedData([], {})).rejects.toThrow(
@@ -897,9 +875,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "../../../utils/operationalHooks"
             );
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await expect(service.persistImportedData([], {})).rejects.toThrow(
@@ -976,9 +952,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ]);
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => {
-                    return await operation();
-                }
+                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(complexSites, complexSettings);

@@ -71,10 +71,10 @@ interface CustomEvent {
 
 // Mock event system implementation
 class MockEventSystem {
-  private handlers: Map<string, EventHandler[]> = new Map();
-  private delegators: Map<string, EventDelegator[]> = new Map();
+  private handlers = new Map<string, EventHandler[]>();
+  private delegators = new Map<string, EventDelegator[]>();
   private eventQueue: SyntheticEvent[] = [];
-  private eventHistory: Array<{ event: SyntheticEvent; metrics: EventMetrics }> = [];
+  private eventHistory: { event: SyntheticEvent; metrics: EventMetrics }[] = [];
 
   // Event handler registration
   addEventListener(
@@ -299,7 +299,7 @@ class MockEventSystem {
     
     // Simple simulation: assume element IDs follow a pattern
     while (currentElement.includes("-")) {
-      const parentElement = currentElement.substring(0, currentElement.lastIndexOf("-"));
+      const parentElement = currentElement.slice(0, Math.max(0, currentElement.lastIndexOf("-")));
       containers.push(parentElement);
       currentElement = parentElement;
     }
@@ -311,10 +311,10 @@ class MockEventSystem {
   private matchesSelector(element: string, selector: string): boolean {
     // Simplified selector matching
     if (selector.startsWith(".")) {
-      return element.includes(selector.substring(1));
+      return element.includes(selector.slice(1));
     }
     if (selector.startsWith("#")) {
-      return element === selector.substring(1);
+      return element === selector.slice(1);
     }
     if (selector.includes("[")) {
       // Attribute selector simulation
@@ -324,7 +324,7 @@ class MockEventSystem {
   }
 
   // Batch event processing
-  batchProcessEvents(events: Array<{ element: string; type: string; data?: any }>): EventMetrics[] {
+  batchProcessEvents(events: { element: string; type: string; data?: any }[]): EventMetrics[] {
     const results: EventMetrics[] = [];
     
     for (const eventSpec of events) {
@@ -496,7 +496,7 @@ describe("React Event Handling Performance", () => {
     
     // Dispatch events that will bubble through the hierarchy
     for (let i = 0; i < 100; i++) {
-      const deepestElement = elements[elements.length - 1];
+      const deepestElement = elements.at(-1);
       eventSystem.dispatchEvent(deepestElement, "click", {
         bubbles: true,
         cancelable: true,
@@ -547,7 +547,7 @@ describe("React Event Handling Performance", () => {
   // Custom event system benchmarks
   bench("custom events - event bus", () => {
     const customEvents: CustomEvent[] = [];
-    const eventListeners: Map<string, Array<(event: CustomEvent) => void>> = new Map();
+    const eventListeners = new Map<string, ((event: CustomEvent) => void)[]>();
     
     // Custom event dispatcher
     const dispatchCustomEvent = (event: CustomEvent) => {
@@ -607,24 +607,20 @@ describe("React Event Handling Performance", () => {
     let lastThrottleTime = 0;
     let debounceTimeout: NodeJS.Timeout | null = null;
     
-    const throttle = (fn: Function, limit: number) => {
-      return (...args: any[]) => {
+    const throttle = (fn: Function, limit: number) => (...args: any[]) => {
         const now = Date.now();
         if (now - lastThrottleTime >= limit) {
           fn.apply(null, args);
           lastThrottleTime = now;
         }
       };
-    };
     
-    const debounce = (fn: Function, delay: number) => {
-      return (...args: any[]) => {
+    const debounce = (fn: Function, delay: number) => (...args: any[]) => {
         if (debounceTimeout) {
           clearTimeout(debounceTimeout);
         }
         debounceTimeout = setTimeout(() => fn.apply(null, args), delay);
       };
-    };
     
     const throttledHandler = throttle(() => {
       throttledCallCount++;
@@ -714,7 +710,7 @@ describe("React Event Handling Performance", () => {
     const eventSystem = new MockEventSystem();
     const gestureState = {
       touches: new Map<number, { x: number; y: number; startTime: number }>(),
-      gestures: [] as Array<{ type: string; duration: number; distance: number }>,
+      gestures: [] as { type: string; duration: number; distance: number }[],
     };
     
     // Touch event handlers
@@ -734,9 +730,9 @@ describe("React Event Handling Performance", () => {
       touches.forEach((touch: any, index: number) => {
         const startTouch = gestureState.touches.get(touch.identifier || index);
         if (startTouch) {
-          const distance = Math.sqrt(
-            Math.pow(touch.clientX - startTouch.x, 2) + 
-            Math.pow(touch.clientY - startTouch.y, 2)
+          const distance = Math.hypot(
+            (touch.clientX - startTouch.x), 
+            (touch.clientY - startTouch.y)
           );
         }
       });
@@ -748,9 +744,9 @@ describe("React Event Handling Performance", () => {
         const startTouch = gestureState.touches.get(touch.identifier || index);
         if (startTouch) {
           const duration = Date.now() - startTouch.startTime;
-          const distance = Math.sqrt(
-            Math.pow(touch.clientX - startTouch.x, 2) + 
-            Math.pow(touch.clientY - startTouch.y, 2)
+          const distance = Math.hypot(
+            (touch.clientX - startTouch.x), 
+            (touch.clientY - startTouch.y)
           );
           
           gestureState.gestures.push({

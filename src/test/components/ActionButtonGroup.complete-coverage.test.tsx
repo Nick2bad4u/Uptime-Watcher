@@ -75,13 +75,11 @@ const defaultProps = {
     onStopSiteMonitoring: vi.fn(),
 };
 
-const renderActionButtonGroup = (props = {}) => {
-    return render(
+const renderActionButtonGroup = (props = {}) => render(
         <ThemeProvider>
             <ActionButtonGroup {...defaultProps} {...props} />
         </ThemeProvider>
     );
-};
 
 describe("ActionButtonGroup - Complete Coverage", () => {
     beforeEach(() => {

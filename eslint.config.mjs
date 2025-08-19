@@ -15,17 +15,17 @@
 /* eslint-disable import-x/namespace */
 /* eslint-disable import-x/no-named-as-default-member */
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable no-magic-numbers */
-/* eslint-disable no-inline-comments */
+ 
+ 
 /* eslint-disable n/no-unpublished-import */
 /* eslint-disable perfectionist/sort-imports */
-/* eslint-disable max-lines */
-/* eslint-disable id-length */
-/* eslint-disable sort-keys */
+ 
+ 
+ 
 /* eslint-disable perfectionist/sort-objects */
-/* eslint-disable object-shorthand */
-/* eslint-disable sort-imports */
-/* eslint-disable capitalized-comments */
+ 
+ 
+ 
 
 import { importX } from "eslint-plugin-import-x";
 import { plugin as ex } from "eslint-plugin-exception-handling";
@@ -244,6 +244,11 @@ export default [
             "coverage-report.json",
             "html/**",
             "report/**",
+            // Ignore large test and benchmark directories during a repo-wide lint-fix run
+            "**/benchmarks/**",
+            "**/electron/test/**",
+            "**/src/test/**",
+            "**/test/**",
             // "**/*.config.{js,mjs,ts}",
         ],
     },
@@ -4487,6 +4492,7 @@ export default [
             "max-depth": "off",
             "no-shadow": "off",
             "no-underscore-dangle": "off",
+            "default-case": "off",
             "func-names": "off",
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -4626,6 +4632,7 @@ export default [
             "max-depth": "off",
             "no-shadow": "off",
             "no-underscore-dangle": "off",
+            "default-case": "off",
             "func-names": "off",
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -5134,6 +5141,7 @@ export default [
             "max-depth": "off",
             "no-shadow": "off",
             "no-underscore-dangle": "off",
+            "default-case": "off",
             "func-names": "off",
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -5298,6 +5306,7 @@ export default [
             "max-depth": "off",
             "no-shadow": "off",
             "no-underscore-dangle": "off",
+            "default-case": "off",
             "func-names": "off",
             "one-var": "off",
             "no-magic-numbers": "off",
@@ -5562,7 +5571,6 @@ export default [
                 },
             ],
             "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND
-            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },

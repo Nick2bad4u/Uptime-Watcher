@@ -68,8 +68,8 @@ interface FileSearchOptions {
 }
 
 class MockFileSystem {
-    private files: Map<string, { metadata: FileMetadata; content: FileContent }> = new Map();
-    private directories: Set<string> = new Set();
+    private files = new Map<string, { metadata: FileMetadata; content: FileContent }>();
+    private directories = new Set<string>();
 
     async writeFile(path: string, content: Buffer | string, options?: {
         encoding?: 'utf8' | 'base64' | 'binary';
@@ -154,11 +154,9 @@ class MockFileSystem {
                 if (fileDir.startsWith(normalizedDir)) {
                     files.push({ ...file.metadata });
                 }
-            } else {
-                if (fileDir === normalizedDir) {
+            } else if (fileDir === normalizedDir) {
                     files.push({ ...file.metadata });
                 }
-            }
         }
         
         return files.sort((a, b) => a.name.localeCompare(b.name));
@@ -229,7 +227,7 @@ class MockFileSystem {
         return {
             totalFiles: files.length,
             totalSize,
-            availableSpace: 1000000000, // 1GB mock available space
+            availableSpace: 1_000_000_000, // 1GB mock available space
             usedSpace: totalSize,
             folders: this.directories.size,
             compressionRatio: compressedSize > 0 ? totalSize / compressedSize : 1
@@ -241,7 +239,7 @@ class MockFileSystem {
         let currentPath = '';
         
         for (const part of parts) {
-            currentPath += '/' + part;
+            currentPath += `/${  part}`;
             this.directories.add(currentPath);
         }
     }
@@ -256,7 +254,7 @@ class MockFileSystem {
     }
 
     private normalizePath(path: string): string {
-        return path.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+        return path.replaceAll(/\/+/g, '/').replace(/\/$/, '') || '/';
     }
 
     private getMimeType(path: string): string {
@@ -284,7 +282,7 @@ class MockFileSystem {
         for (let i = 0; i < data.length; i++) {
             const char = data.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+            hash &= hash; // Convert to 32-bit integer
         }
         return Math.abs(hash).toString(16);
     }
@@ -315,7 +313,7 @@ class MockFileSystem {
 }
 
 class MockBackupService {
-    private backups: Map<string, BackupInfo> = new Map();
+    private backups = new Map<string, BackupInfo>();
     private nextId = 1;
 
     async createBackup(files: FileMetadata[], options?: {
@@ -387,8 +385,8 @@ class MockBackupService {
 class MockFileManagementService {
     private fileSystem: MockFileSystem;
     private backupService: MockBackupService;
-    private cache: Map<string, { data: any; expiry: Date }> = new Map();
-    private cacheTimeout = 300000; // 5 minutes
+    private cache = new Map<string, { data: any; expiry: Date }>();
+    private cacheTimeout = 300_000; // 5 minutes
 
     constructor() {
         this.fileSystem = new MockFileSystem();
@@ -486,13 +484,13 @@ class MockFileManagementService {
         return await this.fileSystem.searchFiles(options);
     }
 
-    async batchOperations(operations: Array<{
+    async batchOperations(operations: {
         type: 'create' | 'update' | 'delete' | 'copy' | 'move';
         sourcePath?: string;
         destPath?: string;
         content?: Buffer | string;
         options?: any;
-    }>): Promise<{ successful: number; failed: number; results: any[] }> {
+    }[]): Promise<{ successful: number; failed: number; results: any[] }> {
         let successful = 0;
         let failed = 0;
         const results: any[] = [];
@@ -503,36 +501,41 @@ class MockFileManagementService {
                 
                 switch (operation.type) {
                     case 'create':
-                    case 'update':
+                    case 'update': {
                         if (!operation.destPath || !operation.content) {
                             throw new Error('Missing required parameters for create/update');
                         }
                         result = await this.saveFile(operation.destPath, operation.content, operation.options);
                         break;
+                    }
                     
-                    case 'delete':
+                    case 'delete': {
                         if (!operation.sourcePath) {
                             throw new Error('Missing sourcePath for delete');
                         }
                         result = await this.deleteFile(operation.sourcePath);
                         break;
+                    }
                     
-                    case 'copy':
+                    case 'copy': {
                         if (!operation.sourcePath || !operation.destPath) {
                             throw new Error('Missing paths for copy');
                         }
                         result = await this.copyFile(operation.sourcePath, operation.destPath);
                         break;
+                    }
                     
-                    case 'move':
+                    case 'move': {
                         if (!operation.sourcePath || !operation.destPath) {
                             throw new Error('Missing paths for move');
                         }
                         result = await this.moveFile(operation.sourcePath, operation.destPath);
                         break;
+                    }
                     
-                    default:
+                    default: {
                         throw new Error(`Unknown operation type: ${operation.type}`);
+                    }
                 }
                 
                 results.push({ success: true, result });
@@ -627,11 +630,11 @@ class MockFileManagementService {
 }
 
 // Helper functions for creating test data
-function generateTestFiles(count: number, directory: string = '/test'): Array<{
+function generateTestFiles(count: number, directory: string = '/test'): {
     path: string;
     content: string;
     options?: any;
-}> {
+}[] {
     return Array.from({ length: count }, (_, i) => ({
         path: `${directory}/file_${i}.txt`,
         content: `Test content for file ${i}\n`.repeat(Math.floor(Math.random() * 100) + 10),

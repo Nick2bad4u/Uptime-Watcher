@@ -33,9 +33,9 @@ interface Alert {
 }
 
 class MockAlertSystem {
-    private rules: Map<string, AlertRule> = new Map();
-    private alerts: Map<string, Alert> = new Map();
-    private monitorData: Map<string, any[]> = new Map();
+    private rules = new Map<string, AlertRule>();
+    private alerts = new Map<string, Alert>();
+    private monitorData = new Map<string, any[]>();
 
     constructor() {
         this.initializeTestData();
@@ -48,7 +48,7 @@ class MockAlertSystem {
                 id: `rule-${i}`,
                 name: `Alert Rule ${i}`,
                 type: ['threshold', 'anomaly', 'status_change'][i % 3] as any,
-                conditions: { threshold: Math.random() * 1000, timeWindow: 300000 },
+                conditions: { threshold: Math.random() * 1000, timeWindow: 300_000 },
                 severity: ['low', 'medium', 'high', 'critical'][i % 4] as any,
                 isEnabled: Math.random() > 0.1
             };
@@ -59,7 +59,7 @@ class MockAlertSystem {
         for (let i = 0; i < 100; i++) {
             const monitorId = `monitor-${i}`;
             const data = Array.from({ length: 1000 }, (_, j) => ({
-                timestamp: Date.now() - j * 60000,
+                timestamp: Date.now() - j * 60_000,
                 responseTime: Math.random() * 2000,
                 status: Math.random() > 0.1 ? 'online' : 'offline',
                 success: Math.random() > 0.05

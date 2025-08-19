@@ -524,8 +524,7 @@ describe("Console Statement Remediation", () => {
             }
 
             // Example function to apply replacements (not actually run)
-            const generateReplacementScript = () => {
-                return `
+            const generateReplacementScript = () => `
 // Example replacement script (manual review required)
 function replaceConsoleStatements(fileContent: string): string {
     let result = fileContent;
@@ -549,7 +548,6 @@ function replaceConsoleStatements(fileContent: string): string {
     return result;
 }
 `;
-            };
 
             const script = generateReplacementScript();
             expect(script.length).toBeGreaterThan(0);

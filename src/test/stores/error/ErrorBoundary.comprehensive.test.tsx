@@ -221,14 +221,12 @@ describe("ErrorBoundary", () => {
         it("should reset error state on retry", async () => {
             const user = userEvent.setup();
 
-            let componentState = { shouldThrow: true };
-            const StateControlledComponent = () => {
-                return (
+            const componentState = { shouldThrow: true };
+            const StateControlledComponent = () => (
                     <ThrowingComponent
                         shouldThrow={componentState.shouldThrow}
                     />
                 );
-            };
 
             render(
                 <ErrorBoundary>

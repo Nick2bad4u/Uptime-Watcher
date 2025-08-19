@@ -6,9 +6,7 @@
 import { bench, describe } from "vitest";
 
 // Interface definitions for React Context system
-interface ContextValue {
-  [key: string]: any;
-}
+type ContextValue = Record<string, any>;
 
 interface ContextProvider {
   id: string;
@@ -79,11 +77,11 @@ interface SelectorPerformance {
 
 // Mock React Context system
 class MockReactContext {
-  private providers: Map<string, ContextProvider> = new Map();
-  private consumers: Map<string, ContextConsumer> = new Map();
-  private components: Map<string, ComponentInstance> = new Map();
+  private providers = new Map<string, ContextProvider>();
+  private consumers = new Map<string, ContextConsumer>();
+  private components = new Map<string, ComponentInstance>();
   private contextUpdates: ContextUpdate[] = [];
-  private selectorCache: Map<string, { value: any; deps: any[]; timestamp: number }> = new Map();
+  private selectorCache = new Map<string, { value: any; deps: any[]; timestamp: number }>();
   private nextId = 0;
 
   // Context creation and management
@@ -192,13 +190,15 @@ class MockReactContext {
     let updatedValue: ContextValue;
 
     switch (mergeStrategy) {
-      case "replace":
+      case "replace": {
         updatedValue = { ...newValue };
         break;
-      case "merge":
+      }
+      case "merge": {
         updatedValue = { ...provider.value, ...newValue };
         break;
-      case "selective":
+      }
+      case "selective": {
         updatedValue = { ...provider.value };
         Object.keys(newValue).forEach(key => {
           if (this.shouldUpdateKey(key, oldValue[key], newValue[key])) {
@@ -206,6 +206,7 @@ class MockReactContext {
           }
         });
         break;
+      }
     }
 
     provider.value = updatedValue;
@@ -385,9 +386,7 @@ class MockReactContext {
   ): (value: ContextValue) => T {
     const selectorId = `selector-${this.nextId++}`;
     
-    return (value: ContextValue): T => {
-      return this.applySelectorWithMemoization(selectorId, selectorFunction, value);
-    };
+    return (value: ContextValue): T => this.applySelectorWithMemoization(selectorId, selectorFunction, value);
   }
 
   // Context splitting for performance
@@ -401,7 +400,7 @@ class MockReactContext {
     const newContextIds: string[] = [];
     
     switch (splitStrategy) {
-      case "by-key":
+      case "by-key": {
         // Split by object keys
         const keys = Object.keys(provider.value);
         const keyGroups = this.groupKeysByUsage(keys, originalContextId);
@@ -417,8 +416,9 @@ class MockReactContext {
           newContextIds.push(newContextId);
         });
         break;
+      }
         
-      case "by-usage":
+      case "by-usage": {
         // Split by consumer usage patterns
         const usagePatterns = this.analyzeConsumerUsagePatterns(originalContextId);
         usagePatterns.forEach((pattern, index) => {
@@ -427,8 +427,9 @@ class MockReactContext {
           newContextIds.push(newContextId);
         });
         break;
+      }
         
-      case "by-update-frequency":
+      case "by-update-frequency": {
         // Split by update frequency
         const frequencyGroups = this.groupByUpdateFrequency(provider.value);
         frequencyGroups.forEach((group, index) => {
@@ -437,6 +438,7 @@ class MockReactContext {
           newContextIds.push(newContextId);
         });
         break;
+      }
     }
     
     return newContextIds;
@@ -470,8 +472,8 @@ class MockReactContext {
     return [highUsage, lowUsage].filter(group => group.length > 0);
   }
 
-  private analyzeConsumerUsagePatterns(contextId: string): Array<{ value: ContextValue; consumers: string[] }> {
-    const patterns: Array<{ value: ContextValue; consumers: string[] }> = [];
+  private analyzeConsumerUsagePatterns(contextId: string): { value: ContextValue; consumers: string[] }[] {
+    const patterns: { value: ContextValue; consumers: string[] }[] = [];
     const consumerGroups = new Map<string, string[]>();
     
     // Group consumers by their subscription patterns
@@ -775,7 +777,7 @@ describe("React Context Performance", () => {
         (value) => ({
           counterDisplay: `Count: ${value.counter}`,
           userStatus: value.user?.online ? "online" : "offline",
-          hasError: !!value.ui?.error,
+          hasError: Boolean(value.ui?.error),
         })
       );
     }
@@ -787,18 +789,22 @@ describe("React Context Performance", () => {
       let update: any;
       
       switch (updateType) {
-        case 0:
+        case 0: {
           update = { counter: i };
           break;
-        case 1:
+        }
+        case 1: {
           update = { timestamp: Date.now() + i };
           break;
-        case 2:
+        }
+        case 2: {
           update = { user: { online: Math.random() > 0.5, lastActivity: Date.now() } };
           break;
-        case 3:
+        }
+        case 3: {
           update = { ui: { loading: Math.random() > 0.8, error: Math.random() > 0.9 ? "Error!" : null } };
           break;
+        }
       }
       
       const result = contextSystem.updateContextValue(providerId, update, "merge");
@@ -934,21 +940,23 @@ describe("React Context Performance", () => {
       let selectorFunction: (value: any) => any = (value) => ({ default: true });
       
       switch (selectorComplexity) {
-        case 0:
+        case 0: {
           // Simple selector
           selectorFunction = (value) => ({
             userCount: value.users?.length || 0,
             teamCount: value.teams?.length || 0,
           });
           break;
-        case 1:
+        }
+        case 1: {
           // Medium selector with filtering
           selectorFunction = (value) => ({
             adminUsers: value.users?.filter((u: any) => u.role === "admin") || [],
             activeProjects: value.projects?.filter((p: any) => p.status === "active") || [],
           });
           break;
-        case 2:
+        }
+        case 2: {
           // Complex selector with computation
           selectorFunction = (value) => {
             const users = value.users || [];
@@ -969,7 +977,8 @@ describe("React Context Performance", () => {
             };
           };
           break;
-        case 3:
+        }
+        case 3: {
           // Very complex selector with deep computation
           selectorFunction = (value) => {
             const users = value.users || [];
@@ -989,13 +998,14 @@ describe("React Context Performance", () => {
                 projectCount: teamProjects.length,
                 efficiency: teamUsers.length > 0 ? teamProjects.length / teamUsers.length : 0,
                 avgPermissions: teamUsers.reduce((sum: number, user: any) => 
-                  sum + user.permissions.filter((p: boolean) => p).length, 0) / teamUsers.length,
+                  sum + user.permissions.filter(Boolean).length, 0) / teamUsers.length,
               };
             });
             
             return { teamEfficiency };
           };
           break;
+        }
       }
       
       const consumer = contextSystem.createConsumer(
@@ -1162,7 +1172,7 @@ describe("React Context Performance", () => {
           if (provider) {
             contextSystem.updateContextValue(provider.id, updateData, "merge");
           }
-        } catch (error) {
+        } catch {
           // Context not found, skip
         }
       }

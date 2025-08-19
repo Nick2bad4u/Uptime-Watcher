@@ -23,7 +23,7 @@ import {
  * Helper function to create a test site with specified monitors.
  */
 function createTestSite(
-    monitors: Array<{ monitoring: boolean; status: MonitorStatus }>
+    monitors: { monitoring: boolean; status: MonitorStatus }[]
 ): SiteForStatus {
     return {
         monitors: monitors.map((monitor) => ({

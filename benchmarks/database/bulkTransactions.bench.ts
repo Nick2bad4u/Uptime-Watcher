@@ -13,8 +13,8 @@
  */
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
-import { tmpdir } from "os";
-import { join } from "path";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 // Import production types
 import type { Site, Monitor, StatusHistory } from "../../shared/types";
@@ -44,7 +44,7 @@ function generateMonitors(count: number, siteIdentifier: string): Monitor[] {
             siteIdentifier,
             type,
             monitoring: true,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             timeout: 5000,
             retryAttempts: 3,
             status: (i % 4 === 0 ? "down" : "up") as "up" | "down",
@@ -55,25 +55,28 @@ function generateMonitors(count: number, siteIdentifier: string): Monitor[] {
         };
 
         switch (type) {
-            case "http":
+            case "http": {
                 monitors.push({
                     ...baseMonitor,
                     url: `https://api-${i}.example.com`,
                 });
                 break;
-            case "ping":
+            }
+            case "ping": {
                 monitors.push({
                     ...baseMonitor,
                     host: `host-${i}.example.com`,
                 });
                 break;
-            case "port":
+            }
+            case "port": {
                 monitors.push({
                     ...baseMonitor,
                     host: `port-${i}.example.com`,
                     port: 80 + (i % 10),
                 });
                 break;
+            }
         }
     }
     return monitors;
@@ -85,7 +88,7 @@ function generateStatusHistory(count: number): StatusHistory[] {
     
     for (let i = 0; i < count; i++) {
         history.push({
-            timestamp: now - (i * 60000), // One minute intervals
+            timestamp: now - (i * 60_000), // One minute intervals
             status: (i % 5 === 0 ? "down" : "up") as "up" | "down",
             responseTime: Math.floor(Math.random() * 500),
             details: i % 10 === 0 ? `Error detail for entry ${i}` : undefined,
@@ -224,7 +227,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
         });
 
         bench("Bulk insert 10000 history entries", async () => {
-            const history = generateStatusHistory(10000);
+            const history = generateStatusHistory(10_000);
             await simulateBulkInsert(history);
         });
 
@@ -370,7 +373,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
 
     describe("Memory-Intensive Operations", () => {
         bench("Process large dataset: 10,000 monitor status updates", async () => {
-            const monitors = generateMonitors(10000, "memory-test");
+            const monitors = generateMonitors(10_000, "memory-test");
             
             // Simulate processing large dataset in memory
             const updates = monitors.map(monitor => ({
@@ -423,7 +426,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
             
             // Simulate serialization time
             const jsonData = JSON.stringify(exportData);
-            await new Promise(resolve => setTimeout(resolve, jsonData.length / 100000)); // Simulate based on size
+            await new Promise(resolve => setTimeout(resolve, jsonData.length / 100_000)); // Simulate based on size
         });
     });
 });

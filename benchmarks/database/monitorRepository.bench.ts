@@ -27,18 +27,18 @@ class MockDatabase {
                     return { lastInsertRowid: monitor.id };
                 }
                 if (sql.includes('UPDATE')) {
-                    const index = this.monitors.findIndex(m => m.id === params[params.length - 1]);
+                    const index = this.monitors.findIndex(m => m.id === params.at(-1));
                     if (index !== -1) {
                         this.monitors[index] = { ...this.monitors[index], ...params };
                     }
-                    return { changes: index !== -1 ? 1 : 0 };
+                    return { changes: index === -1 ? 0 : 1 };
                 }
                 if (sql.includes('DELETE')) {
                     const index = this.monitors.findIndex(m => m.id === params[0]);
                     if (index !== -1) {
                         this.monitors.splice(index, 1);
                     }
-                    return { changes: index !== -1 ? 1 : 0 };
+                    return { changes: index === -1 ? 0 : 1 };
                 }
                 return {};
             },
@@ -74,7 +74,7 @@ class MockMonitorRepository {
                 type: ['http', 'ping', 'port'][i % 3],
                 name: `Monitor ${i}`,
                 isEnabled: Math.random() > 0.3,
-                interval: [30000, 60000, 120000][i % 3],
+                interval: [30_000, 60_000, 120_000][i % 3],
                 timeout: 5000,
                 retries: 3,
                 configuration: JSON.stringify({ method: 'GET', expectedStatus: 200 })
@@ -141,7 +141,7 @@ class MockMonitorRepository {
         return stmt.run(siteId);
     }
 
-    bulkUpdateStatus(updates: Array<{ id: number; status: string; lastChecked: string }>) {
+    bulkUpdateStatus(updates: { id: number; status: string; lastChecked: string }[]) {
         const stmt = this.db.prepare(`
             UPDATE monitors SET status = ?, lastChecked = ? WHERE id = ?
         `);
@@ -176,7 +176,7 @@ describe("Monitor Repository Performance", () => {
             type: 'http',
             name: 'Test Monitor',
             isEnabled: true,
-            interval: 60000,
+            interval: 60_000,
             timeout: 5000,
             retries: 3,
             configuration: JSON.stringify({ method: 'GET', expectedStatus: 200 })
@@ -186,7 +186,7 @@ describe("Monitor Repository Performance", () => {
     bench("find monitor by id", () => {
         repository = new MockMonitorRepository();
         repository.findById(Math.floor(Math.random() * 1000) + 1);
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("find monitors by site id", () => {
         repository = new MockMonitorRepository();
@@ -211,8 +211,8 @@ describe("Monitor Repository Performance", () => {
             type: 'http',
             name: 'Updated Monitor',
             isEnabled: false,
-            interval: 120000,
-            timeout: 10000,
+            interval: 120_000,
+            timeout: 10_000,
             retries: 5,
             configuration: JSON.stringify({ method: 'POST', expectedStatus: 201 })
         });

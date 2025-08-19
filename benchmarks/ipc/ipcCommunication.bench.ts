@@ -228,7 +228,7 @@ describe("IPC Communication Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 

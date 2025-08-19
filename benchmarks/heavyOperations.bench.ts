@@ -64,7 +64,7 @@ function generateSites(count: number, monitorsPerSite: number): Site[] {
 
             for (let k = 0; k < historyCount; k++) {
                 history.push({
-                    timestamp: Date.now() - k * 30000, // 30-second intervals
+                    timestamp: Date.now() - k * 30_000, // 30-second intervals
                     status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
                     responseTime: Math.floor(Math.random() * 500) + 10,
                 });
@@ -200,9 +200,9 @@ function aggregateSiteStatistics(sites: Site[]): Map<string, UptimeStats> {
 
 function detectOutages(
     history: StatusEntry[],
-    minimumDuration: number = 60000
-): Array<{ start: number; end: number; duration: number }> {
-    const outages: Array<{ start: number; end: number; duration: number }> = [];
+    minimumDuration: number = 60_000
+): { start: number; end: number; duration: number }[] {
+    const outages: { start: number; end: number; duration: number }[] = [];
     let currentOutageStart: number | null = null;
 
     // Sort history by timestamp for sequential processing
@@ -264,9 +264,9 @@ describe("Heavy Computational Operations Benchmarks", () => {
     const massiveDataset = generateSites(500, 10); // 5000 monitors
 
     const smallHistory = generateStatusUpdates(1000);
-    const mediumHistory = generateStatusUpdates(10000);
-    const largeHistory = generateStatusUpdates(50000);
-    const massiveHistory = generateStatusUpdates(100000);
+    const mediumHistory = generateStatusUpdates(10_000);
+    const largeHistory = generateStatusUpdates(50_000);
+    const massiveHistory = generateStatusUpdates(100_000);
 
     describe("Small Dataset Operations (50 monitors)", () => {
         bench(
@@ -290,7 +290,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
         bench(
             "Detect outages in monitor history",
             () => {
-                detectOutages(smallHistory, 60000);
+                detectOutages(smallHistory, 60_000);
             },
             { iterations: 500 }
         );
@@ -326,7 +326,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
         bench(
             "Detect outages in large monitor history",
             () => {
-                detectOutages(mediumHistory, 60000);
+                detectOutages(mediumHistory, 60_000);
             },
             { iterations: 50 }
         );
@@ -380,7 +380,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
         bench(
             "Detect outages in massive history",
             () => {
-                detectOutages(largeHistory, 60000);
+                detectOutages(largeHistory, 60_000);
             },
             { iterations: 10 }
         );
@@ -417,7 +417,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                             stats.averageResponseTime
                         );
 
-                        const outages = detectOutages(monitor.history, 60000);
+                        const outages = detectOutages(monitor.history, 60_000);
                         totalOutages += outages.length;
 
                         const sla = calculateSLACompliance(
@@ -463,7 +463,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                     now
                 );
                 const stats = calculateUptimeStatistics(filteredHistory);
-                const outages = detectOutages(filteredHistory, 300000); // 5-minute minimum outages
+                const outages = detectOutages(filteredHistory, 300_000); // 5-minute minimum outages
             },
             { iterations: 2 }
         );
@@ -519,7 +519,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                 // Process sites with empty history
                 for (const site of emptySites) {
                     calculateUptimeStatistics([]);
-                    detectOutages([], 60000);
+                    detectOutages([], 60_000);
                     calculateSLACompliance([], 99.9);
                 }
             },
@@ -530,7 +530,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
             "Handle single-status datasets",
             () => {
                 // Create history with only "up" status
-                const upOnlyHistory = Array(1000)
+                const upOnlyHistory = Array.from({length: 1000})
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,
@@ -539,7 +539,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                     }));
 
                 // Create history with only "down" status
-                const downOnlyHistory = Array(1000)
+                const downOnlyHistory = Array.from({length: 1000})
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,
@@ -549,8 +549,8 @@ describe("Heavy Computational Operations Benchmarks", () => {
 
                 calculateUptimeStatistics(upOnlyHistory);
                 calculateUptimeStatistics(downOnlyHistory);
-                detectOutages(upOnlyHistory, 60000);
-                detectOutages(downOnlyHistory, 60000);
+                detectOutages(upOnlyHistory, 60_000);
+                detectOutages(downOnlyHistory, 60_000);
             },
             { iterations: 200 }
         );
@@ -559,7 +559,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
             "Handle rapid status changes",
             () => {
                 // Create history with status changing every second
-                const rapidChanges = Array(5000)
+                const rapidChanges = Array.from({length: 5000})
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,
@@ -570,7 +570,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
 
                 const stats = calculateUptimeStatistics(rapidChanges);
                 const outages = detectOutages(rapidChanges, 5000); // 5-second minimum
-                const sla = calculateSLACompliance(rapidChanges, 50.0); // 50% threshold
+                const sla = calculateSLACompliance(rapidChanges, 50); // 50% threshold
             },
             { iterations: 50 }
         );

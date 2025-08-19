@@ -103,9 +103,9 @@ interface Alert {
 }
 
 class MockMetricsStorage {
-    private timeSeries: Map<string, TimeSeries> = new Map();
-    private indexByTime: Map<number, string[]> = new Map(); // timestamp -> metric names
-    private indexByTags: Map<string, Set<string>> = new Map(); // tag -> metric names
+    private timeSeries = new Map<string, TimeSeries>();
+    private indexByTime = new Map<number, string[]>(); // timestamp -> metric names
+    private indexByTags = new Map<string, Set<string>>(); // tag -> metric names
 
     async store(name: string, points: MetricPoint[], unit: string = 'count', tags: Record<string, string> = {}): Promise<void> {
         let series = this.timeSeries.get(name);
@@ -125,7 +125,7 @@ class MockMetricsStorage {
             series.points.push(point);
             
             // Update time index
-            const timeKey = Math.floor(point.timestamp.getTime() / 60000) * 60000; // Round to minute
+            const timeKey = Math.floor(point.timestamp.getTime() / 60_000) * 60_000; // Round to minute
             if (!this.indexByTime.has(timeKey)) {
                 this.indexByTime.set(timeKey, []);
             }
@@ -197,29 +197,36 @@ class MockMetricsStorage {
             const values = s.points.map(p => p.value);
             
             switch (aggregationType) {
-                case 'sum':
+                case 'sum': {
                     value = values.reduce((sum, val) => sum + val, 0);
                     break;
-                case 'avg':
+                }
+                case 'avg': {
                     value = values.reduce((sum, val) => sum + val, 0) / values.length;
                     break;
-                case 'min':
+                }
+                case 'min': {
                     value = Math.min(...values);
                     break;
-                case 'max':
+                }
+                case 'max': {
                     value = Math.max(...values);
                     break;
-                case 'count':
+                }
+                case 'count': {
                     value = values.length;
                     break;
-                case 'percentile':
+                }
+                case 'percentile': {
                     // Default to 95th percentile
                     const sorted = [...values].sort((a, b) => a - b);
                     const index = Math.ceil(sorted.length * 0.95) - 1;
                     value = sorted[index] || 0;
                     break;
-                default:
+                }
+                default: {
                     value = 0;
+                }
             }
             
             results.push({
@@ -229,7 +236,7 @@ class MockMetricsStorage {
                 aggregationType: aggregationType as any,
                 timeRange: {
                     start: s.points[0]?.timestamp || new Date(),
-                    end: s.points[s.points.length - 1]?.timestamp || new Date()
+                    end: s.points.at(-1)?.timestamp || new Date()
                 },
                 tags: s.tags
             });
@@ -259,8 +266,8 @@ class MockMetricsStorage {
 }
 
 class MockAlertEngine {
-    private rules: Map<string, AlertRule> = new Map();
-    private alerts: Map<string, Alert> = new Map();
+    private rules = new Map<string, AlertRule>();
+    private alerts = new Map<string, Alert>();
     private nextAlertId = 1;
 
     addRule(rule: AlertRule): void {
@@ -301,20 +308,27 @@ class MockAlertEngine {
 
     private evaluateCondition(value: number, condition: AlertRule['condition']): boolean {
         switch (condition.operator) {
-            case '>':
+            case '>': {
                 return value > condition.threshold;
-            case '<':
+            }
+            case '<': {
                 return value < condition.threshold;
-            case '>=':
+            }
+            case '>=': {
                 return value >= condition.threshold;
-            case '<=':
+            }
+            case '<=': {
                 return value <= condition.threshold;
-            case '==':
+            }
+            case '==': {
                 return value === condition.threshold;
-            case '!=':
+            }
+            case '!=': {
                 return value !== condition.threshold;
-            default:
+            }
+            default: {
                 return false;
+            }
         }
     }
 
@@ -339,8 +353,8 @@ class MockAlertEngine {
 }
 
 class MockQueryCache {
-    private cache: Map<string, { result: AnalyticsResult; expiry: Date }> = new Map();
-    private cacheTimeout = 300000; // 5 minutes
+    private cache = new Map<string, { result: AnalyticsResult; expiry: Date }>();
+    private cacheTimeout = 300_000; // 5 minutes
 
     get(query: AnalyticsQuery): AnalyticsResult | null {
         const key = this.generateKey(query);
@@ -391,7 +405,7 @@ class MockAnalyticsService {
     private storage: MockMetricsStorage;
     private alertEngine: MockAlertEngine;
     private cache: MockQueryCache;
-    private dashboards: Map<string, Dashboard> = new Map();
+    private dashboards = new Map<string, Dashboard>();
 
     constructor() {
         this.storage = new MockMetricsStorage();
@@ -409,12 +423,12 @@ class MockAnalyticsService {
         await this.storage.store(name, [point]);
     }
 
-    async recordBatchMetrics(metrics: Array<{
+    async recordBatchMetrics(metrics: {
         name: string;
         value: number;
         timestamp?: Date;
         metadata?: Record<string, any>;
-    }>): Promise<void> {
+    }[]): Promise<void> {
         const batchMap = new Map<string, MetricPoint[]>();
         
         for (const metric of metrics) {
@@ -631,19 +645,19 @@ class MockAnalyticsService {
 }
 
 // Helper functions for creating test data
-function generateMetricData(metricName: string, count: number, timeRangeMinutes: number = 60): Array<{
+function generateMetricData(metricName: string, count: number, timeRangeMinutes: number = 60): {
     name: string;
     value: number;
     timestamp: Date;
     metadata?: Record<string, any>;
-}> {
+}[] {
     const now = new Date();
-    const data: Array<{
+    const data: {
         name: string;
         value: number;
         timestamp: Date;
         metadata?: Record<string, any>;
-    }> = [];
+    }[] = [];
     
     for (let i = 0; i < count; i++) {
         const timestamp = new Date(now.getTime() - (timeRangeMinutes - i) * 60 * 1000);
@@ -665,7 +679,7 @@ function createTestDashboard(): Dashboard {
     return {
         id: 'main-dashboard',
         name: 'Main Monitoring Dashboard',
-        refreshInterval: 30000,
+        refreshInterval: 30_000,
         lastUpdated: new Date(),
         widgets: [
             {
@@ -692,7 +706,7 @@ function createTestDashboard(): Dashboard {
                         start: new Date(Date.now() - 60 * 60 * 1000),
                         end: new Date()
                     },
-                    aggregation: { type: 'avg', interval: 300000 }
+                    aggregation: { type: 'avg', interval: 300_000 }
                 },
                 configuration: { chartType: 'line' }
             }
@@ -747,7 +761,7 @@ describe("Analytics Service Performance", () => {
                     start: new Date(Date.now() - 120 * 60 * 1000),
                     end: new Date()
                 },
-                aggregation: { type: 'percentile', percentile: 95, interval: 600000 },
+                aggregation: { type: 'percentile', percentile: 95, interval: 600_000 },
                 filters: { region: 'us-east' },
                 groupBy: ['siteId']
             };
@@ -836,7 +850,7 @@ describe("Analytics Service Performance", () => {
             id: 'high-response-time',
             name: 'High Response Time',
             metricName: 'response_time.avg',
-            condition: { operator: '>', threshold: 500, duration: 300000 },
+            condition: { operator: '>', threshold: 500, duration: 300_000 },
             isActive: true
         });
         
@@ -844,7 +858,7 @@ describe("Analytics Service Performance", () => {
             id: 'low-uptime',
             name: 'Low Uptime',
             metricName: 'uptime.percentage',
-            condition: { operator: '<', threshold: 95, duration: 600000 },
+            condition: { operator: '<', threshold: 95, duration: 600_000 },
             isActive: true
         });
         
@@ -906,7 +920,7 @@ describe("Analytics Service Performance", () => {
                     start: new Date(Date.now() - 60 * 60 * 1000),
                     end: new Date()
                 },
-                aggregation: { type: 'avg', interval: 300000 }
+                aggregation: { type: 'avg', interval: 300_000 }
             };
             
             service.executeQuery(query);
@@ -1018,7 +1032,7 @@ describe("Analytics Service Performance", () => {
                 id: 'test-rule',
                 name: 'Test Rule',
                 metricName: 'reset.metric',
-                condition: { operator: '>', threshold: 100, duration: 60000 },
+                condition: { operator: '>', threshold: 100, duration: 60_000 },
                 isActive: true
             });
             

@@ -15,8 +15,8 @@ import { bench, describe } from "vitest";
 
 // Mock site monitoring service
 class MockSiteMonitor {
-    private sites: Map<string, any> = new Map();
-    private monitoringResults: Map<string, any[]> = new Map();
+    private sites = new Map<string, any>();
+    private monitoringResults = new Map<string, any[]>();
 
     constructor() {
         this.initializeTestSites();
@@ -30,7 +30,7 @@ class MockSiteMonitor {
                 url: `https://site${i}.example.com`,
                 name: `Site ${i}`,
                 isActive: Math.random() > 0.1,
-                checkInterval: [30000, 60000, 120000][i % 3],
+                checkInterval: [30_000, 60_000, 120_000][i % 3],
                 timeout: 5000,
                 expectedStatus: 200,
                 lastChecked: null,
@@ -112,7 +112,7 @@ class MockSiteMonitor {
             avgResponseTime: responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length,
             minResponseTime: Math.min(...responseTimes),
             maxResponseTime: Math.max(...responseTimes),
-            lastCheck: results[results.length - 1],
+            lastCheck: results.at(-1),
             statusCodes: this.getStatusCodeDistribution(results)
         };
     }
@@ -205,17 +205,21 @@ class MockSiteMonitor {
 
     private evaluateAlertRule(rule: any, results: any[], site: any) {
         switch (rule.type) {
-            case 'uptime':
+            case 'uptime': {
                 const uptime = results.filter(r => r.isHealthy).length / results.length * 100;
                 return uptime < rule.threshold;
-            case 'response_time':
+            }
+            case 'response_time': {
                 const avgResponseTime = results.reduce((sum, r) => sum + r.responseTime, 0) / results.length;
                 return avgResponseTime > rule.threshold;
-            case 'consecutive_failures':
+            }
+            case 'consecutive_failures': {
                 const recentFailures = results.slice(-rule.threshold).every(r => !r.isHealthy);
                 return recentFailures && results.length >= rule.threshold;
-            default:
+            }
+            default: {
                 return false;
+            }
         }
     }
 
@@ -338,8 +342,8 @@ describe("Site Monitoring Performance", () => {
         }
 
         const alertRules = [
-            { name: 'uptime_alert', type: 'uptime', threshold: 90, timeWindow: 300000, severity: 'warning', message: 'Low uptime detected' },
-            { name: 'response_time_alert', type: 'response_time', threshold: 1000, timeWindow: 300000, severity: 'critical', message: 'High response time' }
+            { name: 'uptime_alert', type: 'uptime', threshold: 90, timeWindow: 300_000, severity: 'warning', message: 'Low uptime detected' },
+            { name: 'response_time_alert', type: 'response_time', threshold: 1000, timeWindow: 300_000, severity: 'critical', message: 'High response time' }
         ];
         
         await monitor.generateAlerts(alertRules);

@@ -109,77 +109,89 @@ describe("Application Service Benchmarks", () => {
       let memoryAllocated: number;
       
       switch (phase) {
-        case 'initialization':
+        case 'initialization': {
           operations = ['parse-args', 'load-config', 'setup-logging', 'validate-environment'];
           baseDuration = 50;
           resourcesInitialized = 15;
           memoryAllocated = 2048;
           break;
-        case 'early-startup':
+        }
+        case 'early-startup': {
           operations = ['setup-crash-reporter', 'initialize-protocols', 'setup-security'];
           baseDuration = 30;
           resourcesInitialized = 8;
           memoryAllocated = 1024;
           break;
-        case 'plugin-loading':
+        }
+        case 'plugin-loading': {
           operations = ['scan-plugins', 'load-extensions', 'initialize-addons'];
           baseDuration = 100;
           resourcesInitialized = 25;
           memoryAllocated = 4096;
           break;
-        case 'window-creation':
+        }
+        case 'window-creation': {
           operations = ['create-main-window', 'setup-menus', 'initialize-ui'];
           baseDuration = 150;
           resourcesInitialized = 20;
           memoryAllocated = 8192;
           break;
-        case 'services-startup':
+        }
+        case 'services-startup': {
           operations = ['start-background-services', 'initialize-api', 'setup-ipc'];
           baseDuration = 80;
           resourcesInitialized = 30;
           memoryAllocated = 3072;
           break;
-        case 'ui-ready':
+        }
+        case 'ui-ready': {
           operations = ['render-ui', 'bind-events', 'show-window'];
           baseDuration = 120;
           resourcesInitialized = 18;
           memoryAllocated = 6144;
           break;
-        case 'full-ready':
+        }
+        case 'full-ready': {
           operations = ['post-init-tasks', 'auto-updater', 'telemetry-init'];
           baseDuration = 60;
           resourcesInitialized = 12;
           memoryAllocated = 2048;
           break;
-        case 'runtime':
+        }
+        case 'runtime': {
           operations = ['handle-events', 'process-queue', 'monitor-health'];
           baseDuration = 5; // Continuous operation
           resourcesInitialized = 5;
           memoryAllocated = 512;
           break;
-        case 'pre-shutdown':
+        }
+        case 'pre-shutdown': {
           operations = ['save-state', 'notify-services', 'prepare-exit'];
           baseDuration = 40;
           resourcesInitialized = 0;
           memoryAllocated = -1024; // Memory being freed
           break;
-        case 'shutdown':
+        }
+        case 'shutdown': {
           operations = ['close-windows', 'stop-services', 'cleanup-resources'];
           baseDuration = 80;
           resourcesInitialized = 0;
           memoryAllocated = -4096;
           break;
-        case 'cleanup':
+        }
+        case 'cleanup': {
           operations = ['final-cleanup', 'release-handles', 'exit-process'];
           baseDuration = 30;
           resourcesInitialized = 0;
           memoryAllocated = -8192;
           break;
-        default:
+        }
+        default: {
           operations = ['unknown-operation'];
           baseDuration = 10;
           resourcesInitialized = 0;
           memoryAllocated = 0;
+        }
       }
       
       // Add some variance to timing
@@ -230,20 +242,24 @@ describe("Application Service Benchmarks", () => {
       switch (eventType) {
         case 'ready':
         case 'before-quit':
-        case 'will-quit':
+        case 'will-quit': {
           priority = 1; // High priority
           break;
+        }
         case 'window-all-closed':
         case 'activate':
-        case 'second-instance':
+        case 'second-instance': {
           priority = 2; // Medium-high priority
           break;
+        }
         case 'browser-window-focus':
-        case 'browser-window-blur':
+        case 'browser-window-blur': {
           priority = 3; // Medium priority
           break;
-        default:
-          priority = 4; // Low priority
+        }
+        default: {
+          priority = 4;
+        } // Low priority
       }
       
       const event: AppEvent = {
@@ -276,19 +292,23 @@ describe("Application Service Benchmarks", () => {
       let baseProcessingTime: number;
       switch (event.type) {
         case 'ready':
-        case 'window-all-closed':
+        case 'window-all-closed': {
           baseProcessingTime = 50; // Complex events
           break;
+        }
         case 'before-quit':
-        case 'will-quit':
+        case 'will-quit': {
           baseProcessingTime = 30; // Shutdown events
           break;
+        }
         case 'browser-window-focus':
-        case 'browser-window-blur':
+        case 'browser-window-blur': {
           baseProcessingTime = 5; // Simple events
           break;
-        default:
-          baseProcessingTime = 15; // Average events
+        }
+        default: {
+          baseProcessingTime = 15;
+        } // Average events
       }
       
       const processingTime = baseProcessingTime + Math.random() * 10;
@@ -378,15 +398,13 @@ describe("Application Service Benchmarks", () => {
       const menuTemplate = generateMenuTemplate();
       
       // Calculate complexity based on menu structure
-      const countMenuItems = (template: MenuTemplate[]): number => {
-        return template.reduce((count, item) => {
+      const countMenuItems = (template: MenuTemplate[]): number => template.reduce((count, item) => {
           let itemCount = 1;
           if (item.submenu) {
             itemCount += countMenuItems(item.submenu);
           }
           return count + itemCount;
         }, 0);
-      };
       
       const complexity = countMenuItems(menuTemplate);
       
@@ -396,35 +414,41 @@ describe("Application Service Benchmarks", () => {
       let bindingTime: number;
       
       switch (operationType) {
-        case 'build':
+        case 'build': {
           buildTime = complexity * 0.5 + Math.random() * 5;
           renderTime = complexity * 0.3 + Math.random() * 3;
           bindingTime = complexity * 0.2 + Math.random() * 2;
           break;
-        case 'update':
+        }
+        case 'update': {
           buildTime = complexity * 0.1 + Math.random() * 2;
           renderTime = complexity * 0.2 + Math.random() * 2;
           bindingTime = complexity * 0.1 + Math.random() * 1;
           break;
-        case 'rebuild':
+        }
+        case 'rebuild': {
           buildTime = complexity * 0.4 + Math.random() * 4;
           renderTime = complexity * 0.3 + Math.random() * 3;
           bindingTime = complexity * 0.2 + Math.random() * 2;
           break;
-        case 'localize':
+        }
+        case 'localize': {
           buildTime = complexity * 0.3 + Math.random() * 3;
           renderTime = complexity * 0.1 + Math.random() * 1;
           bindingTime = complexity * 0.05 + Math.random() * 0.5;
           break;
-        case 'theme-change':
+        }
+        case 'theme-change': {
           buildTime = complexity * 0.2 + Math.random() * 2;
           renderTime = complexity * 0.4 + Math.random() * 4;
           bindingTime = complexity * 0.1 + Math.random() * 1;
           break;
-        default:
+        }
+        default: {
           buildTime = complexity * 0.3;
           renderTime = complexity * 0.2;
           bindingTime = complexity * 0.1;
+        }
       }
       
       const operation: MenuOperation = {
@@ -496,43 +520,52 @@ describe("Application Service Benchmarks", () => {
       let baseResourceUsage: number;
       
       switch (component) {
-        case 'notification-system':
+        case 'notification-system': {
           baseSystemResponse = operation === 'trigger' ? 50 : 20;
           baseResourceUsage = 15;
           break;
-        case 'system-tray':
+        }
+        case 'system-tray': {
           baseSystemResponse = operation === 'register' ? 100 : 30;
           baseResourceUsage = 25;
           break;
-        case 'dock-menu':
+        }
+        case 'dock-menu': {
           baseSystemResponse = 40;
           baseResourceUsage = 20;
           break;
-        case 'auto-launcher':
+        }
+        case 'auto-launcher': {
           baseSystemResponse = operation === 'register' ? 150 : 50;
           baseResourceUsage = 10;
           break;
+        }
         case 'deep-links':
-        case 'protocol-handlers':
+        case 'protocol-handlers': {
           baseSystemResponse = operation === 'register' ? 200 : 60;
           baseResourceUsage = 30;
           break;
-        case 'file-associations':
+        }
+        case 'file-associations': {
           baseSystemResponse = operation === 'register' ? 300 : 80;
           baseResourceUsage = 35;
           break;
-        case 'global-shortcuts':
+        }
+        case 'global-shortcuts': {
           baseSystemResponse = operation === 'register' ? 80 : 25;
           baseResourceUsage = 12;
           break;
+        }
         case 'power-monitor':
-        case 'idle-detector':
+        case 'idle-detector': {
           baseSystemResponse = 30;
           baseResourceUsage = 8;
           break;
-        default:
+        }
+        default: {
           baseSystemResponse = 50;
           baseResourceUsage = 15;
+        }
       }
       
       // Add variance
@@ -545,15 +578,18 @@ describe("Application Service Benchmarks", () => {
       let successRate: number;
       switch (component) {
         case 'file-associations':
-        case 'protocol-handlers':
+        case 'protocol-handlers': {
           successRate = 0.95; // Complex system operations
           break;
+        }
         case 'auto-launcher':
-        case 'deep-links':
+        case 'deep-links': {
           successRate = 0.97;
           break;
-        default:
+        }
+        default: {
           successRate = 0.99;
+        }
       }
       
       const success = Math.random() < successRate;
@@ -615,10 +651,10 @@ describe("Application Service Benchmarks", () => {
       isFocused: true,
       windowCount: 3,
       memoryUsage: {
-        rss: 150000000, // 150MB
-        heapTotal: 80000000, // 80MB
-        heapUsed: 60000000, // 60MB
-        external: 10000000, // 10MB
+        rss: 150_000_000, // 150MB
+        heapTotal: 80_000_000, // 80MB
+        heapUsed: 60_000_000, // 60MB
+        external: 10_000_000, // 10MB
       },
       cpuUsage: {
         percentCPUUsage: 5.2,
@@ -638,11 +674,11 @@ describe("Application Service Benchmarks", () => {
       
       // Memory usage changes
       if (Math.random() > 0.3) {
-        const memoryDelta = (Math.random() - 0.5) * 20000000; // ±20MB
+        const memoryDelta = (Math.random() - 0.5) * 20_000_000; // ±20MB
         stateChanges.memoryUsage = {
           ...currentState.memoryUsage,
-          rss: Math.max(50000000, currentState.memoryUsage.rss + memoryDelta),
-          heapUsed: Math.max(20000000, currentState.memoryUsage.heapUsed + memoryDelta * 0.6),
+          rss: Math.max(50_000_000, currentState.memoryUsage.rss + memoryDelta),
+          heapUsed: Math.max(20_000_000, currentState.memoryUsage.heapUsed + memoryDelta * 0.6),
         };
       }
       
@@ -681,7 +717,7 @@ describe("Application Service Benchmarks", () => {
       // Check for alerts
       const alertsTriggered: string[] = [];
       
-      if (currentState.memoryUsage.rss > 500000000) { // 500MB threshold
+      if (currentState.memoryUsage.rss > 500_000_000) { // 500MB threshold
         alertsTriggered.push('HIGH_MEMORY_USAGE');
       }
       
@@ -711,7 +747,7 @@ describe("Application Service Benchmarks", () => {
     // Analyze monitoring performance
     const totalAlerts = stateSnapshots.reduce((sum, s) => sum + s.alertsTriggered.length, 0);
     const averageMonitoringOverhead = stateSnapshots.reduce((sum, s) => sum + s.monitoringOverhead, 0) / stateSnapshots.length;
-    const memoryTrend = stateSnapshots[stateSnapshots.length - 1].state.memoryUsage.rss - stateSnapshots[0].state.memoryUsage.rss;
-    const cpuTrend = stateSnapshots[stateSnapshots.length - 1].state.cpuUsage.percentCPUUsage - stateSnapshots[0].state.cpuUsage.percentCPUUsage;
+    const memoryTrend = stateSnapshots.at(-1).state.memoryUsage.rss - stateSnapshots[0].state.memoryUsage.rss;
+    const cpuTrend = stateSnapshots.at(-1).state.cpuUsage.percentCPUUsage - stateSnapshots[0].state.cpuUsage.percentCPUUsage;
   });
 });

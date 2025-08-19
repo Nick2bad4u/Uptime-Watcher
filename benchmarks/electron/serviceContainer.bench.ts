@@ -224,7 +224,7 @@ describe("Service Container Benchmarks", () => {
         targetService.type === 'singleton'
       );
       
-      const fromCache = !!existingInstance;
+      const fromCache = Boolean(existingInstance);
       let success = true;
       let dependencyCount = 0;
       let circularDependency = false;
@@ -232,7 +232,13 @@ describe("Service Container Benchmarks", () => {
       let memoryAllocated = 0;
       let error: string | undefined;
       
-      if (!fromCache) {
+      if (fromCache) {
+        // Update existing instance access info
+        existingInstance.lastAccessedAt = Date.now();
+        existingInstance.accessCount++;
+        dependencyCount = existingInstance.dependencies.length;
+        memoryAllocated = 0; // No new memory allocation
+      } else {
         // Simulate dependency resolution
         const resolvedDependencies: string[] = [];
         const resolutionStack: string[] = [targetService.id];
@@ -301,12 +307,6 @@ describe("Service Container Benchmarks", () => {
           
           serviceInstances.push(serviceInstance);
         }
-      } else {
-        // Update existing instance access info
-        existingInstance.lastAccessedAt = Date.now();
-        existingInstance.accessCount++;
-        dependencyCount = existingInstance.dependencies.length;
-        memoryAllocated = 0; // No new memory allocation
       }
       
       // Simulate resolution time based on complexity
@@ -366,11 +366,11 @@ describe("Service Container Benchmarks", () => {
     
     // Create initial service instances
     const serviceConfigs = [
-      { id: 'persistent-service', type: 'singleton', lifetime: 3600000 }, // 1 hour
-      { id: 'session-service', type: 'scoped', lifetime: 1800000 }, // 30 minutes
-      { id: 'request-service', type: 'transient', lifetime: 60000 }, // 1 minute
-      { id: 'cache-service', type: 'singleton', lifetime: 7200000 }, // 2 hours
-      { id: 'temp-service', type: 'transient', lifetime: 30000 }, // 30 seconds
+      { id: 'persistent-service', type: 'singleton', lifetime: 3_600_000 }, // 1 hour
+      { id: 'session-service', type: 'scoped', lifetime: 1_800_000 }, // 30 minutes
+      { id: 'request-service', type: 'transient', lifetime: 60_000 }, // 1 minute
+      { id: 'cache-service', type: 'singleton', lifetime: 7_200_000 }, // 2 hours
+      { id: 'temp-service', type: 'transient', lifetime: 30_000 }, // 30 seconds
     ];
     
     let currentTime = Date.now();
@@ -383,7 +383,7 @@ describe("Service Container Benchmarks", () => {
           (config.type === 'singleton' && !managedInstances.some(i => i.serviceId === config.id));
         
         if (shouldCreate) {
-          const instanceId = `${config.id}-instance-${cycle}-${Math.random().toString(36).substring(7)}`;
+          const instanceId = `${config.id}-instance-${cycle}-${Math.random().toString(36).slice(7)}`;
           
           // Create instance
           const instance: ServiceInstance = {
@@ -392,7 +392,7 @@ describe("Service Container Benchmarks", () => {
             createdAt: currentTime,
             lastAccessedAt: currentTime,
             accessCount: 0,
-            memoryUsage: Math.floor(Math.random() * 10000) + 1000, // 1-11KB
+            memoryUsage: Math.floor(Math.random() * 10_000) + 1000, // 1-11KB
             state: 'initializing',
             dependencies: [],
             children: [],
@@ -512,7 +512,7 @@ describe("Service Container Benchmarks", () => {
       }
       
       // Advance time
-      currentTime += Math.random() * 10000 + 5000; // 5-15 seconds
+      currentTime += Math.random() * 10_000 + 5000; // 5-15 seconds
     }
     
     // Calculate lifecycle metrics
@@ -552,7 +552,7 @@ describe("Service Container Benchmarks", () => {
   // Service scope management
   bench("service scope simulation", () => {
     const serviceScopes: ServiceScope[] = [];
-    const scopeOperations: Array<{
+    const scopeOperations: {
       operationId: string;
       type: 'create' | 'resolve' | 'dispose' | 'inherit';
       scopeId: string;
@@ -561,7 +561,7 @@ describe("Service Container Benchmarks", () => {
       timestamp: number;
       duration: number;
       success: boolean;
-    }> = [];
+    }[] = [];
     
     // Create root scope
     const rootScope: ServiceScope = {
@@ -620,7 +620,10 @@ describe("Service Container Benchmarks", () => {
           }
         }
         
-        if (!existingInstance) {
+        if (existingInstance) {
+          existingInstance.lastAccessedAt = currentTime;
+          existingInstance.accessCount++;
+        } else {
           // Create new service instance in scope
           const newInstance: ServiceInstance = {
             instanceId: `scoped-instance-${operation}`,
@@ -635,9 +638,6 @@ describe("Service Container Benchmarks", () => {
           };
           
           targetScope.serviceInstances.push(newInstance);
-        } else {
-          existingInstance.lastAccessedAt = currentTime;
-          existingInstance.accessCount++;
         }
         
       } else if (operationType < 0.9) {
@@ -697,7 +697,7 @@ describe("Service Container Benchmarks", () => {
             const parentScope = serviceScopes.find(s => s.scopeId === targetScope.parentScopeId);
             if (parentScope) {
               const childIndex = parentScope.childScopes.findIndex(c => c.scopeId === targetScope.scopeId);
-              if (childIndex >= 0) {
+              if (childIndex !== -1) {
                 parentScope.childScopes.splice(childIndex, 1);
               }
             }
@@ -710,22 +710,27 @@ describe("Service Container Benchmarks", () => {
       // Calculate operation duration based on complexity
       let duration: number;
       switch (opType) {
-        case 'create':
+        case 'create': {
           duration = Math.random() * 50 + 10; // 10-60ms
           break;
-        case 'resolve':
+        }
+        case 'resolve': {
           const scopeDepth = targetScope.parentScopeId ? 2 : 1;
           duration = Math.random() * 30 * scopeDepth + 5; // 5-65ms based on depth
           break;
-        case 'inherit':
+        }
+        case 'inherit': {
           duration = Math.random() * 20 + 5; // 5-25ms
           break;
-        case 'dispose':
+        }
+        case 'dispose': {
           const instanceCount = targetScope.serviceInstances.length;
           duration = Math.random() * 10 * instanceCount + 10; // 10ms + 10ms per instance
           break;
-        default:
+        }
+        default: {
           duration = 10;
+        }
       }
       
       const success = Math.random() > 0.02; // 98% success rate
@@ -783,14 +788,14 @@ describe("Service Container Benchmarks", () => {
     }
     
     const performanceMetrics: ContainerMetrics[] = [];
-    const operationHistory: Array<{
+    const operationHistory: {
       operation: string;
       startTime: number;
       endTime: number;
       memoryBefore: number;
       memoryAfter: number;
       success: boolean;
-    }> = [];
+    }[] = [];
     
     let currentMemory = 50 * 1024 * 1024; // Start with 50MB
     let totalGcCollections = 0;
@@ -866,7 +871,7 @@ describe("Service Container Benchmarks", () => {
       }
       
       // Calculate interval metrics
-      const intervalEnd = currentTime + 60000; // 1-minute intervals
+      const intervalEnd = currentTime + 60_000; // 1-minute intervals
       const activeServices = Math.floor(Math.random() * 50) + 10; // 10-60 active services
       const totalInstances = Math.floor(Math.random() * 200) + 50; // 50-250 instances
       

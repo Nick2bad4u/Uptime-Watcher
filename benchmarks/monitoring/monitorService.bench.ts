@@ -142,10 +142,10 @@ class MockDnsMonitor {
 
 // Main monitor service
 class MockMonitorService {
-    private monitors: Map<string, any> = new Map();
-    private executors: Map<string, any> = new Map();
-    private results: Map<string, MonitorResult[]> = new Map();
-    private schedules: Map<string, NodeJS.Timeout> = new Map();
+    private monitors = new Map<string, any>();
+    private executors = new Map<string, any>();
+    private results = new Map<string, MonitorResult[]>();
+    private schedules = new Map<string, NodeJS.Timeout>();
 
     constructor() {
         this.initializeExecutors();
@@ -168,7 +168,7 @@ class MockMonitorService {
                 id: `monitor-${i}`,
                 type,
                 target: this.generateTarget(type, i),
-                interval: [30000, 60000, 120000][i % 3],
+                interval: [30_000, 60_000, 120_000][i % 3],
                 timeout: 5000,
                 retries: 3,
                 settings: this.generateSettings(type, i)
@@ -181,44 +181,54 @@ class MockMonitorService {
 
     private generateTarget(type: string, index: number): string {
         switch (type) {
-            case 'http':
+            case 'http': {
                 return `https://site${index}.example.com`;
-            case 'ping':
+            }
+            case 'ping': {
                 return `host${index}.example.com`;
-            case 'port':
+            }
+            case 'port': {
                 return `server${index}.example.com`;
-            case 'dns':
+            }
+            case 'dns': {
                 return `domain${index}.example.com`;
-            default:
+            }
+            default: {
                 return 'localhost';
+            }
         }
     }
 
     private generateSettings(type: string, index: number): Record<string, any> {
         switch (type) {
-            case 'http':
+            case 'http': {
                 return {
                     method: ['GET', 'POST', 'HEAD'][index % 3],
                     expectedStatus: 200,
                     followRedirects: true
                 };
-            case 'ping':
+            }
+            case 'ping': {
                 return {
                     packetSize: 32,
                     count: 4
                 };
-            case 'port':
+            }
+            case 'port': {
                 return {
                     port: [80, 443, 22, 25][index % 4],
                     protocol: 'tcp'
                 };
-            case 'dns':
+            }
+            case 'dns': {
                 return {
                     recordType: ['A', 'AAAA', 'MX', 'TXT'][index % 4],
                     nameserver: '8.8.8.8'
                 };
-            default:
+            }
+            default: {
                 return {};
+            }
         }
     }
 
@@ -337,7 +347,7 @@ class MockMonitorService {
                 responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : 0,
             minResponseTime: responseTimes.length > 0 ? Math.min(...responseTimes) : 0,
             maxResponseTime: responseTimes.length > 0 ? Math.max(...responseTimes) : 0,
-            lastExecution: results[results.length - 1]
+            lastExecution: results.at(-1)
         };
     }
 
@@ -533,8 +543,8 @@ describe("Monitor Service Performance", () => {
     bench("update monitor config", () => {
         service = new MockMonitorService();
         service.updateMonitorConfig('monitor-0', {
-            interval: 30000,
-            timeout: 10000,
+            interval: 30_000,
+            timeout: 10_000,
             retries: 5
         });
     }, { warmupIterations: 5, iterations: 5000 });
@@ -553,7 +563,7 @@ describe("Monitor Service Performance", () => {
         service.getSystemMetrics();
         
         // Update a config
-        service.updateMonitorConfig('monitor-0', { interval: 45000 });
+        service.updateMonitorConfig('monitor-0', { interval: 45_000 });
         
         // Clean up
         monitorIds.forEach(id => service.unscheduleMonitor(id));

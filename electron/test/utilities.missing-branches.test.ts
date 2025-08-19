@@ -353,7 +353,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
             for (const array of arrays) {
                 expect(() => {
-                    const length = array.length;
+                    const {length} = array;
                     const filtered = array.filter(Boolean);
                     const mapped = array.map((x) => x);
                     const hasSome = array.some(Boolean);

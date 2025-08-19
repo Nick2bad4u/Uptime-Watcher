@@ -33,9 +33,9 @@ interface CorrelationChain {
 }
 
 class MockEventCorrelator {
-    private correlationChains: Map<string, CorrelationChain> = new Map();
-    private eventLookup: Map<string, CorrelatedEvent> = new Map();
-    private correlationIndex: Map<string, string[]> = new Map(); // eventType -> correlationIds
+    private correlationChains = new Map<string, CorrelationChain>();
+    private eventLookup = new Map<string, CorrelatedEvent>();
+    private correlationIndex = new Map<string, string[]>(); // eventType -> correlationIds
     private metrics = {
         chainsCreated: 0,
         chainsCompleted: 0,
@@ -199,7 +199,7 @@ class MockEventCorrelator {
     }
 
     private generateCorrelationId(): string {
-        return `corr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     }
 
     private indexEventType(eventType: string, correlationId: string): void {

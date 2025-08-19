@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-objects */
-/* eslint-disable sort-keys */
-/* eslint-disable no-inline-comments */
+ 
+ 
 /**
  * PostCSS configuration for the Uptime Watcher application.
  *

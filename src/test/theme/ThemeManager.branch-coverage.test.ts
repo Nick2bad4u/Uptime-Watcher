@@ -157,10 +157,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             const mockBodyClassList = {
                 add: vi.fn(),
                 remove: vi.fn(),
-                contains: vi.fn().mockImplementation((className: string) => {
+                contains: vi.fn().mockImplementation((className: string) => 
                     // Simulate that body contains 'theme-dark' initially
-                    return className === "theme-dark";
-                }),
+                     className === "theme-dark"
+                ),
                 toggle: vi.fn(),
             };
 

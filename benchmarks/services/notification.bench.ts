@@ -78,8 +78,8 @@ interface NotificationStats {
 }
 
 class MockNotificationQueue {
-    private queue: Map<string, QueuedNotification> = new Map();
-    private processing: Set<string> = new Set();
+    private queue = new Map<string, QueuedNotification>();
+    private processing = new Set<string>();
     private nextId = 1;
 
     async enqueue(request: NotificationRequest): Promise<string> {
@@ -148,18 +148,16 @@ class MockNotificationQueue {
         if (success) {
             notification.status = 'sent';
             notification.sentAt = new Date();
-        } else {
-            if (notification.attempts >= notification.maxAttempts) {
+        } else if (notification.attempts >= notification.maxAttempts) {
                 notification.status = 'failed';
                 notification.failedAt = new Date();
                 notification.error = error;
             } else {
                 notification.status = 'retrying';
                 // Exponential backoff
-                const delay = Math.pow(2, notification.attempts) * 1000;
+                const delay = 2**notification.attempts * 1000;
                 notification.scheduledAt = new Date(Date.now() + delay);
             }
-        }
         
         this.processing.delete(id);
         this.queue.set(id, notification);
@@ -187,17 +185,20 @@ class MockNotificationQueue {
         
         for (const notification of notifications) {
             switch (notification.status) {
-                case 'sent':
+                case 'sent': {
                     stats.sent++;
                     break;
-                case 'failed':
+                }
+                case 'failed': {
                     stats.failed++;
                     break;
+                }
                 case 'pending':
                 case 'processing':
-                case 'retrying':
+                case 'retrying': {
                     stats.pending++;
                     break;
+                }
             }
             
             // Count by priority
@@ -242,8 +243,8 @@ class MockNotificationQueue {
 }
 
 class MockChannelProvider {
-    private channels: Map<string, NotificationChannel> = new Map();
-    private rateLimitCounters: Map<string, { minute: number; hour: number; day: number; lastReset: Date }> = new Map();
+    private channels = new Map<string, NotificationChannel>();
+    private rateLimitCounters = new Map<string, { minute: number; hour: number; day: number; lastReset: Date }>();
 
     constructor() {
         this.initializeDefaultChannels();
@@ -344,7 +345,7 @@ class MockChannelProvider {
             'push': 0.88,
             'in-app': 0.99
         };
-        return rates[type] || 0.90;
+        return rates[type] || 0.9;
     }
 
     private initializeDefaultChannels(): void {
@@ -401,7 +402,7 @@ class MockChannelProvider {
 }
 
 class MockTemplateEngine {
-    private templates: Map<string, NotificationTemplate> = new Map();
+    private templates = new Map<string, NotificationTemplate>();
 
     constructor() {
         this.initializeDefaultTemplates();
@@ -419,8 +420,8 @@ class MockTemplateEngine {
 
         for (const [key, value] of Object.entries(variables)) {
             const placeholder = `{{${key}}}`;
-            subject = subject.replace(new RegExp(placeholder, 'g'), String(value));
-            body = body.replace(new RegExp(placeholder, 'g'), String(value));
+            subject = subject.replaceAll(new RegExp(placeholder, 'g'), String(value));
+            body = body.replaceAll(new RegExp(placeholder, 'g'), String(value));
         }
 
         return { subject, body };
@@ -644,11 +645,11 @@ function createMaintenanceNotification(siteData: any): NotificationRequest {
         recipients: ['team@example.com', '#maintenance'],
         variables: {
             siteName: siteData.name,
-            startTime: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
+            startTime: new Date(Date.now() + 3_600_000).toISOString(), // 1 hour from now
             duration: '2 hours'
         },
         priority: 'normal',
-        scheduledAt: new Date(Date.now() + 1800000), // 30 minutes from now
+        scheduledAt: new Date(Date.now() + 1_800_000), // 30 minutes from now
         metadata: { type: 'maintenance', siteId: siteData.id }
     };
 }
@@ -839,7 +840,7 @@ describe("Notification Service Performance", () => {
             recipients: [`scheduled${i}@example.com`],
             variables: { siteName: `Scheduled Site ${i}`, startTime: new Date().toISOString(), duration: '30 minutes' },
             priority: 'normal' as const,
-            scheduledAt: new Date(Date.now() + i * 60000) // Schedule every minute
+            scheduledAt: new Date(Date.now() + i * 60_000) // Schedule every minute
         }));
         
         service.sendBulkNotifications(scheduledNotifications);

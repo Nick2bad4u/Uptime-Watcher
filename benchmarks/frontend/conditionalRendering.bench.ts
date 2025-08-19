@@ -169,9 +169,7 @@ class MockReactElementFactory {
     let size = type.length * 2; // Base type size
     
     // Props size
-    size += Object.entries(props).reduce((sum, [key, value]) => {
-      return sum + key.length * 2 + this.calculateValueSize(value);
-    }, 0);
+    size += Object.entries(props).reduce((sum, [key, value]) => sum + key.length * 2 + this.calculateValueSize(value), 0);
     
     // Children size
     size += children.reduce((sum, child) => sum + child.size, 0);
@@ -227,7 +225,7 @@ class MockReactElementFactory {
 
 // Mock Conditional Rendering System
 class MockConditionalRenderer {
-  private components: Map<string, ConditionalRenderingContext> = new Map();
+  private components = new Map<string, ConditionalRenderingContext>();
   private elementFactory = new MockReactElementFactory();
   private globalConditionId = 0;
   private globalBlockId = 0;
@@ -300,7 +298,7 @@ class MockConditionalRenderer {
   ): ReactElement | null {
     const condition = () => value in cases;
     const trueElement = () => cases[value]();
-    const falseElement = defaultCase ? defaultCase : () => null;
+    const falseElement = defaultCase ?? (() => null);
 
     return this.executeConditionalRender(
       componentId,
@@ -314,10 +312,10 @@ class MockConditionalRenderer {
 
   renderWithGuardClause(
     componentId: string,
-    guards: Array<{
+    guards: {
       condition: boolean | (() => boolean);
       element: () => ReactElement | null;
-    }>,
+    }[],
     fallback?: () => ReactElement
   ): ReactElement | null {
     const startTime = performance.now();
@@ -330,18 +328,18 @@ class MockConditionalRenderer {
       context.conditionEvaluations++;
 
       if (conditionResult) {
-        const element = guard.element();
+        
         const renderTime = performance.now() - startTime;
         this.updatePerformanceMetrics(context, renderTime);
-        return element;
+        return guard.element();
       }
     }
 
     // No guard matched, use fallback
-    const fallbackElement = fallback ? fallback() : null;
+    
     const renderTime = performance.now() - startTime;
     this.updatePerformanceMetrics(context, renderTime);
-    return fallbackElement;
+    return (fallback ? fallback() : null);
   }
 
   // Optimized conditional rendering
@@ -467,14 +465,14 @@ class MockConditionalRenderer {
   // Complex conditional patterns
   renderNestedConditionals(
     componentId: string,
-    conditions: Array<{
+    conditions: {
       test: boolean | (() => boolean);
       render: () => ReactElement | null;
-      nested?: Array<{
+      nested?: {
         test: boolean | (() => boolean);
         render: () => ReactElement | null;
-      }>;
-    }>
+      }[];
+    }[]
   ): ReactElement[] {
     const startTime = performance.now();
     const context = this.getContext(componentId);
@@ -1010,7 +1008,7 @@ describe("Conditional Rendering Performance", () => {
           render: () => elementFactory.createElement("NoDataMessage", {}),
         },
         {
-          test: !!state.data,
+          test: Boolean(state.data),
           render: () => elementFactory.createElement("DataDisplay", { data: state.data }),
           nested: [
             {
@@ -1095,7 +1093,7 @@ describe("Conditional Rendering Performance", () => {
         shouldLoad,
         async () => {
           // Simulate async component loading
-          await new Promise(resolve => setTimeout(resolve, Math.random() * 50));
+          await new Promise(resolve => {setTimeout(resolve, Math.random() * 50)});
           return elementFactory.createComplexElement(8);
         }
       );
@@ -1177,7 +1175,7 @@ describe("Conditional Rendering Performance", () => {
       const componentId = components[Math.floor(Math.random() * components.length)];
       
       // Large dataset
-      const items = Array.from({ length: 10000 }, (_, index) => ({
+      const items = Array.from({ length: 10_000 }, (_, index) => ({
         id: index,
         content: `Item ${index}`,
         data: Array.from({ length: 10 }, () => Math.random()),
@@ -1228,7 +1226,7 @@ describe("Conditional Rendering Performance", () => {
         const scenario = Math.floor(Math.random() * 6);
 
         switch (scenario) {
-          case 0: // Simple ternary
+          case 0: { // Simple ternary
             renderer.renderWithTernary(
               componentId,
               Math.random() > 0.5,
@@ -1236,21 +1234,20 @@ describe("Conditional Rendering Performance", () => {
               () => elementFactory.createElement("Alternative", {})
             );
             break;
+          }
 
-          case 1: // Complex condition function
+          case 1: { // Complex condition function
             renderer.renderWithTernary(
               componentId,
-              () => {
-                const complexCondition = Math.random() > 0.3 && 
+              () => (Math.random() > 0.3 && 
                   Date.now() % 2 === 0 && 
-                  Math.sin(Date.now()) > 0;
-                return complexCondition;
-              },
+                  Math.sin(Date.now()) > 0),
               () => elementFactory.createComplexElement(3)
             );
             break;
+          }
 
-          case 2: // Memoized rendering
+          case 2: { // Memoized rendering
             renderer.renderWithMemoization(
               componentId,
               Math.random() > 0.4,
@@ -1258,8 +1255,9 @@ describe("Conditional Rendering Performance", () => {
               [cycle, render % 5] // Changing dependencies
             );
             break;
+          }
 
-          case 3: // Guard clauses
+          case 3: { // Guard clauses
             renderer.renderWithGuardClause(
               componentId,
               [
@@ -1269,8 +1267,9 @@ describe("Conditional Rendering Performance", () => {
               ]
             );
             break;
+          }
 
-          case 4: // Conditional list
+          case 4: { // Conditional list
             const items = Array.from({ length: 50 }, (_, j) => ({ id: j, active: Math.random() > 0.5 }));
             renderer.renderConditionalList(
               componentId,
@@ -1280,8 +1279,9 @@ describe("Conditional Rendering Performance", () => {
               item => item.id
             );
             break;
+          }
 
-          case 5: // Nested conditionals
+          case 5: { // Nested conditionals
             renderer.renderNestedConditionals(componentId, [
               {
                 test: Math.random() > 0.3,
@@ -1293,6 +1293,7 @@ describe("Conditional Rendering Performance", () => {
               },
             ]);
             break;
+          }
         }
       }
 
@@ -1336,9 +1337,7 @@ describe("Conditional Rendering Performance", () => {
           test: () => {
             // Complex condition logic
             const factors = Array.from({ length: 5 }, () => Math.random());
-            return factors.reduce((acc, factor, i) => {
-              return acc && (factor > 0.3 || i % 2 === 0);
-            }, true);
+            return factors.reduce((acc, factor, i) => acc && (factor > 0.3 || i % 2 === 0), true);
           },
           render: () => elementFactory.createComplexElement(3 + index),
           nested: index < 3 ? [{

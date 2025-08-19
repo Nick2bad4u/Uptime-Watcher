@@ -74,9 +74,7 @@ describe("DataImportExportService - Corrected Implementation", () => {
             databaseService: {
                 executeTransaction: vi
                     .fn()
-                    .mockImplementation(async (callback) => {
-                        return await callback(mockDb);
-                    }),
+                    .mockImplementation(async (callback) => await callback(mockDb)),
             },
             eventEmitter: {
                 emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -110,9 +108,7 @@ describe("DataImportExportService - Corrected Implementation", () => {
         } as any;
 
         // Setup operational hooks mock
-        mockWithDatabaseOperation.mockImplementation(async (operation) => {
-            return await operation();
-        });
+        mockWithDatabaseOperation.mockImplementation(async (operation) => await operation());
 
         service = new DataImportExportService(mockConfig);
     });

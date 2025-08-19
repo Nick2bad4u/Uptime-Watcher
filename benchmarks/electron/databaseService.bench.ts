@@ -19,7 +19,7 @@ describe("Database Service Performance", () => {
         options: {
           mode: "readwrite",
           timeout: 5000,
-          busyTimeout: 30000,
+          busyTimeout: 30_000,
         },
       };
       
@@ -53,7 +53,7 @@ describe("Database Service Performance", () => {
       // Simulate query parsing
       const queryParts = query.split(' ');
       const operation = queryParts[0];
-      const table = queryParts[queryParts.length - 1];
+      const table = queryParts.at(-1);
       
       // Simulate query execution time
       const executionTime = Math.random() * 5;
@@ -81,8 +81,8 @@ describe("Database Service Performance", () => {
       const query = complexQueries[i % complexQueries.length];
       
       // Simulate complex query processing
-      const tables = query.match(/FROM\s+(\w+)|JOIN\s+(\w+)/gi) || [];
-      const joinCount = (query.match(/JOIN/gi) || []).length;
+      const tables = query.match(/from\s+(\w+)|join\s+(\w+)/gi) || [];
+      const joinCount = (query.match(/join/gi) || []).length;
       
       // Simulate increased execution time for joins
       const baseTime = Math.random() * 5;
@@ -113,7 +113,7 @@ describe("Database Service Performance", () => {
       
       // Simulate aggregation processing
       const hasGroupBy = query.includes('GROUP BY');
-      const aggregateFunction = query.match(/(COUNT|AVG|MAX|MIN|SUM)\(/i)?.[1] || 'UNKNOWN';
+      const aggregateFunction = query.match(/(count|avg|max|min|sum)\(/i)?.[1] || 'UNKNOWN';
       
       // Simulate processing overhead for aggregations
       const baseTime = Math.random() * 3;
@@ -143,17 +143,21 @@ describe("Database Service Performance", () => {
       // Simulate transaction overhead
       let executionTime: number;
       switch (operation) {
-        case 'BEGIN':
+        case 'BEGIN': {
           executionTime = Math.random() * 1;
           break;
-        case 'COMMIT':
+        }
+        case 'COMMIT': {
           executionTime = Math.random() * 3;
           break;
-        case 'ROLLBACK':
+        }
+        case 'ROLLBACK': {
           executionTime = Math.random() * 2;
           break;
-        default:
+        }
+        default: {
           executionTime = Math.random() * 1;
+        }
       }
       
       const transactionData = {
@@ -236,17 +240,21 @@ describe("Database Service Performance", () => {
       // Simulate execution time based on complexity
       let executionTime: number;
       switch (complexity) {
-        case 'low':
+        case 'low': {
           executionTime = Math.random() * 2;
           break;
-        case 'medium':
+        }
+        case 'medium': {
           executionTime = Math.random() * 5;
           break;
-        case 'high':
+        }
+        case 'high': {
           executionTime = Math.random() * 8;
           break;
-        default:
+        }
+        default: {
           executionTime = Math.random() * 2;
+        }
       }
       
       const result = {
@@ -302,7 +310,7 @@ describe("Database Service Performance", () => {
     const connections = Array.from({ length: poolSize }, (_, i) => ({
       id: i,
       inUse: false,
-      lastUsed: Date.now() - Math.random() * 60000,
+      lastUsed: Date.now() - Math.random() * 60_000,
       queryCount: Math.floor(Math.random() * 100),
     }));
 
@@ -334,7 +342,7 @@ describe("Database Service Performance", () => {
         const result = {
           waited: true,
           waitTime,
-          poolUtilization: 1.0,
+          poolUtilization: 1,
           availableConnections: 0,
         };
       }
@@ -372,7 +380,7 @@ describe("Database Service Performance", () => {
     
     // Simulate batch processing
     let totalTime = 0;
-    const batchResults: Array<BatchOperation & { executionTime: number; success: boolean }> = [];
+    const batchResults: (BatchOperation & { executionTime: number; success: boolean })[] = [];
     
     for (const operation of operations) {
       const executionTime = Math.random() * 0.5;

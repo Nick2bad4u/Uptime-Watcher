@@ -17,9 +17,9 @@
  */
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
-import { tmpdir } from "os";
-import { join } from "path";
-import { readFileSync } from "fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { readFileSync } from "node:fs";
 
 // Import actual production types and services
 import type { Site, Monitor, StatusHistory } from "../../shared/types";
@@ -83,7 +83,7 @@ describe("Enhanced Database Performance Benchmarks", () => {
             type,
             url:
                 type === "http" ? `https://example${monitorId}.com` : undefined,
-            host: type !== "http" ? `host${monitorId}.example.com` : undefined,
+            host: type === "http" ? undefined : `host${monitorId}.example.com`,
             port: type === "port" ? 8080 + (monitorId % 100) : undefined,
             checkInterval:
                 [
@@ -106,7 +106,7 @@ describe("Enhanced Database Performance Benchmarks", () => {
             monitoring: Math.random() > 0.1, // 90% active
             status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
             responseTime: Math.floor(Math.random() * 500) + 10,
-            lastChecked: new Date(Date.now() - Math.random() * 3600000),
+            lastChecked: new Date(Date.now() - Math.random() * 3_600_000),
             history: [],
         };
     }
@@ -122,7 +122,7 @@ describe("Enhanced Database Performance Benchmarks", () => {
             history.push({
                 id: `history-${monitorId}-${i}`,
                 monitorId,
-                timestamp: new Date(now - i * 30000), // 30-second intervals
+                timestamp: new Date(now - i * 30_000), // 30-second intervals
                 status: Math.random() > 0.05 ? "up" : "down",
                 responseTime: Math.floor(Math.random() * 1000) + 10,
                 errorMessage: Math.random() > 0.9 ? `Error ${i}` : undefined,
@@ -303,7 +303,7 @@ describe("Enhanced Database Performance Benchmarks", () => {
             "Load large result set (10,000 history entries)",
             async () => {
                 const monitorId = "benchmark-monitor-0";
-                await historyRepository.findByMonitorId(monitorId, 10000);
+                await historyRepository.findByMonitorId(monitorId, 10_000);
             },
             { iterations: 5 }
         );

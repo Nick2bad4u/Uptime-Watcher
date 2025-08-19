@@ -158,9 +158,7 @@ describe("SiteManager", () => {
             };
 
             mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => {
-                    return await fn();
-                }
+                async (fn: any) => await fn()
             );
 
             const result = await manager.addSite(newSite);
@@ -383,9 +381,7 @@ describe("SiteManager", () => {
 
             mockDependencies.siteRepository.delete.mockResolvedValue(false);
             mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => {
-                    return await fn();
-                }
+                async (fn: any) => await fn()
             );
 
             const result = await manager.removeSite("nonexistent");
@@ -467,9 +463,7 @@ describe("SiteManager", () => {
             vi.spyOn(manager, "updateSitesCache").mockResolvedValue(undefined);
 
             mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => {
-                    return await fn();
-                }
+                async (fn: any) => await fn()
             );
 
             const result = await manager.updateSite("site1", updates);
@@ -486,9 +480,7 @@ describe("SiteManager", () => {
     describe("removeMonitor", () => {
         it("should remove a monitor from a site", async () => {
             mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => {
-                    return await fn();
-                }
+                async (fn: any) => await fn()
             );
             mockDependencies.monitorRepository.findByIdentifier = vi
                 .fn()

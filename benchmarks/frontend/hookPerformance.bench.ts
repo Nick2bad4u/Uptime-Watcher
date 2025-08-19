@@ -91,7 +91,7 @@ interface HookPerformanceMetrics {
 
 // Mock React Hooks system
 class MockReactHooks {
-  private components: Map<string, ComponentHookContext> = new Map();
+  private components = new Map<string, ComponentHookContext>();
   private globalHookIndex = 0;
   private currentComponentId: string | null = null;
   private hookExecutionOrder: string[] = [];
@@ -185,7 +185,21 @@ class MockReactHooks {
     
     let hook = context.hooks[hookIndex] as UseEffectHook | undefined;
     
-    if (!hook) {
+    if (hook) {
+      // Check dependencies
+      const depsChanged = dependencies ? 
+        this.dependencyComparator.hasDependenciesChanged(hook.dependencies, dependencies) : 
+        true;
+      
+      if (depsChanged) {
+        hook.hasChanged = true;
+        hook.dependencies = dependencies ? [...dependencies] : [];
+        context.hookDependencyChanges++;
+      } else {
+        hook.hasChanged = false;
+        hook.skipCount++;
+      }
+    } else {
       // Initialize hook
       hook = {
         id: `useEffect-${this.globalHookIndex++}`,
@@ -202,20 +216,6 @@ class MockReactHooks {
       };
       
       context.hooks.push(hook);
-    } else {
-      // Check dependencies
-      const depsChanged = dependencies ? 
-        this.dependencyComparator.hasDependenciesChanged(hook.dependencies, dependencies) : 
-        true;
-      
-      if (depsChanged) {
-        hook.hasChanged = true;
-        hook.dependencies = dependencies ? [...dependencies] : [];
-        context.hookDependencyChanges++;
-      } else {
-        hook.hasChanged = false;
-        hook.skipCount++;
-      }
     }
     
     // Execute effect if dependencies changed
@@ -251,30 +251,7 @@ class MockReactHooks {
     
     let hook = context.hooks[hookIndex] as UseMemoHook | undefined;
     
-    if (!hook) {
-      // Initialize hook
-      const computationStartTime = performance.now();
-      const value = computationFunction();
-      const computationTime = performance.now() - computationStartTime;
-      
-      hook = {
-        id: `useMemo-${this.globalHookIndex++}`,
-        type: "useMemo",
-        value,
-        dependencies: [...dependencies],
-        computationFunction,
-        hasChanged: true,
-        executionCount: 0,
-        totalExecutionTime: 0,
-        lastExecutionTime: 0,
-        memoryUsage: this.calculateValueSize(value),
-        cacheHits: 0,
-        cacheMisses: 1,
-        computationTime,
-      };
-      
-      context.hooks.push(hook);
-    } else {
+    if (hook) {
       // Check dependencies
       const depsChanged = this.dependencyComparator.hasDependenciesChanged(
         hook.dependencies, 
@@ -299,6 +276,29 @@ class MockReactHooks {
         hook.hasChanged = false;
         hook.cacheHits++;
       }
+    } else {
+      // Initialize hook
+      const computationStartTime = performance.now();
+      const value = computationFunction();
+      const computationTime = performance.now() - computationStartTime;
+      
+      hook = {
+        id: `useMemo-${this.globalHookIndex++}`,
+        type: "useMemo",
+        value,
+        dependencies: [...dependencies],
+        computationFunction,
+        hasChanged: true,
+        executionCount: 0,
+        totalExecutionTime: 0,
+        lastExecutionTime: 0,
+        memoryUsage: this.calculateValueSize(value),
+        cacheHits: 0,
+        cacheMisses: 1,
+        computationTime,
+      };
+      
+      context.hooks.push(hook);
     }
     
     hook.executionCount++;
@@ -321,25 +321,7 @@ class MockReactHooks {
     
     let hook = context.hooks[hookIndex] as UseCallbackHook | undefined;
     
-    if (!hook) {
-      // Initialize hook
-      hook = {
-        id: `useCallback-${this.globalHookIndex++}`,
-        type: "useCallback",
-        value: callback,
-        dependencies: [...dependencies],
-        originalFunction: callback,
-        hasChanged: true,
-        executionCount: 0,
-        totalExecutionTime: 0,
-        lastExecutionTime: 0,
-        memoryUsage: this.calculateFunctionSize(callback),
-        callCount: 0,
-        memoizationHits: 0,
-      };
-      
-      context.hooks.push(hook);
-    } else {
+    if (hook) {
       // Check dependencies
       const depsChanged = this.dependencyComparator.hasDependenciesChanged(
         hook.dependencies, 
@@ -358,6 +340,24 @@ class MockReactHooks {
         hook.hasChanged = false;
         hook.memoizationHits++;
       }
+    } else {
+      // Initialize hook
+      hook = {
+        id: `useCallback-${this.globalHookIndex++}`,
+        type: "useCallback",
+        value: callback,
+        dependencies: [...dependencies],
+        originalFunction: callback,
+        hasChanged: true,
+        executionCount: 0,
+        totalExecutionTime: 0,
+        lastExecutionTime: 0,
+        memoryUsage: this.calculateFunctionSize(callback),
+        callCount: 0,
+        memoizationHits: 0,
+      };
+      
+      context.hooks.push(hook);
     }
     
     hook.executionCount++;
@@ -485,26 +485,32 @@ class MockReactHooks {
     
     context.hooks.forEach(hook => {
       switch (hook.type) {
-        case "useState":
+        case "useState": {
           work += 0.1;
           break;
-        case "useEffect":
+        }
+        case "useEffect": {
           work += 0.2;
           break;
-        case "useMemo":
+        }
+        case "useMemo": {
           const memoHook = hook as UseMemoHook;
           work += memoHook.hasChanged ? memoHook.computationTime * 0.1 : 0.05;
           break;
-        case "useCallback":
+        }
+        case "useCallback": {
           work += 0.1;
           break;
-        case "useRef":
+        }
+        case "useRef": {
           work += 0.05;
           break;
-        case "custom":
+        }
+        case "custom": {
           const customHook = hook as CustomHookState;
           work += customHook.complexity * 0.3;
           break;
+        }
       }
     });
     
@@ -679,8 +685,8 @@ class DependencyComparator {
   hasDependenciesChanged(oldDeps: any[], newDeps: any[]): boolean {
     if (oldDeps.length !== newDeps.length) return true;
     
-    for (let i = 0; i < oldDeps.length; i++) {
-      if (!Object.is(oldDeps[i], newDeps[i])) {
+    for (const [i, oldDep] of oldDeps.entries()) {
+      if (!Object.is(oldDep, newDeps[i])) {
         return true;
       }
     }
@@ -747,15 +753,18 @@ describe("React Hook Performance", () => {
       // Simulate different types of state updates
       const updateType = Math.floor(Math.random() * 3);
       switch (updateType) {
-        case 0:
+        case 0: {
           hookSystem.renderComponent(componentId);
           break;
-        case 1:
+        }
+        case 1: {
           hookSystem.renderComponent(componentId);
           break;
-        case 2:
+        }
+        case 2: {
           hookSystem.renderComponent(componentId);
           break;
+        }
       }
     }
     
@@ -944,20 +953,16 @@ describe("React Hook Performance", () => {
       };
       
       // Memoized expensive computation
-      const memoizedValue = hookSystem.useMemo(() => {
-        return expensiveComputation();
-      }, [items.length]);
+      const memoizedValue = hookSystem.useMemo(() => expensiveComputation(), [items.length]);
       
       // Memoized filtered and sorted data
-      const processedData = hookSystem.useMemo(() => {
-        return items
+      const processedData = hookSystem.useMemo(() => items
           .filter(item => item.value.toString().includes(filter))
           .sort((a, b) => {
             if (sortBy === "id") return a.id - b.id;
             if (sortBy === "value") return a.value - b.value;
             return 0;
-          });
-      }, [items, filter, sortBy]);
+          }), [items, filter, sortBy]);
       
       // Memoized statistics
       const statistics = hookSystem.useMemo(() => {
@@ -1014,9 +1019,7 @@ describe("React Hook Performance", () => {
         const update = [...data, newItem];
       }, [data]);
       
-      const handleCalculation = hookSystem.useCallback((value: number) => {
-        return value * config.multiplier * Math.random();
-      }, [config.multiplier]);
+      const handleCalculation = hookSystem.useCallback((value: number) => value * config.multiplier * Math.random(), [config.multiplier]);
       
       // Complex callback with multiple dependencies
       const handleComplexOperation = hookSystem.useCallback((params: any) => {
@@ -1065,10 +1068,10 @@ describe("React Hook Performance", () => {
     };
     
     const useLocalStorage = (key: string, defaultValue: any) => {
-      const [value, setValue] = hookSystem.useState(() => {
+      const [value, setValue] = hookSystem.useState(() => 
         // Simulate localStorage read
-        return defaultValue;
-      });
+         defaultValue
+      );
       
       const setStoredValue = hookSystem.useCallback((newValue: any) => {
         setValue(newValue);
@@ -1092,8 +1095,8 @@ describe("React Hook Performance", () => {
           const result = { id: Math.random(), data: "fetched data" };
           setData(result);
           setError(null);
-        } catch (err) {
-          setError(err);
+        } catch (error_) {
+          setError(error_);
         } finally {
           setLoading(false);
         }
@@ -1159,18 +1162,16 @@ describe("React Hook Performance", () => {
       );
       
       // Well-optimized hooks
-      const memoizedSum = hookSystem.useMemo(() => {
-        return items.reduce((sum, item) => sum + item.value, 0);
-      }, [items]);
+      const memoizedSum = hookSystem.useMemo(() => items.reduce((sum, item) => sum + item.value, 0), [items]);
       
       const optimizedCallback = hookSystem.useCallback(() => {
         console.log("Optimized callback");
       }, []);
       
       // Poorly optimized hooks (for comparison)
-      const unoptimizedMemo = hookSystem.useMemo(() => {
-        return { sum: memoizedSum, timestamp: Date.now() }; // Creates new object every time
-      }, [memoizedSum]);
+      const unoptimizedMemo = hookSystem.useMemo(() => 
+         ({ sum: memoizedSum, timestamp: Date.now() }) // Creates new object every time
+      , [memoizedSum]);
       
       const unoptimizedCallback = hookSystem.useCallback(() => {
         console.log("Unoptimized callback", { user, counter }); // Dependencies change frequently

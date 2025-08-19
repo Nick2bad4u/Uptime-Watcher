@@ -111,14 +111,12 @@ interface ListPerformanceMetrics {
   cacheHitRate: number;
 }
 
-interface GroupedItems {
-  [groupKey: string]: {
+type GroupedItems = Record<string, {
     items: ListItem[];
     header: ReactListElement;
     collapsed: boolean;
     totalSize: number;
-  };
-}
+  }>;
 
 type FilterOperator = "equals" | "contains" | "startsWith" | "endsWith" | "greaterThan" | "lessThan" | "between" | "in";
 type SelectionMode = "none" | "single" | "multiple" | "range";
@@ -126,7 +124,7 @@ type SortDirection = "asc" | "desc";
 
 // Mock React List Renderer
 class MockReactListRenderer {
-  private components: Map<string, ListRenderingContext> = new Map();
+  private components = new Map<string, ListRenderingContext>();
   private elementFactory = new MockListElementFactory();
   private virtualizer = new ListVirtualizer();
   private sorter = new ListSorter();
@@ -538,7 +536,7 @@ class MockReactListRenderer {
   private calculateMasonryLayout(
     items: ListItem[],
     config: { columnCount: number; gap: number; estimateItemHeight: (item: ListItem) => number }
-  ): { columns: Array<{ items: ListItem[]; heights: number[] }> } {
+  ): { columns: { items: ListItem[]; heights: number[] }[] } {
     const columns = Array.from({ length: config.columnCount }, () => ({
       items: [] as ListItem[],
       heights: [] as number[],
@@ -707,12 +705,12 @@ interface ListRenderingContext {
   renderedElements: ReactListElement[];
   config: ListOperationConfig;
   metrics: ListPerformanceMetrics;
-  renderHistory: Array<{
+  renderHistory: {
     timestamp: number;
     itemCount: number;
     renderTime: number;
     config: ListOperationConfig;
-  }>;
+  }[];
   cacheState: Map<string, any>;
   selectionState: Set<string | number>;
 }
@@ -852,9 +850,7 @@ class ListVirtualizer {
       return items.length * config.itemHeight;
     }
 
-    return items.reduce((total, _, index) => {
-      return total + (config.itemHeight as Function)(index);
-    }, 0);
+    return items.reduce((total, _, index) => total + (config.itemHeight as Function)(index), 0);
   }
 
   getVisibleItems(items: ListItem[], config: VirtualizationConfig): ListItem[] {
@@ -903,35 +899,42 @@ class ListSorter {
 
 class ListFilterer {
   filterItems(items: ListItem[], criteria: FilterCriteria[]): ListItem[] {
-    return items.filter(item => {
-      return criteria.every(criterion => this.evaluateFilter(item, criterion));
-    });
+    return items.filter(item => criteria.every(criterion => this.evaluateFilter(item, criterion)));
   }
 
   private evaluateFilter(item: ListItem, criterion: FilterCriteria): boolean {
     const fieldValue = this.getFieldValue(item, criterion.field);
     
     switch (criterion.operator) {
-      case "equals":
+      case "equals": {
         return fieldValue === criterion.value;
-      case "contains":
+      }
+      case "contains": {
         return String(fieldValue).toLowerCase().includes(String(criterion.value).toLowerCase());
-      case "startsWith":
+      }
+      case "startsWith": {
         return String(fieldValue).toLowerCase().startsWith(String(criterion.value).toLowerCase());
-      case "endsWith":
+      }
+      case "endsWith": {
         return String(fieldValue).toLowerCase().endsWith(String(criterion.value).toLowerCase());
-      case "greaterThan":
+      }
+      case "greaterThan": {
         return Number(fieldValue) > Number(criterion.value);
-      case "lessThan":
+      }
+      case "lessThan": {
         return Number(fieldValue) < Number(criterion.value);
-      case "between":
+      }
+      case "between": {
         const [min, max] = Array.isArray(criterion.value) ? criterion.value : [0, 0];
         const numValue = Number(fieldValue);
         return numValue >= min && numValue <= max;
-      case "in":
+      }
+      case "in": {
         return Array.isArray(criterion.value) ? criterion.value.includes(fieldValue) : false;
-      default:
+      }
+      default: {
         return true;
+      }
     }
   }
 
@@ -1017,7 +1020,7 @@ class ListSelector {
     const newSelection = new Set(currentSelection);
     
     switch (mode) {
-      case "single":
+      case "single": {
         if (selected) {
           newSelection.clear();
           newSelection.add(item.id);
@@ -1025,16 +1028,18 @@ class ListSelector {
           newSelection.delete(item.id);
         }
         break;
+      }
         
-      case "multiple":
+      case "multiple": {
         if (selected) {
           newSelection.add(item.id);
         } else {
           newSelection.delete(item.id);
         }
         break;
+      }
         
-      case "range":
+      case "range": {
         // Simplified range selection
         if (selected) {
           newSelection.add(item.id);
@@ -1042,10 +1047,12 @@ class ListSelector {
           newSelection.delete(item.id);
         }
         break;
+      }
         
-      default:
+      default: {
         // No selection allowed
         break;
+      }
     }
     
     return newSelection;
@@ -1115,7 +1122,7 @@ describe("React List Operations Performance", () => {
         id: `item-${index}`,
         value: `Item ${index}`,
         metadata: {
-          created: Date.now() - Math.random() * 86400000,
+          created: Date.now() - Math.random() * 86_400_000,
           modified: Date.now(),
           tags: [`tag${index % 5}`, `category${index % 3}`],
           category: `Category ${index % 5}`,
@@ -1171,7 +1178,7 @@ describe("React List Operations Performance", () => {
           inStock: Math.random() > 0.3,
         },
         metadata: {
-          created: Date.now() - Math.random() * 86400000,
+          created: Date.now() - Math.random() * 86_400_000,
           modified: Date.now(),
           tags: [`tag${index % 10}`, `type${index % 7}`],
           category: `Category ${index % 8}`,
@@ -1242,13 +1249,13 @@ describe("React List Operations Performance", () => {
         id: `item-${index}`,
         value: {
           name: `Item ${Math.floor(Math.random() * 1000)}`,
-          timestamp: Date.now() - Math.random() * 86400000,
+          timestamp: Date.now() - Math.random() * 86_400_000,
           score: Math.random() * 100,
           category: `Category ${index % 5}`,
         },
         metadata: {
-          created: Date.now() - Math.random() * 86400000 * 30,
-          modified: Date.now() - Math.random() * 86400000 * 7,
+          created: Date.now() - Math.random() * 86_400_000 * 30,
+          modified: Date.now() - Math.random() * 86_400_000 * 7,
           tags: [`tag${index % 12}`],
           category: `Category ${index % 5}`,
           priority: Math.random(),
@@ -1333,20 +1340,20 @@ describe("React List Operations Performance", () => {
           itemHeight: 50,
           containerHeight: 400,
           overscan: 5,
-          scrollOffset: Math.random() * 10000,
+          scrollOffset: Math.random() * 10_000,
         },
         {
           itemHeight: (index: number) => 40 + (index % 5) * 20, // Variable height
           containerHeight: 600,
           overscan: 10,
-          scrollOffset: Math.random() * 15000,
+          scrollOffset: Math.random() * 15_000,
           estimatedItemSize: 60,
         },
         {
           itemHeight: 80,
           containerHeight: 300,
           overscan: 3,
-          scrollOffset: Math.random() * 20000,
+          scrollOffset: Math.random() * 20_000,
         },
       ];
 
@@ -1380,7 +1387,7 @@ describe("React List Operations Performance", () => {
           status: ["active", "pending", "completed"][index % 3],
         },
         metadata: {
-          created: Date.now() - Math.random() * 86400000 * 30,
+          created: Date.now() - Math.random() * 86_400_000 * 30,
           modified: Date.now(),
           tags: [`tag${index % 8}`],
           category: `Category ${index % 6}`,
@@ -1533,8 +1540,8 @@ describe("React List Operations Performance", () => {
           featured: Math.random() > 0.7,
         },
         metadata: {
-          created: Date.now() - Math.random() * 86400000 * 365,
-          modified: Date.now() - Math.random() * 86400000 * 30,
+          created: Date.now() - Math.random() * 86_400_000 * 365,
+          modified: Date.now() - Math.random() * 86_400_000 * 30,
           tags: [`tag${index % 20}`, `feature${index % 15}`],
           category: `Category ${index % 12}`,
           priority: Math.random(),
@@ -1598,7 +1605,7 @@ describe("React List Operations Performance", () => {
       const componentId = stressComponents[Math.floor(Math.random() * stressComponents.length)];
       
       // Very large dataset
-      const items: ListItem[] = Array.from({ length: 10000 }, (_, index) => ({
+      const items: ListItem[] = Array.from({ length: 10_000 }, (_, index) => ({
         id: `stress-item-${index}`,
         value: {
           title: `Stress Item ${index}`,
@@ -1614,7 +1621,7 @@ describe("React List Operations Performance", () => {
           },
         },
         metadata: {
-          created: Date.now() - Math.random() * 86400000 * 365,
+          created: Date.now() - Math.random() * 86_400_000 * 365,
           modified: Date.now(),
           tags: Array.from({ length: 10 }, (_, j) => `tag${j}-${index % 50}`),
           category: `Category ${index % 25}`,
@@ -1664,7 +1671,7 @@ describe("React List Operations Performance", () => {
           itemHeight: (index: number) => 50 + (index % 10) * 10,
           containerHeight: 800,
           overscan: 20,
-          scrollOffset: Math.random() * 50000,
+          scrollOffset: Math.random() * 50_000,
           estimatedItemSize: 75,
         },
         grouping: {

@@ -44,7 +44,7 @@ describe("StatusBadge - Additional Coverage", () => {
 
     it("should handle edge cases for size mapping completeness", () => {
         // Test all documented sizes to ensure complete coverage
-        const sizes: Array<NonNullable<StatusBadgeProperties["size"]>> = [
+        const sizes: NonNullable<StatusBadgeProperties["size"]>[] = [
             "2xl",
             "3xl",
             "4xl",

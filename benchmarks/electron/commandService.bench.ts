@@ -181,7 +181,7 @@ describe("Command Service Benchmarks", () => {
         aliases: ['s'],
         deprecated: false,
         async: true,
-        timeout: 30000,
+        timeout: 30_000,
         rateLimited: true,
       },
       {
@@ -199,7 +199,7 @@ describe("Command Service Benchmarks", () => {
         aliases: ['mon', 'm'],
         deprecated: false,
         async: true,
-        timeout: 60000,
+        timeout: 60_000,
         rateLimited: false,
       },
       {
@@ -218,7 +218,7 @@ describe("Command Service Benchmarks", () => {
         aliases: ['exp'],
         deprecated: false,
         async: true,
-        timeout: 120000,
+        timeout: 120_000,
         rateLimited: true,
       },
     ];
@@ -251,17 +251,21 @@ describe("Command Service Benchmarks", () => {
           let value: unknown;
           
           switch (argDef.type) {
-            case 'string':
+            case 'string': {
               value = `test-value-${i}`;
               break;
-            case 'number':
+            }
+            case 'number': {
               value = Math.floor(Math.random() * 1000);
               break;
-            case 'boolean':
+            }
+            case 'boolean': {
               value = Math.random() > 0.5;
               break;
-            default:
+            }
+            default: {
               value = 'unknown';
+            }
           }
           
           command.args.push(String(value));
@@ -277,27 +281,33 @@ describe("Command Service Benchmarks", () => {
           let value: unknown;
           
           switch (optDef.type) {
-            case 'string':
+            case 'string': {
               value = `option-value-${i}`;
               break;
-            case 'url':
+            }
+            case 'url': {
               value = Math.random() > 0.1 ? 'https://example.com' : 'invalid-url'; // 10% invalid URLs
               if (value === 'invalid-url') errors.push(`Invalid URL: ${optDef.name}`);
               break;
-            case 'path':
+            }
+            case 'path': {
               value = `./path/to/file-${i}.txt`;
               break;
-            case 'number':
+            }
+            case 'number': {
               value = Math.floor(Math.random() * 1000);
               if (optDef.name === 'interval' && (value as number) < 60) {
                 warnings.push('Interval less than 60 seconds may cause high load');
               }
               break;
-            case 'boolean':
+            }
+            case 'boolean': {
               value = Math.random() > 0.5;
               break;
-            default:
+            }
+            default: {
               value = 'unknown';
+            }
           }
           
           command.options[optDef.name] = value;
@@ -349,10 +359,10 @@ describe("Command Service Benchmarks", () => {
       { name: 'site-create', baseTime: 2000, variance: 0.3, successRate: 0.95, memoryUsage: 5120 },
       { name: 'site-delete', baseTime: 1000, variance: 0.2, successRate: 0.98, memoryUsage: 2048 },
       { name: 'monitor-start', baseTime: 3000, variance: 0.4, successRate: 0.92, memoryUsage: 8192 },
-      { name: 'export-data', baseTime: 8000, variance: 0.5, successRate: 0.88, memoryUsage: 16384 },
-      { name: 'import-sites', baseTime: 5000, variance: 0.6, successRate: 0.85, memoryUsage: 12288 },
+      { name: 'export-data', baseTime: 8000, variance: 0.5, successRate: 0.88, memoryUsage: 16_384 },
+      { name: 'import-sites', baseTime: 5000, variance: 0.6, successRate: 0.85, memoryUsage: 12_288 },
       { name: 'status-check', baseTime: 500, variance: 0.2, successRate: 0.99, memoryUsage: 1024 },
-      { name: 'backup-create', baseTime: 15000, variance: 0.4, successRate: 0.93, memoryUsage: 32768 },
+      { name: 'backup-create', baseTime: 15_000, variance: 0.4, successRate: 0.93, memoryUsage: 32_768 },
       { name: 'config-update', baseTime: 300, variance: 0.3, successRate: 0.97, memoryUsage: 512 },
     ];
     
@@ -378,25 +388,29 @@ describe("Command Service Benchmarks", () => {
         exitCode = 0;
         
         switch (scenario.name) {
-          case 'site-create':
+          case 'site-create': {
             result = { siteId: `site-${i}`, status: 'created' };
             break;
-          case 'status-check':
+          }
+          case 'status-check': {
             result = { 
               totalSites: Math.floor(Math.random() * 50) + 10,
               activeSites: Math.floor(Math.random() * 40) + 8,
               upSites: Math.floor(Math.random() * 35) + 5,
             };
             break;
-          case 'export-data':
+          }
+          case 'export-data': {
             result = { 
               exported: Math.floor(Math.random() * 1000) + 100,
-              fileSize: Math.floor(Math.random() * 10000000) + 1000000,
+              fileSize: Math.floor(Math.random() * 10_000_000) + 1_000_000,
               format: 'json',
             };
             break;
-          default:
+          }
+          default: {
             result = { status: 'success', message: `${scenario.name} completed` };
+          }
         }
       } else {
         const errorCodes = [1, 2, 126, 127, 130];
@@ -494,7 +508,7 @@ describe("Command Service Benchmarks", () => {
       const historyEntry: HistoryEntry = {
         id: `hist-${i}`,
         command,
-        timestamp: Date.now() - Math.random() * 86400000 * 30, // Last 30 days
+        timestamp: Date.now() - Math.random() * 86_400_000 * 30, // Last 30 days
         duration: Math.random() * 5000 + 100, // 100ms to 5s
         success: Math.random() > 0.1, // 90% success rate
         userId: Math.random() > 0.3 ? `user-${Math.floor(Math.random() * 10)}` : undefined,
@@ -548,7 +562,7 @@ describe("Command Service Benchmarks", () => {
           timestamp: Date.now(),
           accessCount: 1,
           lastAccessed: Date.now(),
-          ttl: Math.random() * 3600000 + 300000, // 5 minutes to 1 hour
+          ttl: Math.random() * 3_600_000 + 300_000, // 5 minutes to 1 hour
           size,
         };
         
@@ -567,30 +581,36 @@ describe("Command Service Benchmarks", () => {
       let queryTime: number;
       
       switch (queryType) {
-        case 'recent':
+        case 'recent': {
           resultsCount = Math.min(50, historyEntries.length);
           queryTime = Math.random() * 10 + 2; // 2-12ms
           break;
-        case 'by-user':
+        }
+        case 'by-user': {
           resultsCount = historyEntries.filter(h => h.userId === `user-${Math.floor(Math.random() * 10)}`).length;
           queryTime = Math.random() * 25 + 5; // 5-30ms
           break;
-        case 'by-command':
+        }
+        case 'by-command': {
           const searchCommand = commonCommands[Math.floor(Math.random() * commonCommands.length)];
           resultsCount = historyEntries.filter(h => h.command.includes(searchCommand)).length;
           queryTime = Math.random() * 15 + 3; // 3-18ms
           break;
-        case 'by-session':
+        }
+        case 'by-session': {
           resultsCount = historyEntries.filter(h => h.sessionId === `session-${Math.floor(Math.random() * 20)}`).length;
           queryTime = Math.random() * 20 + 4; // 4-24ms
           break;
-        case 'failed-only':
+        }
+        case 'failed-only': {
           resultsCount = historyEntries.filter(h => !h.success).length;
           queryTime = Math.random() * 30 + 8; // 8-38ms (slower due to filtering)
           break;
-        default:
+        }
+        default: {
           resultsCount = 0;
           queryTime = 1;
+        }
       }
       
       const queryResult = {

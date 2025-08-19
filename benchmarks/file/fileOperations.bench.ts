@@ -43,7 +43,7 @@ function generateFileOperationTestData(): FileOperationTestData {
         theme: "dark",
         notifications: true,
         autoUpdate: false,
-        checkInterval: 30000,
+        checkInterval: 30_000,
         retryAttempts: 3,
     };
 
@@ -54,7 +54,7 @@ function generateFileOperationTestData(): FileOperationTestData {
             name: `Site ${i}`,
             url: `https://example${i}.com`,
             monitoring: true,
-            checkInterval: 30000,
+            checkInterval: 30_000,
             monitors: Array.from({ length: 3 }, (_, j) => ({
                 id: `monitor-${i}-${j}`,
                 type: "http",
@@ -72,13 +72,13 @@ function generateFileOperationTestData(): FileOperationTestData {
             name: `Site ${i}`,
             url: `https://example${i}.com`,
             monitoring: true,
-            checkInterval: 30000,
+            checkInterval: 30_000,
             monitors: Array.from({ length: 5 }, (_, j) => ({
                 id: `monitor-${i}-${j}`,
                 type: j % 2 === 0 ? "http" : "ping",
                 timeout: 5000,
                 history: Array.from({ length: 100 }, (_, k) => ({
-                    timestamp: Date.now() - k * 60000,
+                    timestamp: Date.now() - k * 60_000,
                     status: Math.random() > 0.1 ? "up" : "down",
                     responseTime: Math.random() * 1000,
                 })),
@@ -99,8 +99,8 @@ function generateFileOperationTestData(): FileOperationTestData {
     // CSV data (monitoring history export)
     const csvHeaders =
         "timestamp,site_id,monitor_id,status,response_time,error_message";
-    const csvRows = Array.from({ length: 10000 }, (_, i) => {
-        const timestamp = Date.now() - i * 60000;
+    const csvRows = Array.from({ length: 10_000 }, (_, i) => {
+        const timestamp = Date.now() - i * 60_000;
         const siteId = `site-${i % 100}`;
         const monitorId = `monitor-${i % 500}`;
         const status = Math.random() > 0.1 ? "up" : "down";
@@ -108,7 +108,7 @@ function generateFileOperationTestData(): FileOperationTestData {
         const errorMessage = status === "down" ? "Connection timeout" : "";
         return `${timestamp},${siteId},${monitorId},${status},${responseTime},"${errorMessage}"`;
     });
-    const csvData = csvHeaders + "\n" + csvRows.join("\n");
+    const csvData = `${csvHeaders  }\n${  csvRows.join("\n")}`;
 
     // Configuration file data
     const configData = `
@@ -178,13 +178,13 @@ function simulateFileRead(size: number): Promise<string> {
 
 function compressData(data: string): string {
     // Simple compression simulation (replace repeated characters)
-    return data.replace(/(.)\1+/g, (match, char) => `${char}*${match.length}`);
+    return data.replaceAll(/(.)\1+/g, (match, char) => `${char}*${match.length}`);
 }
 
 function decompressData(compressed: string): string {
     // Simple decompression simulation
-    return compressed.replace(/(.)\*(\d+)/g, (match, char, count) =>
-        char.repeat(parseInt(count))
+    return compressed.replaceAll(/(.)\*(\d+)/g, (match, char, count) =>
+        char.repeat(Number.parseInt(count))
     );
 }
 
@@ -204,9 +204,9 @@ function parseConfigFile(
             // Parse value type
             if (value === "true") result[currentSection][key] = true;
             else if (value === "false") result[currentSection][key] = false;
-            else if (!isNaN(Number(value)))
-                result[currentSection][key] = Number(value);
-            else result[currentSection][key] = value;
+            else if (isNaN(Number(value)))
+                {result[currentSection][key] = value;}
+            else {result[currentSection][key] = Number(value);}
         }
     });
 
@@ -224,12 +224,12 @@ function generateBackupData(): BackupData {
             id: `monitor-${i}`,
             siteId: `site-${i % 500}`,
             type: "http",
-            interval: 30000,
+            interval: 30_000,
         })),
-        history: Array.from({ length: 50000 }, (_, i) => ({
+        history: Array.from({ length: 50_000 }, (_, i) => ({
             id: `history-${i}`,
             monitorId: `monitor-${i % 1500}`,
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: Math.random() > 0.1 ? "up" : "down",
         })),
         settings: {
@@ -257,7 +257,7 @@ describe("File Operations Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 
@@ -292,7 +292,7 @@ describe("File Operations Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 
@@ -346,7 +346,7 @@ describe("File Operations Performance Benchmarks", () => {
                         (h) =>
                             `${h.timestamp},${h.monitorId},${h.status},${Math.random() * 1000}`
                     );
-                const csv = headers + "\n" + rows.join("\n");
+                const csv = `${headers  }\n${  rows.join("\n")}`;
                 // Simulate processing the CSV data
                 csv.length;
             },
@@ -419,7 +419,7 @@ describe("File Operations Performance Benchmarks", () => {
                 const config = {
                     monitoring: {
                         enabled: true,
-                        interval: 30000,
+                        interval: 30_000,
                         timeout: 5000,
                     },
                     notifications: {
@@ -484,7 +484,7 @@ describe("File Operations Performance Benchmarks", () => {
                 const backup = {
                     sites: backupData.sites,
                     monitors: backupData.monitors,
-                    history: backupData.history.slice(0, 10000), // Limit for performance
+                    history: backupData.history.slice(0, 10_000), // Limit for performance
                     settings: backupData.settings,
                     metadata: {
                         ...backupData.metadata,
@@ -668,7 +668,7 @@ describe("File Operations Performance Benchmarks", () => {
             () => {
                 const data = testData.binaryLikeData;
                 let checksum = 0;
-                for (let i = 0; i < Math.min(data.length, 10000); i++) {
+                for (let i = 0; i < Math.min(data.length, 10_000); i++) {
                     checksum += data[i];
                 }
                 const result = checksum % 256;

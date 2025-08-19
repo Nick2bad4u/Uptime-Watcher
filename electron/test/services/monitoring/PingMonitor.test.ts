@@ -27,15 +27,9 @@ const mockPerformPingCheckWithRetry =
 
 // Mock the monitor type guards
 vi.mock("../../../services/monitoring/utils/monitorTypeGuards", () => ({
-    hasValidHost: vi.fn((monitor): boolean => {
-        return isNonEmptyString(monitor.host);
-    }),
-    getMonitorTimeout: vi.fn((monitor, defaultTimeout) => {
-        return monitor.timeout || defaultTimeout;
-    }),
-    getMonitorRetryAttempts: vi.fn((monitor, defaultRetries) => {
-        return monitor.retryAttempts || defaultRetries;
-    }),
+    hasValidHost: vi.fn((monitor): boolean => isNonEmptyString(monitor.host)),
+    getMonitorTimeout: vi.fn((monitor, defaultTimeout) => monitor.timeout || defaultTimeout),
+    getMonitorRetryAttempts: vi.fn((monitor, defaultRetries) => monitor.retryAttempts || defaultRetries),
 }));
 
 describe("PingMonitor", () => {

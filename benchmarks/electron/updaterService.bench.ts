@@ -150,30 +150,33 @@ describe("Updater Service Benchmarks", () => {
         
         // Generate new version based on scenario
         switch (selectedScenario.name) {
-          case 'minor-update-available':
+          case 'minor-update-available': {
             versionParts[2]++;
             break;
-          case 'major-update-available':
+          }
+          case 'major-update-available': {
             versionParts[1]++;
             versionParts[2] = 0;
             break;
-          case 'critical-update-available':
+          }
+          case 'critical-update-available': {
             versionParts[0]++;
             versionParts[1] = 0;
             versionParts[2] = 0;
             break;
+          }
         }
         
         const newVersion = versionParts.join('.');
-        const updateSize = Math.floor(Math.random() * 100000000) + 10000000; // 10MB - 110MB
+        const updateSize = Math.floor(Math.random() * 100_000_000) + 10_000_000; // 10MB - 110MB
         
         updateInfo = {
           version: newVersion,
-          releaseDate: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(), // Within last week
+          releaseDate: new Date(Date.now() - Math.random() * 86_400_000 * 7).toISOString(), // Within last week
           downloadUrl: `https://releases.example.com/v${newVersion}/update.zip`,
           size: updateSize,
-          checksum: `sha256:${Math.random().toString(36).substring(2, 66)}`, // Mock checksum
-          signature: Math.random() > 0.2 ? `sig_${Math.random().toString(36).substring(2, 20)}` : undefined,
+          checksum: `sha256:${Math.random().toString(36).slice(2, 66)}`, // Mock checksum
+          signature: Math.random() > 0.2 ? `sig_${Math.random().toString(36).slice(2, 20)}` : undefined,
           releaseNotes: `Release notes for version ${newVersion}`,
           critical: selectedScenario.name === 'critical-update-available',
           minimumVersion: selectedScenario.name === 'critical-update-available' ? currentVersion : undefined,
@@ -217,21 +220,21 @@ describe("Updater Service Benchmarks", () => {
     const downloadScenarios = [
       {
         name: 'small-update',
-        size: { min: 5000000, max: 25000000 }, // 5-25 MB
-        speed: { min: 1000000, max: 5000000 }, // 1-5 MB/s
+        size: { min: 5_000_000, max: 25_000_000 }, // 5-25 MB
+        speed: { min: 1_000_000, max: 5_000_000 }, // 1-5 MB/s
         reliabilityRate: 0.98,
       },
       {
         name: 'medium-update',
-        size: { min: 25000000, max: 100000000 }, // 25-100 MB
-        speed: { min: 800000, max: 4000000 }, // 0.8-4 MB/s
+        size: { min: 25_000_000, max: 100_000_000 }, // 25-100 MB
+        speed: { min: 800_000, max: 4_000_000 }, // 0.8-4 MB/s
         reliabilityRate: 0.95,
       },
       {
         name: 'large-update',
-        size: { min: 100000000, max: 500000000 }, // 100-500 MB
-        speed: { min: 500000, max: 3000000 }, // 0.5-3 MB/s
-        reliabilityRate: 0.90,
+        size: { min: 100_000_000, max: 500_000_000 }, // 100-500 MB
+        speed: { min: 500_000, max: 3_000_000 }, // 0.5-3 MB/s
+        reliabilityRate: 0.9,
       },
     ];
     
@@ -259,7 +262,7 @@ describe("Updater Service Benchmarks", () => {
       while (downloadedBytes < totalBytes) {
         // Simulate speed variations (±30%)
         const speedVariation = (Math.random() - 0.5) * 0.6;
-        currentSpeed = Math.max(100000, baseSpeed * (1 + speedVariation)); // Minimum 100 KB/s
+        currentSpeed = Math.max(100_000, baseSpeed * (1 + speedVariation)); // Minimum 100 KB/s
         
         // Simulate potential pauses (5% chance)
         if (Math.random() < 0.05 && !paused) {
@@ -319,7 +322,7 @@ describe("Updater Service Benchmarks", () => {
     
     // Calculate download metrics
     const completedDownloads = downloadProgresses
-      .filter(dp => dp.progress >= 1.0)
+      .filter(dp => dp.progress >= 1)
       .reduce((groups, dp) => {
         if (!groups[dp.downloadId]) {
           groups[dp.downloadId] = dp;
@@ -381,7 +384,7 @@ describe("Updater Service Benchmarks", () => {
       const hasSignature = Math.random() < scenario.hasSignature;
       
       // Generate checksums
-      const expectedChecksum = `${scenario.checksumAlgorithm}:${Math.random().toString(36).substring(2, 66)}`;
+      const expectedChecksum = `${scenario.checksumAlgorithm}:${Math.random().toString(36).slice(2, 66)}`;
       
       // Simulate verification process
       const verificationStartTime = Date.now();
@@ -397,7 +400,7 @@ describe("Updater Service Benchmarks", () => {
       // Generate actual checksum (same as expected if valid)
       const actualChecksum = checksumValid ? 
         expectedChecksum : 
-        `${scenario.checksumAlgorithm}:${Math.random().toString(36).substring(2, 66)}`;
+        `${scenario.checksumAlgorithm}:${Math.random().toString(36).slice(2, 66)}`;
       
       const success = checksumValid && signatureValid;
       
@@ -439,7 +442,7 @@ describe("Updater Service Benchmarks", () => {
       {
         name: 'standard-installation',
         phases: installationPhases.slice(),
-        phaseDurations: [1000, 3000, 2000, 8000, 12000, 2000, 3000, 1000], // milliseconds
+        phaseDurations: [1000, 3000, 2000, 8000, 12_000, 2000, 3000, 1000], // milliseconds
         successRate: 0.95,
         backupEnabled: true,
         rollbackSupported: true,
@@ -455,8 +458,8 @@ describe("Updater Service Benchmarks", () => {
       {
         name: 'complex-installation',
         phases: installationPhases.concat(['migration', 'post-install-verification']),
-        phaseDurations: [1500, 5000, 3000, 15000, 20000, 4000, 5000, 2000, 8000, 3000],
-        successRate: 0.90,
+        phaseDurations: [1500, 5000, 3000, 15_000, 20_000, 4000, 5000, 2000, 8000, 3000],
+        successRate: 0.9,
         backupEnabled: true,
         rollbackSupported: true,
       },
@@ -532,7 +535,7 @@ describe("Updater Service Benchmarks", () => {
     }, {} as Record<string, InstallationProgress[]>);
     
     const installationStats = Object.values(installationGroups).map(progressList => {
-      const lastProgress = progressList[progressList.length - 1];
+      const lastProgress = progressList.at(-1);
       const success = !lastProgress.error && lastProgress.progress >= 0.95;
       const totalDuration = lastProgress.currentTime - progressList[0].startTime;
       const phases = [...new Set(progressList.map(p => p.phase))];
@@ -601,25 +604,29 @@ describe("Updater Service Benchmarks", () => {
       let filesRestored: number;
       
       switch (selectedTrigger.complexity) {
-        case 'low':
+        case 'low': {
           baseDuration = 5000; // 5 seconds
           successRate = 0.99;
           filesRestored = Math.floor(Math.random() * 50) + 10;
           break;
-        case 'medium':
-          baseDuration = 15000; // 15 seconds
+        }
+        case 'medium': {
+          baseDuration = 15_000; // 15 seconds
           successRate = 0.95;
           filesRestored = Math.floor(Math.random() * 200) + 50;
           break;
-        case 'high':
-          baseDuration = 45000; // 45 seconds
-          successRate = 0.90;
+        }
+        case 'high': {
+          baseDuration = 45_000; // 45 seconds
+          successRate = 0.9;
           filesRestored = Math.floor(Math.random() * 500) + 100;
           break;
-        default:
-          baseDuration = 10000;
+        }
+        default: {
+          baseDuration = 10_000;
           successRate = 0.95;
           filesRestored = 100;
+        }
       }
       
       // Add variance to duration
@@ -712,7 +719,7 @@ describe("Updater Service Benchmarks", () => {
       {
         scheduleId: 'daily-stable',
         updateChannel: 'stable',
-        checkInterval: 86400000, // 24 hours
+        checkInterval: 86_400_000, // 24 hours
         installationWindow: { start: 2, end: 6 }, // 2 AM - 6 AM
         retryPolicy: { maxRetries: 3, backoffMultiplier: 2 },
         userInteractionRequired: true,
@@ -721,7 +728,7 @@ describe("Updater Service Benchmarks", () => {
       {
         scheduleId: 'weekly-beta',
         updateChannel: 'beta',
-        checkInterval: 604800000, // 7 days
+        checkInterval: 604_800_000, // 7 days
         installationWindow: { start: 1, end: 5 }, // 1 AM - 5 AM
         retryPolicy: { maxRetries: 2, backoffMultiplier: 1.5 },
         userInteractionRequired: false,
@@ -730,7 +737,7 @@ describe("Updater Service Benchmarks", () => {
       {
         scheduleId: 'critical-immediate',
         updateChannel: 'stable',
-        checkInterval: 3600000, // 1 hour
+        checkInterval: 3_600_000, // 1 hour
         installationWindow: { start: 0, end: 24 }, // Any time
         retryPolicy: { maxRetries: 5, backoffMultiplier: 1.2 },
         userInteractionRequired: false,
@@ -744,7 +751,7 @@ describe("Updater Service Benchmarks", () => {
       const schedule = updateSchedules[Math.floor(Math.random() * updateSchedules.length)];
       
       // Generate scheduled update time
-      const baseTime = Date.now() + Math.random() * 86400000 * 7; // Within next week
+      const baseTime = Date.now() + Math.random() * 86_400_000 * 7; // Within next week
       const windowStart = new Date(baseTime);
       windowStart.setHours(schedule.installationWindow.start, 0, 0, 0);
       const windowEnd = new Date(baseTime);
@@ -772,7 +779,7 @@ describe("Updater Service Benchmarks", () => {
         const networkIssue = Math.random() < 0.05; // 5% chance of network issues
         
         if (systemBusy) {
-          actualStartTime += Math.random() * 3600000; // Delay up to 1 hour
+          actualStartTime += Math.random() * 3_600_000; // Delay up to 1 hour
         }
         
         if (networkIssue) {
@@ -801,25 +808,30 @@ describe("Updater Service Benchmarks", () => {
             let phaseSuccessRate: number;
             
             switch (phase) {
-              case 'check':
+              case 'check': {
                 phaseDuration = Math.random() * 5000 + 1000; // 1-6 seconds
                 phaseSuccessRate = 0.98;
                 break;
-              case 'download':
-                phaseDuration = Math.random() * 120000 + 30000; // 30s-2.5min
+              }
+              case 'download': {
+                phaseDuration = Math.random() * 120_000 + 30_000; // 30s-2.5min
                 phaseSuccessRate = 0.92;
                 break;
-              case 'verify':
-                phaseDuration = Math.random() * 10000 + 2000; // 2-12 seconds
+              }
+              case 'verify': {
+                phaseDuration = Math.random() * 10_000 + 2000; // 2-12 seconds
                 phaseSuccessRate = 0.99;
                 break;
-              case 'install':
-                phaseDuration = Math.random() * 60000 + 20000; // 20s-1.3min
+              }
+              case 'install': {
+                phaseDuration = Math.random() * 60_000 + 20_000; // 20s-1.3min
                 phaseSuccessRate = 0.95;
                 break;
-              default:
+              }
+              default: {
                 phaseDuration = 5000;
                 phaseSuccessRate = 0.95;
+              }
             }
             
             actualEndTime += phaseDuration;
@@ -841,7 +853,7 @@ describe("Updater Service Benchmarks", () => {
           
           // Apply retry backoff
           if (attempt < schedule.retryPolicy.maxRetries) {
-            const backoffDelay = Math.pow(schedule.retryPolicy.backoffMultiplier, attempt) * 300000; // Base 5 minutes
+            const backoffDelay = schedule.retryPolicy.backoffMultiplier**attempt * 300_000; // Base 5 minutes
             actualEndTime += backoffDelay;
           }
         }

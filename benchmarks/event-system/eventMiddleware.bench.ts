@@ -25,7 +25,7 @@ type MiddlewareFunction = (context: EventContext, next: () => Promise<void>) => 
 
 class MockEventMiddleware {
     private middlewares: MiddlewareFunction[] = [];
-    private interceptors: Map<string, Function[]> = new Map();
+    private interceptors = new Map<string, Function[]>();
     private metrics = {
         processed: 0,
         intercepted: 0,
@@ -170,7 +170,7 @@ class MockEventMiddleware {
                     attempts++;
                     if (attempts < maxRetries) {
                         // Exponential backoff
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 100));
+                        await new Promise(resolve => setTimeout(resolve, 2**attempts * 100));
                     }
                 }
             }

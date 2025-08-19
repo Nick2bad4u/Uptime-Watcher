@@ -44,7 +44,7 @@ interface ComponentInstance {
   renderTime: number;
   unmountTime?: number;
   hooks: HookState[];
-  effectCleanups: Array<() => void>;
+  effectCleanups: (() => void)[];
   refs: Map<string, any>;
 }
 
@@ -99,7 +99,7 @@ class MockComponentLifecycle {
 
   private nextId = 0;
   private batchUpdateInProgress = false;
-  private pendingEffects: Array<() => void> = [];
+  private pendingEffects: (() => void)[] = [];
 
   // Component creation and mounting
   createComponent(
@@ -344,24 +344,30 @@ class MockComponentLifecycle {
       
       // Simulate operation work
       switch (operation) {
-        case "createElement":
+        case "createElement": {
           const elementCreation = Math.random() * 2;
           break;
-        case "updateElement":
+        }
+        case "updateElement": {
           const elementUpdate = Math.random() * 1.5;
           break;
-        case "removeElement":
+        }
+        case "removeElement": {
           const elementRemoval = Math.random() * 1;
           break;
-        case "moveElement":
+        }
+        case "moveElement": {
           const elementMove = Math.random() * 3;
           break;
-        case "updateProps":
+        }
+        case "updateProps": {
           const propsUpdate = Math.random() * 2.5;
           break;
-        case "updateText":
+        }
+        case "updateText": {
           const textUpdate = Math.random() * 0.5;
           break;
+        }
       }
     }
   }
@@ -375,36 +381,43 @@ class MockComponentLifecycle {
     const executionTime = Math.random() * 5; // Random execution time
     
     switch (method) {
-      case "constructor":
+      case "constructor": {
         component.state.isInitialized = true;
         break;
-      case "componentWillMount":
+      }
+      case "componentWillMount": {
         // Legacy method simulation
         break;
-      case "componentDidMount":
+      }
+      case "componentDidMount": {
         // Post-mount work simulation
         this.scheduleEffect(() => {
           const postMountWork = Math.random() * 10;
         });
         break;
-      case "shouldComponentUpdate":
+      }
+      case "shouldComponentUpdate": {
         // Return random decision for simulation
-        return Math.random() > 0.1; // 90% update rate
-      case "componentWillUpdate":
+        return Math.random() > 0.1;
+      } // 90% update rate
+      case "componentWillUpdate": {
         // Pre-update work simulation
         break;
-      case "componentDidUpdate":
+      }
+      case "componentDidUpdate": {
         // Post-update work simulation
         this.scheduleEffect(() => {
           const postUpdateWork = Math.random() * 8;
         });
         break;
-      case "componentWillUnmount":
+      }
+      case "componentWillUnmount": {
         // Cleanup work simulation
         component.effectCleanups.forEach(cleanup => {
           const cleanupWork = Math.random() * 3;
         });
         break;
+      }
     }
     
     return true;
@@ -443,25 +456,28 @@ class MockComponentLifecycle {
       
       // Simulate hook updates based on type
       switch (hook.type) {
-        case "useState":
+        case "useState": {
           if (Math.random() > 0.7) {
             hook.value = this.generateHookValue();
             hook.hasChanged = true;
           }
           break;
-        case "useMemo":
+        }
+        case "useMemo": {
           if (this.dependenciesChanged(hook.dependencies)) {
             hook.value = this.computeMemoizedValue();
             hook.hasChanged = true;
           }
           break;
-        case "useCallback":
+        }
+        case "useCallback": {
           if (this.dependenciesChanged(hook.dependencies)) {
             hook.value = () => Math.random();
             hook.hasChanged = true;
           }
           break;
-        case "useEffect":
+        }
+        case "useEffect": {
           if (this.dependenciesChanged(hook.dependencies)) {
             // Schedule effect
             this.scheduleEffect(() => {
@@ -469,6 +485,7 @@ class MockComponentLifecycle {
             });
           }
           break;
+        }
       }
     });
   }
@@ -476,7 +493,7 @@ class MockComponentLifecycle {
   private generateHookValue(): any {
     const valueTypes = [
       () => Math.random() * 100,
-      () => `string-${Math.random().toString(36).substr(2, 9)}`,
+      () => `string-${Math.random().toString(36).slice(2, 11)}`,
       () => ({ key: Math.random(), nested: { value: Math.random() } }),
       () => Array.from({ length: Math.floor(Math.random() * 10) }, () => Math.random()),
       () => new Date(),
@@ -520,7 +537,7 @@ class MockComponentLifecycle {
   }
 
   // Batch updating system
-  batchUpdate(updates: Array<{ component: ComponentInstance; props?: any; state?: any }>): LifecycleMetrics[] {
+  batchUpdate(updates: { component: ComponentInstance; props?: any; state?: any }[]): LifecycleMetrics[] {
     this.batchUpdateInProgress = true;
     const metrics: LifecycleMetrics[] = [];
     
@@ -613,18 +630,21 @@ class MockComponentLifecycle {
       phaseDistribution[metrics.phase]++;
       
       switch (metrics.phase) {
-        case "mounted":
+        case "mounted": {
           totalMountTime += metrics.duration;
           mountCount++;
           break;
-        case "updated":
+        }
+        case "updated": {
           totalUpdateTime += metrics.duration;
           updateCount++;
           break;
-        case "unmounted":
+        }
+        case "unmounted": {
           totalUnmountTime += metrics.duration;
           unmountCount++;
           break;
+        }
       }
     });
     
@@ -1018,9 +1038,7 @@ describe("React Component Lifecycle Performance", () => {
     };
 
     // Memory and performance analysis
-    const analyzePerformance = () => {
-      return lifecycle.getLifecycleStatistics();
-    };
+    const analyzePerformance = () => lifecycle.getLifecycleStatistics();
     
     const app = initializeApp();
     simulateRouteChanges(app);

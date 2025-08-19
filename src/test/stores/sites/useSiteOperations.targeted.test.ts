@@ -60,9 +60,7 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/fileDownload", () => ({
-    handleSQLiteBackupDownload: vi.fn(async (callback) => {
-        return await callback();
-    }),
+    handleSQLiteBackupDownload: vi.fn(async (callback) => await callback()),
 }));
 
 vi.mock("../../../utils/safeExtractIpcData", () => ({

@@ -91,17 +91,17 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
-    ConditionalResponseTime: ({ children, monitorType }: any) => {
+    ConditionalResponseTime: ({ children, monitorType }: any) => 
         // Always show children (assumes response time is supported for test simplicity)
-        return (
+         (
             <div
                 data-testid="conditional-response-time"
                 data-monitor-type={monitorType}
             >
                 {children}
             </div>
-        );
-    },
+        )
+    ,
 }));
 
 // Mock the monitorUiHelpers to prevent async operations

@@ -80,11 +80,11 @@ describe("Database Backup and Restore Benchmarks", () => {
   ];
 
   const compressionAlgorithms = [
-    { name: 'gzip', ratio: 0.3, speed: 1.0, cpuCost: 0.6 },
-    { name: 'lz4', ratio: 0.5, speed: 3.0, cpuCost: 0.3 },
-    { name: 'zstd', ratio: 0.25, speed: 2.0, cpuCost: 0.5 },
+    { name: 'gzip', ratio: 0.3, speed: 1, cpuCost: 0.6 },
+    { name: 'lz4', ratio: 0.5, speed: 3, cpuCost: 0.3 },
+    { name: 'zstd', ratio: 0.25, speed: 2, cpuCost: 0.5 },
     { name: 'bzip2', ratio: 0.2, speed: 0.4, cpuCost: 0.9 },
-    { name: 'none', ratio: 1.0, speed: 10.0, cpuCost: 0.1 },
+    { name: 'none', ratio: 1, speed: 10, cpuCost: 0.1 },
   ];
 
   // Full backup performance
@@ -219,7 +219,7 @@ describe("Database Backup and Restore Benchmarks", () => {
       const incrementalCount = Math.floor(Math.random() * 10) + 5; // 5-15 incrementals
       const incrementalBackupIds: string[] = [];
       
-      let chainStartTime = Date.now();
+      const chainStartTime = Date.now();
       let cumulativeDataSize = fullBackupSize;
       let totalCompressedSize = Math.floor(fullBackupSize * compressionAlg.ratio);
       
@@ -231,7 +231,7 @@ describe("Database Backup and Restore Benchmarks", () => {
         const incrementalDataSize = Math.floor(fullBackupSize * (0.01 + Math.random() * 0.09));
         cumulativeDataSize += incrementalDataSize;
         
-        const startTime = chainStartTime + (inc + 1) * (Math.random() * 86400000 + 3600000); // 1-25 hours apart
+        const startTime = chainStartTime + (inc + 1) * (Math.random() * 86_400_000 + 3_600_000); // 1-25 hours apart
         
         // Incremental backups are faster than full backups
         const baseIncrementalTime = (incrementalDataSize / (100 * 1024 * 1024)) * 1000; // 100MB/s for incrementals
@@ -266,7 +266,7 @@ describe("Database Backup and Restore Benchmarks", () => {
       }
       
       // Calculate chain metrics
-      const chainEndTime = chainStartTime + (incrementalCount * 86400000); // Approximate end time
+      const chainEndTime = chainStartTime + (incrementalCount * 86_400_000); // Approximate end time
       const successfulIncrementals = incrementalBackups
         .filter(b => b.backupId.startsWith(`incremental-${chain}-`) && b.success);
       
@@ -348,25 +348,29 @@ describe("Database Backup and Restore Benchmarks", () => {
       const dataSize = dataSizes[Math.floor(Math.random() * dataSizes.length)];
       
       const currentTime = Date.now();
-      const targetTimestamp = currentTime - (Math.random() * scenario.timeRangeHours * 3600000);
+      const targetTimestamp = currentTime - (Math.random() * scenario.timeRangeHours * 3_600_000);
       const startTime = currentTime;
       
       // Calculate recovery complexity
       let baseRecoveryTime = 0;
       
       switch (scenario.complexity) {
-        case 'low':
+        case 'low': {
           baseRecoveryTime = (dataSize.sizeBytes / (200 * 1024 * 1024)) * 1000; // 200MB/s
           break;
-        case 'medium':
+        }
+        case 'medium': {
           baseRecoveryTime = (dataSize.sizeBytes / (100 * 1024 * 1024)) * 1000; // 100MB/s
           break;
-        case 'high':
+        }
+        case 'high': {
           baseRecoveryTime = (dataSize.sizeBytes / (50 * 1024 * 1024)) * 1000; // 50MB/s
           break;
-        case 'critical':
+        }
+        case 'critical': {
           baseRecoveryTime = (dataSize.sizeBytes / (300 * 1024 * 1024)) * 1000; // 300MB/s (emergency priority)
           break;
+        }
       }
       
       // Add complexity factors
@@ -443,7 +447,7 @@ describe("Database Backup and Restore Benchmarks", () => {
     // Scenario analysis
     const scenarioAnalysis = recoveryScenarios.map(scenario => {
       const scenarioRecoveries = recoveryOperations.filter(r => {
-        const timeDiff = (Date.now() - (r.targetTimestamp || 0)) / 3600000;
+        const timeDiff = (Date.now() - (r.targetTimestamp || 0)) / 3_600_000;
         return timeDiff <= scenario.timeRangeHours;
       });
       
@@ -470,8 +474,8 @@ describe("Database Backup and Restore Benchmarks", () => {
     
     // Test different data patterns
     const dataPatterns = [
-      { name: 'highly-compressible', compressionBonus: 0.3, cpuPenalty: 1.0 },
-      { name: 'moderately-compressible', compressionBonus: 0.0, cpuPenalty: 1.0 },
+      { name: 'highly-compressible', compressionBonus: 0.3, cpuPenalty: 1 },
+      { name: 'moderately-compressible', compressionBonus: 0, cpuPenalty: 1 },
       { name: 'poorly-compressible', compressionBonus: -0.4, cpuPenalty: 1.2 },
       { name: 'encrypted-data', compressionBonus: -0.8, cpuPenalty: 1.5 },
     ];
@@ -488,7 +492,7 @@ describe("Database Backup and Restore Benchmarks", () => {
           const compressionTime = baseCompressionTime + patternPenalty;
           
           // Calculate compression ratio with pattern adjustment
-          const adjustedRatio = Math.max(0.1, Math.min(1.0, 
+          const adjustedRatio = Math.max(0.1, Math.min(1, 
             algorithm.ratio + pattern.compressionBonus
           ));
           
@@ -573,7 +577,7 @@ describe("Database Backup and Restore Benchmarks", () => {
       },
       {
         type: 'hardware-failure' as const,
-        dataLossRange: [0.0, 0.1],
+        dataLossRange: [0, 0.1],
         downtimeRange: [0.5, 4],
         recoveryMethods: ['replica-failover', 'backup-restore', 'hardware-replacement'],
         businessImpactProb: { low: 0.4, medium: 0.35, high: 0.2, critical: 0.05 },
@@ -587,7 +591,7 @@ describe("Database Backup and Restore Benchmarks", () => {
       },
       {
         type: 'disaster' as const,
-        dataLossRange: [0.0, 0.2],
+        dataLossRange: [0, 0.2],
         downtimeRange: [2, 24],
         recoveryMethods: ['dr-site-failover', 'cloud-restore', 'offsite-backup-restore'],
         businessImpactProb: { low: 0.1, medium: 0.2, high: 0.4, critical: 0.3 },
@@ -629,7 +633,7 @@ describe("Database Backup and Restore Benchmarks", () => {
         'point-in-time-restore': 0.95,
         'backup-restore': 0.92,
         'replica-failover': 0.98,
-        'table-restore': 0.90,
+        'table-restore': 0.9,
         'transaction-rollback': 0.88,
         'dr-site-failover': 0.96,
         'cloud-restore': 0.93,
@@ -637,11 +641,11 @@ describe("Database Backup and Restore Benchmarks", () => {
         'hardware-replacement': 0.87,
       };
       
-      const baseSuccessRate = methodSuccessRates[recoveryMethod] || 0.90;
+      const baseSuccessRate = methodSuccessRates[recoveryMethod] || 0.9;
       
       // Adjust success rate based on business impact (higher impact = more pressure = potential mistakes)
       const impactPenalty = {
-        low: 0.0,
+        low: 0,
         medium: 0.02,
         high: 0.05,
         critical: 0.08,

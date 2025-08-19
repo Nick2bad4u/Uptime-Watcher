@@ -48,8 +48,8 @@ function generateMonitorConfigs(count: number): MonitorConfig[] {
         configs.push({
             timeout: [
                 5000,
-                10000,
-                30000,
+                10_000,
+                30_000,
             ][i % 3],
             retryAttempts: [
                 1,
@@ -175,10 +175,10 @@ function aggregateResponseTimes(results: MonitorCheckResult[]): {
         responseTimes.reduce((sum, time) => sum + time, 0) /
         responseTimes.length;
     const min = responseTimes[0];
-    const max = responseTimes[responseTimes.length - 1];
+    const max = responseTimes.at(-1);
     const p95Index = Math.floor(responseTimes.length * 0.95);
     const p95 =
-        responseTimes[p95Index] || responseTimes[responseTimes.length - 1];
+        responseTimes[p95Index] || responseTimes.at(-1);
 
     return { average, min, max, p95 };
 }
@@ -186,9 +186,9 @@ function aggregateResponseTimes(results: MonitorCheckResult[]): {
 function validateMonitorConfig(config: MonitorConfig): boolean {
     return (
         config.timeout > 0 &&
-        config.timeout <= 300000 &&
+        config.timeout <= 300_000 &&
         (config.retryAttempts === undefined || config.retryAttempts >= 0) &&
-        (config.checkInterval === undefined || config.checkInterval >= 30000)
+        (config.checkInterval === undefined || config.checkInterval >= 30_000)
     );
 }
 
@@ -226,10 +226,10 @@ describe("Monitoring Operations Performance Benchmarks", () => {
         largeConfigs = generateMonitorConfigs(2000);
         smallUpdates = generateStatusUpdates(100);
         mediumUpdates = generateStatusUpdates(1000);
-        largeUpdates = generateStatusUpdates(10000);
+        largeUpdates = generateStatusUpdates(10_000);
         smallResults = generateMonitorCheckResults(100);
         mediumResults = generateMonitorCheckResults(1000);
-        largeResults = generateMonitorCheckResults(10000);
+        largeResults = generateMonitorCheckResults(10_000);
     });
 
     // Monitor check simulation benchmarks
@@ -365,8 +365,7 @@ describe("Monitoring Operations Performance Benchmarks", () => {
     bench(
         "Simulate retry logic - Medium batch (500 monitors)",
         () => {
-            for (let i = 0; i < mediumConfigs.length; i++) {
-                const config = mediumConfigs[i];
+            for (const config of mediumConfigs) {
                 simulateRetryLogic(
                     () => simulatePingCheck("example.com", config.timeout),
                     config.retryAttempts || 3

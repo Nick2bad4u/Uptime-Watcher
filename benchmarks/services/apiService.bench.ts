@@ -117,7 +117,7 @@ interface ApiKey {
 }
 
 class MockRateLimiter {
-    private requests: Map<string, number[]> = new Map();
+    private requests = new Map<string, number[]>();
 
     async isAllowed(key: string, windowMs: number, maxRequests: number): Promise<boolean> {
         const now = Date.now();
@@ -161,7 +161,7 @@ class MockRateLimiter {
         
         return {
             count: validRequests.length,
-            resetTime: resetTime > now ? resetTime : now
+            resetTime: Math.max(resetTime, now)
         };
     }
 
@@ -171,7 +171,7 @@ class MockRateLimiter {
 }
 
 class MockCache {
-    private cache: Map<string, { value: any; expiry: number }> = new Map();
+    private cache = new Map<string, { value: any; expiry: number }>();
 
     async get(key: string): Promise<any | null> {
         const item = this.cache.get(key);
@@ -220,7 +220,7 @@ class MockCache {
 }
 
 class MockUserRepository {
-    private users: Map<string, User> = new Map();
+    private users = new Map<string, User>();
     private nextId = 1;
 
     async create(userData: Partial<User>): Promise<User> {
@@ -230,7 +230,7 @@ class MockUserRepository {
             email: userData.email || `user${this.nextId}@test.com`,
             roles: userData.roles || ['user'],
             permissions: userData.permissions || ['read'],
-            isActive: userData.isActive !== undefined ? userData.isActive : true,
+            isActive: userData.isActive === undefined ? true : userData.isActive,
             lastLoginAt: userData.lastLoginAt
         };
 
@@ -281,7 +281,7 @@ class MockUserRepository {
 }
 
 class MockApiKeyRepository {
-    private apiKeys: Map<string, ApiKey> = new Map();
+    private apiKeys = new Map<string, ApiKey>();
     private nextId = 1;
 
     async create(keyData: Partial<ApiKey>): Promise<ApiKey> {
@@ -294,7 +294,7 @@ class MockApiKeyRepository {
             permissions: keyData.permissions || ['read'],
             rateLimit: keyData.rateLimit,
             expiresAt: keyData.expiresAt,
-            isActive: keyData.isActive !== undefined ? keyData.isActive : true
+            isActive: keyData.isActive === undefined ? true : keyData.isActive
         };
 
         this.apiKeys.set(apiKey.id, apiKey);
@@ -319,7 +319,7 @@ class MockApiKeyRepository {
     }
 
     private generateKey(): string {
-        return `ak_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+        return `ak_${Math.random().toString(36).slice(2, 15)}${Math.random().toString(36).slice(2, 15)}`;
     }
 
     private hashKey(key: string): string {
@@ -334,7 +334,7 @@ class MockApiKeyRepository {
 }
 
 class MockApiService {
-    private routes: Map<string, Route> = new Map();
+    private routes = new Map<string, Route>();
     private middleware: Middleware[] = [];
     private rateLimiter: MockRateLimiter;
     private cache: MockCache;
@@ -553,7 +553,7 @@ class MockApiService {
         }
 
         if (authHeader.startsWith('Bearer ')) {
-            const token = authHeader.substring(7);
+            const token = authHeader.slice(7);
             // JWT validation would go here
             const user = await this.userRepo.findById('user-1'); // Mock user
             if (user && user.isActive) {
@@ -561,7 +561,7 @@ class MockApiService {
                 return { success: true, user };
             }
         } else if (authHeader.startsWith('ApiKey ')) {
-            const apiKey = authHeader.substring(7);
+            const apiKey = authHeader.slice(7);
             const hash = this.hashApiKey(apiKey);
             const keyRecord = await this.apiKeyRepo.findByHash(hash);
             
@@ -672,12 +672,12 @@ class MockApiService {
 }
 
 // Helper functions for creating test data
-function createTestRoutes(): Array<{
+function createTestRoutes(): {
     method: string;
     path: string;
     handler: Route['handler'];
     options?: any;
-}> {
+}[] {
     return [
         {
             method: 'GET',
@@ -711,7 +711,7 @@ function createTestRoutes(): Array<{
             handler: async () => ({ monitors: ['monitor1', 'monitor2'] }),
             options: {
                 rateLimit: {
-                    windowMs: 60000,
+                    windowMs: 60_000,
                     maxRequests: 100,
                     keyGenerator: (req: ApiRequest) => req.ip
                 }
@@ -835,7 +835,7 @@ describe("API Service Performance", () => {
             data: 'rate limited endpoint'
         }), {
             rateLimit: {
-                windowMs: 60000,
+                windowMs: 60_000,
                 maxRequests: 10,
                 keyGenerator: (req: ApiRequest) => req.ip
             }
@@ -912,13 +912,11 @@ describe("API Service Performance", () => {
         service.createUser({
             username: 'apiuser',
             permissions: ['api:read', 'api:write']
-        }).then(user => {
-            return service.createApiKey({
+        }).then(user => service.createApiKey({
                 name: 'Test API Key',
                 userId: user.id,
                 permissions: ['api:read', 'api:write']
-            });
-        }).then(apiKey => {
+            })).then(apiKey => {
             service.registerRoute('GET', '/api/key-protected', async () => ({
                 data: 'API key protected data'
             }), { authenticated: true });

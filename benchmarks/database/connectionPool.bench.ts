@@ -21,7 +21,7 @@ class MockConnection {
     public queryCount: number = 0;
 
     constructor() {
-        this.id = Math.random().toString(36).substring(7);
+        this.id = Math.random().toString(36).slice(7);
     }
 
     async execute(sql: string, params: any[] = []) {
@@ -54,15 +54,15 @@ class MockConnection {
 }
 
 class MockConnectionPool {
-    private connections: Map<string, MockConnection> = new Map();
+    private connections = new Map<string, MockConnection>();
     private available: string[] = [];
-    private inUse: Set<string> = new Set();
+    private inUse = new Set<string>();
     private maxConnections: number;
     private minConnections: number;
     private maxIdleTime: number;
-    private waitQueue: Array<{ resolve: Function; reject: Function }> = [];
+    private waitQueue: { resolve: Function; reject: Function }[] = [];
 
-    constructor(minConnections = 2, maxConnections = 10, maxIdleTime = 30000) {
+    constructor(minConnections = 2, maxConnections = 10, maxIdleTime = 30_000) {
         this.minConnections = minConnections;
         this.maxConnections = maxConnections;
         this.maxIdleTime = maxIdleTime;
@@ -115,7 +115,7 @@ class MockConnectionPool {
                     this.waitQueue.splice(index, 1);
                     reject(new Error('Connection timeout'));
                 }
-            }, 10000);
+            }, 10_000);
         });
     }
 
@@ -148,7 +148,7 @@ class MockConnectionPool {
         }
     }
 
-    async executeBatch(queries: Array<{ sql: string; params?: any[] }>) {
+    async executeBatch(queries: { sql: string; params?: any[] }[]) {
         const results: any[] = [];
         for (const query of queries) {
             results.push(await this.executeQuery(query.sql, query.params));
@@ -156,7 +156,7 @@ class MockConnectionPool {
         return results;
     }
 
-    async executeParallel(queries: Array<{ sql: string; params?: any[] }>) {
+    async executeParallel(queries: { sql: string; params?: any[] }[]) {
         const promises = queries.map(query => this.executeQuery(query.sql, query.params));
         return Promise.all(promises);
     }
@@ -266,25 +266,25 @@ describe("Database Connection Pool Performance", () => {
     let pool: MockConnectionPool;
 
     bench("connection pool initialization", async () => {
-        pool = new MockConnectionPool(2, 10, 30000);
+        pool = new MockConnectionPool(2, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 20)); // Wait for initialization
     }, { warmupIterations: 5, iterations: 500 });
 
     bench("get single connection", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         const connection = await pool.getConnection();
         await pool.releaseConnection(connection);
     }, { warmupIterations: 5, iterations: 2000 });
 
     bench("execute single query through pool", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         await pool.executeQuery('SELECT * FROM users WHERE id = ?', [1]);
     }, { warmupIterations: 5, iterations: 1000 });
 
     bench("execute batch queries (5 queries)", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         const queries = Array.from({ length: 5 }, (_, i) => ({
             sql: 'INSERT INTO test (value) VALUES (?)',
@@ -294,7 +294,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 200 });
 
     bench("execute parallel queries (5 queries)", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         const queries = Array.from({ length: 5 }, (_, i) => ({
             sql: 'SELECT * FROM test WHERE id = ?',
@@ -304,7 +304,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 200 });
 
     bench("execute parallel queries (10 queries)", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         const queries = Array.from({ length: 10 }, (_, i) => ({
             sql: 'SELECT * FROM test WHERE id = ?',
@@ -330,13 +330,13 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 100 });
 
     bench("pool warm-up", async () => {
-        pool = new MockConnectionPool(1, 10, 30000);
+        pool = new MockConnectionPool(1, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 20));
         await pool.warmUp();
     }, { warmupIterations: 2, iterations: 200 });
 
     bench("get pool statistics", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         
         // Execute some queries to generate stats
@@ -347,13 +347,13 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 5, iterations: 5000 });
 
     bench("connection pool health check", async () => {
-        pool = new MockConnectionPool(3, 8, 30000);
+        pool = new MockConnectionPool(3, 8, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         await pool.healthCheck();
     }, { warmupIterations: 2, iterations: 200 });
 
     bench("high concurrency simulation (20 parallel queries)", async () => {
-        pool = new MockConnectionPool(5, 10, 30000);
+        pool = new MockConnectionPool(5, 10, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         
         const queries = Array.from({ length: 20 }, (_, i) => ({
@@ -365,7 +365,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 1, iterations: 50 });
 
     bench("connection exhaustion recovery", async () => {
-        pool = new MockConnectionPool(2, 3, 30000); // Small pool
+        pool = new MockConnectionPool(2, 3, 30_000); // Small pool
         await new Promise(resolve => setTimeout(resolve, 20));
         
         // Get all connections
@@ -383,7 +383,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 200 });
 
     bench("pool drain operation", async () => {
-        pool = new MockConnectionPool(3, 8, 30000);
+        pool = new MockConnectionPool(3, 8, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         
         // Execute some queries
@@ -394,7 +394,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 100 });
 
     bench("connection reuse efficiency", async () => {
-        pool = new MockConnectionPool(2, 5, 30000);
+        pool = new MockConnectionPool(2, 5, 30_000);
         await new Promise(resolve => setTimeout(resolve, 20));
         
         // Execute multiple queries to test reuse
@@ -404,7 +404,7 @@ describe("Database Connection Pool Performance", () => {
     }, { warmupIterations: 2, iterations: 100 });
 
     bench("mixed workload simulation", async () => {
-        pool = new MockConnectionPool(3, 8, 30000);
+        pool = new MockConnectionPool(3, 8, 30_000);
         await new Promise(resolve => setTimeout(resolve, 30));
         
         // Mix of serial and parallel operations

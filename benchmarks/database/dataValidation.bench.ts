@@ -122,7 +122,7 @@ describe("Database Data Validation Benchmarks", () => {
   const validationRuleTypes = [
     { 
       type: 'constraint' as const, 
-      avgCost: 1.0, 
+      avgCost: 1, 
       violationRate: 0.02, 
       complexity: 'low' 
     },
@@ -134,7 +134,7 @@ describe("Database Data Validation Benchmarks", () => {
     },
     { 
       type: 'business' as const, 
-      avgCost: 3.0, 
+      avgCost: 3, 
       violationRate: 0.05, 
       complexity: 'high' 
     },
@@ -146,13 +146,13 @@ describe("Database Data Validation Benchmarks", () => {
     },
     { 
       type: 'reference' as const, 
-      avgCost: 2.0, 
+      avgCost: 2, 
       violationRate: 0.02, 
       complexity: 'medium' 
     },
     { 
       type: 'custom' as const, 
-      avgCost: 4.0, 
+      avgCost: 4, 
       violationRate: 0.08, 
       complexity: 'high' 
     },
@@ -216,24 +216,28 @@ describe("Database Data Validation Benchmarks", () => {
       // Calculate records to validate based on scope and method
       let recordsValidated = 0;
       switch (validationScope) {
-        case 'single-record':
+        case 'single-record': {
           recordsValidated = 1;
           break;
-        case 'table-level':
-          recordsValidated = Math.floor(Math.random() * 100000) + 1000;
+        }
+        case 'table-level': {
+          recordsValidated = Math.floor(Math.random() * 100_000) + 1000;
           break;
-        case 'cross-table':
-          recordsValidated = Math.floor(Math.random() * 500000) + 10000;
+        }
+        case 'cross-table': {
+          recordsValidated = Math.floor(Math.random() * 500_000) + 10_000;
           break;
-        case 'database-wide':
-          recordsValidated = Math.floor(Math.random() * 2000000) + 100000;
+        }
+        case 'database-wide': {
+          recordsValidated = Math.floor(Math.random() * 2_000_000) + 100_000;
           break;
+        }
       }
       
       // Method affects record count
       const methodMultiplier = {
         'real-time': 0.001,
-        'batch': 1.0,
+        'batch': 1,
         'scheduled': 0.8,
         'trigger-based': 0.1,
       }[validationMethod];
@@ -246,13 +250,13 @@ describe("Database Data Validation Benchmarks", () => {
       // Enforcement level affects performance
       const enforcementMultiplier = {
         strict: 1.3,
-        flexible: 1.0,
+        flexible: 1,
         advisory: 0.7,
       }[rule.enforcementLevel];
       
       // Performance impact affects execution time
       const impactMultiplier = {
-        low: 1.0,
+        low: 1,
         medium: 1.5,
         high: 2.5,
       }[rule.performanceImpact];
@@ -390,8 +394,8 @@ describe("Database Data Validation Benchmarks", () => {
   bench("data quality assessment", () => {
     const qualityMetrics: DataQualityMetrics[] = [];
     
-    for (let table of tableNames) {
-      for (let dimension of qualityDimensions) {
+    for (const table of tableNames) {
+      for (const dimension of qualityDimensions) {
         // Generate metrics for each table-dimension combination
         for (let i = 0; i < 5; i++) { // 5 measurements per combination
           const baseScore = dimension.typicalScore;
@@ -406,30 +410,36 @@ describe("Database Data Validation Benchmarks", () => {
           let measurementUnit: DataQualityMetrics['measurementUnit'] = 'percentage';
           
           switch (dimension.dimension) {
-            case 'completeness':
+            case 'completeness': {
               measurementValue = qualityScore * 100;
               measurementUnit = 'percentage';
               break;
-            case 'accuracy':
+            }
+            case 'accuracy': {
               measurementValue = qualityScore * 100;
               measurementUnit = 'percentage';
               break;
-            case 'consistency':
+            }
+            case 'consistency': {
               measurementValue = qualityScore;
               measurementUnit = 'ratio';
               break;
-            case 'validity':
+            }
+            case 'validity': {
               measurementValue = qualityScore * 100;
               measurementUnit = 'percentage';
               break;
-            case 'uniqueness':
+            }
+            case 'uniqueness': {
               measurementValue = qualityScore * 100;
               measurementUnit = 'percentage';
               break;
-            case 'timeliness':
+            }
+            case 'timeliness': {
               measurementValue = qualityScore * 10; // 0-10 scale
               measurementUnit = 'score';
               break;
+            }
           }
           
           // Generate benchmark value
@@ -457,10 +467,10 @@ describe("Database Data Validation Benchmarks", () => {
           const trendRand = Math.random();
           let cumulativeWeight = 0;
           
-          for (let j = 0; j < trendDirections.length; j++) {
+          for (const [j, trendDirection_] of trendDirections.entries()) {
             cumulativeWeight += trendWeights[j];
             if (trendRand <= cumulativeWeight) {
-              trendDirection = trendDirections[j];
+              trendDirection = trendDirection_;
               break;
             }
           }
@@ -479,7 +489,7 @@ describe("Database Data Validation Benchmarks", () => {
             qualityScore,
             qualityGrade,
             issuesIdentified,
-            measurementDate: Date.now() - (Math.random() * 7 * 24 * 3600000), // Within last 7 days
+            measurementDate: Date.now() - (Math.random() * 7 * 24 * 3_600_000), // Within last 7 days
             trendDirection,
           };
           
@@ -533,7 +543,7 @@ describe("Database Data Validation Benchmarks", () => {
           else if (avgScore >= 0.8) return 'B';
           else if (avgScore >= 0.7) return 'C';
           else if (avgScore >= 0.6) return 'D';
-          else return 'F';
+          return 'F';
         })(),
         totalIssues: tableMetrics.reduce((sum, m) => sum + m.issuesIdentified, 0),
         weakestDimensions: qualityDimensions
@@ -574,45 +584,51 @@ describe("Database Data Validation Benchmarks", () => {
       let autoFixable = false;
       
       switch (violationType) {
-        case 'null-constraint':
+        case 'null-constraint': {
           violationValue = null;
           expectedValue = 'NOT NULL';
           violationMessage = 'NULL value found in non-nullable column';
           autoFixable = false;
           break;
-        case 'datatype-mismatch':
+        }
+        case 'datatype-mismatch': {
           violationValue = 'abc123';
           expectedValue = 'INTEGER';
           violationMessage = 'String value found in integer column';
           autoFixable = true;
           break;
-        case 'format-invalid':
+        }
+        case 'format-invalid': {
           violationValue = 'invalid-email';
           expectedValue = 'valid@email.com';
           violationMessage = 'Invalid email format detected';
           autoFixable = true;
           break;
-        case 'range-violation':
+        }
+        case 'range-violation': {
           violationValue = 150;
           expectedValue = '0-100';
           violationMessage = 'Value exceeds acceptable range';
           autoFixable = true;
           break;
-        case 'reference-invalid':
-          violationValue = 999999;
+        }
+        case 'reference-invalid': {
+          violationValue = 999_999;
           expectedValue = 'valid foreign key';
           violationMessage = 'Foreign key reference not found';
           autoFixable = false;
           break;
-        case 'business-rule-violation':
+        }
+        case 'business-rule-violation': {
           violationValue = 'ACTIVE';
           expectedValue = 'PENDING';
           violationMessage = 'Business rule validation failed';
           autoFixable = false;
           break;
+        }
       }
       
-      const detectedTime = Date.now() - Math.random() * 7 * 24 * 3600000; // Within last 7 days
+      const detectedTime = Date.now() - Math.random() * 7 * 24 * 3_600_000; // Within last 7 days
       
       // Determine if violation is resolved
       const isResolved = Math.random() < 0.6; // 60% resolution rate
@@ -620,7 +636,7 @@ describe("Database Data Validation Benchmarks", () => {
       let resolutionAction: string | undefined;
       
       if (isResolved) {
-        const resolutionDelay = Math.random() * 48 * 3600000; // Up to 48 hours to resolve
+        const resolutionDelay = Math.random() * 48 * 3_600_000; // Up to 48 hours to resolve
         resolvedTime = detectedTime + resolutionDelay;
         
         const resolutionActions = [
@@ -638,7 +654,7 @@ describe("Database Data Validation Benchmarks", () => {
         violationId: `violation-${i}`,
         ruleId: `rule-${Math.floor(Math.random() * 100)}`,
         tableName,
-        recordId: `record-${Math.floor(Math.random() * 10000)}`,
+        recordId: `record-${Math.floor(Math.random() * 10_000)}`,
         columnName: `column_${Math.floor(Math.random() * 10)}`,
         violationType,
         violationValue,
@@ -737,14 +753,14 @@ describe("Database Data Validation Benchmarks", () => {
         const stageTypes = ['pre-validation', 'core-validation', 'post-validation', 'cleanup'] as const;
         const stageType = stageTypes[Math.min(stage, 3)]; // Follow logical order
         
-        const recordsProcessed = Math.floor(Math.random() * 50000) + 10000;
+        const recordsProcessed = Math.floor(Math.random() * 50_000) + 10_000;
         const baseExecutionTime = recordsProcessed * 0.1; // 0.1ms per record
         
         // Stage complexity affects time
         const complexityMultiplier = {
           'pre-validation': 0.5,
-          'core-validation': 2.0,
-          'post-validation': 1.0,
+          'core-validation': 2,
+          'post-validation': 1,
           'cleanup': 0.3,
         }[stageType];
         
@@ -822,7 +838,7 @@ describe("Database Data Validation Benchmarks", () => {
         (totalRecordsProcessed * 1000) / totalPipelineTime : 0;
       
       // Determine retry count and rollback requirement
-      const retryCount = !pipelineSuccess ? Math.floor(Math.random() * 3) : 0;
+      const retryCount = pipelineSuccess ? 0 : Math.floor(Math.random() * 3);
       const rollbackRequired = !pipelineSuccess && Math.random() < 0.7; // 70% of failures need rollback
       
       const pipeline: ValidationPipeline = {
@@ -890,7 +906,7 @@ describe("Database Data Validation Benchmarks", () => {
       'primary-key', 'foreign-key', 'unique', 'check', 'not-null', 'default'
     ] as const;
     
-    for (let table of tableNames) {
+    for (const table of tableNames) {
       for (let constraint = 0; constraint < 8; constraint++) {
         const constraintType = constraintTypes[Math.floor(Math.random() * constraintTypes.length)];
         
@@ -911,48 +927,54 @@ describe("Database Data Validation Benchmarks", () => {
         let businessValue = 0;
         
         switch (constraintType) {
-          case 'primary-key':
-            validationOverhead = 2.0 * columnCount;
+          case 'primary-key': {
+            validationOverhead = 2 * columnCount;
             violationRate = 0.001; // Very low violation rate
-            enforcementCost = 3.0;
-            maintenanceCost = 1.0;
-            businessValue = 10.0;
+            enforcementCost = 3;
+            maintenanceCost = 1;
+            businessValue = 10;
             break;
-          case 'foreign-key':
-            validationOverhead = 5.0; // Requires lookup
+          }
+          case 'foreign-key': {
+            validationOverhead = 5; // Requires lookup
             violationRate = 0.02;
-            enforcementCost = 4.0;
-            maintenanceCost = 2.0;
-            businessValue = 8.0;
+            enforcementCost = 4;
+            maintenanceCost = 2;
+            businessValue = 8;
             break;
-          case 'unique':
-            validationOverhead = 3.0 * columnCount;
+          }
+          case 'unique': {
+            validationOverhead = 3 * columnCount;
             violationRate = 0.005;
             enforcementCost = 2.5;
             maintenanceCost = 1.5;
-            businessValue = 7.0;
+            businessValue = 7;
             break;
-          case 'check':
+          }
+          case 'check': {
             validationOverhead = 1.5;
             violationRate = 0.03;
             enforcementCost = 1.5;
             maintenanceCost = 0.5;
-            businessValue = 6.0;
+            businessValue = 6;
             break;
-          case 'not-null':
+          }
+          case 'not-null': {
             validationOverhead = 0.5;
             violationRate = 0.01;
             enforcementCost = 0.5;
             maintenanceCost = 0.2;
-            businessValue = 5.0;
+            businessValue = 5;
             break;
-          case 'default':
+          }
+          case 'default': {
             validationOverhead = 0.1;
-            violationRate = 0.0; // Defaults don't violate
+            violationRate = 0; // Defaults don't violate
             enforcementCost = 0.1;
             maintenanceCost = 0.1;
-            businessValue = 3.0;
+            businessValue = 3;
             break;
+          }
         }
         
         // Add variance to values
@@ -970,11 +992,11 @@ describe("Database Data Validation Benchmarks", () => {
         const costBenefitRatio = businessValue / totalCost;
         
         let recommendedAction: ConstraintPerformance['recommendedAction'];
-        if (costBenefitRatio > 2.0) {
+        if (costBenefitRatio > 2) {
           recommendedAction = 'keep';
         } else if (costBenefitRatio > 1.5) {
           recommendedAction = 'optimize';
-        } else if (costBenefitRatio > 1.0) {
+        } else if (costBenefitRatio > 1) {
           recommendedAction = 'modify';
         } else {
           recommendedAction = 'remove';

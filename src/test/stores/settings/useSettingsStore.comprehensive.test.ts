@@ -458,7 +458,7 @@ describe("useSettingsStore", () => {
 
     describe("Loading States", () => {
         it("should set loading state during operations", async () => {
-            let loadingStatesDuringCall: boolean[] = [];
+            const loadingStatesDuringCall: boolean[] = [];
 
             mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
                 (handlers as any).setLoading?.(true);

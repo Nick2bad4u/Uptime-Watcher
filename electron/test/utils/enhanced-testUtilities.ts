@@ -258,10 +258,10 @@ export function resetAllMocks(obj: any): void {
  */
 export function createMockCommandExecutor(): any {
     return {
-        execute: vi.fn().mockImplementation(async (_command: any) => {
+        execute: vi.fn().mockImplementation(async (_command: any) => 
             // Default response for any command
-            return "mock-result";
-        }),
+             "mock-result"
+        ),
         rollbackAll: vi.fn().mockResolvedValue(undefined),
         clear: vi.fn(),
     };

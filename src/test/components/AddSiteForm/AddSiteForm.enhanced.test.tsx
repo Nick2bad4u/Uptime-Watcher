@@ -1055,11 +1055,9 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             // Help text is displayed in the help section at the bottom of the form
             // Look for partial text match to handle the bullet point formatting
             expect(
-                screen.getByText((content, _element) => {
-                    return content.includes(
+                screen.getByText((content, _element) => content.includes(
                         "Enter the URL of the site you want to monitor"
-                    );
-                })
+                    ))
             ).toBeInTheDocument();
         });
 

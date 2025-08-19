@@ -15,7 +15,7 @@ import { bench, describe } from "vitest";
 
 // Mock query executor
 class MockQueryExecutor {
-    private data: Map<string, any[]> = new Map();
+    private data = new Map<string, any[]>();
 
     constructor() {
         this.initializeTestData();
@@ -39,13 +39,13 @@ class MockQueryExecutor {
             type: ['http', 'ping', 'port'][i % 3],
             name: `Monitor ${i + 1}`,
             isEnabled: Math.random() > 0.1,
-            interval: [30000, 60000, 120000][i % 3],
+            interval: [30_000, 60_000, 120_000][i % 3],
             lastChecked: Date.now() - Math.random() * 24 * 60 * 60 * 1000
         }));
         this.data.set('monitors', monitors);
 
         // History table
-        const history = Array.from({ length: 50000 }, (_, i) => ({
+        const history = Array.from({ length: 50_000 }, (_, i) => ({
             id: i + 1,
             monitorId: Math.floor(Math.random() * 3000) + 1,
             siteId: Math.floor(Math.random() * 1000) + 1,
@@ -219,7 +219,7 @@ class MockQueryExecutor {
 
     private calculateStandardDeviation(values: number[]) {
         const mean = values.reduce((a, b) => a + b, 0) / values.length;
-        const squareDiffs = values.map(value => Math.pow(value - mean, 2));
+        const squareDiffs = values.map(value => (value - mean)**2);
         const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / values.length;
         return Math.sqrt(avgSquareDiff);
     }

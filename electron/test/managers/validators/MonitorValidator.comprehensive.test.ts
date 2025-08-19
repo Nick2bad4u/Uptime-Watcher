@@ -167,7 +167,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
         });
 
         it("should handle monitors with all status types", () => {
-            const statuses: Array<Site["monitors"][0]["status"]> = [
+            const statuses: Site["monitors"][0]["status"][] = [
                 "pending",
                 "up",
                 "down",

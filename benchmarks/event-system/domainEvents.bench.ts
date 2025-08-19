@@ -106,7 +106,7 @@ class MockDomainEventFactory {
     }
 
     private generateCorrelationId(): string {
-        return `corr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     }
 
     private createMetadata(): Record<string, any> {
@@ -148,8 +148,8 @@ class MockEventSerializer {
 }
 
 class MockEventStore {
-    private events: Map<string, DomainEvent[]> = new Map();
-    private eventsByType: Map<string, DomainEvent[]> = new Map();
+    private events = new Map<string, DomainEvent[]>();
+    private eventsByType = new Map<string, DomainEvent[]>();
 
     append(aggregateId: string, events: DomainEvent[]): void {
         if (!this.events.has(aggregateId)) {
@@ -196,19 +196,22 @@ class MockEventStore {
 }
 
 class MockEventProjector {
-    private projections: Map<string, any> = new Map();
+    private projections = new Map<string, any>();
 
     project(event: DomainEvent): void {
         switch (event.type) {
-            case 'site.created':
+            case 'site.created': {
                 this.projectSiteCreated(event);
                 break;
-            case 'site.status.changed':
+            }
+            case 'site.status.changed': {
                 this.projectSiteStatusChanged(event);
                 break;
-            case 'monitor.created':
+            }
+            case 'monitor.created': {
                 this.projectMonitorCreated(event);
                 break;
+            }
         }
     }
 
@@ -281,7 +284,7 @@ describe("Domain Events Performance", () => {
             name: 'Test Site',
             url: 'https://test.com',
             monitorType: 'http',
-            interval: 60000
+            interval: 60_000
         });
     }, { warmupIterations: 10, iterations: 5000 });
 
@@ -299,8 +302,8 @@ describe("Domain Events Performance", () => {
         factory = new MockDomainEventFactory();
         factory.createMonitorCreatedEvent('monitor-1', {
             monitorType: 'http',
-            interval: 30000,
-            timeout: 10000,
+            interval: 30_000,
+            timeout: 10_000,
             configuration: { followRedirects: true, validateSSL: true }
         });
     }, { warmupIterations: 10, iterations: 5000 });
@@ -312,7 +315,7 @@ describe("Domain Events Performance", () => {
             name: 'Test Site',
             url: 'https://test.com',
             monitorType: 'http',
-            interval: 60000
+            interval: 60_000
         });
         serializer.serialize(event);
     }, { warmupIterations: 10, iterations: 2000 });
@@ -338,7 +341,7 @@ describe("Domain Events Performance", () => {
             name: 'Test Site',
             url: 'https://test.com',
             monitorType: 'http',
-            interval: 60000
+            interval: 60_000
         });
         const serialized = serializer.serialize(event);
         serializer.deserialize(serialized);
@@ -352,7 +355,7 @@ describe("Domain Events Performance", () => {
                 name: 'Test Site',
                 url: 'https://test.com',
                 monitorType: 'http',
-                interval: 60000
+                interval: 60_000
             }),
             factory.createSiteStatusChangedEvent('site-1', {
                 previousStatus: 'unknown',
@@ -400,7 +403,7 @@ describe("Domain Events Performance", () => {
             name: 'Test Site',
             url: 'https://test.com',
             monitorType: 'http',
-            interval: 60000
+            interval: 60_000
         });
         projector.project(event);
     }, { warmupIterations: 10, iterations: 2000 });
@@ -414,7 +417,7 @@ describe("Domain Events Performance", () => {
                 name: `Site ${i}`,
                 url: `https://site${i}.com`,
                 monitorType: 'http',
-                interval: 60000
+                interval: 60_000
             }));
             events.push(factory.createSiteStatusChangedEvent(`site-${i}`, {
                 previousStatus: 'unknown',
@@ -438,7 +441,7 @@ describe("Domain Events Performance", () => {
             name: 'Lifecycle Site',
             url: 'https://lifecycle.com',
             monitorType: 'http',
-            interval: 60000
+            interval: 60_000
         });
         
         // Serialize

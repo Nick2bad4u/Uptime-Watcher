@@ -21,10 +21,10 @@ interface IpcMessage {
 }
 
 class MockIpcService {
-    private handlers: Map<string, Function> = new Map();
-    private pendingRequests: Map<string, { resolve: Function; reject: Function; timeout: NodeJS.Timeout }> = new Map();
+    private handlers = new Map<string, Function>();
+    private pendingRequests = new Map<string, { resolve: Function; reject: Function; timeout: NodeJS.Timeout }>();
     private messageHistory: IpcMessage[] = [];
-    private requestTimeout = 30000; // 30 seconds
+    private requestTimeout = 30_000; // 30 seconds
 
     registerHandler(channel: string, handler: Function): void {
         this.handlers.set(channel, handler);
@@ -116,7 +116,7 @@ class MockIpcService {
     }
 
     private generateMessageId(): string {
-        return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     }
 
     private logMessage(message: IpcMessage): void {
@@ -160,7 +160,7 @@ class MockIpcService {
             id: `monitor-${i}`,
             siteId,
             type: 'http',
-            interval: 60000,
+            interval: 60_000,
             status: 'active'
         }));
     }
@@ -168,7 +168,7 @@ class MockIpcService {
     handleGetHistory(filters: any): any[] {
         return Array.from({ length: 1000 }, (_, i) => ({
             id: `history-${i}`,
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: ['online', 'offline'][i % 2],
             responseTime: Math.random() * 1000
         }));
@@ -256,9 +256,7 @@ describe("IPC Communication Performance", () => {
 
     bench("batch operations", async () => {
         ipcService = new MockIpcService();
-        ipcService.registerHandler('batch-create', (data: any[]) => {
-            return data.map(item => ({ ...item, id: `item-${Date.now()}` }));
-        });
+        ipcService.registerHandler('batch-create', (data: any[]) => data.map(item => ({ ...item, id: `item-${Date.now()}` })));
         
         const batchData = Array.from({ length: 50 }, (_, i) => ({
             name: `Item ${i}`,

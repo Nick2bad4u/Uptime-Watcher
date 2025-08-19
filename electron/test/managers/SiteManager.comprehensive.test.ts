@@ -69,11 +69,9 @@ const mockCache = {
     onInvalidation: vi.fn().mockReturnValue(() => {}),
 };
 
-vi.mock("../../utils/cache/StandardizedCache", () => {
-    return {
+vi.mock("../../utils/cache/StandardizedCache", () => ({
         StandardizedCache: vi.fn(() => mockCache),
-    };
-});
+    }));
 
 // Create mock instances for dependency injection
 const mockSiteRepositoryServiceInstance = {
@@ -104,11 +102,9 @@ const mockSiteWriterServiceInstance = {
     detectNewMonitors: vi.fn().mockReturnValue([]),
 };
 
-vi.mock("../../utils/database/SiteWriterService", () => {
-    return {
+vi.mock("../../utils/database/SiteWriterService", () => ({
         SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
-    };
-});
+    }));
 
 describe("SiteManager - Comprehensive", () => {
     let siteManager: SiteManager;

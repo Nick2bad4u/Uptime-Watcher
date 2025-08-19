@@ -12,16 +12,14 @@
 
 import { bench, describe } from "vitest";
 
-interface ConfigurationSchema {
-    [key: string]: {
+type ConfigurationSchema = Record<string, {
         type: 'string' | 'number' | 'boolean' | 'object' | 'array';
         default?: any;
         required?: boolean;
         validation?: (value: any) => boolean;
         description?: string;
         group?: string;
-    };
-}
+    }>;
 
 interface ConfigurationValue {
     key: string;
@@ -66,9 +64,9 @@ interface ConfigBackup {
 }
 
 class MockConfigurationRepository {
-    private configurations: Map<string, ConfigurationValue> = new Map();
+    private configurations = new Map<string, ConfigurationValue>();
     private changeHistory: ConfigChangeEvent[] = [];
-    private backups: Map<string, ConfigBackup> = new Map();
+    private backups = new Map<string, ConfigBackup>();
     private nextBackupId = 1;
 
     async get(key: string): Promise<ConfigurationValue | null> {
@@ -217,7 +215,7 @@ class MockConfigurationRepository {
 }
 
 class MockEventEmitter {
-    private listeners: Map<string, Function[]> = new Map();
+    private listeners = new Map<string, Function[]>();
 
     emit(event: string, data: any): void {
         const handlers = this.listeners.get(event) || [];
@@ -241,7 +239,7 @@ class MockEventEmitter {
         const handlers = this.listeners.get(event);
         if (handlers) {
             const index = handlers.indexOf(handler);
-            if (index > -1) {
+            if (index !== -1) {
                 handlers.splice(index, 1);
             }
         }
@@ -256,8 +254,8 @@ class MockConfigurationManagementService {
     private repository: MockConfigurationRepository;
     private eventEmitter: MockEventEmitter;
     private schema: ConfigurationSchema;
-    private cache: Map<string, { value: any; expiry: number }> = new Map();
-    private cacheTimeout = 300000; // 5 minutes
+    private cache = new Map<string, { value: any; expiry: number }>();
+    private cacheTimeout = 300_000; // 5 minutes
 
     constructor() {
         this.repository = new MockConfigurationRepository();
@@ -410,11 +408,11 @@ class MockConfigurationManagementService {
             throw new Error(`Unknown configuration key: ${key}`);
         }
         
-        if (schemaEntry.default !== undefined) {
-            await this.set(key, schemaEntry.default, { modifiedBy: 'system-reset' });
-        } else {
+        if (schemaEntry.default === undefined) {
             await this.repository.delete(key);
             this.cache.delete(key);
+        } else {
+            await this.set(key, schemaEntry.default, { modifiedBy: 'system-reset' });
         }
     }
 
@@ -556,14 +554,14 @@ class MockConfigurationManagementService {
             },
             'monitoring.defaultInterval': {
                 type: 'number',
-                default: 300000,
-                validation: (value: number) => value >= 60000,
+                default: 300_000,
+                validation: (value: number) => value >= 60_000,
                 group: 'monitoring'
             },
             'monitoring.timeout': {
                 type: 'number',
-                default: 30000,
-                validation: (value: number) => value >= 5000 && value <= 120000,
+                default: 30_000,
+                validation: (value: number) => value >= 5000 && value <= 120_000,
                 group: 'monitoring'
             },
             'alerts.enabled': {
@@ -578,7 +576,7 @@ class MockConfigurationManagementService {
             },
             'dashboard.refreshInterval': {
                 type: 'number',
-                default: 30000,
+                default: 30_000,
                 validation: (value: number) => value >= 5000,
                 group: 'dashboard'
             },
@@ -617,11 +615,11 @@ function createTestConfiguration(): Record<string, any> {
     return {
         'app.name': 'Test Application',
         'app.theme': 'light',
-        'monitoring.defaultInterval': 180000,
-        'monitoring.timeout': 25000,
+        'monitoring.defaultInterval': 180_000,
+        'monitoring.timeout': 25_000,
         'alerts.enabled': true,
         'alerts.emailNotifications': true,
-        'dashboard.refreshInterval': 15000,
+        'dashboard.refreshInterval': 15_000,
         'database.retentionDays': 30
     };
 }
@@ -668,7 +666,7 @@ describe("Configuration Management Service Performance", () => {
                 service.get('cached.key', true);
             });
         });
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("set single configuration", () => {
         service = new MockConfigurationManagementService();
@@ -677,7 +675,7 @@ describe("Configuration Management Service Performance", () => {
 
     bench("set configuration with validation", () => {
         service = new MockConfigurationManagementService();
-        service.set('monitoring.defaultInterval', 600000, {
+        service.set('monitoring.defaultInterval', 600_000, {
             validateSchema: true,
             modifiedBy: 'user123'
         });
@@ -696,8 +694,8 @@ describe("Configuration Management Service Performance", () => {
     bench("set configuration group", () => {
         service = new MockConfigurationManagementService();
         const groupValues = {
-            'monitoring.defaultInterval': 240000,
-            'monitoring.timeout': 20000
+            'monitoring.defaultInterval': 240_000,
+            'monitoring.timeout': 20_000
         };
         service.setGroup('monitoring', groupValues, 'admin');
     }, { warmupIterations: 10, iterations: 2000 });
@@ -732,8 +730,8 @@ describe("Configuration Management Service Performance", () => {
     bench("reset configuration group", () => {
         service = new MockConfigurationManagementService();
         const groupValues = {
-            'monitoring.defaultInterval': 120000,
-            'monitoring.timeout': 60000
+            'monitoring.defaultInterval': 120_000,
+            'monitoring.timeout': 60_000
         };
         service.setGroup('monitoring', groupValues).then(() => {
             service.resetGroup('monitoring');
@@ -795,11 +793,11 @@ describe("Configuration Management Service Performance", () => {
         
         // Multiple validation operations
         const operations = [
-            service.set('monitoring.defaultInterval', 150000),
-            service.set('monitoring.timeout', 45000),
+            service.set('monitoring.defaultInterval', 150_000),
+            service.set('monitoring.timeout', 45_000),
             service.set('app.theme', 'dark'),
             service.set('alerts.enabled', false),
-            service.set('dashboard.refreshInterval', 10000)
+            service.set('dashboard.refreshInterval', 10_000)
         ];
         
         Promise.all(operations).then(() => {
@@ -819,8 +817,8 @@ describe("Configuration Management Service Performance", () => {
             service.set('test1', 'value1'),
             service.set('test2', 'value2'),
             service.setGroup('monitoring', {
-                'monitoring.defaultInterval': 300000,
-                'monitoring.timeout': 30000
+                'monitoring.defaultInterval': 300_000,
+                'monitoring.timeout': 30_000
             })
         ];
         

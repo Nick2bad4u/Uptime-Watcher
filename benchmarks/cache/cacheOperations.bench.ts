@@ -30,7 +30,7 @@ class BenchmarkCache<K, V> {
     private maxSize: number;
     private defaultTtl: number;
 
-    constructor(maxSize = 1000, defaultTtl = 300000) {
+    constructor(maxSize = 1000, defaultTtl = 300_000) {
         this.maxSize = maxSize;
         this.defaultTtl = defaultTtl;
     }
@@ -149,18 +149,18 @@ describe("Cache Operations Performance Benchmarks", () => {
 
     beforeAll(() => {
         // Initialize caches with different sizes
-        smallCache = new BenchmarkCache(100, 60000); // 100 entries, 1 min TTL
-        mediumCache = new BenchmarkCache(1000, 300000); // 1K entries, 5 min TTL
-        largeCache = new BenchmarkCache(10000, 600000); // 10K entries, 10 min TTL
+        smallCache = new BenchmarkCache(100, 60_000); // 100 entries, 1 min TTL
+        mediumCache = new BenchmarkCache(1000, 300_000); // 1K entries, 5 min TTL
+        largeCache = new BenchmarkCache(10_000, 600_000); // 10K entries, 10 min TTL
 
         // Generate test data
         smallKeys = generateCacheKeys(100);
         mediumKeys = generateCacheKeys(1000);
-        largeKeys = generateCacheKeys(10000);
+        largeKeys = generateCacheKeys(10_000);
 
         smallValues = generateCacheValues(100);
         mediumValues = generateCacheValues(1000);
-        largeValues = generateCacheValues(10000);
+        largeValues = generateCacheValues(10_000);
 
         // Pre-populate caches for read tests
         smallKeys.forEach((key, i) => smallCache.set(key, smallValues[i]));
@@ -184,7 +184,7 @@ describe("Cache Operations Performance Benchmarks", () => {
     });
 
     bench("Cache set - Large batch (10K entries)", () => {
-        const cache = new BenchmarkCache<string, object>(20000);
+        const cache = new BenchmarkCache<string, object>(20_000);
         largeKeys.forEach((key, i) => {
             cache.set(key, largeValues[i]);
         });

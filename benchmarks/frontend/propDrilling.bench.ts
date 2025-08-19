@@ -68,7 +68,7 @@ interface PropDrillingMetrics {
 
 // Mock component hierarchy system
 class MockPropDrillingSystem {
-  private components: Map<string, ComponentInstance> = new Map();
+  private components = new Map<string, ComponentInstance>();
   private propTransfers: PropTransfer[] = [];
   private propAnalyses: PropAnalysis[] = [];
   private nextId = 0;
@@ -139,12 +139,10 @@ class MockPropDrillingSystem {
 
       // Apply inheritance rules
       for (const rule of inheritanceRules) {
-        if (rule.pattern.test(propName)) {
-          if (rule.inherit === true || (typeof rule.inherit === 'boolean' && rule.inherit)) {
+        if (rule.pattern.test(propName) && (rule.inherit === true || (typeof rule.inherit === 'boolean' && rule.inherit))) {
             inherited[propName] = this.transformPropForInheritance(propName, propValue);
             break;
           }
-        }
       }
     }
 
@@ -163,10 +161,10 @@ class MockPropDrillingSystem {
         const result = propValue(...args);
         return result;
       };
-    } else {
+    } 
       // Primitive values passed as-is
       return propValue;
-    }
+    
   }
 
   private recordPropTransfer(
@@ -341,9 +339,9 @@ class MockPropDrillingSystem {
       return JSON.stringify(propValue).length * 2;
     } else if (typeof propValue === "function") {
       return 100; // Estimated function size
-    } else {
+    } 
       return 4; // Default size
-    }
+    
   }
 
   // Analysis and metrics
@@ -429,20 +427,25 @@ class MockPropDrillingSystem {
     let optimizedMetrics: PropDrillingMetrics;
 
     switch (strategy) {
-      case "context":
+      case "context": {
         optimizedMetrics = this.simulateContextOptimization(rootComponent);
         break;
-      case "composition":
+      }
+      case "composition": {
         optimizedMetrics = this.simulateCompositionOptimization(rootComponent);
         break;
-      case "memoization":
+      }
+      case "memoization": {
         optimizedMetrics = this.simulateMemoizationOptimization(rootComponent);
         break;
-      case "state-lifting":
+      }
+      case "state-lifting": {
         optimizedMetrics = this.simulateStateLiftingOptimization(rootComponent);
         break;
-      default:
+      }
+      default: {
         optimizedMetrics = originalMetrics;
+      }
     }
 
     const improvement = (
@@ -681,10 +684,10 @@ describe("React Prop Drilling Performance", () => {
   // Context optimization simulation
   bench("context optimization - prop reduction", () => {
     const system = new MockPropDrillingSystem();
-    const optimizationResults: Array<{
+    const optimizationResults: {
       strategy: string;
       improvement: number;
-    }> = [];
+    }[] = [];
 
     for (let test = 0; test < 20; test++) {
       const hierarchy = createDeepHierarchy(system, 6, 3, 15);
@@ -703,10 +706,10 @@ describe("React Prop Drilling Performance", () => {
 
   bench("composition optimization - structural changes", () => {
     const system = new MockPropDrillingSystem();
-    const optimizationResults: Array<{
+    const optimizationResults: {
       strategy: string;
       improvement: number;
-    }> = [];
+    }[] = [];
 
     for (let test = 0; test < 20; test++) {
       const hierarchy = createDeepHierarchy(system, 5, 4, 12);
@@ -752,11 +755,11 @@ describe("React Prop Drilling Performance", () => {
   // Prop context usage
   bench("prop context - usage patterns", () => {
     const system = new MockPropDrillingSystem();
-    const contextResults: Array<{
+    const contextResults: {
       contextSize: number;
       affectedComponents: number;
       performanceImprovement: number;
-    }> = [];
+    }[] = [];
 
     for (let test = 0; test < 25; test++) {
       const hierarchy = createDeepHierarchy(system, 5, 3, 18);
@@ -782,12 +785,12 @@ describe("React Prop Drilling Performance", () => {
   // Performance analysis across strategies
   bench("optimization strategies - comparison", () => {
     const system = new MockPropDrillingSystem();
-    const strategyComparisons: Array<{
+    const strategyComparisons: {
       context: number;
       composition: number;
       memoization: number;
       stateLiing: number;
-    }> = [];
+    }[] = [];
 
     for (let test = 0; test < 15; test++) {
       const hierarchy = createDeepHierarchy(system, 6, 3, 20);

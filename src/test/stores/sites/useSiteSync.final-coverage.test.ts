@@ -96,9 +96,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             // Mock withErrorHandling to execute normally
             vi.mocked(withErrorHandling).mockImplementation(
-                async (operation) => {
-                    return await operation();
-                }
+                async (operation) => await operation()
             );
 
             await syncActions.fullSyncFromBackend();
@@ -134,9 +132,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             // Mock withErrorHandling to execute operation normally
             vi.mocked(withErrorHandling).mockImplementation(
-                async (operation) => {
-                    return await operation();
-                }
+                async (operation) => await operation()
             );
 
             const result = await syncActions.getSyncStatus();

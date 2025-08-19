@@ -184,7 +184,7 @@ describe("Final 90% Function Coverage Push", () => {
                 str.charAt(0).toUpperCase() + str.slice(1);
             const truncate = (str: string, length: number) =>
                 str.length > length
-                    ? str.slice(0, Math.max(0, length)) + "..."
+                    ? `${str.slice(0, Math.max(0, length))  }...`
                     : str;
             const sanitize = (str: string) => str.replaceAll(/[<>]/g, "");
 
@@ -295,11 +295,9 @@ describe("Final 90% Function Coverage Push", () => {
             const validateConfig = <T>(
                 config: T,
                 required: (keyof T)[]
-            ): boolean => {
-                return required.every(
+            ): boolean => required.every(
                     (key) => config[key] !== undefined && config[key] !== null
                 );
-            };
 
             const baseConfig = { timeout: 5000, retries: 3, enabled: true };
             const override = { timeout: 10_000 };

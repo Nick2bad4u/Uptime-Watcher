@@ -39,9 +39,7 @@ describe("SiteRepository", () => {
 
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
-            executeTransaction: vi.fn().mockImplementation(async (callback) => {
-                return callback(mockDatabase);
-            }),
+            executeTransaction: vi.fn().mockImplementation(async (callback) => callback(mockDatabase)),
         };
 
         repository = new SiteRepository({
@@ -109,9 +107,7 @@ describe("SiteRepository", () => {
             };
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: any) => {
-                    return callback(mockDatabase);
-                }
+                async (callback: any) => callback(mockDatabase)
             );
 
             await repository.upsert(siteData);

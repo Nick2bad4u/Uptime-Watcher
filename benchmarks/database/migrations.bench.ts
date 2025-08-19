@@ -16,9 +16,9 @@ import { bench, describe } from "vitest";
 // Mock migration system
 class MockMigrationSystem {
     private currentVersion = 0;
-    private appliedMigrations: Set<number> = new Set();
-    private schema: Map<string, any> = new Map();
-    private data: Map<string, any[]> = new Map();
+    private appliedMigrations = new Set<number>();
+    private schema = new Map<string, any>();
+    private data = new Map<string, any[]>();
 
     constructor() {
         this.initializeBaseTables();
@@ -35,7 +35,7 @@ class MockMigrationSystem {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async runMigration(version: number, name: string, operations: Array<() => Promise<void>>) {
+    async runMigration(version: number, name: string, operations: (() => Promise<void>)[]) {
         if (this.appliedMigrations.has(version)) {
             throw new Error(`Migration ${version} already applied`);
         }
@@ -149,7 +149,7 @@ class MockMigrationSystem {
         await this.sleep(Math.min(sourceData.length * 0.1, 50));
     }
 
-    async runMultiMigration(migrations: Array<{ version: number; name: string; operations: Array<() => Promise<void>> }>) {
+    async runMultiMigration(migrations: { version: number; name: string; operations: (() => Promise<void>)[] }[]) {
         const sortedMigrations = migrations.sort((a, b) => a.version - b.version);
         
         for (const migration of sortedMigrations) {
@@ -346,13 +346,13 @@ describe("Database Migration Performance", () => {
     bench("get applied migrations", () => {
         migrationSystem = new MockMigrationSystem();
         migrationSystem.getAppliedMigrations();
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("get pending migrations", () => {
         migrationSystem = new MockMigrationSystem();
         const available = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         migrationSystem.getPendingMigrations(available);
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("schema validation", async () => {
         migrationSystem = new MockMigrationSystem();

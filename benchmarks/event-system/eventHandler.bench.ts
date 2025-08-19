@@ -21,7 +21,7 @@ interface DomainEvent {
 }
 
 class MockEventHandler {
-    private handlers: Map<string, Function[]> = new Map();
+    private handlers = new Map<string, Function[]>();
     private processingQueue: DomainEvent[] = [];
     private isProcessing = false;
     private metrics = {

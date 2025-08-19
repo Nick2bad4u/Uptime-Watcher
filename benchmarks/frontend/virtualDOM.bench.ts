@@ -81,7 +81,7 @@ interface DiffResult {
   deletions: FiberNode[];
   insertions: FiberNode[];
   updates: FiberNode[];
-  moveOperations: Array<{ from: number; to: number; node: FiberNode }>;
+  moveOperations: { from: number; to: number; node: FiberNode }[];
   totalOperations: number;
   diffTime: number;
 }
@@ -180,7 +180,7 @@ class MockVirtualDOM {
     const deletions: FiberNode[] = [];
     const insertions: FiberNode[] = [];
     const updates: FiberNode[] = [];
-    const moveOperations: Array<{ from: number; to: number; node: FiberNode }> = [];
+    const moveOperations: { from: number; to: number; node: FiberNode }[] = [];
 
     if (!oldTree && !newTree) {
       return this.createDiffResult(patches, deletions, insertions, updates, moveOperations, startTime);
@@ -207,7 +207,7 @@ class MockVirtualDOM {
     deletions: FiberNode[],
     insertions: FiberNode[],
     updates: FiberNode[],
-    moveOperations: Array<{ from: number; to: number; node: FiberNode }>
+    moveOperations: { from: number; to: number; node: FiberNode }[]
   ): void {
     // Type comparison
     if (oldNode.type !== newNode.type) {
@@ -250,7 +250,7 @@ class MockVirtualDOM {
     deletions: FiberNode[],
     insertions: FiberNode[],
     updates: FiberNode[],
-    moveOperations: Array<{ from: number; to: number; node: FiberNode }>
+    moveOperations: { from: number; to: number; node: FiberNode }[]
   ): void {
     const oldKeyed = new Map<string | number, { node: VNode; index: number }>();
     const newKeyed = new Map<string | number, { node: VNode; index: number }>();
@@ -270,7 +270,21 @@ class MockVirtualDOM {
 
     // Process new children
     newChildren.forEach((newChild, newIndex) => {
-      if (newChild.key !== undefined) {
+      if (newChild.key === undefined) {
+        // Non-keyed element
+        const oldChild = oldChildren[newIndex];
+        if (oldChild) {
+          this.diffTrees(oldChild, newChild, patches, deletions, insertions, updates, moveOperations);
+        } else {
+          patches.push({
+            type: "INSERT",
+            targetId: newChild.__internal.id,
+            parentId,
+            index: newIndex,
+            newNode: newChild,
+          });
+        }
+      } else {
         const oldEntry = oldKeyed.get(newChild.key);
         if (oldEntry) {
           // Keyed element moved
@@ -284,20 +298,6 @@ class MockVirtualDOM {
           this.diffTrees(oldEntry.node, newChild, patches, deletions, insertions, updates, moveOperations);
         } else {
           // New keyed element
-          patches.push({
-            type: "INSERT",
-            targetId: newChild.__internal.id,
-            parentId,
-            index: newIndex,
-            newNode: newChild,
-          });
-        }
-      } else {
-        // Non-keyed element
-        const oldChild = oldChildren[newIndex];
-        if (oldChild) {
-          this.diffTrees(oldChild, newChild, patches, deletions, insertions, updates, moveOperations);
-        } else {
           patches.push({
             type: "INSERT",
             targetId: newChild.__internal.id,
@@ -390,7 +390,7 @@ class MockVirtualDOM {
     deletions: FiberNode[],
     insertions: FiberNode[],
     updates: FiberNode[],
-    moveOperations: Array<{ from: number; to: number; node: FiberNode }>,
+    moveOperations: { from: number; to: number; node: FiberNode }[],
     startTime: number
   ): DiffResult {
     const endTime = performance.now();
@@ -434,25 +434,30 @@ class MockVirtualDOM {
 
   private applyPatch(patch: Patch): void {
     switch (patch.type) {
-      case "INSERT":
+      case "INSERT": {
         this.handleInsertPatch(patch);
         this.reconcilerMetrics.createdNodes++;
         break;
-      case "DELETE":
+      }
+      case "DELETE": {
         this.handleDeletePatch(patch);
         this.reconcilerMetrics.deletedNodes++;
         break;
-      case "UPDATE":
+      }
+      case "UPDATE": {
         this.handleUpdatePatch(patch);
         break;
-      case "MOVE":
+      }
+      case "MOVE": {
         this.handleMovePatch(patch);
         break;
-      case "REPLACE":
+      }
+      case "REPLACE": {
         this.handleReplacePatch(patch);
         this.reconcilerMetrics.deletedNodes++;
         this.reconcilerMetrics.createdNodes++;
         break;
+      }
     }
   }
 
@@ -899,7 +904,7 @@ describe("React Virtual DOM Performance", () => {
 
   bench("reconciliation - fiber tree updates", () => {
     const vdom = new MockVirtualDOM();
-    const workResults: Array<{ processed: number; remaining: number; timeUsed: number }> = [];
+    const workResults: { processed: number; remaining: number; timeUsed: number }[] = [];
     
     // Schedule many updates
     for (let i = 0; i < 200; i++) {
@@ -978,11 +983,11 @@ describe("React Virtual DOM Performance", () => {
   // Memory optimization benchmarks
   bench("memory optimization and cleanup", () => {
     const vdom = new MockVirtualDOM();
-    const optimizationResults: Array<{
+    const optimizationResults: {
       nodesOptimized: number;
       memoryFreed: number;
       optimizationTime: number;
-    }> = [];
+    }[] = [];
     
     // Create many nodes to simulate memory pressure
     for (let i = 0; i < 500; i++) {
@@ -1001,11 +1006,11 @@ describe("React Virtual DOM Performance", () => {
   // Stress test - large scale operations
   bench("stress test - large virtual DOM operations", () => {
     const vdom = new MockVirtualDOM();
-    const operations: Array<{
+    const operations: {
       type: "create" | "diff" | "reconcile";
       time: number;
       nodesProcessed: number;
-    }> = [];
+    }[] = [];
     
     let currentTree: VNode | null = null;
     
@@ -1014,7 +1019,7 @@ describe("React Virtual DOM Performance", () => {
       const startTime = performance.now();
       
       switch (operationType) {
-        case "create":
+        case "create": {
           currentTree = createComplexTree(vdom, 4, 3);
           operations.push({
             type: operationType,
@@ -1022,8 +1027,9 @@ describe("React Virtual DOM Performance", () => {
             nodesProcessed: 1,
           });
           break;
+        }
           
-        case "diff":
+        case "diff": {
           if (currentTree) {
             const newTree = createComplexTree(vdom, 4, 3);
             const diffResult = vdom.diff(currentTree, newTree);
@@ -1035,8 +1041,9 @@ describe("React Virtual DOM Performance", () => {
             currentTree = newTree;
           }
           break;
+        }
           
-        case "reconcile":
+        case "reconcile": {
           if (currentTree) {
             const newTree = createComplexTree(vdom, 4, 3);
             const diffResult = vdom.diff(currentTree, newTree);
@@ -1048,6 +1055,7 @@ describe("React Virtual DOM Performance", () => {
             });
           }
           break;
+        }
       }
     }
     

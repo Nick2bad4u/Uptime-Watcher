@@ -9,9 +9,7 @@ import React from "react";
 import ThemedBox from "../../theme/components/ThemedBox";
 import ThemeProvider from "../../theme/components/ThemeProvider";
 
-const renderWithTheme = (component: React.ReactElement) => {
-    return render(<ThemeProvider>{component}</ThemeProvider>);
-};
+const renderWithTheme = (component: React.ReactElement) => render(<ThemeProvider>{component}</ThemeProvider>);
 
 describe("ThemedBox - Keyboard Interaction Coverage", () => {
     describe("onKeyDown handler coverage (lines 111-113)", () => {

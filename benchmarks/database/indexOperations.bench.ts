@@ -117,28 +117,28 @@ describe("Database Index Operations Benchmarks", () => {
   const tableTypes = [
     { 
       name: 'small-table', 
-      rowCount: 10000, 
+      rowCount: 10_000, 
       avgRowSize: 100, 
       columnCount: 8,
       indexCandidates: 3 
     },
     { 
       name: 'medium-table', 
-      rowCount: 1000000, 
+      rowCount: 1_000_000, 
       avgRowSize: 250, 
       columnCount: 15,
       indexCandidates: 6 
     },
     { 
       name: 'large-table', 
-      rowCount: 50000000, 
+      rowCount: 50_000_000, 
       avgRowSize: 400, 
       columnCount: 25,
       indexCandidates: 10 
     },
     { 
       name: 'wide-table', 
-      rowCount: 500000, 
+      rowCount: 500_000, 
       avgRowSize: 2000, 
       columnCount: 100,
       indexCandidates: 15 
@@ -146,12 +146,12 @@ describe("Database Index Operations Benchmarks", () => {
   ];
 
   const indexTypes = [
-    { type: 'btree' as const, cost: 1.0, seekEfficiency: 0.9, scanEfficiency: 0.7 },
+    { type: 'btree' as const, cost: 1, seekEfficiency: 0.9, scanEfficiency: 0.7 },
     { type: 'hash' as const, cost: 0.8, seekEfficiency: 0.95, scanEfficiency: 0.3 },
     { type: 'gin' as const, cost: 1.5, seekEfficiency: 0.8, scanEfficiency: 0.9 },
     { type: 'gist' as const, cost: 1.8, seekEfficiency: 0.7, scanEfficiency: 0.8 },
     { type: 'bitmap' as const, cost: 1.2, seekEfficiency: 0.6, scanEfficiency: 0.95 },
-    { type: 'clustered' as const, cost: 2.0, seekEfficiency: 0.95, scanEfficiency: 0.95 },
+    { type: 'clustered' as const, cost: 2, seekEfficiency: 0.95, scanEfficiency: 0.95 },
     { type: 'covering' as const, cost: 1.6, seekEfficiency: 0.9, scanEfficiency: 0.85 },
   ];
 
@@ -206,9 +206,9 @@ describe("Database Index Operations Benchmarks", () => {
       
       // Determine creation method based on table size and system load
       let creationMethod: IndexCreationOperation['creationMethod'] = 'offline';
-      if (tableType.rowCount > 10000000) {
+      if (tableType.rowCount > 10_000_000) {
         creationMethod = Math.random() < 0.6 ? 'online' : 'parallel';
-      } else if (tableType.rowCount > 1000000) {
+      } else if (tableType.rowCount > 1_000_000) {
         creationMethod = Math.random() < 0.4 ? 'online' : 'concurrent';
       }
       
@@ -218,7 +218,7 @@ describe("Database Index Operations Benchmarks", () => {
       const baseCreationTime = (estimatedSize / (50 * 1024 * 1024)) * 1000; // 50MB/s base rate
       const typeComplexity = indexType.cost;
       const methodEfficiency = {
-        offline: 1.0,
+        offline: 1,
         online: 1.4,
         concurrent: 1.2,
         parallel: 0.7,
@@ -353,21 +353,26 @@ describe("Database Index Operations Benchmarks", () => {
       let fragmentationBefore: number;
       
       switch (operationType) {
-        case 'rebuild':
+        case 'rebuild': {
           fragmentationBefore = 30 + Math.random() * 60; // 30-90% for rebuilds
           break;
-        case 'reorganize':
+        }
+        case 'reorganize': {
           fragmentationBefore = 10 + Math.random() * 30; // 10-40% for reorganize
           break;
-        case 'defragment':
+        }
+        case 'defragment': {
           fragmentationBefore = 15 + Math.random() * 45; // 15-60% for defragment
           break;
-        case 'update-statistics':
+        }
+        case 'update-statistics': {
           fragmentationBefore = Math.random() * 20; // 0-20% for stats update
           break;
-        case 'analyze':
+        }
+        case 'analyze': {
           fragmentationBefore = Math.random() * 100; // Any level for analyze
           break;
+        }
       }
       
       const startTime = Date.now();
@@ -377,26 +382,31 @@ describe("Database Index Operations Benchmarks", () => {
       let fragmentationImprovement = 0;
       
       switch (operationType) {
-        case 'rebuild':
-          baseTime = (tableType.rowCount / 100000) * 30000; // 30s per 100k rows
+        case 'rebuild': {
+          baseTime = (tableType.rowCount / 100_000) * 30_000; // 30s per 100k rows
           fragmentationImprovement = 0.85 + Math.random() * 0.1; // 85-95% improvement
           break;
-        case 'reorganize':
-          baseTime = (tableType.rowCount / 100000) * 15000; // 15s per 100k rows
+        }
+        case 'reorganize': {
+          baseTime = (tableType.rowCount / 100_000) * 15_000; // 15s per 100k rows
           fragmentationImprovement = 0.4 + Math.random() * 0.3; // 40-70% improvement
           break;
-        case 'defragment':
-          baseTime = (tableType.rowCount / 100000) * 20000; // 20s per 100k rows
+        }
+        case 'defragment': {
+          baseTime = (tableType.rowCount / 100_000) * 20_000; // 20s per 100k rows
           fragmentationImprovement = 0.6 + Math.random() * 0.25; // 60-85% improvement
           break;
-        case 'update-statistics':
-          baseTime = (tableType.rowCount / 1000000) * 5000; // 5s per 1M rows
+        }
+        case 'update-statistics': {
+          baseTime = (tableType.rowCount / 1_000_000) * 5000; // 5s per 1M rows
           fragmentationImprovement = 0; // Doesn't affect fragmentation
           break;
-        case 'analyze':
-          baseTime = (tableType.rowCount / 1000000) * 2000; // 2s per 1M rows
+        }
+        case 'analyze': {
+          baseTime = (tableType.rowCount / 1_000_000) * 2000; // 2s per 1M rows
           fragmentationImprovement = 0; // Analysis only
           break;
+        }
       }
       
       // Apply fragmentation complexity factor
@@ -530,19 +540,19 @@ describe("Database Index Operations Benchmarks", () => {
     const queryPatterns = [
       {
         pattern: 'simple-select',
-        baseComplexity: 1.0,
+        baseComplexity: 1,
         optimizationPotential: 0.3,
         indexBenefit: 0.8,
       },
       {
         pattern: 'complex-join',
-        baseComplexity: 3.0,
+        baseComplexity: 3,
         optimizationPotential: 0.7,
         indexBenefit: 0.9,
       },
       {
         pattern: 'aggregation',
-        baseComplexity: 2.0,
+        baseComplexity: 2,
         optimizationPotential: 0.5,
         indexBenefit: 0.6,
       },
@@ -561,10 +571,10 @@ describe("Database Index Operations Benchmarks", () => {
     ];
     
     const scanTypes = [
-      { type: 'table-scan' as const, cost: 10.0, accuracy: 1.0 },
-      { type: 'index-scan' as const, cost: 3.0, accuracy: 0.9 },
-      { type: 'index-seek' as const, cost: 1.0, accuracy: 0.95 },
-      { type: 'clustered-index-scan' as const, cost: 5.0, accuracy: 0.95 },
+      { type: 'table-scan' as const, cost: 10, accuracy: 1 },
+      { type: 'index-scan' as const, cost: 3, accuracy: 0.9 },
+      { type: 'index-seek' as const, cost: 1, accuracy: 0.95 },
+      { type: 'clustered-index-scan' as const, cost: 5, accuracy: 0.95 },
     ];
     
     for (let i = 0; i < 300; i++) {
@@ -576,7 +586,7 @@ describe("Database Index Operations Benchmarks", () => {
       const originalQuery = `SELECT * FROM ${tableType.name} WHERE condition_${i % 10} = value_${i}`;
       
       // Calculate original execution time
-      const baseExecutionTime = (tableType.rowCount / 100000) * queryPattern.baseComplexity * scanType.cost;
+      const baseExecutionTime = (tableType.rowCount / 100_000) * queryPattern.baseComplexity * scanType.cost;
       const executionTimeBefore = Math.max(100, baseExecutionTime + (Math.random() - 0.5) * baseExecutionTime * 0.3);
       
       // Calculate original cost
@@ -617,18 +627,18 @@ describe("Database Index Operations Benchmarks", () => {
       }
       
       // Calculate optimization improvement
-      let improvementFactor = 1.0;
+      let improvementFactor = 1;
       
       // Apply technique improvements
       optimizationTechniques.forEach(technique => {
         const improvements: Record<string, number> = {
           'index-recommendation': 0.15,
-          'query-rewrite': 0.20,
+          'query-rewrite': 0.2,
           'join-order-optimization': 0.25,
-          'predicate-pushdown': 0.10,
+          'predicate-pushdown': 0.1,
           'column-pruning': 0.08,
           'constant-folding': 0.05,
-          'subquery-flattening': 0.30,
+          'subquery-flattening': 0.3,
         };
         improvementFactor *= (1 - (improvements[technique] || 0));
       });
@@ -736,35 +746,40 @@ describe("Database Index Operations Benchmarks", () => {
       
       // Different index types have different usage patterns
       switch (indexType.type) {
-        case 'btree':
-          userSeeks = Math.floor(Math.random() * 100000) + 1000;
-          userScans = Math.floor(Math.random() * 10000);
-          userLookups = Math.floor(Math.random() * 50000);
+        case 'btree': {
+          userSeeks = Math.floor(Math.random() * 100_000) + 1000;
+          userScans = Math.floor(Math.random() * 10_000);
+          userLookups = Math.floor(Math.random() * 50_000);
           userUpdates = Math.floor(Math.random() * 5000);
           break;
-        case 'hash':
-          userSeeks = Math.floor(Math.random() * 150000) + 5000; // Hash indexes excel at seeks
+        }
+        case 'hash': {
+          userSeeks = Math.floor(Math.random() * 150_000) + 5000; // Hash indexes excel at seeks
           userScans = Math.floor(Math.random() * 1000); // Poor scan performance
-          userLookups = Math.floor(Math.random() * 80000);
+          userLookups = Math.floor(Math.random() * 80_000);
           userUpdates = Math.floor(Math.random() * 3000);
           break;
-        case 'clustered':
-          userSeeks = Math.floor(Math.random() * 50000);
-          userScans = Math.floor(Math.random() * 50000) + 10000; // Good for scans
-          userLookups = Math.floor(Math.random() * 30000);
-          userUpdates = Math.floor(Math.random() * 15000) + 2000; // Higher updates on clustered
+        }
+        case 'clustered': {
+          userSeeks = Math.floor(Math.random() * 50_000);
+          userScans = Math.floor(Math.random() * 50_000) + 10_000; // Good for scans
+          userLookups = Math.floor(Math.random() * 30_000);
+          userUpdates = Math.floor(Math.random() * 15_000) + 2000; // Higher updates on clustered
           break;
-        case 'covering':
-          userSeeks = Math.floor(Math.random() * 80000) + 2000;
-          userScans = Math.floor(Math.random() * 20000);
-          userLookups = Math.floor(Math.random() * 100000) + 5000; // Excellent for lookups
+        }
+        case 'covering': {
+          userSeeks = Math.floor(Math.random() * 80_000) + 2000;
+          userScans = Math.floor(Math.random() * 20_000);
+          userLookups = Math.floor(Math.random() * 100_000) + 5000; // Excellent for lookups
           userUpdates = Math.floor(Math.random() * 1000); // Lower updates on covering
           break;
-        default:
-          userSeeks = Math.floor(Math.random() * 75000);
-          userScans = Math.floor(Math.random() * 15000);
-          userLookups = Math.floor(Math.random() * 40000);
+        }
+        default: {
+          userSeeks = Math.floor(Math.random() * 75_000);
+          userScans = Math.floor(Math.random() * 15_000);
+          userLookups = Math.floor(Math.random() * 40_000);
           userUpdates = Math.floor(Math.random() * 8000);
+        }
       }
       
       // System statistics (typically lower than user statistics)
@@ -775,10 +790,10 @@ describe("Database Index Operations Benchmarks", () => {
       
       // Generate last access times (some indexes may not have recent access)
       const now = Date.now();
-      const lastUserSeek = userSeeks > 0 ? now - Math.floor(Math.random() * 7 * 24 * 3600000) : undefined; // Within 7 days
-      const lastUserScan = userScans > 0 ? now - Math.floor(Math.random() * 30 * 24 * 3600000) : undefined; // Within 30 days
-      const lastUserLookup = userLookups > 0 ? now - Math.floor(Math.random() * 3 * 24 * 3600000) : undefined; // Within 3 days
-      const lastUserUpdate = userUpdates > 0 ? now - Math.floor(Math.random() * 1 * 24 * 3600000) : undefined; // Within 1 day
+      const lastUserSeek = userSeeks > 0 ? now - Math.floor(Math.random() * 7 * 24 * 3_600_000) : undefined; // Within 7 days
+      const lastUserScan = userScans > 0 ? now - Math.floor(Math.random() * 30 * 24 * 3_600_000) : undefined; // Within 30 days
+      const lastUserLookup = userLookups > 0 ? now - Math.floor(Math.random() * 3 * 24 * 3_600_000) : undefined; // Within 3 days
+      const lastUserUpdate = userUpdates > 0 ? now - Math.floor(Math.random() * 1 * 24 * 3_600_000) : undefined; // Within 1 day
       
       // Calculate efficiency score
       const totalReads = userSeeks + userScans + userLookups;
@@ -852,9 +867,9 @@ describe("Database Index Operations Benchmarks", () => {
     
     // Usage pattern analysis
     const usagePatternAnalysis = {
-      highSeekIndexes: usageStatistics.filter(stat => stat.userSeeks > 50000).length,
-      highScanIndexes: usageStatistics.filter(stat => stat.userScans > 20000).length,
-      highUpdateIndexes: usageStatistics.filter(stat => stat.userUpdates > 10000).length,
+      highSeekIndexes: usageStatistics.filter(stat => stat.userSeeks > 50_000).length,
+      highScanIndexes: usageStatistics.filter(stat => stat.userScans > 20_000).length,
+      highUpdateIndexes: usageStatistics.filter(stat => stat.userUpdates > 10_000).length,
       underutilizedIndexes: usageStatistics.filter(stat => 
         (stat.userSeeks + stat.userScans + stat.userLookups) < 1000
       ).length,
@@ -882,10 +897,10 @@ describe("Database Index Operations Benchmarks", () => {
       
       // Larger tables and certain index types tend to fragment more
       const tableSizeFactor = tableType.name === 'large-table' ? 1.5 : 
-                            tableType.name === 'medium-table' ? 1.2 : 1.0;
+                            tableType.name === 'medium-table' ? 1.2 : 1;
       
       const indexTypeFactor = indexType.type === 'clustered' ? 1.3 :
-                             indexType.type === 'btree' ? 1.0 : 0.8;
+                             indexType.type === 'btree' ? 1 : 0.8;
       
       const baseFragmentation = Math.random() * 60; // 0-60% base
       fragmentationPercent = Math.min(95, baseFragmentation * tableSizeFactor * indexTypeFactor);

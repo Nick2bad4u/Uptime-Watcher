@@ -39,9 +39,7 @@ describe("MonitorRepository", () => {
         // Mock the DatabaseService
         mockDatabaseService = {
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
-            executeTransaction: vi.fn().mockImplementation(async (callback) => {
-                return callback(mockDatabase);
-            }),
+            executeTransaction: vi.fn().mockImplementation(async (callback) => callback(mockDatabase)),
         };
 
         repository = new MonitorRepository({

@@ -176,7 +176,7 @@ describe("generateUuid", () => {
             vi.useFakeTimers();
 
             let timeValue = 1_640_995_200_000; // 2022-01-01T00:00:00.000Z
-            let randomValue = 0.1;
+            const randomValue = 0.1;
 
             vi.setSystemTime(timeValue);
             const mockRandom = vi

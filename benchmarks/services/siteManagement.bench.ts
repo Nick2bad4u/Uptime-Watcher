@@ -67,7 +67,7 @@ interface PaginatedResult<T> {
 }
 
 class MockSiteRepository {
-    private sites: Map<string, Site> = new Map();
+    private sites = new Map<string, Site>();
     private nextId = 1;
 
     async create(siteData: SiteCreateRequest): Promise<Site> {
@@ -80,7 +80,7 @@ class MockSiteRepository {
             url: siteData.url,
             status: 'unknown',
             isActive: true,
-            checkInterval: siteData.checkInterval || 300000, // 5 minutes
+            checkInterval: siteData.checkInterval || 300_000, // 5 minutes
             createdAt: now,
             updatedAt: now,
             tags: siteData.tags || [],
@@ -231,7 +231,7 @@ class MockSiteRepository {
 }
 
 class MockEventBus {
-    private handlers: Map<string, Function[]> = new Map();
+    private handlers = new Map<string, Function[]>();
 
     emit(event: string, data: any): void {
         const eventHandlers = this.handlers.get(event) || [];
@@ -249,7 +249,7 @@ class MockEventBus {
         const handlers = this.handlers.get(event);
         if (handlers) {
             const index = handlers.indexOf(handler);
-            if (index > -1) {
+            if (index !== -1) {
                 handlers.splice(index, 1);
             }
         }
@@ -374,7 +374,7 @@ class MockSiteManagementService {
         return await this.repository.findByStatus(status);
     }
 
-    async bulkUpdateSites(updates: Array<{ id: string; data: SiteUpdateRequest }>): Promise<Site[]> {
+    async bulkUpdateSites(updates: { id: string; data: SiteUpdateRequest }[]): Promise<Site[]> {
         const results: Site[] = [];
         
         for (const update of updates) {
@@ -435,7 +435,7 @@ class MockSiteManagementService {
         
         this.validateUrl(request.url);
         
-        if (request.checkInterval && request.checkInterval < 60000) {
+        if (request.checkInterval && request.checkInterval < 60_000) {
             throw new Error('Check interval must be at least 60 seconds');
         }
     }
@@ -464,7 +464,7 @@ function createSiteRequest(index: number): SiteCreateRequest {
     return {
         name: `Site ${index}`,
         url: `https://site${index}.example.com`,
-        checkInterval: 300000 + (index * 60000),
+        checkInterval: 300_000 + (index * 60_000),
         tags: [`tag${index}`, `category${index % 3}`],
         metadata: {
             owner: `owner${index}`,
@@ -496,7 +496,7 @@ describe("Site Management Service Performance", () => {
         const request: SiteCreateRequest = {
             name: "Complex Site",
             url: "https://complex-site.example.com/path?param=value",
-            checkInterval: 120000,
+            checkInterval: 120_000,
             tags: ["production", "critical", "api", "monitoring"],
             metadata: {
                 owner: "team-platform",
@@ -525,7 +525,7 @@ describe("Site Management Service Performance", () => {
         service.createSite(request).then(site => {
             service.updateSite(site.id, {
                 name: "Updated Site Name",
-                checkInterval: 600000,
+                checkInterval: 600_000,
                 tags: ["updated", "modified"]
             });
         });
@@ -640,7 +640,7 @@ describe("Site Management Service Performance", () => {
                 isActive: true,
                 tags: ['tag1', 'tag2', 'category1'],
                 searchTerm: 'site',
-                createdAfter: new Date(Date.now() - 86400000) // 24 hours ago
+                createdAfter: new Date(Date.now() - 86_400_000) // 24 hours ago
             }, {
                 page: 1,
                 limit: 25,

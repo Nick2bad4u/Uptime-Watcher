@@ -19,7 +19,7 @@ interface EventData {
 }
 
 class MockTypedEventBus {
-    private listeners: Map<string, Function[]> = new Map();
+    private listeners = new Map<string, Function[]>();
     private middleware: Function[] = [];
     private eventHistory: EventData[] = [];
 
@@ -34,7 +34,7 @@ class MockTypedEventBus {
         const listeners = this.listeners.get(eventType);
         if (listeners) {
             const index = listeners.indexOf(listener);
-            if (index > -1) {
+            if (index !== -1) {
                 listeners.splice(index, 1);
             }
         }
@@ -103,7 +103,7 @@ describe("Event Bus Performance", () => {
     bench("register single listener", () => {
         eventBus = new MockTypedEventBus();
         eventBus.on('test-event', () => {});
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("register multiple listeners", () => {
         eventBus = new MockTypedEventBus();
@@ -115,7 +115,7 @@ describe("Event Bus Performance", () => {
     bench("emit event with no listeners", () => {
         eventBus = new MockTypedEventBus();
         eventBus.emit('non-existent-event', { data: 'test' });
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("emit event with single listener", () => {
         eventBus = new MockTypedEventBus();

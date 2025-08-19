@@ -72,9 +72,9 @@ interface RollbackOperation {
 
 describe("Database Migration Operations Benchmarks", () => {
   const databaseSizes = [
-    { name: 'small', tableCount: 10, totalRows: 10000 },
-    { name: 'medium', tableCount: 50, totalRows: 500000 },
-    { name: 'large', tableCount: 200, totalRows: 10000000 },
+    { name: 'small', tableCount: 10, totalRows: 10_000 },
+    { name: 'medium', tableCount: 50, totalRows: 500_000 },
+    { name: 'large', tableCount: 200, totalRows: 10_000_000 },
   ];
 
   // Schema migration performance
@@ -102,7 +102,7 @@ describe("Database Migration Operations Benchmarks", () => {
         name: 'drop-column',
         riskLevel: 'high' as const,
         operationTypes: ['alter-table'],
-        estimatedDuration: 10000,
+        estimatedDuration: 10_000,
         rollbackSupported: false,
       },
       {
@@ -116,7 +116,7 @@ describe("Database Migration Operations Benchmarks", () => {
         name: 'add-foreign-key',
         riskLevel: 'medium' as const,
         operationTypes: ['alter-table'],
-        estimatedDuration: 15000,
+        estimatedDuration: 15_000,
         rollbackSupported: true,
       },
     ];
@@ -165,10 +165,10 @@ describe("Database Migration Operations Benchmarks", () => {
       
       // Apply size multiplier
       const sizeMultiplier = {
-        small: 1.0,
+        small: 1,
         medium: 2.5,
-        large: 8.0,
-      }[dbSize.name] ?? 1.0;
+        large: 8,
+      }[dbSize.name] ?? 1;
       
       actualDuration *= sizeMultiplier;
       
@@ -194,18 +194,22 @@ describe("Database Migration Operations Benchmarks", () => {
         
         // Operation-specific adjustments
         switch (operation.type) {
-          case 'create-table':
+          case 'create-table': {
             opDuration *= 0.5; // Tables create quickly
             break;
-          case 'alter-table':
+          }
+          case 'alter-table': {
             opDuration *= 1.5; // Alterations take longer
             break;
-          case 'create-index':
-            opDuration *= 2.0; // Indexes take time to build
+          }
+          case 'create-index': {
+            opDuration *= 2; // Indexes take time to build
             break;
-          case 'drop-table':
+          }
+          case 'drop-table': {
             opDuration *= 0.3; // Drops are fast
             break;
+          }
         }
         
         // Simulate failure chance based on risk level
@@ -377,25 +381,28 @@ describe("Database Migration Operations Benchmarks", () => {
           
           // Operation type impact
           switch (operation.type) {
-            case 'insert-data':
-              baseBatchTime *= 1.0;
+            case 'insert-data': {
+              baseBatchTime *= 1;
               break;
-            case 'update-data':
+            }
+            case 'update-data': {
               baseBatchTime *= 1.5; // Updates take longer
               break;
-            case 'delete-data':
+            }
+            case 'delete-data': {
               baseBatchTime *= 0.8; // Deletes are faster
               break;
+            }
           }
           
           // Database size impact
           const dbSize = databaseSizes.find(db => migration.name.includes(db.name));
           if (dbSize) {
             const sizeMultiplier = {
-              small: 1.0,
+              small: 1,
               medium: 1.3,
-              large: 2.0,
-            }[dbSize.name] ?? 1.0;
+              large: 2,
+            }[dbSize.name] ?? 1;
             baseBatchTime *= sizeMultiplier;
           }
           
@@ -455,7 +462,7 @@ describe("Database Migration Operations Benchmarks", () => {
       dataExecutions.push(execution);
       
       // Add cooldown time between data migrations
-      currentTime += Math.random() * 10000 + 5000; // 5-15 seconds
+      currentTime += Math.random() * 10_000 + 5000; // 5-15 seconds
     }
     
     // Calculate data migration metrics
@@ -496,11 +503,11 @@ describe("Database Migration Operations Benchmarks", () => {
     // Simulate applied migrations history
     const appliedMigrations = Array.from({ length: 50 }, (_, i) => `migration-${i + 1}`);
     
-    let currentState: MigrationState = {
+    const currentState: MigrationState = {
       currentVersion: '2.0.50',
       appliedMigrations: [...appliedMigrations],
       pendingMigrations: [],
-      lastMigrationTime: Date.now() - 86400000, // 1 day ago
+      lastMigrationTime: Date.now() - 86_400_000, // 1 day ago
       migrationLockActive: false,
       backupCreated: true,
     };
@@ -568,19 +575,18 @@ describe("Database Migration Operations Benchmarks", () => {
       // Lock migrations during rollback
       currentState.migrationLockActive = true;
       
-      for (let j = 0; j < migrationsToRollback.length; j++) {
-        const migrationToRollback = migrationsToRollback[j];
+      for (const migrationToRollback of migrationsToRollback) {
         
         // Simulate rollback operation complexity
         let migrationRollbackTime = 2000; // 2 seconds base
         
         // Urgency affects rollback speed
         const urgencyMultiplier = {
-          low: 1.0,
+          low: 1,
           medium: 0.8,
           high: 0.6,
           critical: 0.4,
-        }[scenario.urgency] ?? 1.0;
+        }[scenario.urgency] ?? 1;
         
         migrationRollbackTime *= urgencyMultiplier;
         
@@ -608,7 +614,7 @@ describe("Database Migration Operations Benchmarks", () => {
           // Emergency backup restore for critical failures
           if (scenario.urgency === 'critical' && currentState.backupCreated) {
             backupRestored = true;
-            rollbackDuration += 30000; // 30 seconds for backup restore
+            rollbackDuration += 30_000; // 30 seconds for backup restore
             success = true; // Backup restore saves the rollback
             error = undefined;
             dataLoss = true; // Backup restore means some data loss
@@ -621,7 +627,7 @@ describe("Database Migration Operations Benchmarks", () => {
         
         // Remove migration from applied list
         const migrationIndex = currentState.appliedMigrations.indexOf(migrationToRollback);
-        if (migrationIndex >= 0) {
+        if (migrationIndex !== -1) {
           currentState.appliedMigrations.splice(migrationIndex, 1);
           currentState.pendingMigrations.unshift(migrationToRollback);
         }
@@ -655,7 +661,7 @@ describe("Database Migration Operations Benchmarks", () => {
       // Save state snapshot
       migrationHistory.push({ ...currentState });
       
-      currentTime = endTime + Math.random() * 30000 + 10000; // 10-40 seconds between rollbacks
+      currentTime = endTime + Math.random() * 30_000 + 10_000; // 10-40 seconds between rollbacks
     }
     
     // Calculate rollback metrics
@@ -730,7 +736,7 @@ describe("Database Migration Operations Benchmarks", () => {
           }],
           dependencies: [],
           rollbackSupported: Math.random() > 0.2,
-          estimatedDuration: Math.random() * 10000 + 2000, // 2-12 seconds
+          estimatedDuration: Math.random() * 10_000 + 2000, // 2-12 seconds
           riskLevel: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'medium' : 'low',
         };
         

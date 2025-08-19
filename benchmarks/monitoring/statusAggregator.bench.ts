@@ -13,7 +13,7 @@
 import { bench, describe } from "vitest";
 
 class MockStatusAggregator {
-    aggregateStatuses(statuses: Array<{ id: string; status: string; timestamp: number }>): any {
+    aggregateStatuses(statuses: { id: string; status: string; timestamp: number }[]): any {
         const grouped = statuses.reduce((acc: any, status) => {
             acc[status.status] = (acc[status.status] || 0) + 1;
             return acc;
@@ -21,7 +21,7 @@ class MockStatusAggregator {
         return grouped;
     }
 
-    getOverallStatus(statuses: Array<{ status: string }>): string {
+    getOverallStatus(statuses: { status: string }[]): string {
         if (statuses.some(s => s.status === 'critical')) return 'critical';
         if (statuses.some(s => s.status === 'degraded')) return 'degraded';
         if (statuses.every(s => s.status === 'online')) return 'online';

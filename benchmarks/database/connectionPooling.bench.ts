@@ -73,27 +73,27 @@ describe("Database Connection Pooling Benchmarks", () => {
     {
       minConnections: 5,
       maxConnections: 20,
-      acquireTimeout: 30000,
-      idleTimeout: 300000,
-      validationInterval: 60000,
+      acquireTimeout: 30_000,
+      idleTimeout: 300_000,
+      validationInterval: 60_000,
       retryAttempts: 3,
       backoffMultiplier: 2,
     },
     {
       minConnections: 2,
       maxConnections: 10,
-      acquireTimeout: 10000,
-      idleTimeout: 180000,
-      validationInterval: 30000,
+      acquireTimeout: 10_000,
+      idleTimeout: 180_000,
+      validationInterval: 30_000,
       retryAttempts: 2,
       backoffMultiplier: 1.5,
     },
     {
       minConnections: 10,
       maxConnections: 50,
-      acquireTimeout: 60000,
-      idleTimeout: 600000,
-      validationInterval: 120000,
+      acquireTimeout: 60_000,
+      idleTimeout: 600_000,
+      validationInterval: 120_000,
       retryAttempts: 5,
       backoffMultiplier: 2.5,
     },
@@ -211,13 +211,12 @@ describe("Database Connection Pooling Benchmarks", () => {
             waitTime: creationTime,
           };
           
-          connectionOperations.push(createOperation);
-          connectionOperations.push(acquireOperation);
+          connectionOperations.push(createOperation, acquireOperation);
           
           if (!createOperation.success) {
             // Remove failed connection
             const failedIndex = connections.findIndex(c => c.connectionId === newConnection.connectionId);
-            if (failedIndex >= 0) {
+            if (failedIndex !== -1) {
               connections.splice(failedIndex, 1);
             }
             request.fulfilled = false;
@@ -352,7 +351,7 @@ describe("Database Connection Pooling Benchmarks", () => {
         
         // Remove from pending requests
         const timeoutIndex = pendingRequests.findIndex(req => req.requestId === timedOutRequest.requestId);
-        if (timeoutIndex >= 0) {
+        if (timeoutIndex !== -1) {
           pendingRequests.splice(timeoutIndex, 1);
         }
       }
@@ -374,7 +373,7 @@ describe("Database Connection Pooling Benchmarks", () => {
         
         // Remove broken connection
         const brokenIndex = connections.findIndex(c => c.connectionId === brokenConn.connectionId);
-        if (brokenIndex >= 0) {
+        if (brokenIndex !== -1) {
           connections.splice(brokenIndex, 1);
         }
       }
@@ -422,13 +421,13 @@ describe("Database Connection Pooling Benchmarks", () => {
     }
     
     const scalingEvents: ScalingEvent[] = [];
-    const poolStates: Array<{
+    const poolStates: {
       timestamp: number;
       connectionCount: number;
       utilization: number;
       pendingRequests: number;
       averageWaitTime: number;
-    }> = [];
+    }[] = [];
     
     let currentConnections = poolConfigs[1].minConnections;
     const maxConnections = poolConfigs[1].maxConnections;
@@ -439,11 +438,11 @@ describe("Database Connection Pooling Benchmarks", () => {
     
     // Simulate different load patterns
     const loadPatterns = [
-      { name: 'steady-low', utilizationRange: [0.2, 0.4], duration: 60000 },
-      { name: 'steady-medium', utilizationRange: [0.5, 0.7], duration: 120000 },
-      { name: 'steady-high', utilizationRange: [0.7, 0.9], duration: 90000 },
-      { name: 'spike', utilizationRange: [0.9, 1.0], duration: 30000 },
-      { name: 'variable', utilizationRange: [0.1, 0.8], duration: 180000 },
+      { name: 'steady-low', utilizationRange: [0.2, 0.4], duration: 60_000 },
+      { name: 'steady-medium', utilizationRange: [0.5, 0.7], duration: 120_000 },
+      { name: 'steady-high', utilizationRange: [0.7, 0.9], duration: 90_000 },
+      { name: 'spike', utilizationRange: [0.9, 1], duration: 30_000 },
+      { name: 'variable', utilizationRange: [0.1, 0.8], duration: 180_000 },
     ];
     
     for (let cycle = 0; cycle < 100; cycle++) {
@@ -499,7 +498,7 @@ describe("Database Connection Pooling Benchmarks", () => {
       // Simulate load spikes
       if (Math.random() < 0.1) { // 10% chance of load spike
         const spikeUtilization = 0.95 + Math.random() * 0.05; // 95-100% utilization
-        const spikeDuration = Math.random() * 10000 + 5000; // 5-15 second spike
+        const spikeDuration = Math.random() * 10_000 + 5000; // 5-15 second spike
         
         const spikeEvent: ScalingEvent = {
           eventId: `spike-${eventCounter++}`,
@@ -529,7 +528,7 @@ describe("Database Connection Pooling Benchmarks", () => {
       }
       
       // Regular state recording
-      const currentUtilization = Math.min(1.0, targetUtilization + (Math.random() - 0.5) * 0.1);
+      const currentUtilization = Math.min(1, targetUtilization + (Math.random() - 0.5) * 0.1);
       const pendingRequests = Math.max(0, Math.floor((currentUtilization - 0.8) * currentConnections * 5));
       const averageWaitTime = Math.max(0, (currentUtilization - 0.8) * 200);
       
@@ -607,7 +606,7 @@ describe("Database Connection Pooling Benchmarks", () => {
     // Initialize connections for monitoring
     const monitoredConnections = Array.from({ length: 15 }, (_, i) => ({
       connectionId: `monitored-conn-${i}`,
-      healthScore: 1.0,
+      healthScore: 1,
       consecutiveFailures: 0,
       lastSuccessfulCheck: Date.now(),
       totalChecks: 0,
@@ -647,29 +646,33 @@ describe("Database Connection Pooling Benchmarks", () => {
         let successProbability: number;
         
         switch (checkType) {
-          case 'heartbeat':
+          case 'heartbeat': {
             baseResponseTime = 5; // 5ms base
             successProbability = 0.98;
             break;
-          case 'query-validation':
+          }
+          case 'query-validation': {
             baseResponseTime = 15; // 15ms base
             successProbability = 0.94;
             break;
-          case 'timeout-check':
+          }
+          case 'timeout-check': {
             baseResponseTime = 2; // 2ms base
             successProbability = 0.99;
             break;
-          case 'resource-check':
+          }
+          case 'resource-check': {
             baseResponseTime = 10; // 10ms base
             successProbability = 0.96;
             break;
+          }
         }
         
         // Adjust success probability based on current health score
         successProbability *= connState.healthScore;
         
         // Simulate degradation over time
-        if (currentTime - connState.lastSuccessfulCheck > 300000) { // 5 minutes
+        if (currentTime - connState.lastSuccessfulCheck > 300_000) { // 5 minutes
           successProbability *= 0.8; // 20% penalty for stale connections
         }
         
@@ -680,17 +683,15 @@ describe("Database Connection Pooling Benchmarks", () => {
         let result: HealthCheck['result'];
         const success = Math.random() < successProbability;
         
-        if (!success) {
-          if (Math.random() < 0.3) {
+        if (success) {
+          result = responseTime > baseResponseTime * 2 ? 'degraded' : 'healthy';
+        } else if (Math.random() < 0.3) {
             result = 'timeout';
           } else if (Math.random() < 0.6) {
             result = 'degraded';
           } else {
             result = 'unhealthy';
           }
-        } else {
-          result = responseTime > baseResponseTime * 2 ? 'degraded' : 'healthy';
-        }
         
         // Update connection state
         connState.totalChecks++;
@@ -699,14 +700,14 @@ describe("Database Connection Pooling Benchmarks", () => {
         if (result === 'healthy') {
           connState.consecutiveFailures = 0;
           connState.lastSuccessfulCheck = currentTime;
-          connState.healthScore = Math.min(1.0, connState.healthScore + 0.05);
+          connState.healthScore = Math.min(1, connState.healthScore + 0.05);
         } else {
           connState.consecutiveFailures++;
-          connState.healthScore = Math.max(0.0, connState.healthScore - 0.1);
+          connState.healthScore = Math.max(0, connState.healthScore - 0.1);
           
           // Severe degradation for consecutive failures
           if (connState.consecutiveFailures >= 3) {
-            connState.healthScore = Math.max(0.0, connState.healthScore - 0.2);
+            connState.healthScore = Math.max(0, connState.healthScore - 0.2);
           }
         }
         
@@ -718,15 +719,26 @@ describe("Database Connection Pooling Benchmarks", () => {
           totalChecks: connState.totalChecks,
         };
         
-        if (checkType === 'query-validation') {
+        switch (checkType) {
+        case 'query-validation': {
           details.querySuccess = result === 'healthy';
           details.queryTime = responseTime;
-        } else if (checkType === 'resource-check') {
+        
+        break;
+        }
+        case 'resource-check': {
           details.memoryUsage = Math.random() * 100 + 50; // 50-150MB
           details.openTransactions = Math.floor(Math.random() * 10);
-        } else if (checkType === 'timeout-check') {
-          details.timeoutThreshold = 30000; // 30 seconds
+        
+        break;
+        }
+        case 'timeout-check': {
+          details.timeoutThreshold = 30_000; // 30 seconds
           details.lastActivity = currentTime - connState.lastSuccessfulCheck;
+        
+        break;
+        }
+        // No default
         }
         
         const healthCheck: HealthCheck = {
@@ -772,7 +784,7 @@ describe("Database Connection Pooling Benchmarks", () => {
       }
       
       // Advance time
-      currentTime += Math.random() * 5000 + 10000; // 10-15 seconds between monitoring cycles
+      currentTime += Math.random() * 5000 + 10_000; // 10-15 seconds between monitoring cycles
     }
     
     // Calculate health monitoring metrics
@@ -863,7 +875,7 @@ describe("Database Connection Pooling Benchmarks", () => {
       const activeSessions: ConcurrentSession[] = [];
       const waitingSessions: ConcurrentSession[] = [...sessionBatch];
       
-      let batchStartTime = currentTime;
+      const batchStartTime = currentTime;
       let batchCurrentTime = batchStartTime;
       
       while (waitingSessions.length > 0 || activeSessions.length > 0) {
@@ -897,7 +909,7 @@ describe("Database Connection Pooling Benchmarks", () => {
         // Remove completed sessions and free connections
         for (const completed of completedSessions) {
           const index = activeSessions.findIndex(s => s.sessionId === completed.sessionId);
-          if (index >= 0) {
+          if (index !== -1) {
             activeSessions.splice(index, 1);
           }
         }
@@ -908,7 +920,7 @@ describe("Database Connection Pooling Benchmarks", () => {
         batchCurrentTime += 100; // 100ms time steps
         
         // Prevent infinite loops
-        if (batchCurrentTime - batchStartTime > 60000) { // 1 minute timeout
+        if (batchCurrentTime - batchStartTime > 60_000) { // 1 minute timeout
           // Force completion of remaining sessions
           for (const remaining of [...activeSessions, ...waitingSessions]) {
             remaining.endTime = batchCurrentTime;

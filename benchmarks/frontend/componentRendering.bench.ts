@@ -62,7 +62,7 @@ describe("React Component Rendering Performance", () => {
     props: ComponentProps;
     state: ComponentState;
     renderCount: number = 0;
-    updateQueue: Array<() => void> = [];
+    updateQueue: (() => void)[] = [];
 
     constructor(props: ComponentProps) {
       this.props = props;
@@ -176,8 +176,7 @@ describe("React Component Rendering Performance", () => {
   }
 
   // Generate test data
-  const generateComponentProps = (count: number): ComponentProps[] => {
-    return Array.from({ length: count }, (_, i) => ({
+  const generateComponentProps = (count: number): ComponentProps[] => Array.from({ length: count }, (_, i) => ({
       id: `component-${i}`,
       title: `Component ${i}`,
       data: Array.from({ length: 10 + Math.floor(Math.random() * 90) }, (_, j) => ({
@@ -190,10 +189,9 @@ describe("React Component Rendering Performance", () => {
       style: {
         width: Math.floor(Math.random() * 500) + 200,
         height: Math.floor(Math.random() * 300) + 100,
-        backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+        backgroundColor: `#${Math.floor(Math.random() * 16_777_215).toString(16)}`,
       },
     }));
-  };
 
   const componentPropsSet = generateComponentProps(100);
 
@@ -331,8 +329,7 @@ describe("React Component Rendering Performance", () => {
     });
     
     // Simulate virtual DOM diffing
-    for (let i = 0; i < oldElements.length; i++) {
-      const oldElement = oldElements[i];
+    for (const [i, oldElement] of oldElements.entries()) {
       const newElement = newElements[i];
       
       const diff = calculateDiff(oldElement, newElement);
@@ -419,11 +416,11 @@ describe("React Component Rendering Performance", () => {
       Array.from({ length: 500 + i * 100 }, (_, j) => ({
         id: `large-item-${i}-${j}`,
         name: `Large Item ${j}`,
-        value: Math.random() * 10000,
+        value: Math.random() * 10_000,
         category: `Category ${j % 20}`,
         metadata: {
-          created: Date.now() - Math.random() * 86400000,
-          updated: Date.now() - Math.random() * 3600000,
+          created: Date.now() - Math.random() * 86_400_000,
+          updated: Date.now() - Math.random() * 3_600_000,
           tags: Array.from({ length: Math.floor(Math.random() * 5) }, (_, k) => `tag-${k}`),
         },
       }))
@@ -505,8 +502,8 @@ function calculateDiff(oldElement: VirtualElement, newElement: VirtualElement): 
   return diff;
 }
 
-function generatePatches(diff: any): Array<{ type: string; path: string; value: any }> {
-  const patches: Array<{ type: string; path: string; value: any }> = [];
+function generatePatches(diff: any): { type: string; path: string; value: any }[] {
+  const patches: { type: string; path: string; value: any }[] = [];
   
   if (diff.type) {
     patches.push({ type: "replace", path: "type", value: diff.type.new });

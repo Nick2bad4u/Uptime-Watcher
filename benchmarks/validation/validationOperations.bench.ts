@@ -55,7 +55,7 @@ function generateValidationTestData(): ValidationTestData {
         id: `monitor-${i}`,
         type: "http",
         monitoring: true,
-        checkInterval: 30000 + i * 1000,
+        checkInterval: 30_000 + i * 1000,
         timeout: 5000 + i * 100,
         url: `https://example${i}.com`,
     }));
@@ -98,8 +98,8 @@ function generateValidationTestData(): ValidationTestData {
         "not json at all",
         '{"circular": {"ref": "problem"}}',
         '{"numbers": [1,2,3,4,}',
-        '{"escaped": "quotes\\"inside"}',
-        '{"unicode": "\\u0000\\u0001"}',
+        String.raw`{"escaped": "quotes\"inside"}`,
+        String.raw`{"unicode": "\u0000\u0001"}`,
     ];
 
     return { sites, monitors, invalidData, complexObjects, malformedJson };
@@ -112,20 +112,25 @@ function validateSchema(data: any, schema: any): boolean {
 
         const value = data[key];
         switch (expectedType) {
-            case "string":
+            case "string": {
                 if (typeof value !== "string") return false;
                 break;
-            case "number":
+            }
+            case "number": {
                 if (typeof value !== "number" || isNaN(value)) return false;
                 break;
-            case "boolean":
+            }
+            case "boolean": {
                 if (typeof value !== "boolean") return false;
                 break;
-            case "array":
+            }
+            case "array": {
                 if (!Array.isArray(value)) return false;
                 break;
-            default:
+            }
+            default: {
                 return false;
+            }
         }
     }
     return true;
@@ -133,11 +138,11 @@ function validateSchema(data: any, schema: any): boolean {
 
 function sanitizeString(input: string): string {
     return input
-        .replace(/[<>]/g, "") // Remove potential HTML tags
-        .replace(/['"]/g, "") // Remove quotes
-        .replace(/\s+/g, " ") // Normalize whitespace
+        .replaceAll(/[<>]/g, "") // Remove potential HTML tags
+        .replaceAll(/["']/g, "") // Remove quotes
+        .replaceAll(/\s+/g, " ") // Normalize whitespace
         .trim()
-        .substring(0, 1000); // Limit length
+        .slice(0, 1000); // Limit length
 }
 
 function parseAndValidateJson(jsonString: string): {
@@ -187,7 +192,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 
@@ -209,7 +214,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 
@@ -296,7 +301,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             "check number ranges (timeout values)",
             () => {
                 monitors.every((monitor) =>
-                    validateNumberRange(monitor.timeout, 1000, 30000)
+                    validateNumberRange(monitor.timeout, 1000, 30_000)
                 );
             },
             {
@@ -309,7 +314,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             "check number ranges (intervals)",
             () => {
                 monitors.every((monitor) =>
-                    validateNumberRange(monitor.checkInterval, 10000, 300000)
+                    validateNumberRange(monitor.checkInterval, 10_000, 300_000)
                 );
             },
             {
@@ -358,12 +363,12 @@ describe("Validation Operations Performance Benchmarks", () => {
                     typeof value === "number";
                     typeof value === "boolean";
                     Array.isArray(value);
-                    value !== null && typeof value === "object";
+                    if (value !== null) typeof value === "object";
                 });
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
     });
@@ -382,7 +387,7 @@ describe("Validation Operations Performance Benchmarks", () => {
             },
             {
                 time: 1000,
-                iterations: 10000,
+                iterations: 10_000,
             }
         );
 
@@ -456,13 +461,13 @@ describe("Validation Operations Performance Benchmarks", () => {
                     if (!validateSchema(monitor, monitorSchema)) return false;
 
                     // Range validation
-                    if (!validateNumberRange(monitor.timeout, 1000, 30000))
+                    if (!validateNumberRange(monitor.timeout, 1000, 30_000))
                         return false;
                     if (
                         !validateNumberRange(
                             monitor.checkInterval,
-                            10000,
-                            300000
+                            10_000,
+                            300_000
                         )
                     )
                         return false;
@@ -517,7 +522,7 @@ describe("Validation Operations Performance Benchmarks", () => {
                 invalidData.forEach((item) => {
                     try {
                         validateSchema(item, siteSchema);
-                    } catch (error) {
+                    } catch {
                         // Error recovery logic
                         const fallback = {
                             identifier: item.id || "unknown",
@@ -550,7 +555,7 @@ describe("Validation Operations Performance Benchmarks", () => {
                         try {
                             // Try to extract partial data
                             const partial =
-                                json.substring(0, json.indexOf("{") + 1) + "}";
+                                `${json.slice(0, Math.max(0, json.indexOf("{") + 1))  }}`;
                             parseAndValidateJson(partial);
                         } catch {
                             // Final fallback

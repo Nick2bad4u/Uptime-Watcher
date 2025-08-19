@@ -15,7 +15,7 @@ import { bench, describe } from "vitest";
 
 // Mock database connection
 class MockDatabase {
-    private settings: Map<string, any> = new Map();
+    private settings = new Map<string, any>();
 
     prepare(sql: string) {
         return {
@@ -38,9 +38,7 @@ class MockDatabase {
                 }
                 return {};
             },
-            get: (...params: any[]) => {
-                return this.settings.get(params[0]) || null;
-            },
+            get: (...params: any[]) => this.settings.get(params[0]) || null,
             all: () => {
                 if (sql.includes('WHERE category =')) {
                     return Array.from(this.settings.values()).filter(s => s.category === 'test');
@@ -116,18 +114,22 @@ class MockSettingsRepository {
         if (!setting) return null;
 
         switch (setting.type) {
-            case 'boolean':
+            case 'boolean': {
                 return setting.value === 'true';
-            case 'number':
-                return parseFloat(setting.value);
-            case 'json':
+            }
+            case 'number': {
+                return Number.parseFloat(setting.value);
+            }
+            case 'json': {
                 try {
                     return JSON.parse(setting.value);
                 } catch {
                     return null;
                 }
-            default:
+            }
+            default: {
                 return setting.value;
+            }
         }
     }
 
@@ -160,7 +162,7 @@ class MockSettingsRepository {
         return stmt.run(key);
     }
 
-    bulkUpdate(settings: Array<{ key: string; value: string; type?: string; category?: string }>) {
+    bulkUpdate(settings: { key: string; value: string; type?: string; category?: string }[]) {
         const stmt = this.db.prepare(`
             INSERT OR REPLACE INTO settings (key, value, type, category, isSystem, updatedAt)
             VALUES (?, ?, ?, ?, 0, datetime('now'))
@@ -177,10 +179,10 @@ class MockSettingsRepository {
         if (category) {
             const stmt = this.db.prepare('DELETE FROM settings WHERE category = ? AND isSystem = 0');
             return stmt.run(category);
-        } else {
+        } 
             const stmt = this.db.prepare('DELETE FROM settings WHERE isSystem = 0');
             return stmt.run();
-        }
+        
     }
 
     export() {
@@ -207,19 +209,23 @@ class MockSettingsRepository {
 
     validate(key: string, value: string, type: string) {
         switch (type) {
-            case 'boolean':
+            case 'boolean': {
                 return value === 'true' || value === 'false';
-            case 'number':
-                return !isNaN(parseFloat(value));
-            case 'json':
+            }
+            case 'number': {
+                return !isNaN(Number.parseFloat(value));
+            }
+            case 'json': {
                 try {
                     JSON.parse(value);
                     return true;
                 } catch {
                     return false;
                 }
-            default:
+            }
+            default: {
                 return true;
+            }
         }
     }
 
@@ -244,12 +250,12 @@ describe("Settings Repository Performance", () => {
     bench("get setting by key", () => {
         repository = new MockSettingsRepository();
         repository.get('app.theme');
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("get typed setting", () => {
         repository = new MockSettingsRepository();
         repository.getTyped('monitor.defaultInterval');
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("get all settings", () => {
         repository = new MockSettingsRepository();
@@ -317,7 +323,7 @@ describe("Settings Repository Performance", () => {
         repository.validate('test.number', '123', 'number');
         repository.validate('test.boolean', 'true', 'boolean');
         repository.validate('test.json', '{"key":"value"}', 'json');
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("get categories", () => {
         repository = new MockSettingsRepository();

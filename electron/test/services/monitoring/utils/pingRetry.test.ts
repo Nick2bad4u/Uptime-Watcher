@@ -55,9 +55,7 @@ describe("pingRetry utilities", () => {
         vi.clearAllMocks();
 
         // Default operational hooks mock - just calls the function
-        mockWithOperationalHooks.mockImplementation(async (fn) => {
-            return fn();
-        });
+        mockWithOperationalHooks.mockImplementation(async (fn) => fn());
     });
     afterEach(() => {
         vi.resetAllMocks();
@@ -193,9 +191,7 @@ describe("pingRetry utilities", () => {
 
         beforeEach(() => {
             // Mock operational hooks to just return the result
-            mockWithOperationalHooks.mockImplementation(async (fn) => {
-                return fn();
-            });
+            mockWithOperationalHooks.mockImplementation(async (fn) => fn());
         });
         it("should call withOperationalHooks with correct parameters", async () => {
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);

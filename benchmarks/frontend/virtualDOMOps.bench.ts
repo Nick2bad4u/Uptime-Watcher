@@ -130,21 +130,26 @@ class MockVirtualDOM {
         // Simulate applying patches to real DOM
         patches.forEach(patch => {
             switch (patch.type) {
-                case 'CREATE':
+                case 'CREATE': {
                     this.createElement(patch.node!.type, patch.node!.props, ...patch.node!.children);
                     break;
-                case 'UPDATE':
+                }
+                case 'UPDATE': {
                     // Update properties
                     break;
-                case 'DELETE':
+                }
+                case 'DELETE': {
                     // Remove element
                     break;
-                case 'REPLACE':
+                }
+                case 'REPLACE': {
                     // Replace element
                     break;
-                case 'REORDER':
+                }
+                case 'REORDER': {
                     // Reorder children
                     break;
+                }
             }
         });
     }
@@ -156,7 +161,7 @@ class MockVirtualDOM {
 
     private optimizeNode(vnode: VNode): VNode {
         // Flatten unnecessary wrapper elements
-        if (vnode.type === 'div' && vnode.children.length === 1 && !Object.keys(vnode.props).length) {
+        if (vnode.type === 'div' && vnode.children.length === 1 && Object.keys(vnode.props).length === 0) {
             return this.optimizeNode(vnode.children[0]);
         }
         
@@ -278,7 +283,7 @@ describe("Virtual DOM Operations Performance", () => {
     bench("create simple element", () => {
         vdom = new MockVirtualDOM();
         vdom.createElement('div', { className: 'simple' });
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("create nested elements", () => {
         vdom = new MockVirtualDOM();

@@ -166,7 +166,7 @@ describe("ServiceContainer - Factory Bypass Test", () => {
         console.log("🧪 Testing SiteManager creation");
 
         const siteManager = container.getSiteManager();
-        console.log("🎯 SiteManager created:", !!siteManager);
+        console.log("🎯 SiteManager created:", Boolean(siteManager));
 
         expect(siteManager).toBeDefined();
         expect(siteManager.initialize).toBeDefined();
@@ -178,11 +178,11 @@ describe("ServiceContainer - Factory Bypass Test", () => {
 
         // First create SiteManager
         const siteManager = container.getSiteManager();
-        console.log("🎯 SiteManager created:", !!siteManager);
+        console.log("🎯 SiteManager created:", Boolean(siteManager));
 
         // Then create MonitorManager - this should NOT fail because EnhancedMonitoringServiceFactory is mocked
         const monitorManager = container.getMonitorManager();
-        console.log("🎯 MonitorManager created:", !!monitorManager);
+        console.log("🎯 MonitorManager created:", Boolean(monitorManager));
 
         expect(siteManager).toBeDefined();
         expect(monitorManager).toBeDefined();

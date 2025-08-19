@@ -1,4 +1,4 @@
-/* eslint-disable max-lines, no-magic-numbers, no-inline-comments */
+ 
 /**
  * Commitlint configuration for Uptime Watcher
  *
@@ -138,7 +138,7 @@ export default {
                         emoji: "🧹",
                         title: "Chores",
                     },
-                    // eslint-disable-next-line sort-keys -- broken with emojii
+                     
                     "🚜 [refactor]": {
                         description:
                             "A code change that neither fixes a bug nor adds a feature",

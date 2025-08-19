@@ -149,7 +149,7 @@ type ErrorType = "network" | "timeout" | "dns" | "ssl" | "http" | "content" | "r
 
 // Mock Site Checker Implementation
 class MockSiteChecker {
-  private checkers: Map<string, SiteCheckerInstance> = new Map();
+  private checkers = new Map<string, SiteCheckerInstance>();
   private networkSimulator = new NetworkSimulator();
   private dnsResolver = new MockDNSResolver();
   private sslValidator = new MockSSLValidator();
@@ -468,7 +468,7 @@ class MockSiteChecker {
       status: validationResult.isValid ? "success" : "failure",
       httpStatus: response.status,
       headers: response.headers,
-      body: content.substring(0, 1000), // Limit body size
+      body: content.slice(0, 1000), // Limit body size
       contentLength: response.contentLength,
       metrics,
       certificates,
@@ -520,7 +520,7 @@ class MockSiteChecker {
 
     // Additional validations based on check type
     switch (request.checkType) {
-      case "performance":
+      case "performance": {
         if (response.responseTime > request.metadata.alertThresholds.responseTime) {
           return {
             isValid: false,
@@ -530,10 +530,12 @@ class MockSiteChecker {
           };
         }
         break;
+      }
 
-      case "ssl":
+      case "ssl": {
         // SSL-specific validations would go here
         break;
+      }
     }
 
     return { isValid: true };
@@ -555,7 +557,7 @@ class MockSiteChecker {
 
   private calculateRetryDelay(strategy: RetryStrategy, attempt: number): number {
     const baseDelay = strategy.baseDelay;
-    const backoffDelay = baseDelay * Math.pow(strategy.backoffMultiplier, attempt - 1);
+    const backoffDelay = baseDelay * strategy.backoffMultiplier**(attempt - 1);
     const jitter = Math.random() * strategy.jitterFactor * backoffDelay;
     
     return Math.min(backoffDelay + jitter, strategy.maxDelay);
@@ -589,7 +591,7 @@ class MockSiteChecker {
     if (!breaker) {
       breaker = new CircuitBreaker({
         failureThreshold: 5,
-        recoveryTimeout: 30000,
+        recoveryTimeout: 30_000,
         halfOpenMaxCalls: 3,
         successThreshold: 2,
       });
@@ -803,14 +805,14 @@ class NetworkSimulator {
         contentLength: 100,
         redirectChain: [],
       };
-    } else {
+    } 
       // Timeout
       throw new Error("Request timeout");
-    }
+    
   }
 
   async downloadContent(contentLength: number): Promise<string> {
-    const downloadTime = contentLength / 10000; // Simulate download based on size
+    const downloadTime = contentLength / 10_000; // Simulate download based on size
     await this.delay(downloadTime);
     
     return "<!DOCTYPE html><html><head><title>Test Site</title></head><body>".repeat(
@@ -1031,7 +1033,7 @@ describe("Site Checking Algorithms Performance", () => {
         successRate: 0.95,
         alertThresholds: {
           responseTime: 2000,
-          downtime: 30000,
+          downtime: 30_000,
           errorRate: 0.1,
           consecutiveFailures: 3,
         },
@@ -1088,7 +1090,7 @@ describe("Site Checking Algorithms Performance", () => {
         successRate: 0.92 + Math.random() * 0.07,
         alertThresholds: {
           responseTime: 1500,
-          downtime: 15000,
+          downtime: 15_000,
           errorRate: 0.05,
           consecutiveFailures: 2,
         },
@@ -1118,7 +1120,7 @@ describe("Site Checking Algorithms Performance", () => {
       },
       circuitBreaker: {
         failureThreshold: 5,
-        recoveryTimeout: 30000,
+        recoveryTimeout: 30_000,
         halfOpenMaxCalls: 3,
         successThreshold: 2,
       },
@@ -1144,7 +1146,7 @@ describe("Site Checking Algorithms Performance", () => {
         successRate: index % 5 === 0 ? 0.7 : 0.95, // Unreliable sites have lower success rate
         alertThresholds: {
           responseTime: 3000,
-          downtime: 60000,
+          downtime: 60_000,
           errorRate: 0.15,
           consecutiveFailures: 4,
         },
@@ -1202,7 +1204,7 @@ describe("Site Checking Algorithms Performance", () => {
             successRate: 0.98,
             alertThresholds: {
               responseTime: 1000,
-              downtime: 10000,
+              downtime: 10_000,
               errorRate: 0.02,
               consecutiveFailures: 2,
             },
@@ -1265,7 +1267,7 @@ describe("Site Checking Algorithms Performance", () => {
     }));
 
     // Simulate 10 seconds of continuous monitoring with 2-second intervals
-    checker.startContinuousMonitoring(checkerId, requests, 2000, 10000);
+    checker.startContinuousMonitoring(checkerId, requests, 2000, 10_000);
     checker.reset();
   });
 
@@ -1306,7 +1308,7 @@ describe("Site Checking Algorithms Performance", () => {
         successRate: 0.99,
         alertThresholds: {
           responseTime: 5000,
-          downtime: 30000,
+          downtime: 30_000,
           errorRate: 0.02,
           consecutiveFailures: 2,
         },
@@ -1345,7 +1347,7 @@ describe("Site Checking Algorithms Performance", () => {
       const priority = priorities[index % priorities.length];
       const timeoutMultiplier = priority === "critical" ? 1.5 : 
                                priority === "high" ? 1.2 : 
-                               priority === "normal" ? 1.0 : 0.8;
+                               priority === "normal" ? 1 : 0.8;
       
       return {
         id: `priority-${priority}-${index}`,
@@ -1374,8 +1376,8 @@ describe("Site Checking Algorithms Performance", () => {
                          priority === "high" ? 1000 : 
                          priority === "normal" ? 2000 : 3000,
             downtime: priority === "critical" ? 5000 : 
-                     priority === "high" ? 15000 : 
-                     priority === "normal" ? 30000 : 60000,
+                     priority === "high" ? 15_000 : 
+                     priority === "normal" ? 30_000 : 60_000,
             errorRate: priority === "critical" ? 0.001 : 
                       priority === "high" ? 0.005 : 
                       priority === "normal" ? 0.01 : 0.05,
@@ -1435,7 +1437,7 @@ describe("Site Checking Algorithms Performance", () => {
           successRate: 0.95 + checkerIndex * 0.01,
           alertThresholds: {
             responseTime: 2000,
-            downtime: 20000,
+            downtime: 20_000,
             errorRate: 0.05,
             consecutiveFailures: 3,
           },

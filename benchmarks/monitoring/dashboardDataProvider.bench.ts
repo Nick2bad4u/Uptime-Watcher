@@ -27,7 +27,7 @@ class MockDashboardDataProvider {
             id: `site-${i}`,
             name: `Site ${i}`,
             status: ['online', 'offline', 'degraded'][i % 3],
-            lastChecked: Date.now() - Math.random() * 3600000
+            lastChecked: Date.now() - Math.random() * 3_600_000
         }));
 
         this.monitors = Array.from({ length: 300 }, (_, i) => ({
@@ -38,10 +38,10 @@ class MockDashboardDataProvider {
             responseTime: Math.random() * 1000
         }));
 
-        this.history = Array.from({ length: 10000 }, (_, i) => ({
+        this.history = Array.from({ length: 10_000 }, (_, i) => ({
             id: `history-${i}`,
             monitorId: `monitor-${i % 300}`,
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             status: ['online', 'offline'][i % 2],
             responseTime: Math.random() * 1000
         }));

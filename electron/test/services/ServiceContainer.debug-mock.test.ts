@@ -124,7 +124,7 @@ describe("ServiceContainer - Debug Mock Test", () => {
         console.log("Creating SiteManager...");
         const siteManager = serviceContainer.getSiteManager();
 
-        console.log("SiteManager created successfully:", !!siteManager);
+        console.log("SiteManager created successfully:", Boolean(siteManager));
         expect(siteManager).toBeDefined();
     });
 });

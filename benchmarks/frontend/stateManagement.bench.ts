@@ -28,8 +28,8 @@ interface StateSlice {
 interface StateStore {
   slices: Record<string, StateSlice>;
   actions: StateAction[];
-  middleware: Array<(action: StateAction) => StateAction>;
-  subscriptions: Record<string, Array<(state: any) => void>>;
+  middleware: ((action: StateAction) => StateAction)[];
+  subscriptions: Record<string, ((state: any) => void)[]>;
   history: StateAction[];
   maxHistorySize: number;
 }
@@ -63,8 +63,8 @@ interface BatchUpdate {
 // Mock state management system
 class MockStateManager {
   private store: StateStore;
-  private selectors: Map<string, StateSelector<any>> = new Map();
-  private computedCache: Map<string, { value: any; timestamp: number }> = new Map();
+  private selectors = new Map<string, StateSelector<any>>();
+  private computedCache = new Map<string, { value: any; timestamp: number }>();
 
   constructor() {
     this.store = {
@@ -157,34 +157,39 @@ class MockStateManager {
     let totalStateSize = 0;
 
     switch (action.type) {
-      case "SET_USER":
+      case "SET_USER": {
         this.updateSlice("user", () => action.payload);
         affectedSlices.push("user");
         break;
+      }
       
-      case "ADD_ITEM":
+      case "ADD_ITEM": {
         this.updateSlice("items", (items) => [...items, action.payload]);
         affectedSlices.push("items");
         break;
+      }
       
-      case "REMOVE_ITEM":
+      case "REMOVE_ITEM": {
         this.updateSlice("items", (items) => 
           items.filter((item: any) => item.id !== action.payload.id)
         );
         affectedSlices.push("items");
         break;
+      }
       
-      case "UPDATE_SETTINGS":
+      case "UPDATE_SETTINGS": {
         this.updateSlice("settings", (settings) => ({ ...settings, ...action.payload }));
         affectedSlices.push("settings");
         break;
+      }
       
-      case "RESET_ALL":
+      case "RESET_ALL": {
         Object.keys(this.store.slices).forEach(sliceId => {
           this.updateSlice(sliceId, () => ({}));
           affectedSlices.push(sliceId);
         });
         break;
+      }
     }
 
     // Calculate total state size
@@ -271,7 +276,7 @@ class MockStateManager {
     return () => {
       const callbacks = this.store.subscriptions[sliceId];
       const index = callbacks.indexOf(callback);
-      if (index > -1) {
+      if (index !== -1) {
         callbacks.splice(index, 1);
       }
     };
@@ -377,7 +382,7 @@ describe("React State Management Performance", () => {
       Array.from({ length: 200 }, (_, i) => ({
         key: `cache-key-${i}`,
         value: `cache-value-${i}`,
-        expiry: Date.now() + Math.random() * 3600000,
+        expiry: Date.now() + Math.random() * 3_600_000,
       }))
     );
   });
@@ -433,7 +438,7 @@ describe("React State Management Performance", () => {
         name: `User ${i}`,
         age: 20 + Math.floor(Math.random() * 40),
         department: `dept-${i % 10}`,
-        salary: 30000 + Math.random() * 70000,
+        salary: 30_000 + Math.random() * 70_000,
         active: Math.random() > 0.2,
       }))
     );
@@ -442,7 +447,7 @@ describe("React State Management Performance", () => {
       Array.from({ length: 50 }, (_, i) => ({
         id: `project-${i}`,
         name: `Project ${i}`,
-        budget: Math.random() * 100000,
+        budget: Math.random() * 100_000,
         assignees: Array.from({ length: Math.floor(Math.random() * 10) }, 
           (_, j) => `user-${j}`
         ),
@@ -522,7 +527,7 @@ describe("React State Management Performance", () => {
     const stateManager = new MockStateManager();
     stateManager.createSlice("notifications", "Notifications", []);
     
-    const unsubscribeFunctions: Array<() => void> = [];
+    const unsubscribeFunctions: (() => void)[] = [];
     
     // Create many subscribers
     for (let i = 0; i < 200; i++) {
@@ -652,7 +657,7 @@ describe("React State Management Performance", () => {
         Object.keys(stats).forEach(category => {
           const categoryStats = stats[category];
           categoryStats.avgPrice = categoryStats.totalValue / categoryStats.count;
-          categoryStats.avgRating = categoryStats.avgRating / categoryStats.count;
+          categoryStats.avgRating /= categoryStats.count;
           categoryStats.stockPercentage = (categoryStats.inStockCount / categoryStats.count) * 100;
         });
         
@@ -739,16 +744,14 @@ describe("React State Management Performance", () => {
       },
       
       // Transformation middleware
-      (action: StateAction) => {
-        return {
+      (action: StateAction) => ({
           ...action,
           meta: {
             ...action.meta,
             processed: true,
             middlewareTimestamp: Date.now(),
           },
-        };
-      },
+        }),
       
       // Analytics middleware
       (action: StateAction) => {

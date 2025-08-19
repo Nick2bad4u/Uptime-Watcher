@@ -55,21 +55,17 @@ const mockIsMonitoring = vi.fn(() => false);
 const mockRestartMonitor = vi.fn(() => true);
 
 // Mock MonitorScheduler
-vi.mock("../../services/monitoring/MonitorScheduler", () => {
-    return {
+vi.mock("../../services/monitoring/MonitorScheduler", () => ({
         MonitorScheduler: vi.fn(() => ({
             setCheckCallback: mockSetCheckCallback,
             getActiveCount: mockGetActiveCount,
             isMonitoring: mockIsMonitoring,
             restartMonitor: mockRestartMonitor,
         })),
-    };
-});
+    }));
 
 vi.mock("../../utils/operationalHooks", () => ({
-    withDatabaseOperation: vi.fn(async (operation) => {
-        return await operation();
-    }),
+    withDatabaseOperation: vi.fn(async (operation) => await operation()),
 }));
 
 describe("MonitorManager - Comprehensive Coverage", () => {

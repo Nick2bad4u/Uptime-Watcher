@@ -915,7 +915,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.get("key2");
             cache.get("nonexistent");
 
-            let stats = cache.getStats();
+            const stats = cache.getStats();
             expect(stats.hits).toBe(2);
             expect(stats.misses).toBe(1);
             expect(stats.size).toBe(3);

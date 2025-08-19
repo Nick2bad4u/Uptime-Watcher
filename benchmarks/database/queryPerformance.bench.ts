@@ -64,8 +64,8 @@ describe("Database Query Performance Benchmarks", () => {
   const tableConfigs = [
     { name: 'sites', baseRows: 1000, avgRowSize: 512 },
     { name: 'monitors', baseRows: 5000, avgRowSize: 256 },
-    { name: 'monitor_results', baseRows: 100000, avgRowSize: 128 },
-    { name: 'alerts', baseRows: 10000, avgRowSize: 384 },
+    { name: 'monitor_results', baseRows: 100_000, avgRowSize: 128 },
+    { name: 'alerts', baseRows: 10_000, avgRowSize: 384 },
     { name: 'configurations', baseRows: 100, avgRowSize: 1024 },
   ];
 
@@ -277,7 +277,7 @@ describe("Database Query Performance Benchmarks", () => {
         'low': 1.1,
         'medium': 1.5,
         'high': 2.2,
-      }[scenario.indexMaintenanceLoad] ?? 1.0;
+      }[scenario.indexMaintenanceLoad] ?? 1;
       
       baseExecutionTime *= indexMaintenanceFactor;
       
@@ -290,7 +290,7 @@ describe("Database Query Performance Benchmarks", () => {
       // Determine success based on constraints and data integrity
       let successRate = 0.98;
       if (scenario.hasConstraints && scenario.batchSize > 500) {
-        successRate = 0.90; // Higher chance of constraint violations in large batches
+        successRate = 0.9; // Higher chance of constraint violations in large batches
       } else if (scenario.hasConstraints) {
         successRate = 0.94;
       }
@@ -386,7 +386,7 @@ describe("Database Query Performance Benchmarks", () => {
       },
       {
         name: 'full-table-update',
-        whereSelectivity: 1.0, // Updates entire table
+        whereSelectivity: 1, // Updates entire table
         fieldCount: 1,
         hasComplexWhere: false,
         affectsIndexes: false,
@@ -544,7 +544,7 @@ describe("Database Query Performance Benchmarks", () => {
       
       // Trigger execution impact
       if (scenario.hasTriggers) {
-        baseExecutionTime += affectedRows * 1.0; // 1ms per row for trigger execution
+        baseExecutionTime += affectedRows * 1; // 1ms per row for trigger execution
       }
       
       // Add variance
@@ -566,7 +566,7 @@ describe("Database Query Performance Benchmarks", () => {
       const memoryUsage = affectedRows * table.avgRowSize + // Row data for deletion
         (scenario.cascadeDeletes ? affectedRows * table.avgRowSize * 2 : 0) + // Cascade data
         (scenario.hasTriggers ? affectedRows * 150 : 0) + // Trigger execution memory
-        (!scenario.softDelete ? affectedRows * 50 : 0); // Physical deletion overhead
+        (scenario.softDelete ? 0 : affectedRows * 50); // Physical deletion overhead
       
       const deleteOperation: QueryOperation = {
         operationId: `delete-${i}`,
@@ -659,35 +659,43 @@ describe("Database Query Performance Benchmarks", () => {
       }
       
       // Calculate optimization impact
-      let optimizationFactor = 1.0;
+      let optimizationFactor = 1;
       let optimizedTime = originalTime;
       
       for (const technique of appliedTechniques) {
         switch (technique) {
-          case 'index-hint':
+          case 'index-hint': {
             optimizationFactor *= 0.3; // 70% improvement
             break;
-          case 'join-reordering':
+          }
+          case 'join-reordering': {
             optimizationFactor *= 0.6; // 40% improvement
             break;
-          case 'subquery-optimization':
+          }
+          case 'subquery-optimization': {
             optimizationFactor *= 0.4; // 60% improvement
             break;
-          case 'predicate-pushdown':
+          }
+          case 'predicate-pushdown': {
             optimizationFactor *= 0.7; // 30% improvement
             break;
-          case 'query-rewrite':
+          }
+          case 'query-rewrite': {
             optimizationFactor *= 0.5; // 50% improvement
             break;
-          case 'materialized-views':
+          }
+          case 'materialized-views': {
             optimizationFactor *= 0.2; // 80% improvement
             break;
-          case 'partition-pruning':
+          }
+          case 'partition-pruning': {
             optimizationFactor *= 0.8; // 20% improvement
             break;
-          case 'parallel-execution':
+          }
+          case 'parallel-execution': {
             optimizationFactor *= 0.6; // 40% improvement
             break;
+          }
         }
       }
       

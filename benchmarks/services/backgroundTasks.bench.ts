@@ -101,8 +101,8 @@ interface RetryPolicy {
 }
 
 class MockTaskQueue {
-    private tasks: Map<string, Task> = new Map();
-    private results: Map<string, TaskResult> = new Map();
+    private tasks = new Map<string, Task>();
+    private results = new Map<string, TaskResult>();
     private nextId = 1;
 
     async enqueue(taskType: string, payload: any, options?: {
@@ -116,7 +116,7 @@ class MockTaskQueue {
         const opts = {
             priority: 'normal' as const,
             scheduledAt: new Date(),
-            timeout: 30000,
+            timeout: 30_000,
             maxAttempts: 3,
             tags: [],
             metadata: {},
@@ -231,8 +231,8 @@ class MockTaskQueue {
             task.status = 'retrying';
             // Exponential backoff
             const delay = Math.min(
-                task.retryDelay * Math.pow(2, task.attempts - 1),
-                30000 // Max 30 seconds
+                task.retryDelay * 2**(task.attempts - 1),
+                30_000 // Max 30 seconds
             );
             task.scheduledAt = new Date(now.getTime() + delay);
         }
@@ -312,8 +312,8 @@ class MockTaskQueue {
 }
 
 class MockWorkerPool {
-    private workers: Map<string, Worker> = new Map();
-    private activeWorkers: Set<string> = new Set();
+    private workers = new Map<string, Worker>();
+    private activeWorkers = new Set<string>();
     private nextId = 1;
 
     createWorker(name: string, capabilities: string[], maxConcurrency: number = 1): Worker {
@@ -422,7 +422,7 @@ class MockWorkerPool {
 }
 
 class MockScheduler {
-    private jobs: Map<string, ScheduledJob> = new Map();
+    private jobs = new Map<string, ScheduledJob>();
     private nextId = 1;
 
     createJob(name: string, cronExpression: string, taskType: string, payload: any, metadata?: Record<string, any>): ScheduledJob {
@@ -478,9 +478,9 @@ class MockScheduler {
             return new Date(now + 60 * 60 * 1000);
         } else if (cronExpression.includes('0 0 * * *')) { // Daily
             return new Date(now + 24 * 60 * 60 * 1000);
-        } else {
+        } 
             return new Date(now + 5 * 60 * 1000); // Default: 5 minutes
-        }
+        
     }
 
     enableJob(jobId: string): boolean {
@@ -515,7 +515,7 @@ class MockBackgroundTaskService {
     private queue: MockTaskQueue;
     private workerPool: MockWorkerPool;
     private scheduler: MockScheduler;
-    private processors: Map<string, TaskProcessor> = new Map();
+    private processors = new Map<string, TaskProcessor>();
     private isProcessing = false;
     private processingInterval?: NodeJS.Timeout;
 
@@ -535,11 +535,11 @@ class MockBackgroundTaskService {
         return await this.queue.enqueue(taskType, payload, options);
     }
 
-    async submitBulkTasks(tasks: Array<{
+    async submitBulkTasks(tasks: {
         type: string;
         payload: any;
         options?: any;
-    }>): Promise<string[]> {
+    }[]): Promise<string[]> {
         const taskIds: string[] = [];
         
         for (const task of tasks) {
@@ -561,12 +561,12 @@ class MockBackgroundTaskService {
         const processor: TaskProcessor = {
             type,
             handler,
-            timeout: options?.timeout || 30000,
+            timeout: options?.timeout || 30_000,
             retryPolicy: {
                 maxAttempts: 3,
                 delay: 1000,
                 backoffMultiplier: 2,
-                maxDelay: 30000,
+                maxDelay: 30_000,
                 ...options?.retryPolicy
             }
         };
@@ -675,7 +675,7 @@ class MockBackgroundTaskService {
                 });
                 
                 await this.scheduler.markJobExecuted(job.id, true);
-            } catch (error) {
+            } catch {
                 await this.scheduler.markJobExecuted(job.id, false);
             }
         }
@@ -717,11 +717,11 @@ class MockBackgroundTaskService {
 }
 
 // Helper functions for creating test data
-function createTestTasks(count: number, types: string[] = ['email', 'notification', 'backup']): Array<{
+function createTestTasks(count: number, types: string[] = ['email', 'notification', 'backup']): {
     type: string;
     payload: any;
     options?: any;
-}> {
+}[] {
     return Array.from({ length: count }, (_, i) => {
         const type = types[i % types.length];
         return {

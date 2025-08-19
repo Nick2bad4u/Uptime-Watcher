@@ -79,7 +79,7 @@ class MockHistoryRepository {
     private initialize() {
         // Seed with test data
         const now = Date.now();
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < 10_000; i++) {
             this.logEvent({
                 siteId: (i % 100) + 1,
                 monitorId: (i % 1000) + 1,
@@ -90,7 +90,7 @@ class MockHistoryRepository {
                     responseTime: Math.floor(Math.random() * 1000),
                     statusCode: [200, 404, 500, 503][i % 4]
                 }),
-                timestamp: now - (i * 60000) // 1 minute intervals
+                timestamp: now - (i * 60_000) // 1 minute intervals
             });
         }
     }
@@ -217,8 +217,8 @@ describe("History Repository Performance", () => {
 
     bench("find record by id", () => {
         repository = new MockHistoryRepository();
-        repository.findById(Math.floor(Math.random() * 10000) + 1);
-    }, { warmupIterations: 5, iterations: 10000 });
+        repository.findById(Math.floor(Math.random() * 10_000) + 1);
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("find recent records", () => {
         repository = new MockHistoryRepository();

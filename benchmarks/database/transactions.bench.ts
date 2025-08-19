@@ -37,23 +37,32 @@ class MockDatabase {
                 const source = this.inTransaction ? this.transactionData : this.data;
                 return source.find(r => r.params[0] === params[0]) || null;
             },
-            all: () => {
-                return this.inTransaction ? this.transactionData : this.data;
-            }
+            all: () => this.inTransaction ? this.transactionData : this.data
         };
     }
 
     exec(sql: string) {
-        if (sql === 'BEGIN TRANSACTION') {
+        switch (sql) {
+        case 'BEGIN TRANSACTION': {
             this.inTransaction = true;
             this.transactionData = [];
-        } else if (sql === 'COMMIT') {
+        
+        break;
+        }
+        case 'COMMIT': {
             this.data.push(...this.transactionData);
             this.inTransaction = false;
             this.transactionData = [];
-        } else if (sql === 'ROLLBACK') {
+        
+        break;
+        }
+        case 'ROLLBACK': {
             this.inTransaction = false;
             this.transactionData = [];
+        
+        break;
+        }
+        // No default
         }
         return this;
     }
@@ -102,7 +111,7 @@ class MockTransactionManager {
                     throw lastError;
                 }
                 // Simulate retry delay
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 10));
+                await new Promise(resolve => setTimeout(resolve, 2**attempt * 10));
             }
         }
         
@@ -116,7 +125,7 @@ class MockTransactionManager {
         });
     }
 
-    bulkUpdate(updates: Array<{ id: number; data: any }>) {
+    bulkUpdate(updates: { id: number; data: any }[]) {
         return this.executeTransaction(() => {
             const stmt = this.db.prepare('UPDATE test SET data = ? WHERE id = ?');
             return updates.map(update => stmt.run(JSON.stringify(update.data), update.id));

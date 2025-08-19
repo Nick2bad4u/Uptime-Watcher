@@ -32,9 +32,9 @@ interface SubscriptionGroup {
 }
 
 class MockEventSubscriptionManager {
-    private subscriptions: Map<string, EventSubscription> = new Map();
-    private subscriptionsByType: Map<string, Set<string>> = new Map();
-    private subscriptionGroups: Map<string, SubscriptionGroup> = new Map();
+    private subscriptions = new Map<string, EventSubscription>();
+    private subscriptionsByType = new Map<string, Set<string>>();
+    private subscriptionGroups = new Map<string, SubscriptionGroup>();
     private subscriptionCounter = 0;
     private metrics = {
         totalSubscriptions: 0,
@@ -152,11 +152,9 @@ class MockEventSubscriptionManager {
         const activeSubscriptions: EventSubscription[] = [];
         for (const subscriptionId of subscriptionIds) {
             const subscription = this.subscriptions.get(subscriptionId);
-            if (subscription && this.isSubscriptionActive(subscription)) {
-                if (!subscription.filter || subscription.filter(payload)) {
+            if (subscription && this.isSubscriptionActive(subscription) && (!subscription.filter || subscription.filter(payload))) {
                     activeSubscriptions.push(subscription);
                 }
-            }
         }
         
         // Sort by priority (higher first)

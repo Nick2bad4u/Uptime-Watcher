@@ -437,9 +437,7 @@ describe("Settings Component Coverage Tests", () => {
 
     describe("Callbacks", () => {
         it("should handle useCallback optimization", () => {
-            const useCallback = (fn: Function, _deps: any[]) => {
-                return fn;
-            };
+            const useCallback = (fn: Function, _deps: any[]) => fn;
 
             const clearButtonLoading = useCallback(() => {}, []);
             const showButtonLoadingCallback = useCallback(() => {}, []);

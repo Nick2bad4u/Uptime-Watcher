@@ -124,7 +124,7 @@ vi.mock("path", async () => {
     return {
         ...actual,
         join: vi.fn((...args) => args.join("/")),
-        resolve: vi.fn((...args) => "/" + args.join("/")),
+        resolve: vi.fn((...args) => `/${  args.join("/")}`),
     };
 });
 
@@ -170,8 +170,7 @@ vi.mock("../utils/logger", () => ({
 
 // Mock MonitorScheduler
 vi.mock("../services/monitoring/MonitorScheduler", () => ({
-    MonitorScheduler: vi.fn(() => {
-        return {
+    MonitorScheduler: vi.fn(() => ({
             // Private properties accessed by tests
             intervals: new Map(),
             onCheckCallback: undefined,
@@ -265,8 +264,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             getActiveMonitors: vi.fn(function (this: any) {
                 return [...this.intervals.keys()];
             }),
-        };
-    }),
+        })),
 }));
 
 // Mock MonitoringService

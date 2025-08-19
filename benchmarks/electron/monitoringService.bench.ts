@@ -87,21 +87,26 @@ describe("Monitoring Service Benchmarks", () => {
         let baseExecutionTime: number;
         switch (monitorExecution.type) {
           case 'HTTP':
-          case 'HTTPS':
+          case 'HTTPS': {
             baseExecutionTime = Math.random() * 5000 + 500; // 500ms - 5.5s
             break;
-          case 'PING':
+          }
+          case 'PING': {
             baseExecutionTime = Math.random() * 1000 + 100; // 100ms - 1.1s
             break;
-          case 'DNS':
+          }
+          case 'DNS': {
             baseExecutionTime = Math.random() * 2000 + 200; // 200ms - 2.2s
             break;
+          }
           case 'TCP':
-          case 'UDP':
+          case 'UDP': {
             baseExecutionTime = Math.random() * 3000 + 300; // 300ms - 3.3s
             break;
-          default:
+          }
+          default: {
             baseExecutionTime = Math.random() * 1000 + 500;
+          }
         }
         
         // Add jitter and potential timeouts
@@ -140,7 +145,7 @@ describe("Monitoring Service Benchmarks", () => {
       siteId: `sched-site-${i % 100}`,
       type: monitorTypes[Math.floor(Math.random() * monitorTypes.length)],
       interval: [30, 60, 300, 600, 3600][Math.floor(Math.random() * 5)] * 1000, // 30s to 1h
-      nextRun: Date.now() + Math.random() * 60000, // Next run within 1 minute
+      nextRun: Date.now() + Math.random() * 60_000, // Next run within 1 minute
       priority: Math.floor(Math.random() * 10) + 1, // 1-10 priority
       enabled: i % 8 !== 0, // 87.5% enabled
     }));
@@ -203,7 +208,7 @@ describe("Monitoring Service Benchmarks", () => {
         currentStatus = otherStatuses[Math.floor(Math.random() * otherStatuses.length)];
       }
       
-      const statusDuration = Math.random() * 300000 + 60000; // 1-6 minutes
+      const statusDuration = Math.random() * 300_000 + 60_000; // 1-6 minutes
       const isSignificantChange = (previousStatus === 'UP' && currentStatus === 'DOWN') ||
                                  (previousStatus === 'DOWN' && currentStatus === 'UP');
       
@@ -212,7 +217,7 @@ describe("Monitoring Service Benchmarks", () => {
         monitorId,
         previousStatus,
         currentStatus,
-        timestamp: Date.now() - Math.random() * 86400000, // Within last 24 hours
+        timestamp: Date.now() - Math.random() * 86_400_000, // Within last 24 hours
         duration: statusDuration,
         alertGenerated: isSignificantChange && Math.random() > 0.2, // 80% alert generation for significant changes
       };
@@ -240,7 +245,7 @@ describe("Monitoring Service Benchmarks", () => {
         type: 'http',
         config: {
           url: 'https://example.com',
-          timeout: 30000,
+          timeout: 30_000,
         },
       },
       {
@@ -257,7 +262,7 @@ describe("Monitoring Service Benchmarks", () => {
           hostname: 'example.com',
           recordType: 'A',
           nameserver: '8.8.8.8',
-          timeout: 10000,
+          timeout: 10_000,
         },
       },
       {
@@ -265,7 +270,7 @@ describe("Monitoring Service Benchmarks", () => {
         config: {
           host: 'example.com',
           port: 80,
-          timeout: 15000,
+          timeout: 15_000,
         },
       },
     ];
@@ -290,17 +295,18 @@ describe("Monitoring Service Benchmarks", () => {
       
       // Type-specific validation
       switch (monitorConfig.type) {
-        case 'http':
+        case 'http': {
           if (!monitorConfig.config.url || !monitorConfig.config.url.startsWith('http')) {
             isValid = false;
             validationErrors.push('Invalid URL');
           }
-          if (monitorConfig.config.timeout && (monitorConfig.config.timeout < 1000 || monitorConfig.config.timeout > 60000)) {
+          if (monitorConfig.config.timeout && (monitorConfig.config.timeout < 1000 || monitorConfig.config.timeout > 60_000)) {
             isValid = false;
             validationErrors.push('Invalid timeout range');
           }
           break;
-        case 'ping':
+        }
+        case 'ping': {
           if (!monitorConfig.config.host) {
             isValid = false;
             validationErrors.push('Host required');
@@ -310,7 +316,8 @@ describe("Monitoring Service Benchmarks", () => {
             validationErrors.push('Invalid packet count');
           }
           break;
-        case 'dns':
+        }
+        case 'dns': {
           if (!monitorConfig.config.hostname) {
             isValid = false;
             validationErrors.push('Hostname required');
@@ -320,12 +327,14 @@ describe("Monitoring Service Benchmarks", () => {
             validationErrors.push('Invalid record type');
           }
           break;
-        case 'port':
-          if (monitorConfig.config.port && (monitorConfig.config.port < 1 || monitorConfig.config.port > 65535)) {
+        }
+        case 'port': {
+          if (monitorConfig.config.port && (monitorConfig.config.port < 1 || monitorConfig.config.port > 65_535)) {
             isValid = false;
             validationErrors.push('Invalid port range');
           }
           break;
+        }
       }
       
       const validationTime = Date.now() - validationStartTime + Math.random() * 3;
@@ -427,18 +436,22 @@ describe("Monitoring Service Benchmarks", () => {
         let siteTime = 0;
         
         switch (coordination.operationType) {
-          case 'start_all':
+          case 'start_all': {
             siteTime = siteOperation.monitors * (Math.random() * 3 + 2);
             break;
-          case 'stop_all':
+          }
+          case 'stop_all': {
             siteTime = siteOperation.monitors * (Math.random() * 1 + 0.5);
             break;
-          case 'restart_site':
+          }
+          case 'restart_site': {
             siteTime = siteOperation.monitors * (Math.random() * 4 + 3);
             break;
-          case 'health_check':
+          }
+          case 'health_check': {
             siteTime = siteOperation.monitors * (Math.random() * 2 + 1);
             break;
+          }
         }
         
         totalTime += siteTime;
@@ -563,17 +576,21 @@ describe("Monitoring Service Benchmarks", () => {
           // Calculate retry delay based on strategy
           let retryDelay: number;
           switch (errorScenario.retryStrategy) {
-            case 'exponential':
-              retryDelay = Math.pow(2, retry) * 1000; // 1s, 2s, 4s, etc.
+            case 'exponential': {
+              retryDelay = 2**retry * 1000; // 1s, 2s, 4s, etc.
               break;
-            case 'linear':
+            }
+            case 'linear': {
               retryDelay = (retry + 1) * 1000; // 1s, 2s, 3s, etc.
               break;
-            case 'immediate':
+            }
+            case 'immediate': {
               retryDelay = 100; // Immediate retry with minimal delay
               break;
-            default:
+            }
+            default: {
               retryDelay = 1000;
+            }
           }
           
           totalRetryTime += retryDelay;

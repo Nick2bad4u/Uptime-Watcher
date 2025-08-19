@@ -26,7 +26,7 @@ interface ComponentProps {
 }
 
 class MockReactRenderer {
-    private componentInstances: Map<string, any> = new Map();
+    private componentInstances = new Map<string, any>();
     private renderCount = 0;
     private updateCount = 0;
 
@@ -321,7 +321,7 @@ describe("React Component Rendering Performance", () => {
     bench("create simple element", () => {
         renderer = new MockReactRenderer();
         renderer.createElement('div', { className: 'test' });
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("render simple DOM element", () => {
         renderer = new MockReactRenderer();
@@ -386,7 +386,7 @@ describe("React Component Rendering Performance", () => {
             name: `Site ${i}`,
             status: ['online', 'offline'][i % 2],
             responseTime: Math.random() * 1000,
-            lastCheck: Date.now() - Math.random() * 3600000
+            lastCheck: Date.now() - Math.random() * 3_600_000
         }));
         const element = renderer.createElement(MockSiteList, { sites: sitesData });
         renderer.render(element);
@@ -426,7 +426,7 @@ describe("React Component Rendering Performance", () => {
                 id: `activity-${i}`,
                 siteName: `Site ${i}`,
                 status: 'status changed',
-                timestamp: Date.now() - i * 60000
+                timestamp: Date.now() - i * 60_000
             }))
         };
         const element = renderer.createElement(MockDashboard, dashboardData);

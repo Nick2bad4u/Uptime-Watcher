@@ -89,7 +89,7 @@ vi.mock("../components/Settings/Settings", () => ({
 }));
 
 // Mock the actual stores
-let mockUpdatesStoreState = {
+const mockUpdatesStoreState = {
     updateStatus: "idle" as any,
     updateError: undefined as string | undefined,
     setUpdateStatus: vi.fn(),
@@ -99,7 +99,7 @@ let mockUpdatesStoreState = {
     subscribeToStatusUpdates: vi.fn(),
 };
 
-let mockSitesStoreState = {
+const mockSitesStoreState = {
     sites: [
         {
             id: "1",
@@ -150,7 +150,7 @@ let mockSitesStoreState = {
     setSelectedMonitorId: vi.fn(),
 };
 
-let mockErrorStoreState = {
+const mockErrorStoreState = {
     isLoading: false,
     lastError: undefined as string | undefined,
     clearError: vi.fn(),
@@ -162,7 +162,7 @@ let mockErrorStoreState = {
     }),
 };
 
-let mockUIStoreState = {
+const mockUIStoreState = {
     showAddSiteModal: false,
     showSettings: false,
     selectedSiteId: undefined as string | undefined,
@@ -171,14 +171,14 @@ let mockUIStoreState = {
     selectSite: vi.fn(),
 };
 
-let mockSettingsStoreState = {
+const mockSettingsStoreState = {
     initializeSettings: vi.fn().mockResolvedValue(undefined),
     settings: {},
     updateSetting: vi.fn(),
     resetSettings: vi.fn(),
 };
 
-let mockThemeState = {
+const mockThemeState = {
     availableThemes: ["light", "dark"] as any,
     currentTheme: {
         name: "light",

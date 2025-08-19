@@ -20,7 +20,7 @@ interface HookState<T> {
 }
 
 class MockHookManager {
-    private hooks: Map<string, HookState<any>> = new Map();
+    private hooks = new Map<string, HookState<any>>();
     private currentHookId = 0;
 
     useState<T>(initialValue: T): [T, (newValue: T | ((prev: T) => T)) => void] {
@@ -106,10 +106,14 @@ class MockSiteCardComponent {
 
         const statusColor = this.hookManager.useMemo(() => {
             switch (localStatus) {
-                case 'online': return '#10b981';
-                case 'offline': return '#ef4444';
-                case 'degraded': return '#f59e0b';
-                default: return '#6b7280';
+                case 'online': { return '#10b981';
+                }
+                case 'offline': { return '#ef4444';
+                }
+                case 'degraded': { return '#f59e0b';
+                }
+                default: { return '#6b7280';
+                }
             }
         }, [localStatus]);
 
@@ -205,7 +209,7 @@ class MockDashboardComponent {
         const [refreshing, setRefreshing] = this.hookManager.useState(false);
         const [lastUpdated, setLastUpdated] = this.hookManager.useState(Date.now());
         const [autoRefresh, setAutoRefresh] = this.hookManager.useState(true);
-        const [refreshInterval, setRefreshInterval] = this.hookManager.useState(30000);
+        const [refreshInterval, setRefreshInterval] = this.hookManager.useState(30_000);
 
         const refreshIntervalRef = this.hookManager.useRef<NodeJS.Timeout | null>(null);
 
@@ -223,7 +227,7 @@ class MockDashboardComponent {
                     recentActivity: Array.from({ length: 10 }, (_, i) => ({
                         id: `activity-${i}`,
                         message: `Activity ${i}`,
-                        timestamp: Date.now() - i * 60000
+                        timestamp: Date.now() - i * 60_000
                     }))
                 });
                 setLastUpdated(Date.now());
@@ -331,7 +335,7 @@ class MockFormComponent {
             if (validateForm()) {
                 try {
                     await this.props.onSubmit?.(formData);
-                } catch (error) {
+                } catch {
                     setErrors({ submit: 'Failed to submit form' });
                 }
             }
@@ -345,9 +349,7 @@ class MockFormComponent {
             setTouched({});
         }, []);
 
-        const isValid = this.hookManager.useMemo(() => {
-            return Object.keys(errors).length === 0 && Object.keys(formData).length > 0;
-        }, [errors, formData]);
+        const isValid = this.hookManager.useMemo(() => Object.keys(errors).length === 0 && Object.keys(formData).length > 0, [errors, formData]);
 
         return {
             formData,
@@ -392,19 +394,17 @@ describe("Component State Management Performance", () => {
 
     bench("useEffect hook", () => {
         hookManager = new MockHookManager();
-        hookManager.useEffect(() => {
+        hookManager.useEffect(() => 
             // Simulate side effect
-            return () => {
+             () => {
                 // Cleanup
-            };
-        }, []);
+            }
+        , []);
     }, { warmupIterations: 10, iterations: 3000 });
 
     bench("useCallback hook", () => {
         hookManager = new MockHookManager();
-        const callback = hookManager.useCallback(() => {
-            return 'memoized function';
-        }, []);
+        const callback = hookManager.useCallback(() => 'memoized function', []);
         callback();
     }, { warmupIterations: 10, iterations: 5000 });
 
@@ -467,7 +467,7 @@ describe("Component State Management Performance", () => {
             recentActivity: Array.from({ length: 10 }, (_, i) => ({
                 id: `activity-${i}`,
                 message: `Activity ${i}`,
-                timestamp: Date.now() - i * 60000
+                timestamp: Date.now() - i * 60_000
             }))
         };
         
@@ -548,7 +548,7 @@ describe("Component State Management Performance", () => {
         }
         
         state.toggleAutoRefresh();
-        state.setRefreshInterval(15000);
+        state.setRefreshInterval(15_000);
         state.toggleAutoRefresh();
     }, { warmupIterations: 5, iterations: 200 });
 
@@ -577,9 +577,9 @@ describe("Component State Management Performance", () => {
         // Create multiple hooks
         for (let i = 0; i < 20; i++) {
             hookManager.useState(i);
-            hookManager.useEffect(() => {
-                return () => {}; // Cleanup function
-            }, []);
+            hookManager.useEffect(() => 
+                 () => {} // Cleanup function
+            , []);
             hookManager.useCallback(() => {}, []);
             hookManager.useMemo(() => i * 2, [i]);
             hookManager.useRef(null);

@@ -12,30 +12,22 @@ describe("Component Coverage Boost", () => {
         it("should handle SiteList empty state logic", () => {
             // Test SiteList.tsx functionality (lines 35-49)
             interface SiteListProps {
-                sites: Array<{ id: string; name: string; status: string }>;
+                sites: { id: string; name: string; status: string }[];
                 loading: boolean;
                 error: string | null;
             }
 
             const SiteListLogic = {
-                shouldShowEmptyState: (props: SiteListProps) => {
-                    return (
+                shouldShowEmptyState: (props: SiteListProps) => (
                         props.sites.length === 0 &&
                         !props.loading &&
                         !props.error
-                    );
-                },
-                shouldShowLoading: (props: SiteListProps) => {
-                    return props.loading && props.sites.length === 0;
-                },
-                shouldShowError: (props: SiteListProps) => {
-                    return props.error !== null && !props.loading;
-                },
-                shouldShowSites: (props: SiteListProps) => {
-                    return (
+                    ),
+                shouldShowLoading: (props: SiteListProps) => props.loading && props.sites.length === 0,
+                shouldShowError: (props: SiteListProps) => props.error !== null && !props.loading,
+                shouldShowSites: (props: SiteListProps) => (
                         props.sites.length > 0 && !props.loading && !props.error
-                    );
-                },
+                    ),
             };
 
             expect(
@@ -81,12 +73,10 @@ describe("Component Coverage Boost", () => {
                 return "yellow";
             };
 
-            const renderSiteList = (sites: typeof mockSites) => {
-                return sites.map((site) => ({
+            const renderSiteList = (sites: typeof mockSites) => sites.map((site) => ({
                     ...site,
                     statusColor: getStatusColor(site.status),
                 }));
-            };
 
             const utils = renderSiteList(mockSites);
             expect(utils).toHaveLength(3);
@@ -229,12 +219,10 @@ describe("Component Coverage Boost", () => {
                 getActiveItem: (
                     items: NavigationItem[],
                     currentTab: string
-                ) => {
-                    return (
+                ) => (
                         items.find((item) => item.key === currentTab) ||
                         items[0]
-                    );
-                },
+                    ),
                 getNextTab: (items: NavigationItem[], currentTab: string) => {
                     const currentIndex = items.findIndex(
                         (item) => item.key === currentTab
@@ -283,7 +271,7 @@ describe("Component Coverage Boost", () => {
         it("should handle SiteCardHistory memo comparison logic", () => {
             // Test SiteCardHistory.tsx areHistoryPropsEqual function (lines 36-65)
             interface SiteCardHistoryProps {
-                filteredHistory: Array<{ timestamp: number; status: string }>;
+                filteredHistory: { timestamp: number; status: string }[];
                 monitor: Monitor | undefined;
             }
 
@@ -573,17 +561,13 @@ describe("Component Coverage Boost", () => {
             }
 
             const actionButtonLogic = {
-                shouldDisableButtons: (props: ActionButtonGroupProps) => {
-                    return props.isLoading || props.disabled;
-                },
-                getButtonState: (props: ActionButtonGroupProps) => {
-                    return {
+                shouldDisableButtons: (props: ActionButtonGroupProps) => props.isLoading || props.disabled,
+                getButtonState: (props: ActionButtonGroupProps) => ({
                         checkNowDisabled: props.isLoading || props.disabled,
                         monitoringDisabled: props.isLoading || props.disabled,
                         showStopButton: props.isMonitoring,
                         showStartButton: !props.isMonitoring,
-                    };
-                },
+                    }),
                 handleCheckNowClick: (
                     props: ActionButtonGroupProps,
                     event?: React.MouseEvent
@@ -694,17 +678,15 @@ describe("Component Coverage Boost", () => {
             const siteMonitoringLogic = {
                 shouldShowSiteMonitoringButton: (
                     _props: ActionButtonGroupProps
-                ) => {
-                    return true; // Always shows SiteMonitoringButton
-                },
-                getSiteMonitoringProps: (props: ActionButtonGroupProps) => {
-                    return {
+                ) => 
+                     true // Always shows SiteMonitoringButton
+                ,
+                getSiteMonitoringProps: (props: ActionButtonGroupProps) => ({
                         allMonitorsRunning: props.allMonitorsRunning,
                         isLoading: props.isLoading || props.disabled,
                         onStartSiteMonitoring: props.onStartSiteMonitoring,
                         onStopSiteMonitoring: props.onStopSiteMonitoring,
-                    };
-                },
+                    }),
             };
 
             const propsAllRunning: ActionButtonGroupProps = {
@@ -758,7 +740,7 @@ describe("Component Coverage Boost", () => {
             interface FormData {
                 siteName: string;
                 url: string;
-                monitors: Array<{ type: string; name: string }>;
+                monitors: { type: string; name: string }[];
             }
 
             const formValidation = {
@@ -848,13 +830,13 @@ describe("Component Coverage Boost", () => {
             // Test DynamicMonitorFields.tsx functionality (lines 140,175,182-186,194,236)
             interface MonitorFieldConfig {
                 type: string;
-                fields: Array<{
+                fields: {
                     name: string;
                     type: "text" | "number" | "boolean" | "select";
                     required: boolean;
                     options?: string[];
                     validation?: (value: any) => string | null;
-                }>;
+                }[];
             }
 
             const monitorConfigs: MonitorFieldConfig[] = [
@@ -880,12 +862,10 @@ describe("Component Coverage Boost", () => {
             ];
 
             const fieldLogic = {
-                getFieldsForType: (type: string) => {
-                    return (
+                getFieldsForType: (type: string) => (
                         monitorConfigs.find((config) => config.type === type)
                             ?.fields || []
-                    );
-                },
+                    ),
                 getRequiredFields: (type: string) => {
                     const fields = fieldLogic.getFieldsForType(type);
                     return fields.filter((field) => field.required);
@@ -978,9 +958,7 @@ describe("Component Coverage Boost", () => {
                     },
                     visible: value !== null && value !== undefined,
                 }),
-                getVisibleComponents: (components: MonitorUIComponent[]) => {
-                    return components.filter((component) => component.visible);
-                },
+                getVisibleComponents: (components: MonitorUIComponent[]) => components.filter((component) => component.visible),
             };
 
             const statusComponent = monitorUILogic.createStatusComponent(
@@ -1050,9 +1028,7 @@ describe("Component Coverage Boost", () => {
                     };
                     return icons[status] || icons["unknown"];
                 },
-                getStatusText: (status: string) => {
-                    return status.charAt(0).toUpperCase() + status.slice(1);
-                },
+                getStatusText: (status: string) => status.charAt(0).toUpperCase() + status.slice(1),
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
                     // eslint-disable-next-line unicorn/explicit-length-check
@@ -1080,20 +1056,19 @@ describe("Component Coverage Boost", () => {
             // Test ChartComponents.tsx functionality (lines 29-67)
             interface ChartData {
                 labels: string[];
-                datasets: Array<{
+                datasets: {
                     label: string;
                     data: number[];
                     borderColor: string;
                     backgroundColor: string;
-                }>;
+                }[];
             }
 
             const chartLogic = {
                 formatChartData: (
-                    rawData: Array<{ timestamp: string; value: number }>,
+                    rawData: { timestamp: string; value: number }[],
                     label: string
-                ): ChartData => {
-                    return {
+                ): ChartData => ({
                         labels: rawData.map((item) =>
                             new Date(item.timestamp).toLocaleTimeString()
                         ),
@@ -1105,8 +1080,7 @@ describe("Component Coverage Boost", () => {
                                 backgroundColor: "#3b82f620",
                             },
                         ],
-                    };
-                },
+                    }),
                 getChartOptions: (title: string) => ({
                     responsive: true,
                     plugins: {
@@ -1161,11 +1135,11 @@ describe("Component Coverage Boost", () => {
         it("should handle HistoryChart edge cases", () => {
             // Test HistoryChart.tsx uncovered lines (57-68)
             interface HistoryChartProps {
-                data: Array<{
+                data: {
                     timestamp: string;
                     status: string;
                     responseTime?: number;
-                }>;
+                }[];
                 timeRange: "1h" | "6h" | "24h" | "7d";
                 showResponseTime: boolean;
             }
@@ -1276,7 +1250,7 @@ describe("Component Coverage Boost", () => {
                     return "F";
                 },
                 calculateMTTR: (
-                    incidents: Array<{ startTime: string; endTime: string }>
+                    incidents: { startTime: string; endTime: string }[]
                 ) => {
                     if (incidents.length === 0) return 0;
                     let totalDowntime = 0;

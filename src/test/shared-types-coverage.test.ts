@@ -14,11 +14,11 @@ describe("Shared Types Coverage", () => {
             interface MockFormData {
                 siteName: string;
                 url: string;
-                monitors: Array<{
+                monitors: {
                     type: string;
                     name: string;
                     configuration: Record<string, any>;
-                }>;
+                }[];
                 validation?: {
                     isValid: boolean;
                     errors: string[];
@@ -107,9 +107,7 @@ describe("Shared Types Coverage", () => {
                 interval: number;
                 timeout: number;
                 retryAttempts: number;
-                configuration: {
-                    [key: string]: any;
-                };
+                configuration: Record<string, any>;
                 alerts?: {
                     onFailure: boolean;
                     onRecovery: boolean;
@@ -334,16 +332,16 @@ describe("Shared Types Coverage", () => {
             interface ValidationResult<T = any> {
                 isValid: boolean;
                 data?: T;
-                errors: Array<{
+                errors: {
                     field: string;
                     message: string;
                     code: string;
-                }>;
-                warnings: Array<{
+                }[];
+                warnings: {
                     field: string;
                     message: string;
                     code: string;
-                }>;
+                }[];
                 metadata?: {
                     validatedAt: Date;
                     validator: string;

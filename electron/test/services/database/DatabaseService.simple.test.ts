@@ -105,10 +105,10 @@ describe("DatabaseService Coverage Tests", () => {
 
         try {
             const instance = DatabaseService.getInstance();
-            await instance.executeTransaction(() => {
+            await instance.executeTransaction(() => 
                 // Mock transaction operation
-                return Promise.resolve("success");
-            });
+                 Promise.resolve("success")
+            );
             expect(true).toBe(true);
         } catch (error) {
             // Transaction might fail in test environment

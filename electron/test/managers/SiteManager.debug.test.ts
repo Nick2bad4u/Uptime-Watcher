@@ -36,11 +36,9 @@ const mockCache = {
     onInvalidation: vi.fn().mockReturnValue(() => {}),
 };
 
-vi.mock("../../utils/cache/StandardizedCache", () => {
-    return {
+vi.mock("../../utils/cache/StandardizedCache", () => ({
         StandardizedCache: vi.fn(() => mockCache),
-    };
-});
+    }));
 
 const mockSiteRepositoryServiceInstance = {
     getSitesFromDatabase: vi.fn().mockResolvedValue([]),
@@ -69,11 +67,9 @@ const mockSiteWriterServiceInstance = {
     detectNewMonitors: vi.fn().mockReturnValue([]),
 };
 
-vi.mock("../../utils/database/SiteWriterService", () => {
-    return {
+vi.mock("../../utils/database/SiteWriterService", () => ({
         SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
-    };
-});
+    }));
 
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {
@@ -174,13 +170,13 @@ describe("SiteManager Mock Debug", () => {
         const debugInfo = {
             cache: {
                 constructor: cache?.constructor?.name,
-                hasGet: !!cache?.get,
+                hasGet: Boolean(cache?.get),
                 methods: Object.getOwnPropertyNames(cache || {}),
                 isGetMocked: cache?.get ? vi.isMockFunction(cache.get) : false,
             },
             writer: {
                 constructor: writer?.constructor?.name,
-                hasCreateSite: !!writer?.createSite,
+                hasCreateSite: Boolean(writer?.createSite),
                 methods: Object.getOwnPropertyNames(writer || {}),
                 isCreateSiteMocked: writer?.createSite
                     ? vi.isMockFunction(writer.createSite)
@@ -188,7 +184,7 @@ describe("SiteManager Mock Debug", () => {
             },
             repo: {
                 constructor: repo?.constructor?.name,
-                hasGetSites: !!repo?.getSitesFromDatabase,
+                hasGetSites: Boolean(repo?.getSitesFromDatabase),
                 methods: Object.getOwnPropertyNames(repo || {}),
                 isGetSitesMocked: repo?.getSitesFromDatabase
                     ? vi.isMockFunction(repo.getSitesFromDatabase)

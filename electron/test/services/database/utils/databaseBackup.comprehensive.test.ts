@@ -280,7 +280,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         });
         it("should handle very long file paths", async () => {
             const longPath =
-                "/very/long/path/" + "x".repeat(1000) + "/database.sqlite";
+                `/very/long/path/${  "x".repeat(1000)  }/database.sqlite`;
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(longPath);
@@ -306,7 +306,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         });
         it("should handle very long custom filename", async () => {
             const longFileName =
-                "very-long-filename-" + "x".repeat(1000) + ".sqlite";
+                `very-long-filename-${  "x".repeat(1000)  }.sqlite`;
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(testDbPath, longFileName);

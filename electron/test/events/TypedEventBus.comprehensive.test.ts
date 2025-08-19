@@ -35,7 +35,7 @@ interface TestEvents extends Record<string, unknown> {
     "object-with-meta": { data: string; _meta: string };
     "complex-object": {
         id: string;
-        items: Array<{ name: string; value: number }>;
+        items: { name: string; value: number }[];
     };
     "primitive-boolean": boolean;
     "null-event": null;

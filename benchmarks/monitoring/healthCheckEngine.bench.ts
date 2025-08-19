@@ -13,14 +13,14 @@
 import { bench, describe } from "vitest";
 
 class MockHealthCheckEngine {
-    private checks: Map<string, any> = new Map();
+    private checks = new Map<string, any>();
 
     constructor() {
         for (let i = 0; i < 100; i++) {
             this.checks.set(`check-${i}`, {
                 id: `check-${i}`,
                 url: `https://site${i}.com`,
-                interval: 60000,
+                interval: 60_000,
                 timeout: 5000
             });
         }
@@ -69,5 +69,5 @@ describe("Health Check Engine Performance", () => {
     bench("get check config", () => {
         engine = new MockHealthCheckEngine();
         engine.getCheckConfig('check-0');
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 });

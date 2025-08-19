@@ -80,7 +80,7 @@ interface AuthorizationContext {
 class MockPasswordService {
     async hash(password: string): Promise<string> {
         // Simulate bcrypt-like hashing
-        const salt = Math.random().toString(36).substring(2, 15);
+        const salt = Math.random().toString(36).slice(2, 15);
         return `$2b$10$${salt}$${this.simpleHash(password + salt)}`;
     }
 
@@ -99,7 +99,7 @@ class MockPasswordService {
         for (let i = 0; i < input.length; i++) {
             const char = input.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+            hash &= hash; // Convert to 32-bit integer
         }
         return Math.abs(hash).toString(36);
     }
@@ -145,7 +145,7 @@ class MockTokenService {
             }
 
             return payload;
-        } catch (error) {
+        } catch {
             return null;
         }
     }
@@ -157,14 +157,14 @@ class MockTokenService {
         for (let i = 0; i < combined.length; i++) {
             const char = combined.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
+            hash &= hash;
         }
         return Math.abs(hash).toString(36);
     }
 }
 
 class MockUserRepository {
-    private users: Map<string, User> = new Map();
+    private users = new Map<string, User>();
     private nextId = 1;
 
     async create(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
@@ -226,7 +226,7 @@ class MockUserRepository {
 }
 
 class MockSessionRepository {
-    private sessions: Map<string, Session> = new Map();
+    private sessions = new Map<string, Session>();
     private nextId = 1;
 
     async create(sessionData: Omit<Session, 'id' | 'createdAt'>): Promise<Session> {
@@ -301,8 +301,8 @@ class MockSessionRepository {
 }
 
 class MockPermissionService {
-    private permissions: Map<string, Permission> = new Map();
-    private roles: Map<string, Role> = new Map();
+    private permissions = new Map<string, Permission>();
+    private roles = new Map<string, Role>();
 
     constructor() {
         this.initializeDefaultRoles();

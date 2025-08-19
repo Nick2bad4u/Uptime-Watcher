@@ -40,7 +40,7 @@ function generateStatusHistory(count: number): StatusHistory[] {
 
     for (let i = 0; i < count; i++) {
         history.push({
-            timestamp: now - i * 60000, // 1 minute intervals
+            timestamp: now - i * 60_000, // 1 minute intervals
             status: Math.random() > 0.1 ? "up" : "down", // 90% uptime
             responseTime: Math.floor(Math.random() * 1000) + 50, // 50-1050ms
         });
@@ -56,7 +56,7 @@ function generateLargeDataset(count: number): StatusHistory[] {
     for (let i = 0; i < count; i++) {
         const isDown = Math.random() < 0.05; // 5% downtime
         history.push({
-            timestamp: now - i * 30000, // 30 second intervals
+            timestamp: now - i * 30_000, // 30 second intervals
             status: isDown ? "down" : "up",
             responseTime: isDown ? 0 : Math.floor(Math.random() * 500) + 100,
         });
@@ -208,7 +208,7 @@ describe("Site Analytics Performance Benchmarks", () => {
     );
 
     // Large dataset benchmarks (10,000 records)
-    const largeDataset = generateLargeDataset(10000);
+    const largeDataset = generateLargeDataset(10_000);
 
     bench(
         "Calculate downtime periods - Large dataset (10K records)",
@@ -237,7 +237,7 @@ describe("Site Analytics Performance Benchmarks", () => {
     );
 
     // History filtering benchmarks
-    const veryLargeDataset = generateLargeDataset(50000);
+    const veryLargeDataset = generateLargeDataset(50_000);
 
     bench(
         "Filter history by time range - Very large dataset (50K records)",

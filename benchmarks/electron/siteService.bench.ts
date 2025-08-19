@@ -43,8 +43,8 @@ describe("Site Service Performance", () => {
     name: `Site ${i}`,
     url: `https://example${i}.com`,
     enabled: i % 2 === 0,
-    monitoringInterval: 300000 + (i * 1000),
-    lastChecked: Date.now() - Math.random() * 86400000,
+    monitoringInterval: 300_000 + (i * 1000),
+    lastChecked: Date.now() - Math.random() * 86_400_000,
     status: ['up', 'down', 'unknown'][Math.floor(Math.random() * 3)] as any,
     responseTime: Math.floor(Math.random() * 2000),
   })) as any[];
@@ -58,10 +58,10 @@ describe("Site Service Performance", () => {
     config: {
       url: `https://example${Math.floor(i / 2)}.com`,
       method: 'GET',
-      timeout: 30000,
-      interval: 300000,
+      timeout: 30_000,
+      interval: 300_000,
     },
-    lastRun: Date.now() - Math.random() * 3600000,
+    lastRun: Date.now() - Math.random() * 3_600_000,
     status: ['success', 'failure', 'timeout'][Math.floor(Math.random() * 3)],
   }));
 
@@ -69,14 +69,14 @@ describe("Site Service Performance", () => {
     id: `history-${i}`,
     siteId: `site-${Math.floor(i / 10)}`,
     monitorId: `monitor-${Math.floor(i / 5)}`,
-    timestamp: Date.now() - (i * 60000),
+    timestamp: Date.now() - (i * 60_000),
     status: ['up', 'down'][Math.floor(Math.random() * 2)],
     responseTime: Math.floor(Math.random() * 3000),
     error: i % 10 === 0 ? `Error ${i}` : null,
     metadata: {
       httpCode: Math.floor(Math.random() * 500) + 200,
       contentType: 'text/html',
-      size: Math.floor(Math.random() * 50000),
+      size: Math.floor(Math.random() * 50_000),
     },
   }));
 
@@ -202,7 +202,7 @@ describe("Site Service Performance", () => {
         name: `New Site ${i}`,
         url: `https://newsite${i}.example.com`,
         enabled: true,
-        monitoringInterval: 300000,
+        monitoringInterval: 300_000,
       };
       
       // Simulate validation
@@ -250,7 +250,7 @@ describe("Site Service Performance", () => {
           name: `Bulk Site ${i}`,
           url: `https://bulk${i}.example.com`,
           enabled: i % 3 !== 0,
-          monitoringInterval: 300000,
+          monitoringInterval: 300_000,
         })),
       };
       
@@ -305,7 +305,7 @@ describe("Site Service Performance", () => {
         name: `Updated Site ${i}`,
         url: `https://updated${i}.example.com`,
         enabled: i % 2 === 0,
-        monitoringInterval: 300000 + (i * 1000),
+        monitoringInterval: 300_000 + (i * 1000),
       };
       
       // Simulate finding existing site
@@ -523,27 +523,26 @@ describe("Site Service Performance", () => {
       // Step 3: Process based on operation type
       let processingTime = 0;
       switch (operation.type) {
-        case 'full_reload':
+        case 'full_reload': {
           processingTime = Math.random() * 25;
-          steps.push({ step: 'reload_config', time: processingTime * 0.3 });
-          steps.push({ step: 'validate_monitors', time: processingTime * 0.4 });
-          steps.push({ step: 'update_cache', time: processingTime * 0.3 });
+          steps.push({ step: 'reload_config', time: processingTime * 0.3 }, { step: 'validate_monitors', time: processingTime * 0.4 }, { step: 'update_cache', time: processingTime * 0.3 });
           break;
-        case 'health_check':
+        }
+        case 'health_check': {
           processingTime = Math.random() * 20;
-          steps.push({ step: 'check_connectivity', time: processingTime * 0.6 });
-          steps.push({ step: 'validate_response', time: processingTime * 0.4 });
+          steps.push({ step: 'check_connectivity', time: processingTime * 0.6 }, { step: 'validate_response', time: processingTime * 0.4 });
           break;
-        case 'status_update':
+        }
+        case 'status_update': {
           processingTime = Math.random() * 8;
           steps.push({ step: 'update_status', time: processingTime });
           break;
-        case 'config_sync':
+        }
+        case 'config_sync': {
           processingTime = Math.random() * 30;
-          steps.push({ step: 'sync_monitors', time: processingTime * 0.5 });
-          steps.push({ step: 'update_schedules', time: processingTime * 0.3 });
-          steps.push({ step: 'validate_config', time: processingTime * 0.2 });
+          steps.push({ step: 'sync_monitors', time: processingTime * 0.5 }, { step: 'update_schedules', time: processingTime * 0.3 }, { step: 'validate_config', time: processingTime * 0.2 });
           break;
+        }
       }
       totalTime += processingTime;
       
@@ -590,18 +589,22 @@ describe("Site Service Performance", () => {
         let operationTime = 0;
         
         switch (op.type) {
-          case 'create':
+          case 'create': {
             operationTime = Math.random() * 15;
             break;
-          case 'update':
+          }
+          case 'update': {
             operationTime = Math.random() * 10;
             break;
-          case 'delete':
+          }
+          case 'delete': {
             operationTime = Math.random() * 12;
             break;
-          case 'load':
+          }
+          case 'load': {
             operationTime = Math.random() * 8;
             break;
+          }
         }
         
         totalTime += operationTime;

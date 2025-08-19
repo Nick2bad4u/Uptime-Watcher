@@ -15,8 +15,8 @@ import { bench, describe } from "vitest";
 
 // Mock database service
 class MockDatabaseService {
-    private connections: Map<string, any> = new Map();
-    private queryCache: Map<string, any> = new Map();
+    private connections = new Map<string, any>();
+    private queryCache = new Map<string, any>();
     private isInitialized = false;
 
     async initialize() {
@@ -65,7 +65,7 @@ class MockDatabaseService {
         return result;
     }
 
-    async batchExecute(queries: Array<{ sql: string; params?: any[] }>) {
+    async batchExecute(queries: { sql: string; params?: any[] }[]) {
         const results: any[] = [];
         for (const query of queries) {
             results.push(await this.executeQuery(query.sql, query.params, false));
@@ -83,20 +83,20 @@ class MockDatabaseService {
         return { 
             tableStats: Array.from({ length: 10 }, (_, i) => ({
                 name: `table${i}`,
-                rows: Math.floor(Math.random() * 10000),
-                size: Math.floor(Math.random() * 1000000)
+                rows: Math.floor(Math.random() * 10_000),
+                size: Math.floor(Math.random() * 1_000_000)
             }))
         };
     }
 
     async backup(path: string) {
         await this.sleep(100);
-        return { success: true, path, size: Math.floor(Math.random() * 10000000) };
+        return { success: true, path, size: Math.floor(Math.random() * 10_000_000) };
     }
 
     async restore(path: string) {
         await this.sleep(150);
-        return { success: true, recordsRestored: Math.floor(Math.random() * 100000) };
+        return { success: true, recordsRestored: Math.floor(Math.random() * 100_000) };
     }
 
     async optimize() {
@@ -122,7 +122,7 @@ class MockDatabaseService {
             status: 'healthy',
             connections: this.connections.size,
             uptime: Date.now() - (this.isInitialized ? 0 : Date.now()),
-            memoryUsage: Math.floor(Math.random() * 1000000)
+            memoryUsage: Math.floor(Math.random() * 1_000_000)
         };
     }
 
@@ -134,7 +134,7 @@ class MockDatabaseService {
         return this.connections.delete(name);
     }
 
-    async executeTransaction(operations: Array<{ sql: string; params?: any[] }>) {
+    async executeTransaction(operations: { sql: string; params?: any[] }[]) {
         try {
             const results: any[] = [];
             for (const op of operations) {
@@ -179,7 +179,7 @@ describe("Database Service Performance", () => {
     bench("get connection", () => {
         service = new MockDatabaseService();
         service.getConnection();
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("get multiple connections", () => {
         service = new MockDatabaseService();
@@ -262,7 +262,7 @@ describe("Database Service Performance", () => {
     bench("clear cache", () => {
         service = new MockDatabaseService();
         service.clearCache();
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("close connection", () => {
         service = new MockDatabaseService();

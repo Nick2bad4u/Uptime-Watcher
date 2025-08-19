@@ -139,7 +139,7 @@ interface HistoryEntry {
 
 function generateHistoryEntry(): HistoryEntry {
     return {
-        timestamp: Date.now() - Math.random() * 86400000,
+        timestamp: Date.now() - Math.random() * 86_400_000,
         status: Math.random() > 0.05 ? "up" : "down",
         responseTime: Math.floor(Math.random() * 1000) + 10,
         metadata:
@@ -175,8 +175,8 @@ function generateMonitorData(
                 ? `https://example${monitorIndex}.com`
                 : undefined,
         config: {
-            timeout: Math.floor(Math.random() * 30000) + 5000,
-            interval: Math.floor(Math.random() * 600000) + 60000,
+            timeout: Math.floor(Math.random() * 30_000) + 5000,
+            interval: Math.floor(Math.random() * 600_000) + 60_000,
             retryAttempts: Math.floor(Math.random() * 5) + 1,
             headers:
                 monitorIndex % 3 === 0
@@ -215,8 +215,8 @@ function generateSiteData(
         monitors,
         history,
         metadata: {
-            createdAt: Date.now() - Math.random() * 86400000 * 30,
-            lastUpdated: Date.now() - Math.random() * 3600000,
+            createdAt: Date.now() - Math.random() * 86_400_000 * 30,
+            lastUpdated: Date.now() - Math.random() * 3_600_000,
             tags: [
                 `tag-${Math.floor(Math.random() * 10)}`,
                 `category-${Math.floor(Math.random() * 5)}`,
@@ -274,7 +274,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     objects.push({
                         id: `obj-${i}`,
                         timestamp: Date.now(),
-                        data: new Array(100).fill(Math.random()),
+                        data: Array.from({length: 100}).fill(Math.random()),
                         metadata: {
                             created: Date.now(),
                             type: "small-object",
@@ -363,9 +363,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Process data (memory intensive operations)
                 const processedData = sites.map((site) => {
                     const aggregatedHistory = site.monitors.reduce(
-                        (acc, monitor) => {
-                            return acc.concat(monitor.history);
-                        },
+                        (acc, monitor) => acc.concat(monitor.history),
                         [] as HistoryEntry[]
                     );
 
@@ -453,7 +451,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 }
 
                 // Heavy access patterns
-                for (let i = 0; i < 10000; i++) {
+                for (let i = 0; i < 10_000; i++) {
                     const key = `site-${Math.floor(Math.random() * 5000)}`;
                     cache.get(key);
                 }
@@ -470,13 +468,13 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 100; i++) {
                     const largeObject = {
                         id: `large-${i}`,
-                        data: new Array(10000).fill(null).map(() => ({
+                        data: Array.from({length: 10_000}).fill(null).map(() => ({
                             timestamp: Date.now(),
                             value: Math.random(),
                             metadata: {
                                 index: Math.floor(Math.random() * 1000),
                                 category: `category-${Math.floor(Math.random() * 10)}`,
-                                tags: new Array(5)
+                                tags: Array.from({length: 5})
                                     .fill(null)
                                     .map(
                                         () =>
@@ -547,7 +545,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     const obj = {
                         id: i,
-                        data: new Array(100).fill(Math.random()),
+                        data: Array.from({length: 100}).fill(Math.random()),
                         parent: null as any,
                         children: [] as any[],
                     };
@@ -638,8 +636,8 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 }
 
                 // Cleanup listeners
-                for (let i = 0; i < eventTargets.length; i++) {
-                    eventTargets[i].removeEventListener(listeners[i]);
+                for (const [i, eventTarget] of eventTargets.entries()) {
+                    eventTarget.removeEventListener(listeners[i]);
                 }
             },
             { iterations: 100 }
@@ -653,7 +651,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     // Allocate temporary objects
                     const temp = {
-                        data: new Array(1000).fill(Math.random()),
+                        data: Array.from({length: 1000}).fill(Math.random()),
                         created: Date.now(),
                         id: i,
                     };
@@ -678,16 +676,16 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     if (pool.length > 0) {
                         const obj = pool.pop();
                         // Reset object
-                        obj.data = new Array(100).fill(Math.random());
+                        obj.data = Array.from({length: 100}).fill(Math.random());
                         obj.used = true;
                         return obj;
-                    } else {
+                    } 
                         return {
-                            data: new Array(100).fill(Math.random()),
+                            data: Array.from({length: 100}).fill(Math.random()),
                             used: true,
                             pooled: true,
                         };
-                    }
+                    
                 }
 
                 function returnToPool(obj: any) {
@@ -717,7 +715,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
             () => {
                 // Test 1: Many small objects
                 const smallObjects: any[] = [];
-                for (let i = 0; i < 10000; i++) {
+                for (let i = 0; i < 10_000; i++) {
                     smallObjects.push({
                         id: i,
                         value: Math.random(),
@@ -730,7 +728,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 10; i++) {
                     largeObjects.push({
                         id: i,
-                        data: new Array(1000).fill(null).map((_, j) => ({
+                        data: Array.from({length: 1000}).fill(null).map((_, j) => ({
                             index: j,
                             value: Math.random(),
                             timestamp: Date.now(),

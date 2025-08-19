@@ -75,7 +75,7 @@ export interface CompleteMonitor {
     /** Interval between checks in milliseconds */
     checkInterval: number;
     /** History of monitoring check results */
-    history: Array<{
+    history: {
         /** Additional details about the check result */
         details?: string;
         /** Response time for the check in milliseconds */
@@ -84,7 +84,7 @@ export interface CompleteMonitor {
         status: "down" | "up";
         /** Timestamp when the check was performed */
         timestamp: number;
-    }>;
+    }[];
     /** Host address for port-based monitors */
     host?: string;
     /** Unique identifier for the monitor */

@@ -48,9 +48,7 @@ describe("SettingsRepository", () => {
 
         // Spy on withDatabaseOperation and make it just call the operation directly
         vi.spyOn(operationalHooks, "withDatabaseOperation").mockImplementation(
-            async (operation) => {
-                return await operation();
-            }
+            async (operation) => await operation()
         );
 
         // Reset database mock implementations

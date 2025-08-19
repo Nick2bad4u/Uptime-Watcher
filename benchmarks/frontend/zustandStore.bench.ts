@@ -29,15 +29,13 @@ interface StoreApi<T> {
 
 class MockZustandStore<T> implements StoreApi<T> {
     private state: T;
-    private listeners: Set<(state: T, prevState: T) => void> = new Set();
+    private listeners = new Set<(state: T, prevState: T) => void>();
 
     constructor(createState: StateCreator<T>) {
         this.state = createState(this.setState.bind(this), this.getState.bind(this));
     }
 
-    getState = (): T => {
-        return this.state;
-    };
+    getState = (): T => this.state;
 
     setState = (partial: Partial<T> | ((state: T) => Partial<T>)): void => {
         const prevState = this.state;
@@ -253,8 +251,8 @@ const createMonitorStore = (set: any, get: any): MonitorState => ({
     activeMonitors: new Set(),
     monitorHistory: [],
     settings: {
-        defaultInterval: 60000,
-        defaultTimeout: 10000,
+        defaultInterval: 60_000,
+        defaultTimeout: 10_000,
         maxConcurrentChecks: 10,
         retryAttempts: 3,
         alertThreshold: 95
@@ -338,7 +336,7 @@ describe("Zustand Store Performance", () => {
     bench("get state", () => {
         siteStore = new MockZustandStore(createSiteStore);
         siteStore.getState();
-    }, { warmupIterations: 10, iterations: 10000 });
+    }, { warmupIterations: 10, iterations: 10_000 });
 
     bench("set simple state", () => {
         siteStore = new MockZustandStore(createSiteStore);
@@ -397,8 +395,8 @@ describe("Zustand Store Performance", () => {
             status: ['online', 'offline', 'degraded'][i % 3] as Site['status'],
             responseTime: Math.random() * 1000,
             uptime: 90 + Math.random() * 10,
-            lastCheck: Date.now() - Math.random() * 3600000,
-            created: Date.now() - Math.random() * 86400000,
+            lastCheck: Date.now() - Math.random() * 3_600_000,
+            created: Date.now() - Math.random() * 86_400_000,
             tags: [`tag${i % 5}`, `category${i % 3}`]
         }));
         siteStore.getState().setSites(sites);
@@ -433,8 +431,8 @@ describe("Zustand Store Performance", () => {
             id: 'monitor-1',
             siteId: 'site-1',
             type: 'http',
-            interval: 60000,
-            timeout: 10000,
+            interval: 60_000,
+            timeout: 10_000,
             configuration: {
                 method: 'GET',
                 followRedirects: true,
@@ -452,8 +450,8 @@ describe("Zustand Store Performance", () => {
             id: `control-monitor-${i}`,
             siteId: `site-${i}`,
             type: 'http',
-            interval: 60000,
-            timeout: 10000,
+            interval: 60_000,
+            timeout: 10_000,
             configuration: {},
             enabled: true,
             created: Date.now()
@@ -595,7 +593,7 @@ describe("Zustand Store Performance", () => {
             id: 'complex-monitor',
             siteId: site.id,
             type: 'http',
-            interval: 30000,
+            interval: 30_000,
             timeout: 5000,
             configuration: { method: 'GET' },
             enabled: true,

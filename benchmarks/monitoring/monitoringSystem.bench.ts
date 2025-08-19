@@ -27,7 +27,7 @@ class MockMonitorOperationRegistry {
     }
 
     private generateOperationId(): string {
-        return `op-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `op-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     }
 
     validateOperation(operationId: string): boolean {
@@ -86,7 +86,7 @@ class MockMonitorScheduler {
             if (this.checkCallback) {
                 try {
                     await this.checkCallback(siteId, monitorId);
-                } catch (error) {
+                } catch {
                     // Handle error
                 }
             }
@@ -200,7 +200,7 @@ function generateSiteData(count: number): MockSite[] {
                     type: "http",
                     url: `https://example${i}.com`,
                     monitoring: true,
-                    checkInterval: 60000,
+                    checkInterval: 60_000,
                     timeout: 5000,
                     retryAttempts: 3,
                 },
@@ -209,7 +209,7 @@ function generateSiteData(count: number): MockSite[] {
                     type: "ping",
                     host: `example${i}.com`,
                     monitoring: true,
-                    checkInterval: 30000,
+                    checkInterval: 30_000,
                     timeout: 3000,
                     retryAttempts: 2,
                 },
@@ -281,7 +281,7 @@ describe("Monitoring System Performance Benchmarks", () => {
 
         bench("start/stop monitor operations", () => {
             for (let i = 0; i < 100; i++) {
-                scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60000);
+                scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60_000);
             }
 
             for (let i = 0; i < 100; i++) {
@@ -292,7 +292,7 @@ describe("Monitoring System Performance Benchmarks", () => {
         bench("scheduler state queries", () => {
             // Start some monitors
             for (let i = 0; i < 50; i++) {
-                scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60000);
+                scheduler.startMonitor(`site-${i}`, `monitor-${i}`, 60_000);
             }
 
             // Query state many times
@@ -321,7 +321,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             }
 
             // Perform many lookups
-            for (let i = 0; i < 10000; i++) {
+            for (let i = 0; i < 10_000; i++) {
                 const siteId = `site-${i % 1000}`;
                 cache.get(siteId);
             }
@@ -357,7 +357,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             try {
                 await simulateMonitorCheck();
                 registry.completeOperation(operationId);
-            } catch (error) {
+            } catch {
                 registry.cancelOperation(operationId);
             }
         });

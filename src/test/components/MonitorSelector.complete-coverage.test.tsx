@@ -58,13 +58,11 @@ const defaultProps = {
     onChange: vi.fn(),
 };
 
-const renderMonitorSelector = (props = {}) => {
-    return render(
+const renderMonitorSelector = (props = {}) => render(
         <ThemeProvider>
             <MonitorSelector {...defaultProps} {...props} />
         </ThemeProvider>
     );
-};
 
 describe("MonitorSelector - Complete Coverage", () => {
     beforeEach(() => {

@@ -27,18 +27,18 @@ class MockDatabase {
                     return { lastInsertRowid: site.id };
                 }
                 if (sql.includes('UPDATE')) {
-                    const index = this.sites.findIndex(s => s.id === params[params.length - 1]);
+                    const index = this.sites.findIndex(s => s.id === params.at(-1));
                     if (index !== -1) {
                         this.sites[index] = { ...this.sites[index], ...params };
                     }
-                    return { changes: index !== -1 ? 1 : 0 };
+                    return { changes: index === -1 ? 0 : 1 };
                 }
                 if (sql.includes('DELETE')) {
                     const index = this.sites.findIndex(s => s.id === params[0]);
                     if (index !== -1) {
                         this.sites.splice(index, 1);
                     }
-                    return { changes: index !== -1 ? 1 : 0 };
+                    return { changes: index === -1 ? 0 : 1 };
                 }
                 return {};
             },
@@ -73,7 +73,7 @@ class MockSiteRepository {
                 name: `Site ${i}`,
                 url: `https://example${i}.com`,
                 isActive: Math.random() > 0.5,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 metadata: JSON.stringify({ type: 'test', priority: i % 5 })
             });
@@ -143,7 +143,7 @@ describe("Site Repository Performance", () => {
             name: 'Test Site',
             url: 'https://test.com',
             isActive: true,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             timeout: 5000,
             metadata: JSON.stringify({ type: 'test' })
         });
@@ -152,7 +152,7 @@ describe("Site Repository Performance", () => {
     bench("find site by id", () => {
         repository = new MockSiteRepository();
         repository.findById(Math.floor(Math.random() * 1000) + 1);
-    }, { warmupIterations: 5, iterations: 10000 });
+    }, { warmupIterations: 5, iterations: 10_000 });
 
     bench("find all sites", () => {
         repository = new MockSiteRepository();
@@ -171,8 +171,8 @@ describe("Site Repository Performance", () => {
             name: 'Updated Site',
             url: 'https://updated.com',
             isActive: false,
-            checkInterval: 120000,
-            timeout: 10000,
+            checkInterval: 120_000,
+            timeout: 10_000,
             metadata: JSON.stringify({ type: 'updated' })
         });
     }, { warmupIterations: 5, iterations: 1000 });
@@ -189,7 +189,7 @@ describe("Site Repository Performance", () => {
             name: `Bulk Site ${i}`,
             url: `https://bulk${i}.com`,
             isActive: true,
-            checkInterval: 60000,
+            checkInterval: 60_000,
             timeout: 5000,
             metadata: JSON.stringify({ type: 'bulk' })
         }));

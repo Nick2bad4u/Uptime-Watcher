@@ -7,10 +7,11 @@ on:
         types: [opened, edited, synchronize]
 
 permissions:
+    models: read
     contents: read
 
 jobs:
-    summary:
+    inference:
         runs-on: ubuntu-latest
         permissions:
             issues: write
@@ -48,7 +49,23 @@ jobs:
                     gh issue comment "$ISSUE_NUMBER" --body "$RESPONSE"
                   fi
               env:
+                  enable-github-mcp: true
+                  model: gpt-5
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  github-mcp-token: ${{ secrets.GITHUB_TOKEN }}
                   ISSUE_NUMBER: ${{ github.event.issue.number }}
                   PR_NUMBER: ${{ github.event.pull_request.number }}
                   RESPONSE: ${{ steps.inference.outputs.response }}
+                  prompt-file: ".github/prompts/PR-Review.prompt.md"
+                  system-prompt-file: ".github/prompts/BeastMode.prompt.md"
+                  endpoint: "https://models.github.ai/inference"
+                  max-tokens: 2000
+
+            - name: Print Output
+              id: output
+              run: |
+                  echo "${{ steps.inference.outputs.response }}"
+                  echo "${{ steps.inference.outputs.response-file }}"
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

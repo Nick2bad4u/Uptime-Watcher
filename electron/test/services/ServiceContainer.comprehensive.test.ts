@@ -116,8 +116,7 @@ vi.mock("../../managers/MonitorManager", () => ({
 }));
 
 // Create SiteManager mock using constructor function pattern
-const MockSiteManager = vi.hoisted(() => {
-    return function MockSiteManagerConstructor() {
+const MockSiteManager = vi.hoisted(() => function MockSiteManagerConstructor() {
         const managerEventBus = {
             emit: vi.fn(),
             on: vi.fn().mockReturnValue(undefined),
@@ -164,8 +163,7 @@ const MockSiteManager = vi.hoisted(() => {
             isInitialized: vi.fn().mockReturnValue(true),
             eventBus: managerEventBus,
         };
-    };
-});
+    });
 
 vi.mock("../../managers/SiteManager", () => ({
     SiteManager: MockSiteManager,

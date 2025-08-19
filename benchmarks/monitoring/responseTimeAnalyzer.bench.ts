@@ -32,12 +32,12 @@ class MockResponseTimeAnalyzer {
 
     detectAnomalies(responseTimes: number[], threshold: number = 2): number[] {
         const avg = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
-        const stdDev = Math.sqrt(responseTimes.reduce((sum, rt) => sum + Math.pow(rt - avg, 2), 0) / responseTimes.length);
+        const stdDev = Math.sqrt(responseTimes.reduce((sum, rt) => sum + (rt - avg)**2, 0) / responseTimes.length);
         
         return responseTimes.filter(rt => Math.abs(rt - avg) > threshold * stdDev);
     }
 
-    getTrend(responseTimes: Array<{ timestamp: number; value: number }>): string {
+    getTrend(responseTimes: { timestamp: number; value: number }[]): string {
         if (responseTimes.length < 2) return 'stable';
         
         const recent = responseTimes.slice(-10);
@@ -72,7 +72,7 @@ describe("Response Time Analyzer Performance", () => {
     bench("get trend analysis", () => {
         analyzer = new MockResponseTimeAnalyzer();
         const data = Array.from({ length: 100 }, (_, i) => ({
-            timestamp: Date.now() - i * 60000,
+            timestamp: Date.now() - i * 60_000,
             value: Math.random() * 1000 + 200
         }));
         analyzer.getTrend(data);

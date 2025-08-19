@@ -196,9 +196,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             mockSafeExtractIpcData.mockReturnValue(250);
 
             // Mock withErrorHandling to execute normally
-            mockWithErrorHandling.mockImplementation(async (asyncFn) => {
-                return await asyncFn();
-            });
+            mockWithErrorHandling.mockImplementation(async (asyncFn) => await asyncFn());
 
             const { syncFromBackend } = useSettingsStore.getState();
 
@@ -273,9 +271,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             );
             mockSafeExtractIpcData.mockReturnValue(300);
 
-            mockWithErrorHandling.mockImplementation(async (asyncFn) => {
-                return await asyncFn();
-            });
+            mockWithErrorHandling.mockImplementation(async (asyncFn) => await asyncFn());
 
             const { syncFromBackend } = useSettingsStore.getState();
             await syncFromBackend();
@@ -335,9 +331,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             });
             mockSafeExtractIpcData.mockReturnValue(350);
 
-            mockWithErrorHandling.mockImplementation(async (asyncFn) => {
-                return await asyncFn();
-            });
+            mockWithErrorHandling.mockImplementation(async (asyncFn) => await asyncFn());
 
             const { syncFromBackend } = useSettingsStore.getState();
             const result = await syncFromBackend();
@@ -353,9 +347,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             });
             mockSafeExtractIpcData.mockReturnValue(400);
 
-            mockWithErrorHandling.mockImplementation(async (asyncFn) => {
-                return await asyncFn();
-            });
+            mockWithErrorHandling.mockImplementation(async (asyncFn) => await asyncFn());
 
             const { syncFromBackend } = useSettingsStore.getState();
 

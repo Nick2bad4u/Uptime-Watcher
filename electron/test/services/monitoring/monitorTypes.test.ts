@@ -118,7 +118,7 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should provide proper type narrowing", () => {
-            const unknownType: string = "http";
+            const unknownType = "http";
 
             if (isBaseMonitorType(unknownType)) {
                 // TypeScript should narrow the type here
@@ -235,7 +235,7 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should handle very long strings", () => {
-            const longString = "http" + "x".repeat(1000);
+            const longString = `http${  "x".repeat(1000)}`;
             expect(isBaseMonitorType(longString)).toBe(false);
         });
 

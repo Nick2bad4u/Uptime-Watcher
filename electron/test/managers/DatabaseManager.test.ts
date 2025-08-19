@@ -89,12 +89,10 @@ const mockSiteLoadingOrchestrator = {
     ),
 };
 
-vi.mock("../../utils/database/SiteRepositoryService", () => {
-    return {
+vi.mock("../../utils/database/SiteRepositoryService", () => ({
         SiteRepositoryService: vi.fn(() => mockSiteRepositoryService),
         SiteLoadingOrchestrator: vi.fn(() => mockSiteLoadingOrchestrator),
-    };
-});
+    }));
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(() => Promise.resolve()),

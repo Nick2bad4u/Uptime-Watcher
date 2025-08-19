@@ -119,7 +119,7 @@ describe("Notification Service Benchmarks", () => {
           'A new version ({version}) is available for download',
           'System update is ready to install. Would you like to update now?'
         ],
-        urgencyDistribution: { low: 0.7, normal: 0.3, critical: 0.0 },
+        urgencyDistribution: { low: 0.7, normal: 0.3, critical: 0 },
         iconRequired: false,
         actionsCount: 2,
       },
@@ -130,7 +130,7 @@ describe("Notification Service Benchmarks", () => {
           'Backup completed successfully. {fileCount} files backed up to {destination}',
           'Scheduled backup finished. Size: {backupSize}, Duration: {duration}'
         ],
-        urgencyDistribution: { low: 0.8, normal: 0.2, critical: 0.0 },
+        urgencyDistribution: { low: 0.8, normal: 0.2, critical: 0 },
         iconRequired: false,
         actionsCount: 1,
       },
@@ -260,18 +260,21 @@ describe("Notification Service Benchmarks", () => {
       const platformSpecific: Record<string, unknown> = {};
       
       switch (platform) {
-        case 'win32':
+        case 'win32': {
           platformSpecific.useToastNotification = scenario.method === 'native';
           platformSpecific.balloonTimeout = scenario.method === 'tray' ? 5000 : undefined;
           break;
-        case 'darwin':
+        }
+        case 'darwin': {
           platformSpecific.useNotificationCenter = scenario.method === 'native';
           platformSpecific.soundName = scenario.method === 'sound' ? 'default' : undefined;
           break;
-        case 'linux':
+        }
+        case 'linux': {
           platformSpecific.useLibnotify = scenario.method === 'native';
           platformSpecific.urgencyLevel = ['low', 'normal', 'critical'][Math.floor(Math.random() * 3)];
           break;
+        }
       }
       
       // Simulate user interaction (15% interaction rate)
@@ -280,7 +283,7 @@ describe("Notification Service Benchmarks", () => {
         const interactionTypes = ['click', 'dismiss', 'action-1', 'action-2'];
         userInteraction = {
           action: interactionTypes[Math.floor(Math.random() * interactionTypes.length)],
-          timestamp: endTime + Math.random() * 30000, // Within 30 seconds
+          timestamp: endTime + Math.random() * 30_000, // Within 30 seconds
           value: Math.random() > 0.7 ? 'user-response' : undefined,
         };
       }
@@ -422,7 +425,7 @@ describe("Notification Service Benchmarks", () => {
       processed: processedNotifications.filter(n => n.priority === queue.priority).length,
       dropped: queue.droppedCount,
       averageWaitTime: queue.averageWaitTime,
-      efficiency: queue.droppedCount === 0 ? 1.0 : processedNotifications.filter(n => n.priority === queue.priority).length / 
+      efficiency: queue.droppedCount === 0 ? 1 : processedNotifications.filter(n => n.priority === queue.priority).length / 
         (processedNotifications.filter(n => n.priority === queue.priority).length + queue.droppedCount),
     }));
   });
@@ -433,7 +436,7 @@ describe("Notification Service Benchmarks", () => {
       {
         category: 'site-status',
         maxNotifications: 10,
-        timeWindow: 60000, // 1 minute
+        timeWindow: 60_000, // 1 minute
         currentCount: 0,
         windowStart: Date.now(),
         violationCount: 0,
@@ -441,7 +444,7 @@ describe("Notification Service Benchmarks", () => {
       {
         category: 'monitor-alert',
         maxNotifications: 5,
-        timeWindow: 60000, // 1 minute
+        timeWindow: 60_000, // 1 minute
         currentCount: 0,
         windowStart: Date.now(),
         violationCount: 0,
@@ -449,7 +452,7 @@ describe("Notification Service Benchmarks", () => {
       {
         category: 'system-update',
         maxNotifications: 1,
-        timeWindow: 3600000, // 1 hour
+        timeWindow: 3_600_000, // 1 hour
         currentCount: 0,
         windowStart: Date.now(),
         violationCount: 0,
@@ -457,7 +460,7 @@ describe("Notification Service Benchmarks", () => {
       {
         category: 'error-occurred',
         maxNotifications: 20,
-        timeWindow: 300000, // 5 minutes
+        timeWindow: 300_000, // 5 minutes
         currentCount: 0,
         windowStart: Date.now(),
         violationCount: 0,
@@ -592,7 +595,7 @@ describe("Notification Service Benchmarks", () => {
         name: 'emergency-broadcast',
         channels: ['native', 'in-app', 'tray', 'sound', 'popup'],
         fallbackChain: [],
-        timeout: 10000,
+        timeout: 10_000,
         requireAllChannels: false,
       },
     ];
@@ -617,29 +620,35 @@ describe("Notification Service Benchmarks", () => {
         let baseLatency: number;
         
         switch (channel) {
-          case 'native':
+          case 'native': {
             successRate = 0.95;
             baseLatency = 100;
             break;
-          case 'in-app':
+          }
+          case 'in-app': {
             successRate = 0.98;
             baseLatency = 20;
             break;
-          case 'tray':
+          }
+          case 'tray': {
             successRate = 0.92;
             baseLatency = 80;
             break;
-          case 'sound':
+          }
+          case 'sound': {
             successRate = 0.88;
             baseLatency = 30;
             break;
-          case 'popup':
+          }
+          case 'popup': {
             successRate = 0.96;
             baseLatency = 60;
             break;
-          default:
-            successRate = 0.90;
+          }
+          default: {
+            successRate = 0.9;
             baseLatency = 50;
+          }
         }
         
         const latency = baseLatency + Math.random() * 50;
@@ -697,11 +706,7 @@ describe("Notification Service Benchmarks", () => {
       }
       
       // Determine overall coordination success
-      if (strategy.requireAllChannels) {
-        overallSuccess = deliveryResults.filter(d => !d.fallbackUsed).every(d => d.success);
-      } else {
-        overallSuccess = anyChannelSucceeded;
-      }
+      overallSuccess = strategy.requireAllChannels ? deliveryResults.filter(d => !d.fallbackUsed).every(d => d.success) : anyChannelSucceeded;
     }
     
     // Calculate coordination metrics

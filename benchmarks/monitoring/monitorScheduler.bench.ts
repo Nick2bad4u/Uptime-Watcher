@@ -13,8 +13,8 @@
 import { bench, describe } from "vitest";
 
 class MockMonitorScheduler {
-    private schedules: Map<string, any> = new Map();
-    private timers: Map<string, NodeJS.Timeout> = new Map();
+    private schedules = new Map<string, any>();
+    private timers = new Map<string, NodeJS.Timeout>();
 
     schedule(monitorId: string, interval: number): void {
         this.unschedule(monitorId);
@@ -45,7 +45,7 @@ class MockMonitorScheduler {
         return Array.from(this.schedules.values());
     }
 
-    bulkSchedule(monitors: Array<{ id: string; interval: number }>): void {
+    bulkSchedule(monitors: { id: string; interval: number }[]): void {
         monitors.forEach(monitor => this.schedule(monitor.id, monitor.interval));
     }
 
@@ -67,13 +67,13 @@ describe("Monitor Scheduler Performance", () => {
 
     bench("schedule single monitor", () => {
         scheduler = new MockMonitorScheduler();
-        scheduler.schedule('monitor-1', 60000);
+        scheduler.schedule('monitor-1', 60_000);
         scheduler.cleanup();
     }, { warmupIterations: 5, iterations: 2000 });
 
     bench("unschedule monitor", () => {
         scheduler = new MockMonitorScheduler();
-        scheduler.schedule('monitor-1', 60000);
+        scheduler.schedule('monitor-1', 60_000);
         scheduler.unschedule('monitor-1');
     }, { warmupIterations: 5, iterations: 2000 });
 
@@ -81,7 +81,7 @@ describe("Monitor Scheduler Performance", () => {
         scheduler = new MockMonitorScheduler();
         const monitors = Array.from({ length: 50 }, (_, i) => ({
             id: `monitor-${i}`,
-            interval: 60000 + i * 1000
+            interval: 60_000 + i * 1000
         }));
         scheduler.bulkSchedule(monitors);
         scheduler.cleanup();
@@ -91,7 +91,7 @@ describe("Monitor Scheduler Performance", () => {
         scheduler = new MockMonitorScheduler();
         scheduler.bulkSchedule(Array.from({ length: 20 }, (_, i) => ({
             id: `monitor-${i}`,
-            interval: 60000
+            interval: 60_000
         })));
         scheduler.getSchedules();
         scheduler.cleanup();
@@ -99,8 +99,8 @@ describe("Monitor Scheduler Performance", () => {
 
     bench("reschedule monitor", () => {
         scheduler = new MockMonitorScheduler();
-        scheduler.schedule('monitor-1', 60000);
-        scheduler.reschedule('monitor-1', 30000);
+        scheduler.schedule('monitor-1', 60_000);
+        scheduler.reschedule('monitor-1', 30_000);
         scheduler.cleanup();
     }, { warmupIterations: 5, iterations: 1000 });
 });

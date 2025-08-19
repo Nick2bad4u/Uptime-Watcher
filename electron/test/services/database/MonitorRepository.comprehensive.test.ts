@@ -34,9 +34,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         // Mock DatabaseService with transaction support
         mockDatabaseService = {
             getDatabase: vi.fn(() => mockDatabase),
-            executeTransaction: vi.fn(async (callback) => {
-                return callback(mockDatabase);
-            }),
+            executeTransaction: vi.fn(async (callback) => callback(mockDatabase)),
             initialize: vi.fn(),
             close: vi.fn(),
         } as any;
@@ -51,7 +49,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
     describe("bulkCreate", () => {
         it("should create multiple monitors successfully", async () => {
             const siteIdentifier = "site-123";
-            const monitors: Array<Site["monitors"][0]> = [
+            const monitors: Site["monitors"][0][] = [
                 {
                     type: "http",
                     url: "https://example.com",
@@ -422,7 +420,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
     });
     describe("Complex Scenarios", () => {
         it("should handle mixed monitor types in bulk operations", async () => {
-            const mixedMonitors: Array<Site["monitors"][0]> = [
+            const mixedMonitors: Site["monitors"][0][] = [
                 {
                     type: "http",
                     url: "https://example.com",

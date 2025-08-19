@@ -45,9 +45,7 @@ const mockSettingsRepository = {
 
 // Mock database service
 const mockDatabaseService = {
-    executeTransaction: vi.fn(async (callback) => {
-        return await callback(mockDatabase);
-    }),
+    executeTransaction: vi.fn(async (callback) => await callback(mockDatabase)),
     getDatabase: vi.fn(() => mockDatabase),
 } as unknown as DatabaseService;
 

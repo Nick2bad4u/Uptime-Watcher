@@ -66,7 +66,7 @@ function generateHistoryEntries(count: number): StatusHistory[] {
 
     for (let i = 0; i < count; i++) {
         entries.push({
-            timestamp: now - i * 30000, // 30 second intervals
+            timestamp: now - i * 30_000, // 30 second intervals
             status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
             responseTime: Math.floor(Math.random() * 1000) + 50,
             details: Math.random() > 0.8 ? `Error details ${i}` : undefined,
@@ -89,7 +89,7 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
                 "port",
             ][i % 3],
             url: i % 3 === 0 ? `https://example${i}.com` : undefined,
-            host: i % 3 !== 0 ? `host${i}.example.com` : undefined,
+            host: i % 3 === 0 ? undefined : `host${i}.example.com`,
             port: i % 3 === 2 ? 8080 + (i % 100) : undefined,
             checkInterval:
                 [
@@ -111,7 +111,7 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
             monitoring: Math.random() > 0.1,
             status: Math.random() > 0.05 ? "up" : "down",
             responseTime: Math.floor(Math.random() * 1000) + 50,
-            lastChecked: new Date(Date.now() - Math.random() * 86400000),
+            lastChecked: new Date(Date.now() - Math.random() * 86_400_000),
             active_operations: JSON.stringify([`op-${i}-1`, `op-${i}-2`]),
         });
     }
@@ -216,7 +216,7 @@ describe("Database Operations Performance Benchmarks", () => {
         // Pre-generate datasets to avoid affecting benchmark timing
         smallHistoryDataset = generateHistoryEntries(100);
         mediumHistoryDataset = generateHistoryEntries(1000);
-        largeHistoryDataset = generateHistoryEntries(10000);
+        largeHistoryDataset = generateHistoryEntries(10_000);
         smallRowDataset = generateDatabaseRows(100);
         mediumRowDataset = generateDatabaseRows(1000);
         largeRowDataset = generateDatabaseRows(5000);

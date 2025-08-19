@@ -132,18 +132,18 @@ vi.mock("../../managers/ConfigurationManager", () => ({
 
 // Mock SiteManager
 vi.mock("../../managers/SiteManager", () => ({
-    SiteManager: vi.fn().mockImplementation((_dependencies) => {
+    SiteManager: vi.fn().mockImplementation((_dependencies) => 
         // Store the event bus passed to the constructor so ServiceContainer can use it
 
-        return {
+         ({
             initialize: vi.fn().mockResolvedValue(undefined),
             getSitesCache: vi.fn().mockReturnValue(new Map()),
             addSite: vi.fn().mockResolvedValue(undefined),
             updateSite: vi.fn().mockResolvedValue(undefined),
             deleteSite: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
-        };
-    }),
+        })
+    ),
 }));
 
 // Mock UptimeOrchestrator
