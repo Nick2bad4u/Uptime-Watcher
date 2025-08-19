@@ -96,11 +96,13 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
     ): FormSubmitProperties => ({
         addMode: "new",
         checkInterval: 300_000,
+        expectedValue: "",
         formError: undefined,
         host: "example.com",
         monitorType: "http",
         name: "Test Site",
         port: "80",
+        recordType: "A",
         selectedExistingSite: "",
         siteId: "test-site-id",
         url: "https://example.com",

@@ -9,7 +9,7 @@ import {
     registerTitleSuffixFormatter,
     type TitleSuffixFormatter,
 } from "../../utils/monitorTitleFormatters";
-import { Monitor } from "@shared/types";
+import { Monitor } from "../../../shared/types.js";
 
 /**
  * Mock monitor factory for testing
@@ -213,6 +213,94 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
+        describe("DNS monitor type", () => {
+            it("should return formatted recordType host suffix for DNS monitor with both host and recordType", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    host: "example.com",
+                    recordType: "A",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (A example.com)");
+            });
+
+            it("should return empty string for DNS monitor without host", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    recordType: "A",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+
+            it("should return empty string for DNS monitor without recordType", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    host: "example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+
+            it("should return empty string for DNS monitor with null host", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    recordType: "AAAA",
+                });
+                (monitor as any).host = null;
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+
+            it("should return empty string for DNS monitor with null recordType", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    host: "example.com",
+                });
+                (monitor as any).recordType = null;
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+
+            it("should handle various DNS record types", () => {
+                const recordTypes = ["A", "AAAA", "CNAME", "MX", "TXT", "NS", "PTR", "SOA"];
+                
+                for (const recordType of recordTypes) {
+                    const monitor = createMockMonitor({
+                        type: "dns",
+                        host: "test.example.com",
+                        recordType,
+                    });
+
+                    const result = formatTitleSuffix(monitor);
+
+                    expect(result).toBe(` (${recordType} test.example.com)`);
+                }
+            });
+
+            it("should handle DNS monitor with subdomain", () => {
+                const monitor = createMockMonitor({
+                    type: "dns",
+                    host: "api.subdomain.example.com",
+                    recordType: "CNAME",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (CNAME api.subdomain.example.com)");
+            });
+        });
+
         describe("Unknown monitor types", () => {
             it("should return empty string for unknown monitor type", () => {
                 const monitor = createMockMonitor({
@@ -289,6 +377,13 @@ describe("monitorTitleFormatters", () => {
 
         it("should return port formatter for 'port' type", () => {
             const formatter = getTitleSuffixFormatter("port");
+
+            expect(formatter).toBeDefined();
+            expect(typeof formatter).toBe("function");
+        });
+
+        it("should return DNS formatter for 'dns' type", () => {
+            const formatter = getTitleSuffixFormatter("dns");
 
             expect(formatter).toBeDefined();
             expect(typeof formatter).toBe("function");

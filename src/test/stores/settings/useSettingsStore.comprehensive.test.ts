@@ -330,27 +330,27 @@ describe("useSettingsStore", () => {
                 await result.current.resetSettings();
             });
 
-            // Ensure we start with the actual default
+            // Clear any persisted state that might interfere
             act(() => {
-                result.current.updateSettings({
-                    autoStart: false,
-                    historyLimit: 500, // DEFAULT_HISTORY_LIMIT
-                    minimizeToTray: true,
-                    notifications: true,
-                    soundAlerts: false,
-                    theme: "system",
-                });
+                useSettingsStore.persist.clearStorage();
             });
 
-            // Set initial value BEFORE setting up the error mock
-            act(() => {
+            // Mock getHistoryLimit to return 200 consistently to avoid sync interference
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
+                data: 200,
+            });
+
+            // Set initial value first and wait for it to be set
+            await act(async () => {
                 result.current.updateSettings({ historyLimit: 200 });
+                // Wait long enough for any sync operations to complete
+                await new Promise(resolve => setTimeout(resolve, 150));
             });
 
             // Verify the initial state is set correctly
             expect(result.current.settings.historyLimit).toBe(200);
 
-            // Now mock the error AFTER setting initial state
+            // Now mock the updateHistoryLimit to fail
             mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
                 error
             );
@@ -363,6 +363,7 @@ describe("useSettingsStore", () => {
             });
 
             // Should be reverted to previous value (200), not the attempted value (600)
+            // The error handling should revert to the original value before the failed update
             expect(result.current.settings.historyLimit).toBe(200);
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                 "settings",

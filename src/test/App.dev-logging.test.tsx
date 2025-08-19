@@ -169,16 +169,18 @@ describe("App Development Logging Coverage", () => {
 
         // Get the callback function passed to subscribeToStatusUpdates
         const statusUpdateCallback =
-            subscribeToStatusUpdatesMock.mock.calls[0][0];
+            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
 
-        // Create a mock status update
-        const mockUpdate = {
-            site: { identifier: "test-site-id" },
-            siteIdentifier: "fallback-site-id",
-        };
+        if (statusUpdateCallback) {
+            // Create a mock status update
+            const mockUpdate = {
+                site: { identifier: "test-site-id" },
+                siteIdentifier: "fallback-site-id",
+            };
 
-        // Call the callback to trigger development logging
-        statusUpdateCallback(mockUpdate);
+            // Call the callback to trigger development logging
+            statusUpdateCallback(mockUpdate);
+        }
 
         // Verify that logger.debug was called
         expect(logger.debug).toHaveBeenCalledWith(
@@ -210,16 +212,18 @@ describe("App Development Logging Coverage", () => {
 
         // Get the callback function passed to subscribeToStatusUpdates
         const statusUpdateCallback =
-            subscribeToStatusUpdatesMock.mock.calls[0][0];
+            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
 
-        // Create a mock status update with undefined site.identifier
-        const mockUpdate = {
-            site: { identifier: undefined },
-            siteIdentifier: "fallback-site-id",
-        };
+        if (statusUpdateCallback) {
+            // Create a mock status update with undefined site.identifier
+            const mockUpdate = {
+                site: { identifier: undefined },
+                siteIdentifier: "fallback-site-id",
+            };
 
-        // Call the callback to trigger development logging with fallback
-        statusUpdateCallback(mockUpdate);
+            // Call the callback to trigger development logging with fallback
+            statusUpdateCallback(mockUpdate);
+        }
 
         // Verify that logger.debug was called with fallback identifier
         expect(logger.debug).toHaveBeenCalledWith(

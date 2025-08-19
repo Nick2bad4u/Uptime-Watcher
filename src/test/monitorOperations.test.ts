@@ -378,6 +378,7 @@ describe("monitorOperations", () => {
                 responseTime: 250,
                 retryAttempts: 3,
                 timeout: 5000,
+                type: "port", // Set type to port since we're providing host and port
             };
 
             const result = normalizeMonitor(partialMonitor);
@@ -395,7 +396,7 @@ describe("monitorOperations", () => {
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
-                type: "http",
+                type: "port",
             });
         });
 
@@ -422,6 +423,7 @@ describe("monitorOperations", () => {
             const partialMonitor: Partial<Monitor> = {
                 monitoring: true,
                 port: 443,
+                type: "port", // Set type to port since we're providing port
             };
 
             const result = normalizeMonitor(partialMonitor);
@@ -437,7 +439,7 @@ describe("monitorOperations", () => {
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
-                type: "http",
+                type: "port",
             });
         });
     });

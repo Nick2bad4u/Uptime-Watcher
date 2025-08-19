@@ -69,9 +69,8 @@ describe("chartConfig utilities", () => {
                 plugins: null,
             };
 
-            // Actually, hasPlugins doesn't check for null plugins specifically,
-            // so this would return true because typeof null === "object"
-            expect(hasPlugins(config)).toBe(true);
+            // hasPlugins correctly includes null check to return false for null plugins
+            expect(hasPlugins(config)).toBe(false);
         });
 
         it("should return false for objects with non-object plugins", () => {

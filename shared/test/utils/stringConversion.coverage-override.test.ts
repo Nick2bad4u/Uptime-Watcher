@@ -1,6 +1,25 @@
 /**
  * Complete test coverage for stringConversion.ts unreachable code paths This
- * test uses advanced techniques to reach the theoretically unreachable code
+ * test uses advanced techniques to reach    it("should handle all typeof results comprehensively", () => {
+        // This test ensures we exercise all possible typeof results
+        const testCases = [
+            ["boolean", true],
+            ["number", 42],
+            ["string", "test"],
+            ["symbol", Symbol("test")],
+            ["bigint", BigInt(123)],
+            ["function", () => {}],
+            ["object", {}],
+            ["object", null], // typeof null === "object"
+            ["undefined", undefined],
+        ];
+
+        for (const [expectedTypeName, value] of testCases) {
+            expect(typeof value).toBe(expectedTypeName);
+            const result = safeStringify(value);
+            expect(typeof result).toBe("string");
+        }
+    });nreachable code
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -125,7 +144,7 @@ describe("String Conversion - 100% Coverage Override", () => {
 
     it("should handle all typeof results comprehensively", () => {
         // This test ensures we exercise all possible typeof results
-        const typeTests = [
+        const testCases = [
             ["boolean", true],
             ["number", 42],
             ["string", "test"],
@@ -137,8 +156,8 @@ describe("String Conversion - 100% Coverage Override", () => {
             ["undefined", undefined],
         ];
 
-        for (const [expectedType, value] of typeTests) {
-            expect(typeof value).toBe(expectedType);
+        for (const [expectedTypeName, value] of testCases) {
+            expect(typeof value).toBe(expectedTypeName);
             const result = safeStringify(value);
             expect(typeof result).toBe("string");
         }
