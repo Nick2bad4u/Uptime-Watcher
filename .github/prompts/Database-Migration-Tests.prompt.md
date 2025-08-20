@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Generate database migration and testing utilities"
 ---
 

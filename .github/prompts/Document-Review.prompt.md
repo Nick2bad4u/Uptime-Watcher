@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Review and Update Coding Documentation"
 ---
 

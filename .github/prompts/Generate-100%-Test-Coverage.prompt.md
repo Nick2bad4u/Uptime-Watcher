@@ -14,8 +14,9 @@ description: "Generate 100% Test Coverage"
    - `npm run test:electron`
    - `npm run test:shared`
    - `npm run type-check:test`
+   *Do not move onto the next step until all tests pass with no errors or warnings.*
 3. Ensure all tests pass with no errors or warnings.
-4. Check coverage and create tests for files below 90% (or 100% if above 90%):
+4. Check coverage and create tests for files below 95% (or 100% if above 95%):
    - `npm run test:coverage`
    - `npm run test:electron:coverage`
    - `npm run test:shared:coverage`
@@ -23,9 +24,11 @@ description: "Generate 100% Test Coverage"
 6. Ensure comprehensive tests for all edge cases.
 7. Use unlimited requests and time as needed.
 8. **Do not skip any files**, regardless of size or perceived triviality.
-9. Continue until all files reach 90% (or 100% if above 90%) coverage for branch, line, function, and statement.
+9. Continue until all files reach 95% (or 100% if above 95%) coverage for branch, line, function, and statement.
 10. Do not stop, even if the process is lengthy.
 11. All new test files should be created in `tests/strictTests/` directory, under electron, shared, or src directories as appropriate.
+12. Always start with the files with the lowest coverage first, and work your way up to the highest coverage files.
+13. Some files may have low coverage due to being development only features, console statements, or logging. These should be ignored for coverage purposes. (If you find a way to ignore those coverage lines in the report, even better!)
 
 ## Test Creation Rules
 
@@ -107,8 +110,8 @@ description: "Generate 100% Test Coverage"
 
 ## Requirements
 
-- 90% branch, line, function, and statement coverage for all files (100% if above 90% already).
-- Create tests for all files below 90% coverage until all files are covered.
+- 95% branch, line, function, and statement coverage for all files (100% if above 95% already).
+- Create tests for all files below 95% coverage until all files are covered.
 
 ## If Attachments Are Present
 
@@ -185,9 +188,9 @@ You cannot stop until you eliminate all of these test warnings:
 
 I REPEAT: You cannot stop until you eliminate all of these test warnings:
 
-"ERROR: Coverage for lines does not meet global threshold (90%)"
-"ERROR: Coverage for functions does not meet global threshold (90%)"
-"ERROR: Coverage for statements does not meet global threshold (90%)"
-"ERROR: Coverage for branches does not meet global threshold (90%)"
+"ERROR: Coverage for lines does not meet global threshold (95%)"
+"ERROR: Coverage for functions does not meet global threshold (95%)"
+"ERROR: Coverage for statements does not meet global threshold (95%)"
+"ERROR: Coverage for branches does not meet global threshold (95%)"
 
 I REPEAT: You cannot stop until you eliminate all of these test warnings above for both Front AND Backend tests.

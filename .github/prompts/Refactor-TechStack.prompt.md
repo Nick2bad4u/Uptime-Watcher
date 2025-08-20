@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Refactor code to align with Electron, React 19, TypeScript, Vite, Zustand, Vitest, Tailwind, and modern linting/testing best practices"
 ---
 

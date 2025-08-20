@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Create TypeScript utility functions with comprehensive testing"
 ---
 

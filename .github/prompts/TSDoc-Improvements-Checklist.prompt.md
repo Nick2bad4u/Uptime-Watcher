@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Review TSDoc comments to ensure they are accurate, complete, and compliant with project standards."
 ---
 

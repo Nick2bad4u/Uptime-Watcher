@@ -1,6 +1,6 @@
 ---
 description: Plan and assist in migrating codebases or components, such as framework upgrades or technology transitions.
-tools: ['All Tools']
+tools: ['Best Tools']
 ---
 
 # Migration mode instructions

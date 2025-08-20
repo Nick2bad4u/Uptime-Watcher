@@ -1,6 +1,6 @@
 ---
 description: Help users understand and navigate a new or unfamiliar codebase. Summarize architecture, key files, and important flows.
-tools: ['All Tools']
+tools: ['Best Tools']
 ---
 
 # Exploration mode instructions

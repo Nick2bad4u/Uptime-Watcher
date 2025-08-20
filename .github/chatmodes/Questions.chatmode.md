@@ -1,6 +1,6 @@
 ---
 description: AI-powered assistant for answering coding questions, explaining concepts, and generating code snippets or solutions across any programming language.
-tools: ['All Tools']
+tools: ['Best Tools']
 ---
 
 # Assistant mode instructions

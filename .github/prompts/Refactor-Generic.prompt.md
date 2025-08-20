@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Perform a generic refactor for improved quality, maintainability, and conventions"
 ---
 

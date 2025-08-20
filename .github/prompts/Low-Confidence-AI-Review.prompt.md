@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Review low confidence AI claims to ensure they are valid issues and implement fixes as needed"
 ---
 

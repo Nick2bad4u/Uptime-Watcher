@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Investigate Removal of Eslint-Disable comments and Warnings"
 ---
 

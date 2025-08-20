@@ -1,6 +1,6 @@
 ---
 mode: "agent"
-tools: ['All Tools']
+tools: ['Best Tools']
 description: "Review new pull requests (PRs) against the Uptime Watcher repository in a low-confidence safe mode, ensuring correctness and adherence to project standards."
 ---
 # PR Review Assistant — Low-Confidence Safe Mode
