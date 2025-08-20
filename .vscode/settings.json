@@ -76,6 +76,10 @@
         "**/release/**": true,
         "**/.nyc_output/**": true,
         "**/dist-shared/**": true,
+        "**/dist-shared-test/**": true,
+        "**/dist-test/**": true,
+        "**/dist-electron-test/**": true,
+        "**/dist-test-electron/**": true,
         "**/html/**": true,
         "**/report/**": true
     },
@@ -89,22 +93,29 @@
         "**/.nyc_output/**": true,
         "**/dist-shared/**": true,
         "**/html/**": true,
-        "**/report/**": true
+        "**/report/**": true,
+        "**/docs/Packages/**": true,
+        "**/docs/Archive/**": true,
+        "**/docs/docusaurus/**": true
     },
     "search.exclude": {
+        "**/docs/Packages/**": true,
+        "**/docs/Archive/**": true,
+        "**/docs/docusaurus/**": true,
         "**/.husky/**": true,
         "**/coverage/**": true,
-        "**/dist-shared/**": true,
         "**/dist-electron/**": true,
         "**/dist/**": true,
         "**/node_modules/**": true,
         "**/release/**": true,
-        "**/docs/Packages/**": true,
-        "**/docs/Archive/**": true,
-        "**/docs/docusaurus/**": true,
+        "**/.nyc_output/**": true,
+        "**/dist-shared/**": true,
+        "**/dist-shared-test/**": true,
+        "**/dist-test/**": true,
+        "**/dist-electron-test/**": true,
+        "**/dist-test-electron/**": true,
         "**/html/**": true,
-        "**/report/**": true,
-        "**/scripts/**": true
+        "**/report/**": true
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",
