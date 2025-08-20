@@ -158,17 +158,17 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("Form Data Validation", () => {
         it("should validate form data types", () => {
             const validateFormData = (data: any) => ({
-                    hasType: typeof data.type === "string",
-                    hasValidCheckInterval:
-                        typeof data.checkInterval === "number" &&
-                        data.checkInterval > 0,
-                    hasValidTimeout:
-                        typeof data.timeout === "number" && data.timeout > 0,
-                    hasValidRetryAttempts:
-                        typeof data.retryAttempts === "number" &&
-                        data.retryAttempts >= 0,
-                    hasValidMonitoring: typeof data.monitoring === "boolean",
-                });
+                hasType: typeof data.type === "string",
+                hasValidCheckInterval:
+                    typeof data.checkInterval === "number" &&
+                    data.checkInterval > 0,
+                hasValidTimeout:
+                    typeof data.timeout === "number" && data.timeout > 0,
+                hasValidRetryAttempts:
+                    typeof data.retryAttempts === "number" &&
+                    data.retryAttempts >= 0,
+                hasValidMonitoring: typeof data.monitoring === "boolean",
+            });
 
             const validData = {
                 type: "http",
@@ -270,11 +270,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     describe("Type Safety", () => {
         it("should enforce type safety for HTTP form data", () => {
             const createHttpFormData = (url: string, type: "http") => ({
-                    type,
-                    url,
-                    checkInterval: 30_000,
-                    monitoring: true,
-                });
+                type,
+                url,
+                checkInterval: 30_000,
+                monitoring: true,
+            });
 
             const httpData = createHttpFormData("https://example.com", "http");
             expect(httpData.type).toBe("http");
@@ -283,12 +283,12 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
         it("should handle optional fields safely", () => {
             const createFormData = (required: { type: string }) => ({
-                    ...required,
-                    checkInterval: undefined,
-                    monitoring: undefined,
-                    retryAttempts: undefined,
-                    timeout: undefined,
-                });
+                ...required,
+                checkInterval: undefined,
+                monitoring: undefined,
+                retryAttempts: undefined,
+                timeout: undefined,
+            });
 
             const formData = createFormData({ type: "http" });
             expect(formData.type).toBe("http");
@@ -338,12 +338,11 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
     describe("Form Data Utilities", () => {
         it("should check if form data is complete", () => {
-            const isCompleteHttpFormData = (data: any) => (
-                    typeof data.type === "string" &&
-                    data.type === "http" &&
-                    typeof data.url === "string" &&
-                    data.url.length > 0
-                );
+            const isCompleteHttpFormData = (data: any) =>
+                typeof data.type === "string" &&
+                data.type === "http" &&
+                typeof data.url === "string" &&
+                data.url.length > 0;
 
             const completeData = {
                 type: "http",
@@ -361,26 +360,26 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
         it("should sanitize form data", () => {
             const sanitizeFormData = (data: any) => ({
-                    type: typeof data.type === "string" ? data.type : undefined,
-                    checkInterval:
-                        typeof data.checkInterval === "number" &&
-                        data.checkInterval > 0
-                            ? data.checkInterval
-                            : undefined,
-                    monitoring:
-                        typeof data.monitoring === "boolean"
-                            ? data.monitoring
-                            : false,
-                    retryAttempts:
-                        typeof data.retryAttempts === "number" &&
-                        data.retryAttempts >= 0
-                            ? data.retryAttempts
-                            : undefined,
-                    timeout:
-                        typeof data.timeout === "number" && data.timeout > 0
-                            ? data.timeout
-                            : undefined,
-                });
+                type: typeof data.type === "string" ? data.type : undefined,
+                checkInterval:
+                    typeof data.checkInterval === "number" &&
+                    data.checkInterval > 0
+                        ? data.checkInterval
+                        : undefined,
+                monitoring:
+                    typeof data.monitoring === "boolean"
+                        ? data.monitoring
+                        : false,
+                retryAttempts:
+                    typeof data.retryAttempts === "number" &&
+                    data.retryAttempts >= 0
+                        ? data.retryAttempts
+                        : undefined,
+                timeout:
+                    typeof data.timeout === "number" && data.timeout > 0
+                        ? data.timeout
+                        : undefined,
+            });
 
             const rawData = {
                 type: "http",

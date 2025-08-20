@@ -530,7 +530,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
             "Handle single-status datasets",
             () => {
                 // Create history with only "up" status
-                const upOnlyHistory = Array.from({length: 1000})
+                const upOnlyHistory = Array.from({ length: 1000 })
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,
@@ -539,7 +539,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                     }));
 
                 // Create history with only "down" status
-                const downOnlyHistory = Array.from({length: 1000})
+                const downOnlyHistory = Array.from({ length: 1000 })
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,
@@ -559,7 +559,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
             "Handle rapid status changes",
             () => {
                 // Create history with status changing every second
-                const rapidChanges = Array.from({length: 5000})
+                const rapidChanges = Array.from({ length: 5000 })
                     .fill(null)
                     .map((_, i) => ({
                         timestamp: Date.now() - i * 1000,

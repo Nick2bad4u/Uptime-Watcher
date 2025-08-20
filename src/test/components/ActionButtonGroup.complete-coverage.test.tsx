@@ -75,7 +75,8 @@ const defaultProps = {
     onStopSiteMonitoring: vi.fn(),
 };
 
-const renderActionButtonGroup = (props = {}) => render(
+const renderActionButtonGroup = (props = {}) =>
+    render(
         <ThemeProvider>
             <ActionButtonGroup {...defaultProps} {...props} />
         </ThemeProvider>

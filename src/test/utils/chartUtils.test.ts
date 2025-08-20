@@ -508,7 +508,7 @@ describe("Chart Utilities", () => {
                         },
                         ticks: {
                             callback: function (value: number) {
-                                return `$${  value}`;
+                                return `$${value}`;
                             },
                         },
                     },
@@ -564,9 +564,11 @@ describe("Chart Utilities", () => {
                 expect(hasScales(input)).toBe(
                     input === false
                         ? false
-                        : Boolean(input &&
-                              typeof input === "object" &&
-                              "scales" in input)
+                        : Boolean(
+                              input &&
+                                  typeof input === "object" &&
+                                  "scales" in input
+                          )
                 );
                 expect(getScaleConfig(input, "x")).toBeUndefined();
                 expect(getScaleProperty(input, "x", "type")).toBeUndefined();

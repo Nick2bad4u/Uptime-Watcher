@@ -75,9 +75,9 @@ describe("useSelectedSite", () => {
         mockUseMemo = vi.mocked(reactModule.useMemo);
 
         // Setup default mock behavior for useMemo
-        mockUseMemo.mockImplementation((fn: () => any, _deps: any[]) => 
+        mockUseMemo.mockImplementation((fn: () => any, _deps: any[]) =>
             // In real tests, we want to actually execute the memoized function
-             fn()
+            fn()
         );
     });
 
@@ -451,9 +451,9 @@ describe("useSelectedSite", () => {
             mockUseSitesStore.mockReturnValue(mockSites);
 
             // Use real useMemo behavior for this test
-            mockUseMemo.mockImplementation((fn: any, _deps: any) => 
+            mockUseMemo.mockImplementation((fn: any, _deps: any) =>
                 // Track how many times the computation function is called
-                 fn()
+                fn()
             );
 
             // Act

@@ -49,14 +49,14 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 expect(() => {
                     // Simulate error handling paths
                     if (error instanceof Error) {
-                        const {message} = error;
+                        const { message } = error;
                         expect(typeof message).toBe("string");
                     } else if (
                         error &&
                         typeof error === "object" &&
                         "message" in error
                     ) {
-                        const {message} = error;
+                        const { message } = error;
                         expect(typeof message).toBe("string");
                     } else {
                         const fallback = String(error);

@@ -34,7 +34,9 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         // Mock DatabaseService with transaction support
         mockDatabaseService = {
             getDatabase: vi.fn(() => mockDatabase),
-            executeTransaction: vi.fn(async (callback) => callback(mockDatabase)),
+            executeTransaction: vi.fn(async (callback) =>
+                callback(mockDatabase)
+            ),
             initialize: vi.fn(),
             close: vi.fn(),
         } as any;

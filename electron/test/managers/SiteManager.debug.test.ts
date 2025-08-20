@@ -37,8 +37,8 @@ const mockCache = {
 };
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
-        StandardizedCache: vi.fn(() => mockCache),
-    }));
+    StandardizedCache: vi.fn(() => mockCache),
+}));
 
 const mockSiteRepositoryServiceInstance = {
     getSitesFromDatabase: vi.fn().mockResolvedValue([]),
@@ -68,8 +68,8 @@ const mockSiteWriterServiceInstance = {
 };
 
 vi.mock("../../utils/database/SiteWriterService", () => ({
-        SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
-    }));
+    SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
+}));
 
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {

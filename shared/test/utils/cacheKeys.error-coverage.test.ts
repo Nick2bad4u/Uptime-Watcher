@@ -15,8 +15,8 @@ describe("Cache Keys - Error Coverage", () => {
     it("should handle 2-part key with empty identifier", () => {
         const result = parseCacheKey("prefix:" as any);
         expect(result).toEqual({
-            prefix: 'prefix',
-            identifier: '',
+            prefix: "prefix",
+            identifier: "",
         });
     });
 

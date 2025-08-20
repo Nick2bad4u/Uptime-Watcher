@@ -1,4 +1,3 @@
- 
 /**
  * Commitlint configuration for Uptime Watcher
  *
@@ -138,7 +137,7 @@ export default {
                         emoji: "🧹",
                         title: "Chores",
                     },
-                     
+
                     "🚜 [refactor]": {
                         description:
                             "A code change that neither fixes a bug nor adds a feature",

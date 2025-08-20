@@ -28,7 +28,8 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
         onChange: vi.fn(),
     };
 
-    const renderWithTheme = (props: MonitorSelectorProperties) => render(
+    const renderWithTheme = (props: MonitorSelectorProperties) =>
+        render(
             <ThemeProvider>
                 <MonitorSelector {...props} />
             </ThemeProvider>

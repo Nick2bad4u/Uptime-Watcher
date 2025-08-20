@@ -58,7 +58,8 @@ const defaultProps = {
     onChange: vi.fn(),
 };
 
-const renderMonitorSelector = (props = {}) => render(
+const renderMonitorSelector = (props = {}) =>
+    render(
         <ThemeProvider>
             <MonitorSelector {...defaultProps} {...props} />
         </ThemeProvider>

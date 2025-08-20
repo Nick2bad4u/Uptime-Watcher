@@ -1,6 +1,5 @@
 /* eslint-disable perfectionist/sort-objects */
- 
- 
+
 /**
  * PostCSS configuration for the Uptime Watcher application.
  *

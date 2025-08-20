@@ -12,10 +12,9 @@ import { describe, expect, it } from "vitest";
 describe("Precision Function Coverage - Targeted Functions", () => {
     it("should test specific uncovered utility functions", () => {
         // Test random ID generation utility
-        const generateRandomId = (): string => (
-                Math.random().toString(36).slice(2, 15) +
-                Math.random().toString(36).slice(2, 15)
-            );
+        const generateRandomId = (): string =>
+            Math.random().toString(36).slice(2, 15) +
+            Math.random().toString(36).slice(2, 15);
 
         const id1 = generateRandomId();
         const id2 = generateRandomId();
@@ -218,7 +217,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(unique([1])).toEqual([1]);
 
         // Test array filtering with type guard
-        const filterValidItems = (items: any[]): string[] => items.filter((item): item is string => typeof item === "string" && item.length > 0);
+        const filterValidItems = (items: any[]): string[] =>
+            items.filter(
+                (item): item is string =>
+                    typeof item === "string" && item.length > 0
+            );
 
         expect(
             filterValidItems([
@@ -265,7 +268,8 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(formatDate("invalid")).toBe("Invalid Date");
 
         // Test time difference utility
-        const getTimeDifference = (start: Date, end: Date): number => end.getTime() - start.getTime();
+        const getTimeDifference = (start: Date, end: Date): number =>
+            end.getTime() - start.getTime();
 
         const start = new Date("2023-12-01T10:00:00Z");
         const end = new Date("2023-12-01T10:30:00Z");
@@ -333,7 +337,8 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(callCount).toBe(2);
 
         // Test cache key generation
-        const generateCacheKey = (...args: any[]): string => args
+        const generateCacheKey = (...args: any[]): string =>
+            args
                 .map((arg) => {
                     if (typeof arg === "object") {
                         return JSON.stringify(arg);

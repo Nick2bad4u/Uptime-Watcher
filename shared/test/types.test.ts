@@ -1,11 +1,11 @@
 /**
  * Comprehensive test suite for shared/types.ts
- * 
- * Tests for validation functions and type guards that ensure type safety
- * across the application. These functions are critical for validating
- * data integrity between frontend and backend.
- * 
- * @fileoverview Tests for shared type validation functions
+ *
+ * Tests for validation functions and type guards that ensure type safety across
+ * the application. These functions are critical for validating data integrity
+ * between frontend and backend.
+ *
+ * @file Tests for shared type validation functions
  */
 
 import { describe, it, expect } from "vitest";
@@ -19,7 +19,7 @@ import {
     type MonitorType,
     type SiteStatus,
     type StatusHistory,
-    BASE_MONITOR_TYPES
+    BASE_MONITOR_TYPES,
 } from "../types.ts";
 // Import namespace for function coverage validation
 import * as types from "../types.ts";
@@ -86,9 +86,14 @@ describe("isComputedSiteStatus", () => {
 });
 
 describe("isMonitorStatus", () => {
-    const validStatuses: MonitorStatus[] = ["down", "paused", "pending", "up"];
+    const validStatuses: MonitorStatus[] = [
+        "down",
+        "paused",
+        "pending",
+        "up",
+    ];
 
-    validStatuses.forEach(status => {
+    validStatuses.forEach((status) => {
         it(`should return true for valid status '${status}'`, () => {
             expect(isMonitorStatus(status)).toBe(true);
         });
@@ -151,9 +156,16 @@ describe("isMonitorStatus", () => {
 });
 
 describe("isSiteStatus", () => {
-    const validStatuses: SiteStatus[] = ["down", "mixed", "paused", "pending", "unknown", "up"];
+    const validStatuses: SiteStatus[] = [
+        "down",
+        "mixed",
+        "paused",
+        "pending",
+        "unknown",
+        "up",
+    ];
 
-    validStatuses.forEach(status => {
+    validStatuses.forEach((status) => {
         it(`should return true for valid status '${status}'`, () => {
             expect(isSiteStatus(status)).toBe(true);
         });
@@ -208,11 +220,16 @@ describe("isSiteStatus", () => {
     });
 
     it("should include all monitor statuses plus computed statuses", () => {
-        const monitorStatuses = ["down", "paused", "pending", "up"];
+        const monitorStatuses = [
+            "down",
+            "paused",
+            "pending",
+            "up",
+        ];
         const computedStatuses = ["mixed", "unknown"];
         const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
-        
-        allSiteStatuses.forEach(status => {
+
+        allSiteStatuses.forEach((status) => {
             expect(isSiteStatus(status)).toBe(true);
         });
     });
@@ -234,7 +251,7 @@ describe("validateMonitor", () => {
         port: 443,
         expectedValue: "success",
         recordType: "A",
-        lastChecked: new Date()
+        lastChecked: new Date(),
     });
 
     it("should return true for valid monitor", () => {
@@ -292,13 +309,13 @@ describe("validateMonitor", () => {
 
         it("should validate against BASE_MONITOR_TYPES", () => {
             const monitor = createValidMonitor();
-            
+
             // Test with first valid type if BASE_MONITOR_TYPES is available
             if (BASE_MONITOR_TYPES && BASE_MONITOR_TYPES.length > 0) {
                 monitor.type = BASE_MONITOR_TYPES[0];
                 expect(validateMonitor(monitor)).toBe(true);
             }
-            
+
             // Test with invalid type
             monitor.type = "invalid-type" as any;
             expect(validateMonitor(monitor)).toBe(false);
@@ -320,15 +337,24 @@ describe("validateMonitor", () => {
 
         it("should validate using isMonitorStatus", () => {
             const monitor = createValidMonitor();
-            
+
             // Valid statuses
-            ["down", "paused", "pending", "up"].forEach(status => {
+            [
+                "down",
+                "paused",
+                "pending",
+                "up",
+            ].forEach((status) => {
                 monitor.status = status as MonitorStatus;
                 expect(validateMonitor(monitor)).toBe(true);
             });
-            
+
             // Invalid statuses
-            ["mixed", "unknown", "invalid"].forEach(status => {
+            [
+                "mixed",
+                "unknown",
+                "invalid",
+            ].forEach((status) => {
                 monitor.status = status as any;
                 expect(validateMonitor(monitor)).toBe(false);
             });
@@ -352,16 +378,21 @@ describe("validateMonitor", () => {
             const monitor = createValidMonitor();
             monitor.monitoring = true;
             expect(validateMonitor(monitor)).toBe(true);
-            
+
             monitor.monitoring = false;
             expect(validateMonitor(monitor)).toBe(true);
         });
     });
 
     describe("numeric field validation", () => {
-        const numericFields = ["responseTime", "checkInterval", "timeout", "retryAttempts"];
-        
-        numericFields.forEach(field => {
+        const numericFields = [
+            "responseTime",
+            "checkInterval",
+            "timeout",
+            "retryAttempts",
+        ];
+
+        numericFields.forEach((field) => {
             it(`should return false for missing ${field}`, () => {
                 const monitor = createValidMonitor();
                 delete (monitor as any)[field];
@@ -398,28 +429,30 @@ describe("validateMonitor", () => {
         expect(validateMonitor({})).toBe(false);
         expect(validateMonitor({ id: "test" })).toBe(false);
         expect(validateMonitor({ id: "test", type: "http" })).toBe(false);
-        expect(validateMonitor({ 
-            id: "test", 
-            type: "http", 
-            status: "up" 
-        })).toBe(false);
+        expect(
+            validateMonitor({
+                id: "test",
+                type: "http",
+                status: "up",
+            })
+        ).toBe(false);
     });
 
     it("should handle edge cases", () => {
         const monitor = createValidMonitor();
-        
+
         // Empty strings for numeric fields should fail
         (monitor as any).responseTime = "";
         expect(validateMonitor(monitor)).toBe(false);
-        
+
         monitor.responseTime = 150; // Reset
-        
+
         // NaN is considered a number type in JavaScript, so it passes type check
         monitor.timeout = NaN;
         expect(validateMonitor(monitor)).toBe(true);
-        
+
         monitor.timeout = 5000; // Reset
-        
+
         // Infinity is also considered a number type
         monitor.checkInterval = Infinity;
         expect(validateMonitor(monitor)).toBe(true);
@@ -434,12 +467,12 @@ describe("Function Coverage Validation", () => {
         expect(typeof types.isMonitorStatus).toBe("function");
         expect(typeof types.isSiteStatus).toBe("function");
         expect(typeof types.validateMonitor).toBe("function");
-        
+
         // Call functions with valid inputs to ensure they execute
         types.isComputedSiteStatus("mixed");
         types.isMonitorStatus("up");
         types.isSiteStatus("up");
-        
+
         // Create a valid monitor for testing validateMonitor
         const validMonitor: Partial<Monitor> = {
             id: "test",
@@ -452,7 +485,7 @@ describe("Function Coverage Validation", () => {
             retryAttempts: 3,
             lastChecked: new Date(),
             history: [],
-            url: "https://example.com"
+            url: "https://example.com",
         };
         types.validateMonitor(validMonitor);
     });

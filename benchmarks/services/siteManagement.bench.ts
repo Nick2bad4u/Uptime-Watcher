@@ -1,12 +1,17 @@
 /**
  * Site Management Service Performance Benchmarks
  *
- * @file Performance benchmarks for site management operations and business logic.
+ * @file Performance benchmarks for site management operations and business
+ *   logic.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Services-SiteManagement
+ *
  * @tags ["performance", "services", "site-management", "crud"]
  */
 
@@ -16,7 +21,7 @@ interface Site {
     id: string;
     name: string;
     url: string;
-    status: 'online' | 'offline' | 'unknown' | 'maintenance';
+    status: "online" | "offline" | "unknown" | "maintenance";
     isActive: boolean;
     checkInterval: number;
     createdAt: Date;
@@ -55,7 +60,7 @@ interface SitePaginationOptions {
     page: number;
     limit: number;
     sortBy?: keyof Site;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
 }
 
 interface PaginatedResult<T> {
@@ -73,20 +78,20 @@ class MockSiteRepository {
     async create(siteData: SiteCreateRequest): Promise<Site> {
         const id = `site-${this.nextId++}`;
         const now = new Date();
-        
+
         const site: Site = {
             id,
             name: siteData.name,
             url: siteData.url,
-            status: 'unknown',
+            status: "unknown",
             isActive: true,
             checkInterval: siteData.checkInterval || 300_000, // 5 minutes
             createdAt: now,
             updatedAt: now,
             tags: siteData.tags || [],
-            metadata: siteData.metadata || {}
+            metadata: siteData.metadata || {},
         };
-        
+
         this.sites.set(id, site);
         return { ...site };
     }
@@ -96,44 +101,51 @@ class MockSiteRepository {
         return site ? { ...site } : null;
     }
 
-    async findAll(filter?: SiteFilter, pagination?: SitePaginationOptions): Promise<PaginatedResult<Site>> {
+    async findAll(
+        filter?: SiteFilter,
+        pagination?: SitePaginationOptions
+    ): Promise<PaginatedResult<Site>> {
         let sites = Array.from(this.sites.values());
-        
+
         // Apply filters
         if (filter) {
             sites = this.applyFilters(sites, filter);
         }
-        
+
         // Apply sorting
         if (pagination?.sortBy) {
-            sites = this.applySorting(sites, pagination.sortBy, pagination.sortOrder || 'asc');
+            sites = this.applySorting(
+                sites,
+                pagination.sortBy,
+                pagination.sortOrder || "asc"
+            );
         }
-        
+
         // Apply pagination
         const page = pagination?.page || 1;
         const limit = pagination?.limit || 10;
         const offset = (page - 1) * limit;
         const paginatedSites = sites.slice(offset, offset + limit);
-        
+
         return {
-            data: paginatedSites.map(site => ({ ...site })),
+            data: paginatedSites.map((site) => ({ ...site })),
             total: sites.length,
             page,
             limit,
-            totalPages: Math.ceil(sites.length / limit)
+            totalPages: Math.ceil(sites.length / limit),
         };
     }
 
     async update(id: string, updates: SiteUpdateRequest): Promise<Site | null> {
         const site = this.sites.get(id);
         if (!site) return null;
-        
+
         const updatedSite: Site = {
             ...site,
             ...updates,
-            updatedAt: new Date()
+            updatedAt: new Date(),
         };
-        
+
         this.sites.set(id, updatedSite);
         return { ...updatedSite };
     }
@@ -151,72 +163,86 @@ class MockSiteRepository {
         return null;
     }
 
-    async findByStatus(status: Site['status']): Promise<Site[]> {
+    async findByStatus(status: Site["status"]): Promise<Site[]> {
         return Array.from(this.sites.values())
-            .filter(site => site.status === status)
-            .map(site => ({ ...site }));
+            .filter((site) => site.status === status)
+            .map((site) => ({ ...site }));
     }
 
-    async updateStatus(id: string, status: Site['status']): Promise<Site | null> {
+    async updateStatus(
+        id: string,
+        status: Site["status"]
+    ): Promise<Site | null> {
         const site = this.sites.get(id);
         if (!site) return null;
-        
+
         site.status = status;
         site.updatedAt = new Date();
-        
+
         return { ...site };
     }
 
     private applyFilters(sites: Site[], filter: SiteFilter): Site[] {
-        return sites.filter(site => {
+        return sites.filter((site) => {
             if (filter.status && !filter.status.includes(site.status)) {
                 return false;
             }
-            
-            if (filter.isActive !== undefined && site.isActive !== filter.isActive) {
+
+            if (
+                filter.isActive !== undefined &&
+                site.isActive !== filter.isActive
+            ) {
                 return false;
             }
-            
+
             if (filter.tags && filter.tags.length > 0) {
-                const hasTag = filter.tags.some(tag => site.tags.includes(tag));
+                const hasTag = filter.tags.some((tag) =>
+                    site.tags.includes(tag)
+                );
                 if (!hasTag) return false;
             }
-            
+
             if (filter.searchTerm) {
                 const searchLower = filter.searchTerm.toLowerCase();
-                const matchesSearch = 
+                const matchesSearch =
                     site.name.toLowerCase().includes(searchLower) ||
                     site.url.toLowerCase().includes(searchLower) ||
-                    site.tags.some(tag => tag.toLowerCase().includes(searchLower));
+                    site.tags.some((tag) =>
+                        tag.toLowerCase().includes(searchLower)
+                    );
                 if (!matchesSearch) return false;
             }
-            
+
             if (filter.createdAfter && site.createdAt < filter.createdAfter) {
                 return false;
             }
-            
+
             if (filter.createdBefore && site.createdAt > filter.createdBefore) {
                 return false;
             }
-            
+
             return true;
         });
     }
 
-    private applySorting(sites: Site[], sortBy: keyof Site, sortOrder: 'asc' | 'desc'): Site[] {
+    private applySorting(
+        sites: Site[],
+        sortBy: keyof Site,
+        sortOrder: "asc" | "desc"
+    ): Site[] {
         return sites.sort((a, b) => {
             const aValue = a[sortBy];
             const bValue = b[sortBy];
-            
+
             let comparison = 0;
-            
+
             if (aValue < bValue) {
                 comparison = -1;
             } else if (aValue > bValue) {
                 comparison = 1;
             }
-            
-            return sortOrder === 'desc' ? comparison * -1 : comparison;
+
+            return sortOrder === "desc" ? comparison * -1 : comparison;
         });
     }
 
@@ -235,7 +261,7 @@ class MockEventBus {
 
     emit(event: string, data: any): void {
         const eventHandlers = this.handlers.get(event) || [];
-        eventHandlers.forEach(handler => handler(data));
+        eventHandlers.forEach((handler) => handler(data));
     }
 
     on(event: string, handler: Function): void {
@@ -274,19 +300,19 @@ class MockSiteManagementService {
     async createSite(request: SiteCreateRequest): Promise<Site> {
         // Validate input
         this.validateSiteRequest(request);
-        
+
         // Check for duplicate URL
         const existingSite = await this.repository.findByUrl(request.url);
         if (existingSite) {
             throw new Error(`Site with URL ${request.url} already exists`);
         }
-        
+
         // Create site
         const site = await this.repository.create(request);
-        
+
         // Emit event
-        this.eventBus.emit('site.created', { site });
-        
+        this.eventBus.emit("site.created", { site });
+
         return site;
     }
 
@@ -295,13 +321,13 @@ class MockSiteManagementService {
         if (request.url) {
             this.validateUrl(request.url);
         }
-        
+
         // Check if site exists
         const existingSite = await this.repository.findById(id);
         if (!existingSite) {
             throw new Error(`Site with ID ${id} not found`);
         }
-        
+
         // Check for URL conflicts
         if (request.url && request.url !== existingSite.url) {
             const urlConflict = await this.repository.findByUrl(request.url);
@@ -309,16 +335,16 @@ class MockSiteManagementService {
                 throw new Error(`Site with URL ${request.url} already exists`);
             }
         }
-        
+
         // Update site
         const updatedSite = await this.repository.update(id, request);
-        
+
         // Emit event
-        this.eventBus.emit('site.updated', { 
-            site: updatedSite, 
-            previous: existingSite 
+        this.eventBus.emit("site.updated", {
+            site: updatedSite,
+            previous: existingSite,
         });
-        
+
         return updatedSite!;
     }
 
@@ -328,15 +354,15 @@ class MockSiteManagementService {
         if (!site) {
             throw new Error(`Site with ID ${id} not found`);
         }
-        
+
         // Delete site
         const deleted = await this.repository.delete(id);
         if (!deleted) {
             throw new Error(`Failed to delete site with ID ${id}`);
         }
-        
+
         // Emit event
-        this.eventBus.emit('site.deleted', { site });
+        this.eventBus.emit("site.deleted", { site });
     }
 
     async getSite(id: string): Promise<Site> {
@@ -347,52 +373,60 @@ class MockSiteManagementService {
         return site;
     }
 
-    async getSites(filter?: SiteFilter, pagination?: SitePaginationOptions): Promise<PaginatedResult<Site>> {
+    async getSites(
+        filter?: SiteFilter,
+        pagination?: SitePaginationOptions
+    ): Promise<PaginatedResult<Site>> {
         return await this.repository.findAll(filter, pagination);
     }
 
-    async updateSiteStatus(id: string, status: Site['status']): Promise<Site> {
+    async updateSiteStatus(id: string, status: Site["status"]): Promise<Site> {
         const site = await this.repository.findById(id);
         if (!site) {
             throw new Error(`Site with ID ${id} not found`);
         }
-        
+
         const previousStatus = site.status;
         const updatedSite = await this.repository.updateStatus(id, status);
-        
+
         // Emit status change event
-        this.eventBus.emit('site.status.changed', {
+        this.eventBus.emit("site.status.changed", {
             site: updatedSite,
             previousStatus,
-            newStatus: status
+            newStatus: status,
         });
-        
+
         return updatedSite!;
     }
 
-    async getSitesByStatus(status: Site['status']): Promise<Site[]> {
+    async getSitesByStatus(status: Site["status"]): Promise<Site[]> {
         return await this.repository.findByStatus(status);
     }
 
-    async bulkUpdateSites(updates: { id: string; data: SiteUpdateRequest }[]): Promise<Site[]> {
+    async bulkUpdateSites(
+        updates: { id: string; data: SiteUpdateRequest }[]
+    ): Promise<Site[]> {
         const results: Site[] = [];
-        
+
         for (const update of updates) {
             try {
-                const updatedSite = await this.updateSite(update.id, update.data);
+                const updatedSite = await this.updateSite(
+                    update.id,
+                    update.data
+                );
                 results.push(updatedSite);
             } catch (error) {
                 // Log error but continue with other updates
                 console.error(`Failed to update site ${update.id}:`, error);
             }
         }
-        
+
         // Emit bulk update event
-        this.eventBus.emit('sites.bulk.updated', { 
-            updated: results, 
-            attempted: updates.length 
+        this.eventBus.emit("sites.bulk.updated", {
+            updated: results,
+            attempted: updates.length,
         });
-        
+
         return results;
     }
 
@@ -404,52 +438,55 @@ class MockSiteManagementService {
         return await this.updateSite(id, { isActive: true });
     }
 
-    async searchSites(searchTerm: string, options?: { 
-        limit?: number; 
-        includeInactive?: boolean; 
-    }): Promise<Site[]> {
+    async searchSites(
+        searchTerm: string,
+        options?: {
+            limit?: number;
+            includeInactive?: boolean;
+        }
+    ): Promise<Site[]> {
         const filter: SiteFilter = {
             searchTerm,
-            isActive: options?.includeInactive ? undefined : true
+            isActive: options?.includeInactive ? undefined : true,
         };
-        
+
         const pagination: SitePaginationOptions = {
             page: 1,
             limit: options?.limit || 50,
-            sortBy: 'name',
-            sortOrder: 'asc'
+            sortBy: "name",
+            sortOrder: "asc",
         };
-        
+
         const result = await this.repository.findAll(filter, pagination);
         return result.data;
     }
 
     private validateSiteRequest(request: SiteCreateRequest): void {
         if (!request.name || request.name.trim().length === 0) {
-            throw new Error('Site name is required');
+            throw new Error("Site name is required");
         }
-        
+
         if (!request.url) {
-            throw new Error('Site URL is required');
+            throw new Error("Site URL is required");
         }
-        
+
         this.validateUrl(request.url);
-        
+
         if (request.checkInterval && request.checkInterval < 60_000) {
-            throw new Error('Check interval must be at least 60 seconds');
+            throw new Error("Check interval must be at least 60 seconds");
         }
     }
 
     private validateUrl(url: string): void {
         if (!this.urlValidator.test(url)) {
-            throw new Error('Invalid URL format');
+            throw new Error("Invalid URL format");
         }
     }
 
     getStatistics(): any {
         return {
             totalSites: this.repository.getCount(),
-            eventHandlers: this.eventBus['handlers'].size
+            eventHandlers: this.eventBus["handlers"].size,
         };
     }
 
@@ -464,13 +501,13 @@ function createSiteRequest(index: number): SiteCreateRequest {
     return {
         name: `Site ${index}`,
         url: `https://site${index}.example.com`,
-        checkInterval: 300_000 + (index * 60_000),
+        checkInterval: 300_000 + index * 60_000,
         tags: [`tag${index}`, `category${index % 3}`],
         metadata: {
             owner: `owner${index}`,
             priority: index % 5,
-            description: `Description for site ${index}`
-        }
+            description: `Description for site ${index}`,
+        },
     };
 }
 
@@ -481,188 +518,300 @@ function createBulkSites(count: number): SiteCreateRequest[] {
 describe("Site Management Service Performance", () => {
     let service: MockSiteManagementService;
 
-    bench("service initialization", () => {
-        service = new MockSiteManagementService();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "service initialization",
+        () => {
+            service = new MockSiteManagementService();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("create single site", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request);
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "create single site",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request);
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("create site with validation", () => {
-        service = new MockSiteManagementService();
-        const request: SiteCreateRequest = {
-            name: "Complex Site",
-            url: "https://complex-site.example.com/path?param=value",
-            checkInterval: 120_000,
-            tags: ["production", "critical", "api", "monitoring"],
-            metadata: {
-                owner: "team-platform",
-                environment: "production",
-                region: "us-east-1",
-                alertChannels: ["slack", "email", "pagerduty"],
-                dependencies: ["database", "cache", "cdn"],
-                maintenanceWindow: "02:00-04:00 UTC"
-            }
-        };
-        service.createSite(request);
-    }, { warmupIterations: 10, iterations: 3000 });
+    bench(
+        "create site with validation",
+        () => {
+            service = new MockSiteManagementService();
+            const request: SiteCreateRequest = {
+                name: "Complex Site",
+                url: "https://complex-site.example.com/path?param=value",
+                checkInterval: 120_000,
+                tags: [
+                    "production",
+                    "critical",
+                    "api",
+                    "monitoring",
+                ],
+                metadata: {
+                    owner: "team-platform",
+                    environment: "production",
+                    region: "us-east-1",
+                    alertChannels: [
+                        "slack",
+                        "email",
+                        "pagerduty",
+                    ],
+                    dependencies: [
+                        "database",
+                        "cache",
+                        "cdn",
+                    ],
+                    maintenanceWindow: "02:00-04:00 UTC",
+                },
+            };
+            service.createSite(request);
+        },
+        { warmupIterations: 10, iterations: 3000 }
+    );
 
-    bench("get site by ID", () => {
-        service = new MockSiteManagementService();
-        // Setup
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.getSite(site.id);
-        });
-    }, { warmupIterations: 10, iterations: 8000 });
-
-    bench("update site", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.updateSite(site.id, {
-                name: "Updated Site Name",
-                checkInterval: 600_000,
-                tags: ["updated", "modified"]
+    bench(
+        "get site by ID",
+        () => {
+            service = new MockSiteManagementService();
+            // Setup
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.getSite(site.id);
             });
-        });
-    }, { warmupIterations: 10, iterations: 5000 });
+        },
+        { warmupIterations: 10, iterations: 8000 }
+    );
 
-    bench("update site status", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.updateSiteStatus(site.id, 'online');
-        });
-    }, { warmupIterations: 10, iterations: 8000 });
-
-    bench("delete site", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.deleteSite(site.id);
-        });
-    }, { warmupIterations: 10, iterations: 5000 });
-
-    bench("get all sites without pagination", () => {
-        service = new MockSiteManagementService();
-        // Setup multiple sites
-        const sites = createBulkSites(50);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.getSites();
-        });
-    }, { warmupIterations: 5, iterations: 500 });
-
-    bench("get sites with pagination", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(100);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.getSites(undefined, {
-                page: 2,
-                limit: 20,
-                sortBy: 'name',
-                sortOrder: 'asc'
+    bench(
+        "update site",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.updateSite(site.id, {
+                    name: "Updated Site Name",
+                    checkInterval: 600_000,
+                    tags: ["updated", "modified"],
+                });
             });
-        });
-    }, { warmupIterations: 5, iterations: 300 });
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("filter sites by status", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(75);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.getSites({
-                status: ['online', 'offline'],
-                isActive: true
+    bench(
+        "update site status",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.updateSiteStatus(site.id, "online");
             });
-        });
-    }, { warmupIterations: 5, iterations: 400 });
+        },
+        { warmupIterations: 10, iterations: 8000 }
+    );
 
-    bench("search sites", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(60);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.searchSites("site", { limit: 10 });
-        });
-    }, { warmupIterations: 5, iterations: 600 });
+    bench(
+        "delete site",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.deleteSite(site.id);
+            });
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("bulk update sites", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(30);
-        Promise.all(sites.map(site => service.createSite(site))).then(createdSites => {
-            const updates = createdSites.slice(0, 10).map(site => ({
-                id: site.id,
-                data: { isActive: false, tags: ['bulk-updated'] }
-            }));
-            service.bulkUpdateSites(updates);
-        });
-    }, { warmupIterations: 5, iterations: 200 });
-
-    bench("get sites by status", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(40);
-        Promise.all(sites.map(site => service.createSite(site))).then(createdSites => {
-            // Update some sites to online status
-            const statusUpdates = createdSites.slice(0, 20).map(site => 
-                service.updateSiteStatus(site.id, 'online')
+    bench(
+        "get all sites without pagination",
+        () => {
+            service = new MockSiteManagementService();
+            // Setup multiple sites
+            const sites = createBulkSites(50);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.getSites();
+                }
             );
-            Promise.all(statusUpdates).then(() => {
-                service.getSitesByStatus('online');
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
+
+    bench(
+        "get sites with pagination",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(100);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.getSites(undefined, {
+                        page: 2,
+                        limit: 20,
+                        sortBy: "name",
+                        sortOrder: "asc",
+                    });
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 300 }
+    );
+
+    bench(
+        "filter sites by status",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(75);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.getSites({
+                        status: ["online", "offline"],
+                        isActive: true,
+                    });
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 400 }
+    );
+
+    bench(
+        "search sites",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(60);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.searchSites("site", { limit: 10 });
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 600 }
+    );
+
+    bench(
+        "bulk update sites",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(30);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                (createdSites) => {
+                    const updates = createdSites.slice(0, 10).map((site) => ({
+                        id: site.id,
+                        data: { isActive: false, tags: ["bulk-updated"] },
+                    }));
+                    service.bulkUpdateSites(updates);
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 200 }
+    );
+
+    bench(
+        "get sites by status",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(40);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                (createdSites) => {
+                    // Update some sites to online status
+                    const statusUpdates = createdSites
+                        .slice(0, 20)
+                        .map((site) =>
+                            service.updateSiteStatus(site.id, "online")
+                        );
+                    Promise.all(statusUpdates).then(() => {
+                        service.getSitesByStatus("online");
+                    });
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 400 }
+    );
+
+    bench(
+        "archive site",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.archiveSite(site.id);
             });
-        });
-    }, { warmupIterations: 5, iterations: 400 });
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("archive site", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.archiveSite(site.id);
-        });
-    }, { warmupIterations: 10, iterations: 5000 });
-
-    bench("activate site", () => {
-        service = new MockSiteManagementService();
-        const request = createSiteRequest(1);
-        service.createSite(request).then(site => {
-            service.archiveSite(site.id).then(() => {
-                service.activateSite(site.id);
+    bench(
+        "activate site",
+        () => {
+            service = new MockSiteManagementService();
+            const request = createSiteRequest(1);
+            service.createSite(request).then((site) => {
+                service.archiveSite(site.id).then(() => {
+                    service.activateSite(site.id);
+                });
             });
-        });
-    }, { warmupIterations: 10, iterations: 3000 });
+        },
+        { warmupIterations: 10, iterations: 3000 }
+    );
 
-    bench("complex filtering and sorting", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(80);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.getSites({
-                isActive: true,
-                tags: ['tag1', 'tag2', 'category1'],
-                searchTerm: 'site',
-                createdAfter: new Date(Date.now() - 86_400_000) // 24 hours ago
-            }, {
-                page: 1,
-                limit: 25,
-                sortBy: 'createdAt',
-                sortOrder: 'desc'
-            });
-        });
-    }, { warmupIterations: 5, iterations: 150 });
+    bench(
+        "complex filtering and sorting",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(80);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.getSites(
+                        {
+                            isActive: true,
+                            tags: [
+                                "tag1",
+                                "tag2",
+                                "category1",
+                            ],
+                            searchTerm: "site",
+                            createdAfter: new Date(Date.now() - 86_400_000), // 24 hours ago
+                        },
+                        {
+                            page: 1,
+                            limit: 25,
+                            sortBy: "createdAt",
+                            sortOrder: "desc",
+                        }
+                    );
+                }
+            );
+        },
+        { warmupIterations: 5, iterations: 150 }
+    );
 
-    bench("service statistics", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(25);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.getStatistics();
-        });
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "service statistics",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(25);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.getStatistics();
+                }
+            );
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("service reset", () => {
-        service = new MockSiteManagementService();
-        const sites = createBulkSites(20);
-        Promise.all(sites.map(site => service.createSite(site))).then(() => {
-            service.reset();
-        });
-    }, { warmupIterations: 10, iterations: 800 });
+    bench(
+        "service reset",
+        () => {
+            service = new MockSiteManagementService();
+            const sites = createBulkSites(20);
+            Promise.all(sites.map((site) => service.createSite(site))).then(
+                () => {
+                    service.reset();
+                }
+            );
+        },
+        { warmupIterations: 10, iterations: 800 }
+    );
 });

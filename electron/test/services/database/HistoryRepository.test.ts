@@ -65,7 +65,9 @@ describe("HistoryRepository", () => {
         // Mock database service
         mockDatabaseService = {
             getDatabase: vi.fn(() => mockDatabase),
-            executeTransaction: vi.fn((callback) => Promise.resolve(callback(mockDatabase))),
+            executeTransaction: vi.fn((callback) =>
+                Promise.resolve(callback(mockDatabase))
+            ),
         } as unknown as DatabaseService;
 
         dependencies = {

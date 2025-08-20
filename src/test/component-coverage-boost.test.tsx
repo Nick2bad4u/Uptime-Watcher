@@ -18,16 +18,14 @@ describe("Component Coverage Boost", () => {
             }
 
             const SiteListLogic = {
-                shouldShowEmptyState: (props: SiteListProps) => (
-                        props.sites.length === 0 &&
-                        !props.loading &&
-                        !props.error
-                    ),
-                shouldShowLoading: (props: SiteListProps) => props.loading && props.sites.length === 0,
-                shouldShowError: (props: SiteListProps) => props.error !== null && !props.loading,
-                shouldShowSites: (props: SiteListProps) => (
-                        props.sites.length > 0 && !props.loading && !props.error
-                    ),
+                shouldShowEmptyState: (props: SiteListProps) =>
+                    props.sites.length === 0 && !props.loading && !props.error,
+                shouldShowLoading: (props: SiteListProps) =>
+                    props.loading && props.sites.length === 0,
+                shouldShowError: (props: SiteListProps) =>
+                    props.error !== null && !props.loading,
+                shouldShowSites: (props: SiteListProps) =>
+                    props.sites.length > 0 && !props.loading && !props.error,
             };
 
             expect(
@@ -73,7 +71,8 @@ describe("Component Coverage Boost", () => {
                 return "yellow";
             };
 
-            const renderSiteList = (sites: typeof mockSites) => sites.map((site) => ({
+            const renderSiteList = (sites: typeof mockSites) =>
+                sites.map((site) => ({
                     ...site,
                     statusColor: getStatusColor(site.status),
                 }));
@@ -216,13 +215,8 @@ describe("Component Coverage Boost", () => {
                     { key: "history", label: "History", icon: "📝" },
                     { key: "settings", label: "Settings", icon: "⚙️" },
                 ],
-                getActiveItem: (
-                    items: NavigationItem[],
-                    currentTab: string
-                ) => (
-                        items.find((item) => item.key === currentTab) ||
-                        items[0]
-                    ),
+                getActiveItem: (items: NavigationItem[], currentTab: string) =>
+                    items.find((item) => item.key === currentTab) || items[0],
                 getNextTab: (items: NavigationItem[], currentTab: string) => {
                     const currentIndex = items.findIndex(
                         (item) => item.key === currentTab
@@ -561,13 +555,14 @@ describe("Component Coverage Boost", () => {
             }
 
             const actionButtonLogic = {
-                shouldDisableButtons: (props: ActionButtonGroupProps) => props.isLoading || props.disabled,
+                shouldDisableButtons: (props: ActionButtonGroupProps) =>
+                    props.isLoading || props.disabled,
                 getButtonState: (props: ActionButtonGroupProps) => ({
-                        checkNowDisabled: props.isLoading || props.disabled,
-                        monitoringDisabled: props.isLoading || props.disabled,
-                        showStopButton: props.isMonitoring,
-                        showStartButton: !props.isMonitoring,
-                    }),
+                    checkNowDisabled: props.isLoading || props.disabled,
+                    monitoringDisabled: props.isLoading || props.disabled,
+                    showStopButton: props.isMonitoring,
+                    showStartButton: !props.isMonitoring,
+                }),
                 handleCheckNowClick: (
                     props: ActionButtonGroupProps,
                     event?: React.MouseEvent
@@ -678,15 +673,13 @@ describe("Component Coverage Boost", () => {
             const siteMonitoringLogic = {
                 shouldShowSiteMonitoringButton: (
                     _props: ActionButtonGroupProps
-                ) => 
-                     true // Always shows SiteMonitoringButton
-                ,
+                ) => true, // Always shows SiteMonitoringButton
                 getSiteMonitoringProps: (props: ActionButtonGroupProps) => ({
-                        allMonitorsRunning: props.allMonitorsRunning,
-                        isLoading: props.isLoading || props.disabled,
-                        onStartSiteMonitoring: props.onStartSiteMonitoring,
-                        onStopSiteMonitoring: props.onStopSiteMonitoring,
-                    }),
+                    allMonitorsRunning: props.allMonitorsRunning,
+                    isLoading: props.isLoading || props.disabled,
+                    onStartSiteMonitoring: props.onStartSiteMonitoring,
+                    onStopSiteMonitoring: props.onStopSiteMonitoring,
+                }),
             };
 
             const propsAllRunning: ActionButtonGroupProps = {
@@ -862,10 +855,9 @@ describe("Component Coverage Boost", () => {
             ];
 
             const fieldLogic = {
-                getFieldsForType: (type: string) => (
-                        monitorConfigs.find((config) => config.type === type)
-                            ?.fields || []
-                    ),
+                getFieldsForType: (type: string) =>
+                    monitorConfigs.find((config) => config.type === type)
+                        ?.fields || [],
                 getRequiredFields: (type: string) => {
                     const fields = fieldLogic.getFieldsForType(type);
                     return fields.filter((field) => field.required);
@@ -958,7 +950,8 @@ describe("Component Coverage Boost", () => {
                     },
                     visible: value !== null && value !== undefined,
                 }),
-                getVisibleComponents: (components: MonitorUIComponent[]) => components.filter((component) => component.visible),
+                getVisibleComponents: (components: MonitorUIComponent[]) =>
+                    components.filter((component) => component.visible),
             };
 
             const statusComponent = monitorUILogic.createStatusComponent(
@@ -1028,7 +1021,8 @@ describe("Component Coverage Boost", () => {
                     };
                     return icons[status] || icons["unknown"];
                 },
-                getStatusText: (status: string) => status.charAt(0).toUpperCase() + status.slice(1),
+                getStatusText: (status: string) =>
+                    status.charAt(0).toUpperCase() + status.slice(1),
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
                     // eslint-disable-next-line unicorn/explicit-length-check
@@ -1069,18 +1063,18 @@ describe("Component Coverage Boost", () => {
                     rawData: { timestamp: string; value: number }[],
                     label: string
                 ): ChartData => ({
-                        labels: rawData.map((item) =>
-                            new Date(item.timestamp).toLocaleTimeString()
-                        ),
-                        datasets: [
-                            {
-                                label,
-                                data: rawData.map((item) => item.value),
-                                borderColor: "#3b82f6",
-                                backgroundColor: "#3b82f620",
-                            },
-                        ],
-                    }),
+                    labels: rawData.map((item) =>
+                        new Date(item.timestamp).toLocaleTimeString()
+                    ),
+                    datasets: [
+                        {
+                            label,
+                            data: rawData.map((item) => item.value),
+                            borderColor: "#3b82f6",
+                            backgroundColor: "#3b82f620",
+                        },
+                    ],
+                }),
                 getChartOptions: (title: string) => ({
                     responsive: true,
                     plugins: {

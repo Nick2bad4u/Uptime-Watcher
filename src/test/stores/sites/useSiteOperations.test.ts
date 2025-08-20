@@ -43,9 +43,10 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/fileDownload", () => ({
-    handleSQLiteBackupDownload: vi.fn(async (callback) => 
-        // Actually call the callback to trigger the electron API call
-         await callback()
+    handleSQLiteBackupDownload: vi.fn(
+        async (callback) =>
+            // Actually call the callback to trigger the electron API call
+            await callback()
     ),
 }));
 

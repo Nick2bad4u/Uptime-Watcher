@@ -643,7 +643,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 );
 
                 // This ensures we test all branches thoroughly
-                const categories = Object.keys(EVENT_CATEGORIES) as (keyof typeof EVENT_CATEGORIES)[];
+                const categories = Object.keys(
+                    EVENT_CATEGORIES
+                ) as (keyof typeof EVENT_CATEGORIES)[];
                 const testEvent = "site:added" as keyof UptimeEvents;
 
                 for (const category of categories) {

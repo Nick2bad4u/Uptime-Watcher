@@ -2,16 +2,16 @@
  * Comprehensive test suite for OperationTimeoutManager
  *
  * @remarks
- * Tests all functionality including timeout scheduling, clearing, and 
- * automatic operation cancellation on timeout with proper logging.
+ * Tests all functionality including timeout scheduling, clearing, and automatic
+ * operation cancellation on timeout with proper logging.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OperationTimeoutManager } from "../../../services/monitoring/OperationTimeoutManager";
-import type { 
-    MonitorCheckOperation, 
-    MonitorOperationRegistry 
+import type {
+    MonitorCheckOperation,
+    MonitorOperationRegistry,
 } from "../../../services/monitoring/MonitorOperationRegistry";
 
 // Mock the logger
@@ -26,12 +26,13 @@ vi.mock("../../../utils/logger", () => ({
 
 // Mock log templates
 vi.mock("@shared/utils/logTemplates", () => ({
-    interpolateLogTemplate: vi.fn((template: string, params: any) => 
-        template.replace(/\{(\w+)\}/g, (match, key) => params[key] || match)
+    interpolateLogTemplate: vi.fn((template: string, params: any) =>
+        template.replaceAll(/{(\w+)}/g, (match, key) => params[key] || match)
     ),
     LOG_TEMPLATES: {
         debug: {
-            OPERATION_TIMEOUT_SCHEDULED: "Timeout scheduled for operation {operationId} with {timeoutMs}ms",
+            OPERATION_TIMEOUT_SCHEDULED:
+                "Timeout scheduled for operation {operationId} with {timeoutMs}ms",
         },
         warnings: {
             OPERATION_TIMEOUT: "Operation {operationId} timed out, cancelling",
@@ -53,7 +54,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             cancelOperations: vi.fn(),
         } as unknown as MonitorOperationRegistry;
 
-        operationTimeoutManager = new OperationTimeoutManager(mockOperationRegistry);
+        operationTimeoutManager = new OperationTimeoutManager(
+            mockOperationRegistry
+        );
     });
 
     afterEach(() => {
@@ -63,7 +66,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     describe("Constructor", () => {
         it("should create instance with operation registry", () => {
             expect(operationTimeoutManager).toBeDefined();
-            expect(operationTimeoutManager).toBeInstanceOf(OperationTimeoutManager);
+            expect(operationTimeoutManager).toBeInstanceOf(
+                OperationTimeoutManager
+            );
         });
     });
 
@@ -80,7 +85,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
         it("should log debug message when timeout is scheduled", async () => {
             const { monitorLogger } = await import("../../../utils/logger");
-            const { interpolateLogTemplate, LOG_TEMPLATES } = await import("@shared/utils/logTemplates");
+            const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
+                "@shared/utils/logTemplates"
+            );
 
             const operationId = "op-456";
             const timeoutMs = 3000;
@@ -118,7 +125,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     describe("clearTimeout", () => {
         it("should clear existing timeout", () => {
             const operationId = "op-clear";
-            
+
             // Schedule a timeout
             operationTimeoutManager.scheduleTimeout(operationId, 5000);
             expect(vi.getTimerCount()).toBe(1);
@@ -143,13 +150,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
         it("should do nothing when clearing non-existent timeout", async () => {
             const { monitorLogger } = await import("../../../utils/logger");
-            
+
             // Clear non-existent timeout (should not throw or log)
             operationTimeoutManager.clearTimeout("non-existent");
 
             // Should not log debug message for non-existent timeout
             expect(monitorLogger.debug).not.toHaveBeenCalledWith(
-                expect.stringContaining("Cleared timeout for operation non-existent")
+                expect.stringContaining(
+                    "Cleared timeout for operation non-existent"
+                )
             );
         });
 
@@ -168,7 +177,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     describe("handleTimeout (timeout execution)", () => {
         it("should handle timeout for active operation", async () => {
             const { monitorLogger } = await import("../../../utils/logger");
-            const { interpolateLogTemplate, LOG_TEMPLATES } = await import("@shared/utils/logTemplates");
+            const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
+                "@shared/utils/logTemplates"
+            );
 
             const operationId = "op-timeout";
             const monitorId = "monitor-123";
@@ -181,7 +192,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 initiatedAt: new Date(),
             };
 
-            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(mockOperation);
+            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(
+                mockOperation
+            );
 
             // Schedule timeout
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -190,7 +203,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             vi.advanceTimersByTime(1000);
 
             // Verify operation was retrieved
-            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(operationId);
+            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
+                operationId
+            );
 
             // Verify warning was logged
             expect(interpolateLogTemplate).toHaveBeenCalledWith(
@@ -200,7 +215,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(monitorLogger.warn).toHaveBeenCalled();
 
             // Verify operation was cancelled
-            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(monitorId);
+            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
+                monitorId
+            );
         });
 
         it("should not cancel already cancelled operation", async () => {
@@ -215,7 +232,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 initiatedAt: new Date(),
             };
 
-            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(mockOperation);
+            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(
+                mockOperation
+            );
 
             // Schedule timeout
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -224,17 +243,23 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             vi.advanceTimersByTime(1000);
 
             // Verify operation was retrieved
-            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(operationId);
+            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
+                operationId
+            );
 
             // Verify operation was NOT cancelled (already cancelled)
-            expect(mockOperationRegistry.cancelOperations).not.toHaveBeenCalled();
+            expect(
+                mockOperationRegistry.cancelOperations
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle timeout for non-existent operation", async () => {
             const operationId = "op-non-existent";
 
             // Mock registry returning null/undefined
-            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(undefined);
+            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(
+                undefined
+            );
 
             // Schedule timeout
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -243,10 +268,14 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             vi.advanceTimersByTime(1000);
 
             // Verify operation was retrieved
-            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(operationId);
+            expect(mockOperationRegistry.getOperation).toHaveBeenCalledWith(
+                operationId
+            );
 
             // Verify no cancellation was attempted
-            expect(mockOperationRegistry.cancelOperations).not.toHaveBeenCalled();
+            expect(
+                mockOperationRegistry.cancelOperations
+            ).not.toHaveBeenCalled();
         });
 
         it("should clear timeout after handling timeout", () => {
@@ -260,7 +289,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 initiatedAt: new Date(),
             };
 
-            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(mockOperation);
+            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(
+                mockOperation
+            );
 
             // Schedule timeout
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -277,7 +308,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     describe("Edge Cases and Error Conditions", () => {
         it("should handle zero timeout", () => {
             const operationId = "op-zero";
-            
+
             operationTimeoutManager.scheduleTimeout(operationId, 0);
             expect(vi.getTimerCount()).toBe(1);
 
@@ -288,7 +319,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
         it("should handle negative timeout", () => {
             const operationId = "op-negative";
-            
+
             // Should still schedule timeout (setTimeout handles negative as 0)
             operationTimeoutManager.scheduleTimeout(operationId, -1000);
             expect(vi.getTimerCount()).toBe(1);
@@ -297,14 +328,14 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
         it("should handle very large timeout", () => {
             const operationId = "op-large";
             const largeTimeout = Number.MAX_SAFE_INTEGER;
-            
+
             operationTimeoutManager.scheduleTimeout(operationId, largeTimeout);
             expect(vi.getTimerCount()).toBe(1);
         });
 
         it("should handle empty operation ID", () => {
             const operationId = "";
-            
+
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
             expect(vi.getTimerCount()).toBe(1);
 
@@ -314,7 +345,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
         it("should handle special characters in operation ID", () => {
             const operationId = "op-with-special-chars-!@#$%^&*()";
-            
+
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
             expect(vi.getTimerCount()).toBe(1);
 
@@ -341,13 +372,28 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Mock operations
             const operations = [
-                { id: "op-1", monitorId: "monitor-1", cancelled: false, initiatedAt: new Date() },
-                { id: "op-2", monitorId: "monitor-2", cancelled: false, initiatedAt: new Date() },
-                { id: "op-3", monitorId: "monitor-3", cancelled: false, initiatedAt: new Date() },
+                {
+                    id: "op-1",
+                    monitorId: "monitor-1",
+                    cancelled: false,
+                    initiatedAt: new Date(),
+                },
+                {
+                    id: "op-2",
+                    monitorId: "monitor-2",
+                    cancelled: false,
+                    initiatedAt: new Date(),
+                },
+                {
+                    id: "op-3",
+                    monitorId: "monitor-3",
+                    cancelled: false,
+                    initiatedAt: new Date(),
+                },
             ];
 
-            vi.mocked(mockOperationRegistry.getOperation).mockImplementation((id) => 
-                operations.find(op => op.id === id)
+            vi.mocked(mockOperationRegistry.getOperation).mockImplementation(
+                (id) => operations.find((op) => op.id === id)
             );
 
             // Schedule timeouts with different durations
@@ -359,21 +405,29 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Advance time to trigger first timeout
             vi.advanceTimersByTime(1000);
-            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith("monitor-1");
+            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
+                "monitor-1"
+            );
             expect(vi.getTimerCount()).toBe(2);
 
             // Advance time to trigger second timeout
             vi.advanceTimersByTime(1000);
-            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith("monitor-2");
+            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
+                "monitor-2"
+            );
             expect(vi.getTimerCount()).toBe(1);
 
             // Advance time to trigger third timeout
             vi.advanceTimersByTime(1000);
-            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith("monitor-3");
+            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
+                "monitor-3"
+            );
             expect(vi.getTimerCount()).toBe(0);
 
             // Verify all cancellations occurred
-            expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledTimes(3);
+            expect(
+                mockOperationRegistry.cancelOperations
+            ).toHaveBeenCalledTimes(3);
         });
 
         it("should handle clearing timeout before it expires", () => {
@@ -387,7 +441,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
                 initiatedAt: new Date(),
             };
 
-            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(mockOperation);
+            vi.mocked(mockOperationRegistry.getOperation).mockReturnValue(
+                mockOperation
+            );
 
             // Schedule timeout
             operationTimeoutManager.scheduleTimeout(operationId, 2000);
@@ -400,7 +456,9 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             vi.advanceTimersByTime(2000);
 
             // Verify operation was NOT cancelled (timeout was cleared)
-            expect(mockOperationRegistry.cancelOperations).not.toHaveBeenCalled();
+            expect(
+                mockOperationRegistry.cancelOperations
+            ).not.toHaveBeenCalled();
         });
     });
 });

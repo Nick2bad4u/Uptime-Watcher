@@ -1,9 +1,10 @@
 /**
  * Function coverage validation test for shared/types/validation.ts
- * 
- * This test ensures all exported functions are called to achieve 100% function coverage.
- * 
- * @fileoverview Function coverage validation for validation type helpers
+ *
+ * This test ensures all exported functions are called to achieve 100% function
+ * coverage.
+ *
+ * @file Function coverage validation for validation type helpers
  */
 
 import { describe, it, expect } from "vitest";
@@ -15,18 +16,20 @@ describe("Function Coverage Validation", () => {
         expect(typeof validation.createFailureResult).toBe("function");
         expect(typeof validation.createSuccessResult).toBe("function");
         expect(typeof validation.isValidationResult).toBe("function");
-        
+
         // Call each function with minimal valid inputs to register coverage
         validation.createFailureResult(["test error"]);
         validation.createSuccessResult("test data");
         validation.isValidationResult({ success: true } as any);
-        
+
         // Verify basic functionality
         const failureResult = validation.createFailureResult(["test error"]);
         const successResult = validation.createSuccessResult("test data");
-        
+
         expect(failureResult.success).toBe(false);
         expect(successResult.success).toBe(true);
-        expect(typeof validation.isValidationResult(failureResult)).toBe("boolean");
+        expect(typeof validation.isValidationResult(failureResult)).toBe(
+            "boolean"
+        );
     });
 });

@@ -190,9 +190,7 @@ describe("Port Error Handling", () => {
 
             // The property exists and has the expected value
             expect(error.responseTime).toBe(100);
-            expect(Object.hasOwn(error, "responseTime")).toBe(
-                true
-            );
+            expect(Object.hasOwn(error, "responseTime")).toBe(true);
         });
 
         it("should handle empty string message", () => {
@@ -477,7 +475,7 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle very long error messages", () => {
-                const longMessage = `Error: ${  "x".repeat(1000)}`;
+                const longMessage = `Error: ${"x".repeat(1000)}`;
                 const error = new Error(longMessage);
 
                 const result = handlePortCheckError(error, "long.test", 443);

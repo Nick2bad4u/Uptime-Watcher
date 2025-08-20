@@ -223,10 +223,8 @@ describe("ErrorBoundary", () => {
 
             const componentState = { shouldThrow: true };
             const StateControlledComponent = () => (
-                    <ThrowingComponent
-                        shouldThrow={componentState.shouldThrow}
-                    />
-                );
+                <ThrowingComponent shouldThrow={componentState.shouldThrow} />
+            );
 
             render(
                 <ErrorBoundary>

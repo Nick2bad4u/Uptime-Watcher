@@ -108,7 +108,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
         mockDatabaseService = {
             executeTransaction: vi
                 .fn()
-                .mockImplementation(async (callback: Function) => await callback(mockDatabase)),
+                .mockImplementation(
+                    async (callback: Function) => await callback(mockDatabase)
+                ),
             getDatabase: vi.fn().mockReturnValue(mockDatabase),
         };
 

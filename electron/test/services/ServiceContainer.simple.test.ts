@@ -38,7 +38,8 @@ const mockSiteManager = vi.hoisted(() => {
     }));
 });
 
-const mockEventBus = vi.hoisted(() => vi.fn().mockImplementation((name?: string) => {
+const mockEventBus = vi.hoisted(() =>
+    vi.fn().mockImplementation((name?: string) => {
         const emitter = new EventTarget();
         // Add required TypedEventBus methods
         (emitter as any).onTyped = vi.fn().mockReturnThis();
@@ -46,7 +47,8 @@ const mockEventBus = vi.hoisted(() => vi.fn().mockImplementation((name?: string)
         (emitter as any).busId = name || "test-bus";
         (emitter as any).destroy = vi.fn();
         return emitter;
-    }));
+    })
+);
 
 // Mock all dependencies with vi.hoisted for proper hoisting
 vi.mock("../../managers/SiteManager", () => ({

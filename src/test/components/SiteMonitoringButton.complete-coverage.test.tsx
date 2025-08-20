@@ -39,7 +39,8 @@ vi.mock("../../theme/components/ThemedButton", () => ({
 /**
  * Test wrapper with theme provider
  */
-const renderWithTheme = (ui: React.ReactElement) => render(<ThemeProvider>{ui}</ThemeProvider>);
+const renderWithTheme = (ui: React.ReactElement) =>
+    render(<ThemeProvider>{ui}</ThemeProvider>);
 
 describe("SiteMonitoringButton - Complete Coverage", () => {
     const defaultProps = {

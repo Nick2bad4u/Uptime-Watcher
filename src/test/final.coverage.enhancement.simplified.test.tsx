@@ -17,7 +17,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             const capitalize = (str: string) =>
                 str.charAt(0).toUpperCase() + str.slice(1);
             const truncate = (str: string, length: number) =>
-                str.length > length ? `${str.slice(0, length)  }...` : str;
+                str.length > length ? `${str.slice(0, length)}...` : str;
 
             expect(capitalize("hello")).toBe("Hello");
             expect(truncate("Hello world", 5)).toBe("Hello...");
@@ -116,11 +116,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     "GB",
                 ];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return (
-                    `${Number.parseFloat((bytes / k**i).toFixed(2)) 
-                    } ${ 
-                    sizes[i]}`
-                );
+                return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${
+                    sizes[i]
+                }`;
             };
 
             const formatTime = (seconds: number) => {

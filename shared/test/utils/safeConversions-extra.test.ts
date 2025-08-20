@@ -1,10 +1,10 @@
 /**
  * Comprehensive test suite for shared/utils/safeConversions.ts
- * 
+ *
  * Tests for type-safe conversion utilities that handle user input and data
  * transformation with proper error handling and fallback values.
- * 
- * @fileoverview Tests for safe conversion utility functions
+ *
+ * @file Tests for safe conversion utility functions
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -18,7 +18,7 @@ import {
     safeParsePositiveInt,
     safeParseRetryAttempts,
     safeParseTimeout,
-    safeParseTimestamp
+    safeParseTimestamp,
 } from "@shared/utils/safeConversions";
 
 describe("safeNumberConversion", () => {
@@ -200,7 +200,7 @@ describe("safeParseInt", () => {
 
     it("should handle special numeric values", () => {
         expect(safeParseInt(Infinity)).toBe(Infinity); // Infinity is a number, Math.floor(Infinity) = Infinity
-        expect(safeParseInt(-Infinity)).toBe(-Infinity); // -Infinity is a number, Math.floor(-Infinity) = -Infinity  
+        expect(safeParseInt(-Infinity)).toBe(-Infinity); // -Infinity is a number, Math.floor(-Infinity) = -Infinity
         expect(safeParseInt(NaN)).toBe(0); // NaN should use default
     });
 });
@@ -340,7 +340,9 @@ describe("safeParsePositiveInt", () => {
     it("should handle edge cases", () => {
         expect(safeParsePositiveInt(1)).toBe(1); // minimum positive
         expect(safeParsePositiveInt("1")).toBe(1);
-        expect(safeParsePositiveInt(Number.MAX_SAFE_INTEGER)).toBe(Number.MAX_SAFE_INTEGER);
+        expect(safeParsePositiveInt(Number.MAX_SAFE_INTEGER)).toBe(
+            Number.MAX_SAFE_INTEGER
+        );
     });
 });
 
@@ -451,13 +453,15 @@ describe("safeParseTimestamp", () => {
     const ONE_DAY = 86400000; // 24 hours in milliseconds
 
     beforeEach(() => {
-        mockDateNow = vi.spyOn(Date, 'now').mockReturnValue(CURRENT_TIME);
+        mockDateNow = vi.spyOn(Date, "now").mockReturnValue(CURRENT_TIME);
     });
 
     it("should return valid timestamps unchanged", () => {
         const validTimestamp = CURRENT_TIME - 1000; // 1 second ago
         expect(safeParseTimestamp(validTimestamp)).toBe(validTimestamp);
-        expect(safeParseTimestamp(validTimestamp.toString())).toBe(validTimestamp);
+        expect(safeParseTimestamp(validTimestamp.toString())).toBe(
+            validTimestamp
+        );
     });
 
     it("should return current time for timestamps that are zero or negative", () => {
@@ -475,16 +479,20 @@ describe("safeParseTimestamp", () => {
     it("should accept timestamps up to 1 day in the future", () => {
         const almostOneDayFuture = CURRENT_TIME + ONE_DAY - 1000; // Just under 1 day ahead
         const exactlyOneDayFuture = CURRENT_TIME + ONE_DAY; // Exactly 1 day ahead
-        
+
         expect(safeParseTimestamp(almostOneDayFuture)).toBe(almostOneDayFuture);
-        expect(safeParseTimestamp(exactlyOneDayFuture)).toBe(exactlyOneDayFuture);
+        expect(safeParseTimestamp(exactlyOneDayFuture)).toBe(
+            exactlyOneDayFuture
+        );
     });
 
     it("should use custom default value when provided", () => {
         const customDefault = CURRENT_TIME - 5000;
         expect(safeParseTimestamp(0, customDefault)).toBe(customDefault);
         expect(safeParseTimestamp(-1000, customDefault)).toBe(customDefault);
-        expect(safeParseTimestamp("invalid", customDefault)).toBe(customDefault);
+        expect(safeParseTimestamp("invalid", customDefault)).toBe(
+            customDefault
+        );
     });
 
     it("should handle invalid inputs", () => {
@@ -503,7 +511,7 @@ describe("safeParseTimestamp", () => {
         // Exactly at the limit
         const limitTimestamp = CURRENT_TIME + ONE_DAY;
         expect(safeParseTimestamp(limitTimestamp)).toBe(limitTimestamp);
-        
+
         // Just over the limit
         const overLimitTimestamp = CURRENT_TIME + ONE_DAY + 1;
         expect(safeParseTimestamp(overLimitTimestamp)).toBe(CURRENT_TIME);
@@ -542,17 +550,17 @@ describe("Function Coverage Validation", () => {
         expect(safeParseRetryAttempts(3)).toBe(3);
         expect(safeParseTimeout(5000)).toBe(5000);
         expect(safeParseTimestamp(Date.now())).toBeGreaterThan(0);
-        
+
         // Verify functions handle edge cases
-        expect(safeNumberConversion('invalid')).toBe(0);
-        expect(safeParseCheckInterval('invalid')).toBe(300000);
-        expect(safeParseFloat('invalid')).toBe(0);
-        expect(safeParseInt('invalid')).toBe(0);
-        expect(safeParsePercentage('invalid')).toBe(0);
-        expect(safeParsePort('invalid')).toBe(80);
-        expect(safeParsePositiveInt('invalid')).toBe(1);
-        expect(safeParseRetryAttempts('invalid')).toBe(3);
-        expect(safeParseTimeout('invalid')).toBe(10000);
-        expect(safeParseTimestamp('invalid')).toBeGreaterThan(0);
+        expect(safeNumberConversion("invalid")).toBe(0);
+        expect(safeParseCheckInterval("invalid")).toBe(300000);
+        expect(safeParseFloat("invalid")).toBe(0);
+        expect(safeParseInt("invalid")).toBe(0);
+        expect(safeParsePercentage("invalid")).toBe(0);
+        expect(safeParsePort("invalid")).toBe(80);
+        expect(safeParsePositiveInt("invalid")).toBe(1);
+        expect(safeParseRetryAttempts("invalid")).toBe(3);
+        expect(safeParseTimeout("invalid")).toBe(10000);
+        expect(safeParseTimestamp("invalid")).toBeGreaterThan(0);
     });
 });

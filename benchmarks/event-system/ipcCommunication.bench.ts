@@ -1,12 +1,17 @@
 /**
  * IPC Communication Performance Benchmarks
  *
- * @file Performance benchmarks for IPC communication between main and renderer processes.
+ * @file Performance benchmarks for IPC communication between main and renderer
+ *   processes.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Event-IpcCommunication
+ *
  * @tags ["performance", "ipc", "electron", "communication"]
  */
 
@@ -17,12 +22,15 @@ interface IpcMessage {
     channel: string;
     data: any;
     timestamp: number;
-    type: 'request' | 'response' | 'notification';
+    type: "request" | "response" | "notification";
 }
 
 class MockIpcService {
     private handlers = new Map<string, Function>();
-    private pendingRequests = new Map<string, { resolve: Function; reject: Function; timeout: NodeJS.Timeout }>();
+    private pendingRequests = new Map<
+        string,
+        { resolve: Function; reject: Function; timeout: NodeJS.Timeout }
+    >();
     private messageHistory: IpcMessage[] = [];
     private requestTimeout = 30_000; // 30 seconds
 
@@ -37,7 +45,7 @@ class MockIpcService {
             channel,
             data,
             timestamp: Date.now(),
-            type: 'request'
+            type: "request",
         };
 
         this.logMessage(message);
@@ -45,7 +53,9 @@ class MockIpcService {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 this.pendingRequests.delete(messageId);
-                reject(new Error(`IPC request timeout for channel: ${channel}`));
+                reject(
+                    new Error(`IPC request timeout for channel: ${channel}`)
+                );
             }, this.requestTimeout);
 
             this.pendingRequests.set(messageId, { resolve, reject, timeout });
@@ -61,7 +71,10 @@ class MockIpcService {
                         this.handleError(messageId, error);
                     }
                 } else {
-                    this.handleError(messageId, new Error(`No handler for channel: ${channel}`));
+                    this.handleError(
+                        messageId,
+                        new Error(`No handler for channel: ${channel}`)
+                    );
                 }
             }, Math.random() * 10);
         });
@@ -73,7 +86,7 @@ class MockIpcService {
             channel,
             data,
             timestamp: Date.now(),
-            type: 'notification'
+            type: "notification",
         };
 
         this.logMessage(message);
@@ -92,16 +105,16 @@ class MockIpcService {
         if (pending) {
             clearTimeout(pending.timeout);
             this.pendingRequests.delete(messageId);
-            
+
             const responseMessage: IpcMessage = {
                 id: this.generateMessageId(),
-                channel: 'response',
+                channel: "response",
                 data: result,
                 timestamp: Date.now(),
-                type: 'response'
+                type: "response",
             };
             this.logMessage(responseMessage);
-            
+
             pending.resolve(result);
         }
     }
@@ -132,7 +145,7 @@ class MockIpcService {
             id: `site-${i}`,
             name: `Site ${i}`,
             url: `https://site${i}.com`,
-            status: ['online', 'offline'][i % 2]
+            status: ["online", "offline"][i % 2],
         }));
     }
 
@@ -140,14 +153,14 @@ class MockIpcService {
         return {
             id: `site-${Date.now()}`,
             ...data,
-            created: Date.now()
+            created: Date.now(),
         };
     }
 
     handleUpdateSite(data: any): any {
         return {
             ...data,
-            updated: Date.now()
+            updated: Date.now(),
         };
     }
 
@@ -159,9 +172,9 @@ class MockIpcService {
         return Array.from({ length: 10 }, (_, i) => ({
             id: `monitor-${i}`,
             siteId,
-            type: 'http',
+            type: "http",
             interval: 60_000,
-            status: 'active'
+            status: "active",
         }));
     }
 
@@ -169,8 +182,8 @@ class MockIpcService {
         return Array.from({ length: 1000 }, (_, i) => ({
             id: `history-${i}`,
             timestamp: Date.now() - i * 60_000,
-            status: ['online', 'offline'][i % 2],
-            responseTime: Math.random() * 1000
+            status: ["online", "offline"][i % 2],
+            responseTime: Math.random() * 1000,
         }));
     }
 
@@ -190,92 +203,155 @@ class MockIpcService {
 describe("IPC Communication Performance", () => {
     let ipcService: MockIpcService;
 
-    bench("ipc service initialization", () => {
-        ipcService = new MockIpcService();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "ipc service initialization",
+        () => {
+            ipcService = new MockIpcService();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("register handler", () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('test-channel', () => 'response');
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "register handler",
+        () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler("test-channel", () => "response");
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("send notification", () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('notification', () => {});
-        ipcService.send('notification', { message: 'test' });
-    }, { warmupIterations: 10, iterations: 2000 });
+    bench(
+        "send notification",
+        () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler("notification", () => {});
+            ipcService.send("notification", { message: "test" });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
 
-    bench("invoke simple request", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('simple-request', () => 'simple-response');
-        await ipcService.invoke('simple-request', { data: 'test' });
-    }, { warmupIterations: 5, iterations: 500 });
+    bench(
+        "invoke simple request",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler(
+                "simple-request",
+                () => "simple-response"
+            );
+            await ipcService.invoke("simple-request", { data: "test" });
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
 
-    bench("invoke get sites", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('get-sites', ipcService.handleGetSites.bind(ipcService));
-        await ipcService.invoke('get-sites', {});
-    }, { warmupIterations: 5, iterations: 300 });
+    bench(
+        "invoke get sites",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler(
+                "get-sites",
+                ipcService.handleGetSites.bind(ipcService)
+            );
+            await ipcService.invoke("get-sites", {});
+        },
+        { warmupIterations: 5, iterations: 300 }
+    );
 
-    bench("invoke create site", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('create-site', ipcService.handleCreateSite.bind(ipcService));
-        await ipcService.invoke('create-site', {
-            name: 'Test Site',
-            url: 'https://test.com',
-            type: 'http'
-        });
-    }, { warmupIterations: 5, iterations: 500 });
+    bench(
+        "invoke create site",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler(
+                "create-site",
+                ipcService.handleCreateSite.bind(ipcService)
+            );
+            await ipcService.invoke("create-site", {
+                name: "Test Site",
+                url: "https://test.com",
+                type: "http",
+            });
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
 
-    bench("invoke get monitors", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('get-monitors', ipcService.handleGetMonitors.bind(ipcService));
-        await ipcService.invoke('get-monitors', 'site-1');
-    }, { warmupIterations: 5, iterations: 500 });
+    bench(
+        "invoke get monitors",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler(
+                "get-monitors",
+                ipcService.handleGetMonitors.bind(ipcService)
+            );
+            await ipcService.invoke("get-monitors", "site-1");
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
 
-    bench("invoke get history", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('get-history', ipcService.handleGetHistory.bind(ipcService));
-        await ipcService.invoke('get-history', {
-            siteId: 'site-1',
-            timeRange: 24 * 60 * 60 * 1000
-        });
-    }, { warmupIterations: 5, iterations: 200 });
+    bench(
+        "invoke get history",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler(
+                "get-history",
+                ipcService.handleGetHistory.bind(ipcService)
+            );
+            await ipcService.invoke("get-history", {
+                siteId: "site-1",
+                timeRange: 24 * 60 * 60 * 1000,
+            });
+        },
+        { warmupIterations: 5, iterations: 200 }
+    );
 
-    bench("concurrent requests", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('concurrent-test', () => 'response');
-        
-        const promises: Promise<any>[] = [];
-        for (let i = 0; i < 10; i++) {
-            promises.push(ipcService.invoke('concurrent-test', { index: i }));
-        }
-        
-        await Promise.all(promises);
-    }, { warmupIterations: 5, iterations: 100 });
+    bench(
+        "concurrent requests",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler("concurrent-test", () => "response");
 
-    bench("batch operations", async () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('batch-create', (data: any[]) => data.map(item => ({ ...item, id: `item-${Date.now()}` })));
-        
-        const batchData = Array.from({ length: 50 }, (_, i) => ({
-            name: `Item ${i}`,
-            value: i
-        }));
-        
-        await ipcService.invoke('batch-create', batchData);
-    }, { warmupIterations: 5, iterations: 100 });
+            const promises: Promise<any>[] = [];
+            for (let i = 0; i < 10; i++) {
+                promises.push(
+                    ipcService.invoke("concurrent-test", { index: i })
+                );
+            }
 
-    bench("message history management", () => {
-        ipcService = new MockIpcService();
-        ipcService.registerHandler('history-test', () => 'response');
-        
-        // Generate messages to test history management
-        for (let i = 0; i < 1200; i++) {
-            ipcService.send('history-test', { index: i });
-        }
-        
-        ipcService.getMessageHistory();
-        ipcService.clearHistory();
-    }, { warmupIterations: 5, iterations: 50 });
+            await Promise.all(promises);
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
+
+    bench(
+        "batch operations",
+        async () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler("batch-create", (data: any[]) =>
+                data.map((item) => ({ ...item, id: `item-${Date.now()}` }))
+            );
+
+            const batchData = Array.from({ length: 50 }, (_, i) => ({
+                name: `Item ${i}`,
+                value: i,
+            }));
+
+            await ipcService.invoke("batch-create", batchData);
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
+
+    bench(
+        "message history management",
+        () => {
+            ipcService = new MockIpcService();
+            ipcService.registerHandler("history-test", () => "response");
+
+            // Generate messages to test history management
+            for (let i = 0; i < 1200; i++) {
+                ipcService.send("history-test", { index: i });
+            }
+
+            ipcService.getMessageHistory();
+            ipcService.clearHistory();
+        },
+        { warmupIterations: 5, iterations: 50 }
+    );
 });

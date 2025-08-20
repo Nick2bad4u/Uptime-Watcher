@@ -1,29 +1,30 @@
 /**
  * Comprehensive test suite for shared/utils/validation.ts
- * 
+ *
  * Tests for validation functions that ensure data integrity and type safety
  * across the application. These functions validate monitor and site data
  * structures to prevent runtime errors and ensure consistency.
- * 
- * @fileoverview Tests for shared validation utility functions
+ *
+ * @file Tests for shared validation utility functions
  */
 
 import { describe, it, expect } from "vitest";
 import {
     validateMonitorType,
     getMonitorValidationErrors,
-    validateSite
+    validateSite,
 } from "@shared/utils/validation";
-import type {
-    Monitor,
-    MonitorType,
-    Site
-} from "../../types";
+import type { Monitor, MonitorType, Site } from "../../types";
 
 describe("validateMonitorType", () => {
-    const validTypes: MonitorType[] = ["http", "port", "ping", "dns"];
+    const validTypes: MonitorType[] = [
+        "http",
+        "port",
+        "ping",
+        "dns",
+    ];
 
-    validTypes.forEach(type => {
+    validTypes.forEach((type) => {
         it(`should return true for valid type '${type}'`, () => {
             expect(validateMonitorType(type)).toBe(true);
         });
@@ -74,14 +75,14 @@ describe("getMonitorValidationErrors", () => {
         status: "up",
         checkInterval: 30000,
         timeout: 5000,
-        retryAttempts: 3
+        retryAttempts: 3,
     });
 
     describe("basic field validation", () => {
         it("should return no errors for valid monitor", () => {
             const monitor = {
                 ...createBaseMonitor(),
-                url: "https://example.com"
+                url: "https://example.com",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toEqual([]);
@@ -115,7 +116,10 @@ describe("getMonitorValidationErrors", () => {
         });
 
         it("should return error for invalid status", () => {
-            const monitor = { ...createBaseMonitor(), status: "invalid" as any };
+            const monitor = {
+                ...createBaseMonitor(),
+                status: "invalid" as any,
+            };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Invalid monitor status");
         });
@@ -124,26 +128,37 @@ describe("getMonitorValidationErrors", () => {
             it("should accept valid checkInterval", () => {
                 const monitor = { ...createBaseMonitor(), checkInterval: 5000 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Check interval must be at least 1000ms");
+                expect(errors).not.toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
 
             it("should return error for checkInterval too small", () => {
                 const monitor = { ...createBaseMonitor(), checkInterval: 500 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Check interval must be at least 1000ms");
+                expect(errors).toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
 
             it("should return error for non-number checkInterval", () => {
-                const monitor = { ...createBaseMonitor(), checkInterval: "5000" as any };
+                const monitor = {
+                    ...createBaseMonitor(),
+                    checkInterval: "5000" as any,
+                };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Check interval must be at least 1000ms");
+                expect(errors).toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
 
             it("should not validate undefined checkInterval", () => {
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.checkInterval;
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Check interval must be at least 1000ms");
+                expect(errors).not.toContain(
+                    "Check interval must be at least 1000ms"
+                );
             });
         });
 
@@ -151,7 +166,9 @@ describe("getMonitorValidationErrors", () => {
             it("should accept valid timeout", () => {
                 const monitor = { ...createBaseMonitor(), timeout: 1000 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Timeout must be a positive number");
+                expect(errors).not.toContain(
+                    "Timeout must be a positive number"
+                );
             });
 
             it("should return error for zero timeout", () => {
@@ -167,7 +184,10 @@ describe("getMonitorValidationErrors", () => {
             });
 
             it("should return error for non-number timeout", () => {
-                const monitor = { ...createBaseMonitor(), timeout: "5000" as any };
+                const monitor = {
+                    ...createBaseMonitor(),
+                    timeout: "5000" as any,
+                };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain("Timeout must be a positive number");
             });
@@ -176,7 +196,9 @@ describe("getMonitorValidationErrors", () => {
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.timeout;
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Timeout must be a positive number");
+                expect(errors).not.toContain(
+                    "Timeout must be a positive number"
+                );
             });
         });
 
@@ -184,44 +206,61 @@ describe("getMonitorValidationErrors", () => {
             it("should accept valid retryAttempts", () => {
                 const monitor = { ...createBaseMonitor(), retryAttempts: 5 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Retry attempts must be between 0 and 10");
+                expect(errors).not.toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should accept zero retryAttempts", () => {
                 const monitor = { ...createBaseMonitor(), retryAttempts: 0 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Retry attempts must be between 0 and 10");
+                expect(errors).not.toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should accept maximum retryAttempts", () => {
                 const monitor = { ...createBaseMonitor(), retryAttempts: 10 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Retry attempts must be between 0 and 10");
+                expect(errors).not.toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should return error for negative retryAttempts", () => {
                 const monitor = { ...createBaseMonitor(), retryAttempts: -1 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should return error for retryAttempts too high", () => {
                 const monitor = { ...createBaseMonitor(), retryAttempts: 11 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should return error for non-number retryAttempts", () => {
-                const monitor = { ...createBaseMonitor(), retryAttempts: "3" as any };
+                const monitor = {
+                    ...createBaseMonitor(),
+                    retryAttempts: "3" as any,
+                };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).toContain("Retry attempts must be between 0 and 10");
+                expect(errors).toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
 
             it("should not validate undefined retryAttempts", () => {
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.retryAttempts;
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Retry attempts must be between 0 and 10");
+                expect(errors).not.toContain(
+                    "Retry attempts must be between 0 and 10"
+                );
             });
         });
     });
@@ -231,7 +270,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
-                url: "https://example.com"
+                url: "https://example.com",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toEqual([]);
@@ -240,7 +279,7 @@ describe("getMonitorValidationErrors", () => {
         it("should return error for missing URL", () => {
             const monitor = {
                 ...createBaseMonitor(),
-                type: "http" as const
+                type: "http" as const,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("URL is required for HTTP monitors");
@@ -250,7 +289,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
-                url: 123 as any
+                url: 123 as any,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("URL is required for HTTP monitors");
@@ -260,7 +299,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
-                url: ""
+                url: "",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("URL is required for HTTP monitors");
@@ -272,7 +311,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
-                host: "example.com"
+                host: "example.com",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toEqual([]);
@@ -281,7 +320,7 @@ describe("getMonitorValidationErrors", () => {
         it("should return error for missing host", () => {
             const monitor = {
                 ...createBaseMonitor(),
-                type: "ping" as const
+                type: "ping" as const,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for ping monitors");
@@ -291,7 +330,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
-                host: 123 as any
+                host: 123 as any,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for ping monitors");
@@ -301,7 +340,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
-                host: ""
+                host: "",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for ping monitors");
@@ -314,7 +353,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "example.com",
-                port: 80
+                port: 80,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toEqual([]);
@@ -324,7 +363,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
-                port: 80
+                port: 80,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for port monitors");
@@ -335,7 +374,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: 123 as any,
-                port: 80
+                port: 80,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for port monitors");
@@ -346,7 +385,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "",
-                port: 80
+                port: 80,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for port monitors");
@@ -356,10 +395,12 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
-                host: "example.com"
+                host: "example.com",
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+            expect(errors).toContain(
+                "Valid port number (1-65535) is required for port monitors"
+            );
         });
 
         it("should return error for invalid port number", () => {
@@ -367,10 +408,12 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "example.com",
-                port: 0
+                port: 0,
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+            expect(errors).toContain(
+                "Valid port number (1-65535) is required for port monitors"
+            );
         });
 
         it("should return error for port too high", () => {
@@ -378,10 +421,12 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "example.com",
-                port: 65536
+                port: 65536,
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+            expect(errors).toContain(
+                "Valid port number (1-65535) is required for port monitors"
+            );
         });
 
         it("should return error for non-number port", () => {
@@ -389,23 +434,33 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "port" as const,
                 host: "example.com",
-                port: "80" as any
+                port: "80" as any,
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Valid port number (1-65535) is required for port monitors");
+            expect(errors).toContain(
+                "Valid port number (1-65535) is required for port monitors"
+            );
         });
 
         it("should accept valid port numbers", () => {
-            const validPorts = [1, 80, 443, 8080, 65535];
-            validPorts.forEach(port => {
+            const validPorts = [
+                1,
+                80,
+                443,
+                8080,
+                65535,
+            ];
+            validPorts.forEach((port) => {
                 const monitor = {
                     ...createBaseMonitor(),
                     type: "port" as const,
                     host: "example.com",
-                    port
+                    port,
                 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain("Valid port number (1-65535) is required for port monitors");
+                expect(errors).not.toContain(
+                    "Valid port number (1-65535) is required for port monitors"
+                );
             });
         });
     });
@@ -416,7 +471,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "example.com",
-                recordType: "A"
+                recordType: "A",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toEqual([]);
@@ -426,7 +481,7 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
-                recordType: "A"
+                recordType: "A",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for DNS monitors");
@@ -437,7 +492,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: 123 as any,
-                recordType: "A"
+                recordType: "A",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for DNS monitors");
@@ -448,7 +503,7 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "",
-                recordType: "A"
+                recordType: "A",
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Host is required for DNS monitors");
@@ -458,10 +513,12 @@ describe("getMonitorValidationErrors", () => {
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
-                host: "example.com"
+                host: "example.com",
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Record type is required for DNS monitors");
+            expect(errors).toContain(
+                "Record type is required for DNS monitors"
+            );
         });
 
         it("should return error for non-string recordType", () => {
@@ -469,10 +526,12 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "example.com",
-                recordType: 123 as any
+                recordType: 123 as any,
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Record type is required for DNS monitors");
+            expect(errors).toContain(
+                "Record type is required for DNS monitors"
+            );
         });
 
         it("should return error for empty recordType", () => {
@@ -480,27 +539,42 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "example.com",
-                recordType: ""
+                recordType: "",
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Record type is required for DNS monitors");
+            expect(errors).toContain(
+                "Record type is required for DNS monitors"
+            );
         });
 
         it("should accept valid DNS record types", () => {
             const validRecordTypes = [
-                "A", "AAAA", "ANY", "CAA", "CNAME", "MX", 
-                "NAPTR", "NS", "PTR", "SOA", "SRV", "TLSA", "TXT"
+                "A",
+                "AAAA",
+                "ANY",
+                "CAA",
+                "CNAME",
+                "MX",
+                "NAPTR",
+                "NS",
+                "PTR",
+                "SOA",
+                "SRV",
+                "TLSA",
+                "TXT",
             ];
-            
-            validRecordTypes.forEach(recordType => {
+
+            validRecordTypes.forEach((recordType) => {
                 const monitor = {
                     ...createBaseMonitor(),
                     type: "dns" as const,
                     host: "example.com",
-                    recordType
+                    recordType,
                 };
                 const errors = getMonitorValidationErrors(monitor);
-                expect(errors).not.toContain(expect.stringContaining("Invalid record type"));
+                expect(errors).not.toContain(
+                    expect.stringContaining("Invalid record type")
+                );
             });
         });
 
@@ -509,10 +583,12 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "example.com",
-                recordType: "a"
+                recordType: "a",
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).not.toContain(expect.stringContaining("Invalid record type"));
+            expect(errors).not.toContain(
+                expect.stringContaining("Invalid record type")
+            );
         });
 
         it("should return error for invalid DNS record type", () => {
@@ -520,10 +596,12 @@ describe("getMonitorValidationErrors", () => {
                 ...createBaseMonitor(),
                 type: "dns" as const,
                 host: "example.com",
-                recordType: "INVALID"
+                recordType: "INVALID",
             };
             const errors = getMonitorValidationErrors(monitor);
-            expect(errors).toContain("Invalid record type: INVALID. Valid types are: A, AAAA, ANY, CAA, CNAME, MX, NAPTR, NS, PTR, SOA, SRV, TLSA, TXT");
+            expect(errors).toContain(
+                "Invalid record type: INVALID. Valid types are: A, AAAA, ANY, CAA, CNAME, MX, NAPTR, NS, PTR, SOA, SRV, TLSA, TXT"
+            );
         });
     });
 
@@ -531,7 +609,7 @@ describe("getMonitorValidationErrors", () => {
         it("should return error for unknown monitor type", () => {
             const monitor = {
                 ...createBaseMonitor(),
-                type: "unknown" as any
+                type: "unknown" as any,
             };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Unknown monitor type: unknown");
@@ -543,10 +621,10 @@ describe("getMonitorValidationErrors", () => {
             type: "http" as const,
             checkInterval: 500,
             timeout: -1000,
-            retryAttempts: 15
+            retryAttempts: 15,
         };
         const errors = getMonitorValidationErrors(monitor);
-        
+
         expect(errors).toContain("Monitor id is required");
         expect(errors).toContain("Monitor status is required");
         expect(errors).toContain("URL is required for HTTP monitors");
@@ -561,7 +639,7 @@ describe("validateSite", () => {
         identifier: "test-site",
         name: "Test Site",
         monitoring: true,
-        monitors: []
+        monitors: [],
     });
 
     it("should return true for valid site", () => {
@@ -692,7 +770,7 @@ describe("validateSite", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],
-                url: "https://example.com"
+                url: "https://example.com",
             };
 
             const site = createValidSite();
@@ -703,7 +781,7 @@ describe("validateSite", () => {
         it("should return false if any monitor is invalid", () => {
             const invalidMonitor = {
                 // Missing required fields
-                type: "http"
+                type: "http",
             };
 
             const site = createValidSite();
@@ -722,11 +800,11 @@ describe("validateSite", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [],
-                url: "https://example.com"
+                url: "https://example.com",
             };
 
             const invalidMonitor = {
-                type: "http"
+                type: "http",
             };
 
             const site = createValidSite();
@@ -738,14 +816,18 @@ describe("validateSite", () => {
     it("should return false for partial site objects", () => {
         expect(validateSite({})).toBe(false);
         expect(validateSite({ identifier: "test" })).toBe(false);
-        expect(validateSite({ 
-            identifier: "test", 
-            name: "Test" 
-        })).toBe(false);
-        expect(validateSite({ 
-            identifier: "test", 
-            name: "Test", 
-            monitoring: true 
-        })).toBe(false);
+        expect(
+            validateSite({
+                identifier: "test",
+                name: "Test",
+            })
+        ).toBe(false);
+        expect(
+            validateSite({
+                identifier: "test",
+                name: "Test",
+                monitoring: true,
+            })
+        ).toBe(false);
     });
 });

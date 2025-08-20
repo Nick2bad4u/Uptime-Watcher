@@ -63,7 +63,6 @@ describe("withRetry", () => {
             }
             if (reason === "String error") {
                 // Also expected from our retry tests
-                
             }
         });
     });

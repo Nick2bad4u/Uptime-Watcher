@@ -274,7 +274,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     objects.push({
                         id: `obj-${i}`,
                         timestamp: Date.now(),
-                        data: Array.from({length: 100}).fill(Math.random()),
+                        data: Array.from({ length: 100 }).fill(Math.random()),
                         metadata: {
                             created: Date.now(),
                             type: "small-object",
@@ -468,20 +468,22 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 100; i++) {
                     const largeObject = {
                         id: `large-${i}`,
-                        data: Array.from({length: 10_000}).fill(null).map(() => ({
-                            timestamp: Date.now(),
-                            value: Math.random(),
-                            metadata: {
-                                index: Math.floor(Math.random() * 1000),
-                                category: `category-${Math.floor(Math.random() * 10)}`,
-                                tags: Array.from({length: 5})
-                                    .fill(null)
-                                    .map(
-                                        () =>
-                                            `tag-${Math.floor(Math.random() * 100)}`
-                                    ),
-                            },
-                        })),
+                        data: Array.from({ length: 10_000 })
+                            .fill(null)
+                            .map(() => ({
+                                timestamp: Date.now(),
+                                value: Math.random(),
+                                metadata: {
+                                    index: Math.floor(Math.random() * 1000),
+                                    category: `category-${Math.floor(Math.random() * 10)}`,
+                                    tags: Array.from({ length: 5 })
+                                        .fill(null)
+                                        .map(
+                                            () =>
+                                                `tag-${Math.floor(Math.random() * 100)}`
+                                        ),
+                                },
+                            })),
                         created: Date.now(),
                     };
                     largeObjects.push(largeObject);
@@ -545,7 +547,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     const obj = {
                         id: i,
-                        data: Array.from({length: 100}).fill(Math.random()),
+                        data: Array.from({ length: 100 }).fill(Math.random()),
                         parent: null as any,
                         children: [] as any[],
                     };
@@ -651,7 +653,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     // Allocate temporary objects
                     const temp = {
-                        data: Array.from({length: 1000}).fill(Math.random()),
+                        data: Array.from({ length: 1000 }).fill(Math.random()),
                         created: Date.now(),
                         id: i,
                     };
@@ -676,16 +678,17 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     if (pool.length > 0) {
                         const obj = pool.pop();
                         // Reset object
-                        obj.data = Array.from({length: 100}).fill(Math.random());
+                        obj.data = Array.from({ length: 100 }).fill(
+                            Math.random()
+                        );
                         obj.used = true;
                         return obj;
-                    } 
-                        return {
-                            data: Array.from({length: 100}).fill(Math.random()),
-                            used: true,
-                            pooled: true,
-                        };
-                    
+                    }
+                    return {
+                        data: Array.from({ length: 100 }).fill(Math.random()),
+                        used: true,
+                        pooled: true,
+                    };
                 }
 
                 function returnToPool(obj: any) {
@@ -728,11 +731,13 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 10; i++) {
                     largeObjects.push({
                         id: i,
-                        data: Array.from({length: 1000}).fill(null).map((_, j) => ({
-                            index: j,
-                            value: Math.random(),
-                            timestamp: Date.now(),
-                        })),
+                        data: Array.from({ length: 1000 })
+                            .fill(null)
+                            .map((_, j) => ({
+                                index: j,
+                                value: Math.random(),
+                                timestamp: Date.now(),
+                            })),
                     });
                 }
 

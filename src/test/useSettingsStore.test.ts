@@ -27,10 +27,12 @@ Object.defineProperty(globalThis, "electronAPI", {
 // Mock utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn((asyncFn, handlers) => asyncFn().catch((error: Error) => {
+    withErrorHandling: vi.fn((asyncFn, handlers) =>
+        asyncFn().catch((error: Error) => {
             handlers.setError(error);
             throw error;
-        })),
+        })
+    ),
 }));
 
 // Mock useErrorStore

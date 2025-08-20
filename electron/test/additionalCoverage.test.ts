@@ -136,7 +136,8 @@ describe("Additional Coverage Tests", () => {
     });
     describe("Async Coverage", () => {
         it("should handle async operations", async () => {
-            const asyncFunction = async () => new Promise((resolve) => {
+            const asyncFunction = async () =>
+                new Promise((resolve) => {
                     setTimeout(() => resolve("success"), 1);
                 });
 

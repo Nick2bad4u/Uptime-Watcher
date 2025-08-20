@@ -4,9 +4,13 @@
  * @file Performance benchmarks for TypedEventBus operations.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Event-EventBus
+ *
  * @tags ["performance", "events", "event-bus", "messaging"]
  */
 
@@ -44,7 +48,7 @@ class MockTypedEventBus {
         const eventData: EventData = {
             id: `event-${Date.now()}-${Math.random()}`,
             timestamp: Date.now(),
-            payload: data
+            payload: data,
         };
 
         // Apply middleware
@@ -66,7 +70,7 @@ class MockTypedEventBus {
                 try {
                     listener(processedData.payload);
                 } catch (error) {
-                    console.error('Event listener error:', error);
+                    console.error("Event listener error:", error);
                 }
             }
         }
@@ -96,69 +100,115 @@ class MockTypedEventBus {
 describe("Event Bus Performance", () => {
     let eventBus: MockTypedEventBus;
 
-    bench("event bus initialization", () => {
-        eventBus = new MockTypedEventBus();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "event bus initialization",
+        () => {
+            eventBus = new MockTypedEventBus();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("register single listener", () => {
-        eventBus = new MockTypedEventBus();
-        eventBus.on('test-event', () => {});
-    }, { warmupIterations: 10, iterations: 10_000 });
+    bench(
+        "register single listener",
+        () => {
+            eventBus = new MockTypedEventBus();
+            eventBus.on("test-event", () => {});
+        },
+        { warmupIterations: 10, iterations: 10_000 }
+    );
 
-    bench("register multiple listeners", () => {
-        eventBus = new MockTypedEventBus();
-        for (let i = 0; i < 10; i++) {
-            eventBus.on(`event-${i}`, () => {});
-        }
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "register multiple listeners",
+        () => {
+            eventBus = new MockTypedEventBus();
+            for (let i = 0; i < 10; i++) {
+                eventBus.on(`event-${i}`, () => {});
+            }
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("emit event with no listeners", () => {
-        eventBus = new MockTypedEventBus();
-        eventBus.emit('non-existent-event', { data: 'test' });
-    }, { warmupIterations: 10, iterations: 10_000 });
+    bench(
+        "emit event with no listeners",
+        () => {
+            eventBus = new MockTypedEventBus();
+            eventBus.emit("non-existent-event", { data: "test" });
+        },
+        { warmupIterations: 10, iterations: 10_000 }
+    );
 
-    bench("emit event with single listener", () => {
-        eventBus = new MockTypedEventBus();
-        eventBus.on('test-event', () => {});
-        eventBus.emit('test-event', { data: 'test' });
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "emit event with single listener",
+        () => {
+            eventBus = new MockTypedEventBus();
+            eventBus.on("test-event", () => {});
+            eventBus.emit("test-event", { data: "test" });
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("emit event with multiple listeners", () => {
-        eventBus = new MockTypedEventBus();
-        for (let i = 0; i < 10; i++) {
-            eventBus.on('test-event', () => {});
-        }
-        eventBus.emit('test-event', { data: 'test' });
-    }, { warmupIterations: 10, iterations: 2000 });
+    bench(
+        "emit event with multiple listeners",
+        () => {
+            eventBus = new MockTypedEventBus();
+            for (let i = 0; i < 10; i++) {
+                eventBus.on("test-event", () => {});
+            }
+            eventBus.emit("test-event", { data: "test" });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
 
-    bench("emit events with middleware", () => {
-        eventBus = new MockTypedEventBus();
-        eventBus.addMiddleware((data: EventData) => ({ ...data, processed: true }));
-        eventBus.addMiddleware((data: EventData) => ({ ...data, timestamp: Date.now() }));
-        eventBus.on('test-event', () => {});
-        eventBus.emit('test-event', { data: 'test' });
-    }, { warmupIterations: 10, iterations: 2000 });
+    bench(
+        "emit events with middleware",
+        () => {
+            eventBus = new MockTypedEventBus();
+            eventBus.addMiddleware((data: EventData) => ({
+                ...data,
+                processed: true,
+            }));
+            eventBus.addMiddleware((data: EventData) => ({
+                ...data,
+                timestamp: Date.now(),
+            }));
+            eventBus.on("test-event", () => {});
+            eventBus.emit("test-event", { data: "test" });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
 
-    bench("unregister listeners", () => {
-        eventBus = new MockTypedEventBus();
-        const listener = () => {};
-        eventBus.on('test-event', listener);
-        eventBus.off('test-event', listener);
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "unregister listeners",
+        () => {
+            eventBus = new MockTypedEventBus();
+            const listener = () => {};
+            eventBus.on("test-event", listener);
+            eventBus.off("test-event", listener);
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("bulk event emission", () => {
-        eventBus = new MockTypedEventBus();
-        eventBus.on('bulk-event', () => {});
-        for (let i = 0; i < 100; i++) {
-            eventBus.emit('bulk-event', { index: i });
-        }
-    }, { warmupIterations: 5, iterations: 100 });
+    bench(
+        "bulk event emission",
+        () => {
+            eventBus = new MockTypedEventBus();
+            eventBus.on("bulk-event", () => {});
+            for (let i = 0; i < 100; i++) {
+                eventBus.emit("bulk-event", { index: i });
+            }
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
 
-    bench("event history management", () => {
-        eventBus = new MockTypedEventBus();
-        for (let i = 0; i < 1500; i++) {
-            eventBus.emit('history-event', { index: i });
-        }
-        eventBus.getAllEvents();
-    }, { warmupIterations: 5, iterations: 50 });
+    bench(
+        "event history management",
+        () => {
+            eventBus = new MockTypedEventBus();
+            for (let i = 0; i < 1500; i++) {
+                eventBus.emit("history-event", { index: i });
+            }
+            eventBus.getAllEvents();
+        },
+        { warmupIterations: 5, iterations: 50 }
+    );
 });

@@ -25,7 +25,8 @@ import type { IpcParameterValidator } from "../../../services/ipc/types.js";
 function createParameterCountValidator(
     expectedCount: number
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => params.length === expectedCount
+    return (params: unknown[]): null | string[] =>
+        params.length === expectedCount
             ? null
             : [
                   `Expected exactly ${expectedCount} parameter${expectedCount === 1 ? "" : "s"}`,

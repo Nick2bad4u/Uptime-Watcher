@@ -115,7 +115,8 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 "component"
             );
 
-            const getValue = (input: unknown): string => typeof input === "string" ? input : String(input);
+            const getValue = (input: unknown): string =>
+                typeof input === "string" ? input : String(input);
 
             expect(getValue("hello")).toBe("hello");
             expect(getValue(123)).toBe("123");
@@ -185,7 +186,8 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 obj: any,
                 key: string,
                 fallback = "default"
-            ): string => obj && typeof obj === "object" && key in obj
+            ): string =>
+                obj && typeof obj === "object" && key in obj
                     ? obj[key]
                     : fallback;
 
@@ -302,15 +304,13 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 "component"
             );
 
-            const isStringArray = (value: unknown): value is string[] => (
-                    Array.isArray(value) &&
-                    value.every((item) => typeof item === "string")
-                );
+            const isStringArray = (value: unknown): value is string[] =>
+                Array.isArray(value) &&
+                value.every((item) => typeof item === "string");
 
-            const isNumberArray = (value: unknown): value is number[] => (
-                    Array.isArray(value) &&
-                    value.every((item) => typeof item === "number")
-                );
+            const isNumberArray = (value: unknown): value is number[] =>
+                Array.isArray(value) &&
+                value.every((item) => typeof item === "number");
 
             expect(
                 isStringArray([

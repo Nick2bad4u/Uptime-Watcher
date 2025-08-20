@@ -531,7 +531,7 @@ describe("App Additional Coverage Tests", () => {
             },
             { timeout: 500 }
         );
-        
+
         // Verify the loading text is also present
         expect(screen.getByText("Loading...")).toBeInTheDocument();
     });
@@ -705,7 +705,7 @@ describe("App Additional Coverage Tests", () => {
             },
             { timeout: 2000 }
         );
-        
+
         // Verify other initialization calls
         expect(initializeSitesMock).toHaveBeenCalled();
         expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
@@ -773,7 +773,7 @@ describe("App Additional Coverage Tests", () => {
         await waitFor(() => {
             expect(initializeSettingsMock).toHaveBeenCalled();
         });
-        
+
         // Verify other initialization calls
         expect(initializeSitesMock).toHaveBeenCalled();
         expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
@@ -862,7 +862,7 @@ describe("App Additional Coverage Tests", () => {
         await waitFor(() => {
             expect(initializeSettingsMock).toHaveBeenCalled();
         });
-        
+
         // Verify sites initialization was called
         expect(initializeSitesMock).toHaveBeenCalled();
     });

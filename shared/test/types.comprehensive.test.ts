@@ -140,7 +140,10 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for monitor with invalid type", () => {
-            const invalidMonitor = { ...validMonitor, type: "invalid-type" } as any;
+            const invalidMonitor = {
+                ...validMonitor,
+                type: "invalid-type",
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
@@ -153,17 +156,26 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for monitor with invalid monitoring type", () => {
-            const invalidMonitor = { ...validMonitor, monitoring: "true" } as any;
+            const invalidMonitor = {
+                ...validMonitor,
+                monitoring: "true",
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid responseTime type", () => {
-            const invalidMonitor = { ...validMonitor, responseTime: "150" } as any;
+            const invalidMonitor = {
+                ...validMonitor,
+                responseTime: "150",
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
         it("should return false for monitor with invalid checkInterval type", () => {
-            const invalidMonitor = { ...validMonitor, checkInterval: "60000" } as any;
+            const invalidMonitor = {
+                ...validMonitor,
+                checkInterval: "60000",
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
@@ -173,7 +185,10 @@ describe("shared/types type guards and validators", () => {
         });
 
         it("should return false for monitor with invalid retryAttempts type", () => {
-            const invalidMonitor = { ...validMonitor, retryAttempts: "3" } as any;
+            const invalidMonitor = {
+                ...validMonitor,
+                retryAttempts: "3",
+            } as any;
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 

@@ -136,7 +136,11 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should handle boolean field changes", () => {
-            const booleanHandler = (fieldName: string, value: boolean) => ({ fieldName, value, type: "boolean" });
+            const booleanHandler = (fieldName: string, value: boolean) => ({
+                fieldName,
+                value,
+                type: "boolean",
+            });
 
             const result = booleanHandler("followRedirects", true);
             expect(result.fieldName).toBe("followRedirects");
@@ -145,7 +149,11 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should handle number field changes", () => {
-            const numberHandler = (fieldName: string, value: number) => ({ fieldName, value, type: "number" });
+            const numberHandler = (fieldName: string, value: number) => ({
+                fieldName,
+                value,
+                type: "number",
+            });
 
             const result = numberHandler("timeout", 5000);
             expect(result.fieldName).toBe("timeout");
@@ -154,7 +162,11 @@ describe("Monitor Forms Types Coverage Tests", () => {
         });
 
         it("should handle string field changes", () => {
-            const stringHandler = (fieldName: string, value: string) => ({ fieldName, value, type: "string" });
+            const stringHandler = (fieldName: string, value: string) => ({
+                fieldName,
+                value,
+                type: "string",
+            });
 
             const result = stringHandler("url", "https://example.com");
             expect(result.fieldName).toBe("url");
@@ -366,11 +378,13 @@ describe("Monitor Forms Types Coverage Tests", () => {
 
     describe("Field Type Safety", () => {
         it("should enforce type safety for handlers", () => {
-            const createHandler = <T>(expectedType: string) => (fieldName: string, value: T) => ({
-                        fieldName,
-                        value,
-                        isCorrectType: typeof value === expectedType,
-                    });
+            const createHandler =
+                <T>(expectedType: string) =>
+                (fieldName: string, value: T) => ({
+                    fieldName,
+                    value,
+                    isCorrectType: typeof value === expectedType,
+                });
 
             const stringHandler = createHandler<string>("string");
             const numberHandler = createHandler<number>("number");

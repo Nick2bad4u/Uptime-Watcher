@@ -5,9 +5,13 @@
  *   transaction handling, rollbacks, and bulk operations within transactions.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Database-Transactions
+ *
  * @tags ["performance", "database", "transactions", "rollback", "bulk"]
  */
 
@@ -23,46 +27,53 @@ class MockDatabase {
     prepare(sql: string) {
         return {
             run: (...params: any[]) => {
-                const record = { id: this.nextId++, sql, params, timestamp: Date.now() };
-                
+                const record = {
+                    id: this.nextId++,
+                    sql,
+                    params,
+                    timestamp: Date.now(),
+                };
+
                 if (this.inTransaction) {
                     this.transactionData.push(record);
                 } else {
                     this.data.push(record);
                 }
-                
+
                 return { lastInsertRowid: record.id, changes: 1 };
             },
             get: (...params: any[]) => {
-                const source = this.inTransaction ? this.transactionData : this.data;
-                return source.find(r => r.params[0] === params[0]) || null;
+                const source = this.inTransaction
+                    ? this.transactionData
+                    : this.data;
+                return source.find((r) => r.params[0] === params[0]) || null;
             },
-            all: () => this.inTransaction ? this.transactionData : this.data
+            all: () => (this.inTransaction ? this.transactionData : this.data),
         };
     }
 
     exec(sql: string) {
         switch (sql) {
-        case 'BEGIN TRANSACTION': {
-            this.inTransaction = true;
-            this.transactionData = [];
-        
-        break;
-        }
-        case 'COMMIT': {
-            this.data.push(...this.transactionData);
-            this.inTransaction = false;
-            this.transactionData = [];
-        
-        break;
-        }
-        case 'ROLLBACK': {
-            this.inTransaction = false;
-            this.transactionData = [];
-        
-        break;
-        }
-        // No default
+            case "BEGIN TRANSACTION": {
+                this.inTransaction = true;
+                this.transactionData = [];
+
+                break;
+            }
+            case "COMMIT": {
+                this.data.push(...this.transactionData);
+                this.inTransaction = false;
+                this.transactionData = [];
+
+                break;
+            }
+            case "ROLLBACK": {
+                this.inTransaction = false;
+                this.transactionData = [];
+
+                break;
+            }
+            // No default
         }
         return this;
     }
@@ -88,20 +99,23 @@ class MockTransactionManager {
     }
 
     async executeTransaction<T>(operation: () => T): Promise<T> {
-        this.db.exec('BEGIN TRANSACTION');
+        this.db.exec("BEGIN TRANSACTION");
         try {
             const result = operation();
-            this.db.exec('COMMIT');
+            this.db.exec("COMMIT");
             return result;
         } catch (error) {
-            this.db.exec('ROLLBACK');
+            this.db.exec("ROLLBACK");
             throw error;
         }
     }
 
-    async executeWithRetry<T>(operation: () => T, maxRetries: number = 3): Promise<T> {
+    async executeWithRetry<T>(
+        operation: () => T,
+        maxRetries: number = 3
+    ): Promise<T> {
         let lastError: Error | null = null;
-        
+
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             try {
                 return await this.executeTransaction(operation);
@@ -111,50 +125,64 @@ class MockTransactionManager {
                     throw lastError;
                 }
                 // Simulate retry delay
-                await new Promise(resolve => setTimeout(resolve, 2**attempt * 10));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, 2 ** attempt * 10)
+                );
             }
         }
-        
+
         throw lastError;
     }
 
     bulkInsert(records: any[]) {
         return this.executeTransaction(() => {
-            const stmt = this.db.prepare('INSERT INTO test (data) VALUES (?)');
-            return records.map(record => stmt.run(JSON.stringify(record)));
+            const stmt = this.db.prepare("INSERT INTO test (data) VALUES (?)");
+            return records.map((record) => stmt.run(JSON.stringify(record)));
         });
     }
 
     bulkUpdate(updates: { id: number; data: any }[]) {
         return this.executeTransaction(() => {
-            const stmt = this.db.prepare('UPDATE test SET data = ? WHERE id = ?');
-            return updates.map(update => stmt.run(JSON.stringify(update.data), update.id));
+            const stmt = this.db.prepare(
+                "UPDATE test SET data = ? WHERE id = ?"
+            );
+            return updates.map((update) =>
+                stmt.run(JSON.stringify(update.data), update.id)
+            );
         });
     }
 
     bulkDelete(ids: number[]) {
         return this.executeTransaction(() => {
-            const stmt = this.db.prepare('DELETE FROM test WHERE id = ?');
-            return ids.map(id => stmt.run(id));
+            const stmt = this.db.prepare("DELETE FROM test WHERE id = ?");
+            return ids.map((id) => stmt.run(id));
         });
     }
 
     complexOperation() {
         return this.executeTransaction(() => {
-            const insertStmt = this.db.prepare('INSERT INTO test (data) VALUES (?)');
-            const updateStmt = this.db.prepare('UPDATE test SET data = ? WHERE id = ?');
-            const deleteStmt = this.db.prepare('DELETE FROM test WHERE id = ?');
+            const insertStmt = this.db.prepare(
+                "INSERT INTO test (data) VALUES (?)"
+            );
+            const updateStmt = this.db.prepare(
+                "UPDATE test SET data = ? WHERE id = ?"
+            );
+            const deleteStmt = this.db.prepare("DELETE FROM test WHERE id = ?");
 
             // Insert records
             const insertResults: any[] = [];
             for (let i = 0; i < 10; i++) {
-                insertResults.push(insertStmt.run(JSON.stringify({ value: i })));
+                insertResults.push(
+                    insertStmt.run(JSON.stringify({ value: i }))
+                );
             }
 
             // Update some records
             const updateResults: any[] = [];
             for (let i = 0; i < 5; i++) {
-                updateResults.push(updateStmt.run(JSON.stringify({ value: i * 2 }), i + 1));
+                updateResults.push(
+                    updateStmt.run(JSON.stringify({ value: i * 2 }), i + 1)
+                );
             }
 
             // Delete some records
@@ -169,30 +197,36 @@ class MockTransactionManager {
 
     simulateFailure() {
         return this.executeTransaction(() => {
-            const stmt = this.db.prepare('INSERT INTO test (data) VALUES (?)');
-            stmt.run(JSON.stringify({ value: 'success' }));
-            throw new Error('Simulated failure');
+            const stmt = this.db.prepare("INSERT INTO test (data) VALUES (?)");
+            stmt.run(JSON.stringify({ value: "success" }));
+            throw new Error("Simulated failure");
         });
     }
 
     nestedOperations() {
         return this.executeTransaction(() => {
-            const stmt = this.db.prepare('INSERT INTO test (data) VALUES (?)');
-            
+            const stmt = this.db.prepare("INSERT INTO test (data) VALUES (?)");
+
             // Simulate nested operations
             for (let i = 0; i < 5; i++) {
                 stmt.run(JSON.stringify({ level: 1, value: i }));
-                
+
                 for (let j = 0; j < 3; j++) {
                     stmt.run(JSON.stringify({ level: 2, parent: i, value: j }));
-                    
+
                     for (let k = 0; k < 2; k++) {
-                        stmt.run(JSON.stringify({ level: 3, parent: `${i}-${j}`, value: k }));
+                        stmt.run(
+                            JSON.stringify({
+                                level: 3,
+                                parent: `${i}-${j}`,
+                                value: k,
+                            })
+                        );
                     }
                 }
             }
-            
-            return this.db.prepare('SELECT COUNT(*) as count FROM test').get();
+
+            return this.db.prepare("SELECT COUNT(*) as count FROM test").get();
         });
     }
 
@@ -208,100 +242,182 @@ class MockTransactionManager {
 describe("Database Transaction Performance", () => {
     let manager: MockTransactionManager;
 
-    bench("transaction manager initialization", () => {
-        manager = new MockTransactionManager();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "transaction manager initialization",
+        () => {
+            manager = new MockTransactionManager();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("simple transaction (single insert)", async () => {
-        manager = new MockTransactionManager();
-        await manager.executeTransaction(() => {
-            const stmt = manager['db'].prepare('INSERT INTO test (data) VALUES (?)');
-            return stmt.run(JSON.stringify({ test: 'data' }));
-        });
-    }, { warmupIterations: 5, iterations: 5000 });
+    bench(
+        "simple transaction (single insert)",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.executeTransaction(() => {
+                const stmt = manager["db"].prepare(
+                    "INSERT INTO test (data) VALUES (?)"
+                );
+                return stmt.run(JSON.stringify({ test: "data" }));
+            });
+        },
+        { warmupIterations: 5, iterations: 5000 }
+    );
 
-    bench("simple transaction (multiple operations)", async () => {
-        manager = new MockTransactionManager();
-        await manager.executeTransaction(() => {
-            const insertStmt = manager['db'].prepare('INSERT INTO test (data) VALUES (?)');
-            const updateStmt = manager['db'].prepare('UPDATE test SET data = ? WHERE id = ?');
-            
-            const result1 = insertStmt.run(JSON.stringify({ value: 1 }));
-            const result2 = insertStmt.run(JSON.stringify({ value: 2 }));
-            const result3 = updateStmt.run(JSON.stringify({ value: 3 }), result1.lastInsertRowid);
-            
-            return [result1, result2, result3];
-        });
-    }, { warmupIterations: 5, iterations: 2000 });
+    bench(
+        "simple transaction (multiple operations)",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.executeTransaction(() => {
+                const insertStmt = manager["db"].prepare(
+                    "INSERT INTO test (data) VALUES (?)"
+                );
+                const updateStmt = manager["db"].prepare(
+                    "UPDATE test SET data = ? WHERE id = ?"
+                );
 
-    bench("bulk insert in transaction (50 records)", async () => {
-        manager = new MockTransactionManager();
-        const records = Array.from({ length: 50 }, (_, i) => ({ id: i, value: `record${i}` }));
-        await manager.bulkInsert(records);
-    }, { warmupIterations: 2, iterations: 200 });
+                const result1 = insertStmt.run(JSON.stringify({ value: 1 }));
+                const result2 = insertStmt.run(JSON.stringify({ value: 2 }));
+                const result3 = updateStmt.run(
+                    JSON.stringify({ value: 3 }),
+                    result1.lastInsertRowid
+                );
 
-    bench("bulk insert in transaction (200 records)", async () => {
-        manager = new MockTransactionManager();
-        const records = Array.from({ length: 200 }, (_, i) => ({ id: i, value: `record${i}` }));
-        await manager.bulkInsert(records);
-    }, { warmupIterations: 2, iterations: 50 });
+                return [
+                    result1,
+                    result2,
+                    result3,
+                ];
+            });
+        },
+        { warmupIterations: 5, iterations: 2000 }
+    );
 
-    bench("bulk update in transaction (50 records)", async () => {
-        manager = new MockTransactionManager();
-        const updates = Array.from({ length: 50 }, (_, i) => ({ id: i + 1, data: { updated: true, value: i } }));
-        await manager.bulkUpdate(updates);
-    }, { warmupIterations: 2, iterations: 200 });
+    bench(
+        "bulk insert in transaction (50 records)",
+        async () => {
+            manager = new MockTransactionManager();
+            const records = Array.from({ length: 50 }, (_, i) => ({
+                id: i,
+                value: `record${i}`,
+            }));
+            await manager.bulkInsert(records);
+        },
+        { warmupIterations: 2, iterations: 200 }
+    );
 
-    bench("bulk delete in transaction (20 records)", async () => {
-        manager = new MockTransactionManager();
-        const ids = Array.from({ length: 20 }, (_, i) => i + 1);
-        await manager.bulkDelete(ids);
-    }, { warmupIterations: 2, iterations: 500 });
+    bench(
+        "bulk insert in transaction (200 records)",
+        async () => {
+            manager = new MockTransactionManager();
+            const records = Array.from({ length: 200 }, (_, i) => ({
+                id: i,
+                value: `record${i}`,
+            }));
+            await manager.bulkInsert(records);
+        },
+        { warmupIterations: 2, iterations: 50 }
+    );
 
-    bench("complex transaction operation", async () => {
-        manager = new MockTransactionManager();
-        await manager.complexOperation();
-    }, { warmupIterations: 2, iterations: 500 });
+    bench(
+        "bulk update in transaction (50 records)",
+        async () => {
+            manager = new MockTransactionManager();
+            const updates = Array.from({ length: 50 }, (_, i) => ({
+                id: i + 1,
+                data: { updated: true, value: i },
+            }));
+            await manager.bulkUpdate(updates);
+        },
+        { warmupIterations: 2, iterations: 200 }
+    );
 
-    bench("transaction with retry (success)", async () => {
-        manager = new MockTransactionManager();
-        await manager.executeWithRetry(() => {
-            const stmt = manager['db'].prepare('INSERT INTO test (data) VALUES (?)');
-            return stmt.run(JSON.stringify({ retry: 'success' }));
-        });
-    }, { warmupIterations: 5, iterations: 1000 });
+    bench(
+        "bulk delete in transaction (20 records)",
+        async () => {
+            manager = new MockTransactionManager();
+            const ids = Array.from({ length: 20 }, (_, i) => i + 1);
+            await manager.bulkDelete(ids);
+        },
+        { warmupIterations: 2, iterations: 500 }
+    );
 
-    bench("transaction rollback simulation", async () => {
-        manager = new MockTransactionManager();
-        try {
-            await manager.simulateFailure();
-        } catch {
-            // Expected failure
-        }
-    }, { warmupIterations: 5, iterations: 1000 });
+    bench(
+        "complex transaction operation",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.complexOperation();
+        },
+        { warmupIterations: 2, iterations: 500 }
+    );
 
-    bench("nested operations in transaction", async () => {
-        manager = new MockTransactionManager();
-        await manager.nestedOperations();
-    }, { warmupIterations: 2, iterations: 100 });
+    bench(
+        "transaction with retry (success)",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.executeWithRetry(() => {
+                const stmt = manager["db"].prepare(
+                    "INSERT INTO test (data) VALUES (?)"
+                );
+                return stmt.run(JSON.stringify({ retry: "success" }));
+            });
+        },
+        { warmupIterations: 5, iterations: 1000 }
+    );
 
-    bench("transaction with concurrent reads", async () => {
-        manager = new MockTransactionManager();
-        await manager.executeTransaction(() => {
-            const insertStmt = manager['db'].prepare('INSERT INTO test (data) VALUES (?)');
-            const selectStmt = manager['db'].prepare('SELECT * FROM test WHERE id = ?');
-            
-            for (let i = 0; i < 10; i++) {
-                const result = insertStmt.run(JSON.stringify({ concurrent: i }));
-                selectStmt.get(result.lastInsertRowid);
+    bench(
+        "transaction rollback simulation",
+        async () => {
+            manager = new MockTransactionManager();
+            try {
+                await manager.simulateFailure();
+            } catch {
+                // Expected failure
             }
-            
-            return selectStmt.all();
-        });
-    }, { warmupIterations: 2, iterations: 500 });
+        },
+        { warmupIterations: 5, iterations: 1000 }
+    );
 
-    bench("transaction cleanup", () => {
-        manager = new MockTransactionManager();
-        manager.clear();
-    }, { warmupIterations: 5, iterations: 1000 });
+    bench(
+        "nested operations in transaction",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.nestedOperations();
+        },
+        { warmupIterations: 2, iterations: 100 }
+    );
+
+    bench(
+        "transaction with concurrent reads",
+        async () => {
+            manager = new MockTransactionManager();
+            await manager.executeTransaction(() => {
+                const insertStmt = manager["db"].prepare(
+                    "INSERT INTO test (data) VALUES (?)"
+                );
+                const selectStmt = manager["db"].prepare(
+                    "SELECT * FROM test WHERE id = ?"
+                );
+
+                for (let i = 0; i < 10; i++) {
+                    const result = insertStmt.run(
+                        JSON.stringify({ concurrent: i })
+                    );
+                    selectStmt.get(result.lastInsertRowid);
+                }
+
+                return selectStmt.all();
+            });
+        },
+        { warmupIterations: 2, iterations: 500 }
+    );
+
+    bench(
+        "transaction cleanup",
+        () => {
+            manager = new MockTransactionManager();
+            manager.clear();
+        },
+        { warmupIterations: 5, iterations: 1000 }
+    );
 });

@@ -87,15 +87,21 @@ describe("Ultimate Function Coverage - String Utilities", () => {
 
 describe("Ultimate Function Coverage - Chart Configuration", () => {
     it("should test chart configuration type guards", () => {
-        const hasPlugins = (config: any): boolean => Boolean(config &&
-                typeof config === "object" &&
-                config !== null &&
-                "plugins" in config);
+        const hasPlugins = (config: any): boolean =>
+            Boolean(
+                config &&
+                    typeof config === "object" &&
+                    config !== null &&
+                    "plugins" in config
+            );
 
-        const hasScales = (config: any): boolean => Boolean(config &&
-                typeof config === "object" &&
-                config !== null &&
-                "scales" in config);
+        const hasScales = (config: any): boolean =>
+            Boolean(
+                config &&
+                    typeof config === "object" &&
+                    config !== null &&
+                    "scales" in config
+            );
 
         // Test hasPlugins
         expect(hasPlugins({ plugins: [] })).toBe(true);
@@ -128,7 +134,8 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
             return hostRegex.test(trimmed) || trimmed === "localhost";
         };
 
-        const isValidPort = (port: number): boolean => Number.isInteger(port) && port >= 1 && port <= 65_535;
+        const isValidPort = (port: number): boolean =>
+            Number.isInteger(port) && port >= 1 && port <= 65_535;
 
         // Test isValidHost
         expect(isValidHost("example.com")).toBe(true);

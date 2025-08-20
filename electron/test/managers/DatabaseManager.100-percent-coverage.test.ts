@@ -129,7 +129,9 @@ vi.mock("../../utils/logger", () => ({
 }));
 
 vi.mock("../../shared/utils/errorHandling", () => {
-    const mockWithErrorHandling = vi.fn().mockImplementation(async (fn) => await fn());
+    const mockWithErrorHandling = vi
+        .fn()
+        .mockImplementation(async (fn) => await fn());
     return {
         withErrorHandling: mockWithErrorHandling,
     };
@@ -489,7 +491,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             ];
 
             // Ensure siteCache is accessible and mock its methods
-            const {siteCache} = (databaseManager as any);
+            const { siteCache } = databaseManager as any;
             if (!siteCache) {
                 throw new Error("siteCache is not initialized");
             }
@@ -521,7 +523,7 @@ describe("DatabaseManager - 100% Coverage", () => {
 
         it("should handle cache access errors and return empty array", async () => {
             // Arrange
-            const {siteCache} = (databaseManager as any);
+            const { siteCache } = databaseManager as any;
             if (!siteCache) {
                 throw new Error("siteCache is not initialized");
             }

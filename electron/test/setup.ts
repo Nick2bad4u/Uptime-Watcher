@@ -124,7 +124,7 @@ vi.mock("path", async () => {
     return {
         ...actual,
         join: vi.fn((...args) => args.join("/")),
-        resolve: vi.fn((...args) => `/${  args.join("/")}`),
+        resolve: vi.fn((...args) => `/${args.join("/")}`),
     };
 });
 
@@ -171,100 +171,92 @@ vi.mock("../utils/logger", () => ({
 // Mock MonitorScheduler
 vi.mock("../services/monitoring/MonitorScheduler", () => ({
     MonitorScheduler: vi.fn(() => ({
-            // Private properties accessed by tests
-            intervals: new Map(),
-            onCheckCallback: undefined,
+        // Private properties accessed by tests
+        intervals: new Map(),
+        onCheckCallback: undefined,
 
-            // Public methods
-            setCheckCallback: vi.fn(function (this: any, callback: any) {
-                this.onCheckCallback = callback;
-            }),
-            startMonitor: vi.fn(function (
-                this: any,
-                siteId: string,
-                monitor: any
-            ) {
-                if (!monitor.id) return false;
-                const key = `${siteId}|${monitor.id}`;
-                this.intervals.set(key, 123); // Mock interval ID
+        // Public methods
+        setCheckCallback: vi.fn(function (this: any, callback: any) {
+            this.onCheckCallback = callback;
+        }),
+        startMonitor: vi.fn(function (this: any, siteId: string, monitor: any) {
+            if (!monitor.id) return false;
+            const key = `${siteId}|${monitor.id}`;
+            this.intervals.set(key, 123); // Mock interval ID
+            return true;
+        }),
+        stopMonitor: vi.fn(function (
+            this: any,
+            siteId: string,
+            monitorId: string
+        ) {
+            const key = `${siteId}|${monitorId}`;
+            if (this.intervals.has(key)) {
+                this.intervals.delete(key);
                 return true;
-            }),
-            stopMonitor: vi.fn(function (
-                this: any,
-                siteId: string,
-                monitorId: string
-            ) {
-                const key = `${siteId}|${monitorId}`;
-                if (this.intervals.has(key)) {
-                    this.intervals.delete(key);
-                    return true;
-                }
-                return false;
-            }),
-            startSite: vi.fn(function (this: any, site: any) {
-                let started = 0;
-                if (site.monitors) {
-                    for (const monitor of site.monitors) {
-                        if (monitor.id && monitor.isActive) {
-                            this.startMonitor(site.id, monitor);
-                            started++;
-                        }
+            }
+            return false;
+        }),
+        startSite: vi.fn(function (this: any, site: any) {
+            let started = 0;
+            if (site.monitors) {
+                for (const monitor of site.monitors) {
+                    if (monitor.id && monitor.isActive) {
+                        this.startMonitor(site.id, monitor);
+                        started++;
                     }
                 }
-                return started;
-            }),
-            stopSite: vi.fn(function (
-                this: any,
-                siteId: string,
-                monitors?: any[]
-            ) {
-                if (monitors) {
-                    for (const monitor of monitors) {
-                        if (monitor.id) {
-                            this.stopMonitor(siteId, monitor.id);
-                        }
+            }
+            return started;
+        }),
+        stopSite: vi.fn(function (this: any, siteId: string, monitors?: any[]) {
+            if (monitors) {
+                for (const monitor of monitors) {
+                    if (monitor.id) {
+                        this.stopMonitor(siteId, monitor.id);
                     }
-                } else {
-                    // Stop all monitors for the site
-                    const keysToDelete: string[] = [];
-                    for (const key of this.intervals.keys()) {
-                        if (
-                            typeof key === "string" &&
-                            key.startsWith(`${siteId}|`)
-                        ) {
-                            keysToDelete.push(key);
-                        }
-                    }
-                    for (const key of keysToDelete) this.intervals.delete(key);
                 }
-            }),
-            stopAll: vi.fn(function (this: any) {
-                this.intervals.clear();
-            }),
-            restartMonitor: vi.fn(function (
-                this: any,
-                siteId: string,
-                monitor: any
-            ) {
-                if (!monitor.id) return false;
-                this.stopMonitor(siteId, monitor.id);
-                return this.startMonitor(siteId, monitor);
-            }),
-            isMonitoring: vi.fn(function (
-                this: any,
-                siteId: string,
-                monitorId: string
-            ) {
-                const key = `${siteId}|${monitorId}`;
-                return this.intervals.has(key);
-            }),
-            getActiveCount: vi.fn(function (this: any) {
-                return this.intervals.size;
-            }),
-            getActiveMonitors: vi.fn(function (this: any) {
-                return [...this.intervals.keys()];
-            }),
-        })),
+            } else {
+                // Stop all monitors for the site
+                const keysToDelete: string[] = [];
+                for (const key of this.intervals.keys()) {
+                    if (
+                        typeof key === "string" &&
+                        key.startsWith(`${siteId}|`)
+                    ) {
+                        keysToDelete.push(key);
+                    }
+                }
+                for (const key of keysToDelete) this.intervals.delete(key);
+            }
+        }),
+        stopAll: vi.fn(function (this: any) {
+            this.intervals.clear();
+        }),
+        restartMonitor: vi.fn(function (
+            this: any,
+            siteId: string,
+            monitor: any
+        ) {
+            if (!monitor.id) return false;
+            this.stopMonitor(siteId, monitor.id);
+            return this.startMonitor(siteId, monitor);
+        }),
+        isMonitoring: vi.fn(function (
+            this: any,
+            siteId: string,
+            monitorId: string
+        ) {
+            const key = `${siteId}|${monitorId}`;
+            return this.intervals.has(key);
+        }),
+        getActiveCount: vi.fn(function (this: any) {
+            return this.intervals.size;
+        }),
+        getActiveMonitors: vi.fn(function (this: any) {
+            return [...this.intervals.keys()];
+        }),
+    })),
 }));
 
 // Mock MonitoringService

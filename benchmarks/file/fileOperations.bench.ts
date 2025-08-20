@@ -108,7 +108,7 @@ function generateFileOperationTestData(): FileOperationTestData {
         const errorMessage = status === "down" ? "Connection timeout" : "";
         return `${timestamp},${siteId},${monitorId},${status},${responseTime},"${errorMessage}"`;
     });
-    const csvData = `${csvHeaders  }\n${  csvRows.join("\n")}`;
+    const csvData = `${csvHeaders}\n${csvRows.join("\n")}`;
 
     // Configuration file data
     const configData = `
@@ -178,7 +178,10 @@ function simulateFileRead(size: number): Promise<string> {
 
 function compressData(data: string): string {
     // Simple compression simulation (replace repeated characters)
-    return data.replaceAll(/(.)\1+/g, (match, char) => `${char}*${match.length}`);
+    return data.replaceAll(
+        /(.)\1+/g,
+        (match, char) => `${char}*${match.length}`
+    );
 }
 
 function decompressData(compressed: string): string {
@@ -204,9 +207,11 @@ function parseConfigFile(
             // Parse value type
             if (value === "true") result[currentSection][key] = true;
             else if (value === "false") result[currentSection][key] = false;
-            else if (isNaN(Number(value)))
-                {result[currentSection][key] = value;}
-            else {result[currentSection][key] = Number(value);}
+            else if (isNaN(Number(value))) {
+                result[currentSection][key] = value;
+            } else {
+                result[currentSection][key] = Number(value);
+            }
         }
     });
 
@@ -346,7 +351,7 @@ describe("File Operations Performance Benchmarks", () => {
                         (h) =>
                             `${h.timestamp},${h.monitorId},${h.status},${Math.random() * 1000}`
                     );
-                const csv = `${headers  }\n${  rows.join("\n")}`;
+                const csv = `${headers}\n${rows.join("\n")}`;
                 // Simulate processing the CSV data
                 csv.length;
             },

@@ -301,7 +301,8 @@ const mockUseSiteDetailsReturn = {
     timeoutChanged: false,
 };
 
-const renderSiteDetails = (site = mockSite, onClose = vi.fn()) => render(
+const renderSiteDetails = (site = mockSite, onClose = vi.fn()) =>
+    render(
         <MockBrowserRouter>
             <SiteDetails site={site} onClose={onClose} />
         </MockBrowserRouter>
@@ -447,7 +448,10 @@ describe("SiteDetails", () => {
 
             // Use a more flexible text matcher to handle broken up text
             expect(
-                screen.getByText((_content, element) => element?.textContent === "Site: Custom Test Site")
+                screen.getByText(
+                    (_content, element) =>
+                        element?.textContent === "Site: Custom Test Site"
+                )
             ).toBeInTheDocument();
         });
     });

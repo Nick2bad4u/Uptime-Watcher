@@ -70,8 +70,8 @@ const mockCache = {
 };
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
-        StandardizedCache: vi.fn(() => mockCache),
-    }));
+    StandardizedCache: vi.fn(() => mockCache),
+}));
 
 // Create mock instances for dependency injection
 const mockSiteRepositoryServiceInstance = {
@@ -103,8 +103,8 @@ const mockSiteWriterServiceInstance = {
 };
 
 vi.mock("../../utils/database/SiteWriterService", () => ({
-        SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
-    }));
+    SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
+}));
 
 describe("SiteManager - Comprehensive", () => {
     let siteManager: SiteManager;
@@ -702,9 +702,11 @@ describe("SiteManager - Comprehensive", () => {
             // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
             vi.mocked(
                 mockSiteWriterService.handleMonitorIntervalChanges
-            ).mockImplementation(async (_id: any, _orig: any, _monitors: any, config: any) => {
-                config.setHistoryLimit(100);
-            });
+            ).mockImplementation(
+                async (_id: any, _orig: any, _monitors: any, config: any) => {
+                    config.setHistoryLimit(100);
+                }
+            );
 
             await expect(
                 siteManager.updateSite("site-1", updates)

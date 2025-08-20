@@ -116,54 +116,57 @@ vi.mock("../../managers/MonitorManager", () => ({
 }));
 
 // Create SiteManager mock using constructor function pattern
-const MockSiteManager = vi.hoisted(() => function MockSiteManagerConstructor() {
-        const managerEventBus = {
-            emit: vi.fn(),
-            on: vi.fn().mockReturnValue(undefined),
-            off: vi.fn(),
-            once: vi.fn(),
-            removeListener: vi.fn(),
-            removeAllListeners: vi.fn(),
-            listeners: vi.fn().mockReturnValue([]),
-            addListener: vi.fn(),
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-            onTyped: vi.fn(),
-            busId: "test-site-manager-bus",
-            destroy: vi.fn(),
-        };
+const MockSiteManager = vi.hoisted(
+    () =>
+        function MockSiteManagerConstructor() {
+            const managerEventBus = {
+                emit: vi.fn(),
+                on: vi.fn().mockReturnValue(undefined),
+                off: vi.fn(),
+                once: vi.fn(),
+                removeListener: vi.fn(),
+                removeAllListeners: vi.fn(),
+                listeners: vi.fn().mockReturnValue([]),
+                addListener: vi.fn(),
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+                onTyped: vi.fn(),
+                busId: "test-site-manager-bus",
+                destroy: vi.fn(),
+            };
 
-        // Create a proper mock for StandardizedCache
-        const mockStandardizedCache = {
-            get: vi.fn(),
-            set: vi.fn(),
-            has: vi.fn().mockReturnValue(false),
-            delete: vi.fn().mockReturnValue(false),
-            clear: vi.fn(),
-            keys: vi.fn().mockReturnValue([]),
-            entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
-            getAll: vi.fn().mockReturnValue([]),
-            size: 0,
-            getStats: vi
-                .fn()
-                .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
-            cleanup: vi.fn().mockReturnValue(0),
-            invalidate: vi.fn(),
-            invalidateAll: vi.fn(),
-            bulkUpdate: vi.fn(),
-            onInvalidation: vi.fn().mockReturnValue(() => {}),
-        };
+            // Create a proper mock for StandardizedCache
+            const mockStandardizedCache = {
+                get: vi.fn(),
+                set: vi.fn(),
+                has: vi.fn().mockReturnValue(false),
+                delete: vi.fn().mockReturnValue(false),
+                clear: vi.fn(),
+                keys: vi.fn().mockReturnValue([]),
+                entries: vi.fn().mockReturnValue([][Symbol.iterator]()),
+                getAll: vi.fn().mockReturnValue([]),
+                size: 0,
+                getStats: vi
+                    .fn()
+                    .mockReturnValue({ hits: 0, misses: 0, evictions: 0 }),
+                cleanup: vi.fn().mockReturnValue(0),
+                invalidate: vi.fn(),
+                invalidateAll: vi.fn(),
+                bulkUpdate: vi.fn(),
+                onInvalidation: vi.fn().mockReturnValue(() => {}),
+            };
 
-        return {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),
-            getEventBus: vi.fn().mockReturnValue(managerEventBus),
-            addSite: vi.fn().mockResolvedValue(undefined),
-            updateSite: vi.fn().mockResolvedValue(undefined),
-            deleteSite: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true),
-            eventBus: managerEventBus,
-        };
-    });
+            return {
+                initialize: vi.fn().mockResolvedValue(undefined),
+                getSitesCache: vi.fn().mockReturnValue(mockStandardizedCache),
+                getEventBus: vi.fn().mockReturnValue(managerEventBus),
+                addSite: vi.fn().mockResolvedValue(undefined),
+                updateSite: vi.fn().mockResolvedValue(undefined),
+                deleteSite: vi.fn().mockResolvedValue(undefined),
+                isInitialized: vi.fn().mockReturnValue(true),
+                eventBus: managerEventBus,
+            };
+        }
+);
 
 vi.mock("../../managers/SiteManager", () => ({
     SiteManager: MockSiteManager,

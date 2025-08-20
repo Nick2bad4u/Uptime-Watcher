@@ -3,10 +3,11 @@
  *
  * @remarks
  * This file provides 100% test coverage for all validation utility functions
- * using the validator.js package. Tests include edge cases, boundary conditions,
- * type guards, and options handling.
+ * using the validator.js package. Tests include edge cases, boundary
+ * conditions, type guards, and options handling.
  *
  * @author AI Assistant
+ *
  * @since 2024-01-XX
  */
 
@@ -87,7 +88,9 @@ describe("validatorUtils", () => {
         it("should respect options parameter", () => {
             // Allow localhost with require_tld: false
             expect(isValidFQDN("localhost", { require_tld: false })).toBe(true);
-            expect(isValidFQDN("local-server", { require_tld: false })).toBe(true);
+            expect(isValidFQDN("local-server", { require_tld: false })).toBe(
+                true
+            );
         });
     });
 
@@ -142,7 +145,13 @@ describe("validatorUtils", () => {
             expect(isValidIdentifierArray(["test_1", "test_2"])).toBe(true);
             expect(isValidIdentifierArray(["single"])).toBe(true);
             expect(isValidIdentifierArray([])).toBe(true); // Empty array is valid
-            expect(isValidIdentifierArray(["a", "b", "c"])).toBe(true);
+            expect(
+                isValidIdentifierArray([
+                    "a",
+                    "b",
+                    "c",
+                ])
+            ).toBe(true);
         });
 
         it("should return false for arrays containing invalid identifiers", () => {
@@ -163,7 +172,14 @@ describe("validatorUtils", () => {
         });
 
         it("should handle mixed valid identifier formats", () => {
-            expect(isValidIdentifierArray(["test", "test-123", "test_456", "789"])).toBe(true);
+            expect(
+                isValidIdentifierArray([
+                    "test",
+                    "test-123",
+                    "test_456",
+                    "789",
+                ])
+            ).toBe(true);
         });
     });
 
@@ -376,17 +392,27 @@ describe("validatorUtils", () => {
 
         it("should respect options parameter", () => {
             // Allow protocol relative URLs
-            expect(isValidUrl("//example.com", { allow_protocol_relative_urls: true })).toBe(false); // Still false due to require_protocol: true
-            
+            expect(
+                isValidUrl("//example.com", {
+                    allow_protocol_relative_urls: true,
+                })
+            ).toBe(false); // Still false due to require_protocol: true
+
             // Require TLD
-            expect(isValidUrl("http://localhost", { require_tld: true })).toBe(false);
-            
+            expect(isValidUrl("http://localhost", { require_tld: true })).toBe(
+                false
+            );
+
             // Custom protocols - FTP is valid by default
             expect(isValidUrl("ftp://example.com")).toBe(true);
         });
 
         it("should handle complex URLs", () => {
-            expect(isValidUrl("https://user:pass@example.com:443/path?query=value#hash")).toBe(true);
+            expect(
+                isValidUrl(
+                    "https://user:pass@example.com:443/path?query=value#hash"
+                )
+            ).toBe(true);
             expect(isValidUrl("https://192.168.1.1:8080")).toBe(true);
         });
     });
@@ -429,7 +455,7 @@ describe("validatorUtils", () => {
         });
 
         it("should handle string conversion of various types", () => {
-            expect(safeInteger(123, 0)).toBe(123); // Numbers become strings that are valid integers  
+            expect(safeInteger(123, 0)).toBe(123); // Numbers become strings that are valid integers
             expect(safeInteger(true, 0)).toBe(0); // Boolean "true" is not a valid integer
             expect(safeInteger([], 0)).toBe(0); // Array "" is not a valid integer
             expect(safeInteger({}, 0)).toBe(0); // Object "[object Object]" is not a valid integer

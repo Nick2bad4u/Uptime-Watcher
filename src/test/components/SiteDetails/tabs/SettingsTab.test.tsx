@@ -489,9 +489,10 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
             // Use a more flexible text matcher to handle the case where text might be broken up
             expect(
-                screen.getByText((content) => (
+                screen.getByText(
+                    (content) =>
                         content.includes("45") && content.includes("seconds")
-                    ))
+                )
             ).toBeInTheDocument();
         });
 

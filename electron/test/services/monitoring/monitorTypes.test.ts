@@ -235,7 +235,7 @@ describe("Monitor Types Utility", () => {
         });
 
         it("should handle very long strings", () => {
-            const longString = `http${  "x".repeat(1000)}`;
+            const longString = `http${"x".repeat(1000)}`;
             expect(isBaseMonitorType(longString)).toBe(false);
         });
 

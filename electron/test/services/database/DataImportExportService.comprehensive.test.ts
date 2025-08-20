@@ -125,7 +125,9 @@ describe("DataImportExportService", () => {
 
         // Spy on withDatabaseOperation function using vi.mocked
         const mockWithDatabaseOperation = vi.mocked(withDatabaseOperation);
-        mockWithDatabaseOperation.mockImplementation(async (operation: any) => await (operation as () => Promise<void>)());
+        mockWithDatabaseOperation.mockImplementation(
+            async (operation: any) => await (operation as () => Promise<void>)()
+        );
 
         // Setup mock database
         mockDatabase = {
@@ -161,7 +163,9 @@ describe("DataImportExportService", () => {
         mockDatabaseService = {
             executeTransaction: vi
                 .fn()
-                .mockImplementation(async (operation) => await operation(mockDatabase)),
+                .mockImplementation(
+                    async (operation) => await operation(mockDatabase)
+                ),
         };
 
         // Setup event emitter mock
@@ -618,7 +622,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: (db: any) => Promise<void>) => await callback(mockDatabase)
+                async (callback: (db: any) => Promise<void>) =>
+                    await callback(mockDatabase)
             );
 
             await service.persistImportedData(sitesWithoutNames, {});
@@ -636,7 +641,8 @@ describe("DataImportExportService", () => {
 
         it("should call withDatabaseOperation correctly", async () => {
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: (db: any) => Promise<void>) => await callback(mockDatabase)
+                async (callback: (db: any) => Promise<void>) =>
+                    await callback(mockDatabase)
             );
 
             await service.persistImportedData([], {});
@@ -670,7 +676,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: (db: any) => Promise<void>) => await callback(mockDatabase)
+                async (callback: (db: any) => Promise<void>) =>
+                    await callback(mockDatabase)
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
 
@@ -905,7 +912,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: (db: any) => Promise<void>) => await callback(mockDatabase)
+                async (callback: (db: any) => Promise<void>) =>
+                    await callback(mockDatabase)
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
 
@@ -987,7 +995,8 @@ describe("DataImportExportService", () => {
             ];
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: (db: any) => Promise<void>) => await callback(mockDatabase)
+                async (callback: (db: any) => Promise<void>) =>
+                    await callback(mockDatabase)
             );
             mockMonitorRepository.bulkCreate.mockResolvedValue(createdMonitors);
 

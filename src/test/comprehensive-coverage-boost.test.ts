@@ -121,7 +121,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
     describe("Utility Functions Coverage", () => {
         it("should test cache key generation", () => {
             // Simulate cacheKeys.ts functionality (lines 62,108-338)
-            const generateCacheKey = (prefix: string, identifier: string) => `${prefix}:${identifier}`;
+            const generateCacheKey = (prefix: string, identifier: string) =>
+                `${prefix}:${identifier}`;
 
             expect(generateCacheKey("sites", "123")).toBe("sites:123");
             expect(generateCacheKey("monitors", "abc")).toBe("monitors:abc");
@@ -166,10 +167,9 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 UNKNOWN_ERROR: "An unknown error occurred",
             };
 
-            const getErrorMessage = (code: string) => (
-                    errorCatalog[code as keyof typeof errorCatalog] ||
-                    errorCatalog.UNKNOWN_ERROR
-                );
+            const getErrorMessage = (code: string) =>
+                errorCatalog[code as keyof typeof errorCatalog] ||
+                errorCatalog.UNKNOWN_ERROR;
 
             expect(getErrorMessage("VALIDATION_ERROR")).toBe(
                 "Validation failed"
@@ -218,7 +218,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 siteId: "123",
             };
 
-            const isValidTab = (tab: string) => mockNavigationState.availableTabs.includes(tab);
+            const isValidTab = (tab: string) =>
+                mockNavigationState.availableTabs.includes(tab);
 
             expect(isValidTab("overview")).toBe(true);
             expect(isValidTab("analytics")).toBe(true);
@@ -286,11 +287,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
                             : `blob:${filename}`;
                     return { url, filename, blob };
                 },
-                validateFilename: (filename: string) => (
-                        filename.length > 0 &&
-                        !filename.includes("/") &&
-                        !filename.includes("\\")
-                    ),
+                validateFilename: (filename: string) =>
+                    filename.length > 0 &&
+                    !filename.includes("/") &&
+                    !filename.includes("\\"),
                 getFileExtension: (filename: string) => {
                     const parts = filename.split(".");
                     return parts.length > 1 ? parts.at(-1) : "";
@@ -324,16 +324,20 @@ describe("Comprehensive Coverage Boost Tests", () => {
                 hasChanges: false,
             };
 
-            const updateSetting = (key: string, value: any) => ({ ...mockSettingsState, [key]: value, hasChanges: true });
+            const updateSetting = (key: string, value: any) => ({
+                ...mockSettingsState,
+                [key]: value,
+                hasChanges: true,
+            });
 
             const resetSettings = () => ({
-                    theme: "system",
-                    notifications: true,
-                    autoStart: false,
-                    historyLimit: 500,
-                    isLoading: false,
-                    hasChanges: false,
-                });
+                theme: "system",
+                notifications: true,
+                autoStart: false,
+                historyLimit: 500,
+                isLoading: false,
+                hasChanges: false,
+            });
 
             expect(updateSetting("theme", "dark").theme).toBe("dark");
             expect(updateSetting("theme", "dark").hasChanges).toBe(true);
@@ -392,19 +396,19 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             const simulateError = (error: Error) => ({
-                    ...mockErrorBoundaryState,
-                    hasError: true,
-                    error,
-                    errorInfo: { componentStack: "Component stack trace" },
-                });
+                ...mockErrorBoundaryState,
+                hasError: true,
+                error,
+                errorInfo: { componentStack: "Component stack trace" },
+            });
 
             const resetError = () => ({
-                    ...mockErrorBoundaryState,
-                    hasError: false,
-                    error: null,
-                    errorInfo: null,
-                    retryCount: mockErrorBoundaryState.retryCount + 1,
-                });
+                ...mockErrorBoundaryState,
+                hasError: false,
+                error: null,
+                errorInfo: null,
+                retryCount: mockErrorBoundaryState.retryCount + 1,
+            });
 
             const error = new Error("Test error");
             const errorState = simulateError(error);
@@ -427,7 +431,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     fn: (() => T) | null | undefined,
                     fallback: () => T
                 ): (() => T) => fn ?? fallback,
-                getFallbackArray: <T>(arr: T[] | null | undefined): T[] => arr ?? [],
+                getFallbackArray: <T>(arr: T[] | null | undefined): T[] =>
+                    arr ?? [],
             };
 
             expect(mockFallbacks.getFallbackValue(null, "default")).toBe(

@@ -1,25 +1,33 @@
 /**
  * Configuration Management Service Performance Benchmarks
  *
- * @file Performance benchmarks for application configuration and settings management.
+ * @file Performance benchmarks for application configuration and settings
+ *   management.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Services-ConfigurationManagement
+ *
  * @tags ["performance", "services", "configuration", "settings"]
  */
 
 import { bench, describe } from "vitest";
 
-type ConfigurationSchema = Record<string, {
-        type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+type ConfigurationSchema = Record<
+    string,
+    {
+        type: "string" | "number" | "boolean" | "object" | "array";
         default?: any;
         required?: boolean;
         validation?: (value: any) => boolean;
         description?: string;
         group?: string;
-    }>;
+    }
+>;
 
 interface ConfigurationValue {
     key: string;
@@ -74,21 +82,25 @@ class MockConfigurationRepository {
         return config ? { ...config } : null;
     }
 
-    async set(key: string, value: any, metadata?: { modifiedBy?: string }): Promise<ConfigurationValue> {
+    async set(
+        key: string,
+        value: any,
+        metadata?: { modifiedBy?: string }
+    ): Promise<ConfigurationValue> {
         const existing = this.configurations.get(key);
         const now = new Date();
-        
+
         const config: ConfigurationValue = {
             key,
             value,
             type: typeof value,
             lastModified: now,
             modifiedBy: metadata?.modifiedBy,
-            version: existing ? existing.version + 1 : 1
+            version: existing ? existing.version + 1 : 1,
         };
-        
+
         this.configurations.set(key, config);
-        
+
         // Record change
         if (existing) {
             this.changeHistory.push({
@@ -96,85 +108,95 @@ class MockConfigurationRepository {
                 oldValue: existing.value,
                 newValue: value,
                 timestamp: now,
-                source: 'api',
-                userId: metadata?.modifiedBy
+                source: "api",
+                userId: metadata?.modifiedBy,
             });
         }
-        
+
         return { ...config };
     }
 
     async getAll(): Promise<ConfigurationValue[]> {
-        return Array.from(this.configurations.values()).map(config => ({ ...config }));
+        return Array.from(this.configurations.values()).map((config) => ({
+            ...config,
+        }));
     }
 
-    async getByGroup(group: string, schema: ConfigurationSchema): Promise<ConfigurationValue[]> {
-        const groupKeys = Object.keys(schema).filter(key => schema[key].group === group);
+    async getByGroup(
+        group: string,
+        schema: ConfigurationSchema
+    ): Promise<ConfigurationValue[]> {
+        const groupKeys = Object.keys(schema).filter(
+            (key) => schema[key].group === group
+        );
         const results: ConfigurationValue[] = [];
-        
+
         for (const key of groupKeys) {
             const config = this.configurations.get(key);
             if (config) {
                 results.push({ ...config });
             }
         }
-        
+
         return results;
     }
 
     async delete(key: string): Promise<boolean> {
         const existing = this.configurations.get(key);
         if (!existing) return false;
-        
+
         this.configurations.delete(key);
-        
+
         this.changeHistory.push({
             key,
             oldValue: existing.value,
             newValue: undefined,
             timestamp: new Date(),
-            source: 'api'
+            source: "api",
         });
-        
+
         return true;
     }
 
-    async getChangeHistory(key?: string, limit?: number): Promise<ConfigChangeEvent[]> {
+    async getChangeHistory(
+        key?: string,
+        limit?: number
+    ): Promise<ConfigChangeEvent[]> {
         let history = [...this.changeHistory];
-        
+
         if (key) {
-            history = history.filter(event => event.key === key);
+            history = history.filter((event) => event.key === key);
         }
-        
+
         // Sort by timestamp descending
         history.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-        
+
         if (limit) {
             history = history.slice(0, limit);
         }
-        
+
         return history;
     }
 
     async createBackup(reason?: string): Promise<ConfigBackup> {
         const id = `backup-${this.nextBackupId++}`;
         const configuration: Record<string, any> = {};
-        
+
         for (const [key, config] of Array.from(this.configurations.entries())) {
             configuration[key] = config.value;
         }
-        
+
         const backup: ConfigBackup = {
             id,
             timestamp: new Date(),
             configuration,
             metadata: {
-                version: '1.0.0',
-                source: 'manual',
-                reason
-            }
+                version: "1.0.0",
+                source: "manual",
+                reason,
+            },
         };
-        
+
         this.backups.set(id, backup);
         return { ...backup };
     }
@@ -182,20 +204,22 @@ class MockConfigurationRepository {
     async restoreBackup(backupId: string): Promise<boolean> {
         const backup = this.backups.get(backupId);
         if (!backup) return false;
-        
+
         // Clear current configuration
         this.configurations.clear();
-        
+
         // Restore from backup
         for (const [key, value] of Object.entries(backup.configuration)) {
-            await this.set(key, value, { modifiedBy: 'system-restore' });
+            await this.set(key, value, { modifiedBy: "system-restore" });
         }
-        
+
         return true;
     }
 
     async getBackups(): Promise<ConfigBackup[]> {
-        return Array.from(this.backups.values()).map(backup => ({ ...backup }));
+        return Array.from(this.backups.values()).map((backup) => ({
+            ...backup,
+        }));
     }
 
     clear(): void {
@@ -209,7 +233,7 @@ class MockConfigurationRepository {
         return {
             totalConfigurations: this.configurations.size,
             totalChanges: this.changeHistory.length,
-            totalBackups: this.backups.size
+            totalBackups: this.backups.size,
         };
     }
 }
@@ -219,7 +243,7 @@ class MockEventEmitter {
 
     emit(event: string, data: any): void {
         const handlers = this.listeners.get(event) || [];
-        handlers.forEach(handler => {
+        handlers.forEach((handler) => {
             try {
                 handler(data);
             } catch (error) {
@@ -263,7 +287,10 @@ class MockConfigurationManagementService {
         this.schema = this.createDefaultSchema();
     }
 
-    async get<T = any>(key: string, useCache: boolean = true): Promise<T | null> {
+    async get<T = any>(
+        key: string,
+        useCache: boolean = true
+    ): Promise<T | null> {
         // Check cache first
         if (useCache) {
             const cached = this.cache.get(key);
@@ -286,25 +313,31 @@ class MockConfigurationManagementService {
         if (useCache) {
             this.cache.set(key, {
                 value: config.value,
-                expiry: Date.now() + this.cacheTimeout
+                expiry: Date.now() + this.cacheTimeout,
             });
         }
 
         return config.value;
     }
 
-    async set(key: string, value: any, options?: { 
-        validateSchema?: boolean; 
-        modifiedBy?: string;
-        skipCache?: boolean;
-    }): Promise<void> {
+    async set(
+        key: string,
+        value: any,
+        options?: {
+            validateSchema?: boolean;
+            modifiedBy?: string;
+            skipCache?: boolean;
+        }
+    ): Promise<void> {
         const opts = { validateSchema: true, ...options };
 
         // Validate against schema
         if (opts.validateSchema) {
             const validation = this.validateValue(key, value);
             if (!validation.isValid) {
-                throw new Error(`Validation failed for ${key}: ${validation.errors.join(', ')}`);
+                throw new Error(
+                    `Validation failed for ${key}: ${validation.errors.join(", ")}`
+                );
             }
         }
 
@@ -313,92 +346,114 @@ class MockConfigurationManagementService {
         const oldValue = oldConfig?.value;
 
         // Set value
-        const config = await this.repository.set(key, value, { modifiedBy: opts.modifiedBy });
+        const config = await this.repository.set(key, value, {
+            modifiedBy: opts.modifiedBy,
+        });
 
         // Update cache
         if (!opts.skipCache) {
             this.cache.set(key, {
                 value,
-                expiry: Date.now() + this.cacheTimeout
+                expiry: Date.now() + this.cacheTimeout,
             });
         }
 
         // Emit change event
-        this.eventEmitter.emit('config.changed', {
+        this.eventEmitter.emit("config.changed", {
             key,
             oldValue,
             newValue: value,
             timestamp: config.lastModified,
-            modifiedBy: opts.modifiedBy
+            modifiedBy: opts.modifiedBy,
         });
     }
 
     async getGroup(groupName: string): Promise<ConfigurationGroup> {
-        const configurations = await this.repository.getByGroup(groupName, this.schema);
-        
+        const configurations = await this.repository.getByGroup(
+            groupName,
+            this.schema
+        );
+
         return {
             name: groupName,
             description: `Configuration group: ${groupName}`,
             settings: configurations,
             metadata: {
                 count: configurations.length,
-                lastModified: configurations.length > 0 
-                    ? Math.max(...configurations.map(c => c.lastModified.getTime()))
-                    : Date.now()
-            }
+                lastModified:
+                    configurations.length > 0
+                        ? Math.max(
+                              ...configurations.map((c) =>
+                                  c.lastModified.getTime()
+                              )
+                          )
+                        : Date.now(),
+            },
         };
     }
 
-    async setGroup(groupName: string, values: Record<string, any>, modifiedBy?: string): Promise<void> {
-        const groupKeys = Object.keys(this.schema).filter(key => this.schema[key].group === groupName);
-        
+    async setGroup(
+        groupName: string,
+        values: Record<string, any>,
+        modifiedBy?: string
+    ): Promise<void> {
+        const groupKeys = Object.keys(this.schema).filter(
+            (key) => this.schema[key].group === groupName
+        );
+
         // Validate all values first
         const validationErrors: string[] = [];
         for (const [key, value] of Object.entries(values)) {
             if (!groupKeys.includes(key)) {
-                validationErrors.push(`Key ${key} does not belong to group ${groupName}`);
+                validationErrors.push(
+                    `Key ${key} does not belong to group ${groupName}`
+                );
                 continue;
             }
-            
+
             const validation = this.validateValue(key, value);
             if (!validation.isValid) {
-                validationErrors.push(`${key}: ${validation.errors.join(', ')}`);
+                validationErrors.push(
+                    `${key}: ${validation.errors.join(", ")}`
+                );
             }
         }
-        
+
         if (validationErrors.length > 0) {
-            throw new Error(`Group validation failed: ${validationErrors.join('; ')}`);
+            throw new Error(
+                `Group validation failed: ${validationErrors.join("; ")}`
+            );
         }
-        
+
         // Set all values
         for (const [key, value] of Object.entries(values)) {
             await this.set(key, value, { modifiedBy, validateSchema: false });
         }
-        
+
         // Emit group change event
-        this.eventEmitter.emit('config.group.changed', {
+        this.eventEmitter.emit("config.group.changed", {
             groupName,
             values,
             modifiedBy,
-            timestamp: new Date()
+            timestamp: new Date(),
         });
     }
 
     async getAll(): Promise<Record<string, any>> {
         const configurations = await this.repository.getAll();
         const result: Record<string, any> = {};
-        
+
         for (const config of configurations) {
             result[config.key] = config.value;
         }
-        
+
         // Add defaults for missing values
         for (const [key, schemaEntry] of Object.entries(this.schema)) {
             if (!(key in result) && schemaEntry.default !== undefined) {
                 result[key] = schemaEntry.default;
             }
         }
-        
+
         return result;
     }
 
@@ -407,72 +462,78 @@ class MockConfigurationManagementService {
         if (!schemaEntry) {
             throw new Error(`Unknown configuration key: ${key}`);
         }
-        
+
         if (schemaEntry.default === undefined) {
             await this.repository.delete(key);
             this.cache.delete(key);
         } else {
-            await this.set(key, schemaEntry.default, { modifiedBy: 'system-reset' });
+            await this.set(key, schemaEntry.default, {
+                modifiedBy: "system-reset",
+            });
         }
     }
 
     async resetGroup(groupName: string): Promise<void> {
-        const groupKeys = Object.keys(this.schema).filter(key => this.schema[key].group === groupName);
-        
+        const groupKeys = Object.keys(this.schema).filter(
+            (key) => this.schema[key].group === groupName
+        );
+
         for (const key of groupKeys) {
             await this.reset(key);
         }
-        
-        this.eventEmitter.emit('config.group.reset', {
+
+        this.eventEmitter.emit("config.group.reset", {
             groupName,
             keys: groupKeys,
-            timestamp: new Date()
+            timestamp: new Date(),
         });
     }
 
     async validate(): Promise<ConfigValidationResult> {
         const configurations = await this.repository.getAll();
-        const configMap = new Map(configurations.map(c => [c.key, c.value]));
-        
+        const configMap = new Map(configurations.map((c) => [c.key, c.value]));
+
         const errors: string[] = [];
         const warnings: string[] = [];
-        
+
         // Check required values
         for (const [key, schemaEntry] of Object.entries(this.schema)) {
             if (schemaEntry.required && !configMap.has(key)) {
                 if (schemaEntry.default === undefined) {
                     errors.push(`Required configuration ${key} is missing`);
                 } else {
-                    warnings.push(`Required configuration ${key} is using default value`);
+                    warnings.push(
+                        `Required configuration ${key} is using default value`
+                    );
                 }
             }
         }
-        
+
         // Validate existing values
         for (const [key, value] of Array.from(configMap.entries())) {
             const validation = this.validateValue(key, value);
             if (!validation.isValid) {
-                errors.push(`${key}: ${validation.errors.join(', ')}`);
+                errors.push(`${key}: ${validation.errors.join(", ")}`);
             }
-            warnings.push(...validation.warnings.map(w => `${key}: ${w}`));
+            warnings.push(...validation.warnings.map((w) => `${key}: ${w}`));
         }
-        
+
         return {
             isValid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 
     async createBackup(reason?: string): Promise<ConfigBackup> {
         const backup = await this.repository.createBackup(reason);
-        
-        this.eventEmitter.emit('config.backup.created', {
+
+        this.eventEmitter.emit("config.backup.created", {
             backupId: backup.id,
             timestamp: backup.timestamp,
-            reason
+            reason,
         });
-        
+
         return backup;
     }
 
@@ -481,13 +542,13 @@ class MockConfigurationManagementService {
         if (!success) {
             throw new Error(`Backup ${backupId} not found`);
         }
-        
+
         // Clear cache after restore
         this.cache.clear();
-        
-        this.eventEmitter.emit('config.backup.restored', {
+
+        this.eventEmitter.emit("config.backup.restored", {
             backupId,
-            timestamp: new Date()
+            timestamp: new Date(),
         });
     }
 
@@ -495,16 +556,19 @@ class MockConfigurationManagementService {
         return await this.repository.getBackups();
     }
 
-    async getChangeHistory(key?: string, limit?: number): Promise<ConfigChangeEvent[]> {
+    async getChangeHistory(
+        key?: string,
+        limit?: number
+    ): Promise<ConfigChangeEvent[]> {
         return await this.repository.getChangeHistory(key, limit);
     }
 
     onConfigChange(handler: (event: any) => void): void {
-        this.eventEmitter.on('config.changed', handler);
+        this.eventEmitter.on("config.changed", handler);
     }
 
     onGroupChange(handler: (event: any) => void): void {
-        this.eventEmitter.on('config.group.changed', handler);
+        this.eventEmitter.on("config.group.changed", handler);
     }
 
     private validateValue(key: string, value: any): ConfigValidationResult {
@@ -513,79 +577,85 @@ class MockConfigurationManagementService {
             return {
                 isValid: false,
                 errors: [`Unknown configuration key: ${key}`],
-                warnings: []
+                warnings: [],
             };
         }
-        
+
         const errors: string[] = [];
         const warnings: string[] = [];
-        
+
         // Type validation
-        const actualType = Array.isArray(value) ? 'array' : typeof value;
+        const actualType = Array.isArray(value) ? "array" : typeof value;
         if (actualType !== schemaEntry.type) {
             errors.push(`Expected ${schemaEntry.type}, got ${actualType}`);
         }
-        
+
         // Custom validation
         if (schemaEntry.validation && !schemaEntry.validation(value)) {
-            errors.push('Custom validation failed');
+            errors.push("Custom validation failed");
         }
-        
+
         return {
             isValid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 
     private createDefaultSchema(): ConfigurationSchema {
         return {
-            'app.name': {
-                type: 'string',
-                default: 'Uptime Watcher',
+            "app.name": {
+                type: "string",
+                default: "Uptime Watcher",
                 required: true,
-                group: 'application'
+                group: "application",
             },
-            'app.theme': {
-                type: 'string',
-                default: 'dark',
-                validation: (value: string) => ['light', 'dark', 'auto'].includes(value),
-                group: 'appearance'
+            "app.theme": {
+                type: "string",
+                default: "dark",
+                validation: (value: string) =>
+                    [
+                        "light",
+                        "dark",
+                        "auto",
+                    ].includes(value),
+                group: "appearance",
             },
-            'monitoring.defaultInterval': {
-                type: 'number',
+            "monitoring.defaultInterval": {
+                type: "number",
                 default: 300_000,
                 validation: (value: number) => value >= 60_000,
-                group: 'monitoring'
+                group: "monitoring",
             },
-            'monitoring.timeout': {
-                type: 'number',
+            "monitoring.timeout": {
+                type: "number",
                 default: 30_000,
-                validation: (value: number) => value >= 5000 && value <= 120_000,
-                group: 'monitoring'
+                validation: (value: number) =>
+                    value >= 5000 && value <= 120_000,
+                group: "monitoring",
             },
-            'alerts.enabled': {
-                type: 'boolean',
+            "alerts.enabled": {
+                type: "boolean",
                 default: true,
-                group: 'alerts'
+                group: "alerts",
             },
-            'alerts.emailNotifications': {
-                type: 'boolean',
+            "alerts.emailNotifications": {
+                type: "boolean",
                 default: false,
-                group: 'alerts'
+                group: "alerts",
             },
-            'dashboard.refreshInterval': {
-                type: 'number',
+            "dashboard.refreshInterval": {
+                type: "number",
                 default: 30_000,
                 validation: (value: number) => value >= 5000,
-                group: 'dashboard'
+                group: "dashboard",
             },
-            'database.retentionDays': {
-                type: 'number',
+            "database.retentionDays": {
+                type: "number",
                 default: 90,
                 validation: (value: number) => value > 0,
-                group: 'database'
-            }
+                group: "database",
+            },
         };
     }
 
@@ -599,7 +669,7 @@ class MockConfigurationManagementService {
             ...repoStats,
             cacheSize: this.cache.size,
             schemaKeys: Object.keys(this.schema).length,
-            eventHandlers: this.eventEmitter['listeners'].size
+            eventHandlers: this.eventEmitter["listeners"].size,
         };
     }
 
@@ -613,20 +683,20 @@ class MockConfigurationManagementService {
 // Helper functions for creating test configurations
 function createTestConfiguration(): Record<string, any> {
     return {
-        'app.name': 'Test Application',
-        'app.theme': 'light',
-        'monitoring.defaultInterval': 180_000,
-        'monitoring.timeout': 25_000,
-        'alerts.enabled': true,
-        'alerts.emailNotifications': true,
-        'dashboard.refreshInterval': 15_000,
-        'database.retentionDays': 30
+        "app.name": "Test Application",
+        "app.theme": "light",
+        "monitoring.defaultInterval": 180_000,
+        "monitoring.timeout": 25_000,
+        "alerts.enabled": true,
+        "alerts.emailNotifications": true,
+        "dashboard.refreshInterval": 15_000,
+        "database.retentionDays": 30,
     };
 }
 
 function createLargeConfiguration(count: number): Record<string, any> {
     const config: Record<string, any> = {};
-    
+
     for (let i = 0; i < count; i++) {
         config[`setting.${i}`] = {
             value: `Setting value ${i}`,
@@ -635,226 +705,320 @@ function createLargeConfiguration(count: number): Record<string, any> {
             tags: [`tag${i}`, `category${i % 3}`],
             metadata: {
                 description: `Description for setting ${i}`,
-                lastModified: new Date(Date.now() - i * 1000)
-            }
+                lastModified: new Date(Date.now() - i * 1000),
+            },
         };
     }
-    
+
     return config;
 }
 
 describe("Configuration Management Service Performance", () => {
     let service: MockConfigurationManagementService;
 
-    bench("service initialization", () => {
-        service = new MockConfigurationManagementService();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "service initialization",
+        () => {
+            service = new MockConfigurationManagementService();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("get single configuration", () => {
-        service = new MockConfigurationManagementService();
-        service.set('test.key', 'test value').then(() => {
-            service.get('test.key');
-        });
-    }, { warmupIterations: 10, iterations: 8000 });
-
-    bench("get configuration with cache", () => {
-        service = new MockConfigurationManagementService();
-        service.set('cached.key', 'cached value').then(() => {
-            // First call populates cache
-            service.get('cached.key', true).then(() => {
-                // Second call uses cache
-                service.get('cached.key', true);
+    bench(
+        "get single configuration",
+        () => {
+            service = new MockConfigurationManagementService();
+            service.set("test.key", "test value").then(() => {
+                service.get("test.key");
             });
-        });
-    }, { warmupIterations: 10, iterations: 10_000 });
+        },
+        { warmupIterations: 10, iterations: 8000 }
+    );
 
-    bench("set single configuration", () => {
-        service = new MockConfigurationManagementService();
-        service.set('new.key', 'new value');
-    }, { warmupIterations: 10, iterations: 5000 });
-
-    bench("set configuration with validation", () => {
-        service = new MockConfigurationManagementService();
-        service.set('monitoring.defaultInterval', 600_000, {
-            validateSchema: true,
-            modifiedBy: 'user123'
-        });
-    }, { warmupIterations: 10, iterations: 3000 });
-
-    bench("get configuration group", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.getGroup('monitoring');
-        });
-    }, { warmupIterations: 10, iterations: 2000 });
-
-    bench("set configuration group", () => {
-        service = new MockConfigurationManagementService();
-        const groupValues = {
-            'monitoring.defaultInterval': 240_000,
-            'monitoring.timeout': 20_000
-        };
-        service.setGroup('monitoring', groupValues, 'admin');
-    }, { warmupIterations: 10, iterations: 2000 });
-
-    bench("get all configurations", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.getAll();
-        });
-    }, { warmupIterations: 10, iterations: 1000 });
-
-    bench("validate configuration", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.validate();
-        });
-    }, { warmupIterations: 10, iterations: 1500 });
-
-    bench("reset single configuration", () => {
-        service = new MockConfigurationManagementService();
-        service.set('app.theme', 'custom').then(() => {
-            service.reset('app.theme');
-        });
-    }, { warmupIterations: 10, iterations: 3000 });
-
-    bench("reset configuration group", () => {
-        service = new MockConfigurationManagementService();
-        const groupValues = {
-            'monitoring.defaultInterval': 120_000,
-            'monitoring.timeout': 60_000
-        };
-        service.setGroup('monitoring', groupValues).then(() => {
-            service.resetGroup('monitoring');
-        });
-    }, { warmupIterations: 10, iterations: 1500 });
-
-    bench("create backup", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.createBackup('Performance test backup');
-        });
-    }, { warmupIterations: 10, iterations: 1000 });
-
-    bench("restore backup", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.createBackup('Test backup').then(backup => {
-                // Modify some settings
-                service.set('app.theme', 'modified').then(() => {
-                    service.restoreBackup(backup.id);
+    bench(
+        "get configuration with cache",
+        () => {
+            service = new MockConfigurationManagementService();
+            service.set("cached.key", "cached value").then(() => {
+                // First call populates cache
+                service.get("cached.key", true).then(() => {
+                    // Second call uses cache
+                    service.get("cached.key", true);
                 });
             });
-        });
-    }, { warmupIterations: 5, iterations: 500 });
+        },
+        { warmupIterations: 10, iterations: 10_000 }
+    );
 
-    bench("get change history", () => {
-        service = new MockConfigurationManagementService();
-        // Create multiple changes
-        service.set('test.key', 'value1').then(() => {
-            service.set('test.key', 'value2').then(() => {
-                service.set('test.key', 'value3').then(() => {
-                    service.getChangeHistory('test.key', 10);
+    bench(
+        "set single configuration",
+        () => {
+            service = new MockConfigurationManagementService();
+            service.set("new.key", "new value");
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
+
+    bench(
+        "set configuration with validation",
+        () => {
+            service = new MockConfigurationManagementService();
+            service.set("monitoring.defaultInterval", 600_000, {
+                validateSchema: true,
+                modifiedBy: "user123",
+            });
+        },
+        { warmupIterations: 10, iterations: 3000 }
+    );
+
+    bench(
+        "get configuration group",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.getGroup("monitoring");
+            });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
+
+    bench(
+        "set configuration group",
+        () => {
+            service = new MockConfigurationManagementService();
+            const groupValues = {
+                "monitoring.defaultInterval": 240_000,
+                "monitoring.timeout": 20_000,
+            };
+            service.setGroup("monitoring", groupValues, "admin");
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
+
+    bench(
+        "get all configurations",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.getAll();
+            });
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
+
+    bench(
+        "validate configuration",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.validate();
+            });
+        },
+        { warmupIterations: 10, iterations: 1500 }
+    );
+
+    bench(
+        "reset single configuration",
+        () => {
+            service = new MockConfigurationManagementService();
+            service.set("app.theme", "custom").then(() => {
+                service.reset("app.theme");
+            });
+        },
+        { warmupIterations: 10, iterations: 3000 }
+    );
+
+    bench(
+        "reset configuration group",
+        () => {
+            service = new MockConfigurationManagementService();
+            const groupValues = {
+                "monitoring.defaultInterval": 120_000,
+                "monitoring.timeout": 60_000,
+            };
+            service.setGroup("monitoring", groupValues).then(() => {
+                service.resetGroup("monitoring");
+            });
+        },
+        { warmupIterations: 10, iterations: 1500 }
+    );
+
+    bench(
+        "create backup",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.createBackup("Performance test backup");
+            });
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
+
+    bench(
+        "restore backup",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.createBackup("Test backup").then((backup) => {
+                    // Modify some settings
+                    service.set("app.theme", "modified").then(() => {
+                        service.restoreBackup(backup.id);
+                    });
                 });
             });
-        });
-    }, { warmupIterations: 10, iterations: 2000 });
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
 
-    bench("bulk configuration operations", () => {
-        service = new MockConfigurationManagementService();
-        const largeConfig = createLargeConfiguration(50);
-        
-        const operations = Object.entries(largeConfig).map(([key, value]) => 
-            service.set(key, value)
-        );
-        
-        Promise.all(operations).then(() => {
-            service.getAll();
-        });
-    }, { warmupIterations: 5, iterations: 100 });
+    bench(
+        "get change history",
+        () => {
+            service = new MockConfigurationManagementService();
+            // Create multiple changes
+            service.set("test.key", "value1").then(() => {
+                service.set("test.key", "value2").then(() => {
+                    service.set("test.key", "value3").then(() => {
+                        service.getChangeHistory("test.key", 10);
+                    });
+                });
+            });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
 
-    bench("configuration with complex validation", () => {
-        service = new MockConfigurationManagementService();
-        
-        // Multiple validation operations
-        const operations = [
-            service.set('monitoring.defaultInterval', 150_000),
-            service.set('monitoring.timeout', 45_000),
-            service.set('app.theme', 'dark'),
-            service.set('alerts.enabled', false),
-            service.set('dashboard.refreshInterval', 10_000)
-        ];
-        
-        Promise.all(operations).then(() => {
-            service.validate();
-        });
-    }, { warmupIterations: 10, iterations: 800 });
+    bench(
+        "bulk configuration operations",
+        () => {
+            service = new MockConfigurationManagementService();
+            const largeConfig = createLargeConfiguration(50);
 
-    bench("event handling performance", () => {
-        service = new MockConfigurationManagementService();
-        
-        let changeCount = 0;
-        service.onConfigChange(() => changeCount++);
-        service.onGroupChange(() => changeCount++);
-        
-        // Generate multiple events
-        const operations = [
-            service.set('test1', 'value1'),
-            service.set('test2', 'value2'),
-            service.setGroup('monitoring', {
-                'monitoring.defaultInterval': 300_000,
-                'monitoring.timeout': 30_000
-            })
-        ];
-        
-        Promise.all(operations);
-    }, { warmupIterations: 10, iterations: 1000 });
-
-    bench("cache performance", () => {
-        service = new MockConfigurationManagementService();
-        
-        service.set('cached.test', 'test value').then(() => {
-            // Multiple cache hits
-            const promises = Array.from({ length: 20 }, () => 
-                service.get('cached.test', true)
+            const operations = Object.entries(largeConfig).map(([key, value]) =>
+                service.set(key, value)
             );
-            Promise.all(promises);
-        });
-    }, { warmupIterations: 10, iterations: 1000 });
 
-    bench("service statistics", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.getStats();
-        });
-    }, { warmupIterations: 10, iterations: 2000 });
+            Promise.all(operations).then(() => {
+                service.getAll();
+            });
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
 
-    bench("service cleanup", () => {
-        service = new MockConfigurationManagementService();
-        const config = createTestConfiguration();
-        Promise.all(
-            Object.entries(config).map(([key, value]) => service.set(key, value))
-        ).then(() => {
-            service.clearCache();
-            service.resetService();
-        });
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "configuration with complex validation",
+        () => {
+            service = new MockConfigurationManagementService();
+
+            // Multiple validation operations
+            const operations = [
+                service.set("monitoring.defaultInterval", 150_000),
+                service.set("monitoring.timeout", 45_000),
+                service.set("app.theme", "dark"),
+                service.set("alerts.enabled", false),
+                service.set("dashboard.refreshInterval", 10_000),
+            ];
+
+            Promise.all(operations).then(() => {
+                service.validate();
+            });
+        },
+        { warmupIterations: 10, iterations: 800 }
+    );
+
+    bench(
+        "event handling performance",
+        () => {
+            service = new MockConfigurationManagementService();
+
+            let changeCount = 0;
+            service.onConfigChange(() => changeCount++);
+            service.onGroupChange(() => changeCount++);
+
+            // Generate multiple events
+            const operations = [
+                service.set("test1", "value1"),
+                service.set("test2", "value2"),
+                service.setGroup("monitoring", {
+                    "monitoring.defaultInterval": 300_000,
+                    "monitoring.timeout": 30_000,
+                }),
+            ];
+
+            Promise.all(operations);
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
+
+    bench(
+        "cache performance",
+        () => {
+            service = new MockConfigurationManagementService();
+
+            service.set("cached.test", "test value").then(() => {
+                // Multiple cache hits
+                const promises = Array.from({ length: 20 }, () =>
+                    service.get("cached.test", true)
+                );
+                Promise.all(promises);
+            });
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
+
+    bench(
+        "service statistics",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.getStats();
+            });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
+
+    bench(
+        "service cleanup",
+        () => {
+            service = new MockConfigurationManagementService();
+            const config = createTestConfiguration();
+            Promise.all(
+                Object.entries(config).map(([key, value]) =>
+                    service.set(key, value)
+                )
+            ).then(() => {
+                service.clearCache();
+                service.resetService();
+            });
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 });

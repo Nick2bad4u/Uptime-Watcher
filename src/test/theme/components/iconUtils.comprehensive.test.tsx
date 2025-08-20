@@ -93,7 +93,9 @@ describe("iconUtils functions", () => {
             ];
 
             for (const color of colors) {
-                const { unmount } = render(renderColoredIcon(icon, color) as React.ReactElement);
+                const { unmount } = render(
+                    renderColoredIcon(icon, color) as React.ReactElement
+                );
                 const iconElement = screen.getByText("test");
                 expect(iconElement.parentElement?.tagName).toBe("SPAN");
                 expect(iconElement.parentElement).toBeTruthy();
@@ -102,14 +104,24 @@ describe("iconUtils functions", () => {
         });
 
         it("should handle string icons with color classes", () => {
-            render(renderColoredIcon("string-icon", "success") as React.ReactElement);
+            render(
+                renderColoredIcon(
+                    "string-icon",
+                    "success"
+                ) as React.ReactElement
+            );
             const iconElement = screen.getByText("string-icon");
             expect(iconElement).toHaveClass("themed-icon--success");
             expect(iconElement.tagName).toBe("SPAN");
         });
 
         it("should handle string icons with custom colors", () => {
-            render(renderColoredIcon("string-icon", "#00ff00") as React.ReactElement);
+            render(
+                renderColoredIcon(
+                    "string-icon",
+                    "#00ff00"
+                ) as React.ReactElement
+            );
             const iconElement = screen.getByText("string-icon");
             expect(iconElement).toHaveStyle({ color: "#00ff00" });
             expect(iconElement.tagName).toBe("SPAN");

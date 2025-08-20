@@ -27,13 +27,17 @@ describe("Type Guards - Comprehensive Coverage", () => {
         it("should call every exported function for complete coverage", () => {
             // Call ALL functions using both named imports and namespace import
             // This ensures that every function in typeGuards.ts is executed
-            
+
             // Test basic object for multiple functions
             const testObj = { a: 1, b: 2 };
-            const testArray = [1, 2, 3];
+            const testArray = [
+                1,
+                2,
+                3,
+            ];
             const testDate = new Date();
             const testError = new Error("test");
-            
+
             // Call every function with various inputs to ensure coverage
             expect(typeGuards.isObject(testObj)).toBe(true);
             expect(typeGuards.isNumber(42)).toBe(true);
@@ -51,11 +55,13 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(typeGuards.isString("test")).toBe(true);
             expect(typeGuards.isValidPort(80)).toBe(true);
             expect(typeGuards.isValidTimestamp(Date.now())).toBe(true);
-            
+
             // Also test with false cases to ensure all branches are covered
             expect(typeGuards.isObject(null)).toBe(false);
             expect(typeGuards.isNumber("not a number")).toBe(false);
-            expect(typeGuards.hasProperties(testObj, ["nonexistent"])).toBe(false);
+            expect(typeGuards.hasProperties(testObj, ["nonexistent"])).toBe(
+                false
+            );
             expect(typeGuards.hasProperty(testObj, "nonexistent")).toBe(false);
             expect(typeGuards.isArray("not an array")).toBe(false);
             expect(typeGuards.isBoolean("not a boolean")).toBe(false);

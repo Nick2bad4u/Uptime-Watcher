@@ -137,7 +137,7 @@ async function withRetry<T>(
             }
 
             // Exponential backoff (simulated)
-            const delay = baseDelay * 2**attempt;
+            const delay = baseDelay * 2 ** attempt;
             await new Promise((resolve) =>
                 setTimeout(resolve, Math.min(delay, 0.1))
             ); // Very short for benchmarking
@@ -272,7 +272,10 @@ describe("Error Handling Performance Benchmarks", () => {
 
     // Error Recovery Benchmarks
     bench("Error recovery simulation - Immediate success", async () => {
-        const operations = Array.from({ length: 100 }, (_, i) => async () => `Success ${i}`);
+        const operations = Array.from(
+            { length: 100 },
+            (_, i) => async () => `Success ${i}`
+        );
 
         await Promise.all(operations.map((op) => withRetry(op, 3, 10)));
     });

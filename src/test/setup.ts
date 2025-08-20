@@ -80,42 +80,39 @@ const mockElectronAPI: {
     },
     events: {
         onMonitorStatusChanged: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
-        onMonitorUp: vi.fn((_callback: any): Mock<(...args: any[]) => any> => 
-            // Mock implementation - return cleanup function
-             vi.fn() // Mock cleanup function
+        onMonitorUp: vi.fn(
+            (_callback: any): Mock<(...args: any[]) => any> =>
+                // Mock implementation - return cleanup function
+                vi.fn() // Mock cleanup function
         ),
         onMonitorDown: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
         onMonitoringStarted: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
         onMonitoringStopped: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
-        onTestEvent: vi.fn((_callback: any): Mock<(...args: any[]) => any> => 
-            // Mock implementation - return cleanup function
-             vi.fn() // Mock cleanup function
+        onTestEvent: vi.fn(
+            (_callback: any): Mock<(...args: any[]) => any> =>
+                // Mock implementation - return cleanup function
+                vi.fn() // Mock cleanup function
         ),
         onUpdateStatus: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
         removeAllListeners: vi.fn(),
     },
@@ -207,10 +204,9 @@ const mockElectronAPI: {
             synchronized: false,
         }),
         onStateSyncEvent: vi.fn(
-            (_callback: any): Mock<(...args: any[]) => any> => 
+            (_callback: any): Mock<(...args: any[]) => any> =>
                 // Mock implementation - return cleanup function
-                 vi.fn() // Mock cleanup function
-            
+                vi.fn() // Mock cleanup function
         ),
     },
     system: {
@@ -242,7 +238,7 @@ Object.defineProperty(globalThis, "matchMedia", {
 Object.defineProperty(globalThis, "crypto", {
     value: {
         randomUUID: vi.fn(
-            () => `mock-uuid-${  Math.random().toString(36).slice(2, 15)}`
+            () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
         ),
         getRandomValues: vi.fn((arr) => {
             for (let i = 0; i < arr.length; i++) {
@@ -444,11 +440,12 @@ vi.mock("../theme/useTheme", () => ({
                 ? value
                 : mockTheme.colors.text.primary;
         }),
-        getStatusColor: vi.fn((status: string) => (
+        getStatusColor: vi.fn(
+            (status: string) =>
                 mockTheme.colors.status[
                     status as keyof typeof mockTheme.colors.status
                 ] || mockTheme.colors.text.secondary
-            )),
+        ),
         isDark: false,
         setTheme: vi.fn(),
         systemTheme: "light" as const,

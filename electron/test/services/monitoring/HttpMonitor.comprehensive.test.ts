@@ -10,7 +10,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AxiosResponse } from "axios";
 
 import type { Site } from "../../../../shared/types";
-import type { MonitorCheckResult, MonitorConfig } from "../../../services/monitoring/types";
+import type {
+    MonitorCheckResult,
+    MonitorConfig,
+} from "../../../services/monitoring/types";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
 
@@ -60,7 +63,8 @@ vi.mock("@shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn(),
     LOG_TEMPLATES: {
         debug: {
-            MONITOR_RESPONSE_TIME: "URL {url} responded in {responseTime}ms with status {status}",
+            MONITOR_RESPONSE_TIME:
+                "URL {url} responded in {responseTime}ms with status {status}",
         },
     },
 }));
@@ -77,7 +81,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             get: vi.fn(),
         };
 
-        const { createHttpClient } = vi.mocked(await import("../../../services/monitoring/utils/httpClient"));
+        const { createHttpClient } = vi.mocked(
+            await import("../../../services/monitoring/utils/httpClient")
+        );
         createHttpClient.mockReturnValue(mockAxiosInstance);
 
         httpMonitor = new HttpMonitor();
@@ -95,13 +101,13 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
         it("should create instance with custom config", () => {
             const config: MonitorConfig = {
-                timeout: 10000,
+                timeout: 10_000,
                 userAgent: "Custom/1.0",
             };
 
             const customMonitor = new HttpMonitor(config);
             expect(customMonitor.getConfig()).toEqual({
-                timeout: 10000,
+                timeout: 10_000,
                 userAgent: "Custom/1.0",
             });
         });
@@ -109,7 +115,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         it("should merge config with defaults", () => {
             const config: MonitorConfig = { timeout: 8000 };
             const monitor = new HttpMonitor(config);
-            
+
             const result = monitor.getConfig();
             expect(result.timeout).toBe(8000);
             expect(result.userAgent).toBe("UptimeWatcher/1.0");
@@ -134,7 +140,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         it("should return shallow copy", () => {
             const config1 = httpMonitor.getConfig();
             const config2 = httpMonitor.getConfig();
-            
+
             expect(config1).not.toBe(config2);
             expect(config1).toEqual(config2);
         });
@@ -142,8 +148,8 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
     describe("updateConfig", () => {
         it("should update timeout config", () => {
-            httpMonitor.updateConfig({ timeout: 15000 });
-            expect(httpMonitor.getConfig().timeout).toBe(15000);
+            httpMonitor.updateConfig({ timeout: 15_000 });
+            expect(httpMonitor.getConfig().timeout).toBe(15_000);
         });
 
         it("should update userAgent config", () => {
@@ -152,28 +158,38 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         });
 
         it("should merge partial config", () => {
-            httpMonitor.updateConfig({ timeout: 12000 });
+            httpMonitor.updateConfig({ timeout: 12_000 });
             const config = httpMonitor.getConfig();
-            expect(config.timeout).toBe(12000);
+            expect(config.timeout).toBe(12_000);
             expect(config.userAgent).toBe("UptimeWatcher/1.0");
         });
 
         it("should recreate axios instance on config update", async () => {
-            const { createHttpClient } = vi.mocked(await import("../../../services/monitoring/utils/httpClient"));
-            
-            httpMonitor.updateConfig({ timeout: 20000 });
-            
+            const { createHttpClient } = vi.mocked(
+                await import("../../../services/monitoring/utils/httpClient")
+            );
+
+            httpMonitor.updateConfig({ timeout: 20_000 });
+
             expect(createHttpClient).toHaveBeenCalledTimes(2); // Once for constructor, once for update
         });
 
         it("should throw error for invalid timeout", () => {
-            expect(() => httpMonitor.updateConfig({ timeout: -1000 })).toThrow("Invalid timeout: must be a positive number");
-            expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrow("Invalid timeout: must be a positive number");
-            expect(() => httpMonitor.updateConfig({ timeout: "invalid" as any })).toThrow("Invalid timeout: must be a positive number");
+            expect(() => httpMonitor.updateConfig({ timeout: -1000 })).toThrow(
+                "Invalid timeout: must be a positive number"
+            );
+            expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrow(
+                "Invalid timeout: must be a positive number"
+            );
+            expect(() =>
+                httpMonitor.updateConfig({ timeout: "invalid" as any })
+            ).toThrow("Invalid timeout: must be a positive number");
         });
 
         it("should throw error for invalid userAgent", () => {
-            expect(() => httpMonitor.updateConfig({ userAgent: 123 as any })).toThrow("Invalid userAgent: must be a string");
+            expect(() =>
+                httpMonitor.updateConfig({ userAgent: 123 as any })
+            ).toThrow("Invalid userAgent: must be a string");
         });
     });
 
@@ -183,7 +199,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 type: "ping",
                 host: "example.com",
                 id: "test",
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 history: [],
                 monitoring: true,
                 responseTime: 0,
@@ -191,12 +207,18 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 enabled: true,
             } as any;
 
-            await expect(httpMonitor.check(monitor)).rejects.toThrow("HttpMonitor cannot handle monitor type: ping");
+            await expect(httpMonitor.check(monitor)).rejects.toThrow(
+                "HttpMonitor cannot handle monitor type: ping"
+            );
         });
 
         it("should return error result for invalid URL", async () => {
-            const { validateMonitorUrl, createMonitorErrorResult } = vi.mocked(await import("../../../services/monitoring/shared/monitorServiceHelpers"));
-            
+            const { validateMonitorUrl, createMonitorErrorResult } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/shared/monitorServiceHelpers"
+                )
+            );
+
             validateMonitorUrl.mockReturnValue("Invalid URL");
             createMonitorErrorResult.mockReturnValue({
                 status: "down",
@@ -213,14 +235,23 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const result = await httpMonitor.check(monitor);
 
             expect(validateMonitorUrl).toHaveBeenCalledWith(monitor);
-            expect(createMonitorErrorResult).toHaveBeenCalledWith("Invalid URL", 0);
+            expect(createMonitorErrorResult).toHaveBeenCalledWith(
+                "Invalid URL",
+                0
+            );
             expect(result.status).toBe("down");
         });
 
         it("should perform health check with extracted config", async () => {
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(await import("../../../services/monitoring/shared/monitorServiceHelpers"));
-            const { withOperationalHooks: mockWithHooks } = vi.mocked(await import("../../../utils/operationalHooks"));
-            
+            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/shared/monitorServiceHelpers"
+                )
+            );
+            const { withOperationalHooks: mockWithHooks } = vi.mocked(
+                await import("../../../utils/operationalHooks")
+            );
+
             validateMonitorUrl.mockReturnValue(null);
             extractMonitorConfig.mockReturnValue({
                 timeout: 8000,
@@ -248,16 +279,27 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         });
 
         it("should handle check errors", async () => {
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(await import("../../../services/monitoring/shared/monitorServiceHelpers"));
-            const { withOperationalHooks: mockWithHooks } = vi.mocked(await import("../../../utils/operationalHooks"));
-            const { handleCheckError } = vi.mocked(await import("../../../services/monitoring/utils/errorHandling"));
-            
+            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/shared/monitorServiceHelpers"
+                )
+            );
+            const { withOperationalHooks: mockWithHooks } = vi.mocked(
+                await import("../../../utils/operationalHooks")
+            );
+            const { handleCheckError } = vi.mocked(
+                await import("../../../services/monitoring/utils/errorHandling")
+            );
+
             validateMonitorUrl.mockReturnValue(null);
-            extractMonitorConfig.mockReturnValue({ timeout: 5000, retryAttempts: 3 });
-            
+            extractMonitorConfig.mockReturnValue({
+                timeout: 5000,
+                retryAttempts: 3,
+            });
+
             const error = new Error("Network error");
             mockWithHooks.mockRejectedValue(error);
-            
+
             const errorResult: MonitorCheckResult = {
                 status: "down",
                 responseTime: 0,
@@ -273,15 +315,22 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             const result = await httpMonitor.check(monitor);
 
-            expect(handleCheckError).toHaveBeenCalledWith(error, "https://example.com");
+            expect(handleCheckError).toHaveBeenCalledWith(
+                error,
+                "https://example.com"
+            );
             expect(result).toEqual(errorResult);
         });
     });
 
     describe("makeRequest (private method via performSingleHealthCheck)", () => {
         it("should make successful HTTP request", async () => {
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+
             const mockResponse: AxiosResponse = {
                 status: 200,
                 responseTime: 123,
@@ -295,9 +344,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             determineMonitorStatus.mockReturnValue("up");
 
             // Access private method through public interface
-            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+            const result = await (httpMonitor as any).performSingleHealthCheck(
+                "https://example.com",
+                5000
+            );
 
-            expect(mockAxiosInstance.get).toHaveBeenCalledWith("https://example.com", { timeout: 5000 });
+            expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+                "https://example.com",
+                { timeout: 5000 }
+            );
             expect(determineMonitorStatus).toHaveBeenCalledWith(200);
             expect(result).toEqual({
                 status: "up",
@@ -307,8 +362,12 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         });
 
         it("should handle response without responseTime", async () => {
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+
             const mockResponse: AxiosResponse = {
                 status: 200,
                 data: "OK",
@@ -320,14 +379,21 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
 
-            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+            const result = await (httpMonitor as any).performSingleHealthCheck(
+                "https://example.com",
+                5000
+            );
 
             expect(result.responseTime).toBe(0);
         });
 
         it("should include error for down status", async () => {
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+
             const mockResponse: AxiosResponse = {
                 status: 500,
                 responseTime: 250,
@@ -340,7 +406,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("down");
 
-            const result = await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+            const result = await (httpMonitor as any).performSingleHealthCheck(
+                "https://example.com",
+                5000
+            );
 
             expect(result).toEqual({
                 status: "down",
@@ -355,11 +424,17 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         it("should log debug messages in dev mode", async () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            const { interpolateLogTemplate, LOG_TEMPLATES } = vi.mocked(await import("@shared/utils/logTemplates"));
-            
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+            const { interpolateLogTemplate, LOG_TEMPLATES } = vi.mocked(
+                await import("@shared/utils/logTemplates")
+            );
+
             isDev.mockReturnValue(true);
-            
+
             const mockResponse: AxiosResponse = {
                 status: 200,
                 responseTime: 150,
@@ -371,11 +446,18 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
-            interpolateLogTemplate.mockReturnValue("URL https://example.com responded in 150ms with status 200");
+            interpolateLogTemplate.mockReturnValue(
+                "URL https://example.com responded in 150ms with status 200"
+            );
 
-            await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+            await (httpMonitor as any).performSingleHealthCheck(
+                "https://example.com",
+                5000
+            );
 
-            expect(logger.debug).toHaveBeenCalledWith("[HttpMonitor] Checking URL: https://example.com with timeout: 5000ms");
+            expect(logger.debug).toHaveBeenCalledWith(
+                "[HttpMonitor] Checking URL: https://example.com with timeout: 5000ms"
+            );
             expect(interpolateLogTemplate).toHaveBeenCalledWith(
                 LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
                 {
@@ -384,16 +466,22 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                     url: "https://example.com",
                 }
             );
-            expect(logger.debug).toHaveBeenCalledWith("URL https://example.com responded in 150ms with status 200");
+            expect(logger.debug).toHaveBeenCalledWith(
+                "URL https://example.com responded in 150ms with status 200"
+            );
         });
 
         it("should not log in production mode", async () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+
             isDev.mockReturnValue(false);
-            
+
             const mockResponse: AxiosResponse = {
                 status: 200,
                 responseTime: 150,
@@ -406,7 +494,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
 
-            await (httpMonitor as any).performSingleHealthCheck("https://example.com", 5000);
+            await (httpMonitor as any).performSingleHealthCheck(
+                "https://example.com",
+                5000
+            );
 
             expect(logger.debug).not.toHaveBeenCalled();
         });
@@ -414,13 +505,23 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
     describe("Integration Tests", () => {
         it("should handle complete workflow with retry logic", async () => {
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(await import("../../../services/monitoring/shared/monitorServiceHelpers"));
-            const { withOperationalHooks: mockWithHooks } = vi.mocked(await import("../../../utils/operationalHooks"));
-            const { determineMonitorStatus } = vi.mocked(await import("../../../services/monitoring/utils/httpStatusUtils"));
-            
+            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/shared/monitorServiceHelpers"
+                )
+            );
+            const { withOperationalHooks: mockWithHooks } = vi.mocked(
+                await import("../../../utils/operationalHooks")
+            );
+            const { determineMonitorStatus } = vi.mocked(
+                await import(
+                    "../../../services/monitoring/utils/httpStatusUtils"
+                )
+            );
+
             validateMonitorUrl.mockReturnValue(null);
             extractMonitorConfig.mockReturnValue({
-                timeout: 10000,
+                timeout: 10_000,
                 retryAttempts: 1,
             });
 
@@ -458,7 +559,8 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 expect.any(Function),
                 expect.objectContaining({
                     maxRetries: 2, // retryAttempts + 1
-                    operationName: "HTTP check for https://api.example.com/health",
+                    operationName:
+                        "HTTP check for https://api.example.com/health",
                 })
             );
         });

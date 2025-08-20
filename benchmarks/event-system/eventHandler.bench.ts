@@ -4,9 +4,13 @@
  * @file Performance benchmarks for domain event handlers.
  *
  * @author GitHub Copilot
+ *
  * @since 2025-08-19
+ *
  * @category Performance
+ *
  * @benchmark Event-EventHandler
+ *
  * @tags ["performance", "events", "event-handlers", "domain-events"]
  */
 
@@ -27,7 +31,7 @@ class MockEventHandler {
     private metrics = {
         processed: 0,
         failed: 0,
-        averageProcessingTime: 0
+        averageProcessingTime: 0,
     };
 
     registerHandler(eventType: string, handler: Function): void {
@@ -40,7 +44,7 @@ class MockEventHandler {
     async handleEvent(event: DomainEvent): Promise<void> {
         const startTime = Date.now();
         const handlers = this.handlers.get(event.type);
-        
+
         if (!handlers || handlers.length === 0) {
             return;
         }
@@ -82,14 +86,16 @@ class MockEventHandler {
 
     private updateAverageProcessingTime(newTime: number): void {
         const totalProcessed = this.metrics.processed + this.metrics.failed;
-        this.metrics.averageProcessingTime = 
-            (this.metrics.averageProcessingTime * (totalProcessed - 1) + newTime) / totalProcessed;
+        this.metrics.averageProcessingTime =
+            (this.metrics.averageProcessingTime * (totalProcessed - 1) +
+                newTime) /
+            totalProcessed;
     }
 
     handleSiteStatusChanged(event: DomainEvent): void {
         // Simulate site status change handling
         const { siteId, status, responseTime } = event.payload;
-        if (status === 'offline') {
+        if (status === "offline") {
             this.triggerAlert(siteId);
         }
     }
@@ -112,12 +118,20 @@ class MockEventHandler {
         // Process alert...
     }
 
-    private initializeMonitor(monitorId: string, siteId: string, type: string): void {
+    private initializeMonitor(
+        monitorId: string,
+        siteId: string,
+        type: string
+    ): void {
         // Simulate monitor initialization
         // Setup monitoring...
     }
 
-    private processAlert(alertId: string, severity: string, message: string): void {
+    private processAlert(
+        alertId: string,
+        severity: string,
+        message: string
+    ): void {
         // Simulate alert processing
         // Send notifications...
     }
@@ -130,7 +144,7 @@ class MockEventHandler {
         this.metrics = {
             processed: 0,
             failed: 0,
-            averageProcessingTime: 0
+            averageProcessingTime: 0,
         };
     }
 }
@@ -138,118 +152,167 @@ class MockEventHandler {
 describe("Event Handler Performance", () => {
     let eventHandler: MockEventHandler;
 
-    bench("event handler initialization", () => {
-        eventHandler = new MockEventHandler();
-    }, { warmupIterations: 10, iterations: 1000 });
+    bench(
+        "event handler initialization",
+        () => {
+            eventHandler = new MockEventHandler();
+        },
+        { warmupIterations: 10, iterations: 1000 }
+    );
 
-    bench("register single handler", () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('site.status.changed', () => {});
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "register single handler",
+        () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler("site.status.changed", () => {});
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 
-    bench("register multiple handlers", () => {
-        eventHandler = new MockEventHandler();
-        const eventTypes = ['site.status.changed', 'monitor.created', 'alert.triggered'];
-        eventTypes.forEach(type => {
-            eventHandler.registerHandler(type, () => {});
-        });
-    }, { warmupIterations: 10, iterations: 2000 });
+    bench(
+        "register multiple handlers",
+        () => {
+            eventHandler = new MockEventHandler();
+            const eventTypes = [
+                "site.status.changed",
+                "monitor.created",
+                "alert.triggered",
+            ];
+            eventTypes.forEach((type) => {
+                eventHandler.registerHandler(type, () => {});
+            });
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
 
-    bench("handle single event", async () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('test.event', async () => {
-            // Simulate async processing
-            await new Promise(resolve => setTimeout(resolve, 1));
-        });
-        
-        const event: DomainEvent = {
-            id: 'event-1',
-            type: 'test.event',
-            timestamp: Date.now(),
-            correlationId: 'corr-1',
-            payload: { data: 'test' }
-        };
-        
-        await eventHandler.handleEvent(event);
-    }, { warmupIterations: 5, iterations: 500 });
+    bench(
+        "handle single event",
+        async () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler("test.event", async () => {
+                // Simulate async processing
+                await new Promise((resolve) => setTimeout(resolve, 1));
+            });
 
-    bench("handle site status change event", () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('site.status.changed', eventHandler.handleSiteStatusChanged.bind(eventHandler));
-        
-        const event: DomainEvent = {
-            id: 'event-1',
-            type: 'site.status.changed',
-            timestamp: Date.now(),
-            correlationId: 'corr-1',
-            payload: { 
-                siteId: 'site-1', 
-                status: 'offline', 
-                responseTime: 5000 
-            }
-        };
-        
-        eventHandler.handleEvent(event);
-    }, { warmupIterations: 10, iterations: 2000 });
-
-    bench("handle monitor created event", () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('monitor.created', eventHandler.handleMonitorCreated.bind(eventHandler));
-        
-        const event: DomainEvent = {
-            id: 'event-2',
-            type: 'monitor.created',
-            timestamp: Date.now(),
-            correlationId: 'corr-2',
-            payload: { 
-                monitorId: 'monitor-1', 
-                siteId: 'site-1', 
-                type: 'http' 
-            }
-        };
-        
-        eventHandler.handleEvent(event);
-    }, { warmupIterations: 10, iterations: 2000 });
-
-    bench("queue multiple events", () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('queued.event', () => {});
-        
-        for (let i = 0; i < 50; i++) {
             const event: DomainEvent = {
-                id: `event-${i}`,
-                type: 'queued.event',
+                id: "event-1",
+                type: "test.event",
                 timestamp: Date.now(),
-                correlationId: `corr-${i}`,
-                payload: { index: i }
+                correlationId: "corr-1",
+                payload: { data: "test" },
             };
-            eventHandler.enqueueEvent(event);
-        }
-    }, { warmupIterations: 5, iterations: 100 });
 
-    bench("handle batch events", async () => {
-        eventHandler = new MockEventHandler();
-        eventHandler.registerHandler('batch.event', async () => {
-            // Simulate processing
-        });
-        
-        const events: DomainEvent[] = Array.from({ length: 20 }, (_, i) => ({
-            id: `batch-event-${i}`,
-            type: 'batch.event',
-            timestamp: Date.now(),
-            correlationId: `batch-corr-${i}`,
-            payload: { index: i }
-        }));
-        
-        for (const event of events) {
             await eventHandler.handleEvent(event);
-        }
-    }, { warmupIterations: 5, iterations: 100 });
+        },
+        { warmupIterations: 5, iterations: 500 }
+    );
 
-    bench("metrics collection", () => {
-        eventHandler = new MockEventHandler();
-        // Simulate some processing to generate metrics
-        eventHandler.getMetrics();
-        eventHandler.clearMetrics();
-    }, { warmupIterations: 10, iterations: 5000 });
+    bench(
+        "handle site status change event",
+        () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler(
+                "site.status.changed",
+                eventHandler.handleSiteStatusChanged.bind(eventHandler)
+            );
+
+            const event: DomainEvent = {
+                id: "event-1",
+                type: "site.status.changed",
+                timestamp: Date.now(),
+                correlationId: "corr-1",
+                payload: {
+                    siteId: "site-1",
+                    status: "offline",
+                    responseTime: 5000,
+                },
+            };
+
+            eventHandler.handleEvent(event);
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
+
+    bench(
+        "handle monitor created event",
+        () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler(
+                "monitor.created",
+                eventHandler.handleMonitorCreated.bind(eventHandler)
+            );
+
+            const event: DomainEvent = {
+                id: "event-2",
+                type: "monitor.created",
+                timestamp: Date.now(),
+                correlationId: "corr-2",
+                payload: {
+                    monitorId: "monitor-1",
+                    siteId: "site-1",
+                    type: "http",
+                },
+            };
+
+            eventHandler.handleEvent(event);
+        },
+        { warmupIterations: 10, iterations: 2000 }
+    );
+
+    bench(
+        "queue multiple events",
+        () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler("queued.event", () => {});
+
+            for (let i = 0; i < 50; i++) {
+                const event: DomainEvent = {
+                    id: `event-${i}`,
+                    type: "queued.event",
+                    timestamp: Date.now(),
+                    correlationId: `corr-${i}`,
+                    payload: { index: i },
+                };
+                eventHandler.enqueueEvent(event);
+            }
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
+
+    bench(
+        "handle batch events",
+        async () => {
+            eventHandler = new MockEventHandler();
+            eventHandler.registerHandler("batch.event", async () => {
+                // Simulate processing
+            });
+
+            const events: DomainEvent[] = Array.from(
+                { length: 20 },
+                (_, i) => ({
+                    id: `batch-event-${i}`,
+                    type: "batch.event",
+                    timestamp: Date.now(),
+                    correlationId: `batch-corr-${i}`,
+                    payload: { index: i },
+                })
+            );
+
+            for (const event of events) {
+                await eventHandler.handleEvent(event);
+            }
+        },
+        { warmupIterations: 5, iterations: 100 }
+    );
+
+    bench(
+        "metrics collection",
+        () => {
+            eventHandler = new MockEventHandler();
+            // Simulate some processing to generate metrics
+            eventHandler.getMetrics();
+            eventHandler.clearMetrics();
+        },
+        { warmupIterations: 10, iterations: 5000 }
+    );
 });

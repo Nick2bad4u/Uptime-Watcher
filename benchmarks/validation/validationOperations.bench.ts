@@ -554,8 +554,7 @@ describe("Validation Operations Performance Benchmarks", () => {
                         // Fallback parsing strategies
                         try {
                             // Try to extract partial data
-                            const partial =
-                                `${json.slice(0, Math.max(0, json.indexOf("{") + 1))  }}`;
+                            const partial = `${json.slice(0, Math.max(0, json.indexOf("{") + 1))}}`;
                             parseAndValidateJson(partial);
                         } catch {
                             // Final fallback

@@ -17,19 +17,25 @@ describe("cacheKeys utilities - Backend Coverage", () => {
     describe("Function Coverage Validation", () => {
         it("should call every exported function for complete coverage", () => {
             // Call ALL functions using both named imports and namespace import
-            
+
             // Test CacheKeys methods
             const configKey = cacheKeys.CacheKeys.config.byName("test");
-            const configValidationKey = cacheKeys.CacheKeys.config.validation("test-config");
+            const configValidationKey =
+                cacheKeys.CacheKeys.config.validation("test-config");
             const monitorKey = cacheKeys.CacheKeys.monitor.byId("monitor-1");
             const monitorSiteKey = cacheKeys.CacheKeys.monitor.bySite("site-1");
-            const monitorOpKey = cacheKeys.CacheKeys.monitor.operation("monitor-1");
+            const monitorOpKey =
+                cacheKeys.CacheKeys.monitor.operation("monitor-1");
             const siteBulkKey = cacheKeys.CacheKeys.site.bulkOperation();
             const siteKey = cacheKeys.CacheKeys.site.byIdentifier("site-1");
             const siteLoadingKey = cacheKeys.CacheKeys.site.loading("site-1");
-            const validationKey = cacheKeys.CacheKeys.validation.byType("monitor", "config-1");
-            const validationMonitorTypeKey = cacheKeys.CacheKeys.validation.monitorType("http");
-            
+            const validationKey = cacheKeys.CacheKeys.validation.byType(
+                "monitor",
+                "config-1"
+            );
+            const validationMonitorTypeKey =
+                cacheKeys.CacheKeys.validation.monitorType("http");
+
             // Test createCacheKey is called by CacheKeys methods
             expect(typeof configKey).toBe("string");
             expect(typeof configValidationKey).toBe("string");
@@ -41,27 +47,29 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             expect(typeof siteLoadingKey).toBe("string");
             expect(typeof validationKey).toBe("string");
             expect(typeof validationMonitorTypeKey).toBe("string");
-            
+
             // Test isStandardizedCacheKey
             expect(cacheKeys.isStandardizedCacheKey(configKey)).toBe(true);
             expect(cacheKeys.isStandardizedCacheKey(monitorKey)).toBe(true);
             expect(cacheKeys.isStandardizedCacheKey(siteKey)).toBe(true);
             expect(cacheKeys.isStandardizedCacheKey(validationKey)).toBe(true);
             expect(cacheKeys.isStandardizedCacheKey("invalid-key")).toBe(false);
-            
+
             // Test parseCacheKey with all key types
             const parsedConfig = cacheKeys.parseCacheKey(configKey);
             const parsedMonitor = cacheKeys.parseCacheKey(monitorKey);
             const parsedSite = cacheKeys.parseCacheKey(siteKey);
             const parsedValidation = cacheKeys.parseCacheKey(validationKey);
-            
+
             expect(parsedConfig).toBeDefined();
             expect(parsedMonitor).toBeDefined();
             expect(parsedSite).toBeDefined();
             expect(parsedValidation).toBeDefined();
-            
+
             // Also test negative cases - parseCacheKey throws for invalid keys
-            expect(() => cacheKeys.parseCacheKey("invalid-key")).toThrow("Invalid cache key format");
+            expect(() => cacheKeys.parseCacheKey("invalid-key")).toThrow(
+                "Invalid cache key format"
+            );
         });
     });
 

@@ -30,7 +30,8 @@ vi.mock("../../../services/logger", () => ({
 const mockLogger = vi.mocked(logger);
 
 describe("DynamicField - Additional Coverage", () => {
-    const renderWithTheme = (component: React.ReactElement) => render(<ThemeProvider>{component}</ThemeProvider>);
+    const renderWithTheme = (component: React.ReactElement) =>
+        render(<ThemeProvider>{component}</ThemeProvider>);
 
     describe("Unsupported field types (Line 134)", () => {
         it("should display error message for unsupported field type", () => {

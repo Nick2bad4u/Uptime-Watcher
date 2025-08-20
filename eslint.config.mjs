@@ -15,17 +15,11 @@
 /* eslint-disable import-x/namespace */
 /* eslint-disable import-x/no-named-as-default-member */
 /* eslint-disable no-underscore-dangle */
- 
- 
+
 /* eslint-disable n/no-unpublished-import */
 /* eslint-disable perfectionist/sort-imports */
- 
- 
- 
+
 /* eslint-disable perfectionist/sort-objects */
- 
- 
- 
 
 import { importX } from "eslint-plugin-import-x";
 import { plugin as ex } from "eslint-plugin-exception-handling";
@@ -222,8 +216,6 @@ export default [
             "**/shared/**",
             "**/node_modules/**",
             "**/release/**",
-            "**/test/themeTypes.test.tsx",
-            "**/test/types.test.tsx",
             "vite.config.ts", // Ignore vite config due to parsing issues
             "vitest.config.ts", // Ignore vitest config due to parsing issues
             "vitest.electron.config.ts", // Ignore vitest electron config
@@ -239,16 +231,9 @@ export default [
             "node_modules/**",
             "docs/Logger-Error-report.md",
             "release/",
-            "test/themeTypes.test.tsx",
-            "test/types.test.tsx",
             "coverage-report.json",
             "html/**",
             "report/**",
-            // Ignore large test and benchmark directories during a repo-wide lint-fix run
-            "**/benchmarks/**",
-            "**/electron/test/**",
-            "**/src/test/**",
-            "**/test/**",
             // "**/*.config.{js,mjs,ts}",
         ],
     },
@@ -4351,9 +4336,6 @@ export default [
     // Test files (Frontend)
     {
         files: [
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
             "src/**/*.spec.{ts,tsx}",
             "src/**/*.test.{ts,tsx}",
             "src/test/**/*.{ts,tsx}",
@@ -4488,9 +4470,23 @@ export default [
             "no-new": "off", // Allow new for class constructors
             "prefer-destructuring": "off",
             "init-declarations": "off",
+            "nitpick/no-redundant-vars": "off", // Allow redundant vars in tests
+            "no-use-before-define": "off", // Allow use before define in tests
+            "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
+            "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
+            "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
+            "eqeqeq": "off", // Allow == and != in tests for flexibility
+            "func-name-matching": "off", // Allow function names to not match variable names
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",
+            "no-loop-func": "off", // Allow functions in loops for test setups
+            "no-duplicate-imports": "off", // Allow duplicate imports for test setups
+            "no-redeclare": "off", // Allow redeclaring variables in tests
+            "no-promise-executor-return": "off", // Allow returning values from promise executors
+            "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-shadow": "off",
+            complexity: "off",
+            "no-useless-assignment": "off",
             "no-underscore-dangle": "off",
             "default-case": "off",
             "func-names": "off",
@@ -4523,15 +4519,12 @@ export default [
         },
     },
 
-    // Test files (Backend) + Configuration files
+    // Test files (Backend)
     {
         files: [
             "electron/**/*.spec.{ts,tsx}",
             "electron/**/*.test.{ts,tsx}",
             "electron/test/**/*.{ts,tsx}",
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4628,9 +4621,22 @@ export default [
             "no-new": "off", // Allow new for class constructors
             "prefer-destructuring": "off",
             "init-declarations": "off",
+            "no-use-before-define": "off", // Allow use before define in tests
+            "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
+            "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
+            "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
+            "eqeqeq": "off", // Allow == and != in tests for flexibility
+            "func-name-matching": "off", // Allow function names to not match variable names
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",
+            "no-loop-func": "off", // Allow functions in loops for test setups
+            "no-duplicate-imports": "off", // Allow duplicate imports for test setups
+            "no-redeclare": "off", // Allow redeclaring variables in tests
+            "no-promise-executor-return": "off", // Allow returning values from promise executors
+            "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-shadow": "off",
+            complexity: "off",
+            "no-useless-assignment": "off",
             "no-underscore-dangle": "off",
             "default-case": "off",
             "func-names": "off",
@@ -4848,158 +4854,6 @@ export default [
         },
     },
 
-    // Test files (Backend) + Configuration files
-    {
-        files: [
-            "electron/**/*.spec.{ts,tsx}",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/test/**/*.{ts,tsx}",
-        ],
-        languageOptions: {
-            parser: tseslintParser,
-            parserOptions: {
-                ecmaVersion: "latest",
-                project: "tsconfig.electron.test.json",
-                sourceType: "module",
-                tsconfigRootDir: path.resolve(import.meta.dirname),
-                ecmaFeatures: {
-                    jsx: true,
-                },
-                jsDocParsingMode: "all",
-                warnOnUnsupportedTypeScriptVersion: true,
-            },
-            globals: {
-                ...globals.node,
-                ...vitest.environments.env.globals,
-                afterAll: "readonly",
-                afterEach: "readonly",
-                beforeAll: "readonly",
-                beforeEach: "readonly",
-                describe: "readonly",
-                expect: "readonly",
-                it: "readonly",
-                test: "readonly",
-                vi: "readonly",
-                NodeJS: "readonly",
-            },
-        },
-        plugins: {
-            "@typescript-eslint": tseslint,
-            "no-only-tests": pluginNoOnly,
-            "unused-imports": pluginUnusedImports,
-            "import-x": importX,
-            unicorn: pluginUnicorn,
-            vitest: vitest,
-            n: nodePlugin,
-            "testing-library": pluginTestingLibrary,
-            "loadable-imports": pluginLoadableImports,
-        },
-        rules: {
-            ...js.configs.all.rules,
-            ...tseslint.configs.recommendedTypeChecked,
-            ...tseslint.configs.recommended.rules,
-            ...tseslint.configs.strictTypeChecked,
-            ...tseslint.configs.strict.rules,
-            ...tseslint.configs.stylisticTypeChecked,
-            ...tseslint.configs.stylistic.rules,
-            ...vitest.configs.recommended.rules,
-            ...pluginUnicorn.configs["flat/all"].rules,
-            ...pluginTestingLibrary.configs["flat/react"].rules,
-
-            "loadable-imports/sort": "error",
-
-            "testing-library/no-node-access": "off",
-            "testing-library/await-async-queries": "error",
-            "testing-library/no-await-sync-queries": "error",
-            "testing-library/no-debugging-utils": "off",
-            "testing-library/prefer-screen-queries": "warn",
-
-            "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-non-null-assertion": "off",
-            "@typescript-eslint/no-unused-vars": "off",
-
-            "unicorn/no-keyword-prefix": [
-                "error",
-                {
-                    disallowedPrefixes: [
-                        "interface",
-                        "type",
-                        "enum",
-                    ],
-                    checkProperties: false,
-                },
-            ], // Allow "class" prefix for className and other legitimate uses
-            "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
-            "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
-            "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
-            "unicorn/no-null": "off", // Null is common in test setups
-            "unicorn/no-await-expression-member": "off", // Allow await in test expressions
-            "unicorn/filename-case": "off", // Allow test files to have any case
-            "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-
-            // Relaxed function rules for backend tests (explicit for clarity)
-
-            "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
-            "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
-            "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
-            // No Only Tests
-            "no-only-tests/no-only-tests": "error",
-            "one-var": "off",
-            "no-magic-numbers": "off",
-            "func-style": "off",
-            "capitalized-comments": "off",
-            "class-methods-use-this": "off",
-            "sort-imports": "off",
-            "no-inline-comments": "off",
-            "require-await": "off",
-            "no-ternary": "off",
-            "max-lines": "off",
-            "id-length": "off",
-            "max-lines-per-function": "off",
-            "max-statements": "off",
-            "max-params": "off",
-            "sort-keys": "off",
-            "dot-notation": "off",
-            "no-console": "off",
-            "no-plusplus": "off",
-            "no-undefined": "off",
-            "no-void": "off",
-            "require-unicode-regexp": "off",
-            "prefer-arrow-callback": "off",
-            "no-undef-init": "off",
-            "object-shorthand": "off",
-            camelcase: "off",
-            "max-classes-per-file": "off",
-        },
-        settings: {
-            vitest: {
-                typecheck: true,
-            },
-            n: {
-                allowModules: [
-                    "electron",
-                    "node",
-                    "electron-devtools-installer",
-                ],
-            },
-            "import-x/resolver": {
-                // You will also need to install and configure the TypeScript resolver
-                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
-                typescript: true,
-                node: true,
-                project: ["tsconfig.electron.test.json"],
-            },
-            "import/resolver": {
-                // You will also need to install and configure the TypeScript resolver
-                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
-                typescript: {
-                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: ["tsconfig.electron.test.json"],
-                },
-            },
-        },
-    },
-
     // Benchmark files
     {
         files: ["benchmarks/**/*.bench.{ts,tsx}", "benchmarks/**/*.{ts,tsx}"],
@@ -5088,6 +4942,10 @@ export default [
             ...pluginComments.configs.recommended.rules,
             ...pluginUnicorn.configs["flat/all"].rules,
 
+            "nitpick/no-redundant-vars": "off", // Allow redundant vars in benchmarks
+            "no-continue": "off",
+            "no-use-before-define": "off", // Allow use before define in benchmarks
+            "no-div-regex": "off", // Allow division regex in benchmarks
             // Allow performance-focused code patterns in benchmarks
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -5139,7 +4997,14 @@ export default [
             "init-declarations": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",
+            "no-loop-func": "off", // Allow functions in loops for test setups
+            "no-duplicate-imports": "off", // Allow duplicate imports for test setups
+            "no-redeclare": "off", // Allow redeclaring variables in tests
+            "no-promise-executor-return": "off", // Allow returning values from promise executors
+            "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-shadow": "off",
+            complexity: "off",
+            "no-useless-assignment": "off",
             "no-underscore-dangle": "off",
             "default-case": "off",
             "func-names": "off",
@@ -5304,7 +5169,14 @@ export default [
             "init-declarations": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",
+            "no-loop-func": "off", // Allow functions in loops for test setups
+            "no-duplicate-imports": "off", // Allow duplicate imports for test setups
+            "no-redeclare": "off", // Allow redeclaring variables in tests
+            "no-promise-executor-return": "off", // Allow returning values from promise executors
+            "no-await-in-loop": "off", // Allow await in loops for sequential operations
             "no-shadow": "off",
+            complexity: "off",
+            "no-useless-assignment": "off",
             "no-underscore-dangle": "off",
             "default-case": "off",
             "func-names": "off",
@@ -5363,7 +5235,6 @@ export default [
             "unicorn/prevent-abbreviations": "off", // Too many false positives
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
             // Node.js specific
-            complexity: "off",
             // "no-console": "off", // Logging is important for backend - DISABLED FOR NOW
             "no-var": "error",
             "prefer-const": "error",

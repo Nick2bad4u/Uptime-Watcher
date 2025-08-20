@@ -27,17 +27,17 @@ describe("Types Module", () => {
             ];
 
             // All values should be valid UpdateStatus
-            updateStatuses.forEach((status) => {
+            for (const status of updateStatuses) {
                 expect(typeof status).toBe("string");
-            });
+            }
         });
 
         it("should export MonitorType type", () => {
             const monitorTypes: MonitorType[] = ["http", "port"];
 
-            monitorTypes.forEach((type) => {
+            for (const type of monitorTypes) {
                 expect(typeof type).toBe("string");
-            });
+            }
         });
     });
 
@@ -52,7 +52,7 @@ describe("Types Module", () => {
                 lastChecked: new Date(),
                 history: [],
                 monitoring: true,
-                checkInterval: 60000,
+                checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
             };
@@ -65,7 +65,7 @@ describe("Types Module", () => {
             expect(monitor.lastChecked).toBeInstanceOf(Date);
             expect(Array.isArray(monitor.history)).toBe(true);
             expect(monitor.monitoring).toBe(true);
-            expect(monitor.checkInterval).toBe(60000);
+            expect(monitor.checkInterval).toBe(60_000);
             expect(monitor.timeout).toBe(5000);
             expect(monitor.retryAttempts).toBe(3);
         });
@@ -121,7 +121,7 @@ describe("Types Module", () => {
                 "pending",
             ];
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const monitor: Monitor = {
                     id: `monitor-${status}`,
                     type: "http",
@@ -135,7 +135,7 @@ describe("Types Module", () => {
                 };
 
                 expect(monitor.status).toBe(status);
-            });
+            }
         });
     });
 
@@ -212,12 +212,12 @@ describe("Types Module", () => {
     describe("StatusHistory Interface", () => {
         it("should create valid StatusHistory object", () => {
             const history: StatusHistory = {
-                timestamp: 1640995200000,
+                timestamp: 1_640_995_200_000,
                 status: "up",
                 responseTime: 250,
             };
 
-            expect(history.timestamp).toBe(1640995200000);
+            expect(history.timestamp).toBe(1_640_995_200_000);
             expect(history.status).toBe("up");
             expect(history.responseTime).toBe(250);
         });
@@ -225,7 +225,7 @@ describe("Types Module", () => {
         it("should support all status values", () => {
             const statuses: ("up" | "down")[] = ["up", "down"];
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const history: StatusHistory = {
                     timestamp: Date.now(),
                     status,
@@ -233,7 +233,7 @@ describe("Types Module", () => {
                 };
 
                 expect(history.status).toBe(status);
-            });
+            }
         });
 
         it("should handle zero response time", () => {
@@ -302,7 +302,7 @@ describe("Types Module", () => {
                 monitoring: false,
             };
 
-            statuses.forEach((status) => {
+            for (const status of statuses) {
                 const statusUpdate: StatusUpdate = {
                     monitorId: "test-monitor-id",
                     status: "up",
@@ -313,7 +313,7 @@ describe("Types Module", () => {
                 };
 
                 expect(statusUpdate.previousStatus).toBe(status);
-            });
+            }
         });
     });
 
