@@ -40,6 +40,7 @@ const vitestConfig = defineConfig({
                 "electron/**", // Exclude electron files
                 "release/**",
                 "scripts/**",
+                "shared/test",
                 "report/**",
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],

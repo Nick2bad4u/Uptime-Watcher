@@ -34,6 +34,7 @@ const vitestConfig = defineConfig({
                 "**/types.tsx", // Exclude type definition files with JSX
                 "coverage/**",
                 "dist-electron/**",
+                "shared/test",
                 "dist-shared/**",
                 "dist/**",
                 "src/**", // Exclude all src files from electron coverage
@@ -48,7 +49,7 @@ const vitestConfig = defineConfig({
                 // Shared files now have their own dedicated coverage config
             ],
 
-            provider: "istanbul" as const,
+            provider: "v8" as const,
             reporter: [
                 "text",
                 "json",

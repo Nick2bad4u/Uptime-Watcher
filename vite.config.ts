@@ -502,6 +502,7 @@ export default defineConfig(({}) => {
                     "**/types.ts", // Exclude type definition files
                     "**/types.tsx", // Exclude type definition files with JSX
                     "src/test/**",
+                    "shared/test",
                     "coverage/**",
                     "dist-electron/**",
                     "electron/**", // Exclude all electron files from frontend coverage

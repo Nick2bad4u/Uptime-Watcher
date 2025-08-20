@@ -15,7 +15,6 @@ base-version: "24.08"
 # Node.js SDK extension for build-time dependencies
 sdk-extensions:
     - org.freedesktop.Sdk.Extension.node24
-    - org.freedesktop.Sdk.Extension.typescript
 
 # Application entry point
 command: run-electron.sh
@@ -153,9 +152,15 @@ modules:
           - cp package.json /app/
           - chmod 644 /app/package.json
 
-          # Install Electron binary from BaseApp
-          - install -Dm755 /app/bin/electron /app/bin/electron 2>/dev/null ||
-            install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+          # Install Electron binary from BaseApp or node_modules
+          - |
+              if [ -f /usr/bin/electron ]; then
+                install -Dm755 /usr/bin/electron /app/bin/electron
+              elif [ -f node_modules/electron/dist/electron ]; then
+                install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+              else
+                echo "Warning: Electron binary not found, relying on BaseApp"
+              fi
 
           # Install application wrapper script
           - install -Dm755 run-electron.sh /app/bin/run-electron.sh
@@ -173,9 +178,8 @@ modules:
             /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
           - install -Dm644 icons/icon-64.png
             /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-32.png
-            /app/share/icons/hicolor/32x32/apps/io.github.uptimewatcher.png 2>/dev/null ||
-            cp icons/icon-32.png /app/share/icons/hicolor/32x32/apps/io.github.uptimewatcher.png 2>/dev/null || true
+          - install -Dm644 icons/icon-24.png
+            /app/share/icons/hicolor/24x24/apps/io.github.uptimewatcher.png
           - install -Dm644 icons/icon-16.png
             /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
 
@@ -219,7 +223,7 @@ modules:
 # Cleanup commands to optimize final package size
 cleanup-commands:
     - mkdir -p ${FLATPAK_DEST}/lib/electron-cache
-    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,32x32,48x48,64x64,128x128,256x256,512x512}/apps
+    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,24x24,64x64,128x128,256x256,512x512}/apps
 
 # Extension points for additional functionality
 add-extensions:

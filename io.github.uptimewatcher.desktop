@@ -4,8 +4,8 @@ Type=Application
 Name=Uptime Watcher
 GenericName=Website Monitor
 Comment=Monitor website uptime and performance with real-time notifications
-Exec=uptime-watcher %U
-TryExec=uptime-watcher
+Exec=run-electron.sh %U
+TryExec=run-electron.sh
 Icon=io.github.uptimewatcher
 StartupNotify=true
 NoDisplay=false
@@ -18,8 +18,8 @@ Actions=new-monitor;settings;
 
 [Desktop Action new-monitor]
 Name=Add New Monitor
-Exec=uptime-watcher --new-monitor
+Exec=run-electron.sh --new-monitor
 
 [Desktop Action settings]
 Name=Settings
-Exec=uptime-watcher --settings
+Exec=run-electron.sh --settings

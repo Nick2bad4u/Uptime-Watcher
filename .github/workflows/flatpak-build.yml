@@ -52,9 +52,9 @@ jobs:
                   # Ensure the flathub remote exists and install the required SDK extensions
                   flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
                   # Use explicit refs (//24.08) to avoid interactive selection when multiple versions exist
+                  # Note: TypeScript extension removed as it's not needed for runtime builds
                   flatpak install -y --noninteractive --user flathub \
-                    org.freedesktop.Sdk.Extension.node24//24.08 \
-                    org.freedesktop.Sdk.Extension.typescript//24.08
+                    org.freedesktop.Sdk.Extension.node24//24.08
               env:
                   CI: true
 
@@ -94,10 +94,10 @@ jobs:
               run: |
                   cd .
                   ls -l
-                  # Always build the dist repo to ensure it exists and is up-to-date
-                  flatpak-builder --repo=dist-electron --force-clean build-dir flatpak-build.yml
+                  # Build into a proper flatpak repo directory
+                  flatpak-builder --repo=flatpak-repo --force-clean build-dir flatpak-build.yml
                   ls -l
-                  ls -l dist
+                  ls -l dist-electron || true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,9 +108,9 @@ jobs:
               run: |
                   cd .
                   ls -l
-                  ls -l dist-electron
-                  # Use the dist-electron repo produced by flatpak-builder
-                  flatpak build-bundle dist-electron Uptime-Watcher.flatpak com.nick2bad4u.Uptime-Watcher
+                  ls -l flatpak-repo || true
+                  # Use the correct app ID from the manifest and the flatpak-repo produced by flatpak-builder
+                  flatpak build-bundle flatpak-repo Uptime-Watcher.flatpak io.github.uptimewatcher
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   CI: true
