@@ -21,7 +21,7 @@ import {
     DataHandlerValidators,
     MonitorTypeHandlerValidators,
     StateSyncHandlerValidators,
-} from "./validators";
+} from "../services/ipc/validators";
 
 /**
  * Helper function to check if validation result indicates success

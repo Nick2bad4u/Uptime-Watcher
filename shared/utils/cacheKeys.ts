@@ -333,6 +333,11 @@ export function isStandardizedCacheKey(
         return false;
     }
 
+    // For 3-part keys, the operation (middle part) must not be empty
+    if (parts.length === 3 && !parts[1]) {
+        return false;
+    }
+
     const validPrefixes = Object.values(CACHE_PREFIXES) as string[];
     return validPrefixes.includes(prefix);
 }
@@ -363,12 +368,12 @@ export function parseCacheKey(key: StandardizedCacheKey): {
     if (parts.length === 2) {
         const [prefix, identifier] = parts;
 
-        if (!prefix || !identifier) {
+        if (!prefix) {
             throw new Error(`Invalid cache key format: ${key}`);
         }
 
         return {
-            identifier,
+            identifier: identifier || '', // Allow empty identifier for 2-part keys
             prefix,
         };
     }

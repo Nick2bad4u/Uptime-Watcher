@@ -120,6 +120,11 @@ export function safeObjectOmit<
     T extends Record<PropertyKey, unknown>,
     K extends keyof T,
 >(obj: T, keys: readonly K[]): Omit<T, K> {
+    // Handle null/undefined objects
+    if (obj === null || obj === undefined) {
+        return {} as Omit<T, K>;
+    }
+
     const keysToOmit = new Set(keys);
 
     // Handle both string/number keys and symbol keys

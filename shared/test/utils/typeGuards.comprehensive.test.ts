@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { isValidUrl } from "../../validation/validatorUtils";
+// Import ALL functions from typeGuards to ensure coverage
+import * as typeGuards from "../../utils/typeGuards";
 import {
     hasProperties,
     hasProperty,
@@ -20,6 +22,56 @@ import {
 } from "../../utils/typeGuards";
 
 describe("Type Guards - Comprehensive Coverage", () => {
+    // COVERAGE CRITICAL: Call every function to ensure 100% coverage
+    describe("Function Coverage Validation", () => {
+        it("should call every exported function for complete coverage", () => {
+            // Call ALL functions using both named imports and namespace import
+            // This ensures that every function in typeGuards.ts is executed
+            
+            // Test basic object for multiple functions
+            const testObj = { a: 1, b: 2 };
+            const testArray = [1, 2, 3];
+            const testDate = new Date();
+            const testError = new Error("test");
+            
+            // Call every function with various inputs to ensure coverage
+            expect(typeGuards.isObject(testObj)).toBe(true);
+            expect(typeGuards.isNumber(42)).toBe(true);
+            expect(typeGuards.hasProperties(testObj, ["a"])).toBe(true);
+            expect(typeGuards.hasProperty(testObj, "a")).toBe(true);
+            expect(typeGuards.isArray(testArray)).toBe(true);
+            expect(typeGuards.isBoolean(true)).toBe(true);
+            expect(typeGuards.isDate(testDate)).toBe(true);
+            expect(typeGuards.isError(testError)).toBe(true);
+            expect(typeGuards.isFiniteNumber(42)).toBe(true);
+            expect(typeGuards.isFunction(() => {})).toBe(true);
+            expect(typeGuards.isNonNegativeNumber(0)).toBe(true);
+            expect(typeGuards.isNonNullObject(testObj)).toBe(true);
+            expect(typeGuards.isPositiveNumber(1)).toBe(true);
+            expect(typeGuards.isString("test")).toBe(true);
+            expect(typeGuards.isValidPort(80)).toBe(true);
+            expect(typeGuards.isValidTimestamp(Date.now())).toBe(true);
+            
+            // Also test with false cases to ensure all branches are covered
+            expect(typeGuards.isObject(null)).toBe(false);
+            expect(typeGuards.isNumber("not a number")).toBe(false);
+            expect(typeGuards.hasProperties(testObj, ["nonexistent"])).toBe(false);
+            expect(typeGuards.hasProperty(testObj, "nonexistent")).toBe(false);
+            expect(typeGuards.isArray("not an array")).toBe(false);
+            expect(typeGuards.isBoolean("not a boolean")).toBe(false);
+            expect(typeGuards.isDate("not a date")).toBe(false);
+            expect(typeGuards.isError("not an error")).toBe(false);
+            expect(typeGuards.isFiniteNumber(Infinity)).toBe(false);
+            expect(typeGuards.isFunction("not a function")).toBe(false);
+            expect(typeGuards.isNonNegativeNumber(-1)).toBe(false);
+            expect(typeGuards.isNonNullObject(null)).toBe(false);
+            expect(typeGuards.isPositiveNumber(0)).toBe(false);
+            expect(typeGuards.isString(123)).toBe(false);
+            expect(typeGuards.isValidPort(99999)).toBe(false);
+            expect(typeGuards.isValidTimestamp(-1)).toBe(false);
+        });
+    });
+
     describe("hasProperties", () => {
         it("should return true when object has all specified properties", () => {
             const obj = { a: 1, b: 2, c: 3 };

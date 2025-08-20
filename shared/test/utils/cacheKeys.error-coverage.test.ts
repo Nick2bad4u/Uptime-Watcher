@@ -12,10 +12,12 @@ describe("Cache Keys - Error Coverage", () => {
         }).toThrow("Invalid cache key format: :identifier");
     });
 
-    it("should throw error for 2-part key with empty identifier (line 363)", () => {
-        expect(() => {
-            parseCacheKey("prefix:" as any);
-        }).toThrow("Invalid cache key format: prefix:");
+    it("should handle 2-part key with empty identifier", () => {
+        const result = parseCacheKey("prefix:" as any);
+        expect(result).toEqual({
+            prefix: 'prefix',
+            identifier: '',
+        });
     });
 
     it("should throw error for 3-part key with empty prefix (line 375)", () => {

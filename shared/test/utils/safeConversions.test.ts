@@ -4,6 +4,8 @@
  */
 
 import { describe, expect, it } from "vitest";
+// Import ALL functions from safeConversions to ensure coverage
+import * as safeConversions from "../../utils/safeConversions";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -18,6 +20,36 @@ import {
 } from "../../utils/safeConversions";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
+    // COVERAGE CRITICAL: Call every function to ensure 100% coverage
+    describe("Function Coverage Validation", () => {
+        it("should call every exported function for complete coverage", () => {
+            // Call ALL functions using both named imports and namespace import
+            
+            // Test all safe conversion functions with valid inputs
+            expect(safeConversions.safeNumberConversion("42", 0)).toBe(42);
+            expect(safeConversions.safeParseCheckInterval("30000", 60000)).toBe(30000);
+            expect(safeConversions.safeParseFloat("3.14", 0)).toBe(3.14);
+            expect(safeConversions.safeParseInt("42", 0)).toBe(42);
+            expect(safeConversions.safeParsePercentage("75", 0)).toBe(75);
+            expect(safeConversions.safeParsePort("8080", 80)).toBe(8080);
+            expect(safeConversions.safeParsePositiveInt("10", 1)).toBe(10);
+            expect(safeConversions.safeParseRetryAttempts("3", 1)).toBe(3);
+            expect(safeConversions.safeParseTimeout("5000", 10000)).toBe(5000);
+            expect(safeConversions.safeParseTimestamp("1640995200000", Date.now())).toBe(1640995200000);
+            
+            // Test with invalid inputs to trigger fallback logic
+            expect(safeConversions.safeNumberConversion("invalid", 42)).toBe(42);
+            expect(safeConversions.safeParseCheckInterval("invalid", 60000)).toBe(60000);
+            expect(safeConversions.safeParseFloat("invalid", 3.14)).toBe(3.14);
+            expect(safeConversions.safeParseInt("invalid", 42)).toBe(42);
+            expect(safeConversions.safeParsePercentage("invalid", 50)).toBe(50);
+            expect(safeConversions.safeParsePort("invalid", 80)).toBe(80);
+            expect(safeConversions.safeParsePositiveInt("invalid", 1)).toBe(1);
+            expect(safeConversions.safeParseRetryAttempts("invalid", 1)).toBe(1);
+            expect(safeConversions.safeParseTimeout("invalid", 10000)).toBe(10000);
+            expect(safeConversions.safeParseTimestamp("invalid", 123456789)).toBe(123456789);
+        });
+    });
     describe("safeNumberConversion", () => {
         it("should return numbers as-is", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
