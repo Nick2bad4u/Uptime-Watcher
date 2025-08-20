@@ -75,7 +75,7 @@ function calculateDowntimePeriods(
 
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
         const record = filteredHistory[i];
-         
+
         if (!record) continue;
 
         if (record.status === "down") {

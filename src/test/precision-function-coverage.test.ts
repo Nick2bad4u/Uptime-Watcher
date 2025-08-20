@@ -33,7 +33,10 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             let timeout: number;
             return (...args: Parameters<T>) => {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), wait) as unknown as number;
+                timeout = setTimeout(
+                    () => func(...args),
+                    wait
+                ) as unknown as number;
             };
         };
 

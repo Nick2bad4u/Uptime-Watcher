@@ -393,7 +393,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const componentDidMount = vi.fn();
             const componentWillUnmount = vi.fn();
 
-            class TestClassComponent extends Component<object, { value: number }> {
+            class TestClassComponent extends Component<
+                object,
+                { value: number }
+            > {
                 override state = { value: 0 };
 
                 override componentDidMount() {

@@ -1,7 +1,5 @@
 {
-    "version": 3,
     "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
-    "tooltips_action": "replace",
     "blocks": [
         {
             "alignment": "left",
@@ -984,5 +982,7 @@
                 "info"
             ]
         }
-    ]
+    ],
+    "tooltips_action": "replace",
+    "version": 3
 }

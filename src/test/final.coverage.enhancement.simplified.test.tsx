@@ -138,7 +138,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 let timeoutId: number;
                 return (...args: any[]) => {
                     clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn(...args), delay) as unknown as number;
+                    timeoutId = setTimeout(
+                        () => fn(...args),
+                        delay
+                    ) as unknown as number;
                 };
             };
 

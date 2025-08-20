@@ -13,10 +13,7 @@ import {
     safeSetFormProperty,
     createDefaultFormData,
 } from "../../types/monitorFormData";
-import type {
-    PingFormData,
-    PortFormData,
-} from "../../types/monitorFormData";
+import type { PingFormData, PortFormData } from "../../types/monitorFormData";
 
 describe("monitorFormData functions - Additional Coverage", () => {
     describe("isDnsFormData - Edge Cases", () => {

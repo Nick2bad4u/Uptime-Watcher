@@ -75,7 +75,8 @@ describe("Console Statement Remediation", () => {
             context: string;
         }[] = [];
 
-        const consoleRegex = /console\.(?<method>error|warn|log|debug|info)\s*\(/;
+        const consoleRegex =
+            /console\.(?<method>error|warn|log|debug|info)\s*\(/;
 
         for (const [index, line] of lines.entries()) {
             const match = line.match(consoleRegex);

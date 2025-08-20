@@ -27,7 +27,10 @@ vi.mock("../../../utils/logger", () => ({
 // Mock log templates
 vi.mock("@shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn((template: string, params: any) =>
-        template.replaceAll(/{(?<key>\w+)}/g, (match, key) => params[key] || match)
+        template.replaceAll(
+            /{(?<key>\w+)}/g,
+            (match, key) => params[key] || match
+        )
     ),
     LOG_TEMPLATES: {
         debug: {

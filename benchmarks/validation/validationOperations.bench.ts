@@ -117,7 +117,8 @@ function validateSchema(data: any, schema: any): boolean {
                 break;
             }
             case "number": {
-                if (typeof value !== "number" || Number.isNaN(value)) return false;
+                if (typeof value !== "number" || Number.isNaN(value))
+                    return false;
                 break;
             }
             case "boolean": {

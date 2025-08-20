@@ -353,7 +353,10 @@ describe("Final 90% Function Coverage Push", () => {
                 let timeoutId: number;
                 return ((...args: Parameters<T>) => {
                     clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn(...args), delay) as unknown as number;
+                    timeoutId = setTimeout(
+                        () => fn(...args),
+                        delay
+                    ) as unknown as number;
                 }) as T;
             };
 

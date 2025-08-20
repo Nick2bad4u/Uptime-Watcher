@@ -4,7 +4,15 @@
  * coverage.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach, type MockedObject } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    beforeEach,
+    vi,
+    afterEach,
+    type MockedObject,
+} from "vitest";
 
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";

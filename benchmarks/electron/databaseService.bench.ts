@@ -82,7 +82,10 @@ describe("Database Service Performance", () => {
             const query = complexQueries[i % complexQueries.length];
 
             // Simulate complex query processing
-            const tables = query.match(/from\s+(?<table>\w+)|join\s+(?<joinTable>\w+)/gi) || [];
+            const tables =
+                query.match(
+                    /from\s+(?<table>\w+)|join\s+(?<joinTable>\w+)/gi
+                ) || [];
             const joinCount = (query.match(/join/gi) || []).length;
 
             // Simulate increased execution time for joins
@@ -115,7 +118,8 @@ describe("Database Service Performance", () => {
             // Simulate aggregation processing
             const hasGroupBy = query.includes("GROUP BY");
             const aggregateFunction =
-                query.match(/(?<func>count|avg|max|min|sum)\(/i)?.[1] || "UNKNOWN";
+                query.match(/(?<func>count|avg|max|min|sum)\(/i)?.[1] ||
+                "UNKNOWN";
 
             // Simulate processing overhead for aggregations
             const baseTime = Math.random() * 3;

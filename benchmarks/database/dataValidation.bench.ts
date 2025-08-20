@@ -969,7 +969,8 @@ describe("Database Data Validation Benchmarks", () => {
                 resolved: resolvedTypeViolations.length,
                 resolutionRate:
                     violationInstances.length > 0
-                        ? resolvedTypeViolations.length / violationInstances.length
+                        ? resolvedTypeViolations.length /
+                          violationInstances.length
                         : 0,
                 averageResolutionTime:
                     resolvedTypeViolations.length > 0
@@ -980,8 +981,9 @@ describe("Database Data Validation Benchmarks", () => {
                               0
                           ) / resolvedTypeViolations.length
                         : 0,
-                autoFixableCount: violationInstances.filter((v) => v.autoFixable)
-                    .length,
+                autoFixableCount: violationInstances.filter(
+                    (v) => v.autoFixable
+                ).length,
                 severityDistribution: {
                     critical: violationInstances.filter(
                         (v) => v.severityLevel === "critical"
@@ -1070,7 +1072,9 @@ describe("Database Data Validation Benchmarks", () => {
 
                     return Object.entries(violationCounts).reduce(
                         (max, [type, count]) =>
-                            count > max.count ? { type, count: count as number } : max,
+                            count > max.count
+                                ? { type, count: count as number }
+                                : max,
                         { type: "", count: 0 }
                     );
                 })(),

@@ -853,8 +853,8 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 ),
             ];
 
-            for (const rule of rules) migrationRegistry.registerMigration("complex", rule)
-            ;
+            for (const rule of rules)
+                migrationRegistry.registerMigration("complex", rule);
 
             const orchestrator = createMigrationOrchestrator();
             const data = { id: "test" };

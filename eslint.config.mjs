@@ -4475,7 +4475,7 @@ export default [
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
-            "eqeqeq": "off", // Allow == and != in tests for flexibility
+            eqeqeq: "off", // Allow == and != in tests for flexibility
             "func-name-matching": "off", // Allow function names to not match variable names
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",
@@ -4625,7 +4625,7 @@ export default [
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
-            "eqeqeq": "off", // Allow == and != in tests for flexibility
+            eqeqeq: "off", // Allow == and != in tests for flexibility
             "func-name-matching": "off", // Allow function names to not match variable names
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
             "max-depth": "off",

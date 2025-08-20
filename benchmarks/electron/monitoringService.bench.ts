@@ -538,7 +538,8 @@ describe("Monitoring Service Benchmarks", () => {
                     }
                     case "stop_all": {
                         siteTime =
-                            siteOperation.monitors * (Number(Math.random()) * 1 + 0.5);
+                            siteOperation.monitors *
+                            (Number(Math.random()) * 1 + 0.5);
                         break;
                     }
                     case "restart_site": {

@@ -351,9 +351,10 @@ describe("Database Index Operations Benchmarks", () => {
             }
 
             // Calculate blocked queries for online operations
-            blockedQueries = (creationMethod === "online" || creationMethod === "concurrent")
-                ? Math.floor(Math.random() * 10) // 0-9 blocked queries
-                : Math.floor(Math.random() * 50) + 10; // 10-59 blocked queries
+            blockedQueries =
+                creationMethod === "online" || creationMethod === "concurrent"
+                    ? Math.floor(Math.random() * 10) // 0-9 blocked queries
+                    : Math.floor(Math.random() * 50) + 10; // 10-59 blocked queries
 
             const operation: IndexCreationOperation = {
                 operationId: `create-op-${i}`,
@@ -1212,7 +1213,7 @@ describe("Database Index Operations Benchmarks", () => {
                 ];
 
             // Generate realistic fragmentation based on table size and age
-            
+
             // Larger tables and certain index types tend to fragment more
             const tableSizeFactor =
                 tableType.name === "large-table"

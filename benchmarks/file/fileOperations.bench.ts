@@ -186,8 +186,9 @@ function compressData(data: string): string {
 
 function decompressData(compressed: string): string {
     // Simple decompression simulation
-    return compressed.replaceAll(/(?<char>.)\\*(?<count>\d+)/g, (match, char, count) =>
-        char.repeat(Number.parseInt(count, 10))
+    return compressed.replaceAll(
+        /(?<char>.)\\*(?<count>\d+)/g,
+        (match, char, count) => char.repeat(Number.parseInt(count, 10))
     );
 }
 

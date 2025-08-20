@@ -863,7 +863,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             }
 
             // Determine recovery success based on method and disaster type
-             
+
             let recoverySuccess = true;
             const methodSuccessRates: Record<string, number> = {
                 "point-in-time-restore": 0.95,

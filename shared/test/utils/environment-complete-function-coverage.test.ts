@@ -1,18 +1,22 @@
 /**
- * @file Complete Function Coverage Tests for // Test in defa            // Test in default environment (undefined NODE_ENV)
-            delete process.env["NODE_ENV"];
-            expect(environmentModule.isDevelopment()).toBe(false);
-
-            // Test with development environment
-            process.env["NODE_ENV"] = "development";
-            expect(environmentModule.isDevelopment()).toBe(true);
-
-            // Test with production environment
-            process.env["NODE_ENV"] = "production";
-            expect(environmentModule.isDevelopment()).toBe(false);
-
-            // Test with test environment
-            process.env["NODE_ENV"] = "test";t
+ * @file Complete Function Coverage Tests for // Test in defa // Test in default
+ *   environment (undefined NODE_ENV) delete process.env["NODE_ENV"];
+ *   expect(environmentModule.isDevelopment()).toBe(false);
+ *
+ *   ```
+ *   // Test with development environment
+ *   process.env["NODE_ENV"] = "development";
+ *   expect(environmentModule.isDevelopment()).toBe(true);
+ *
+ *   // Test with production environment
+ *   process.env["NODE_ENV"] = "production";
+ *   expect(environmentModule.isDevelopment()).toBe(false);
+ *
+ *   // Test with test environment
+ *   process.env["NODE_ENV"] = "test";
+ *   t;
+ *   ```
+ *
  *   (undefined NODE_ENV) delete process.env["NODE_ENV"];
  *   expect(environmentModule.isDevelopment()).toBe(false);
  *

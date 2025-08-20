@@ -163,7 +163,11 @@ describe("Application Constants", () => {
             for (let i = 1; i < values.length; i++) {
                 const currentValue = values[i];
                 const previousValue = values[i - 1];
-                if (currentValue !== null && previousValue !== null && previousValue !== undefined) {
+                if (
+                    currentValue !== null &&
+                    previousValue !== null &&
+                    previousValue !== undefined
+                ) {
                     expect(currentValue).toBeGreaterThanOrEqual(previousValue);
                 }
             }

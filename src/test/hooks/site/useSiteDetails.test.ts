@@ -21,7 +21,8 @@ interface Site {
 vi.mock("../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         (fn, _context) =>
-            async (...args: any[]) => fn(...args)
+            async (...args: any[]) =>
+                fn(...args)
     ),
 }));
 
@@ -469,7 +470,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         // Reset withUtilityErrorHandling mock
         (withUtilityErrorHandling as any).mockImplementation(
             (fn: any, _context: any) =>
-                async (...args: any[]) => fn(...args)
+                async (...args: any[]) =>
+                    fn(...args)
         );
     });
 

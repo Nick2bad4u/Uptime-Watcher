@@ -22,7 +22,8 @@ vi.mock("../../../utils/logger", () => ({
 
 vi.mock("../../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn(
-        (template: string, params: Record<string, string>) => `${template}: ${JSON.stringify(params)}`
+        (template: string, params: Record<string, string>) =>
+            `${template}: ${JSON.stringify(params)}`
     ),
     LOG_TEMPLATES: {
         warnings: {

@@ -287,8 +287,20 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 },
             ];
 
-            const history1 = [{ timestamp: Date.now(), status: "up" as const, responseTime: 100 }];
-            const history2 = [{ timestamp: Date.now(), status: "down" as const, responseTime: 0 }];
+            const history1 = [
+                {
+                    timestamp: Date.now(),
+                    status: "up" as const,
+                    responseTime: 100,
+                },
+            ];
+            const history2 = [
+                {
+                    timestamp: Date.now(),
+                    status: "down" as const,
+                    responseTime: 0,
+                },
+            ];
 
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
                 siteRows
@@ -753,10 +765,24 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             ];
 
             const history1 = [
-                { timestamp: Date.now() - 1000, status: "up" as const, responseTime: 100 },
-                { timestamp: Date.now(), status: "down" as const, responseTime: 0 },
+                {
+                    timestamp: Date.now() - 1000,
+                    status: "up" as const,
+                    responseTime: 100,
+                },
+                {
+                    timestamp: Date.now(),
+                    status: "down" as const,
+                    responseTime: 0,
+                },
             ];
-            const history2 = [{ timestamp: Date.now(), status: "up" as const, responseTime: 80 }];
+            const history2 = [
+                {
+                    timestamp: Date.now(),
+                    status: "up" as const,
+                    responseTime: 80,
+                },
+            ];
 
             // Mock repository responses
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(

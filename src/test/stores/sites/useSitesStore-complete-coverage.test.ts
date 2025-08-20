@@ -44,7 +44,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             const mockSet = vi.fn();
 
             // Simulate the store creation pattern
-            const storeCreator = (_set: typeof mockSet, _get: typeof mockGet) => {
+            const storeCreator = (
+                _set: typeof mockSet,
+                _get: typeof mockGet
+            ) => {
                 // Mock state actions creation
                 const stateActions = {
                     setSites: vi.fn(),
