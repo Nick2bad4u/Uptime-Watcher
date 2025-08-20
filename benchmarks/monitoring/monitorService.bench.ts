@@ -369,7 +369,7 @@ class MockMonitorService {
 
     getMonitorResults(monitorId: string, limit: number = 100): MonitorResult[] {
         const results = this.results.get(monitorId) || [];
-        return results.slice(-limit).reverse();
+        return results.slice(-limit).toReversed();
     }
 
     getMonitorStats(monitorId: string): any {

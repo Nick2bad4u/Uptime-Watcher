@@ -649,7 +649,7 @@ describe("Database Query Performance Benchmarks", () => {
 
             // Trigger execution impact
             if (scenario.hasTriggers) {
-                baseExecutionTime += affectedRows * 1; // 1ms per row for trigger execution
+                baseExecutionTime += Number(affectedRows) * 1; // 1ms per row for trigger execution
             }
 
             // Add variance

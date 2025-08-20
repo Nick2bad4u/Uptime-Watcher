@@ -208,10 +208,10 @@ describe("calculateMaxDuration", () => {
             const duration3 = calculateMaxDuration(timeout, 3);
 
             // Convert back to numbers for comparison (remove unit)
-            const value0 = Number.parseInt(duration0);
-            const value1 = Number.parseInt(duration1);
-            const value2 = Number.parseInt(duration2);
-            const value3 = Number.parseInt(duration3);
+            const value0 = Number.parseInt(duration0, 10);
+            const value1 = Number.parseInt(duration1, 10);
+            const value2 = Number.parseInt(duration2, 10);
+            const value3 = Number.parseInt(duration3, 10);
 
             // Assert
             expect(value1).toBeGreaterThan(value0);
@@ -229,9 +229,9 @@ describe("calculateMaxDuration", () => {
             const duration15 = calculateMaxDuration(15, retryAttempts);
 
             // Convert back to numbers for comparison
-            const value5 = Number.parseInt(duration5);
-            const value10 = Number.parseInt(duration10);
-            const value15 = Number.parseInt(duration15);
+            const value5 = Number.parseInt(duration5, 10);
+            const value10 = Number.parseInt(duration10, 10);
+            const value15 = Number.parseInt(duration15, 10);
 
             // Assert
             expect(value10).toBeGreaterThan(value5);

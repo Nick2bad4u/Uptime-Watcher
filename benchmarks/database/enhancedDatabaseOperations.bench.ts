@@ -18,7 +18,7 @@
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import path from "node:path";
 import { readFileSync } from "node:fs";
 
 // Import actual production types and services
@@ -37,7 +37,7 @@ describe("Enhanced Database Performance Benchmarks", () => {
 
     beforeAll(async () => {
         // Create temporary database for benchmarking
-        tempDbPath = join(tmpdir(), `benchmark-db-${Date.now()}.db`);
+        tempDbPath = path.join(tmpdir(), `benchmark-db-${Date.now()}.db`);
 
         // Initialize services with actual production code
         databaseService = new DatabaseService({

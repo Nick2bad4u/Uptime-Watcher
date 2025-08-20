@@ -142,7 +142,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     // Type checks and operations
                     const typeResult = typeof value; // eslint-disable-line unicorn/no-keyword-prefix
                     const isArray = Array.isArray(value);
-                    const isNullish = value == null;
+                    const isNullish = value === null;
                     const isNull = value === null;
                     const isUndefined = value === undefined;
 
@@ -357,7 +357,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const filtered = array.filter(Boolean);
                     const mapped = array.map((x) => x);
                     const hasSome = array.some(Boolean);
-                    const hasAll = array.every((x) => x != null);
+                    const hasAll = array.every((x) => x !== null);
                     const spread = [...array];
 
                     // Use results to avoid unused variable warnings
@@ -388,7 +388,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const keys = Object.keys(obj);
                     const values = Object.values(obj);
                     const entries = Object.entries(obj);
-                    const hasProperty = obj.hasOwnProperty?.("key") ?? false;
+                    const hasProperty = Object.hasOwn(obj, "key");
                     const hasKey = "key" in obj;
 
                     // Use results to avoid unused variable warnings

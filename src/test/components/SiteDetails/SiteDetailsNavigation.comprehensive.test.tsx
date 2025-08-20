@@ -5,6 +5,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import React from "react";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
 
 // Mock BrowserRouter to avoid react-router-dom dependency

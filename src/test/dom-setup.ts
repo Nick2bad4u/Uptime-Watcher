@@ -59,7 +59,7 @@ beforeAll(() => {
     };
 
     globalThis.cancelIdleCallback = (id: number): void => {
-        clearTimeout(id as unknown as NodeJS.Timeout);
+        clearTimeout(id as unknown as number);
     };
 
     // Mock getComputedStyle for CSS-dependent tests

@@ -84,12 +84,12 @@ class MockEventSubscriptionManager {
         }
 
         // Remove from type index
-        const typeSubscriptions = this.subscriptionsByType.get(
+        const subscriptionsOfType = this.subscriptionsByType.get(
             subscription.eventType
         );
-        if (typeSubscriptions) {
-            typeSubscriptions.delete(subscriptionId);
-            if (typeSubscriptions.size === 0) {
+        if (subscriptionsOfType) {
+            subscriptionsOfType.delete(subscriptionId);
+            if (subscriptionsOfType.size === 0) {
                 this.subscriptionsByType.delete(subscription.eventType);
             }
         }
@@ -162,12 +162,12 @@ class MockEventSubscriptionManager {
         const activeSubscriptions: EventSubscription[] = [];
         for (const subscriptionId of subscriptionIds) {
             const subscription = this.subscriptions.get(subscriptionId);
-            if (
-                subscription &&
-                this.isSubscriptionActive(subscription) &&
-                (!subscription.filter || subscription.filter(payload))
-            ) {
-                activeSubscriptions.push(subscription);
+            if (subscription && this.isSubscriptionActive(subscription)) {
+                if (!subscription.filter) {
+                    activeSubscriptions.push(subscription);
+                } else if (subscription.filter.call(this, payload)) {
+                    activeSubscriptions.push(subscription);
+                }
             }
         }
 

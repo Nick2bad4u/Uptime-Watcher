@@ -171,7 +171,7 @@ describe("Correlation Utility", () => {
                 if (error instanceof ValidationError) {
                     expect(error.errors).toEqual(["Test error"]);
                 } else {
-                    fail("Should be instance of ValidationError");
+                    throw new TypeError("Should be instance of ValidationError");
                 }
             }
         });

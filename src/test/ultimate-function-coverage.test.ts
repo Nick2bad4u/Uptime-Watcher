@@ -130,7 +130,7 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
 
             // Basic hostname validation
             const hostRegex =
-                /^[\dA-Za-z]([\dA-Za-z\-]{0,61}[\dA-Za-z])?(\.[\dA-Za-z]([\dA-Za-z\-]{0,61}[\dA-Za-z])?)*$/;
+                /^[\dA-Za-z](?:[\dA-Za-z-]{0,61}[\dA-Za-z])?(?:\.[\dA-Za-z](?:[\dA-Za-z-]{0,61}[\dA-Za-z])?)*$/;
             return hostRegex.test(trimmed) || trimmed === "localhost";
         };
 

@@ -678,7 +678,7 @@ describe("React Event Handling Performance", () => {
             (...args: any[]) => {
                 const now = Date.now();
                 if (now - lastThrottleTime >= limit) {
-                    fn.apply(null, args);
+                    fn(...args);
                     lastThrottleTime = now;
                 }
             };
@@ -689,7 +689,7 @@ describe("React Event Handling Performance", () => {
                 if (debounceTimeout) {
                     clearTimeout(debounceTimeout);
                 }
-                debounceTimeout = setTimeout(() => fn.apply(null, args), delay);
+                debounceTimeout = setTimeout(() => fn(...args), delay);
             };
 
         const throttledHandler = throttle(() => {

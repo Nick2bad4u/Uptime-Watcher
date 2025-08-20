@@ -325,8 +325,10 @@ class MockFileSystem {
         let hash = 0;
         const data = Buffer.isBuffer(content) ? content.toString() : content;
         for (let i = 0; i < data.length; i++) {
-            const char = data.codePointAt(i);
+            const char = data.codePointAt(i) ?? 0;
+            // eslint-disable-next-line no-bitwise
             hash = (hash << 5) - hash + char;
+            // eslint-disable-next-line no-bitwise
             hash &= hash; // Convert to 32-bit integer
         }
         return Math.abs(hash).toString(16);
@@ -911,7 +913,7 @@ describe("File Management Service Performance", () => {
                 )
             ).then(() => {
                 service.searchFiles({
-                    pattern: "file_1.*\.txt",
+                    pattern: String.raw`file_1.*\.txt`,
                     limit: 10,
                 });
             });

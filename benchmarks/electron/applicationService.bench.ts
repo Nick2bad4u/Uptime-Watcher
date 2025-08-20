@@ -453,7 +453,7 @@ describe("Application Service Benchmarks", () => {
                     type: Math.random() > 0.8 ? "separator" : "normal",
                     accelerator:
                         Math.random() > 0.7
-                            ? `CmdOrCtrl+${String.fromCharCode(65 + i)}`
+                            ? `CmdOrCtrl+${String.fromCodePoint(65 + i)}`
                             : undefined,
                     enabled: Math.random() > 0.1,
                     visible: Math.random() > 0.05,
@@ -522,7 +522,7 @@ describe("Application Service Benchmarks", () => {
                 case "update": {
                     buildTime = complexity * 0.1 + Math.random() * 2;
                     renderTime = complexity * 0.2 + Math.random() * 2;
-                    bindingTime = complexity * 0.1 + Math.random() * 1;
+                    bindingTime = complexity * 0.1 + Number(Math.random()) * 1;
                     break;
                 }
                 case "rebuild": {
@@ -533,14 +533,14 @@ describe("Application Service Benchmarks", () => {
                 }
                 case "localize": {
                     buildTime = complexity * 0.3 + Math.random() * 3;
-                    renderTime = complexity * 0.1 + Math.random() * 1;
+                    renderTime = complexity * 0.1 + Number(Math.random()) * 1;
                     bindingTime = complexity * 0.05 + Math.random() * 0.5;
                     break;
                 }
                 case "theme-change": {
                     buildTime = complexity * 0.2 + Math.random() * 2;
                     renderTime = complexity * 0.4 + Math.random() * 4;
-                    bindingTime = complexity * 0.1 + Math.random() * 1;
+                    bindingTime = complexity * 0.1 + Number(Math.random()) * 1;
                     break;
                 }
                 default: {

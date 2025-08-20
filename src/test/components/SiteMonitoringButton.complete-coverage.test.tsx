@@ -6,6 +6,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import React from "react";
 import { SiteMonitoringButton } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
 import ThemeProvider from "../../theme/components/ThemeProvider";
 

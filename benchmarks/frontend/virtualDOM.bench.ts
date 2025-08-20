@@ -689,7 +689,7 @@ class MockVirtualDOM {
 
         // Simulate memory optimization
         for (let i = 0; i < 100; i++) {
-            const optimizationWork = Math.random() * 1;
+            const optimizationWork = Number(Math.random());
             nodesOptimized++;
             memoryFreed += Math.random() * 10;
         }
@@ -928,13 +928,13 @@ describe("React Virtual DOM Performance", () => {
                                 border: "2px solid red",
                             },
                         },
-                        ...node.children.map(modifyTree)
+                        ...node.children.map((child) => modifyTree(child))
                     );
                 }
                 return vdom.createElement(
                     node.type as string,
                     node.props,
-                    ...node.children.map(modifyTree)
+                    ...node.children.map((child) => modifyTree(child))
                 );
             };
 

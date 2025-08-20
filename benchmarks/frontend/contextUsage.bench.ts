@@ -376,7 +376,7 @@ class MockReactContext {
 
         // Additional work for selector computation
         if (consumer.selectorFunction) {
-            renderWork += Math.random() * 1;
+            renderWork += Number(Math.random()) * 1;
         }
 
         return renderWork;
@@ -531,7 +531,7 @@ class MockReactContext {
                 const keys = pattern.split(",").filter((k) => k.length > 0);
                 const value: ContextValue = {};
                 keys.forEach((key) => {
-                    if (provider.value.hasOwnProperty(key)) {
+                    if (Object.hasOwn(provider.value, key)) {
                         value[key] = provider.value[key];
                     }
                 });

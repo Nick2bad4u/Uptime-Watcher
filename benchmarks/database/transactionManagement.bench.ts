@@ -1375,11 +1375,11 @@ describe("Database Transaction Management Benchmarks", () => {
                             ],
                         };
 
-                        const typeViolations = violations[testType.testType];
+                        const violationsOfType = violations[testType.testType];
                         violationDetails =
-                            typeViolations[
+                            violationsOfType[
                                 Math.floor(
-                                    Math.random() * typeViolations.length
+                                    Math.random() * violationsOfType.length
                                 )
                             ];
                     }

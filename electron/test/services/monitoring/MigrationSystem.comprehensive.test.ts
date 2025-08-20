@@ -525,7 +525,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.1.0",
                     "Failing migration",
                     false,
-                    () => Promise.reject("String error")
+                    () => Promise.reject(new Error("String error"))
                 );
                 migrationRegistry.registerMigration("http", rule);
 

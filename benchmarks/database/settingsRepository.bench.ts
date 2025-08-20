@@ -303,7 +303,7 @@ class MockSettingsRepository {
                 return value === "true" || value === "false";
             }
             case "number": {
-                return !isNaN(Number.parseFloat(value));
+                return !Number.isNaN(Number.parseFloat(value));
             }
             case "json": {
                 try {

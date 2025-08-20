@@ -75,12 +75,12 @@ describe("Console Statement Remediation", () => {
             context: string;
         }[] = [];
 
-        const consoleRegex = /console\.(error|warn|log|debug|info)\s*\(/;
+        const consoleRegex = /console\.(?<method>error|warn|log|debug|info)\s*\(/;
 
         for (const [index, line] of lines.entries()) {
             const match = line.match(consoleRegex);
             if (match) {
-                const type = match[1] as
+                const type = match.groups?.method as
                     | "error"
                     | "warn"
                     | "log"
@@ -483,29 +483,29 @@ describe("Console Statement Remediation", () => {
 
             const replacementPatterns = [
                 {
-                    pattern: /console\.error\\((.+)\\);?/g,
-                    replacement: "logger.error($1);",
+                    pattern: /console\.error\\\((?<args>.+)\\\);?/g,
+                    replacement: "logger.error($<args>);",
                     description: "Replace console.error with logger.error",
                 },
                 {
-                    pattern: /console\.warn\\((.+)\\);?/g,
-                    replacement: "logger.warn($1);",
+                    pattern: /console\.warn\\\((?<args>.+)\\\);?/g,
+                    replacement: "logger.warn($<args>);",
                     description: "Replace console.warn with logger.warn",
                 },
                 {
-                    pattern: /console\.log\\((.+)\\);?/g,
-                    replacement: "logger.info($1);",
+                    pattern: /console\.log\\\((?<args>.+)\\\);?/g,
+                    replacement: "logger.info($<args>);",
                     description:
                         "Replace console.log with logger.info (review manually)",
                 },
                 {
-                    pattern: /console\.debug\\((.+)\\);?/g,
-                    replacement: "logger.debug($1);",
+                    pattern: /console\.debug\\\((?<args>.+)\\\);?/g,
+                    replacement: "logger.debug($<args>);",
                     description: "Replace console.debug with logger.debug",
                 },
                 {
-                    pattern: /console\.info\\((.+)\\);?/g,
-                    replacement: "logger.info($1);",
+                    pattern: /console\.info\\\((?<args>.+)\\\);?/g,
+                    replacement: "logger.info($<args>);",
                     description: "Replace console.info with logger.info",
                 },
             ];

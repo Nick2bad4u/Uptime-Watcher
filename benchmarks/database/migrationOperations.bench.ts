@@ -658,7 +658,7 @@ describe("Database Migration Operations Benchmarks", () => {
             // Determine migrations to rollback
             const migrationsToRollback = currentState.appliedMigrations
                 .slice(-scenario.rollbackCount)
-                .reverse(); // Rollback in reverse order
+                .toReversed(); // Rollback in reverse order
 
             const targetVersion =
                 currentState.appliedMigrations[

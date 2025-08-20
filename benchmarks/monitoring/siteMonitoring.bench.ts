@@ -112,7 +112,7 @@ class MockSiteMonitor {
 
     getMonitoringHistory(siteId: string, limit: number = 50) {
         const results = this.monitoringResults.get(siteId) || [];
-        return results.slice(-limit).reverse();
+        return results.slice(-limit).toReversed();
     }
 
     getAggregatedStats(siteId: string) {

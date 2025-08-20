@@ -2,71 +2,68 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Monitor } from "../../shared/types";
 
 // Use a simpler mock approach
-vi.mock("node:dns/promises", () => {
-    const mockModule = {
-        resolve4: vi.fn(() => Promise.resolve(["192.168.1.1"])),
-        resolve6: vi.fn(() => Promise.resolve(["2001:db8::1"])),
-        resolveCname: vi.fn(() => Promise.resolve(["canonical.example.com"])),
-        resolveMx: vi.fn(() =>
-            Promise.resolve([{ exchange: "mail.example.com", priority: 10 }])
-        ),
-        resolveTxt: vi.fn(() =>
-            Promise.resolve([["v=spf1 include:_spf.example.com ~all"]])
-        ),
-        resolveNs: vi.fn(() => Promise.resolve(["ns1.example.com"])),
-        resolveSrv: vi.fn(() =>
-            Promise.resolve([
-                {
-                    name: "service.example.com",
-                    port: 443,
-                    priority: 10,
-                    weight: 5,
-                },
-            ])
-        ),
-        resolvePtr: vi.fn(() => Promise.resolve(["example.com"])),
-        resolveSoa: vi.fn(() =>
-            Promise.resolve({
-                nsname: "ns1.example.com",
-                hostmaster: "admin.example.com",
-                serial: 2_023_010_101,
-                refresh: 86_400,
-                retry: 7200,
-                expire: 3_600_000,
-                minttl: 300,
-            })
-        ),
-        resolveAny: vi.fn(() =>
-            Promise.resolve([{ type: "A", address: "192.168.1.1", ttl: 300 }])
-        ),
-        resolveTlsa: vi.fn(() =>
-            Promise.resolve([
-                {
-                    usage: 3,
-                    selector: 1,
-                    matchingType: 1,
-                    certificate: "abc123",
-                },
-            ])
-        ),
-        resolveCaa: vi.fn(() =>
-            Promise.resolve([{ critical: 0, issue: "letsencrypt.org" }])
-        ),
-        resolveNaptr: vi.fn(() =>
-            Promise.resolve([
-                {
-                    flags: "u",
-                    order: 100,
-                    preference: 10,
-                    regexp: "",
-                    replacement: "",
-                    service: "sip+d2u",
-                },
-            ])
-        ),
-    };
-    return mockModule;
-});
+vi.mock("node:dns/promises", () => ({
+    resolve4: vi.fn(() => Promise.resolve(["192.168.1.1"])),
+    resolve6: vi.fn(() => Promise.resolve(["2001:db8::1"])),
+    resolveCname: vi.fn(() => Promise.resolve(["canonical.example.com"])),
+    resolveMx: vi.fn(() =>
+        Promise.resolve([{ exchange: "mail.example.com", priority: 10 }])
+    ),
+    resolveTxt: vi.fn(() =>
+        Promise.resolve([["v=spf1 include:_spf.example.com ~all"]])
+    ),
+    resolveNs: vi.fn(() => Promise.resolve(["ns1.example.com"])),
+    resolveSrv: vi.fn(() =>
+        Promise.resolve([
+            {
+                name: "service.example.com",
+                port: 443,
+                priority: 10,
+                weight: 5,
+            },
+        ])
+    ),
+    resolvePtr: vi.fn(() => Promise.resolve(["example.com"])),
+    resolveSoa: vi.fn(() =>
+        Promise.resolve({
+            nsname: "ns1.example.com",
+            hostmaster: "admin.example.com",
+            serial: 2_023_010_101,
+            refresh: 86_400,
+            retry: 7200,
+            expire: 3_600_000,
+            minttl: 300,
+        })
+    ),
+    resolveAny: vi.fn(() =>
+        Promise.resolve([{ type: "A", address: "192.168.1.1", ttl: 300 }])
+    ),
+    resolveTlsa: vi.fn(() =>
+        Promise.resolve([
+            {
+                usage: 3,
+                selector: 1,
+                matchingType: 1,
+                certificate: "abc123",
+            },
+        ])
+    ),
+    resolveCaa: vi.fn(() =>
+        Promise.resolve([{ critical: 0, issue: "letsencrypt.org" }])
+    ),
+    resolveNaptr: vi.fn(() =>
+        Promise.resolve([
+            {
+                flags: "u",
+                order: 100,
+                preference: 10,
+                regexp: "",
+                replacement: "",
+                service: "sip+d2u",
+            },
+        ])
+    ),
+}));
 
 // Import after mocking
 import { DnsMonitor } from "../services/monitoring/DnsMonitor";

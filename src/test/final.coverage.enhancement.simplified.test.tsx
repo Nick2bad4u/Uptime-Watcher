@@ -135,10 +135,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
         it("should handle debounce and throttle", () => {
             const debounce = (fn: Function, delay: number) => {
-                let timeoutId: NodeJS.Timeout;
+                let timeoutId: number;
                 return (...args: any[]) => {
                     clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn(...args), delay);
+                    timeoutId = setTimeout(() => fn(...args), delay) as unknown as number;
                 };
             };
 
@@ -150,6 +150,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                         lastCall = now;
                         return fn(...args);
                     }
+                    return undefined;
                 };
             };
 

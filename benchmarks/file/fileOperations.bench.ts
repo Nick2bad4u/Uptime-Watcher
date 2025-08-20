@@ -179,15 +179,15 @@ function simulateFileRead(size: number): Promise<string> {
 function compressData(data: string): string {
     // Simple compression simulation (replace repeated characters)
     return data.replaceAll(
-        /(.)\1+/g,
+        /(?<char>.)\1+/g,
         (match, char) => `${char}*${match.length}`
     );
 }
 
 function decompressData(compressed: string): string {
     // Simple decompression simulation
-    return compressed.replaceAll(/(.)\*(\d+)/g, (match, char, count) =>
-        char.repeat(Number.parseInt(count))
+    return compressed.replaceAll(/(?<char>.)\\*(?<count>\d+)/g, (match, char, count) =>
+        char.repeat(Number.parseInt(count, 10))
     );
 }
 
@@ -197,8 +197,8 @@ function parseConfigFile(
     const result: Record<string, Record<string, any>> = {};
     let currentSection = "";
 
-    configData.split("\n").forEach((line) => {
-        line = line.trim();
+    configData.split("\n").forEach((originalLine) => {
+        const line = originalLine.trim();
         if (line.startsWith("[") && line.endsWith("]")) {
             currentSection = line.slice(1, -1);
             result[currentSection] = {};
@@ -207,7 +207,7 @@ function parseConfigFile(
             // Parse value type
             if (value === "true") result[currentSection][key] = true;
             else if (value === "false") result[currentSection][key] = false;
-            else if (isNaN(Number(value))) {
+            else if (Number.isNaN(Number(value))) {
                 result[currentSection][key] = value;
             } else {
                 result[currentSection][key] = Number(value);
@@ -353,7 +353,7 @@ describe("File Operations Performance Benchmarks", () => {
                     );
                 const csv = `${headers}\n${rows.join("\n")}`;
                 // Simulate processing the CSV data
-                csv.length;
+                void csv.length;
             },
             {
                 time: 2000,
@@ -364,12 +364,10 @@ describe("File Operations Performance Benchmarks", () => {
         bench(
             "import sites from JSON",
             () => {
-                const imported = JSON.parse(
-                    JSON.stringify({
-                        sites: backupData.sites.slice(0, 100),
-                        version: "1.0.0",
-                    })
-                );
+                const imported = structuredClone({
+                    sites: backupData.sites.slice(0, 100),
+                    version: "1.0.0",
+                });
 
                 // Validate imported data
                 imported.sites.every(
@@ -397,7 +395,7 @@ describe("File Operations Performance Benchmarks", () => {
                     return obj;
                 });
                 // Process the parsed data
-                data.length;
+                void data.length;
             },
             {
                 time: 2000,
@@ -442,7 +440,7 @@ describe("File Operations Performance Benchmarks", () => {
                     output += "\n";
                 });
                 // Process the generated config
-                output.length;
+                void output.length;
             },
             {
                 time: 1000,
@@ -499,7 +497,7 @@ describe("File Operations Performance Benchmarks", () => {
 
                 const backupString = JSON.stringify(backup);
                 // Process the backup string
-                backupString.length;
+                void backupString.length;
             },
             {
                 time: 5000,
@@ -556,7 +554,7 @@ describe("File Operations Performance Benchmarks", () => {
 
                 const backupString = JSON.stringify(incrementalData);
                 // Process the backup string
-                backupString.length;
+                void backupString.length;
             },
             {
                 time: 2000,

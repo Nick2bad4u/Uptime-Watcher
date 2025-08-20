@@ -490,9 +490,7 @@ describe("Domain Events Performance", () => {
                         url: `https://site${i}.com`,
                         monitorType: "http",
                         interval: 60_000,
-                    })
-                );
-                events.push(
+                    }),
                     factory.createSiteStatusChangedEvent(`site-${i}`, {
                         previousStatus: "unknown",
                         newStatus: "online",

@@ -88,7 +88,7 @@ class MockQueryExecutor {
         limit?: number
     ) {
         const tableData = this.data.get(table) || [];
-        const filtered = tableData.filter(condition);
+        const filtered = tableData.filter((row) => condition(row));
         return limit ? filtered.slice(0, limit) : filtered;
     }
 

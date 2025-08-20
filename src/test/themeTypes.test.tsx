@@ -350,9 +350,9 @@ describe("Theme Types Module", () => {
                 "custom",
             ];
 
-            themeNames.forEach((name) => {
+            for (const name of themeNames) {
                 expect(typeof name).toBe("string");
-            });
+            }
 
             // Test individual values
             expect(themeNames).toContain("light");
@@ -534,9 +534,9 @@ describe("Theme Types Module", () => {
                 warning: "#f59e0b",
             };
 
-            expect(colors.success).toMatch(/^#[0-9a-f]{6}$/i);
-            expect(colors.error).toMatch(/^#[0-9a-f]{6}$/i);
-            expect(colors.warning).toMatch(/^#[0-9a-f]{6}$/i);
+            expect(colors.success).toMatch(/^#[\da-f]{6}$/i);
+            expect(colors.error).toMatch(/^#[\da-f]{6}$/i);
+            expect(colors.warning).toMatch(/^#[\da-f]{6}$/i);
         });
 
         it("should handle rgba color values", () => {

@@ -32,7 +32,7 @@ function deepClone<T>(obj: T): T {
 
     const cloned = {} as T;
     for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (Object.hasOwn(obj, key)) {
             cloned[key] = deepClone(obj[key]);
         }
     }
@@ -91,7 +91,7 @@ function mergeObjects<
     const result = { ...obj1 } as T & U;
 
     for (const key in obj2) {
-        if (Object.prototype.hasOwnProperty.call(obj2, key)) {
+        if (Object.hasOwn(obj2, key)) {
             if (isRecord(result[key as keyof (T & U)]) && isRecord(obj2[key])) {
                 (result as Record<string, unknown>)[key] = mergeObjects(
                     result[key as keyof (T & U)] as Record<string, unknown>,

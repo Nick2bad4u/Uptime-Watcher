@@ -170,7 +170,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             for (const data of inputData) {
                 expect(() => {
                     // Data transformation logic
-                    if (data == null) {
+                    if (data === null) {
                         const emptyResult = null;
                         expect(emptyResult).toBeNull();
                         return;

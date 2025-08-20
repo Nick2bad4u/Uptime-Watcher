@@ -6,6 +6,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import React from "react";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
 // Define types locally since they are not exported from types
@@ -20,13 +21,7 @@ interface Site {
 vi.mock("../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         (fn, _context) =>
-            async (...args: any[]) => {
-                try {
-                    return await fn(...args);
-                } catch (error) {
-                    throw error;
-                }
-            }
+            async (...args: any[]) => fn(...args)
     ),
 }));
 
@@ -474,13 +469,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         // Reset withUtilityErrorHandling mock
         (withUtilityErrorHandling as any).mockImplementation(
             (fn: any, _context: any) =>
-                async (...args: any[]) => {
-                    try {
-                        return await fn(...args);
-                    } catch (error) {
-                        throw error;
-                    }
-                }
+                async (...args: any[]) => fn(...args)
         );
     });
 

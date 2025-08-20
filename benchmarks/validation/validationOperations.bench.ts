@@ -117,7 +117,7 @@ function validateSchema(data: any, schema: any): boolean {
                 break;
             }
             case "number": {
-                if (typeof value !== "number" || isNaN(value)) return false;
+                if (typeof value !== "number" || Number.isNaN(value)) return false;
                 break;
             }
             case "boolean": {
@@ -164,7 +164,7 @@ function parseAndValidateJson(jsonString: string): {
 function validateNumberRange(value: number, min: number, max: number): boolean {
     return (
         typeof value === "number" &&
-        !isNaN(value) &&
+        !Number.isNaN(value) &&
         value >= min &&
         value <= max
     );
@@ -359,11 +359,11 @@ describe("Validation Operations Performance Benchmarks", () => {
                 ];
 
                 values.forEach((value) => {
-                    typeof value === "string";
-                    typeof value === "number";
-                    typeof value === "boolean";
-                    Array.isArray(value);
-                    if (value !== null) typeof value === "object";
+                    void (typeof value === "string");
+                    void (typeof value === "number");
+                    void (typeof value === "boolean");
+                    void Array.isArray(value);
+                    if (value !== null) void (typeof value === "object");
                 });
             },
             {

@@ -54,6 +54,7 @@ class MockHookManager {
         return [hook.value, hook.setValue];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     useEffect(effect: () => (() => void) | void, deps?: any[]): void {
         const hookId = `useEffect-${this.currentHookId++}`;
 
@@ -290,6 +291,7 @@ class MockDashboardComponent {
                     }
                 };
             }
+            return undefined;
         }, [
             autoRefresh,
             refreshInterval,

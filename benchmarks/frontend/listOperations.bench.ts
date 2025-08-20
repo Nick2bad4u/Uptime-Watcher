@@ -983,8 +983,8 @@ class ListSorter {
             const bValue = this.getNestedValue(b, sortBy);
 
             if (aValue === bValue) return 0;
-            if (aValue == null) return 1;
-            if (bValue == null) return -1;
+            if (aValue === null) return 1;
+            if (bValue === null) return -1;
 
             if (typeof aValue === "string" && typeof bValue === "string") {
                 return aValue.localeCompare(bValue) * multiplier;

@@ -13,6 +13,7 @@ import {
     type MockedFunction,
 } from "vitest";
 import "@testing-library/jest-dom";
+import React from "react";
 
 import { isDevelopment } from "@shared/utils/environment";
 

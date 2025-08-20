@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import React from "react";
 
 // Interface definitions for component props and state
 interface ComponentProps {

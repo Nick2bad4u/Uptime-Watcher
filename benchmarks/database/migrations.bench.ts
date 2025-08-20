@@ -116,9 +116,11 @@ class MockMigrationSystem {
 
             // Remove column from existing data
             const tableData = this.data.get(tableName) || [];
-            tableData.forEach((row) => {
-                delete row[columnName];
-            });
+            for (let i = 0; i < tableData.length; i++) {
+                const row = tableData[i];
+                const { [columnName]: removed, ...rest } = row;
+                tableData[i] = rest;
+            }
         }
     }
 
@@ -150,7 +152,7 @@ class MockMigrationSystem {
     async transformData(tableName: string, transformer: (row: any) => any) {
         await this.sleep(5);
         const tableData = this.data.get(tableName) || [];
-        const transformed = tableData.map(transformer);
+        const transformed = tableData.map((row) => transformer(row));
         this.data.set(tableName, transformed);
         await this.sleep(Math.min(tableData.length * 0.05, 30));
     }
@@ -163,7 +165,7 @@ class MockMigrationSystem {
         await this.sleep(10);
         const sourceData = this.data.get(fromTable) || [];
         const transformedData = transformer
-            ? sourceData.map(transformer)
+            ? sourceData.map((row) => transformer(row))
             : sourceData;
 
         if (!this.data.has(toTable)) {

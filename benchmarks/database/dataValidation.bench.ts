@@ -955,21 +955,21 @@ describe("Database Data Validation Benchmarks", () => {
         }
 
         // Analyze violations
-        const violationAnalysis = violationTypes.map((type) => {
-            const typeViolations = validationViolations.filter(
-                (v) => v.violationType === type
+        const violationAnalysis = violationTypes.map((violationType) => {
+            const violationInstances = validationViolations.filter(
+                (v) => v.violationType === violationType
             );
-            const resolvedTypeViolations = typeViolations.filter(
+            const resolvedTypeViolations = violationInstances.filter(
                 (v) => v.resolvedTime
             );
 
             return {
-                violationType: type,
-                totalViolations: typeViolations.length,
+                violationType: violationType,
+                totalViolations: violationInstances.length,
                 resolved: resolvedTypeViolations.length,
                 resolutionRate:
-                    typeViolations.length > 0
-                        ? resolvedTypeViolations.length / typeViolations.length
+                    violationInstances.length > 0
+                        ? resolvedTypeViolations.length / violationInstances.length
                         : 0,
                 averageResolutionTime:
                     resolvedTypeViolations.length > 0
@@ -980,19 +980,19 @@ describe("Database Data Validation Benchmarks", () => {
                               0
                           ) / resolvedTypeViolations.length
                         : 0,
-                autoFixableCount: typeViolations.filter((v) => v.autoFixable)
+                autoFixableCount: violationInstances.filter((v) => v.autoFixable)
                     .length,
                 severityDistribution: {
-                    critical: typeViolations.filter(
+                    critical: violationInstances.filter(
                         (v) => v.severityLevel === "critical"
                     ).length,
-                    major: typeViolations.filter(
+                    major: violationInstances.filter(
                         (v) => v.severityLevel === "major"
                     ).length,
-                    minor: typeViolations.filter(
+                    minor: violationInstances.filter(
                         (v) => v.severityLevel === "minor"
                     ).length,
-                    informational: typeViolations.filter(
+                    informational: violationInstances.filter(
                         (v) => v.severityLevel === "informational"
                     ).length,
                 },
@@ -1058,7 +1058,7 @@ describe("Database Data Validation Benchmarks", () => {
                     (v) => v.severityLevel === "critical"
                 ).length,
                 mostCommonViolationType: (() => {
-                    const typeCounts = violationTypes.reduce(
+                    const violationCounts = violationTypes.reduce(
                         (acc, type) => {
                             acc[type] = tableViolations.filter(
                                 (v) => v.violationType === type
@@ -1068,9 +1068,9 @@ describe("Database Data Validation Benchmarks", () => {
                         {} as Record<string, number>
                     );
 
-                    return Object.entries(typeCounts).reduce(
+                    return Object.entries(violationCounts).reduce(
                         (max, [type, count]) =>
-                            count > max.count ? { type, count } : max,
+                            count > max.count ? { type, count: count as number } : max,
                         { type: "", count: 0 }
                     );
                 })(),
@@ -1280,20 +1280,20 @@ describe("Database Data Validation Benchmarks", () => {
             "cleanup",
         ].map((stageType) => {
             const allStages = validationPipelines.flatMap((p) => p.stages);
-            const typeStages = allStages.filter(
+            const stagesOfType = allStages.filter(
                 (s) => s.stageType === stageType
             );
-            const successfulTypeStages = typeStages.filter(
+            const successfulTypeStages = stagesOfType.filter(
                 (s) => s.stageSuccess
             );
 
             return {
                 stageType,
-                totalStages: typeStages.length,
+                totalStages: stagesOfType.length,
                 successful: successfulTypeStages.length,
                 successRate:
-                    typeStages.length > 0
-                        ? successfulTypeStages.length / typeStages.length
+                    stagesOfType.length > 0
+                        ? successfulTypeStages.length / stagesOfType.length
                         : 0,
                 averageExecutionTime:
                     successfulTypeStages.length > 0
@@ -1462,60 +1462,60 @@ describe("Database Data Validation Benchmarks", () => {
         }
 
         // Analyze constraint performance
-        const constraintTypeAnalysis = constraintTypes.map((type) => {
-            const typeConstraints = constraintPerformances.filter(
-                (c) => c.constraintType === type
+        const constraintTypeAnalysis = constraintTypes.map((constraintType) => {
+            const constraintsOfType = constraintPerformances.filter(
+                (c) => c.constraintType === constraintType
             );
 
             return {
-                constraintType: type,
-                totalConstraints: typeConstraints.length,
+                constraintType: constraintType,
+                totalConstraints: constraintsOfType.length,
                 averageValidationOverhead:
-                    typeConstraints.length > 0
-                        ? typeConstraints.reduce(
+                    constraintsOfType.length > 0
+                        ? constraintsOfType.reduce(
                               (sum, c) => sum + c.validationOverhead,
                               0
-                          ) / typeConstraints.length
+                          ) / constraintsOfType.length
                         : 0,
                 averageValidationLatency:
-                    typeConstraints.length > 0
-                        ? typeConstraints.reduce(
+                    constraintsOfType.length > 0
+                        ? constraintsOfType.reduce(
                               (sum, c) => sum + c.validationLatency,
                               0
-                          ) / typeConstraints.length
+                          ) / constraintsOfType.length
                         : 0,
                 averageViolationRate:
-                    typeConstraints.length > 0
-                        ? typeConstraints.reduce(
+                    constraintsOfType.length > 0
+                        ? constraintsOfType.reduce(
                               (sum, c) => sum + c.violationRate,
                               0
-                          ) / typeConstraints.length
+                          ) / constraintsOfType.length
                         : 0,
                 averageEnforcementCost:
-                    typeConstraints.length > 0
-                        ? typeConstraints.reduce(
+                    constraintsOfType.length > 0
+                        ? constraintsOfType.reduce(
                               (sum, c) => sum + c.enforcementCost,
                               0
-                          ) / typeConstraints.length
+                          ) / constraintsOfType.length
                         : 0,
                 averageBusinessValue:
-                    typeConstraints.length > 0
-                        ? typeConstraints.reduce(
+                    constraintsOfType.length > 0
+                        ? constraintsOfType.reduce(
                               (sum, c) => sum + c.businessValue,
                               0
-                          ) / typeConstraints.length
+                          ) / constraintsOfType.length
                         : 0,
                 recommendationDistribution: {
-                    keep: typeConstraints.filter(
+                    keep: constraintsOfType.filter(
                         (c) => c.recommendedAction === "keep"
                     ).length,
-                    optimize: typeConstraints.filter(
+                    optimize: constraintsOfType.filter(
                         (c) => c.recommendedAction === "optimize"
                     ).length,
-                    modify: typeConstraints.filter(
+                    modify: constraintsOfType.filter(
                         (c) => c.recommendedAction === "modify"
                     ).length,
-                    remove: typeConstraints.filter(
+                    remove: constraintsOfType.filter(
                         (c) => c.recommendedAction === "remove"
                     ).length,
                 },

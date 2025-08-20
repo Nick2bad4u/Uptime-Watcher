@@ -163,7 +163,7 @@ describe("Application Constants", () => {
             for (let i = 1; i < values.length; i++) {
                 const currentValue = values[i];
                 const previousValue = values[i - 1];
-                if (currentValue != null && previousValue != null) {
+                if (currentValue !== null && previousValue !== null) {
                     expect(currentValue).toBeGreaterThanOrEqual(previousValue);
                 }
             }
@@ -404,11 +404,11 @@ describe("Application Constants", () => {
 
         it("should have reasonable animation timing", () => {
             // Extract timing from TRANSITION_ALL
-            const timingMatch = TRANSITION_ALL.match(/([\d.]+)s/);
+            const timingMatch = TRANSITION_ALL.match(/(?<timing>[\d.]+)s/);
             expect(timingMatch).not.toBeNull();
 
-            if (timingMatch && timingMatch[1]) {
-                const seconds = Number.parseFloat(timingMatch[1]);
+            if (timingMatch && timingMatch.groups?.timing) {
+                const seconds = Number.parseFloat(timingMatch.groups.timing);
                 expect(seconds).toBeGreaterThan(0);
                 expect(seconds).toBeLessThan(2); // Should be reasonable for UI animations
             }

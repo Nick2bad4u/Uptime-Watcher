@@ -6,6 +6,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import React from "react";
 import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
 import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
 

@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
+import React from "react";
 
 // Mock React components for testing uncovered component paths
 // Removed unused MockComponent to fix TS6133

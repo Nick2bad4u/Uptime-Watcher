@@ -763,7 +763,7 @@ describe("React State Management Performance", () => {
         // Create history by dispatching many actions
         for (let i = 0; i < 200; i++) {
             const currentState = stateManager.getState();
-            stateHistory.push(JSON.parse(JSON.stringify(currentState)));
+            stateHistory.push(structuredClone(currentState));
 
             stateManager.dispatch({
                 type: "UPDATE_SETTINGS",

@@ -92,7 +92,7 @@ class MemoryPressureSimulator {
     allocateMemory(sizeInMB: number): void {
         const bytesPerMB = 1024 * 1024;
         const arraySize = (sizeInMB * bytesPerMB) / 8; // 8 bytes per number
-        const largeArray = new Array(arraySize).fill(Math.random());
+        const largeArray = Array.from({ length: arraySize }, () => Math.random());
         this.allocatedObjects.push(largeArray);
     }
 

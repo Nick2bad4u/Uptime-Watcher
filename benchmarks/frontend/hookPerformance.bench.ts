@@ -28,6 +28,7 @@ interface UseStateHook extends HookState {
 
 interface UseEffectHook extends HookState {
     type: "useEffect";
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     value: () => void | (() => void);
     dependencies: any[];
     cleanup?: () => void;
@@ -193,6 +194,7 @@ class MockReactHooks {
     }
 
     // useEffect implementation
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     useEffect(effect: () => void | (() => void), dependencies?: any[]): void {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -1174,7 +1176,7 @@ describe("React Hook Performance", () => {
             const setStoredValue = hookSystem.useCallback((newValue: any) => {
                 setValue(newValue);
                 // Simulate localStorage write
-                const writeWork = Math.random() * 1;
+                const writeWork = Number(Math.random());
             }, []);
 
             return [value, setStoredValue];
@@ -1377,7 +1379,7 @@ describe("React Hook Performance", () => {
                     const work = Math.random() * 2;
 
                     return () => {
-                        const cleanup = Math.random() * 1;
+                        const cleanup = Number(Math.random());
                     };
                 }, [states[j % states.length][0].value]);
             }

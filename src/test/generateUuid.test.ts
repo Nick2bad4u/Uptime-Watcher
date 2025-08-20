@@ -67,11 +67,11 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
             const afterTime = Date.now();
 
-            const timestampMatch = /(\d+)$/.exec(uuid);
+            const timestampMatch = /(?<timestamp>\d+)$/.exec(uuid);
             expect(timestampMatch).toBeTruthy();
 
-            if (timestampMatch) {
-                const timestamp = Number.parseInt(timestampMatch[1] ?? "");
+            if (timestampMatch && timestampMatch.groups) {
+                const timestamp = Number.parseInt(timestampMatch.groups.timestamp ?? "", 10);
                 expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
                 expect(timestamp).toBeLessThanOrEqual(afterTime);
             }
@@ -346,7 +346,7 @@ describe("UUID Generation", () => {
             expect(parts[1]).toMatch(/^[\da-z]+$/);
             expect(parts[1]?.length).toBe(9); // substring(2, 11) gives 9 characters
             expect(parts[2]).toMatch(/^\d+$/);
-            expect(Number.parseInt(parts[2] ?? "0")).toBeGreaterThan(0);
+            expect(Number.parseInt(parts[2] ?? "0", 10)).toBeGreaterThan(0);
 
             // Restore crypto mock
             vi.stubGlobal("crypto", {

@@ -30,10 +30,10 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             func: T,
             wait: number
         ): ((...args: Parameters<T>) => void) => {
-            let timeout: NodeJS.Timeout;
+            let timeout: number;
             return (...args: Parameters<T>) => {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), wait);
+                timeout = setTimeout(() => func(...args), wait) as unknown as number;
             };
         };
 
@@ -77,12 +77,14 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             const result = { ...target };
 
             for (const key in source) {
-                result[key] =
-                    source[key] &&
-                    typeof source[key] === "object" &&
-                    !Array.isArray(source[key])
-                        ? deepMerge(result[key] || {}, source[key])
-                        : source[key];
+                if (Object.hasOwn(source, key)) {
+                    result[key] =
+                        source[key] &&
+                        typeof source[key] === "object" &&
+                        !Array.isArray(source[key])
+                            ? deepMerge(result[key] || {}, source[key])
+                            : source[key];
+                }
             }
 
             return result;

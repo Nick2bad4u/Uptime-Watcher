@@ -370,7 +370,7 @@ class MockComponentLifecycle {
                     break;
                 }
                 case "removeElement": {
-                    const elementRemoval = Math.random() * 1;
+                    const elementRemoval = Number(Math.random()) * 1;
                     break;
                 }
                 case "moveElement": {

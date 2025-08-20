@@ -350,10 +350,10 @@ describe("Final 90% Function Coverage Push", () => {
                 fn: T,
                 delay: number
             ): T => {
-                let timeoutId: NodeJS.Timeout;
+                let timeoutId: number;
                 return ((...args: Parameters<T>) => {
                     clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn(...args), delay);
+                    timeoutId = setTimeout(() => fn(...args), delay) as unknown as number;
                 }) as T;
             };
 

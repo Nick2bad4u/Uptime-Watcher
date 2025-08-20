@@ -4,7 +4,7 @@
  * coverage.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach, type MockedObject } from "vitest";
 
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -12,7 +12,7 @@ import type { Site } from "../../../../shared/types.js";
 
 describe("MonitorRepository - Comprehensive Coverage", () => {
     let repository: MonitorRepository;
-    let mockDatabaseService: jest.Mocked<DatabaseService>;
+    let mockDatabaseService: MockedObject<DatabaseService>;
     let mockDatabase: any;
 
     beforeEach(() => {

@@ -4,6 +4,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import React from "react";
 import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 

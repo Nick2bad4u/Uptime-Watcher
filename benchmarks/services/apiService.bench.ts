@@ -346,7 +346,7 @@ class MockApiKeyRepository {
 
     private hashKey(key: string): string {
         // Simple hash implementation
-        return `hash_${key.split("").reduce((hash, char) => hash + char.charCodeAt(0), 0)}`;
+        return `hash_${key.split("").reduce((hash, char) => hash + (char.codePointAt(0) ?? 0), 0)}`;
     }
 
     clear(): void {
@@ -498,6 +498,7 @@ class MockApiService {
                     response.body = { error: authResult.error };
                     return this.finalizeResponse(request, response, startTime);
                 }
+                // eslint-disable-next-line require-atomic-updates
                 request.metadata.user = authResult.user;
             }
 
@@ -565,6 +566,7 @@ class MockApiService {
 
             // Execute route handler
             const result = await route.handler(request, response);
+            // eslint-disable-next-line require-atomic-updates
             response.body = result;
 
             // Cache response
@@ -700,7 +702,7 @@ class MockApiService {
     }
 
     private hashApiKey(key: string): string {
-        return `hash_${key.split("").reduce((hash, char) => hash + char.charCodeAt(0), 0)}`;
+        return `hash_${key.split("").reduce((hash, char) => hash + (char.codePointAt(0) ?? 0), 0)}`;
     }
 
     async getMetrics(): Promise<ApiMetrics> {

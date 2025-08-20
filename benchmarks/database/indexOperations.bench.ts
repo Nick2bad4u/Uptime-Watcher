@@ -280,7 +280,7 @@ describe("Database Index Operations Benchmarks", () => {
             // Calculate creation time based on multiple factors
             const baseCreationTime =
                 (estimatedSize / (50 * 1024 * 1024)) * 1000; // 50MB/s base rate
-            const typeComplexity = indexType.cost;
+            const complexityFactor = indexType.cost;
             const methodEfficiency = {
                 offline: 1,
                 online: 1.4,
@@ -294,7 +294,7 @@ describe("Database Index Operations Benchmarks", () => {
 
             const totalCreationTime =
                 baseCreationTime *
-                typeComplexity *
+                complexityFactor *
                 methodEfficiency *
                 (1 + columnComplexity + uniquenessOverhead + clusteredOverhead);
 
@@ -311,7 +311,7 @@ describe("Database Index Operations Benchmarks", () => {
             // Calculate resource usage
             const cpuPercent = Math.min(
                 100,
-                30 + typeComplexity * 20 + columnCount * 5
+                30 + complexityFactor * 20 + columnCount * 5
             );
             const memoryMB = Math.min(
                 8192,
@@ -332,7 +332,7 @@ describe("Database Index Operations Benchmarks", () => {
             let blockedQueries = 0;
 
             const complexityScore =
-                typeComplexity +
+                complexityFactor +
                 columnComplexity +
                 uniquenessOverhead +
                 clusteredOverhead;
@@ -351,14 +351,9 @@ describe("Database Index Operations Benchmarks", () => {
             }
 
             // Calculate blocked queries for online operations
-            if (
-                creationMethod === "online" ||
-                creationMethod === "concurrent"
-            ) {
-                blockedQueries = Math.floor(Math.random() * 10); // 0-9 blocked queries
-            } else {
-                blockedQueries = Math.floor(Math.random() * 50) + 10; // 10-59 blocked queries
-            }
+            blockedQueries = (creationMethod === "online" || creationMethod === "concurrent")
+                ? Math.floor(Math.random() * 10) // 0-9 blocked queries
+                : Math.floor(Math.random() * 50) + 10; // 10-59 blocked queries
 
             const operation: IndexCreationOperation = {
                 operationId: `create-op-${i}`,
@@ -391,22 +386,22 @@ describe("Database Index Operations Benchmarks", () => {
             totalCreationTime / successfulCreations.length || 0;
 
         // Analyze by index type
-        const typeAnalysis = indexTypes.map((type) => {
-            const typeOperations = indexCreations.filter(
+        const indexTypeAnalysis = indexTypes.map((type) => {
+            const indexOperations = indexCreations.filter(
                 (op) => op.indexDefinition.indexType === type.type
             );
-            const successfulTypeOperations = typeOperations.filter(
+            const successfulTypeOperations = indexOperations.filter(
                 (op) => op.success
             );
 
             return {
                 indexType: type.type,
-                totalOperations: typeOperations.length,
+                totalOperations: indexOperations.length,
                 successful: successfulTypeOperations.length,
                 successRate:
-                    typeOperations.length > 0
+                    indexOperations.length > 0
                         ? successfulTypeOperations.length /
-                          typeOperations.length
+                          indexOperations.length
                         : 0,
                 averageTime:
                     successfulTypeOperations.length > 0
@@ -668,21 +663,21 @@ describe("Database Index Operations Benchmarks", () => {
             "defragment",
             "analyze",
         ].map((opType) => {
-            const typeOperations = maintenanceOperations.filter(
+            const maintenanceOps = maintenanceOperations.filter(
                 (op) => op.operationType === opType
             );
-            const successfulTypeOperations = typeOperations.filter(
+            const successfulTypeOperations = maintenanceOps.filter(
                 (op) => op.success
             );
 
             return {
                 operationType: opType,
-                totalOperations: typeOperations.length,
+                totalOperations: maintenanceOps.length,
                 successful: successfulTypeOperations.length,
                 successRate:
-                    typeOperations.length > 0
+                    maintenanceOps.length > 0
                         ? successfulTypeOperations.length /
-                          typeOperations.length
+                          maintenanceOps.length
                         : 0,
                 averageTime:
                     successfulTypeOperations.length > 0
@@ -1071,7 +1066,7 @@ describe("Database Index Operations Benchmarks", () => {
                     : undefined; // Within 3 days
             const lastUserUpdate =
                 userUpdates > 0
-                    ? now - Math.floor(Math.random() * 1 * 24 * 3_600_000)
+                    ? now - Math.floor(Math.random() * 24 * 3_600_000)
                     : undefined; // Within 1 day
 
             // Calculate efficiency score
@@ -1217,8 +1212,7 @@ describe("Database Index Operations Benchmarks", () => {
                 ];
 
             // Generate realistic fragmentation based on table size and age
-            let fragmentationPercent: number;
-
+            
             // Larger tables and certain index types tend to fragment more
             const tableSizeFactor =
                 tableType.name === "large-table"
@@ -1235,7 +1229,7 @@ describe("Database Index Operations Benchmarks", () => {
                       : 0.8;
 
             const baseFragmentation = Math.random() * 60; // 0-60% base
-            fragmentationPercent = Math.min(
+            const fragmentationPercent = Math.min(
                 95,
                 baseFragmentation * tableSizeFactor * indexTypeFactor
             );

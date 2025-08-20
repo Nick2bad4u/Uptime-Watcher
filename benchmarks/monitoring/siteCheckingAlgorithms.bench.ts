@@ -1077,7 +1077,7 @@ class RateLimiter {
 
         // Wait and retry
         await this.delay(100);
-        return this.waitForSlot(priority);
+        await this.waitForSlot(priority);
     }
 
     private refillTokens(): void {

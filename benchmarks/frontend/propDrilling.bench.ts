@@ -140,7 +140,7 @@ class MockPropDrillingSystem {
 
         for (const [propName, propValue] of Object.entries(parent.props)) {
             // Skip if already defined in own props
-            if (ownProps.hasOwnProperty(propName)) continue;
+            if (Object.hasOwn(ownProps, propName)) continue;
 
             // Apply inheritance rules
             for (const rule of inheritanceRules) {
@@ -166,7 +166,7 @@ class MockPropDrillingSystem {
         // Simulate prop transformation during inheritance
         if (typeof propValue === "object" && propValue !== null) {
             // Deep clone for objects to prevent mutation
-            return JSON.parse(JSON.stringify(propValue));
+            return structuredClone(propValue);
         } else if (typeof propValue === "function") {
             // Wrap functions to track usage
             return (...args: any[]) => {
@@ -222,11 +222,11 @@ class MockPropDrillingSystem {
         component.propProcessingTime = performance.now() - propProcessingStart;
 
         // Simulate actual rendering work
-        const renderWork = this.simulateRenderWork(component);
+        this.simulateRenderWork(component);
 
         // Render children
         for (const child of component.children) {
-            renderWork + this.renderComponent(child);
+            this.renderComponent(child);
         }
 
         const endTime = performance.now();
@@ -287,7 +287,7 @@ class MockPropDrillingSystem {
     // Prop optimization strategies
     memoizeComponent(component: ComponentInstance): ComponentInstance {
         // Simulate memoization setup overhead
-        const memoizationWork = Math.random() * 1;
+        const memoizationWork = Number(Math.random());
 
         // Create memoized version
         const memoizedComponent = {
@@ -316,7 +316,7 @@ class MockPropDrillingSystem {
 
             // Check if component uses context props
             for (const propName of contextProps) {
-                if (component.props.hasOwnProperty(propName)) {
+                if (Object.hasOwn(component.props, propName)) {
                     contextSize += this.calculatePropSize(
                         component.props[propName]
                     );
@@ -807,7 +807,7 @@ describe("React Prop Drilling Performance", () => {
             const allComponents: ComponentInstance[] = [];
             const collectComponents = (component: ComponentInstance) => {
                 allComponents.push(component);
-                component.children.forEach(collectComponents);
+                component.children.forEach((child) => collectComponents(child));
             };
             collectComponents(hierarchy);
 
