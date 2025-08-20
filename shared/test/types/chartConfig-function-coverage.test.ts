@@ -1,8 +1,9 @@
 /**
  * @file Function coverage tests for shared/types/chartConfig.ts
- * 
- * Tests all exported functions to achieve 100% function coverage.
- * Currently shows 50% function coverage - targeting hasPlugins and hasScales functions.
+ *
+ *   Tests all exported functions to achieve 100% function coverage. Currently
+ *   shows 50% function coverage - targeting hasPlugins and hasScales
+ *   functions.
  */
 
 import { describe, expect, it } from "vitest";
@@ -13,8 +14,8 @@ describe("Chart Config Function Coverage", () => {
         it("should return true for valid object with plugins", () => {
             const validConfig = {
                 plugins: {
-                    legend: { display: true }
-                }
+                    legend: { display: true },
+                },
             };
             expect(hasPlugins(validConfig)).toBe(true);
         });
@@ -49,8 +50,8 @@ describe("Chart Config Function Coverage", () => {
             const validConfig = {
                 scales: {
                     x: { type: "linear" },
-                    y: { type: "linear" }
-                }
+                    y: { type: "linear" },
+                },
             };
             expect(hasScales(validConfig)).toBe(true);
         });
@@ -84,7 +85,7 @@ describe("Chart Config Function Coverage", () => {
         it("should work with complex config objects", () => {
             const fullConfig = {
                 plugins: { legend: { display: true } },
-                scales: { x: { type: "linear" } }
+                scales: { x: { type: "linear" } },
             };
 
             expect(hasPlugins(fullConfig)).toBe(true);

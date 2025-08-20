@@ -1,9 +1,9 @@
 /**
  * @file Complete Function Coverage Tests for shared/types.ts
  *
- * This test ensures 100% function coverage for the shared types module,
- * specifically targeting the type guard functions and utility functions
- * that currently have 0% coverage according to the coverage report.
+ *   This test ensures 100% function coverage for the shared types module,
+ *   specifically targeting the type guard functions and utility functions that
+ *   currently have 0% coverage according to the coverage report.
  */
 
 import { describe, expect, it } from "vitest";
@@ -18,11 +18,11 @@ describe("Shared Types - Complete Function Coverage", () => {
 
             // Test isComputedSiteStatus function
             expect(typeof typesModule.isComputedSiteStatus).toBe("function");
-            
+
             // Test all valid computed site status values
             expect(typesModule.isComputedSiteStatus("mixed")).toBe(true);
             expect(typesModule.isComputedSiteStatus("unknown")).toBe(true);
-            
+
             // Test invalid values
             expect(typesModule.isComputedSiteStatus("up")).toBe(false);
             expect(typesModule.isComputedSiteStatus("down")).toBe(false);
@@ -32,13 +32,13 @@ describe("Shared Types - Complete Function Coverage", () => {
 
             // Test isMonitorStatus function
             expect(typeof typesModule.isMonitorStatus).toBe("function");
-            
+
             // Test all valid monitor status values
             expect(typesModule.isMonitorStatus("up")).toBe(true);
             expect(typesModule.isMonitorStatus("down")).toBe(true);
             expect(typesModule.isMonitorStatus("pending")).toBe(true);
             expect(typesModule.isMonitorStatus("paused")).toBe(true);
-            
+
             // Test invalid values
             expect(typesModule.isMonitorStatus("mixed")).toBe(false);
             expect(typesModule.isMonitorStatus("unknown")).toBe(false);
@@ -47,7 +47,7 @@ describe("Shared Types - Complete Function Coverage", () => {
 
             // Test isSiteStatus function
             expect(typeof typesModule.isSiteStatus).toBe("function");
-            
+
             // Test all valid site status values (includes both monitor statuses and computed)
             expect(typesModule.isSiteStatus("up")).toBe(true);
             expect(typesModule.isSiteStatus("down")).toBe(true);
@@ -55,14 +55,14 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(typesModule.isSiteStatus("paused")).toBe(true);
             expect(typesModule.isSiteStatus("mixed")).toBe(true);
             expect(typesModule.isSiteStatus("unknown")).toBe(true);
-            
+
             // Test invalid values
             expect(typesModule.isSiteStatus("invalid")).toBe(false);
             expect(typesModule.isSiteStatus("")).toBe(false);
 
             // Test validateMonitor function
             expect(typeof typesModule.validateMonitor).toBe("function");
-            
+
             // Test valid monitor object
             const validMonitor = {
                 id: "test-monitor-1",
@@ -74,7 +74,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                 timeout: 5000,
                 retryAttempts: 3,
                 history: [] as any[],
-                activeOperations: ["operation-1", "operation-2"]
+                activeOperations: ["operation-1", "operation-2"],
             };
             expect(typesModule.validateMonitor(validMonitor)).toBe(true);
 
@@ -88,7 +88,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                 checkInterval: 60000,
                 timeout: 10000,
                 retryAttempts: 1,
-                history: []
+                history: [],
             };
             expect(typesModule.validateMonitor(minimalValidMonitor)).toBe(true);
 
@@ -101,138 +101,160 @@ describe("Shared Types - Complete Function Coverage", () => {
 
             // Test monitor with missing required fields
             expect(typesModule.validateMonitor({ id: "test" })).toBe(false);
-            expect(typesModule.validateMonitor({ 
-                id: "test", 
-                type: "http",
-                status: "up",
-                monitoring: true
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                })
+            ).toBe(false);
 
             // Test monitor with invalid field types
-            expect(typesModule.validateMonitor({
-                id: 123 as any, // should be string
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: []
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: 123 as any, // should be string
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "invalid-type" as any, // should be valid monitor type
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: []
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "invalid-type" as any, // should be valid monitor type
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "invalid-status" as any, // should be valid monitor status
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: []
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "invalid-status" as any, // should be valid monitor status
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: "yes" as any, // should be boolean
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: []
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: "yes" as any, // should be boolean
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: "150" as any, // should be number
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: []
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: "150" as any, // should be number
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: "not-array" as any // should be array
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: "not-array" as any, // should be array
+                })
+            ).toBe(false);
 
             // Test monitor with invalid activeOperations
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: [],
-                activeOperations: "not-array" as any // should be array or undefined
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                    activeOperations: "not-array" as any, // should be array or undefined
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: [],
-                activeOperations: [123 as any, "valid"] // all elements should be strings
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                    activeOperations: [123 as any, "valid"], // all elements should be strings
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: [],
-                activeOperations: ["", "valid"] // empty strings should be invalid
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                    activeOperations: ["", "valid"], // empty strings should be invalid
+                })
+            ).toBe(false);
 
-            expect(typesModule.validateMonitor({
-                id: "test",
-                type: "http",
-                status: "up",
-                monitoring: true,
-                responseTime: 150,
-                checkInterval: 30000,
-                timeout: 5000,
-                retryAttempts: 3,
-                history: [],
-                activeOperations: ["   ", "valid"] // whitespace-only strings should be invalid
-            })).toBe(false);
+            expect(
+                typesModule.validateMonitor({
+                    id: "test",
+                    type: "http",
+                    status: "up",
+                    monitoring: true,
+                    responseTime: 150,
+                    checkInterval: 30000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    history: [],
+                    activeOperations: ["   ", "valid"], // whitespace-only strings should be invalid
+                })
+            ).toBe(false);
         });
 
         it("should test constants and type definitions", () => {
@@ -269,7 +291,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     checkInterval: 30000,
                     timeout: 5000,
                     retryAttempts: 3,
-                    history: []
+                    history: [],
                 };
                 expect(typesModule.validateMonitor(testMonitor)).toBe(true);
             }
@@ -278,11 +300,11 @@ describe("Shared Types - Complete Function Coverage", () => {
         it("should test all status values from MONITOR_STATUS", () => {
             // Ensure all monitor status values work with type guards
             const statusValues = Object.values(typesModule.MONITOR_STATUS);
-            
+
             for (const status of statusValues) {
                 expect(typesModule.isMonitorStatus(status)).toBe(true);
                 expect(typesModule.isSiteStatus(status)).toBe(true);
-                
+
                 // Test in validateMonitor
                 const testMonitor = {
                     id: "test",
@@ -293,7 +315,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     checkInterval: 30000,
                     timeout: 5000,
                     retryAttempts: 3,
-                    history: []
+                    history: [],
                 };
                 expect(typesModule.validateMonitor(testMonitor)).toBe(true);
             }
@@ -301,17 +323,35 @@ describe("Shared Types - Complete Function Coverage", () => {
 
         it("should test edge cases and comprehensive coverage", () => {
             // Test type guards with various non-string inputs
-            const nonStringInputs = [null, undefined, 123, true, [], {}, Symbol("test")];
-            
+            const nonStringInputs = [
+                null,
+                undefined,
+                123,
+                true,
+                [],
+                {},
+                Symbol("test"),
+            ];
+
             for (const input of nonStringInputs) {
-                expect(typesModule.isComputedSiteStatus(input as any)).toBe(false);
+                expect(typesModule.isComputedSiteStatus(input as any)).toBe(
+                    false
+                );
                 expect(typesModule.isMonitorStatus(input as any)).toBe(false);
                 expect(typesModule.isSiteStatus(input as any)).toBe(false);
             }
 
             // Test validateMonitor with various invalid inputs
-            const invalidInputs = [null, undefined, "string", 123, true, [], Symbol("test")];
-            
+            const invalidInputs = [
+                null,
+                undefined,
+                "string",
+                123,
+                true,
+                [],
+                Symbol("test"),
+            ];
+
             for (const input of invalidInputs) {
                 expect(typesModule.validateMonitor(input as any)).toBe(false);
             }
@@ -321,8 +361,19 @@ describe("Shared Types - Complete Function Coverage", () => {
                 { id: "test" },
                 { id: "test", type: "http" as const },
                 { id: "test", type: "http" as const, status: "up" as const },
-                { id: "test", type: "http" as const, status: "up" as const, monitoring: true },
-                { id: "test", type: "http" as const, status: "up" as const, monitoring: true, responseTime: 100 }
+                {
+                    id: "test",
+                    type: "http" as const,
+                    status: "up" as const,
+                    monitoring: true,
+                },
+                {
+                    id: "test",
+                    type: "http" as const,
+                    status: "up" as const,
+                    monitoring: true,
+                    responseTime: 100,
+                },
             ];
 
             for (const obj of partialObjects) {

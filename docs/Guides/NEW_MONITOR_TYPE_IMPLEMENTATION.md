@@ -973,15 +973,13 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` *
- * @public
- */
 
-import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";
-import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";
-import {
- getMonitorRetryAttempts,
- getMonitorTimeout,
+
+
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` * * @public */import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";import { getMonitorRetryAttempts, getMonitorTimeout,
 } from "./utils/monitorTypeGuards";
 import { withErrorHandling } from "../../utils/errorHandling";
 import { generateCorrelationId } from "../../utils/correlation";
@@ -2121,15 +2119,13 @@ Test the Zod schema thoroughly:
 
 
 
-```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true);
- });
 
- it("should reject invalid configurations", () => {
-  // Test various invalid configurations
- });
-});
-```---
 
+
+
+
+
+```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true); }); it("should reject invalid configurations", () => {  // Test various invalid configurations });});```---
 ## 🎯 DNS Implementation Success Summary
 
 ### **✅ Implementation Verified Complete**
