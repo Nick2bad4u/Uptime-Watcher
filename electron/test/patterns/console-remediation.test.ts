@@ -80,7 +80,7 @@ describe("Console Statement Remediation", () => {
         for (const [index, line] of lines.entries()) {
             const match = line.match(consoleRegex);
             if (match) {
-                const type = match.groups?.method as
+                const type = match.groups?.["method"] as
                     | "error"
                     | "warn"
                     | "log"

@@ -110,6 +110,7 @@
         "dist-electron",
         "dist",
         "dist-shared",
+        "**/dist-shared/**",
         "electron",
         "shared",
         "node_modules",

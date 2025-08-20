@@ -448,12 +448,11 @@ describe("safeParseTimeout", () => {
 });
 
 describe("safeParseTimestamp", () => {
-    let mockDateNow: any;
     const CURRENT_TIME = 1640995200000; // 2022-01-01 00:00:00 UTC
     const ONE_DAY = 86400000; // 24 hours in milliseconds
 
     beforeEach(() => {
-        mockDateNow = vi.spyOn(Date, "now").mockReturnValue(CURRENT_TIME);
+        vi.spyOn(Date, "now").mockReturnValue(CURRENT_TIME);
     });
 
     it("should return valid timestamps unchanged", () => {

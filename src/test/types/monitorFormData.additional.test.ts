@@ -4,7 +4,6 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-    type BaseFormData,
     isDnsFormData,
     isPingFormData,
     isPortFormData,
@@ -15,8 +14,6 @@ import {
     createDefaultFormData,
 } from "../../types/monitorFormData";
 import type {
-    DnsFormData,
-    HttpFormData,
     PingFormData,
     PortFormData,
 } from "../../types/monitorFormData";

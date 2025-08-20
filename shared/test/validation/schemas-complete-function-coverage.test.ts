@@ -135,7 +135,7 @@ describe("Schemas - Complete Function Coverage", () => {
             // Exercise more complex validation scenarios to increase branch coverage
 
             // validateMonitorData with various error conditions
-            const results1 = schemasModule.validateMonitorData("http", {
+            schemasModule.validateMonitorData("http", {
                 id: "", // Invalid empty ID
                 type: "http",
                 url: "invalid-url",

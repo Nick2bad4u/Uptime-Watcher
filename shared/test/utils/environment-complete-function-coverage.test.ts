@@ -1,5 +1,33 @@
 /**
- * @file Complete Function Coverage Tests for environment.ts
+ * @file Complete Function Coverage Tests for // Test in defa            // Test in default environment (undefined NODE_ENV)
+            delete process.env["NODE_ENV"];
+            expect(environmentModule.isDevelopment()).toBe(false);
+
+            // Test with development environment
+            process.env["NODE_ENV"] = "development";
+            expect(environmentModule.isDevelopment()).toBe(true);
+
+            // Test with production environment
+            process.env["NODE_ENV"] = "production";
+            expect(environmentModule.isDevelopment()).toBe(false);
+
+            // Test with test environment
+            process.env["NODE_ENV"] = "test";t
+ *   (undefined NODE_ENV) delete process.env["NODE_ENV"];
+ *   expect(environmentModule.isDevelopment()).toBe(false);
+ *
+ *   ```
+ *   // Test with development environment
+ *   process.env["NODE_ENV"] = "development";
+ *   expect(environmentModule.isDevelopment()).toBe(true);
+ *
+ *   // Test with production environment
+ *   process.env["NODE_ENV"] = "production";
+ *   expect(environmentModule.isDevelopment()).toBe(false);
+ *
+ *   // Test with test environment
+ *   process.env["NODE_ENV"] = "development";
+ *   ```
  *
  *   This test ensures 100% function coverage for the environment module using the
  *   proven Function Coverage Validation pattern with namespace imports and
@@ -31,78 +59,78 @@ describe("Environment - Complete Function Coverage", () => {
             expect(typeof environmentModule.isProduction).toBe("function");
 
             // Test in default environment (undefined NODE_ENV)
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.isProduction()).toBe(false);
 
             // Test with production environment
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
             expect(environmentModule.isProduction()).toBe(true);
 
             // Test with development environment
-            process.env.NODE_ENV = "development";
+            process.env["NODE_ENV"] = "development";
             expect(environmentModule.isProduction()).toBe(false);
 
             // Test with test environment
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.isProduction()).toBe(false);
 
             // Test isDevelopment function
             expect(typeof environmentModule.isDevelopment).toBe("function");
 
             // Test in default environment (undefined NODE_ENV)
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.isDevelopment()).toBe(false); // undefined !== 'development'
 
             // Test with development environment
-            process.env.NODE_ENV = "development";
+            process.env["NODE_ENV"] = "development";
             expect(environmentModule.isDevelopment()).toBe(true);
 
             // Test with production environment
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
             expect(environmentModule.isDevelopment()).toBe(false);
 
             // Test with test environment
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.isDevelopment()).toBe(false);
 
             // Test isTest function
             expect(typeof environmentModule.isTest).toBe("function");
 
             // Test in default environment (undefined NODE_ENV)
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.isTest()).toBe(false);
 
             // Test with test environment
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.isTest()).toBe(true);
 
             // Test with production environment
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
             expect(environmentModule.isTest()).toBe(false);
 
             // Test with development environment
-            process.env.NODE_ENV = "development";
+            process.env["NODE_ENV"] = "development";
             expect(environmentModule.isTest()).toBe(false);
 
             // Test getNodeEnv function
             expect(typeof environmentModule.getNodeEnv).toBe("function");
 
             // Test in default environment (undefined NODE_ENV)
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.getNodeEnv()).toBe("development");
 
             // Test with explicit environments
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
             expect(environmentModule.getNodeEnv()).toBe("production");
 
-            process.env.NODE_ENV = "development";
+            process.env["NODE_ENV"] = "development";
             expect(environmentModule.getNodeEnv()).toBe("development");
 
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.getNodeEnv()).toBe("test");
 
             // Test with custom environment
-            process.env.NODE_ENV = "staging";
+            process.env["NODE_ENV"] = "staging";
             expect(environmentModule.getNodeEnv()).toBe("staging");
 
             // Test isBrowserEnvironment function
@@ -123,39 +151,39 @@ describe("Environment - Complete Function Coverage", () => {
             expect(typeof environmentModule.getEnvironment).toBe("function");
 
             // Reset environment
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.getEnvironment()).toBe("test");
 
             // Test with production environment
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
             expect(environmentModule.getEnvironment()).toBe("production");
 
             // Test with undefined NODE_ENV
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.getEnvironment()).toBe("unknown");
 
             // Test getEnvVar function
             expect(typeof environmentModule.getEnvVar).toBe("function");
 
             // Test with existing environment variable
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
             expect(environmentModule.getEnvVar("NODE_ENV")).toBe("test");
 
             // Test with undefined environment variable
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.getEnvVar("NODE_ENV")).toBeUndefined();
 
             // Test with CODECOV_TOKEN
-            process.env.CODECOV_TOKEN = "test-token";
+            process.env["CODECOV_TOKEN"] = "test-token";
             expect(environmentModule.getEnvVar("CODECOV_TOKEN")).toBe(
                 "test-token"
             );
-            delete process.env.CODECOV_TOKEN;
+            delete process.env["CODECOV_TOKEN"];
         });
 
         it("should handle edge cases and special environments", () => {
             // Test with empty string NODE_ENV (empty string is not nullish, so is returned as-is)
-            process.env.NODE_ENV = "";
+            process.env["NODE_ENV"] = "";
             expect(environmentModule.getNodeEnv()).toBe(""); // Empty string is returned, not fallback
             expect(environmentModule.isDevelopment()).toBe(false); // Empty string !== 'development'
             expect(environmentModule.isProduction()).toBe(false);
@@ -163,7 +191,7 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.getEnvironment()).toBe(""); // Empty string is returned
 
             // Test with undefined NODE_ENV
-            delete process.env.NODE_ENV;
+            delete process.env["NODE_ENV"];
             expect(environmentModule.getNodeEnv()).toBe("development");
             expect(environmentModule.isDevelopment()).toBe(false); // undefined !== 'development'
             expect(environmentModule.isProduction()).toBe(false);
@@ -171,7 +199,7 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.getEnvironment()).toBe("unknown");
 
             // Test case sensitivity
-            process.env.NODE_ENV = "PRODUCTION";
+            process.env["NODE_ENV"] = "PRODUCTION";
             expect(environmentModule.isProduction()).toBe(false); // Case sensitive
             expect(environmentModule.getNodeEnv()).toBe("PRODUCTION");
             expect(environmentModule.getEnvironment()).toBe("PRODUCTION");
@@ -192,7 +220,7 @@ describe("Environment - Complete Function Coverage", () => {
 
         it("should provide consistent environment detection", () => {
             // Test consistency between functions
-            process.env.NODE_ENV = "development";
+            process.env["NODE_ENV"] = "development";
 
             expect(environmentModule.getNodeEnv()).toBe("development");
             expect(environmentModule.getEnvironment()).toBe("development");
@@ -201,7 +229,7 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.isTest()).toBe(false);
 
             // Test production consistency
-            process.env.NODE_ENV = "production";
+            process.env["NODE_ENV"] = "production";
 
             expect(environmentModule.getNodeEnv()).toBe("production");
             expect(environmentModule.getEnvironment()).toBe("production");
@@ -210,7 +238,7 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.isTest()).toBe(false);
 
             // Test test environment consistency
-            process.env.NODE_ENV = "test";
+            process.env["NODE_ENV"] = "test";
 
             expect(environmentModule.getNodeEnv()).toBe("test");
             expect(environmentModule.getEnvironment()).toBe("test");
@@ -221,20 +249,20 @@ describe("Environment - Complete Function Coverage", () => {
 
         it("should handle getEnvVar edge cases", () => {
             // Test with various environment variables
-            process.env.CODECOV_TOKEN = "test-codecov-token";
+            process.env["CODECOV_TOKEN"] = "test-codecov-token";
             expect(environmentModule.getEnvVar("CODECOV_TOKEN")).toBe(
                 "test-codecov-token"
             );
 
             // Test with undefined variable
-            delete process.env.CODECOV_TOKEN;
+            delete process.env["CODECOV_TOKEN"];
             expect(
                 environmentModule.getEnvVar("CODECOV_TOKEN")
             ).toBeUndefined();
 
             // Clean up all test environment variables
-            delete process.env.NODE_ENV;
-            delete process.env.CODECOV_TOKEN;
+            delete process.env["NODE_ENV"];
+            delete process.env["CODECOV_TOKEN"];
         });
     });
 });

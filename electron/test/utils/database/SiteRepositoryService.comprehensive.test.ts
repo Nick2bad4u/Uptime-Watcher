@@ -245,24 +245,50 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             const monitors1 = [
                 {
                     id: "mon1",
-                    type: "http",
+                    type: "http" as const,
                     enabled: true,
                     url: "https://site1.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: true,
+                    responseTime: 100,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
                 },
-                { id: "mon2", type: "ping", enabled: true, host: "site1.com" },
+                {
+                    id: "mon2",
+                    type: "ping" as const,
+                    enabled: true,
+                    host: "site1.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: true,
+                    responseTime: 50,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                },
             ];
 
             const monitors2 = [
                 {
                     id: "mon3",
-                    type: "http",
+                    type: "http" as const,
                     enabled: false,
                     url: "https://site2.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: false,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
                 },
             ];
 
-            const history1 = [{ timestamp: Date.now(), status: "up" }];
-            const history2 = [{ timestamp: Date.now(), status: "down" }];
+            const history1 = [{ timestamp: Date.now(), status: "up" as const, responseTime: 100 }];
+            const history2 = [{ timestamp: Date.now(), status: "down" as const, responseTime: 0 }];
 
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
                 siteRows
@@ -324,7 +350,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
         it("should use default name when name is null", async () => {
             const siteRows: SiteRow[] = [
-                { identifier: "no-name", name: undefined, monitoring: true },
+                { identifier: "no-name", monitoring: true },
             ];
 
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
@@ -336,7 +362,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const sites = await siteRepositoryService.getSitesFromDatabase();
 
-            expect(sites[0].name).toBe("Unknown Site");
+            expect(sites[0]?.name).toBe("Unknown Site");
         });
 
         it("should use default monitoring status when monitoring is null", async () => {
@@ -344,7 +370,6 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 {
                     identifier: "no-monitoring",
                     name: "Site",
-                    monitoring: undefined,
                 },
             ];
 
@@ -357,7 +382,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const sites = await siteRepositoryService.getSitesFromDatabase();
 
-            expect(sites[0].monitoring).toBe(true);
+            expect(sites[0]?.monitoring).toBe(true);
         });
 
         it("should handle monitor without ID", async () => {
@@ -367,11 +392,17 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const monitors = [
                 {
-                    id: undefined,
                     type: "http",
                     enabled: true,
                     url: "https://site1.com",
-                },
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                } as any, // Cast to bypass id requirement for testing
             ];
 
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
@@ -383,7 +414,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             const sites = await siteRepositoryService.getSitesFromDatabase();
 
-            expect(sites[0].monitors[0]).toEqual(monitors[0]);
+            expect(sites[0]?.monitors[0]).toEqual(monitors[0]);
             expect(
                 mockRepositories.history.findByMonitorId
             ).not.toHaveBeenCalled();
@@ -686,26 +717,46 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                     type: "http",
                     enabled: true,
                     url: "https://example.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: true,
+                    responseTime: 100,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
                 },
                 {
                     id: "mon2",
                     type: "ping",
                     enabled: false,
                     host: "example.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: false,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
                 },
                 {
-                    id: undefined,
                     type: "dns",
                     enabled: true,
-                    domain: "example.com",
-                },
+                    expectedValue: "example.com",
+                    checkInterval: 60_000,
+                    history: [],
+                    monitoring: true,
+                    responseTime: 50,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                } as any, // Cast to bypass id requirement for testing
             ];
 
             const history1 = [
-                { timestamp: Date.now() - 1000, status: "up" },
-                { timestamp: Date.now(), status: "down" },
+                { timestamp: Date.now() - 1000, status: "up" as const, responseTime: 100 },
+                { timestamp: Date.now(), status: "down" as const, responseTime: 0 },
             ];
-            const history2 = [{ timestamp: Date.now(), status: "up" }];
+            const history2 = [{ timestamp: Date.now(), status: "up" as const, responseTime: 80 }];
 
             // Mock repository responses
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(

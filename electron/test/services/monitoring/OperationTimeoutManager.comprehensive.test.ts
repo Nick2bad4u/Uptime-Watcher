@@ -368,8 +368,6 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
         });
 
         it("should handle concurrent operations with different timeouts", async () => {
-            const { monitorLogger } = await import("../../../utils/logger");
-
             // Mock operations
             const operations = [
                 {

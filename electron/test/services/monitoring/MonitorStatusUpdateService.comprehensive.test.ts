@@ -242,7 +242,7 @@ describe("MonitorStatusUpdateService", () => {
         it("should handle monitor with no active operations", async () => {
             // Arrange
             const testMonitor = createTestMonitor({
-                activeOperations: undefined,
+                activeOperations: [],
             });
             const testResult = createTestResult();
             const expectedUpdates = {

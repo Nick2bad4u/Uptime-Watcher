@@ -15,7 +15,6 @@ import {
     migrationRegistry,
     versionManager,
     type MigrationRule,
-    type VersionInfo,
 } from "../../../services/monitoring/MigrationSystem";
 
 // Mock the logger to prevent console noise and test logging calls
@@ -95,9 +94,9 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                     "1.2.0"
                 );
                 expect(path).toHaveLength(3);
-                expect(path[0].fromVersion).toBe("0.9.0");
-                expect(path[1].fromVersion).toBe("1.0.0");
-                expect(path[2].fromVersion).toBe("1.1.0");
+                expect(path[0]?.fromVersion).toBe("0.9.0");
+                expect(path[1]?.fromVersion).toBe("1.0.0");
+                expect(path[2]?.fromVersion).toBe("1.1.0");
             });
 
             it("should handle creating migration rules for new monitor type", () => {
@@ -760,12 +759,12 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 const data1 = { host: "localhost", port: "1" };
                 const result1 =
                     await exampleMigrations.portV1_0_to_1_1.transform(data1);
-                expect(result1.port).toBe(1);
+                expect(result1["port"]).toBe(1);
 
                 const data2 = { host: "localhost", port: 65_535 };
                 const result2 =
                     await exampleMigrations.portV1_0_to_1_1.transform(data2);
-                expect(result2.port).toBe(65_535);
+                expect(result2["port"]).toBe(65_535);
             });
 
             it("should have correct migration properties", () => {
@@ -809,7 +808,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
             );
 
             expect(httpResult.success).toBe(true);
-            expect(httpResult.data?.timeout).toBe(30_000);
+            expect(httpResult.data?.["timeout"]).toBe(30_000);
 
             // Test port migration
             const portData = { host: "localhost", port: "8080" };
@@ -821,7 +820,7 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
             );
 
             expect(portResult.success).toBe(true);
-            expect(portResult.data?.port).toBe(8080);
+            expect(portResult.data?.["port"]).toBe(8080);
 
             // Verify version tracking
             expect(versionManager.isVersionApplied("http", "1.1.0")).toBe(true);

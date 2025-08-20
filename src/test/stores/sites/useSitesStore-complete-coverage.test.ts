@@ -3,7 +3,7 @@
  * Tests the store creation and composition pattern.
  */
 
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
@@ -44,10 +44,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
             const mockSet = vi.fn();
 
             // Simulate the store creation pattern
-            const storeCreator = (set: typeof mockSet, get: typeof mockGet) => {
-                // Mock the shared getSites function
-                const getSites = (): Site[] => get().sites || [];
-
+            const storeCreator = (_set: typeof mockSet, _get: typeof mockGet) => {
                 // Mock state actions creation
                 const stateActions = {
                     setSites: vi.fn(),
@@ -230,8 +227,8 @@ describe("useSitesStore - Complete Function Coverage", () => {
             ];
 
             expect(sites).toHaveLength(2);
-            expect(sites[0].monitoring).toBe(false);
-            expect(sites[1].monitoring).toBe(true);
+            expect(sites[0]?.monitoring).toBe(false);
+            expect(sites[1]?.monitoring).toBe(true);
         });
     });
 

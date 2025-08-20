@@ -542,3 +542,4 @@ stylelintcache
 .prettier-cache
 html/
 .lycheecache
+!.vscode\OhMyPosh-Atomic-Custom.json

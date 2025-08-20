@@ -18,11 +18,10 @@ import {
     type MonitorStatus,
     type MonitorType,
     type SiteStatus,
-    type StatusHistory,
     BASE_MONITOR_TYPES,
-} from "../types.ts";
+} from "../types";
 // Import namespace for function coverage validation
-import * as types from "../types.ts";
+import * as types from "../types";
 
 describe("isComputedSiteStatus", () => {
     it("should return true for 'mixed' status", () => {

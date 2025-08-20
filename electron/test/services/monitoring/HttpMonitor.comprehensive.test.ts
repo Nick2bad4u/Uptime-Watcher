@@ -230,6 +230,14 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const monitor: Site["monitors"][0] = {
                 type: "http",
                 url: "invalid-url",
+                id: "test-monitor",
+                checkInterval: 60_000,
+                history: [],
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
             };
 
             const result = await httpMonitor.check(monitor);
@@ -269,6 +277,14 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const monitor: Site["monitors"][0] = {
                 type: "http",
                 url: "https://example.com",
+                id: "test-monitor-2",
+                checkInterval: 60_000,
+                history: [],
+                monitoring: true,
+                responseTime: 150,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
             };
 
             const result = await httpMonitor.check(monitor);
@@ -311,6 +327,14 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const monitor: Site["monitors"][0] = {
                 type: "http",
                 url: "https://example.com",
+                id: "test-monitor-3",
+                checkInterval: 60_000,
+                history: [],
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
             };
 
             const result = await httpMonitor.check(monitor);
@@ -544,6 +568,13 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 type: "http",
                 url: "https://api.example.com/health",
                 id: "mon_123",
+                checkInterval: 60_000,
+                history: [],
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
             };
 
             const result = await httpMonitor.check(monitor);

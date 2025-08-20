@@ -431,10 +431,10 @@ describe("Theme Types Module", () => {
                 },
             };
 
-            expect(state.customThemes?.custom1).toBe(customTheme1);
-            expect(state.customThemes?.custom2).toBe(customTheme2);
-            expect(state.customThemes?.custom1?.isDark).toBe(false);
-            expect(state.customThemes?.custom2?.isDark).toBe(true);
+            expect(state.customThemes?.["custom1"]).toBe(customTheme1);
+            expect(state.customThemes?.["custom2"]).toBe(customTheme2);
+            expect(state.customThemes?.["custom1"]?.isDark).toBe(false);
+            expect(state.customThemes?.["custom2"]?.isDark).toBe(true);
         });
     });
 

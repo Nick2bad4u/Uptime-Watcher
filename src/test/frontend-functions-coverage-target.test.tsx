@@ -18,7 +18,7 @@ import {
     waitFor,
 } from "@testing-library/react";
 import { renderHook } from "@testing-library/react";
-import React, { Component, useState, useEffect } from "react";
+import { Component, useState, useEffect } from "react";
 
 // Import components that may have uncovered functions
 import { DefaultErrorFallback } from "../components/error/DefaultErrorFallback";
@@ -394,13 +394,13 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const componentWillUnmount = vi.fn();
 
             class TestClassComponent extends Component<object, { value: number }> {
-                state = { value: 0 };
+                override state = { value: 0 };
 
-                componentDidMount() {
+                override componentDidMount() {
                     componentDidMount();
                 }
 
-                componentWillUnmount() {
+                override componentWillUnmount() {
                     componentWillUnmount();
                 }
 
@@ -408,7 +408,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                     this.setState({ value: this.state.value + 1 });
                 };
 
-                render() {
+                override render() {
                     return (
                         <button onClick={this.handleClick}>
                             Value: {this.state.value}

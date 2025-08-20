@@ -71,7 +71,7 @@ describe("UUID Generation", () => {
             expect(timestampMatch).toBeTruthy();
 
             if (timestampMatch && timestampMatch.groups) {
-                const timestamp = Number.parseInt(timestampMatch.groups.timestamp ?? "", 10);
+                const timestamp = Number.parseInt(timestampMatch.groups["timestamp"] ?? "", 10);
                 expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
                 expect(timestamp).toBeLessThanOrEqual(afterTime);
             }

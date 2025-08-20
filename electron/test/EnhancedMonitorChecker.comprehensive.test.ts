@@ -169,7 +169,6 @@ describe("EnhancedMonitorChecker", () => {
     it("should handle checkMonitor with manual check", async () => {
         const monitor = createTestMonitor({ type: "http" });
         const site = createTestSite({
-            url: "https://example.com",
             monitors: [monitor],
         });
 
