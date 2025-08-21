@@ -517,29 +517,46 @@ $RECYCLE.BIN/
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
+# Build output directories
 release/
+# Node modules
 node_modules/
 node_modules_backup/
+# Husky
 .husky/
+# Electron build output directories
 dist/
-dist-electron/
 **/dist/
+dist-electron/
 **/dist-electron/
+dist-shared/
 **/dist-shared/
+dist-shared-test/
 **/dist-shared-test/
 **/dist-electron/test
+dist/test/
 **/dist/test/
-.agentic-tools*
-_ZENTASKS
-repomix-output.xml
+# HTML Build output directories
+html/
+
+# Coverage directories
 coverage-results.json
 report/
 
-#Ignore vscode AI rules
+# Docusaurus documentation
+docs/docusaurus/docs
+**/docs/docusaurus/docs
+
+# AI tools
+.agentic-tools*
+_ZENTASKS
+repomix-output.xml
+
+# Cache files
 .stylelintcache
 stylelintcache
 .cspellcache
 .prettier-cache
-html/
 .lycheecache
-!.vscode\OhMyPosh-Atomic-Custom.json
+# Allow custom OhMyPosh theme
+!.vscode/OhMyPosh-Atomic-Custom.json
