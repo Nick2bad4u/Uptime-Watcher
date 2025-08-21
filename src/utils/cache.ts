@@ -131,8 +131,8 @@ export class TypedCache<K, V> {
      * Internal Map storing cache entries with metadata.
      *
      * @remarks
-     * This map contains the actual cached data along with timing metadata
-     * used for TTL expiration and LRU eviction calculations.
+     * This map contains the actual cached data along with timing metadata used
+     * for TTL expiration and LRU eviction calculations.
      *
      * @internal
      */
@@ -143,8 +143,8 @@ export class TypedCache<K, V> {
      *
      * @remarks
      * When set, all entries without an explicit TTL will expire after this
-     * duration. If undefined, entries persist until manually evicted or
-     * removed by LRU eviction.
+     * duration. If undefined, entries persist until manually evicted or removed
+     * by LRU eviction.
      *
      * @internal
      */
@@ -154,8 +154,8 @@ export class TypedCache<K, V> {
      * Maximum number of entries allowed in the cache.
      *
      * @remarks
-     * When this limit is reached, the least recently used entry is evicted
-     * to make room for new entries. Defaults to 100 if not specified in
+     * When this limit is reached, the least recently used entry is evicted to
+     * make room for new entries. Defaults to 100 if not specified in
      * constructor options.
      *
      * @internal

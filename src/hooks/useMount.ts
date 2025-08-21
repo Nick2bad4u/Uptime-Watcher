@@ -62,7 +62,8 @@ import logger from "../services/logger";
 import { ensureError } from "../utils/errorHandling";
 
 /**
- * React hook for mount and unmount lifecycle management with StrictMode compatibility.
+ * React hook for mount and unmount lifecycle management with StrictMode
+ * compatibility.
  *
  * @remarks
  * Provides a clean alternative to useEffect with an empty dependency array for

@@ -153,8 +153,8 @@ export class TypedEventBus<
      * Unique identifier for this event bus instance.
      *
      * @remarks
-     * Used for debugging and logging to distinguish between multiple
-     * event bus instances. Included in event metadata and log messages.
+     * Used for debugging and logging to distinguish between multiple event bus
+     * instances. Included in event metadata and log messages.
      */
     private readonly busId: string;
 
@@ -171,8 +171,8 @@ export class TypedEventBus<
      * Array of registered middleware functions.
      *
      * @remarks
-     * Middleware functions are executed in order during event emission.
-     * Used for cross-cutting concerns like logging, validation, and rate limiting.
+     * Middleware functions are executed in order during event emission. Used
+     * for cross-cutting concerns like logging, validation, and rate limiting.
      */
     private readonly middlewares: EventMiddleware[] = [];
 

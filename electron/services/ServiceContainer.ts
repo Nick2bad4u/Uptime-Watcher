@@ -83,8 +83,8 @@ export interface ServiceContainerConfig {
  * Information about an initialized service.
  *
  * @remarks
- * Contains metadata about a service instance, including its name and
- * the actual service object. Used for service introspection and debugging.
+ * Contains metadata about a service instance, including its name and the actual
+ * service object. Used for service introspection and debugging.
  *
  * @public
  */
@@ -102,8 +102,8 @@ export interface ServiceInfo {
      * The service instance.
      *
      * @remarks
-     * The actual instantiated service object. Type is unknown to support
-     * all service types in the container.
+     * The actual instantiated service object. Type is unknown to support all
+     * service types in the container.
      */
     service: unknown;
 }
@@ -124,8 +124,8 @@ export class ServiceContainer {
      *
      * @remarks
      * Maintains the single instance of the ServiceContainer across the
-     * application lifecycle. Initialized via getInstance() method and
-     * ensures all services are managed through a single container.
+     * application lifecycle. Initialized via getInstance() method and ensures
+     * all services are managed through a single container.
      *
      * @internal
      */
@@ -143,8 +143,8 @@ export class ServiceContainer {
      *
      * @remarks
      * Contains runtime configuration options including debug logging settings
-     * and notification service preferences. Set during initialization and
-     * used throughout the service container lifecycle.
+     * and notification service preferences. Set during initialization and used
+     * throughout the service container lifecycle.
      *
      * @internal
      */

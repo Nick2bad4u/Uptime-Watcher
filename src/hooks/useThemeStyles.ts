@@ -246,10 +246,11 @@ function getUrlStyle(isDarkMode: boolean): CSSProperties {
  *
  * @remarks
  * Provides comprehensive styling that automatically adapts to user's theme
- * preference with proper SSR support and runtime theme change reactivity.
- * The hook listens to media query changes and updates styles accordingly.
+ * preference with proper SSR support and runtime theme change reactivity. The
+ * hook listens to media query changes and updates styles accordingly.
  *
- * @param isCollapsed - Whether the component is in collapsed state (default: false)
+ * @param isCollapsed - Whether the component is in collapsed state (default:
+ *   false)
  *
  * @returns Complete ThemeStyles object with all CSS-in-JS style properties
  *

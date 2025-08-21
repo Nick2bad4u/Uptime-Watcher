@@ -333,6 +333,7 @@ export class ChartConfigService {
      * Get common axis title configuration
      *
      * @param text - The text to display in the axis title
+     *
      * @returns Configured axis title object with theme-aware styling
      */
     private getAxisTitle(text: string): AxisTitleConfig {
@@ -408,12 +409,10 @@ export class ChartConfigService {
      *
      * @param size - Font size in pixels (default: 12)
      * @param weight - Font weight (default: "normal")
+     *
      * @returns Font configuration object with theme-aware family
      */
-    private getChartFont(
-        size = 12,
-        weight = "normal"
-    ): ChartFontConfig {
+    private getChartFont(size = 12, weight = "normal"): ChartFontConfig {
         return {
             family: this.theme.typography.fontFamily.sans.join(", "),
             size,
@@ -425,6 +424,7 @@ export class ChartConfigService {
      * Get common title configuration for charts
      *
      * @param text - The text to display in the chart title
+     *
      * @returns Configured chart title object with theme-aware styling
      */
     private getChartTitle(text: string): ChartTitleConfig {

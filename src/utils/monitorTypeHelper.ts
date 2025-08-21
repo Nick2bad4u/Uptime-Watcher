@@ -33,8 +33,8 @@ export interface MonitorTypeOption {
      * Display name for the monitor type.
      *
      * @remarks
-     * Human-readable text that is shown to users in select dropdowns and
-     * form controls. This should be descriptive and user-friendly.
+     * Human-readable text that is shown to users in select dropdowns and form
+     * controls. This should be descriptive and user-friendly.
      */
     label: string;
 

@@ -197,10 +197,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @remarks
      * Handles database initialization, schema management, repository
-     * coordination, and transaction management. All database operations
-     * are routed through this manager following the repository pattern.
-     * Provides atomic operations and proper error handling for data
-     * persistence across the application.
+     * coordination, and transaction management. All database operations are
+     * routed through this manager following the repository pattern. Provides
+     * atomic operations and proper error handling for data persistence across
+     * the application.
      *
      * @internal
      */
@@ -210,10 +210,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Monitor manager for site monitoring operations.
      *
      * @remarks
-     * Coordinates monitoring lifecycle, status checking, and monitor
-     * scheduling across all sites. Handles monitor registration,
-     * execution, and status updates. Integrates with the event system
-     * to provide real-time status notifications to the frontend.
+     * Coordinates monitoring lifecycle, status checking, and monitor scheduling
+     * across all sites. Handles monitor registration, execution, and status
+     * updates. Integrates with the event system to provide real-time status
+     * notifications to the frontend.
      *
      * @internal
      */
@@ -243,10 +243,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Event handler for retrieving sites from cache.
      *
      * @remarks
-     * Handles internal cache retrieval requests and manages error logging.
-     * This is an arrow function property to maintain proper 'this' binding
-     * when used as an event handler callback. Delegates the actual work to
-     * the handleGetSitesFromCacheRequest method.
+     * Handles internal cache retrieval requests and manages error logging. This
+     * is an arrow function property to maintain proper 'this' binding when used
+     * as an event handler callback. Delegates the actual work to the
+     * handleGetSitesFromCacheRequest method.
      *
      * @internal
      */
@@ -267,10 +267,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Event handler for database initialization completion.
      *
      * @remarks
-     * Handles notification when database initialization is complete and
-     * manages error logging. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback. Delegates
-     * the actual work to the handleDatabaseInitialized method.
+     * Handles notification when database initialization is complete and manages
+     * error logging. This is an arrow function property to maintain proper
+     * 'this' binding when used as an event handler callback. Delegates the
+     * actual work to the handleDatabaseInitialized method.
      *
      * @internal
      */
@@ -336,7 +336,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * public event system. This is an arrow function property to maintain
      * proper 'this' binding when used as an event handler callback.
      *
-     * @param data - Site event data containing site information, metadata, and previous state
+     * @param data - Site event data containing site information, metadata, and
+     *   previous state
      *
      * @internal
      */
@@ -396,12 +397,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Event handler for monitor stop events.
      *
      * @remarks
-     * Handles monitor stop events and manages monitoring state updates.
-     * Emits monitoring:stopped events to notify the frontend of changes
-     * in monitoring state. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback.
+     * Handles monitor stop events and manages monitoring state updates. Emits
+     * monitoring:stopped events to notify the frontend of changes in monitoring
+     * state. This is an arrow function property to maintain proper 'this'
+     * binding when used as an event handler callback.
      *
-     * @param eventData - Monitor stop event data with timing and reason information
+     * @param eventData - Monitor stop event data with timing and reason
+     *   information
      *
      * @internal
      */
@@ -488,10 +490,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @remarks
      * Handles requests to stop monitoring for specific sites or monitors.
      * Delegates to the monitor manager and provides response events with
-     * success status. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback.
+     * success status. This is an arrow function property to maintain proper
+     * 'this' binding when used as an event handler callback.
      *
-     * @param data - Stop monitoring request data with site and monitor identifiers
+     * @param data - Stop monitoring request data with site and monitor
+     *   identifiers
      *
      * @internal
      */
@@ -531,12 +534,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Event handler for monitoring status check requests.
      *
      * @remarks
-     * Handles requests to check if monitoring is active for specific sites
-     * or monitors. Queries the monitor manager and provides response events
-     * with current status. This is an arrow function property to maintain
-     * proper 'this' binding when used as an event handler callback.
+     * Handles requests to check if monitoring is active for specific sites or
+     * monitors. Queries the monitor manager and provides response events with
+     * current status. This is an arrow function property to maintain proper
+     * 'this' binding when used as an event handler callback.
      *
-     * @param data - Monitoring status check request data with site and monitor identifiers
+     * @param data - Monitoring status check request data with site and monitor
+     *   identifiers
      *
      * @internal
      */

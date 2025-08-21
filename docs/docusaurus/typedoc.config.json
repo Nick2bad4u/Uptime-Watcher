@@ -105,6 +105,7 @@
         "alphabetical"
     ],
     "plugin": [
+        "typedoc-plugin-replace-text",
         "typedoc-plugin-markdown",
         "typedoc-docusaurus-theme",
         "typedoc-plugin-zod",
@@ -112,26 +113,37 @@
         "typedoc-plugin-dt-links",
         "typedoc-plugin-external-package-links",
         "typedoc-plugin-coverage",
-        "typedoc-plugin-replace-text",
         "typedoc-plugin-rename-defaults"
     ],
     "resolveUtilityTypes": true,
     "replaceText": {
         "inCodeCommentText": true,
         "inCodeCommentTags": true,
-        "inIncludedFiles": true,
+        "inMarkdownText": true,
         "replacements": [
             {
-                "pattern": "TODO:",
+                "pattern": "\\bTODO:",
                 "replace": "**TODO:**"
             },
             {
-                "pattern": "FIXME:",
+                "pattern": "\\bFIXME:",
                 "replace": "**FIXME:**"
             },
             {
-                "pattern": "NOTE:",
-                "replace": "**NOTE:**"
+                "pattern": "\\bz\\.ZodError\\b",
+                "replace": "https://zod.dev/basics?id=handling-errors"
+            },
+            {
+                "pattern": "\\bError\\b",
+                "replace": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+            },
+            {
+                "pattern": "\\bAxiosError\\b",
+                "replace": "https://axios-http.com/docs/handling_errors"
+            },
+            {
+                "pattern": "\"is-port-reachable\"",
+                "replace": "https://www.npmjs.com/package/is-port-reachable"
             }
         ]
     },

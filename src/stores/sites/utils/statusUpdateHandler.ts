@@ -135,9 +135,9 @@ export class StatusUpdateManager {
      * Function to get current sites from store.
      *
      * @remarks
-     * Callback function that returns the current array of sites from the
-     * store state. Used to access current data when applying incremental
-     * status updates.
+     * Callback function that returns the current array of sites from the store
+     * state. Used to access current data when applying incremental status
+     * updates.
      *
      * @internal
      */
@@ -160,8 +160,8 @@ export class StatusUpdateManager {
      *
      * @remarks
      * Optional callback function that is invoked when a status update is
-     * successfully applied. Receives the StatusUpdate object with details
-     * about the change. Can be used for logging or triggering side effects.
+     * successfully applied. Receives the StatusUpdate object with details about
+     * the change. Can be used for logging or triggering side effects.
      *
      * @internal
      */
@@ -171,9 +171,9 @@ export class StatusUpdateManager {
      * Function to update sites in the store.
      *
      * @remarks
-     * Callback function that updates the store with a new array of sites.
-     * Used to apply incremental status updates and full sync results to
-     * the store state.
+     * Callback function that updates the store with a new array of sites. Used
+     * to apply incremental status updates and full sync results to the store
+     * state.
      *
      * @internal
      */

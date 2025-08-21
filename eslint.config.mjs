@@ -683,7 +683,7 @@ export default [
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "jsx-plus": pluginJsxPlus,
             "no-unary-plus": pluginNoUnary,
-            "granular-selectors": fixupPluginRules(pluginGranular),
+            "granular-selectors": pluginGranular,
             "module-interop": moduleInterop,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "eslint-plugin-toplevel": pluginTopLevel,
@@ -2035,7 +2035,7 @@ export default [
             "jsx-plus": pluginJsxPlus,
             "no-unary-plus": pluginNoUnary,
             "module-interop": moduleInterop,
-            "granular-selectors": fixupPluginRules(pluginGranular),
+            "granular-selectors": pluginGranular,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "eslint-plugin-toplevel": pluginTopLevel,
             "format-sql": pluginFormatSQL,
@@ -3131,7 +3131,7 @@ export default [
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "jsx-plus": pluginJsxPlus,
             "no-unary-plus": pluginNoUnary,
-            "granular-selectors": fixupPluginRules(pluginGranular),
+            "granular-selectors": pluginGranular,
             "module-interop": moduleInterop,
             "no-unawaited-dot-catch-throw": pluginNoUnwaited,
             "eslint-plugin-toplevel": pluginTopLevel,
@@ -4870,7 +4870,10 @@ export default [
 
     // Benchmark files
     {
-        files: ["benchmarks/**/*.bench.{ts,tsx,cts,mts}", "benchmarks/**/*.{ts,tsx,cts,mts}"],
+        files: [
+            "benchmarks/**/*.bench.{ts,tsx,cts,mts}",
+            "benchmarks/**/*.{ts,tsx,cts,mts}",
+        ],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
@@ -5785,7 +5788,12 @@ export default [
 
     // Store-specific overrides to handle false positives
     {
-        files: ["src/stores/**/*.ts", "src/stores/**/*.tsx", "src/stores/**/*.cts", "src/stores/**/*.mts"],
+        files: [
+            "src/stores/**/*.ts",
+            "src/stores/**/*.tsx",
+            "src/stores/**/*.cts",
+            "src/stores/**/*.mts",
+        ],
         rules: {
             // Disable ex/no-unhandled for stores due to false positives with variable access
             // The rule incorrectly flags simple parameter/variable access as potential exceptions

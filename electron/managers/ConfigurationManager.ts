@@ -311,9 +311,15 @@ export class ConfigurationManager {
      *   validation caches.
      */
     public getCacheStats(): {
-        /** Statistics for the configuration cache including hits, misses, and size */
+        /**
+         * Statistics for the configuration cache including hits, misses, and
+         * size
+         */
         configuration: ReturnType<StandardizedCache<ConfigValue>["getStats"]>;
-        /** Statistics for the validation result cache including hits, misses, and size */
+        /**
+         * Statistics for the validation result cache including hits, misses,
+         * and size
+         */
         validation: ReturnType<StandardizedCache<ValidationResult>["getStats"]>;
     } {
         return {

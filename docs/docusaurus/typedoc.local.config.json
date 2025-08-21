@@ -122,16 +122,28 @@
         "inIncludedFiles": true,
         "replacements": [
             {
-                "pattern": "TODO:",
+                "pattern": "\\bTODO:",
                 "replace": "**TODO:**"
             },
             {
-                "pattern": "FIXME:",
+                "pattern": "\\bFIXME:",
                 "replace": "**FIXME:**"
             },
             {
-                "pattern": "NOTE:",
-                "replace": "**NOTE:**"
+                "pattern": "\\bz\\.ZodError\\b",
+                "replace": "https://zod.dev/basics?id=handling-errors"
+            },
+            {
+                "pattern": "\\bError\\b",
+                "replace": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+            },
+            {
+                "pattern": "\\bAxiosError\\b",
+                "replace": "https://axios-http.com/docs/handling_errors"
+            },
+            {
+                "pattern": "\"is-port-reachable\"",
+                "replace": "https://www.npmjs.com/package/is-port-reachable"
             }
         ]
     },
@@ -225,10 +237,6 @@
         },
         "chart.js": {
             "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
-            "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
-            "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
-            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
-            "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
             "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html",
             "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html"
         },
