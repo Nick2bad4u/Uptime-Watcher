@@ -1,7 +1,7 @@
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import { exec } from "child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "fs";
+import { join, resolve as _resolve } from "path";
+import { createHash } from "crypto";
 
 const tags = [
     "alpha",
@@ -73,24 +73,24 @@ const extraPages = [
 const baseGitHubUrl =
     "https://github.com/microsoft/rushstack-websites/raw/refs/heads/main/websites/tsdoc.org/docs/pages/tags";
 let outputDir =
-    process.env.TSDOC_OUTPUT_DIR || path.join(process.cwd(), "docs", "TSDoc");
+    process.env.TSDOC_OUTPUT_DIR || join(process.cwd(), "docs", "TSDoc");
 // Normalize and resolve the output directory for cross-platform compatibility
-outputDir = path.resolve(outputDir);
-const logFile = path.join(outputDir, "TSDoc-Download-Log.md");
+outputDir = _resolve(outputDir);
+const logFile = join(outputDir, "TSDoc-Download-Log.md");
 const tsdocDomain = "https://tsdoc.org/pages";
 
-if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
 }
 
 const downloadedFiles = [];
 
-const hashesPath = path.join(outputDir, "TSDoc-Hashes.json");
+const hashesPath = join(outputDir, "TSDoc-Hashes.json");
 let previousHashes = {};
 
-if (fs.existsSync(hashesPath)) {
+if (existsSync(hashesPath)) {
     try {
-        const parsed = JSON.parse(fs.readFileSync(hashesPath, "utf8"));
+        const parsed = JSON.parse(readFileSync(hashesPath, "utf8"));
         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
             previousHashes = parsed;
         } else {
@@ -156,7 +156,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                     );
                     return reject(err);
                 }
-                if (!fs.existsSync(filePath)) {
+                if (!existsSync(filePath)) {
                     console.error(
                         logMsg.replace("✅", "❌").replace("📘", "❌") +
                             " → File not created."
@@ -165,7 +165,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 }
                 let content;
                 try {
-                    content = fs.readFileSync(filePath, "utf8");
+                    content = readFileSync(filePath, "utf8");
                 } catch (readErr) {
                     console.error(
                         logMsg.replace("✅", "❌").replace("📘", "❌") +
@@ -183,7 +183,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                     );
                 }
                 try {
-                    fs.writeFileSync(filePath, rewriteLinks(content));
+                    writeFileSync(filePath, rewriteLinks(content));
                 } catch (writeErr) {
                     console.error(
                         logMsg.replace("✅", "❌").replace("📘", "❌") +
@@ -202,7 +202,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
 const tagPromises = tags.map((tag) => {
     const url = `${baseGitHubUrl}/${tag}.md`;
     const fileName = `TSDoc-Tag-${tag.charAt(0).toUpperCase() + tag.slice(1)}.md`;
-    const filePath = path.join(outputDir, fileName);
+    const filePath = join(outputDir, fileName);
     const cmd = `curl -sSL "${url}" -o "${filePath}"`;
     return downloadFile(
         cmd,
@@ -212,7 +212,7 @@ const tagPromises = tags.map((tag) => {
     );
 });
 const extraPagePromises = extraPages.map(({ url, fileName }) => {
-    const filePath = path.join(outputDir, fileName);
+    const filePath = join(outputDir, fileName);
     const cmd = `pandoc ${url} -t markdown -o "${filePath}"`;
     return downloadFile(cmd, filePath, `📘 Fetched: ${fileName}`, fileName);
 });
@@ -248,9 +248,9 @@ function writeLogIfComplete() {
     let changedCount = 0;
 
     downloadedFiles.forEach((name) => {
-        const filePath = path.join(outputDir, name);
-        const content = fs.readFileSync(filePath, "utf8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const filePath = join(outputDir, name);
+        const content = readFileSync(filePath, "utf8");
+        const hash = createHash("sha256").update(content).digest("hex");
         newHashes[name] = hash;
 
         if (previousHashes[name] !== hash) {
@@ -262,9 +262,9 @@ function writeLogIfComplete() {
 
     if (changedCount > 0) {
         logEntry += `\n🔧 ${changedCount} changed file${changedCount > 1 ? "s" : ""}\n---\n`;
-        fs.appendFileSync(logFile, logEntry);
+        appendFileSync(logFile, logEntry);
         console.log(`🗒️ Log updated → ${logFile}`);
-        fs.writeFileSync(hashesPath, JSON.stringify(newHashes, null, 2));
+        writeFileSync(hashesPath, JSON.stringify(newHashes, null, 2));
     } else {
         console.log("📦 All files unchanged — no log entry written.");
     }

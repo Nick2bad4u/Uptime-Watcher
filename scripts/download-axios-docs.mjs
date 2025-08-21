@@ -1,7 +1,7 @@
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import { exec } from "child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "fs";
+import { join, resolve as _resolve } from "path";
+import { createHash } from "crypto";
 
 // List of Axios documentation pages to download
 const axiosPages = [
@@ -24,22 +24,22 @@ const axiosPages = [
 const baseAxiosUrl = "https://axios-http.com/docs";
 let outputDir =
     process.env.AXIOS_DOCS_OUTPUT_DIR ||
-    path.join(process.cwd(), "docs", "packages", "axios");
+    join(process.cwd(), "docs", "packages", "axios");
 // Normalize and resolve the output directory for cross-platform compatibility
-outputDir = path.resolve(outputDir);
-const logFile = path.join(outputDir, "Axios-Download-Log.md");
-const hashesPath = path.join(outputDir, "Axios-Hashes.json");
+outputDir = _resolve(outputDir);
+const logFile = join(outputDir, "Axios-Download-Log.md");
+const hashesPath = join(outputDir, "Axios-Hashes.json");
 
-if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
 }
 
 const downloadedFiles = [];
 
 let previousHashes = {};
-if (fs.existsSync(hashesPath)) {
+if (existsSync(hashesPath)) {
     try {
-        const parsed = JSON.parse(fs.readFileSync(hashesPath, "utf8"));
+        const parsed = JSON.parse(readFileSync(hashesPath, "utf8"));
         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
             previousHashes = parsed;
         } else {
@@ -107,7 +107,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
                 return reject(err);
             }
-            if (!fs.existsSync(filePath)) {
+            if (!existsSync(filePath)) {
                 console.error(
                     logMsg.replace("✅", "❌") + " → File not created."
                 );
@@ -115,7 +115,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             }
             let content;
             try {
-                content = fs.readFileSync(filePath, "utf8");
+                content = readFileSync(filePath, "utf8");
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
@@ -133,7 +133,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 // Process content: rewrite links, then clean unwanted sections
                 let processedContent = rewriteLinks(content);
                 processedContent = cleanContent(processedContent);
-                fs.writeFileSync(filePath, processedContent);
+                writeFileSync(filePath, processedContent);
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
@@ -152,7 +152,7 @@ const axiosPagePromises = axiosPages.map((page) => {
     // Download the HTML page and convert to markdown using pandoc
     const url = `${baseAxiosUrl}/${page}`;
     const fileName = `Axios-${page.replace(/_/g, "-")}.md`;
-    const filePath = path.join(outputDir, fileName);
+    const filePath = join(outputDir, fileName);
     const cmd = `pandoc "${url}.html" -t markdown -o "${filePath}"`;
     return downloadFile(
         cmd,
@@ -190,9 +190,9 @@ function writeLogIfComplete() {
     let changedCount = 0;
 
     downloadedFiles.forEach((name) => {
-        const filePath = path.join(outputDir, name);
-        const content = fs.readFileSync(filePath, "utf8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const filePath = join(outputDir, name);
+        const content = readFileSync(filePath, "utf8");
+        const hash = createHash("sha256").update(content).digest("hex");
         newHashes[name] = hash;
 
         if (previousHashes[name] !== hash) {
@@ -203,9 +203,9 @@ function writeLogIfComplete() {
 
     if (changedCount > 0) {
         logEntry += `\n🔧 ${changedCount} changed file${changedCount > 1 ? "s" : ""}\n---\n`;
-        fs.appendFileSync(logFile, logEntry);
+        appendFileSync(logFile, logEntry);
         console.log(`🗒️ Log updated → ${logFile}`);
-        fs.writeFileSync(hashesPath, JSON.stringify(newHashes, null, 2));
+        writeFileSync(hashesPath, JSON.stringify(newHashes, null, 2));
     } else {
         console.log("📦 All files unchanged — no log entry written.");
     }
