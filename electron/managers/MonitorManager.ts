@@ -137,8 +137,11 @@ export interface MonitorManagerDependencies {
      * entities.
      */
     repositories: {
+        /** Repository for managing status history records */
         history: HistoryRepository;
+        /** Repository for managing monitor configuration and data */
         monitor: MonitorRepository;
+        /** Repository for managing site configuration and data */
         site: SiteRepository;
     };
     /**

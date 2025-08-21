@@ -230,7 +230,9 @@ export class DatabaseManager {
      * @throws Error if backup creation or file system operations fail.
      */
     public async downloadBackup(): Promise<{
+        /** The backup data as a Buffer containing the database file contents */
         buffer: Buffer;
+        /** The generated filename for the backup file */
         fileName: string;
     }> {
         const command = new DownloadBackupCommand(

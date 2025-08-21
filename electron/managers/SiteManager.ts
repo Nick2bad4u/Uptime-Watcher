@@ -171,24 +171,36 @@ export interface SiteManagerDependencies {
  * Manages site operations and maintains in-memory cache.
  */
 export class SiteManager {
+    /** Configuration manager for business rules and validation */
     private readonly configurationManager: ConfigurationManager;
 
+    /** Event bus for emitting site-related events */
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
+    /** Optional monitoring operations for coordinating with monitor management */
     private readonly monitoringOperations: IMonitoringOperations | undefined;
 
+    /** Collection of repository and service dependencies for data access */
     private readonly repositories: {
+        /** Database service for transactional operations */
         databaseService: DatabaseService;
+        /** Repository for managing status history records */
         historyRepository: HistoryRepository;
+        /** Repository for managing monitor configuration and data */
         monitorRepository: MonitorRepository;
+        /** Repository for managing application settings */
         settingsRepository: SettingsRepository;
+        /** Repository for managing site configuration and data */
         siteRepository: SiteRepository;
     };
 
+    /** Service for reading site data from repositories */
     private readonly siteRepositoryService: SiteRepositoryService;
 
+    /** In-memory cache for site data performance optimization */
     private readonly sitesCache: StandardizedCache<Site>;
 
+    /** Service for writing and updating site data */
     private readonly siteWriterService: SiteWriterService;
 
     /**

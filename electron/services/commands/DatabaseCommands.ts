@@ -71,7 +71,12 @@ export interface IDatabaseCommand<TResult = void> {
      *
      * @returns Promise resolving to validation result.
      */
-    validate: () => Promise<{ errors: string[]; isValid: boolean }>;
+    validate: () => Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }>;
 }
 
 /**
@@ -86,10 +91,13 @@ export interface IDatabaseCommand<TResult = void> {
 export abstract class DatabaseCommand<TResult = void>
     implements IDatabaseCommand<TResult>
 {
+    /** Site cache for data synchronization during operations */
     protected readonly cache: StandardizedCache<Site>;
 
+    /** Event bus for emitting command execution events */
     protected readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
+    /** Factory for accessing database services and repositories */
     protected readonly serviceFactory: DatabaseServiceFactory;
 
     /**
@@ -157,7 +165,12 @@ export abstract class DatabaseCommand<TResult = void>
 
     public abstract rollback(): Promise<void>;
 
-    public abstract validate(): Promise<{ errors: string[]; isValid: boolean }>;
+    public abstract validate(): Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }>;
 }
 
 /**
@@ -172,6 +185,7 @@ export abstract class DatabaseCommand<TResult = void>
  * @public
  */
 export class DatabaseCommandExecutor {
+    /** Array of successfully executed commands for potential rollback operations */
     private readonly executedCommands: Array<IDatabaseCommand<unknown>> = [];
 
     /**
@@ -289,10 +303,17 @@ export class DatabaseCommandExecutor {
  * @public
  */
 export class DownloadBackupCommand extends DatabaseCommand<{
+    /** The backup data as a Buffer containing the database file contents */
     buffer: Buffer;
+    /** The generated filename for the backup file */
     fileName: string;
 }> {
-    public async execute(): Promise<{ buffer: Buffer; fileName: string }> {
+    public async execute(): Promise<{
+        /** The backup data as a Buffer containing the database file contents */
+        buffer: Buffer;
+        /** The generated filename for the backup file */
+        fileName: string;
+    }> {
         const dataBackupService = this.serviceFactory.createBackupService();
         const result = await dataBackupService.downloadDatabaseBackup();
 
@@ -329,7 +350,12 @@ export class DownloadBackupCommand extends DatabaseCommand<{
      *
      * @returns Resolved promise with validation result indicating success.
      */
-    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }> {
         // No specific validation needed for backup
         await Promise.resolve();
         return { errors: [], isValid: true };
@@ -366,7 +392,12 @@ export class ExportDataCommand extends DatabaseCommand<string> {
         // Export operations don't need rollback
     }
 
-    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }> {
         // No specific validation needed for export
         await Promise.resolve();
         return { errors: [], isValid: true };
@@ -388,8 +419,10 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  * @public
  */
 export class ImportDataCommand extends DatabaseCommand<boolean> {
+    /** Backup of current sites for rollback functionality */
     private backupSites: Site[] = [];
 
+    /** JSON data string to be imported */
     private readonly data: string;
 
     public async execute(): Promise<boolean> {
@@ -432,7 +465,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         await Promise.resolve();
     }
 
-    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }> {
         const errors: string[] = [];
 
         if (!this.data || this.data.trim() === "") {
@@ -479,6 +517,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
  * @public
  */
 export class LoadSitesCommand extends DatabaseCommand<Site[]> {
+    /** Backup of original cache state for rollback functionality */
     private readonly originalCacheState = new Map<string, Site>();
 
     public async execute(): Promise<Site[]> {
@@ -530,7 +569,12 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
      *
      * @returns Resolved promise with validation result indicating success
      */
-    public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
+    public async validate(): Promise<{
+        /** Array of error messages if validation fails */
+        errors: string[];
+        /** Boolean indicating whether validation passed */
+        isValid: boolean;
+    }> {
         // No specific validation needed for loading
         await Promise.resolve();
         return { errors: [], isValid: true };

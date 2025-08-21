@@ -228,7 +228,7 @@
             "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
             "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
             "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
-            "Plugin": "https://www.chartjs.org/docs/latest/developers/plugins.html",
+            "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
             "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html",
             "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html"
         },
@@ -321,14 +321,34 @@
             "waitFor": "https://testing-library.com/docs/dom-testing-library/api-async#waitfor"
         },
         "uptime-watcher": {
-            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "TypedEventBus.emitTyped": "#",
+            "MigrationOrchestrator": "#",
+            "VersionManager": "#",
+            "ValidationResult": "#",
+            "ServiceContainer": "#",
+            "SiteManager": "#",
+            "ConfigurationManager": "#",
+            "MonitorOperationRegistry.registerOperation": "#",
+            "OperationTimeoutManager.createTimeout": "#",
+            "MonitorStatusUpdateService.updateStatus": "#",
+            "MonitorTypeRegistry.getAllTypes": "#",
+            "MonitorTypeRegistry.isValidType": "#",
+            "validateMonitorHost": "#",
+            "hasValidHost": "#",
+            "getMonitorTimeout": "#",
+            "getMonitorRetryAttempts": "#",
+            "Monitor": "#",
+            "Logger": "#",
+            "PortCheckError": "#",
+            "getMonitorTypeConfig": "#"
         }
     },
     "validation": {
         "notExported": false,
-        "invalidLink": false,
-        "rewrittenLink": false,
-        "notDocumented": true,
+        "invalidLink": true,
+        "rewrittenLink": true,
+        "notDocumented": false,
         "unusedMergeModuleWith": true
     },
     "visibilityFilters": {

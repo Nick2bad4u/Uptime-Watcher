@@ -41,12 +41,13 @@
         "strict": true,
         "skipLibCheck": true,
         "resolveJsonModule": true,
-        "declaration": false,
-        "declarationMap": false,
-        "noEmit": true,
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true,
         "sourceMap": true,
+        "noEmit": false,
         "allowJs": true,
-        "checkJs": false,
+        "checkJs": false
     },
     "include": [
         "../../src/**/*.ts",
@@ -65,7 +66,9 @@
     "exclude": [
         "../../node_modules/**",
         "../../dist/**",
+        "**/dist/**",
         "../../dist-electron/**",
+        "../../electron/**/dist/**",
         "../../dist-shared/**",
         "../../dist-shared-test/**",
         "../../coverage/**",
@@ -100,6 +103,9 @@
         "node_modules",
         "dist", 
         "build",
-        "coverage"
+        "coverage",
+        "../../electron/dist/**",
+        "../../src/services/dist/**",
+        "../../src/theme/dist/**"
     ]
 }

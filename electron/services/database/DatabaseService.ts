@@ -70,8 +70,10 @@ const DATABASE_SERVICE_QUERIES = {
  * Core database service for SQLite connection and schema management.
  */
 export class DatabaseService {
+    /** Singleton instance of the database service */
     private static readonly instance: DatabaseService = new DatabaseService();
 
+    /** SQLite database connection instance */
     private db: Database | undefined;
 
     /**

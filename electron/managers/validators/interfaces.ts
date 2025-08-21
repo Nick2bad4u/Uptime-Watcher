@@ -28,6 +28,8 @@
 // Validation result interface - import directly from shared/types/validation
 // if needed
 export interface ValidationResult {
+    /** Array of error messages describing validation failures */
     errors: string[];
+    /** Boolean indicating whether validation was successful */
     success: boolean;
 }
