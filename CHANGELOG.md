@@ -7,14 +7,250 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5ec35dd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)...
-[5ec35dd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5ec35ddd460c829c155c1f4da42ed4231583bc1d...5ec35ddd460c829c155c1f4da42ed4231583bc1d))
+[[cf1b3ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf1b3ef41555069276f24b1639451e9ea4924e5e)...
+[798366b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/798366bcada603b339045c2675afd2fdaf81904c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cf1b3ef41555069276f24b1639451e9ea4924e5e...798366bcada603b339045c2675afd2fdaf81904c))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.8.0 [`(cf1b3ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf1b3ef41555069276f24b1639451e9ea4924e5e)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update TypeDoc output paths and add error resolution prompt
+
+- Clarifies TypeDoc output directory to align documentation generation with Docusaurus structure, preventing misplaced files and improving maintainability.
+- Updates sidebar configuration to point to new documentation locations, ensuring navigation matches generated content.
+- Introduces a prompt for systematically resolving all TypeDoc errors and warnings, establishing clear procedures for documentation quality and future error handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5597484)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5597484654b69497415dbd34f3b621281f7c272e)
+
+
+- 📝 [docs] Streamlines sidebar and Typedoc MD config
+
+- Removes redundant sidebar categories to simplify navigation.
+- Updates Typedoc config to include only top-level markdown files, reducing unnecessary nested documentation and output directory complexity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b82f42b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b82f42b3ce788a4657028ba381da205b69fa1634)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update Node.js and improve sidebar paths
+
+- Upgrades Node.js version for CI to align with latest dependencies and enhances build performance using npm caching.
+- Simplifies documentation sidebar configuration by removing redundant directory prefixes, improving maintainability and clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(798366b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/798366bcada603b339045c2675afd2fdaf81904c)
+
+
+
+
+
+
+## [11.8.0] - 2025-08-21
+
+
+[[c24173d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24173d53743829ca36be787227819e4bb9e82c9)...
+[b9db564](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b9db5645a780af7862714ed1e0b3e81a96be3f97)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c24173d53743829ca36be787227819e4bb9e82c9...b9db5645a780af7862714ed1e0b3e81a96be3f97))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 11.7.0 [`(5ec35dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ec35ddd460c829c155c1f4da42ed4231583bc1d)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Unifies site status utils and Typedoc config, cleans tests
+
+- Removes duplicated and frontend-only site status utility wrappers, consolidating usage to shared module for consistency and maintainability.
+- Updates all test imports to reference the shared site status utilities, simplifying the frontend/backend boundary.
+- Refactors documentation build scripts and Typedoc configs: adds a single local config and updates related scripts, removing legacy config files for clarity.
+- Expands documentation sidebar categories and Typedoc entry points for improved navigation and coverage.
+- Deletes redundant and outdated comprehensive test suites to streamline the codebase.
+
+Reduces maintenance overhead and ensures all site status logic is sourced from the shared module, eliminating confusion and mismatches.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b9db564)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b9db5645a780af7862714ed1e0b3e81a96be3f97)
+
+
+- 🚜 [refactor] Standardizes naming, regex, and type checks across codebase
+
+- Refactors variable and function names for consistency and clarity, improving code readability and maintainability.
+- Updates regular expressions to use named capture groups and more precise patterns, enhancing robustness and future compatibility.
+- Replaces legacy type and property checks (e.g., `.hasOwnProperty`, `isNaN`, `== null`) with modern, explicit methods (`Object.hasOwn`, `Number.isNaN`, `=== null`), preventing subtle bugs and aligning with current ECMAScript standards.
+- Refactors debounce/throttle implementations for clarity and type safety.
+- Adds missing imports and updates test suite setups for React and Vitest.
+- Removes redundant or obsolete files and improves placeholder comments.
+- Improves mock usage in tests, simplifying mocking strategies and clarifying limitations.
+- Fixes minor logic issues and updates test expectations to match current code behavior.
+- Enhances code coverage through targeted changes and explicit type annotations.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f8691a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f8691a834628b865261fbceb99f1fe793ac21a4)
+
+
+- 🚜 [refactor] Apply consistent formatting and structure to DB benchmarks
+
+- Standardizes code style across all database benchmark files for better readability and maintainability.
+- Uses consistent indentation, line breaks, and parameter formatting for improved clarity.
+- Replaces inline callbacks with arrow functions and expands parameter lists for type safety.
+- Updates comment and doc block layouts to ensure uniform documentation standards.
+- Enhances simulated operations with more realistic delays and batch handling.
+- Improves handling of array methods, chunking, and parameter spreading for code reliability.
+- Promotes codebase scalability by making future additions and changes easier to manage.
+
+Relates to code quality and maintainability initiatives.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c04042e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c04042e314546f886dba99f8ff2a9de43126436b)
+
+
+- 🚜 [refactor] Use numeric separators for large numbers in benchmarks
+
+- Improves code readability and consistency by replacing large numeric literals with underscores across benchmark and config files.
+- Refactors array and object generation to use modern JavaScript patterns for clarity.
+- Cleans up ESLint and PostCSS config comments for better maintainability.
+- Updates default-case rule handling and disables explicit type enforcement for TypeScript React components.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca32d65)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca32d6558937b4a6bbee83d5dde5e3df9af8e812)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Expand and refine API documentation comments
+
+- Adds detailed JSDoc comments to interfaces, function return types, and component props throughout the codebase for improved code readability and developer onboarding
+- Refines descriptions for many UI, store, service, and utility types, clarifying usage, expected values, and domain context
+- Removes legacy error catalog and related tests to streamline error handling and reduce redundancy
+
+Improves code maintainability and discoverability by making interfaces, data structures, and API contracts more self-explanatory.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(39e53c9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/39e53c9aa15aff0e079ff49b5cd71d75ae75061c)
+
+
+- 📝 [docs] Add comprehensive architecture and usage docs
+
+- Introduces extensive documentation covering architecture decisions, development patterns, templates, code standards, and troubleshooting.
+- Adds onboarding guides, API references, environment setup, and index files for easier navigation.
+- Documents ADRs for repository, event-driven, error handling, state management, and IPC communication patterns.
+- Improves developer experience, onboarding speed, and architectural consistency across the project.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5243efc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5243efc2ebf0af2df8363575fc0a1f00cc2de681)
+
+
+- 📝 [docs] Remove archived historical and implementation documentation
+
+- Cleans up legacy analysis, implementation records, review summaries, and planning docs from the archive folder.
+- Reduces repository clutter and improves focus on current, actionable documentation.
+- Preserves historical context in git history for reference.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2580769)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2580769f2a5882a58b282a45b069128ccac16ba3)
+
+
+
+### ⚡ Performance
+
+- ⚡ [perf] Add comprehensive performance benchmarks
+
+Adds extensive benchmark suites for database, event system, frontend, monitoring, and analytics modules using vitest.
+Enables profiling of connection pools, repositories, migrations, transactions, event handling/correlation, component rendering/state, virtual DOM ops, Zustand stores, monitoring engines, schedulers, alert/notification systems, and analytics logic.
+
+Improves future insight into system bottlenecks, scalability, and optimization opportunities.
+Explicitly pins Flatpak SDK extension refs to automate CI setup for multiple versions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c24173d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24173d53743829ca36be787227819e4bb9e82c9)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Expand function and branch coverage for utility and validation modules
+
+- Adds thorough unit tests to cover edge cases, branch logic, and all switch statements in utility and validation modules.
+- Improves reliability of function coverage reports by explicitly testing null, undefined, complex object, and error scenarios.
+- Ensures robust validation and error handling for schemas with ZodError path cases and warning categorization.
+- Strengthens coverage for all exported functions, including object safety, string conversion, type guards, and site status logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b4c5d08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b4c5d08daebdae8faa7734c6c8f4e87a5261021f)
+
+
+- 🧪 [test] Add comprehensive function and branch coverage tests
+
+- Improves coverage for shared/utils and types modules by adding targeted tests for uncovered branches, edge cases, and complex type guards.
+- Increases reliability of type checking, schema validation, and error handling logic through integration and missing-case scenarios.
+- Updates test exclusions and coverage providers for more accurate reporting.
+- Refines CI and build workflow scripts, dependency versions, and icon handling for Flatpak, enhancing reproducibility and packaging consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c615708)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c615708c6327edcf68ae3a3191860a365de513a2)
+
+
+- 🧪 [test] Ensure 100% function coverage in string conversion utility
+
+- Updates and expands string conversion utility tests for exhaustive function and branch coverage
+- Validates all data types, edge cases, and determinism in string serialization
+- Harmonizes formatting and improves readability in multiple test files for consistency
+- Refactors multi-parameter functions and class declarations to improve clarity and maintainability
+- Fixes ESLint config property formatting for stricter lint compliance
+- Reorders and restores schema-related JSON properties to resolve validation warnings
+- Standardizes trailing newlines in TypeScript config files for better tooling compatibility
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(23b6fd7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23b6fd74a7a54975efe12632ec37d8225365ebb8)
+
+
+- 🧪 [test] Improve test robustness and coverage patterns
+
+- Updates test assertions for safer optional chaining and property access, reducing the risk of runtime errors and improving type safety.
+- Refactors test imports and component overrides for consistency, modern syntax, and clearer intent.
+- Expands comprehensive coverage for environment detection, conversions, and store creation to address edge cases and improve maintainability.
+- Removes redundant and deprecated targeted coverage tests, streamlining the test suite.
+- Adds a custom Oh My Posh theme configuration for development productivity.
+- Refines .gitignore to ensure development assets are correctly tracked.
+- Enhances tsconfig paths for improved tool compatibility.run
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb8d1da)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb8d1da1b061e2cfc6b3d91cc6fe7488ef42ae3a)
+
+
+- 🧪 [test] Boost function coverage to 95%+ with comprehensive targeted unit tests
+
+Adds a large suite of targeted and comprehensive unit tests for shared utilities, type guards, cache key helpers, conversion functions, environment detection, error handling, and validation logic.
+
+Ensures every exported function is called and all code branches are exercised, raising function coverage above the 90% threshold and eliminating all uncovered function lines in shared and backend code.
+
+Improves maintainability, correctness, and future refactoring safety by validating all edge cases, error paths, and integration points.
+
+Relates to coverage improvement goal and future-proofing core utility modules.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(46551b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/46551b1c85796f2b6dededff858eb8f728b99e00)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Update workspace excludes for test and docs builds
+
+- Expands file and folder exclude lists in workspace settings to ignore additional test and documentation build output directories.
+ - Improves search, file explorer, and version control focus by preventing clutter from generated files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c0f248f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0f248f6eb909099116aef38e6e1df35fe95d42e)
+
+
+- 🧹 [chore] Update tool selection to 'Best Tools' across prompts
+
+- Standardizes tool configuration by replacing 'All Tools' with 'Best Tools' in all chatmode and prompt metadata.
+- Improves clarity and potential quality of tool usage for agent modes.
+- Raises global test coverage requirement from 90% to 95% and adds rules to prioritize lowest coverage files and ignore development-only lines.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(32f68de)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32f68de12100c637e3533195fd68a40cf525ef81)
+
+
+- Update changelogs for v11.7.0 [skip ci] [`(e062bb5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e062bb5f9d07f6783c399227afe113ac33dcf1d6)
 
 
 
