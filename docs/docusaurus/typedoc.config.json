@@ -13,7 +13,7 @@
         "../../docs/TSDoc/*.md",
     ],
     "tsconfig": "tsconfig.typedoc.json",
-    "out": "docs",
+    "out": "docs/docusaurus/docs",
     "cleanOutputDir": true,
     "commentStyle": "jsdoc",
     "excludeInternal": false,

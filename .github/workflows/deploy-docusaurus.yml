@@ -65,6 +65,12 @@ jobs:
                   npm run docs:typedoc
               continue-on-error: true
 
+            - name: List TypeDoc output directories
+              run: |
+                  echo "TypeDoc output directories:"
+                  ls -l docs/docusaurus/docs
+                  ls -l docs
+
             - name: Build Docusaurus website
               run: npm run docusaurus:build
               continue-on-error: true
