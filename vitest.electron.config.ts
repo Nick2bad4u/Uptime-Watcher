@@ -46,6 +46,9 @@ const vitestConfig = defineConfig({
             ],
             include: [
                 "electron/**/*.ts", // Include all electron source files only
+                "electron/**/*.mts", // Include MTS files
+                "electron/**/*.cts", // Include CTS files
+                "electron/**/*.mjs", // Include MJS files
                 // Shared files now have their own dedicated coverage config
             ],
 
@@ -87,7 +90,11 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "electron/**/*.test.ts",
+            "electron/**/*.test.mts",
+            "electron/**/*.test.cts",
             "electron/**/*.spec.ts",
+            "electron/**/*.spec.mts",
+            "electron/**/*.spec.cts",
             // Shared tests now have their own dedicated config (vitest.shared.config.ts)
         ],
         name: {

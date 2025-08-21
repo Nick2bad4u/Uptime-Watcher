@@ -135,8 +135,8 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
-                node-version: 24
-                cache: 'npm'
+                  node-version: 24
+                  cache: "npm"
 
             - name: Cache node modules
               uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
@@ -145,6 +145,7 @@ jobs:
                   key: ${{ runner.os }}-.-node-modules-${{ hashFiles('./package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-.-node-modules-
+              continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
 
             - name: Install dependencies
               run: npm ci --force

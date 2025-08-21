@@ -141,7 +141,9 @@ import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import css from "@eslint/css";
 // import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
+import * as publint from "eslint-plugin-publint";
 
+import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 
 import * as cssPlugin from "eslint-plugin-css";
@@ -149,8 +151,6 @@ import * as cssPlugin from "eslint-plugin-css";
 import { fixupPluginRules } from "@eslint/compat";
 
 // Unused and Uninstalled Plugins:
-// import * as publint from "eslint-plugin-publint";
-// import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 // eslint-config-prettier
 // eslint-find-rules
 // eslint-formatter-compact -- Built into eslint
@@ -339,30 +339,30 @@ export default [
 
     // Package.json Linting
 
-    // {
-    //     files: ["**/package.json"],
-    //     languageOptions: {
-    //         parser: publintParser,
-    //     },
-    //     plugins: { publint },
-    //     rules: {
-    //         /**
-    //          * The 'suggestion' type messages created by publint will cause
-    //          * eslint warns
-    //          */
-    //         "publint/suggestion": "warn",
-    //         /**
-    //          * The 'warning' type messages created by publint will cause eslint
-    //          * warns
-    //          */
-    //         "publint/warning": "warn",
-    //         /**
-    //          * The 'error' type messages created by publint will cause eslint
-    //          * errors
-    //          */
-    //         "publint/error": "error",
-    //     },
-    // },
+    {
+        files: ["**/package.json"],
+        languageOptions: {
+            parser: publintParser,
+        },
+        plugins: { publint },
+        rules: {
+            // /**
+            //  * The 'suggestion' type messages created by publint will cause
+            //  * eslint warns
+            //  */
+            // "publint/suggestion": "warn",
+            // /**
+            //  * The 'warning' type messages created by publint will cause eslint
+            //  * warns
+            //  */
+            // "publint/warning": "warn",
+            // /**
+            //  * The 'error' type messages created by publint will cause eslint
+            //  * errors
+            //  */
+            // "publint/error": "error",
+        },
+    },
     {
         files: ["**/package.json"],
         plugins: { "package-json": packageJson },
@@ -543,14 +543,19 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: ["src/**/*.ts", "src/**/*.tsx"],
+        files: [
+            "src/**/*.ts",
+            "src/**/*.tsx",
+            "src/**/*.mts",
+            "src/**/*.cts",
+        ],
         ignores: [
-            "**/*.spec.{ts,tsx}",
-            "**/*.test.{ts,tsx}",
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
-            "src/test/**/*.{ts,tsx}",
+            "**/*.spec.{ts,tsx,mts,cts}",
+            "**/*.test.{ts,tsx,mts,cts}",
+            "shared/**/*.spec.{ts,tsx,mts,cts}",
+            "shared/**/*.test.{ts,tsx,mts,cts}",
+            "shared/test/**/*.{ts,tsx,mts,cts}",
+            "src/test/**/*.{ts,tsx,mts,cts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -1896,14 +1901,18 @@ export default [
 
     // Electron backend files
     {
-        files: ["electron/**/*.ts"],
+        files: [
+            "electron/**/*.ts",
+            "electron/**/*.cts",
+            "electron/**/*.mts",
+        ],
         ignores: [
-            "electron/**/*.spec.{ts,tsx}",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/test/**/*.ts",
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
+            "electron/**/*.spec.{ts,tsx,mts,cts}",
+            "electron/**/*.test.{ts,tsx,mts,cts}",
+            "electron/test/**/*.{ts,tsx,mts,cts}",
+            "shared/**/*.spec.{ts,tsx,mts,cts}",
+            "shared/**/*.test.{ts,tsx,mts,cts}",
+            "shared/test/**/*.{ts,tsx,mts,cts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -2982,14 +2991,19 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: ["shared/**/*.ts", "shared/**/*.tsx"],
+        files: [
+            "shared/**/*.ts",
+            "shared/**/*.tsx",
+            "src/**/*.cts",
+            "src/**/*.mts",
+        ],
         ignores: [
-            "**/*.spec.{ts,tsx}",
-            "**/*.test.{ts,tsx}",
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
-            "src/test/**/*.{ts,tsx}",
+            "**/*.spec.{ts,tsx,mts,cts}",
+            "**/*.test.{ts,tsx,mts,cts}",
+            "shared/**/*.spec.{ts,tsx,mts,cts}",
+            "shared/**/*.test.{ts,tsx,mts,cts}",
+            "shared/test/**/*.{ts,tsx,mts,cts}",
+            "src/test/**/*.{ts,tsx,mts,cts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4336,12 +4350,12 @@ export default [
     // Test files (Frontend)
     {
         files: [
-            "src/**/*.spec.{ts,tsx}",
-            "src/**/*.test.{ts,tsx}",
-            "src/test/**/*.{ts,tsx}",
-            "tests/**/*.{ts,tsx}",
-            "tests/**/*.spec.{ts,tsx}",
-            "tests/**/*.test.{ts,tsx}",
+            "src/**/*.spec.{ts,tsx,cts,mts}",
+            "src/**/*.test.{ts,tsx,cts,mts}",
+            "src/test/**/*.{ts,tsx,cts,mts}",
+            "tests/**/*.{ts,tsx,cts,mts}",
+            "tests/**/*.spec.{ts,tsx,cts,mts}",
+            "tests/**/*.test.{ts,tsx,cts,mts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4522,9 +4536,9 @@ export default [
     // Test files (Backend)
     {
         files: [
-            "electron/**/*.spec.{ts,tsx}",
-            "electron/**/*.test.{ts,tsx}",
-            "electron/test/**/*.{ts,tsx}",
+            "electron/**/*.spec.{ts,tsx,cts,mts}",
+            "electron/**/*.test.{ts,tsx,cts,mts}",
+            "electron/test/**/*.{ts,tsx,cts,mts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4699,9 +4713,9 @@ export default [
     // Shared Test Files
     {
         files: [
-            "shared/**/*.spec.{ts,tsx}",
-            "shared/**/*.test.{ts,tsx}",
-            "shared/test/**/*.ts",
+            "shared/**/*.spec.{ts,tsx,cts,mts}",
+            "shared/**/*.test.{ts,tsx,cts,mts}",
+            "shared/test/**/*.{ts,tsx,cts,mts}",
         ],
         languageOptions: {
             parser: tseslintParser,
@@ -4856,7 +4870,7 @@ export default [
 
     // Benchmark files
     {
-        files: ["benchmarks/**/*.bench.{ts,tsx}", "benchmarks/**/*.{ts,tsx}"],
+        files: ["benchmarks/**/*.bench.{ts,tsx,cts,mts}", "benchmarks/**/*.{ts,tsx,cts,mts}"],
         languageOptions: {
             parser: tseslintParser,
             parserOptions: {
@@ -5037,7 +5051,7 @@ export default [
     // TypeScript Config files using Electron Test TSConfig
     {
         files: [
-            "**/*.config.{ts}", // Configuration files
+            "**/*.config.{ts,mts,tsx}", // Configuration files
         ],
         ignores: ["./.*/**"],
         languageOptions: {
@@ -5577,7 +5591,7 @@ export default [
 
     // JS/MJS Configuration files
     {
-        files: ["**/*.config.{js,mjs}"],
+        files: ["**/*.config.{js,mjs,cts,cjs}"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -5771,7 +5785,7 @@ export default [
 
     // Store-specific overrides to handle false positives
     {
-        files: ["src/stores/**/*.ts", "src/stores/**/*.tsx"],
+        files: ["src/stores/**/*.ts", "src/stores/**/*.tsx", "src/stores/**/*.cts", "src/stores/**/*.mts"],
         rules: {
             // Disable ex/no-unhandled for stores due to false positives with variable access
             // The rule incorrectly flags simple parameter/variable access as potential exceptions
@@ -5782,8 +5796,8 @@ export default [
     // Strict Test files (Frontend)
     {
         files: [
-            "shared/test/StrictTests/*.{ts,tsx}",
-            "src/test/StrictTests/*.{ts,tsx}",
+            "shared/test/StrictTests/*.{ts,tsx,cts,mts}",
+            "src/test/StrictTests/*.{ts,tsx,cts,mts}",
         ],
         plugins: {
             vitest: vitest,
@@ -5800,7 +5814,7 @@ export default [
 
     // Strict Test files (Backend)
     {
-        files: ["electron/test/StrictTests/*.{ts,tsx}"],
+        files: ["electron/test/StrictTests/*.{ts,tsx,cts,mts}"],
         plugins: {
             vitest: vitest,
         },
@@ -5816,7 +5830,7 @@ export default [
 
     // Theme components override - disable react-perf rule for inline styling
     {
-        files: ["src/theme/**/*.{ts,tsx}"],
+        files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "off",

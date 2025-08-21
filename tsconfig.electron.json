@@ -30,6 +30,8 @@
     "include": [
         "electron/**/*.css",
         "electron/**/*.ts",
+        "electron/**/*.mts",
+        "electron/**/*.cts",
         "electron/**/*.tsx",
         "vite/client",
         "vitest.electron.config.ts"

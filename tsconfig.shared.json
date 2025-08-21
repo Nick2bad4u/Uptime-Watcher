@@ -29,6 +29,8 @@
     "include": [
         "shared/**/*.css",
         "shared/**/*.ts",
+        "shared/**/*.mts",
+        "shared/**/*.cts",
         "shared/**/*.tsx"
     ]
 }

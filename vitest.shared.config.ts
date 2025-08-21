@@ -11,9 +11,9 @@ import { defineConfig } from "vitest/config";
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@shared": normalizePath(path.resolve(__dirname, "shared")),
-            "@electron": normalizePath(path.resolve(__dirname, "electron")),
             "@app": normalizePath(path.resolve(__dirname, "src")),
+            "@electron": normalizePath(path.resolve(__dirname, "electron")),
+            "@shared": normalizePath(path.resolve(__dirname, "shared")),
         },
     },
     test: {
@@ -43,12 +43,18 @@ const vitestConfig = defineConfig({
                 "shared/test",
                 "report/**",
                 "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "shared/**/*.test.ts", // Exclude test files from coverage
+                "shared/**/*.test.mts", // Exclude MTS test files from coverage
+                "shared/**/*.test.cts", // Exclude CTS test files from coverage
+                "shared/**/*.spec.ts", // Exclude spec files from coverage
+                "shared/**/*.spec.mts", // Exclude MTS spec files from coverage
+                "shared/**/*.spec.cts", // Exclude CTS spec files from coverage
+                "shared/test/**", // Exclude test directory
             ],
             include: [
                 "shared/**/*.ts", // Only include shared source files
-                "!shared/**/*.test.ts", // Exclude test files from coverage
-                "!shared/**/*.spec.ts", // Exclude spec files from coverage
-                "!shared/test/**", // Exclude test directory
+                "shared/**/*.mts", // Include MTS source files
+                "shared/**/*.cts", // Include CTS source files
             ],
             provider: "v8" as const, // Use V8 provider for consistency
             reporter: [
@@ -89,7 +95,12 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions
         include: [
             "shared/**/*.test.ts", // Include shared tests only
+            "shared/**/*.test.mts", // Include MTS tests
+            "shared/**/*.test.cts", // Include CTS tests
             "shared/**/*.spec.ts", // Include shared specs only
+            "shared/**/*.spec.mts", // Include MTS specs
+            "shared/**/*.spec.cts", // Include CTS specs
+            "shared/**/*.test.mjs", // Include MJS tests
         ],
         name: {
             color: "yellow",

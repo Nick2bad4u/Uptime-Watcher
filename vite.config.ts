@@ -100,6 +100,8 @@ export default defineConfig(({}) => {
                 "**/*.mjs",
                 "**/*.ts",
                 "**/*.tsx",
+                "**/*.mts",
+                "**/*.cts",
             ],
 
             // More aggressive transformation to help coverage parsing
@@ -256,6 +258,8 @@ export default defineConfig(({}) => {
                     { file: "**/*.tsx" },
                     { file: "**/*.js" },
                     { file: "**/*.jsx" },
+                    { file: "**/*.mjs" },
+                    { file: "**/*.cjs" },
                 ],
                 open: false,
                 projectRoot: normalizePath(path.resolve(__dirname)),

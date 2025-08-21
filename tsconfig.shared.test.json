@@ -14,8 +14,14 @@
     ],
     "include": [
         "shared/**/*.spec.ts",
+        "shared/**/*.spec.mts",
+        "shared/**/*.spec.cts",
         "shared/**/*.test.ts",
+        "shared/**/*.test.mts",
+        "shared/**/*.test.cts",
         "shared/**/*.ts",
+        "shared/**/*.mts",
+        "shared/**/*.cts",
         "shared/**/*.tsx",
         "shared/test/**/*"
     ]

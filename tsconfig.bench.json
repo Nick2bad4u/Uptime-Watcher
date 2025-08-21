@@ -48,11 +48,19 @@
     },
     "include": [
         "benchmarks/**/*.ts",
+        "benchmarks/**/*.mts",
+        "benchmarks/**/*.cts",
         "benchmarks/**/*.tsx",
         "benchmarks/**/*.bench.ts",
         "shared/types/**/*.ts",
+        "shared/types/**/*.mts",
+        "shared/types/**/*.cts",
         "shared/interfaces/**/*.ts",
-        "shared/utils/**/*.ts"
+        "shared/interfaces/**/*.mts",
+        "shared/interfaces/**/*.cts",
+        "shared/utils/**/*.ts",
+        "shared/utils/**/*.mts",
+        "shared/utils/**/*.cts"
     ],
     "exclude": [
         "node_modules",
