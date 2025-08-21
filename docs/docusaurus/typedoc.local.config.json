@@ -20,12 +20,27 @@
     "pretty": true,
     "readme": "../../README.md",
     "treatWarningsAsErrors": false,
+    "projectDocuments": [
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Architecture/**.*.md",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Guides/**.*.md",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Packages/**.*.md",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/TSDoc/**.*.md",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/*.md",
+    ],
     "githubPages": true,
     "hideGenerator": false,
     "gitRemote": "origin",
     "gitRevision": "main",
     "searchInComments": true,
+    "useTsLinkResolution": true,
+    "preserveLinkText": true,
     "searchInDocuments": true,
+    "jsDocCompatibility": {
+        "exampleTag": true,
+        "defaultTag": true,
+        "inheritDocTag": true,
+        "ignoreUnescapedBraces": true
+    },
     "exclude": [
         "**/dist/**",
         "**/dist-electron/**",
@@ -48,7 +63,7 @@
     ],
     "categoryOrder": [
         "Frontend Components",
-        "Frontend Stores", 
+        "Frontend Stores",
         "Frontend Hooks",
         "Frontend Utils",
         "Backend Services",
@@ -64,7 +79,7 @@
     ],
     "kindSortOrder": [
         "Document",
-        "Project", 
+        "Project",
         "Module",
         "Namespace",
         "Enum",
@@ -85,18 +100,22 @@
         "CallSignature",
         "IndexSignature"
     ],
-    "sort": ["source-order", "alphabetical"],
+    "sort": [
+        "source-order",
+        "alphabetical"
+    ],
     "plugin": [
         "typedoc-plugin-markdown",
         "typedoc-docusaurus-theme",
         "typedoc-plugin-zod",
         "typedoc-plugin-mdn-links",
-        "typedoc-plugin-dt-links", 
+        "typedoc-plugin-dt-links",
         "typedoc-plugin-external-package-links",
         "typedoc-plugin-coverage",
         "typedoc-plugin-replace-text",
         "typedoc-plugin-rename-defaults"
     ],
+    "resolveUtilityTypes": true,
     "replaceText": {
         "inCodeCommentText": true,
         "inCodeCommentTags": true,
@@ -116,6 +135,7 @@
             }
         ]
     },
+    "favicon": "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/icons/favicon.ico",
     "searchGroupBoosts": {
         "Classes": 1.5,
         "Interfaces": 1.3,
@@ -130,35 +150,186 @@
             "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
             "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
         },
+        "react": {
+            "Component": "https://react.dev/reference/react/Component",
+            "useState": "https://react.dev/reference/react/useState",
+            "useEffect": "https://react.dev/reference/react/useEffect",
+            "useCallback": "https://react.dev/reference/react/useCallback",
+            "useMemo": "https://react.dev/reference/react/useMemo",
+            "useRef": "https://react.dev/reference/react/useRef",
+            "useContext": "https://react.dev/reference/react/useContext",
+            "useReducer": "https://react.dev/reference/react/useReducer",
+            "ReactNode": "https://react.dev/reference/react/Children#react-node-type",
+            "JSX": "https://react.dev/learn/writing-markup-with-jsx"
+        },
         "vite": {
             "defineConfig": "https://vitejs.dev/config/",
-            "UserConfig": "https://vitejs.dev/config/"
+            "UserConfig": "https://vitejs.dev/config/",
+            "Plugin": "https://vitejs.dev/guide/api-plugin.html"
         },
         "zustand": {
-            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
+            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction",
+            "StateCreator": "https://docs.pmnd.rs/zustand/guides/typescript#state-creator",
+            "StoreApi": "https://docs.pmnd.rs/zustand/guides/typescript#store-api"
         },
         "electron": {
             "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
             "app": "https://www.electronjs.org/docs/latest/api/app",
             "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
+            "ipcRenderer": "https://www.electronjs.org/docs/latest/api/ipc-renderer",
             "Menu": "https://www.electronjs.org/docs/latest/api/menu",
             "Tray": "https://www.electronjs.org/docs/latest/api/tray",
-            "Notification": "https://www.electronjs.org/docs/latest/api/notification"
+            "Notification": "https://www.electronjs.org/docs/latest/api/notification",
+            "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
+            "shell": "https://www.electronjs.org/docs/latest/api/shell",
+            "webContents": "https://www.electronjs.org/docs/latest/api/web-contents"
         },
         "node": {
             "fs": "https://nodejs.org/docs/latest/api/fs.html",
             "path": "https://nodejs.org/docs/latest/api/path.html",
             "os": "https://nodejs.org/docs/latest/api/os.html",
-            "events": "https://nodejs.org/docs/latest/api/events.html"
+            "events": "https://nodejs.org/docs/latest/api/events.html",
+            "EventEmitter": "https://nodejs.org/docs/latest/api/events.html#class-eventemitter",
+            "Buffer": "https://nodejs.org/docs/latest/api/buffer.html#class-buffer",
+            "process": "https://nodejs.org/docs/latest/api/process.html",
+            "url": "https://nodejs.org/docs/latest/api/url.html",
+            "crypto": "https://nodejs.org/docs/latest/api/crypto.html",
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
         },
-        "sqlite": {
-            "Database": "https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#class-database"
+        "axios": {
+            "AxiosResponse": "https://axios-http.com/docs/res_schema",
+            "AxiosError": "https://axios-http.com/docs/handling_errors",
+            "AxiosInstance": "https://axios-http.com/docs/instance",
+            "AxiosRequestConfig": "https://axios-http.com/docs/req_config",
+            "AxiosAdapter": "https://axios-http.com/docs/adapters",
+            "AxiosHeaders": "https://axios-http.com/docs/req_config#request-headers"
+        },
+        "node-sqlite3-wasm": {
+            "Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "\"node-sqlite3-wasm\".Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "Statement": "https://github.com/tndrle/node-sqlite3-wasm#statement"
+        },
+        "zod": {
+            "z": "https://zod.dev/",
+            "z.ZodError": "https://zod.dev/?id=error-handling",
+            "ZodSchema": "https://zod.dev/?id=basic-usage",
+            "ZodError": "https://zod.dev/?id=error-handling",
+            "ZodType": "https://zod.dev/?id=basic-usage",
+            "ZodString": "https://zod.dev/?id=strings",
+            "ZodNumber": "https://zod.dev/?id=numbers",
+            "ZodBoolean": "https://zod.dev/?id=booleans",
+            "ZodObject": "https://zod.dev/?id=objects",
+            "ZodArray": "https://zod.dev/?id=arrays",
+            "ZodOptional": "https://zod.dev/?id=optionals",
+            "ZodUnion": "https://zod.dev/?id=unions"
+        },
+        "chart.js": {
+            "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
+            "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
+            "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
+            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
+            "Plugin": "https://www.chartjs.org/docs/latest/developers/plugins.html",
+            "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html",
+            "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html"
+        },
+        "react-chartjs-2": {
+            "Bar": "https://react-chartjs-2.js.org/components/bar",
+            "Line": "https://react-chartjs-2.js.org/components/line",
+            "Doughnut": "https://react-chartjs-2.js.org/components/doughnut",
+            "Pie": "https://react-chartjs-2.js.org/components/pie",
+            "Radar": "https://react-chartjs-2.js.org/components/radar",
+            "Scatter": "https://react-chartjs-2.js.org/components/scatter"
+        },
+        "chartjs-plugin-zoom": {
+            "Zoom": "https://www.chartjs.org/chartjs-plugin-zoom/latest/"
+        },
+        "chartjs-adapter-date-fns": {
+            "DateAdapter": "https://www.chartjs.org/docs/latest/axes/cartesian/time.html#date-adapters"
+        },
+        "validator": {
+            "isURL": "https://github.com/validatorjs/validator.js#validators",
+            "isEmail": "https://github.com/validatorjs/validator.js#validators",
+            "isPort": "https://github.com/validatorjs/validator.js#validators",
+            "isIP": "https://github.com/validatorjs/validator.js#validators"
+        },
+        "is-port-reachable": {
+            "isPortReachable": "https://github.com/sindresorhus/is-port-reachable",
+            "\"is-port-reachable\"": "https://github.com/sindresorhus/is-port-reachable"
+        },
+        "ping": {
+            "ping": "https://github.com/danielzzz/node-ping"
+        },
+        "electron-log": {
+            "Logger": "https://github.com/megahertz/electron-log#logger",
+            "LogLevel": "https://github.com/megahertz/electron-log#log-level"
+        },
+        "electron-updater": {
+            "autoUpdater": "https://www.electron.build/auto-update",
+            "UpdateInfo": "https://www.electron.build/auto-update#updateinfo"
+        },
+        "react-icons": {
+            "IconType": "https://react-icons.github.io/react-icons/"
+        },
+        "typescript": {
+            "Partial": "https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype",
+            "Required": "https://www.typescriptlang.org/docs/handbook/utility-types.html#requiredtype",
+            "Pick": "https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys",
+            "Omit": "https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys",
+            "Record": "https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type",
+            "Exclude": "https://www.typescriptlang.org/docs/handbook/utility-types.html#excludetype-excludedunion",
+            "Extract": "https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union",
+            "NonNullable": "https://www.typescriptlang.org/docs/handbook/utility-types.html#nonnullabletype",
+            "ReturnType": "https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype",
+            "Parameters": "https://www.typescriptlang.org/docs/handbook/utility-types.html#parameterstype",
+            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+        },
+        "javascript": {
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+            "Array": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+            "Object": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+            "String": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+            "Number": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+            "Boolean": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+            "Date": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+            "RegExp": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+            "Map": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+            "Set": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+            "WeakMap": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+            "WeakSet": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet"
+        },
+        "tailwindcss": {
+            "Config": "https://tailwindcss.com/docs/configuration"
+        },
+        "postcss": {
+            "Plugin": "https://postcss.org/api/#plugin"
+        },
+        "vitest": {
+            "describe": "https://vitest.dev/api/#describe",
+            "test": "https://vitest.dev/api/#test",
+            "it": "https://vitest.dev/api/#test",
+            "expect": "https://vitest.dev/api/#expect",
+            "beforeEach": "https://vitest.dev/api/#beforeeach",
+            "afterEach": "https://vitest.dev/api/#aftereach",
+            "beforeAll": "https://vitest.dev/api/#beforeall",
+            "afterAll": "https://vitest.dev/api/#afterall"
+        },
+        "@testing-library/react": {
+            "render": "https://testing-library.com/docs/react-testing-library/api#render",
+            "screen": "https://testing-library.com/docs/queries/about#screen",
+            "fireEvent": "https://testing-library.com/docs/dom-testing-library/api-events",
+            "waitFor": "https://testing-library.com/docs/dom-testing-library/api-async#waitfor"
+        },
+        "uptime-watcher": {
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
         }
     },
     "validation": {
+        "notExported": false,
+        "invalidLink": false,
+        "rewrittenLink": false,
         "notDocumented": true,
-        "invalidLink": true,
-        "notExported": false
+        "unusedMergeModuleWith": true
     },
     "visibilityFilters": {
         "protected": false,

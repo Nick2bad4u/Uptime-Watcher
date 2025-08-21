@@ -11,24 +11,29 @@
  * 3. Run: `node doc_downloader_template.js`
  */
 
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import { exec } from "child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "fs";
+import { join, resolve as _resolve, parse, dirname } from "path";
+import { createHash } from "crypto";
 
 /* -------------------- CONFIGURATION -------------------- */
 
 // Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "Node-Sqlite3-WASM";
+const DOC_NAME = "Node-Ping";
 
 // Base URL for docs (no trailing slash)
 const BASE_URL =
-    "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main";
+    "https://raw.githubusercontent.com/danielzzz/node-ping/refs/heads/master";
 
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
 // If you have subdirectories, include them (e.g. "examples/example.js")
-const PAGES = ["README.md"];
+const PAGES = [
+    "examples/example.js",
+    "examples/example2.js",
+    "examples/example_win_de_v6.js",
+    "README.md",
+];
 
 const INPUT_FORMAT = "gfm"; // Change to your input format if needed
 const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
@@ -53,41 +58,27 @@ const OUTPUT_EXT = "md";
  *   REMOVE_FROM_MARKER (array, any string).
  * - To remove only lines that contain certain markers, add those to
  *   REMOVE_LINE_MARKERS (array).
- * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER
- *   (array).
  */
-
-// const REMOVE_FROM_MARKER = [
-//     "::::: sponsors_container"
-// ];
-
-// const REMOVE_LINE_MARKERS = [
-//     "::::::: body"
-// ];
-
-// const REMOVE_ABOVE_MARKER = [
-//     "::::: start_here"
-// ];
+const REMOVE_FROM_MARKER = ["::::: sponsors_container"];
+const REMOVE_LINE_MARKERS = ["::::::: body"];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
-// add ".toLowerCase()" after DOC_NAME if you want case-insensitive folder names
-
 let OUTPUT_DIR =
     process.env.DOCS_OUTPUT_DIR ||
-    path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
-OUTPUT_DIR = path.resolve(OUTPUT_DIR);
+    join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME.toLowerCase());
+OUTPUT_DIR = _resolve(OUTPUT_DIR);
 
 // Log and hash file paths (auto-uses DOC_NAME)
-const LOG_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Download-Log.md`);
-const HASHES_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Hashes.json`);
+const LOG_FILE = join(OUTPUT_DIR, `${DOC_NAME}-Download-Log.md`);
+const HASHES_FILE = join(OUTPUT_DIR, `${DOC_NAME}-Hashes.json`);
 
 // Pandoc output file name template (preserve subdirs, always .md extension)
 const FILE_NAME_TEMPLATE = (page) => {
     // Remove any extension and add .md
-    const parsed = path.parse(page);
+    const parsed = parse(page);
     // e.g., "examples/example.js" -> "examples/example.md"
-    return path.join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
+    return join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
 };
 
 const CMD_TEMPLATE = (url, outFile) =>
@@ -113,7 +104,6 @@ function rewriteLinks(content) {
  *
  * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER
  *   onward.
- * - Removes everything above the first occurrence of any REMOVE_ABOVE_MARKER.
  * - Removes any line that contains any REMOVE_LINE_MARKERS.
  *
  * @param {string} content
@@ -121,62 +111,38 @@ function rewriteLinks(content) {
  * @returns {string}
  */
 function cleanContent(content) {
+    // Remove everything from the first REMOVE_FROM_MARKER onward (if any)
     let cleaned = content;
-    // Section removal logic, only if variables are defined
-    switch (true) {
-        case typeof REMOVE_FROM_MARKER !== "undefined" &&
-            Array.isArray(REMOVE_FROM_MARKER):
-            for (const marker of REMOVE_FROM_MARKER) {
-                const idx = cleaned.indexOf(marker);
-                if (idx !== -1) {
-                    // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
-                    cleaned = cleaned.slice(0, lineStart);
-                }
-            }
-            break;
+    for (const marker of REMOVE_FROM_MARKER) {
+        const idx = cleaned.indexOf(marker);
+        if (idx !== -1) {
+            // Find the start of the line for the marker
+            const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
+            cleaned = cleaned.slice(0, lineStart);
+        }
     }
-    switch (true) {
-        case typeof REMOVE_ABOVE_MARKER !== "undefined" &&
-            Array.isArray(REMOVE_ABOVE_MARKER):
-            for (const marker of REMOVE_ABOVE_MARKER) {
-                const idx = cleaned.indexOf(marker);
-                if (idx !== -1) {
-                    // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
-                    cleaned = cleaned.slice(lineStart);
-                }
-            }
-            break;
-    }
-    switch (true) {
-        case typeof REMOVE_LINE_MARKERS !== "undefined" &&
-            Array.isArray(REMOVE_LINE_MARKERS):
-            cleaned = cleaned
-                .split("\n")
-                .filter(
-                    (line) =>
-                        !REMOVE_LINE_MARKERS.some((marker) =>
-                            line.includes(marker)
-                        )
-                )
-                .join("\n")
-                .trimEnd();
-            break;
-    }
+    // Remove lines containing any REMOVE_LINE_MARKERS
+    cleaned = cleaned
+        .split("\n")
+        .filter(
+            (line) =>
+                !REMOVE_LINE_MARKERS.some((marker) => line.includes(marker))
+        )
+        .join("\n")
+        .trimEnd();
 
     return cleaned;
 }
 
 // Ensure output dir exists
-if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
 
 // State tracking
 const downloadedFiles = [];
 let previousHashes = {};
-if (fs.existsSync(HASHES_FILE)) {
+if (existsSync(HASHES_FILE)) {
     try {
-        const parsed = JSON.parse(fs.readFileSync(HASHES_FILE, "utf8"));
+        const parsed = JSON.parse(readFileSync(HASHES_FILE, "utf8"));
         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
             previousHashes = parsed;
         } else {
@@ -191,61 +157,67 @@ const newHashes = {};
 
 // Download and process a single doc page
 function downloadFile(cmd, filePath, logMsg, name) {
-    return new Promise((resolve, reject) => {
-        // Ensure parent directory exists before running pandoc
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return /** @type {Promise<void>} */ (
+        new Promise((resolve, reject) => {
+            // Ensure parent directory exists before running pandoc
+            const dir = dirname(filePath);
+            if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-        exec(cmd, (err) => {
-            if (err) {
-                console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
-                return reject(err);
-            }
-            if (!fs.existsSync(filePath)) {
-                console.error(
-                    logMsg.replace("✅", "❌") + " → File not created."
-                );
-                return reject(new Error("File not created: " + filePath));
-            }
-            let content;
-            try {
-                content = fs.readFileSync(filePath, "utf8");
-            } catch (readErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr.message}`
-                );
-                return reject(readErr);
-            }
-            if (!content || content.trim().length === 0) {
-                console.error(logMsg.replace("✅", "❌") + " → File is empty.");
-                return reject(
-                    new Error("Downloaded file is empty: " + filePath)
-                );
-            }
-            try {
-                let processedContent = rewriteLinks(content);
-                processedContent = cleanContent(processedContent);
-                fs.writeFileSync(filePath, processedContent);
-            } catch (writeErr) {
-                console.error(
-                    logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr.message}`
-                );
-                return reject(writeErr);
-            }
-            console.log(logMsg);
-            downloadedFiles.push(name);
-            resolve();
-        });
-    });
+            exec(cmd, (err) => {
+                if (err) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + ` → ${err.message}`
+                    );
+                    return reject(err);
+                }
+                if (!existsSync(filePath)) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File not created."
+                    );
+                    return reject(new Error("File not created: " + filePath));
+                }
+                let content;
+                try {
+                    content = readFileSync(filePath, "utf8");
+                } catch (readErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to read file: ${readErr.message}`
+                    );
+                    return reject(readErr);
+                }
+                if (!content || content.trim().length === 0) {
+                    console.error(
+                        logMsg.replace("✅", "❌") + " → File is empty."
+                    );
+                    return reject(
+                        new Error("Downloaded file is empty: " + filePath)
+                    );
+                }
+                try {
+                    let processedContent = rewriteLinks(content);
+                    processedContent = cleanContent(processedContent);
+                    writeFileSync(filePath, processedContent);
+                } catch (writeErr) {
+                    console.error(
+                        logMsg.replace("✅", "❌") +
+                            ` → Failed to write file: ${writeErr.message}`
+                    );
+                    return reject(writeErr);
+                }
+                console.log(logMsg);
+                downloadedFiles.push(name);
+                resolve();
+            });
+        })
+    );
 }
 
 // Build page download promises
 const pagePromises = PAGES.map((page) => {
     const url = `${BASE_URL}/${page}`;
     const fileName = FILE_NAME_TEMPLATE(page);
-    const filePath = path.join(OUTPUT_DIR, fileName);
+    const filePath = join(OUTPUT_DIR, fileName);
     const cmd = CMD_TEMPLATE(url, filePath);
     return downloadFile(
         cmd,
@@ -276,9 +248,9 @@ function writeLogIfComplete() {
     let changedCount = 0;
 
     downloadedFiles.forEach((name) => {
-        const filePath = path.join(OUTPUT_DIR, name);
-        const content = fs.readFileSync(filePath, "utf8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const filePath = join(OUTPUT_DIR, name);
+        const content = readFileSync(filePath, "utf8");
+        const hash = createHash("sha256").update(content).digest("hex");
         newHashes[name] = hash;
 
         if (previousHashes[name] !== hash) {
@@ -289,9 +261,9 @@ function writeLogIfComplete() {
 
     if (changedCount > 0) {
         logEntry += `\n🔧 ${changedCount} changed file${changedCount > 1 ? "s" : ""}\n---\n`;
-        fs.appendFileSync(LOG_FILE, logEntry);
+        appendFileSync(LOG_FILE, logEntry);
         console.log(`🗒️ Log updated → ${LOG_FILE}`);
-        fs.writeFileSync(HASHES_FILE, JSON.stringify(newHashes, null, 2));
+        writeFileSync(HASHES_FILE, JSON.stringify(newHashes, null, 2));
     } else {
         console.log("📦 All files unchanged — no log entry written.");
     }

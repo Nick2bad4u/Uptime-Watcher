@@ -62,6 +62,18 @@ export interface UseMonitorFieldsResult {
     isLoaded: boolean;
 }
 
+/**
+ * React hook for accessing monitor field definitions from the registry.
+ *
+ * @remarks
+ * Provides field configurations for dynamic form handling with integration to
+ * the monitor types store. Maintains backward compatibility with existing
+ * utility functions while leveraging centralized state management.
+ *
+ * @returns Hook result containing field access methods and loading state
+ *
+ * @public
+ */
 export function useMonitorFields(): UseMonitorFieldsResult {
     const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } =
         useMonitorTypesStore();

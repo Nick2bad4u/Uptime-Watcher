@@ -20,6 +20,35 @@ import { withUtilityErrorHandling } from "./errorHandling";
 // imports
 
 /**
+ * Option object for monitor type selectors
+ *
+ * @remarks
+ * This interface defines the structure used for form select components and
+ * dropdowns that allow users to choose monitor types. The label provides a
+ * human-readable display name while the value contains the monitor type
+ * identifier used internally.
+ */
+export interface MonitorTypeOption {
+    /**
+     * Display name for the monitor type.
+     *
+     * @remarks
+     * Human-readable text that is shown to users in select dropdowns and
+     * form controls. This should be descriptive and user-friendly.
+     */
+    label: string;
+
+    /**
+     * Unique identifier for the monitor type.
+     *
+     * @remarks
+     * Internal monitor type key used for form submission and backend
+     * processing. This value corresponds to the MonitorType enum values.
+     */
+    value: string;
+}
+
+/**
  * Clear the monitor type cache.
  *
  * @remarks
@@ -106,9 +135,7 @@ export async function getMonitorTypeConfig(
  *
  * @returns Promise resolving to array of option objects for form selectors
  */
-export async function getMonitorTypeOptions(): Promise<
-    Array<{ label: string; value: string }>
-> {
+export async function getMonitorTypeOptions(): Promise<MonitorTypeOption[]> {
     const configs = await getAvailableMonitorTypes();
     return configs.map((config) => ({
         label: config.displayName,

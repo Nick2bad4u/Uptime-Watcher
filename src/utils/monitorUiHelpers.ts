@@ -30,6 +30,36 @@ import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 
 /**
+ * Help text configuration for monitor types
+ *
+ * @remarks
+ * This interface defines the structure for contextual help text displayed
+ * to users when configuring monitors. The help text provides guidance on
+ * monitor-specific configuration options and requirements.
+ */
+export interface MonitorHelpTexts {
+    /**
+     * Primary help text shown prominently.
+     *
+     * @remarks
+     * Main instructional text that appears first and provides essential
+     * guidance for configuring the monitor type. Should be concise and
+     * focused on the most important configuration details.
+     */
+    primary?: string;
+
+    /**
+     * Secondary help text with additional details.
+     *
+     * @remarks
+     * Supplementary help text that provides more detailed information,
+     * examples, or advanced configuration tips. Typically shown after
+     * or below the primary help text.
+     */
+    secondary?: string;
+}
+
+/**
  * Type guard to check if a cache value is a MonitorTypeConfig
  */
 function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
@@ -293,10 +323,7 @@ export async function getAnalyticsLabel(
  *
  * @returns Object containing primary and secondary help texts
  */
-export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<{
-    primary?: string;
-    secondary?: string;
-}> {
+export async function getMonitorHelpTexts(monitorType: MonitorType): Promise<MonitorHelpTexts> {
     return withUtilityErrorHandling(
         async () => {
             const config = await getConfig(monitorType);

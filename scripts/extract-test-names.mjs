@@ -5,8 +5,8 @@
  * files to find describe() and it() blocks and exports test names
  */
 
-const fs = require("fs");
-const path = require("path");
+import { readFileSync, readdirSync, writeFileSync } from "fs";
+import { basename, join, resolve } from "path";
 
 /**
  * Extract test names from a single test file
@@ -17,8 +17,8 @@ const path = require("path");
  */
 function extractTestNames(filePath) {
     try {
-        const content = fs.readFileSync(filePath, "utf8");
-        const fileName = path.basename(filePath);
+        const content = readFileSync(filePath, "utf8");
+        const fileName = basename(filePath);
 
         const testStructure = {
             file: fileName,
@@ -58,10 +58,10 @@ function extractTestNames(filePath) {
  */
 function findTestFiles(dirPath, testFiles = []) {
     try {
-        const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+        const entries = readdirSync(dirPath, { withFileTypes: true });
 
         for (const entry of entries) {
-            const fullPath = path.join(dirPath, entry.name);
+            const fullPath = join(dirPath, entry.name);
 
             if (entry.isDirectory()) {
                 // Skip node_modules, .git, dist folders, etc.
@@ -187,7 +187,7 @@ function main() {
                 ].includes(arg)
             )
             ?.replace("--", "") || "list";
-    const projectRoot = path.resolve(__dirname, "..");
+    const projectRoot = resolve(__dirname, "..");
 
     console.log(`Extracting test names from: ${projectRoot}`);
     console.log(`Output format: ${format}\n`);
@@ -230,11 +230,11 @@ function main() {
 
         // Export to file option
         if (args.includes("--save")) {
-            const outputFile = path.join(
+            const outputFile = join(
                 projectRoot,
                 `test-names-${Date.now()}.txt`
             );
-            fs.writeFileSync(outputFile, output);
+            writeFileSync(outputFile, output);
             console.log(`\nResults saved to: ${outputFile}`);
         }
     } catch (error) {
@@ -273,4 +273,4 @@ if (require.main === module) {
     main();
 }
 
-module.exports = { extractTestNames, findTestFiles, formatTestNames };
+export default { extractTestNames, findTestFiles, formatTestNames };

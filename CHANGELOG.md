@@ -7,9 +7,26 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[5ccc0a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)...
+[5ccc0a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7...5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 11.9.0 [`(5ccc0a6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)
+
+
+
+
+
+
+## [11.9.0] - 2025-08-21
+
+
 [[cf1b3ef](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cf1b3ef41555069276f24b1639451e9ea4924e5e)...
-[798366b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/798366bcada603b339045c2675afd2fdaf81904c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cf1b3ef41555069276f24b1639451e9ea4924e5e...798366bcada603b339045c2675afd2fdaf81904c))
+[95f9902](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f99027de560ed7f63f660fc6531d8682dfa207)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cf1b3ef41555069276f24b1639451e9ea4924e5e...95f99027de560ed7f63f660fc6531d8682dfa207))
 
 
 ### 📦 Dependencies
@@ -19,6 +36,16 @@ All notable changes to this project will be documented in this file.
 
 
 ### 📝 Documentation
+
+- 📝 [docs] Add and improve API documentation for core interfaces
+
+- Expands JSDoc comments for event structures, hooks, configuration services, and helper interfaces to improve code clarity and maintainability.
+- Documents event payloads, lifecycle hooks, cache and monitor utilities, and chart configuration types for better developer understanding and automated API reference generation.
+- Updates documentation generation configs and output settings to support enhanced documentation coverage and link resolution.
+- Improves consistency and discoverability of internal and public APIs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(95f9902)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f99027de560ed7f63f660fc6531d8682dfa207)
+
 
 - 📝 [docs] Update TypeDoc output paths and add error resolution prompt
 
@@ -38,6 +65,12 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b82f
 
 
 
+### 🧹 Chores
+
+- Update changelogs for v11.8.0 [skip ci] [`(89b113a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89b113a49cbb4ce6efd27d93c21789b635e85784)
+
+
+
 ### 👷 CI/CD
 
 - 👷 [ci] Update Node.js and improve sidebar paths
@@ -46,6 +79,32 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b82f
 - Simplifies documentation sidebar configuration by removing redundant directory prefixes, improving maintainability and clarity.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(798366b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/798366bcada603b339045c2675afd2fdaf81904c)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Migrate scripts to ESM and update related configs
+
+- Converts all project scripts from CommonJS to ESM for consistency and better future Node.js compatibility
+- Updates script references in configuration to use .mjs extensions
+- Removes unused and legacy script files
+- Improves maintainability by standardizing import/export usage across scripts
+- Cleans up package scripts to avoid ambiguity and reduce risk of execution errors due to mixed module types
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9fd4a26)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9fd4a26db9309b877b8bb6cf64d1f3ecb8bb9618)
+
+
+- 🔧 [build] Add full support for .mts/.cts TypeScript files
+
+- Expands lint, build, test, and coverage configs to recognize .mts and .cts file extensions for TypeScript modules and CommonJS modules.
+- Updates related scripts, globs, and TypeScript config files to ensure consistent treatment of .mts/.cts in all workflows.
+- Upgrades dependencies for improved compatibility and performance, including linter and resolver packages.
+- Removes unused API documentation sidebar for docs clarity.
+- Improves Typedoc configs to document all comment styles and removes markdown entry points for simplicity.
+- Ensures complete coverage and linting for all source, test, and benchmark files regardless of module format.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(91d4c36)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/91d4c36b60830f95748d85c2398dfa188b4c5769)
 
 
 

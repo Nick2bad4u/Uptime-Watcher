@@ -11,19 +11,19 @@
  * 3. Run: `node doc_downloader_template.js`
  */
 
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import { exec } from "child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "fs";
+import { join, resolve as _resolve, parse, dirname } from "path";
+import { createHash } from "crypto";
 
 /* -------------------- CONFIGURATION -------------------- */
 
 // Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "ValidatorJS";
+const DOC_NAME = "Node-Sqlite3-WASM";
 
 // Base URL for docs (no trailing slash)
 const BASE_URL =
-    "https://github.com/validatorjs/validator.js/raw/refs/heads/master";
+    "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main";
 
 // Array of doc/page names (relative, e.g. ["intro", "example"])
 // These should match the paths in your repo, relative to the base URL
@@ -53,16 +53,21 @@ const OUTPUT_EXT = "md";
  *   REMOVE_FROM_MARKER (array, any string).
  * - To remove only lines that contain certain markers, add those to
  *   REMOVE_LINE_MARKERS (array).
+ * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER
+ *   (array).
  */
+
 // const REMOVE_FROM_MARKER = [
 //     "::::: sponsors_container"
 // ];
-const REMOVE_LINE_MARKERS = [
-    "[![Gitter](https://badges.gitter.im/validatorjs/community.svg)](https://gitter.im/validatorjs/community)",
-];
-const REMOVE_ABOVE_MARKER = [
-    "[![Gitter](https://badges.gitter.im/validatorjs/community.svg)](https://gitter.im/validatorjs/community)",
-];
+
+// const REMOVE_LINE_MARKERS = [
+//     "::::::: body"
+// ];
+
+// const REMOVE_ABOVE_MARKER = [
+//     "::::: start_here"
+// ];
 
 /* --------- END CONFIGURATION (edit above only!) -------- */
 
@@ -70,19 +75,19 @@ const REMOVE_ABOVE_MARKER = [
 
 let OUTPUT_DIR =
     process.env.DOCS_OUTPUT_DIR ||
-    path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
-OUTPUT_DIR = path.resolve(OUTPUT_DIR);
+    join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
+OUTPUT_DIR = _resolve(OUTPUT_DIR);
 
 // Log and hash file paths (auto-uses DOC_NAME)
-const LOG_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Download-Log.md`);
-const HASHES_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Hashes.json`);
+const LOG_FILE = join(OUTPUT_DIR, `${DOC_NAME}-Download-Log.md`);
+const HASHES_FILE = join(OUTPUT_DIR, `${DOC_NAME}-Hashes.json`);
 
 // Pandoc output file name template (preserve subdirs, always .md extension)
 const FILE_NAME_TEMPLATE = (page) => {
     // Remove any extension and add .md
-    const parsed = path.parse(page);
+    const parsed = parse(page);
     // e.g., "examples/example.js" -> "examples/example.md"
-    return path.join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
+    return join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
 };
 
 const CMD_TEMPLATE = (url, outFile) =>
@@ -164,14 +169,14 @@ function cleanContent(content) {
 }
 
 // Ensure output dir exists
-if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
 
 // State tracking
 const downloadedFiles = [];
 let previousHashes = {};
-if (fs.existsSync(HASHES_FILE)) {
+if (existsSync(HASHES_FILE)) {
     try {
-        const parsed = JSON.parse(fs.readFileSync(HASHES_FILE, "utf8"));
+        const parsed = JSON.parse(readFileSync(HASHES_FILE, "utf8"));
         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
             previousHashes = parsed;
         } else {
@@ -188,15 +193,15 @@ const newHashes = {};
 function downloadFile(cmd, filePath, logMsg, name) {
     return new Promise((resolve, reject) => {
         // Ensure parent directory exists before running pandoc
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        const dir = dirname(filePath);
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
         exec(cmd, (err) => {
             if (err) {
                 console.error(logMsg.replace("✅", "❌") + ` → ${err.message}`);
                 return reject(err);
             }
-            if (!fs.existsSync(filePath)) {
+            if (!existsSync(filePath)) {
                 console.error(
                     logMsg.replace("✅", "❌") + " → File not created."
                 );
@@ -204,7 +209,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             }
             let content;
             try {
-                content = fs.readFileSync(filePath, "utf8");
+                content = readFileSync(filePath, "utf8");
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
@@ -221,7 +226,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             try {
                 let processedContent = rewriteLinks(content);
                 processedContent = cleanContent(processedContent);
-                fs.writeFileSync(filePath, processedContent);
+                writeFileSync(filePath, processedContent);
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
@@ -240,7 +245,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
 const pagePromises = PAGES.map((page) => {
     const url = `${BASE_URL}/${page}`;
     const fileName = FILE_NAME_TEMPLATE(page);
-    const filePath = path.join(OUTPUT_DIR, fileName);
+    const filePath = join(OUTPUT_DIR, fileName);
     const cmd = CMD_TEMPLATE(url, filePath);
     return downloadFile(
         cmd,
@@ -271,9 +276,9 @@ function writeLogIfComplete() {
     let changedCount = 0;
 
     downloadedFiles.forEach((name) => {
-        const filePath = path.join(OUTPUT_DIR, name);
-        const content = fs.readFileSync(filePath, "utf8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const filePath = join(OUTPUT_DIR, name);
+        const content = readFileSync(filePath, "utf8");
+        const hash = createHash("sha256").update(content).digest("hex");
         newHashes[name] = hash;
 
         if (previousHashes[name] !== hash) {
@@ -284,9 +289,9 @@ function writeLogIfComplete() {
 
     if (changedCount > 0) {
         logEntry += `\n🔧 ${changedCount} changed file${changedCount > 1 ? "s" : ""}\n---\n`;
-        fs.appendFileSync(LOG_FILE, logEntry);
+        appendFileSync(LOG_FILE, logEntry);
         console.log(`🗒️ Log updated → ${LOG_FILE}`);
-        fs.writeFileSync(HASHES_FILE, JSON.stringify(newHashes, null, 2));
+        writeFileSync(HASHES_FILE, JSON.stringify(newHashes, null, 2));
     } else {
         console.log("📦 All files unchanged — no log entry written.");
     }

@@ -61,6 +61,21 @@ import { useEffect, useRef } from "react";
 import logger from "../services/logger";
 import { ensureError } from "../utils/errorHandling";
 
+/**
+ * React hook for mount and unmount lifecycle management with StrictMode compatibility.
+ *
+ * @remarks
+ * Provides a clean alternative to useEffect with an empty dependency array for
+ * component lifecycle management. Specifically designed to handle React's
+ * StrictMode development behavior where effects can run multiple times.
+ *
+ * @param mountCallback - Function to execute on component mount (can be async)
+ * @param unmountCallback - Optional function to execute on component unmount
+ *
+ * @returns Void - This hook performs side effects only
+ *
+ * @public
+ */
 export function useMount(
     mountCallback: () => Promise<void> | void,
     unmountCallback?: () => void
