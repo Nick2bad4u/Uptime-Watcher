@@ -1,0 +1,172 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "name": "Uptime Watcher - Complete Documentation",
+    "entryPointStrategy": "expand",
+    "entryPoints": [
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/src/**/*.{ts,tsx,js,jsx}",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/electron/**/*.{ts,tsx,js,jsx}",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.{ts,tsx,js,jsx}",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/*.md"
+    ],
+    "tsconfig": "tsconfig.typedoc.json",
+    "out": "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs",
+    "cleanOutputDir": true,
+    "commentStyle": "jsdoc",
+    "excludeInternal": true,
+    "excludeNotDocumented": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeReferences": false,
+    "includeVersion": true,
+    "pretty": true,
+    "readme": "../../README.md",
+    "treatWarningsAsErrors": false,
+    "githubPages": true,
+    "hideGenerator": false,
+    "gitRemote": "origin",
+    "gitRevision": "main",
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "exclude": [
+        "**/dist/**",
+        "**/dist-electron/**",
+        "**/dist-shared/**",
+        "**/node_modules/**",
+        "**/coverage/**",
+        "**/build/**",
+        "**/out/**",
+        "**/tmp/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/spec/**",
+        "**/specs/**",
+        "**/examples/**",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/mock*",
+        "**/test-*",
+        "**/setupTests*"
+    ],
+    "categoryOrder": [
+        "Frontend Components",
+        "Frontend Stores", 
+        "Frontend Hooks",
+        "Frontend Utils",
+        "Backend Services",
+        "Backend Managers",
+        "Backend Database",
+        "Backend Events",
+        "Backend Utils",
+        "Shared Types",
+        "Shared Utils",
+        "Shared Validation",
+        "Constants",
+        "*"
+    ],
+    "kindSortOrder": [
+        "Document",
+        "Project", 
+        "Module",
+        "Namespace",
+        "Enum",
+        "EnumMember",
+        "Class",
+        "Interface",
+        "TypeAlias",
+        "Constructor",
+        "Property",
+        "Variable",
+        "Function",
+        "Method",
+        "Parameter",
+        "TypeParameter",
+        "Accessor",
+        "GetSignature",
+        "SetSignature",
+        "CallSignature",
+        "IndexSignature"
+    ],
+    "sort": ["source-order", "alphabetical"],
+    "plugin": [
+        "typedoc-plugin-markdown",
+        "typedoc-docusaurus-theme",
+        "typedoc-plugin-zod",
+        "typedoc-plugin-mdn-links",
+        "typedoc-plugin-dt-links", 
+        "typedoc-plugin-external-package-links",
+        "typedoc-plugin-coverage",
+        "typedoc-plugin-replace-text",
+        "typedoc-plugin-rename-defaults"
+    ],
+    "replaceText": {
+        "inCodeCommentText": true,
+        "inCodeCommentTags": true,
+        "inIncludedFiles": true,
+        "replacements": [
+            {
+                "pattern": "TODO:",
+                "replace": "**TODO:**"
+            },
+            {
+                "pattern": "FIXME:",
+                "replace": "**FIXME:**"
+            },
+            {
+                "pattern": "NOTE:",
+                "replace": "**NOTE:**"
+            }
+        ]
+    },
+    "searchGroupBoosts": {
+        "Classes": 1.5,
+        "Interfaces": 1.3,
+        "Functions": 1.2,
+        "Types": 1.1
+    },
+    "externalSymbolLinkMappings": {
+        "@types/react": {
+            "React.Component.render": "https://react.dev/reference/react/Component#render",
+            "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
+            "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
+            "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
+            "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
+        },
+        "vite": {
+            "defineConfig": "https://vitejs.dev/config/",
+            "UserConfig": "https://vitejs.dev/config/"
+        },
+        "zustand": {
+            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
+        },
+        "electron": {
+            "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
+            "app": "https://www.electronjs.org/docs/latest/api/app",
+            "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
+            "Menu": "https://www.electronjs.org/docs/latest/api/menu",
+            "Tray": "https://www.electronjs.org/docs/latest/api/tray",
+            "Notification": "https://www.electronjs.org/docs/latest/api/notification"
+        },
+        "node": {
+            "fs": "https://nodejs.org/docs/latest/api/fs.html",
+            "path": "https://nodejs.org/docs/latest/api/path.html",
+            "os": "https://nodejs.org/docs/latest/api/os.html",
+            "events": "https://nodejs.org/docs/latest/api/events.html"
+        },
+        "sqlite": {
+            "Database": "https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#class-database"
+        }
+    },
+    "validation": {
+        "notDocumented": true,
+        "invalidLink": true,
+        "notExported": false
+    },
+    "visibilityFilters": {
+        "protected": false,
+        "private": false,
+        "inherited": true,
+        "external": false,
+        "@alpha": false,
+        "@beta": false
+    }
+}

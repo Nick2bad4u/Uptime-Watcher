@@ -7,7 +7,7 @@
         "start": "docusaurus start",
         "build": "npm run generate-docs && docusaurus build",
         "build:fast": "docusaurus build",
-        "generate-docs": "npm run generate-docs:app && npm run generate-docs:electron",
+        "generate-docs": "typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
         "generate-docs:app": "typedoc --options ../../typedoc.json",
         "generate-docs:electron": "typedoc --options ../../typedoc.electron.json",
         "swizzle": "docusaurus swizzle",

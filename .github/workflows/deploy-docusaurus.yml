@@ -59,9 +59,9 @@ jobs:
                   # Build files
                   npm run build:electron-vite
 
-            - name: Generate TypeDoc API documentation
+            - name: Generate unified TypeDoc documentation
               run: |
-                  # Generate TypeDoc for Electron API
+                  # Generate unified TypeDoc documentation for all source code (Frontend, Backend, Shared)
                   npm run docs:typedoc
               continue-on-error: true
 

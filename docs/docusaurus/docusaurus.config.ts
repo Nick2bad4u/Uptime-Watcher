@@ -9,39 +9,9 @@ const config: Config = {
     tagline: "Cross-platform desktop application for monitoring website uptime and server availability",
     favicon: "img/favicon.ico",
 
-    plugins: [
-        [
-            "docusaurus-plugin-typedoc",
-            {
-                sidebar: {
-                    autoConfiguration: true,
-                    pretty: true,
-                    typescript: true,
-                    deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
-                    entryPoints: ["../../src/**/*.*", "../../shared/**/*.*"],
-                    tsconfig: "../../tsconfig.json",
-                },
-                plugin: ["typedoc-plugin-markdown"],
-                gitRevision: "main",
-            },
-        ],
-        [
-            "docusaurus-plugin-typedoc",
-            {
-                id: "typedoc-plugin-2",
-                sidebar: {
-                    autoConfiguration: true,
-                    pretty: true,
-                    typescript: true,
-                    deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
-                    entryPoints: ["../../electron/**/*.*", "../../shared/**/*.*"],
-                    tsconfig: "../../tsconfig.electron.json",
-                },
-                plugin: ["typedoc-plugin-markdown"],
-                gitRevision: "main",
-            },
-        ],
-    ],
+    // TypeDoc documentation is now generated via npm scripts using unified config
+    // See: docs/docusaurus/typedoc.config.json and npm run docs:typedoc
+    plugins: [],
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
@@ -117,14 +87,9 @@ const config: Config = {
             items: [
                 {
                     type: "docSidebar",
-                    sidebarId: "frontEndSidebar",
+                    sidebarId: "unifiedSidebar",
                     position: "left",
-                    label: "React (Frontend)",
-                },
-                {
-                    label: "Electron (Backend)",
-                    to: "/docs/electron",
-                    position: "left",
+                    label: "Documentation",
                 },
                 {
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",
@@ -145,12 +110,16 @@ const config: Config = {
                     title: "Documentation",
                     items: [
                         {
-                            label: "React Reference",
-                            to: "/docs/app",
+                            label: "Frontend (React)",
+                            to: "/docs/src",
                         },
                         {
-                            label: "Electron Reference",
+                            label: "Backend (Electron)",
                             to: "/docs/electron",
+                        },
+                        {
+                            label: "Shared Code",
+                            to: "/docs/shared",
                         },
                     ],
                 },
