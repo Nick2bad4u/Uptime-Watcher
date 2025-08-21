@@ -107,21 +107,36 @@ export function withSyncErrorHandling<T>(
     }
 }
 
+/**
+ * Default values for UI components and user interface elements.
+ *
+ * @remarks
+ * Centralized defaults that ensure consistent behavior across the application
+ * when data is missing or components need fallback values.
+ */
 export const UiDefaults = {
     // Chart defaults
+    /** Default chart time period for data visualization */
     chartPeriod: "24h" as const,
+    /** Default number of data points to display in charts */
     chartPoints: 24,
 
     // Labels
+    /** Default error message label */
     errorLabel: "Error",
     // Timeouts defaults
+    /** Delay in milliseconds before showing loading spinner */
     loadingDelay: 100, // ms before showing loading spinner
+    /** Default loading state text */
     loadingLabel: "Loading...",
+    /** Default text when data is not available */
     notAvailableLabel: "N/A",
 
     // Pagination defaults
+    /** Default page size for paginated lists */
     pageSize: 10,
 
+    /** Default text for unknown/unspecified values */
     unknownLabel: "Unknown",
 } as const;
 
@@ -139,12 +154,21 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
 
 /**
  * Monitor-specific default values.
+ *
+ * @remarks
+ * Standard defaults for monitor configuration to ensure consistent behavior
+ * when monitors are created or when values are missing.
  */
 export const MonitorDefaults = {
+    /** Default check interval in milliseconds (5 minutes) */
     checkInterval: 300_000, // 5 minutes
+    /** Sentinel value indicating monitor has never been checked */
     responseTime: -1, // Sentinel for "never checked"
+    /** Default number of retry attempts on failure */
     retryAttempts: 3,
+    /** Default status for new monitors */
     status: "pending" as const,
+    /** Default request timeout in milliseconds (10 seconds) */
     timeout: 10_000, // 10 seconds
 } as const;
 
@@ -342,7 +366,12 @@ export function truncateForLogging(value: string, maxLength = 50): string {
 
 /**
  * Site-specific default values.
+ *
+ * @remarks
+ * Standard defaults for site configuration to ensure consistent behavior when
+ * sites are created or when values are missing.
  */
 export const SiteDefaults = {
+    /** Default monitoring state for new sites */
     monitoring: true,
 } as const;

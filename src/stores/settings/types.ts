@@ -48,8 +48,11 @@ export interface SettingsStore {
      *   indicators
      */
     initializeSettings: () => Promise<{
+        /** Descriptive message about the initialization result */
         message: string;
+        /** Whether settings were successfully loaded from storage */
         settingsLoaded: boolean;
+        /** Whether the initialization operation completed successfully */
         success: boolean;
     }>;
 
@@ -70,7 +73,12 @@ export interface SettingsStore {
      *
      * @returns Promise resolving to reset operation result
      */
-    resetSettings: () => Promise<{ message: string; success: boolean }>;
+    resetSettings: () => Promise<{
+        /** Descriptive message about the reset operation result */
+        message: string;
+        /** Whether the reset operation completed successfully */
+        success: boolean;
+    }>;
 
     /**
      * Current application settings configuration.
@@ -93,7 +101,12 @@ export interface SettingsStore {
      * @returns Promise resolving to synchronization result with status
      *   indicators
      */
-    syncFromBackend: () => Promise<{ message: string; success: boolean }>;
+    syncFromBackend: () => Promise<{
+        /** Descriptive message about the synchronization result */
+        message: string;
+        /** Whether the synchronization completed successfully */
+        success: boolean;
+    }>;
 
     /**
      * Updates history retention limit with backend synchronization.

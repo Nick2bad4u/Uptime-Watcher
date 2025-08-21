@@ -17,21 +17,36 @@ import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
 /** Chart data structure for line charts */
 export interface ChartData {
+    /** Chart.js compatible line chart data configuration */
     lineChartData: {
+        /** Array of datasets for the chart */
         datasets: Array<{
+            /** Background color for data points */
             backgroundColor: string;
+            /** Border color for the line */
             borderColor: string;
+            /** Width of the line border */
             borderWidth: number;
+            /** Array of data points with x,y coordinates */
             data: Array<{
+                /** X-axis value (typically timestamp) */
                 x: number;
+                /** Y-axis value (typically response time or status) */
                 y: number;
             }>;
+            /** Whether to fill the area under the line */
             fill: boolean;
+            /** Label for the dataset in legend */
             label: string;
+            /** Background colors for individual data points */
             pointBackgroundColor: string[];
+            /** Border colors for individual data points */
             pointBorderColor: string[];
+            /** Radius of data points when hovered */
             pointHoverRadius: number;
+            /** Radius of data points in normal state */
             pointRadius: number;
+            /** Curve tension for the line (0 = straight, 1 = curved) */
             tension: number;
         }>;
     };
@@ -349,9 +364,13 @@ export const SiteAnalyticsUtils = {
         uptime: number,
         targetSLA = 99.9
     ): {
+        /** Actual downtime percentage (0-1) */
         actualDowntime: number;
+        /** Allowed downtime percentage for target SLA (0-1) */
         allowedDowntime: number;
+        /** Whether the uptime meets the target SLA */
         compliant: boolean;
+        /** Percentage points below target SLA (0 if compliant) */
         deficit: number;
     } {
         const compliant = uptime >= targetSLA;

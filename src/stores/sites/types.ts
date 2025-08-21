@@ -8,6 +8,15 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+/**
+ * Sites store actions interface for managing site operations.
+ *
+ * @remarks
+ * Comprehensive interface defining all site management operations including
+ * CRUD operations, monitoring control, and synchronization functionality.
+ *
+ * @public
+ */
 export interface SitesActions {
     /** Add a monitor to an existing site */
     addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
@@ -33,15 +42,22 @@ export interface SitesActions {
     getSelectedSite: () => Site | undefined;
     /** Get sync status */
     getSyncStatus: () => Promise<{
+        /** Timestamp of last successful sync operation */
         lastSync: null | number | undefined;
+        /** Total number of sites currently managed */
         siteCount: number;
+        /** Whether the sync status check completed successfully */
         success: boolean;
+        /** Whether frontend and backend data are synchronized */
         synchronized: boolean;
     }>;
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
+        /** Descriptive message about the initialization result */
         message: string;
+        /** Number of sites successfully loaded from backend */
         sitesLoaded: number;
+        /** Whether the initialization operation completed successfully */
         success: boolean;
     }>;
     /** Modify an existing site */
@@ -100,6 +116,15 @@ export interface SitesActions {
     ) => Promise<void>;
 }
 
+/**
+ * Sites store state interface for managing site data.
+ *
+ * @remarks
+ * Defines the state structure for site management including current sites,
+ * selected site tracking, and UI state for monitor selection.
+ *
+ * @public
+ */
 export interface SitesState {
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
@@ -118,11 +143,22 @@ export type SitesStore = SitesActions & SitesState;
 /**
  * Dependencies interface for site operations. Defines the minimal interface
  * needed by operation helpers.
+ *
+ * @remarks
+ * Provides the essential dependencies required by site operation utilities to
+ * perform CRUD operations and synchronization tasks.
+ *
+ * @public
  */
 export interface SiteOperationsDependencies {
+    /** Add a new site to the store */
     addSite: (site: Site) => void;
+    /** Get all current sites from the store */
     getSites: () => Site[];
+    /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /** Replace all sites in the store */
     setSites: (sites: Site[]) => void;
+    /** Synchronize sites from backend storage */
     syncSitesFromBackend: () => Promise<void>;
 }

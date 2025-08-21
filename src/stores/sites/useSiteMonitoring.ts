@@ -11,6 +11,16 @@ import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
+/**
+ * Site monitoring actions interface for managing monitoring operations.
+ *
+ * @remarks
+ * Defines the contract for site monitoring functionality including manual
+ * checks and monitoring lifecycle management for sites and individual
+ * monitors.
+ *
+ * @public
+ */
 export interface SiteMonitoringActions {
     /** Check a site now */
     checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;

@@ -7,6 +7,15 @@ import type { Site } from "@shared/types";
 
 import { logStoreAction } from "../utils";
 
+/**
+ * Sites state interface for managing site data and selection.
+ *
+ * @remarks
+ * Defines the core state structure for site management including the sites
+ * array, selected site tracking, and UI state for monitor selection.
+ *
+ * @public
+ */
 export interface SitesState {
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
@@ -16,6 +25,15 @@ export interface SitesState {
     sites: Site[];
 }
 
+/**
+ * Sites state actions interface for managing site state operations.
+ *
+ * @remarks
+ * Defines the contract for state management operations including CRUD
+ * operations for sites and UI state management for selections.
+ *
+ * @public
+ */
 export interface SitesStateActions {
     /** Add a site to the store */
     addSite: (site: Site) => void;
@@ -33,6 +51,15 @@ export interface SitesStateActions {
     setSites: (sites: Site[]) => void;
 }
 
+/**
+ * Combined sites state store type including state and actions.
+ *
+ * @remarks
+ * Provides a complete interface for site state management combining both the
+ * state structure and the action methods.
+ *
+ * @public
+ */
 export type SitesStateStore = SitesState & SitesStateActions;
 
 /**

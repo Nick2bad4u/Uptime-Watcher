@@ -31,10 +31,15 @@ export interface BaseFormData {
  * known at compile time.
  */
 export interface DynamicFormData extends Record<string, unknown> {
+    /** Monitor check interval in milliseconds */
     checkInterval?: number;
+    /** Whether monitoring is enabled */
     monitoring?: boolean;
+    /** Number of retry attempts on failure */
     retryAttempts?: number;
+    /** Request timeout in milliseconds */
     timeout?: number;
+    /** Monitor type identifier */
     type?: string;
 }
 

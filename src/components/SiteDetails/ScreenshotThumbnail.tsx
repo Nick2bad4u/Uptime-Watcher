@@ -28,6 +28,19 @@ export interface ScreenshotThumbnailProperties {
     readonly url: string;
 }
 
+/**
+ * Screenshot thumbnail component with hover preview functionality.
+ *
+ * @remarks
+ * Displays a small thumbnail that expands into a larger preview on hover. Uses
+ * Microlink API for screenshot generation and React portals for overlay.
+ *
+ * @param props - Component properties
+ *
+ * @returns JSX element containing the screenshot thumbnail
+ *
+ * @public
+ */
 export const ScreenshotThumbnail = ({
     siteName,
     url,

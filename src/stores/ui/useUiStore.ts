@@ -78,6 +78,16 @@ type UIStoreWithPersist = UseBoundStore<
     }
 >;
 
+/**
+ * Zustand store for managing UI state and user interface interactions.
+ *
+ * @remarks
+ * This store provides centralized management of UI state including modal
+ * visibility, tab selections, and user preferences with automatic persistence
+ * for settings that should survive session restarts.
+ *
+ * @public
+ */
 export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({

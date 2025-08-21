@@ -10,14 +10,23 @@ import ThemedButton from "./ThemedButton";
  * @public
  */
 export interface ThemedIconButtonProperties {
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Whether the button is disabled */
     readonly disabled?: boolean;
+    /** Icon element to display in the button */
     readonly icon: React.ReactNode;
+    /** Custom color for the icon */
     readonly iconColor?: string;
+    /** Whether the button is in a loading state */
     readonly loading?: boolean;
+    /** Callback fired when button is clicked */
     readonly onClick?: () => void;
+    /** Size variant for the button */
     readonly size?: ButtonSize;
+    /** Tooltip text to display on hover */
     readonly tooltip?: string;
+    /** Visual variant for the button */
     readonly variant?: ButtonVariant;
 }
 

@@ -81,6 +81,16 @@ type UpdatesStoreWithPersist = UseBoundStore<
     }
 >;
 
+/**
+ * Zustand store for managing application updates and update lifecycle.
+ *
+ * @remarks
+ * This store provides comprehensive update management functionality including
+ * checking for updates, download progress tracking, and update installation
+ * with persistence for update status across application sessions.
+ *
+ * @public
+ */
 export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
     persist(
         (set) => ({

@@ -19,6 +19,7 @@ import { useTheme } from "../useTheme";
  * @public
  */
 export interface ThemeProviderProperties {
+    /** Child components to render within the theme context */
     readonly children: React.ReactNode;
 }
 

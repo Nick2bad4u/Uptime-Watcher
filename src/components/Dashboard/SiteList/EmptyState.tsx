@@ -41,6 +41,17 @@ import type { JSX } from "react/jsx-runtime";
 import ThemedBox from "../../../theme/components/ThemedBox";
 import ThemedText from "../../../theme/components/ThemedText";
 
+/**
+ * Empty state component for displaying when no sites are configured.
+ *
+ * @remarks
+ * Renders a user-friendly empty state with visual indicators and messaging to
+ * guide users when no sites are available for monitoring.
+ *
+ * @returns JSX element containing the empty state interface
+ *
+ * @public
+ */
 export const EmptyState = (): JSX.Element => (
     <ThemedBox className="text-center" padding="xl" surface="base">
         {/* empty-state-icon class provides styling from src/theme/components.css */}

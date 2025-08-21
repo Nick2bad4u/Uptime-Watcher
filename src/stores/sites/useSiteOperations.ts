@@ -28,14 +28,29 @@ import {
 export interface SiteOperationsActions extends BaseSiteOperations {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
+        /** Descriptive message about the initialization result */
         message: string;
+        /** Number of sites successfully loaded from backend */
         sitesLoaded: number;
+        /** Whether the initialization operation completed successfully */
         success: boolean;
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
 }
 
+/**
+ * Creates site operations actions for managing CRUD operations.
+ *
+ * @remarks
+ * Factory function that creates actions for site management operations
+ * including creation, modification, deletion, and monitor management. All
+ * operations include proper error handling and logging.
+ *
+ * @param deps - Dependencies required for site operations
+ *
+ * @returns Object containing all site operation action functions
+ */
 export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies
 ): SiteOperationsActions => ({

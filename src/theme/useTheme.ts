@@ -92,6 +92,33 @@ interface UseThemeReturn {
     toggleTheme: () => void;
 }
 
+/**
+ * Main theme hook providing comprehensive theme management functionality.
+ *
+ * @remarks
+ * This hook provides a complete theming solution with system integration, color
+ * utilities, and automatic updates. It serves as the primary interface for all
+ * theme-related operations throughout the application.
+ *
+ * @example
+ *
+ * ```typescript
+ * const { isDark, toggleTheme, getStatusColor } = useTheme();
+ *
+ * // Toggle between light and dark themes
+ * toggleTheme();
+ *
+ * // Get status-based colors
+ * const upColor = getStatusColor("up");
+ * ```
+ *
+ * @returns Object containing theme state, setters, and utility functions
+ *
+ * @public
+ *
+ * @see {@link ThemeManager} for theme management implementation
+ * @see {@link useSettingsStore} for settings integration
+ */
 export function useTheme(): UseThemeReturn {
     const { settings, updateSettings } = useSettingsStore();
     const [systemTheme, setSystemTheme] = useState<"dark" | "light">(
@@ -292,7 +319,26 @@ export function useTheme(): UseThemeReturn {
     };
 }
 
-// Hook for availability-based colors
+/**
+ * Hook for availability-based styling and color management.
+ *
+ * @remarks
+ * Provides theme-aware color mapping and variant selection based on uptime
+ * percentage values. Includes availability descriptions and styling variants
+ * for consistent presentation of uptime data.
+ *
+ * @example
+ *
+ * ```typescript
+ * const { getAvailabilityColor, getAvailabilityDescription } =
+ *     useAvailabilityColors();
+ *
+ * const color = getAvailabilityColor(99.5); // Returns success color
+ * const desc = getAvailabilityDescription(99.5); // Returns "Very Good"
+ * ```
+ *
+ * @returns Object containing availability color and variant functions
+ */
 export function useAvailabilityColors(): UseAvailabilityColorsReturn {
     const { currentTheme } = useTheme();
 
@@ -380,34 +426,6 @@ export function useStatusColors(): UseStatusColorsReturn {
         up: currentTheme.colors.status.up,
     };
 }
-
-/**
- * Main theme hook providing comprehensive theme management functionality.
- *
- * @remarks
- * This hook provides a complete theming solution with system integration, color
- * utilities, and automatic updates. It serves as the primary interface for all
- * theme-related operations throughout the application.
- *
- * @example
- *
- * ```typescript
- * const { isDark, toggleTheme, getStatusColor } = useTheme();
- *
- * // Toggle between light and dark themes
- * toggleTheme();
- *
- * // Get status-based colors
- * const upColor = getStatusColor("up");
- * ```
- *
- * @returns Object containing theme state, setters, and utility functions
- *
- * @public
- *
- * @see {@link ThemeManager} for theme management implementation
- * @see {@link useSettingsStore} for settings integration
- */
 
 /**
  * Hook for theme-aware CSS classes using CSS custom properties. Provides

@@ -90,7 +90,9 @@ export const createPersistConfig = <T>(
     name: string,
     partialize?: (state: T) => Partial<T>
 ): {
+    /** Prefixed store name for persistence */
     name: string;
+    /** Function to select which parts of state to persist */
     partialize: ((state: T) => Partial<T>) | undefined;
 } => ({
     name: `uptime-watcher-${name}`,

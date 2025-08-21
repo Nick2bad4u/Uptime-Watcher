@@ -8,11 +8,17 @@ import { ARIA_LABEL } from "../../constants";
  * @public
  */
 export interface ThemedCheckboxProperties {
+    /** Accessibility label for screen readers */
     readonly "aria-label"?: string;
+    /** Whether the checkbox is checked */
     readonly checked?: boolean;
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Whether the checkbox is disabled */
     readonly disabled?: boolean;
+    /** Callback fired when checkbox state changes */
     readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    /** Whether the checkbox is required for form submission */
     readonly required?: boolean;
 }
 

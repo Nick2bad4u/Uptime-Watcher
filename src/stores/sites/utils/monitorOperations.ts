@@ -199,6 +199,22 @@ function validateMonitorInput(monitor: Partial<Monitor>): void {
     }
 }
 
+/**
+ * Normalizes a partial monitor object into a complete Monitor instance.
+ *
+ * @remarks
+ * This function takes a partial monitor configuration and ensures it has all
+ * required fields with appropriate defaults, validates the data types, and
+ * filters fields based on monitor type.
+ *
+ * @param monitor - Partial monitor data to normalize
+ *
+ * @returns Complete Monitor object with validated and normalized data
+ *
+ * @throws TypeError if monitor data is invalid or malformed
+ *
+ * @public
+ */
 export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
     // Validate input data
     validateMonitorInput(monitor);

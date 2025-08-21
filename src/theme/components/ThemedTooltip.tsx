@@ -6,8 +6,11 @@ import React from "react";
  * @public
  */
 export interface ThemedTooltipProperties {
+    /** Child elements to wrap with tooltip functionality */
     readonly children: React.ReactNode;
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Text content to display in the tooltip */
     readonly content: string;
 }
 

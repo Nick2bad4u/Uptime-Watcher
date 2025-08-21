@@ -58,49 +58,96 @@ export interface UseSiteDetailsProperties {
  *
  * @public
  */
+/**
+ * Return type for the useSiteDetails hook containing all state and handlers.
+ *
+ * @remarks
+ * Provides comprehensive site management functionality including monitor
+ * selection, monitoring controls, settings management, and analytics
+ * integration.
+ *
+ * @public
+ */
 export interface UseSiteDetailsResult {
     // UI state
+    /** Currently active tab in the site details view */
     activeSiteDetailsTab: string;
     // Analytics
+    /** Comprehensive analytics data for the selected monitor */
     analytics: SiteAnalytics;
     // Site data
+    /** The current site being viewed/managed */
     currentSite: Site;
     // Handlers
+    /** Trigger an immediate check of the selected monitor */
     handleCheckNow: () => Promise<void>;
+    /** Handle changes to the check interval dropdown */
     handleIntervalChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+    /** Handle changes to the monitor selection dropdown */
     handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+    /** Remove the selected monitor from the site */
     handleRemoveMonitor: () => Promise<void>;
+    /** Remove the entire site and all its monitors */
     handleRemoveSite: () => Promise<void>;
+    /** Handle changes to the retry attempts input field */
     handleRetryAttemptsChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    /** Save the modified check interval to the database */
     handleSaveInterval: () => Promise<void>;
+    /** Save the modified site name to the database */
     handleSaveName: () => Promise<void>;
+    /** Save the modified retry attempts to the database */
     handleSaveRetryAttempts: () => Promise<void>;
+    /** Save the modified timeout value to the database */
     handleSaveTimeout: () => Promise<void>;
+    /** Start monitoring for the selected monitor only */
     handleStartMonitoring: () => Promise<void>;
+    /** Start monitoring for all monitors in the site */
     handleStartSiteMonitoring: () => Promise<void>;
+    /** Stop monitoring for the selected monitor only */
     handleStopMonitoring: () => Promise<void>;
+    /** Stop monitoring for all monitors in the site */
     handleStopSiteMonitoring: () => Promise<void>;
+    /** Handle changes to the timeout input field */
     handleTimeoutChange: (e: ChangeEvent<HTMLInputElement>) => void;
     // State
+    /** Whether there are unsaved changes to site/monitor settings */
     hasUnsavedChanges: boolean;
+    /** Whether the check interval has been modified but not saved */
     intervalChanged: boolean;
+    /** Whether the component is in a loading state */
     isLoading: boolean;
+    /** Whether monitoring is currently active for any monitor in the site */
     isMonitoring: boolean;
+    /** Local copy of check interval for editing before saving */
     localCheckInterval: number;
+    /** Local copy of site name for editing before saving */
     localName: string;
+    /** Local copy of retry attempts for editing before saving */
     localRetryAttempts: number;
+    /** Local copy of timeout for editing before saving */
     localTimeout: number;
+    /** Whether the retry attempts value has been modified but not saved */
     retryAttemptsChanged: boolean;
+    /** The currently selected monitor object */
     selectedMonitor: Monitor | undefined;
+    /** ID of the currently selected monitor */
     selectedMonitorId: string;
     // Store actions
+    /** Set the active tab in the site details view */
     setActiveSiteDetailsTab: (tab: string) => void;
+    /** Update the local site name state */
     setLocalName: (name: string) => void;
+    /** Toggle advanced metrics display in analytics */
     setShowAdvancedMetrics: (show: boolean) => void;
+    /** Set the time range for analytics charts */
     setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
+    /** Whether to show advanced metrics in analytics */
     showAdvancedMetrics: boolean;
+    /** Current time range setting for analytics charts */
     siteDetailsChartTimeRange: ChartTimeRange;
+    /** Whether the site exists in the database */
     siteExists: boolean;
+    /** Whether the timeout value has been modified but not saved */
     timeoutChanged: boolean;
 }
 

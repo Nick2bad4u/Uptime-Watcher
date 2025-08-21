@@ -40,6 +40,22 @@
 export const TRANSITION_ALL = "all 0.2s ease-in-out";
 
 /**
+ * Interface for monitor type option objects.
+ *
+ * @remarks
+ * Defines the structure for monitor type selection options used in dropdowns
+ * and forms.
+ *
+ * @public
+ */
+export interface MonitorTypeOption {
+    /** Human-readable display name for the monitor type */
+    label: string;
+    /** Unique identifier value for the monitor type */
+    value: string;
+}
+
+/**
  * Fallback monitor type options when backend loading fails.
  *
  * @remarks
@@ -60,7 +76,7 @@ export const TRANSITION_ALL = "all 0.2s ease-in-out";
  *
  * @public
  */
-export const FALLBACK_MONITOR_TYPE_OPTIONS = [
+export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly MonitorTypeOption[] = [
     { label: "HTTP (Website/API)", value: "http" },
     { label: "Port (Host/Port)", value: "port" },
     { label: "Ping (Host)", value: "ping" },

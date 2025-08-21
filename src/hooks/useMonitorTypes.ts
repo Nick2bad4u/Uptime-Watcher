@@ -56,7 +56,12 @@ export interface UseMonitorTypesResult {
     /** Whether monitor types are currently loading */
     isLoading: boolean;
     /** Monitor type options for form select fields */
-    options: Array<{ label: string; value: string }>;
+    options: Array<{
+        /** Human-readable display text for the monitor type */
+        label: string;
+        /** Unique identifier value for the monitor type */
+        value: string;
+    }>;
     /** Refresh monitor types from backend */
     refresh: () => Promise<void>;
 }

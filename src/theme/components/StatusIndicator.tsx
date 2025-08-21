@@ -17,9 +17,13 @@ import { useTheme } from "../useTheme";
  * @public
  */
 export interface StatusIndicatorProperties {
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Whether to display status text alongside the indicator */
     readonly showText?: boolean;
+    /** Size variant for the status indicator */
     readonly size?: "lg" | "md" | "sm";
+    /** Current status to display */
     readonly status: SiteStatus;
 }
 

@@ -9,12 +9,19 @@ import ThemedText from "./ThemedText";
  * @public
  */
 export interface ThemedProgressProperties {
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Optional label text to display with progress */
     readonly label?: string;
+    /** Maximum value for progress calculation */
     readonly max?: number;
+    /** Whether to display the label text */
     readonly showLabel?: boolean;
+    /** Size variant for the progress bar */
     readonly size?: "lg" | "md" | "sm" | "xs";
+    /** Current progress value */
     readonly value: number;
+    /** Color variant for the progress bar */
     readonly variant?: "error" | "primary" | "success" | "warning";
 }
 

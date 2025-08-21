@@ -77,9 +77,13 @@ export interface BaseSiteSync {
     fullSyncFromBackend: () => Promise<void>;
     /** Get sync status */
     getSyncStatus: () => Promise<{
+        /** Timestamp of last successful sync operation */
         lastSync: null | number | undefined;
+        /** Total number of sites currently managed */
         siteCount: number;
+        /** Whether the sync status check completed successfully */
         success: boolean;
+        /** Whether frontend and backend data are synchronized */
         synchronized: boolean;
     }>;
     /** Subscribe to sync events */

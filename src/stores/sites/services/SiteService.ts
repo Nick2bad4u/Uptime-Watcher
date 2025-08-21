@@ -12,6 +12,16 @@ import type { Site } from "@shared/types";
 import { safeExtractIpcData } from "../../../types/ipc";
 import { waitForElectronAPI } from "../../utils";
 
+/**
+ * Service for managing site operations through Electron IPC.
+ *
+ * @remarks
+ * Provides a comprehensive interface for site management operations including
+ * CRUD operations, data synchronization, and backup functionality with
+ * automatic service initialization and type-safe IPC communication.
+ *
+ * @public
+ */
 export const SiteService = {
     /**
      * Adds a new site to the backend.
@@ -74,7 +84,9 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backup operation fails.
      */
     async downloadSQLiteBackup(): Promise<{
+        /** SQLite database backup as binary data */
         buffer: ArrayBuffer;
+        /** Generated filename for the backup file */
         fileName: string;
     }> {
         await this.initialize();

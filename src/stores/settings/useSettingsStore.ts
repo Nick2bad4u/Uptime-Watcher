@@ -82,24 +82,69 @@ const syncSettingsAfterRehydration = (
     }
 };
 
+/**
+ * Zustand store for managing application settings with persistence.
+ *
+ * @remarks
+ * This store provides comprehensive settings management with automatic
+ * persistence using Zustand middleware. It includes additional persist
+ * utilities for hydration management and storage operations.
+ *
+ * @public
+ */
 export const useSettingsStore: UseBoundStore<
     Omit<StoreApi<SettingsStore>, "persist"> & {
+        /**
+         * Persistence utilities for settings storage management.
+         *
+         * @remarks
+         * Provides advanced persistence functionality including hydration
+         * control, storage management, and configuration options.
+         */
         persist: {
+            /** Clears all persisted settings from storage */
             clearStorage: () => void;
+            /**
+             * Gets current persistence configuration options.
+             *
+             * @returns Current persist options with settings configuration
+             */
             getOptions: () => Partial<
                 PersistOptions<
                     SettingsStore,
                     {
+                        /** Persisted settings data structure */
                         settings: AppSettings;
                     }
                 >
             >;
+            /** Returns whether the store has completed hydration from storage */
             hasHydrated: () => boolean;
+            /**
+             * Registers a callback to execute when hydration completes.
+             *
+             * @param fn - Callback function to execute with hydrated state
+             *
+             * @returns Cleanup function to remove the callback
+             */
             onFinishHydration: (
                 fn: (state: SettingsStore) => void
             ) => () => void;
+            /**
+             * Registers a callback to execute during hydration process.
+             *
+             * @param fn - Callback function to execute during hydration
+             *
+             * @returns Cleanup function to remove the callback
+             */
             onHydrate: (fn: (state: SettingsStore) => void) => () => void;
+            /** Forces rehydration of the store from persistent storage */
             rehydrate: () => Promise<void> | void;
+            /**
+             * Updates persistence configuration options.
+             *
+             * @param options - New persistence options to apply
+             */
             setOptions: (
                 options: Partial<
                     PersistOptions<

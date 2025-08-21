@@ -16,9 +16,13 @@ import { useTheme } from "../useTheme";
  * @public
  */
 export interface MiniChartBarProperties {
+    /** Additional CSS classes to apply to the component */
     readonly className?: string;
+    /** Response time in milliseconds for the status check */
     readonly responseTime?: number;
+    /** Current status of the monitor or site */
     readonly status: MonitorStatus | SiteStatus;
+    /** Timestamp when the status was recorded */
     readonly timestamp: Date | number | string;
 }
 

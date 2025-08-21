@@ -174,8 +174,11 @@ interface UpdateSitesCacheRequestData {
  * domain boundaries.
  */
 export interface UptimeOrchestratorDependencies {
+    /** Database manager for data persistence operations */
     databaseManager: DatabaseManager;
+    /** Monitor manager for monitoring lifecycle operations */
     monitorManager: MonitorManager;
+    /** Site manager for site management operations */
     siteManager: SiteManager;
 }
 
@@ -573,7 +576,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *   - FileName: String with the generated backup filename
      */
     public async downloadBackup(): Promise<{
+        /** Buffer containing the SQLite database backup data */
         buffer: Buffer;
+        /** Generated filename for the backup file */
         fileName: string;
     }> {
         return this.databaseManager.downloadBackup();

@@ -99,22 +99,47 @@ export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
  */
 export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
 
+/**
+ * Core monitor interface representing a single monitoring configuration.
+ *
+ * @remarks
+ * Defines all properties required for monitoring a target resource. Contains
+ * both configuration (what to monitor) and state (current status, history).
+ *
+ * @public
+ */
 export interface Monitor {
+    /** Array of currently active operations for this monitor */
     activeOperations?: string[];
+    /** Interval between checks in milliseconds */
     checkInterval: number;
+    /** Expected value for DNS record verification */
     expectedValue?: string; // Added for DNS monitoring
+    /** Historical status data for analytics and trends */
     history: StatusHistory[];
+    /** Hostname or IP address to monitor */
     host?: string;
+    /** Unique identifier for the monitor */
     id: string;
+    /** Timestamp of the last check performed */
     lastChecked?: Date;
+    /** Whether monitoring is currently active for this monitor */
     monitoring: boolean;
+    /** Port number for port-based monitoring */
     port?: number;
+    /** DNS record type to query (A, AAAA, CNAME, etc.) */
     recordType?: string; // Added for DNS monitoring
+    /** Latest response time measurement in milliseconds */
     responseTime: number;
+    /** Number of retry attempts when a check fails */
     retryAttempts: number;
+    /** Current status of the monitor */
     status: MonitorStatus;
+    /** Timeout for monitor checks in milliseconds */
     timeout: number;
+    /** Type of monitoring performed (http, port, ping, dns) */
     type: MonitorType;
+    /** URL to monitor for HTTP-based checks */
     url?: string;
 }
 /**

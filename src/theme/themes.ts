@@ -367,8 +367,19 @@ export const highContrastTheme: Theme = createTheme({
  * Interface for the themes collection.
  */
 export interface Themes {
+    /**
+     * Dark theme configuration with dark backgrounds and light text.
+     */
     readonly dark: Theme;
+
+    /**
+     * High contrast theme for accessibility with maximum contrast ratios.
+     */
     readonly "high-contrast": Theme;
+
+    /**
+     * Light theme configuration with light backgrounds and dark text.
+     */
     readonly light: Theme;
 }
 

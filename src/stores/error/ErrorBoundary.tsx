@@ -58,11 +58,16 @@ import logger from "../../services/logger";
  * @public
  */
 export interface ErrorBoundaryProperties {
+    /** React children to be rendered within the error boundary */
     readonly children: React.ReactNode;
+    /** Optional custom fallback component to render when an error occurs */
     readonly fallback?: React.ComponentType<{
+        /** Error object that was caught by the boundary */
         error?: Error;
+        /** Function to retry rendering by resetting the error state */
         onRetry: () => void;
     }>;
+    /** Optional callback function called when an error is caught */
     readonly onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
@@ -76,8 +81,11 @@ export interface ErrorBoundaryProperties {
  * @public
  */
 export interface ErrorBoundaryState {
+    /** The error object that was caught, if any */
     error?: Error | undefined;
+    /** Whether an error has been caught and the fallback UI should be shown */
     hasError: boolean;
+    /** Number of retry attempts, used to force re-mounting of children */
     retryCount: number;
 }
 

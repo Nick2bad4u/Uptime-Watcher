@@ -38,6 +38,17 @@ import type { ErrorStore } from "./types";
 
 import { logStoreAction } from "../utils";
 
+/**
+ * Zustand store for centralized error management across the application.
+ *
+ * @remarks
+ * This store provides a unified interface for handling errors and loading
+ * states throughout the application. It supports both global error states and
+ * store-specific error isolation to prevent error cross-contamination between
+ * different parts of the application.
+ *
+ * @public
+ */
 export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
     create<ErrorStore>()((set, get) => ({
         // Actions

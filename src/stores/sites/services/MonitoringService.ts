@@ -31,6 +31,16 @@
 
 import { waitForElectronAPI } from "../../utils";
 
+/**
+ * Service for managing monitoring operations through Electron IPC.
+ *
+ * @remarks
+ * Provides a clean interface for all monitoring-related operations including
+ * starting and stopping monitors, manual checks, and site-wide monitoring
+ * control with automatic service initialization and error handling.
+ *
+ * @public
+ */
 export const MonitoringService = {
     /**
      * Initialize the service by ensuring electron API is available

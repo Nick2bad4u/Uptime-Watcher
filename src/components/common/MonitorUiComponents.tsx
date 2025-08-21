@@ -21,8 +21,11 @@ import {
  * @public
  */
 export interface ConditionalResponseTimeProps {
+    /** React node to render when response time is supported */
     readonly children: React.ReactNode;
+    /** React node to render when response time is not supported or while loading */
     readonly fallback?: React.ReactNode;
+    /** Type of monitor to check for response time support */
     readonly monitorType: MonitorType;
 }
 
@@ -33,12 +36,27 @@ export interface ConditionalResponseTimeProps {
  * @public
  */
 export interface DetailLabelProps {
+    /** Raw details string to format */
     readonly details: string;
+    /** Fallback text to display if formatting fails */
     readonly fallback?: string;
+    /** Type of monitor for context-specific formatting */
     readonly monitorType: MonitorType;
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- React components legitimately return different node types (JSX elements, fragments, null, etc.)
+/**
+ * Conditionally renders children based on monitor type's response time support.
+ *
+ * @remarks
+ * Asynchronously checks if the monitor type supports response time measurements
+ * and renders children only if supported, otherwise renders fallback content.
+ *
+ * @param props - Component properties
+ *
+ * @returns React node based on response time support
+ *
+ * @public
+ */
 export function ConditionalResponseTime({
     children,
     fallback,
@@ -94,6 +112,19 @@ export function ConditionalResponseTime({
     return supportsResponseTime ? children : fallback;
 }
 
+/**
+ * Dynamically formats and displays monitor detail labels.
+ *
+ * @remarks
+ * Asynchronously formats detail strings using monitor type-specific formatting
+ * rules. Gracefully degrades to fallback text if formatting fails.
+ *
+ * @param props - Component properties
+ *
+ * @returns JSX element containing the formatted label
+ *
+ * @public
+ */
 export const DetailLabel = ({
     details,
     fallback = details,

@@ -33,8 +33,11 @@ import type { Theme } from "../theme/types";
  * Interface for chart configuration return type.
  */
 export interface ChartConfigs {
+    /** Configuration options for bar charts */
     barChartOptions: ChartOptions<"bar">;
+    /** Configuration options for doughnut charts */
     doughnutOptions: ChartOptions<"doughnut">;
+    /** Configuration options for line charts */
     lineChartOptions: ChartOptions<"line">;
 }
 
@@ -42,12 +45,19 @@ export interface ChartConfigs {
  * Response time line chart data structure
  */
 export interface ResponseTimeChartData extends ChartData<"line"> {
+    /** Dataset configuration for response time line chart */
     datasets: Array<{
+        /** Fill color for area under the line */
         backgroundColor: string;
+        /** Line color */
         borderColor: string;
+        /** Response time data points (null for missing data) */
         data: Array<null | number>;
+        /** Whether to fill area under the line */
         fill: boolean;
+        /** Chart legend label */
         label: string;
+        /** Line curve smoothness (0-1) */
         tension: number;
     }>;
 }
@@ -60,13 +70,20 @@ export interface ResponseTimeChartData extends ChartData<"line"> {
  * Status distribution bar chart data structure
  */
 export interface StatusBarChartData extends ChartData<"bar"> {
+    /** Dataset configuration for status bar chart */
     datasets: Array<{
+        /** Fill colors for each bar */
         backgroundColor: string[];
+        /** Border colors for each bar */
         borderColor: string[];
+        /** Border width for bars */
         borderWidth: number;
+        /** Status count data for each category */
         data: number[];
+        /** Chart legend label */
         label: string;
     }>;
+    /** Status category labels for x-axis */
     labels: string[];
 }
 
@@ -74,12 +91,18 @@ export interface StatusBarChartData extends ChartData<"bar"> {
  * Uptime status doughnut chart data structure
  */
 export interface UptimeChartData extends ChartData<"doughnut"> {
+    /** Dataset configuration for uptime doughnut chart */
     datasets: Array<{
+        /** Segment colors for each status */
         backgroundColor: string[];
+        /** Border colors for each segment */
         borderColor: string[];
+        /** Border width for segments */
         borderWidth: number;
+        /** Uptime percentage data for each status */
         data: number[];
     }>;
+    /** Status labels for legend */
     labels: string[];
 }
 
