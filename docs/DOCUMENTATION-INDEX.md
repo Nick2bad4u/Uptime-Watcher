@@ -82,17 +82,6 @@ Relevant historical context and lessons learned:
 | [Fallback-System-Usage-Analysis.md](./Guides/Fallback-System-Usage-Analysis.md)                   | Migration completion status | Historical context                 |
 | [Monitoring-Race-Condition-Solution-Plan.md](./Guides/Monitoring-Race-Condition-Solution-Plan.md) | Race condition prevention   | Architecture understanding         |
 
-### 📁 Archive (`/docs/Archive/`)
-
-Historical documentation and analysis materials:
-
-| Directory                                                            | Contents                        | Purpose                         |
-| -------------------------------------------------------------------- | ------------------------------- | ------------------------------- |
-| [Archive/](./Archive/)                                               | Historical analysis and reviews | Reference and learning material |
-| [Archive/Historical-Analysis/](./Archive/Historical-Analysis/)       | Analysis documents and planning | Understanding project evolution |
-| [Archive/Implementation-Records/](./Archive/Implementation-Records/) | Completed implementations       | Learning from past work         |
-| [Archive/Type-Safety-Migration/](./Archive/Type-Safety-Migration/)   | Type safety migration docs      | Migration process reference     |
-
 ## 🎯 Documentation by Role
 
 ### 🤖 AI Assistants

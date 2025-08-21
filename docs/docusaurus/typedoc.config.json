@@ -21,10 +21,10 @@
     "readme": "../../README.md",
     "treatWarningsAsErrors": false,
     "projectDocuments": [
-        "../../docs/Architecture/**.*.md",
-        "../../docs/Guides/**.*.md",
-        "../../docs/Packages/**.*.md",
-        "../../docs/TSDoc/**.*.md",
+        "../../docs/Architecture/**/*.md",
+        "../../docs/Guides/**/*.md",
+        "../../docs/Packages/**/*.md",
+        "../../docs/TSDoc/**/*.md",
         "../../docs/*.md"
     ],
     "githubPages": true,
@@ -322,13 +322,13 @@
         },
         "uptime-watcher": {
             "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-            "TypedEventBus.emitTyped": "#",
-            "MigrationOrchestrator": "#",
-            "VersionManager": "#",
             "ValidationResult": "#",
             "ServiceContainer": "#",
             "SiteManager": "#",
             "ConfigurationManager": "#",
+            "TypedEventBus.emitTyped": "#",
+            "MigrationOrchestrator": "#",
+            "VersionManager": "#",
             "MonitorOperationRegistry.registerOperation": "#",
             "OperationTimeoutManager.createTimeout": "#",
             "MonitorStatusUpdateService.updateStatus": "#",
@@ -341,7 +341,8 @@
             "Monitor": "#",
             "Logger": "#",
             "PortCheckError": "#",
-            "getMonitorTypeConfig": "#"
+            "getMonitorTypeConfig": "#",
+            "AxiosError": "https://axios-http.com/docs/handling_errors"
         }
     },
     "validation": {
