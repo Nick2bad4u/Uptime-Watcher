@@ -112,21 +112,29 @@ async function simulateBulkInsert<T>(
     for (let i = 0; i < items.length; i += chunkSize) {
         const chunk = items.slice(i, i + chunkSize);
         // Simulate database write time based on chunk size
-        await new Promise((resolve) => {setTimeout(resolve, chunk.length * 0.1)});
+        await new Promise((resolve) => {
+            setTimeout(resolve, chunk.length * 0.1);
+        });
     }
 }
 
 async function simulateTransaction<T>(operation: () => Promise<T>): Promise<T> {
     // Simulate transaction overhead
-    await new Promise((resolve) => {setTimeout(resolve, 1)});
+    await new Promise((resolve) => {
+        setTimeout(resolve, 1);
+    });
     const result = await operation();
-    await new Promise((resolve) => {setTimeout(resolve, 1)});
+    await new Promise((resolve) => {
+        setTimeout(resolve, 1);
+    });
     return result;
 }
 
 async function simulateComplexQuery(complexity: number): Promise<any[]> {
     // Simulate query execution time based on complexity
-    await new Promise((resolve) => {setTimeout(resolve, complexity * 2)});
+    await new Promise((resolve) => {
+        setTimeout(resolve, complexity * 2);
+    });
     return Array.from({ length: complexity }, (_, i) => ({
         id: i,
         data: `result-${i}`,

@@ -1,5 +1,11 @@
 import { exec } from "child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "fs";
+import {
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    writeFileSync,
+    appendFileSync,
+} from "fs";
 import { join, resolve as _resolve } from "path";
 import { createHash } from "crypto";
 

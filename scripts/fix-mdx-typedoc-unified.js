@@ -55,4 +55,6 @@ function walk(dir) {
 // Process the unified docs directory
 walk(DOCS_DIR);
 
-console.log("Finished fixing TypeDoc markdown for MDX compatibility in unified documentation.");
+console.log(
+    "Finished fixing TypeDoc markdown for MDX compatibility in unified documentation."
+);

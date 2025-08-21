@@ -2,7 +2,8 @@ const fs = require("fs");
 const path = require("path");
 
 // Unified docs directory
-const DOCS_DIR = "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs";
+const DOCS_DIR =
+    "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs";
 
 function fixFile(filePath) {
     let content = fs.readFileSync(filePath, "utf8");
@@ -55,4 +56,6 @@ function walk(dir) {
 // Process the unified docs directory
 walk(DOCS_DIR);
 
-console.log("Finished fixing TypeDoc markdown for MDX compatibility in unified documentation.");
+console.log(
+    "Finished fixing TypeDoc markdown for MDX compatibility in unified documentation."
+);
