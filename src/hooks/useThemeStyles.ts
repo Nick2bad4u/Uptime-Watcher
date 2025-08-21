@@ -241,6 +241,20 @@ function getUrlStyle(isDarkMode: boolean): CSSProperties {
     };
 }
 
+/**
+ * React hook for theme-aware CSS-in-JS styles with collapse state support.
+ *
+ * @remarks
+ * Provides comprehensive styling that automatically adapts to user's theme
+ * preference with proper SSR support and runtime theme change reactivity.
+ * The hook listens to media query changes and updates styles accordingly.
+ *
+ * @param isCollapsed - Whether the component is in collapsed state (default: false)
+ *
+ * @returns Complete ThemeStyles object with all CSS-in-JS style properties
+ *
+ * @public
+ */
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Use state to track theme changes for reactivity
     const [isDarkMode, setIsDarkMode] = useState(() => {

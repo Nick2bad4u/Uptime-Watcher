@@ -107,16 +107,76 @@ export interface StatusUpdateHandlerOptions {
  * @public
  */
 export class StatusUpdateManager {
+    /**
+     * Array of cleanup functions for active event listeners.
+     *
+     * @remarks
+     * Stores cleanup functions returned by IPC event listeners. These are
+     * called during unsubscribe() to properly remove event listeners and
+     * prevent memory leaks. Each function removes a specific event listener.
+     *
+     * @internal
+     */
     private cleanupFunctions: Array<() => void> = [];
 
+    /**
+     * Function to trigger full site data sync from backend.
+     *
+     * @remarks
+     * Callback function provided during construction that performs a complete
+     * refresh of site data from the backend. Used as fallback when incremental
+     * updates fail or when a full sync is required.
+     *
+     * @internal
+     */
     private readonly fullSyncFromBackend: () => Promise<void>;
 
+    /**
+     * Function to get current sites from store.
+     *
+     * @remarks
+     * Callback function that returns the current array of sites from the
+     * store state. Used to access current data when applying incremental
+     * status updates.
+     *
+     * @internal
+     */
     private readonly getSites: () => Site[];
 
+    /**
+     * Flag tracking whether event listener is currently attached.
+     *
+     * @remarks
+     * Boolean flag that tracks the subscription state. True when IPC event
+     * listeners are active and receiving status updates. Used to prevent
+     * duplicate subscriptions and to provide subscription status.
+     *
+     * @internal
+     */
     private isListenerAttached = false;
 
+    /**
+     * Optional callback for status update notifications.
+     *
+     * @remarks
+     * Optional callback function that is invoked when a status update is
+     * successfully applied. Receives the StatusUpdate object with details
+     * about the change. Can be used for logging or triggering side effects.
+     *
+     * @internal
+     */
     private readonly onUpdate: ((update: StatusUpdate) => void) | undefined;
 
+    /**
+     * Function to update sites in the store.
+     *
+     * @remarks
+     * Callback function that updates the store with a new array of sites.
+     * Used to apply incremental status updates and full sync results to
+     * the store state.
+     *
+     * @internal
+     */
     private readonly setSites: (sites: Site[]) => void;
 
     /**

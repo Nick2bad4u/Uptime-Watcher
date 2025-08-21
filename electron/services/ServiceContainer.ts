@@ -80,6 +80,35 @@ export interface ServiceContainerConfig {
 }
 
 /**
+ * Information about an initialized service.
+ *
+ * @remarks
+ * Contains metadata about a service instance, including its name and
+ * the actual service object. Used for service introspection and debugging.
+ *
+ * @public
+ */
+export interface ServiceInfo {
+    /**
+     * The name of the service.
+     *
+     * @remarks
+     * Human-readable service name used for identification and debugging.
+     * Corresponds to the service class name (e.g., "DatabaseService").
+     */
+    name: string;
+
+    /**
+     * The service instance.
+     *
+     * @remarks
+     * The actual instantiated service object. Type is unknown to support
+     * all service types in the container.
+     */
+    service: unknown;
+}
+
+/**
  * Centralized service container for dependency management and lifecycle
  * orchestration.
  *
@@ -90,6 +119,16 @@ export interface ServiceContainerConfig {
  * @public
  */
 export class ServiceContainer {
+    /**
+     * Singleton instance of the ServiceContainer.
+     *
+     * @remarks
+     * Maintains the single instance of the ServiceContainer across the
+     * application lifecycle. Initialized via getInstance() method and
+     * ensures all services are managed through a single container.
+     *
+     * @internal
+     */
     private static instance: ServiceContainer | undefined;
 
     /**
@@ -99,6 +138,16 @@ export class ServiceContainer {
      */
     private autoUpdaterService?: AutoUpdaterService;
 
+    /**
+     * Configuration settings for the service container.
+     *
+     * @remarks
+     * Contains runtime configuration options including debug logging settings
+     * and notification service preferences. Set during initialization and
+     * used throughout the service container lifecycle.
+     *
+     * @internal
+     */
     private readonly config: ServiceContainerConfig;
 
     /**
@@ -411,8 +460,8 @@ export class ServiceContainer {
      *
      * @returns Array of objects containing service names and their instances.
      */
-    public getInitializedServices(): Array<{ name: string; service: unknown }> {
-        const services: Array<{ name: string; service: unknown }> = [];
+    public getInitializedServices(): ServiceInfo[] {
+        const services: ServiceInfo[] = [];
         const serviceMap: Record<string, unknown> = {
             AutoUpdaterService: this.autoUpdaterService,
             ConfigurationManager: this.configurationManager,

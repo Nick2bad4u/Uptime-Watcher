@@ -50,9 +50,41 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param type - Type of cache invalidated ("all", "monitor", or "site").
      */
     "cache:invalidated": {
+        /**
+         * Optional unique identifier for the cache entry.
+         *
+         * @remarks
+         * Specifies which cache entry was invalidated when the invalidation
+         * is targeted to a specific entry rather than a broad invalidation.
+         */
         identifier?: string;
+
+        /**
+         * Reason for invalidation.
+         *
+         * @remarks
+         * Indicates why the cache was invalidated: "delete" for item removal,
+         * "expiry" for TTL timeout, "manual" for user-initiated refresh,
+         * or "update" for data changes.
+         */
         reason: "delete" | "expiry" | "manual" | "update";
+
+        /**
+         * Unix timestamp (ms) when invalidation occurred.
+         *
+         * @remarks
+         * Provides precise timing for invalidation events to support
+         * debugging and audit trails.
+         */
         timestamp: number;
+
+        /**
+         * Type of cache invalidated.
+         *
+         * @remarks
+         * Specifies the scope of invalidation: "all" for full cache clear,
+         * "monitor" for monitor-specific cache, or "site" for site-specific cache.
+         */
         type: "all" | "monitor" | "site";
     };
 
@@ -70,10 +102,50 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the change occurred.
      */
     "config:changed": {
+        /**
+         * The new value of the setting.
+         *
+         * @remarks
+         * Contains the updated value after the configuration change.
+         * Type is unknown to support any configuration value type.
+         */
         newValue: unknown;
+
+        /**
+         * The previous value of the setting.
+         *
+         * @remarks
+         * Contains the value before the configuration change for
+         * comparison and potential rollback scenarios.
+         */
         oldValue: unknown;
+
+        /**
+         * The name of the setting that changed.
+         *
+         * @remarks
+         * Identifies which specific configuration setting was modified.
+         * Used for targeted event handling and change tracking.
+         */
         setting: string;
+
+        /**
+         * The origin of the change.
+         *
+         * @remarks
+         * Indicates what initiated the configuration change: "migration"
+         * for database migrations, "system" for automatic updates, or
+         * "user" for manual changes.
+         */
         source: "migration" | "system" | "user";
+
+        /**
+         * Unix timestamp (ms) when the change occurred.
+         *
+         * @remarks
+         * Provides precise timing for configuration changes to support
+         * debugging and audit trails.
+         */
         timestamp: number;
     };
 
@@ -90,9 +162,41 @@ export interface UptimeEvents extends Record<string, unknown> {
      *   "shutdown").
      */
     "database:backup-created": {
+        /**
+         * Name of the backup file.
+         *
+         * @remarks
+         * The filename of the created backup file, typically including
+         * timestamp information for identification purposes.
+         */
         fileName: string;
+
+        /**
+         * Size of the backup file in bytes.
+         *
+         * @remarks
+         * The total size of the backup file in bytes, useful for
+         * monitoring backup size trends and storage management.
+         */
         size: number;
+
+        /**
+         * Unix timestamp (ms) when backup was created.
+         *
+         * @remarks
+         * Precise timing of backup creation for audit trails and
+         * backup scheduling verification.
+         */
         timestamp: number;
+
+        /**
+         * What triggered the backup.
+         *
+         * @remarks
+         * Indicates the source of the backup operation: "manual" for
+         * user-initiated backups, "scheduled" for automatic backups,
+         * or "shutdown" for application shutdown backups.
+         */
         triggerType: "manual" | "scheduled" | "shutdown";
     };
 
@@ -110,8 +214,32 @@ export interface UptimeEvents extends Record<string, unknown> {
      */
     "database:error": {
         [key: string]: unknown;
+        
+        /**
+         * The error object that caused the database operation to fail.
+         *
+         * @remarks
+         * Contains the specific error information including message, stack trace,
+         * and any additional error details for debugging purposes.
+         */
         error: Error;
+        
+        /**
+         * The database operation that failed.
+         *
+         * @remarks
+         * Identifies which specific database operation encountered the error,
+         * such as "insert", "update", "delete", or "select".
+         */
         operation: string;
+        
+        /**
+         * Unix timestamp (ms) when the error occurred.
+         *
+         * @remarks
+         * Provides precise timing of when the database error was encountered
+         * for debugging and audit trail purposes.
+         */
         timestamp: number;
     };
 
@@ -127,8 +255,32 @@ export interface UptimeEvents extends Record<string, unknown> {
      */
     "database:retry": {
         [key: string]: unknown;
+        
+        /**
+         * The retry attempt number.
+         *
+         * @remarks
+         * Indicates which retry attempt this is, starting from 1 for the first
+         * retry after the initial failure. Used for tracking retry patterns.
+         */
         attempt: number;
+        
+        /**
+         * The database operation being retried.
+         *
+         * @remarks
+         * Identifies which specific database operation is being retried after
+         * a previous failure, such as "insert", "update", "delete", or "select".
+         */
         operation: string;
+        
+        /**
+         * Unix timestamp (ms) when the retry occurred.
+         *
+         * @remarks
+         * Provides precise timing of when the retry was attempted for
+         * debugging and performance analysis purposes.
+         */
         timestamp: number;
     };
 
@@ -144,8 +296,32 @@ export interface UptimeEvents extends Record<string, unknown> {
      */
     "database:success": {
         [key: string]: unknown;
+        
+        /**
+         * Optional duration (ms) of the operation.
+         *
+         * @remarks
+         * When available, provides the time in milliseconds that the database
+         * operation took to complete. Used for performance monitoring and optimization.
+         */
         duration?: number;
+        
+        /**
+         * The database operation that succeeded.
+         *
+         * @remarks
+         * Identifies which specific database operation completed successfully,
+         * such as "insert", "update", "delete", or "select".
+         */
         operation: string;
+        
+        /**
+         * Unix timestamp (ms) when the operation succeeded.
+         *
+         * @remarks
+         * Provides precise timing of when the database operation completed
+         * successfully for audit trails and performance tracking.
+         */
         timestamp: number;
     };
 
@@ -159,10 +335,49 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the transaction completed.
      */
     "database:transaction-completed": {
+        /**
+         * Duration (ms) of the transaction.
+         *
+         * @remarks
+         * The total time in milliseconds that the database transaction took to
+         * complete, including all operations within the transaction.
+         */
         duration: number;
+        
+        /**
+         * The database operation performed in the transaction.
+         *
+         * @remarks
+         * Describes the type of operation that was performed within the transaction,
+         * such as "bulk-insert", "migration", or "backup".
+         */
         operation: string;
+        
+        /**
+         * Optional number of records affected.
+         *
+         * @remarks
+         * When available, indicates how many database records were affected
+         * by the transaction operations.
+         */
         recordsAffected?: number;
+        
+        /**
+         * Whether the transaction was successful.
+         *
+         * @remarks
+         * Indicates if the transaction completed successfully (true) or
+         * was rolled back due to an error (false).
+         */
         success: boolean;
+        
+        /**
+         * Unix timestamp (ms) when the transaction completed.
+         *
+         * @remarks
+         * Provides precise timing of when the transaction finished, regardless
+         * of success or failure status.
+         */
         timestamp: number;
     };
 
@@ -175,9 +390,40 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the download completed.
      */
     "internal:database:backup-downloaded": {
+        /**
+         * Optional name of the backup file.
+         *
+         * @remarks
+         * When available, specifies the filename of the downloaded backup.
+         * May be undefined if the backup download operation failed.
+         */
         fileName?: string;
+        
+        /**
+         * The operation type (always "backup-downloaded").
+         *
+         * @remarks
+         * Constant value identifying this specific database operation type
+         * for event filtering and routing purposes.
+         */
         operation: "backup-downloaded";
+        
+        /**
+         * Whether the download was successful.
+         *
+         * @remarks
+         * Indicates if the backup download completed successfully (true)
+         * or encountered an error (false).
+         */
         success: boolean;
+        
+        /**
+         * Unix timestamp (ms) when the download completed.
+         *
+         * @remarks
+         * Provides precise timing of when the backup download operation
+         * finished, regardless of success or failure status.
+         */
         timestamp: number;
     };
 
@@ -190,9 +436,40 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the export completed.
      */
     "internal:database:data-exported": {
+        /**
+         * Optional name of the exported file.
+         *
+         * @remarks
+         * When available, specifies the filename of the exported data file.
+         * May be undefined if the export operation failed.
+         */
         fileName?: string;
+        
+        /**
+         * The operation type (always "data-exported").
+         *
+         * @remarks
+         * Constant value identifying this specific database operation type
+         * for event filtering and routing purposes.
+         */
         operation: "data-exported";
+        
+        /**
+         * Whether the export was successful.
+         *
+         * @remarks
+         * Indicates if the data export completed successfully (true)
+         * or encountered an error (false).
+         */
         success: boolean;
+        
+        /**
+         * Unix timestamp (ms) when the export completed.
+         *
+         * @remarks
+         * Provides precise timing of when the data export operation
+         * finished, regardless of success or failure status.
+         */
         timestamp: number;
     };
 
@@ -205,9 +482,39 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the import completed.
      */
     "internal:database:data-imported": {
+        /**
+         * The operation type (always "data-imported").
+         *
+         * @remarks
+         * Constant identifier for this specific internal database operation.
+         */
         operation: "data-imported";
+
+        /**
+         * Optional number of records imported.
+         *
+         * @remarks
+         * Provides count of successfully imported records for tracking
+         * and reporting purposes. May be undefined if count is not available.
+         */
         recordCount?: number;
+
+        /**
+         * Whether the import was successful.
+         *
+         * @remarks
+         * Indicates overall success status of the import operation.
+         * False indicates the operation failed or was aborted.
+         */
         success: boolean;
+
+        /**
+         * Unix timestamp (ms) when the import completed.
+         *
+         * @remarks
+         * Precise timing of when the import operation finished for
+         * audit trails and performance monitoring.
+         */
         timestamp: number;
     };
 
@@ -219,7 +526,21 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:database:get-sites-from-cache-requested": {
+        /**
+         * The operation type (always "get-sites-from-cache-requested").
+         *
+         * @remarks
+         * Constant identifier for this specific internal database operation.
+         */
         operation: "get-sites-from-cache-requested";
+
+        /**
+         * Unix timestamp (ms) when the request was made.
+         *
+         * @remarks
+         * Precise timing of when the cache request was initiated for
+         * performance monitoring and debugging.
+         */
         timestamp: number;
     };
 
@@ -232,8 +553,30 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the response was sent.
      */
     "internal:database:get-sites-from-cache-response": {
+        /**
+         * The operation type (always "get-sites-from-cache-response").
+         *
+         * @remarks
+         * Constant identifier for this specific internal database operation.
+         */
         operation: "get-sites-from-cache-response";
+
+        /**
+         * The list of sites returned from the cache.
+         *
+         * @remarks
+         * Array of site objects retrieved from the cache in response
+         * to a get-sites-from-cache request.
+         */
         sites: Site[];
+
+        /**
+         * Unix timestamp (ms) when the response was sent.
+         *
+         * @remarks
+         * Precise timing of when the cache response was generated for
+         * performance monitoring and request tracking.
+         */
         timestamp: number;
     };
 
@@ -245,8 +588,29 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the update occurred.
      */
     "internal:database:history-limit-updated": {
+        /**
+
+         * The new history limit value.
+
+         *
+
+         * @remarks
+
+         * Property value for this event data structure.
+
+         */
         limit: number;
+        /**
+
+         * The operation type (always "history-limit-updated").
+
+         */
         operation: "history-limit-updated";
+        /**
+
+         * Unix timestamp (ms) when the update occurred.
+
+         */
         timestamp: number;
     };
 
@@ -258,8 +622,29 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when initialization completed.
      */
     "internal:database:initialized": {
+        /**
+
+         * The operation type (always "initialized").
+
+         */
         operation: "initialized";
+        /**
+
+         * Whether initialization was successful.
+
+         *
+
+         * @remarks
+
+         * Boolean flag indicating the outcome of the operation.
+
+         */
         success: boolean;
+        /**
+
+         * Unix timestamp (ms) when initialization completed.
+
+         */
         timestamp: number;
     };
 
@@ -271,8 +656,29 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the refresh completed.
      */
     "internal:database:sites-refreshed": {
+        /**
+
+         * The operation type (always "sites-refreshed").
+
+         */
         operation: "sites-refreshed";
+        /**
+
+         * The number of sites refreshed.
+
+         *
+
+         * @remarks
+
+         * Numerical value for tracking and reporting purposes.
+
+         */
         siteCount: number;
+        /**
+
+         * Unix timestamp (ms) when the refresh completed.
+
+         */
         timestamp: number;
     };
 
@@ -285,8 +691,29 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the request was made.
      */
     "internal:database:update-sites-cache-requested": {
+        /**
+
+         * The operation type (always "update-sites-cache-requested").
+
+         */
         operation: "update-sites-cache-requested";
+        /**
+
+         * Optional list of sites to update in the cache.
+
+         *
+
+         * @remarks
+
+         * Cache-related data for performance optimization.
+
+         */
         sites?: Site[];
+        /**
+
+         * Unix timestamp (ms) when the request was made.
+
+         */
         timestamp: number;
     };
 
@@ -301,9 +728,41 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the operation completed.
      */
     "internal:monitor:all-started": {
+        /**
+
+         * The number of monitors started.
+
+         *
+
+         * @remarks
+
+         * Numerical value for tracking and reporting purposes.
+
+         */
         monitorCount: number;
+        /**
+
+         * The operation type (always "all-started").
+
+         */
         operation: "all-started";
+        /**
+
+         * The number of sites involved.
+
+         *
+
+         * @remarks
+
+         * Numerical value for tracking and reporting purposes.
+
+         */
         siteCount: number;
+        /**
+
+         * Unix timestamp (ms) when the operation completed.
+
+         */
         timestamp: number;
     };
 
@@ -316,9 +775,41 @@ export interface UptimeEvents extends Record<string, unknown> {
      * @param timestamp - Unix timestamp (ms) when the operation completed.
      */
     "internal:monitor:all-stopped": {
+        /**
+
+         * The number of monitors that were active.
+
+         *
+
+         * @remarks
+
+         * Numerical value for tracking and reporting purposes.
+
+         */
         activeMonitors: number;
+        /**
+
+         * The operation type (always "all-stopped").
+
+         */
         operation: "all-stopped";
+        /**
+
+         * The reason for stopping.
+
+         *
+
+         * @remarks
+
+         * Indicates the cause or trigger for this operation.
+
+         */
         reason: EventReason;
+        /**
+
+         * Unix timestamp (ms) when the operation completed.
+
+         */
         timestamp: number;
     };
 
@@ -968,12 +1459,35 @@ export type EventTriggerType = "manual" | "scheduled" | "shutdown";
  * @public
  */
 export const EVENT_CATEGORIES = {
+    /**
+     * Cache-related events for cache invalidation and updates.
+     *
+     * @remarks
+     * Events related to cache management, including invalidation notifications
+     * and cache state changes for sites and monitors.
+     */
     CACHE: [
         "cache:invalidated",
         "site:cache-miss",
         "site:cache-updated",
     ] as const,
+
+    /**
+     * Configuration change events.
+     *
+     * @remarks
+     * Events emitted when application configuration settings are modified,
+     * including user preferences and system settings.
+     */
     CONFIG: ["config:changed"] as const,
+
+    /**
+     * Database operation events.
+     *
+     * @remarks
+     * Events related to database operations including backups, errors,
+     * retries, and successful operations.
+     */
     DATABASE: [
         "database:backup-created",
         "database:error",
@@ -981,6 +1495,15 @@ export const EVENT_CATEGORIES = {
         "database:success",
         "database:transaction-completed",
     ] as const,
+
+    /**
+     * Internal database management events.
+     *
+     * @remarks
+     * Internal events for database initialization, data import/export,
+     * and cache management operations. These are typically system-level
+     * events not exposed to end users.
+     */
     INTERNAL_DATABASE: [
         "internal:database:backup-downloaded",
         "internal:database:data-exported",
@@ -992,6 +1515,15 @@ export const EVENT_CATEGORIES = {
         "internal:database:sites-refreshed",
         "internal:database:update-sites-cache-requested",
     ] as const,
+
+    /**
+     * Internal monitor management events.
+     *
+     * @remarks
+     * Internal events for monitor lifecycle management including starting,
+     * stopping, and setup operations. These are system-level events for
+     * monitor orchestration.
+     */
     INTERNAL_MONITOR: [
         "internal:monitor:all-started",
         "internal:monitor:all-stopped",
@@ -1000,6 +1532,14 @@ export const EVENT_CATEGORIES = {
         "internal:monitor:started",
         "internal:monitor:stopped",
     ] as const,
+
+    /**
+     * Internal site management events.
+     *
+     * @remarks
+     * Internal events for site lifecycle management including adding,
+     * removing, updating sites and monitoring state management.
+     */
     INTERNAL_SITE: [
         "internal:site:added",
         "internal:site:cache-updated",
@@ -1012,6 +1552,14 @@ export const EVENT_CATEGORIES = {
         "internal:site:stop-monitoring-requested",
         "internal:site:updated",
     ] as const,
+
+    /**
+     * Monitor status and lifecycle events.
+     *
+     * @remarks
+     * Events related to monitor operations including status changes,
+     * check completions, and monitor up/down state changes.
+     */
     MONITOR: [
         "monitor:added",
         "monitor:check-completed",
@@ -1020,14 +1568,46 @@ export const EVENT_CATEGORIES = {
         "monitor:up",
         "monitor:down",
     ] as const,
+
+    /**
+     * Overall monitoring system events.
+     *
+     * @remarks
+     * High-level events for the entire monitoring system, including
+     * global start and stop operations.
+     */
     MONITORING: ["monitoring:started", "monitoring:stopped"] as const,
+
+    /**
+     * Performance monitoring and metrics events.
+     *
+     * @remarks
+     * Events related to performance metrics collection and performance
+     * warnings when thresholds are exceeded.
+     */
     PERFORMANCE: ["performance:metric", "performance:warning"] as const,
+
+    /**
+     * Site management events.
+     *
+     * @remarks
+     * Events related to site operations including adding, removing,
+     * updating sites and state synchronization.
+     */
     SITE: [
         "site:added",
         "site:removed",
         "site:updated",
         "sites:state-synchronized",
     ] as const,
+
+    /**
+     * System-level events.
+     *
+     * @remarks
+     * Events related to system operations including startup, shutdown,
+     * and system-level errors that affect the entire application.
+     */
     SYSTEM: [
         "system:error",
         "system:shutdown",
@@ -1052,11 +1632,27 @@ export const EVENT_CATEGORIES = {
  * @public
  */
 export const EVENT_PRIORITIES = {
+    /**
+     * Critical priority events that require immediate attention.
+     *
+     * @remarks
+     * Events that indicate system-level issues, performance problems,
+     * or application shutdown scenarios that need immediate processing.
+     */
     CRITICAL: [
         "performance:warning",
         "system:error",
         "system:shutdown",
     ] as const,
+
+    /**
+     * High priority events for important state changes.
+     *
+     * @remarks
+     * Events that represent significant changes to monitoring state,
+     * database transactions, or site availability that should be
+     * processed promptly.
+     */
     HIGH: [
         "database:transaction-completed",
         "monitor:status-changed",
@@ -1064,7 +1660,23 @@ export const EVENT_PRIORITIES = {
         "monitor:down",
         "site:removed",
     ] as const,
+
+    /**
+     * Low priority events for routine data collection.
+     *
+     * @remarks
+     * Events that represent routine metrics and data collection
+     * activities that can be processed with lower priority.
+     */
     LOW: ["performance:metric"] as const,
+
+    /**
+     * Medium priority events for standard operations.
+     *
+     * @remarks
+     * Events that represent normal operational activities like
+     * configuration changes and site management operations.
+     */
     MEDIUM: [
         "config:changed",
         "monitor:added",

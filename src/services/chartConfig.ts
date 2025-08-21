@@ -107,6 +107,81 @@ export interface UptimeChartData extends ChartData<"doughnut"> {
 }
 
 /**
+ * Configuration object for chart axis titles
+ */
+export interface AxisTitleConfig {
+    /** Text color for the axis title */
+    color: string;
+    /** Whether to display the axis title */
+    display: boolean;
+    /** Font configuration for the axis title */
+    font: {
+        /** Font family name */
+        family: string;
+        /** Font size in pixels */
+        size: number;
+    };
+    /** The text content of the axis title */
+    text: string;
+}
+
+/**
+ * Configuration object for chart base scales
+ */
+export interface BaseScaleConfig {
+    /** Grid line configuration */
+    grid: {
+        /** Color of the grid lines */
+        color: string;
+    };
+    /** Tick mark configuration */
+    ticks: {
+        /** Color of the tick marks and labels */
+        color: string;
+        /** Font configuration for tick labels */
+        font: {
+            /** Font family name */
+            family: string;
+            /** Font size in pixels */
+            size: number;
+        };
+    };
+}
+
+/**
+ * Configuration object for chart fonts
+ */
+export interface ChartFontConfig {
+    /** Font family name */
+    family: string;
+    /** Font size in pixels */
+    size: number;
+    /** Font weight (normal, bold, etc.) */
+    weight: string;
+}
+
+/**
+ * Configuration object for chart titles
+ */
+export interface ChartTitleConfig {
+    /** Text color for the chart title */
+    color: string;
+    /** Whether to display the chart title */
+    display: boolean;
+    /** Font configuration for the chart title */
+    font: {
+        /** Font family name */
+        family: string;
+        /** Font size in pixels */
+        size: number;
+        /** Font weight (normal, bold, etc.) */
+        weight: string;
+    };
+    /** The text content of the chart title */
+    text: string;
+}
+
+/**
  * Chart Configuration Service for theme-aware chart styling.
  *
  * @remarks
@@ -256,13 +331,11 @@ export class ChartConfigService {
 
     /**
      * Get common axis title configuration
+     *
+     * @param text - The text to display in the axis title
+     * @returns Configured axis title object with theme-aware styling
      */
-    private getAxisTitle(text: string): {
-        color: string;
-        display: boolean;
-        font: { family: string; size: number };
-        text: string;
-    } {
+    private getAxisTitle(text: string): AxisTitleConfig {
         return {
             color: this.theme.colors.text.secondary,
             display: true,
@@ -311,12 +384,11 @@ export class ChartConfigService {
     }
 
     /**
-     * Get base scale configuration
+     * Get base scale configuration with theme-aware styling
+     *
+     * @returns Base scale configuration object for axes
      */
-    private getBaseScale(): {
-        grid: { color: string };
-        ticks: { color: string; font: { family: string; size: number } };
-    } {
+    private getBaseScale(): BaseScaleConfig {
         return {
             grid: {
                 color: this.theme.colors.border.secondary,
@@ -333,15 +405,15 @@ export class ChartConfigService {
 
     /**
      * Get common font configuration used across charts
+     *
+     * @param size - Font size in pixels (default: 12)
+     * @param weight - Font weight (default: "normal")
+     * @returns Font configuration object with theme-aware family
      */
     private getChartFont(
         size = 12,
         weight = "normal"
-    ): {
-        family: string;
-        size: number;
-        weight: string;
-    } {
+    ): ChartFontConfig {
         return {
             family: this.theme.typography.fontFamily.sans.join(", "),
             size,
@@ -351,13 +423,11 @@ export class ChartConfigService {
 
     /**
      * Get common title configuration for charts
+     *
+     * @param text - The text to display in the chart title
+     * @returns Configured chart title object with theme-aware styling
      */
-    private getChartTitle(text: string): {
-        color: string;
-        display: boolean;
-        font: { family: string; size: number; weight: string };
-        text: string;
-    } {
+    private getChartTitle(text: string): ChartTitleConfig {
         return {
             color: this.theme.colors.text.primary,
             display: true,

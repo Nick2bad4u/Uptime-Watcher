@@ -192,14 +192,38 @@ export interface UptimeOrchestratorDependencies {
 type OrchestratorEvents = UptimeEvents;
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
+    /**
+     * Database manager for all data persistence operations.
+     *
+     * @remarks
+     * Handles database initialization, schema management, repository
+     * coordination, and transaction management. All database operations
+     * are routed through this manager following the repository pattern.
+     * Provides atomic operations and proper error handling for data
+     * persistence across the application.
+     *
+     * @internal
+     */
     private readonly databaseManager: DatabaseManager;
 
+    /**
+     * Monitor manager for site monitoring operations.
+     *
+     * @remarks
+     * Coordinates monitoring lifecycle, status checking, and monitor
+     * scheduling across all sites. Handles monitor registration,
+     * execution, and status updates. Integrates with the event system
+     * to provide real-time status notifications to the frontend.
+     *
+     * @internal
+     */
     private readonly monitorManager: MonitorManager;
 
     // Manager instances
     private readonly siteManager: SiteManager;
 
     // Named event handlers for database events
+    /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
         data: UpdateSitesCacheRequestData
     ): void => {
@@ -215,6 +239,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for retrieving sites from cache.
+     *
+     * @remarks
+     * Handles internal cache retrieval requests and manages error logging.
+     * This is an arrow function property to maintain proper 'this' binding
+     * when used as an event handler callback. Delegates the actual work to
+     * the handleGetSitesFromCacheRequest method.
+     *
+     * @internal
+     */
     private readonly handleGetSitesFromCacheRequestedEvent = (): void => {
         void (async (): Promise<void> => {
             try {
@@ -228,6 +263,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for database initialization completion.
+     *
+     * @remarks
+     * Handles notification when database initialization is complete and
+     * manages error logging. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback. Delegates
+     * the actual work to the handleDatabaseInitialized method.
+     *
+     * @internal
+     */
     private readonly handleDatabaseInitializedEvent = (): void => {
         void (async (): Promise<void> => {
             try {
@@ -242,6 +288,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     // Named event handlers for event forwarding
+    /** Event handler for site addition events */
     private readonly handleSiteAddedEvent = (
         data: SiteEventData & { _meta?: unknown }
     ): void => {
@@ -255,6 +302,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for site removal events.
+     *
+     * @remarks
+     * Handles site removal events and forwards them to the frontend via the
+     * public event system. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback.
+     *
+     * @param data - Site event data containing site information and metadata
+     *
+     * @internal
+     */
     private readonly handleSiteRemovedEvent = (
         data: SiteEventData & { _meta?: unknown }
     ): void => {
@@ -269,6 +328,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for site update events.
+     *
+     * @remarks
+     * Handles site update events and forwards them to the frontend via the
+     * public event system. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback.
+     *
+     * @param data - Site event data containing site information, metadata, and previous state
+     *
+     * @internal
+     */
     private readonly handleSiteUpdatedEvent = (
         data: SiteEventData & { _meta?: unknown; previousSite?: Site }
     ): void => {
@@ -284,6 +355,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     // Named event handlers for monitoring events
+    /** Event handler for monitor start events */
     private readonly handleMonitorStartedEvent = (eventData: {
         identifier: string;
         monitorId?: string;
@@ -320,6 +392,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for monitor stop events.
+     *
+     * @remarks
+     * Handles monitor stop events and manages monitoring state updates.
+     * Emits monitoring:stopped events to notify the frontend of changes
+     * in monitoring state. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback.
+     *
+     * @param eventData - Monitor stop event data with timing and reason information
+     *
+     * @internal
+     */
     private readonly handleMonitorStoppedEvent = (eventData: {
         identifier: string;
         monitorId?: string;
@@ -357,6 +442,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     // Named event handlers for site management events
+    /** Event handler for monitoring start requests */
     private readonly handleStartMonitoringRequestedEvent = (
         data: StartMonitoringRequestData
     ): void => {
@@ -396,6 +482,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for monitoring stop requests.
+     *
+     * @remarks
+     * Handles requests to stop monitoring for specific sites or monitors.
+     * Delegates to the monitor manager and provides response events with
+     * success status. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback.
+     *
+     * @param data - Stop monitoring request data with site and monitor identifiers
+     *
+     * @internal
+     */
     private readonly handleStopMonitoringRequestedEvent = (
         data: StopMonitoringRequestData
     ): void => {
@@ -428,6 +527,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /**
+     * Event handler for monitoring status check requests.
+     *
+     * @remarks
+     * Handles requests to check if monitoring is active for specific sites
+     * or monitors. Queries the monitor manager and provides response events
+     * with current status. This is an arrow function property to maintain
+     * proper 'this' binding when used as an event handler callback.
+     *
+     * @param data - Monitoring status check request data with site and monitor identifiers
+     *
+     * @internal
+     */
     private readonly handleIsMonitoringActiveRequestedEvent = (
         data: IsMonitoringActiveRequestData
     ): void => {
@@ -449,6 +561,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
+    /** Event handler for monitoring restart requests */
     private readonly handleRestartMonitoringRequestedEvent = (
         data: RestartMonitoringRequestData
     ): void => {
