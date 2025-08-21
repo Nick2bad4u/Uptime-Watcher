@@ -17,7 +17,7 @@ import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
     getSiteStatusVariant,
-} from "../../utils/siteStatus";
+} from "@shared/utils/siteStatus";
 
 /**
  * Helper function to create a test site with specified monitors.

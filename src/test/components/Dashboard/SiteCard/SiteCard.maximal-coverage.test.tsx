@@ -32,7 +32,7 @@ vi.mock("../../../../hooks/site/useSite", () => ({
     })),
 }));
 
-vi.mock("../../../../utils/siteStatus", () => ({
+vi.mock("@shared/utils/siteStatus", () => ({
     getSiteDisplayStatus: vi.fn(() => "operational"),
     getSiteStatusVariant: vi.fn(() => "success"),
 }));

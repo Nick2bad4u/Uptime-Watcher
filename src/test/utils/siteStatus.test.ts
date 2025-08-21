@@ -9,7 +9,7 @@ import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
     getSiteStatusVariant,
-} from "../../utils/siteStatus";
+} from "@shared/utils/siteStatus";
 import type { SiteStatus } from "../../../shared/types";
 /**
  * Site Status Utility Tests

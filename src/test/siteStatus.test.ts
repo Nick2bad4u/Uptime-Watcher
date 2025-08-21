@@ -9,8 +9,8 @@ import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
     getSiteStatusVariant,
-} from "../utils/siteStatus";
-import type { Site } from "@shared/types";
+} from "@shared/utils/siteStatus";
+import type { Site } from "../../shared/types";
 
 describe("siteStatus utilities - Uncovered Lines", () => {
     describe("calculateSiteStatus", () => {

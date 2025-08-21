@@ -100,7 +100,7 @@
     "docs:download:zustand": "node scripts/download-zustand-docs.js",
     "docs:preview": "serve docs",
     "docs:typedoc": "cd docs/docusaurus && typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
-    "docs:typedoc:local": "cd docs/docusaurus && typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified-local.js",
+    "docs:typedoc:local": "cd docs/docusaurus && typedoc --options typedoc.local.config.json && node ../../scripts/fix-mdx-typedoc-unified-local.js",
     "docusaurus:broken-links": "npm run docs:typedoc && cd docs/docusaurus && docusaurus check",
     "docusaurus:broken-links:local": "npm run docs:typedoc:local && cd docs/docusaurus && docusaurus check",
     "docusaurus:build": "npm run docs:typedoc && cd docs/docusaurus && docusaurus build",
