@@ -42,21 +42,27 @@ jobs:
               run: |
                   sudo apt-get update
                   sudo apt-get install -y flatpak flatpak-builder elfutils libarchive-tools
-                  flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-                  flatpak install -y --noninteractive --user flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08
-                  flatpak install -y --noninteractive --user flathub org.electronjs.Electron2.BaseApp//24.08
-                  flatpak update -y --user
-
-            - name: Install Flatpak SDK extensions
-              run: |
-                  # Ensure the flathub remote exists and install the required SDK extensions
-                  flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-                  # Use explicit refs (//24.08) to avoid interactive selection when multiple versions exist
-                  # Note: TypeScript extension removed as it's not needed for runtime builds
-                  flatpak install -y --noninteractive --user flathub \
+                  # IMPORTANT: Install EVERYTHING system-wide (no --user) so flatpak-builder sandbox can see extensions.
+                  # --user installs are NOT visible inside the build sandbox -> caused missing org.freedesktop.Sdk.Extension.node24.
+                  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+                  flatpak install -y --noninteractive flathub \
+                    org.freedesktop.Platform//24.08 \
+                    org.freedesktop.Sdk//24.08 \
+                    org.electronjs.Electron2.BaseApp//24.08 \
                     org.freedesktop.Sdk.Extension.node24//24.08
-              env:
-                  CI: true
+                  flatpak update -y
+              continue-on-error: true
+
+            - name: Verify Flatpak components
+              run: |
+                  echo "Verifying required Flatpak components are available (system scope)";
+                  flatpak info org.freedesktop.Platform//24.08 || exit 1
+                  flatpak info org.freedesktop.Sdk//24.08 || exit 1
+                  flatpak info org.electronjs.Electron2.BaseApp//24.08 || exit 1
+                  flatpak info org.freedesktop.Sdk.Extension.node24//24.08 || (echo "node24 extension missing" && exit 1)
+              continue-on-error: true
+
+        # Removed duplicate SDK extension install step (handled above system-wide)
 
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0

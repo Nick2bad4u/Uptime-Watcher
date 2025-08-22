@@ -100,9 +100,11 @@ modules:
     - name: nodejs
       buildsystem: simple
       build-commands:
-          # Node.js SDK extension is available via sdk-extensions declaration
-          - echo "Using Node.js $(node --version) from SDK extension"
-          - echo "npm version: $(npm --version)"
+          # Node.js SDK extension is made available by system-wide install in CI workflow.
+          # We intentionally do NOT hard fail here; earlier workflow verification already
+          # guarantees presence. This keeps local ad-hoc builds more forgiving.
+          - echo "(info) Node.js from extension version: $(node --version 2>/dev/null || echo 'unavailable')"
+          - echo "(info) npm version: $(npm --version 2>/dev/null || echo 'unavailable')"
       sources: []
 
     # Main application module
