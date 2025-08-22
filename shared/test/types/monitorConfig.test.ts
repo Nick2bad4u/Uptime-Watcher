@@ -18,9 +18,46 @@ describe("Function Coverage Validation", () => {
         expect(typeof monitorConfig.isPortMonitorConfig).toBe("function");
 
         // Call each function with minimal valid inputs to register coverage
-        const httpConfig = { type: "http" } as any;
-        const pingConfig = { type: "ping" } as any;
-        const portConfig = { type: "port" } as any;
+        const httpConfig = {
+            id: "http1",
+            name: "HTTP Monitor",
+            type: "http",
+            url: "https://example.com",
+            method: "GET",
+            expectedStatusCodes: [200],
+            followRedirects: true,
+            checkInterval: 30000,
+            enabled: true,
+            retryAttempts: 3,
+            timeout: 5000
+        } as any;
+        
+        const pingConfig = {
+            id: "ping1", 
+            name: "Ping Monitor",
+            type: "ping",
+            host: "example.com",
+            maxPacketLoss: 0,
+            packetCount: 4,
+            packetSize: 32,
+            checkInterval: 30000,
+            enabled: true,
+            retryAttempts: 3,
+            timeout: 5000
+        } as any;
+        
+        const portConfig = {
+            id: "port1",
+            name: "Port Monitor", 
+            type: "port",
+            host: "example.com",
+            port: 80,
+            connectionTimeout: 10000,
+            checkInterval: 30000,
+            enabled: true,
+            retryAttempts: 3,
+            timeout: 5000
+        } as any;
 
         monitorConfig.isHttpMonitorConfig(httpConfig);
         monitorConfig.isPingMonitorConfig(pingConfig);

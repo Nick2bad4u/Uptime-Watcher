@@ -23,9 +23,7 @@
     "projectDocuments": [
         "../../docs/Architecture/**/*.md",
         "../../docs/Guides/**/*.md",
-        "../../docs/Packages/**/*.md",
         "../../docs/TSDoc/**/*.md",
-        "../../docs/*.md"
     ],
     "githubPages": true,
     "hideGenerator": false,
@@ -131,7 +129,7 @@
     "replaceText": {
         "inCodeCommentText": true,
         "inCodeCommentTags": true,
-        "inMarkdownText": true,
+        "inMarkdownText": false,
         "replacements": [
             {
                 "pattern": "\\bTODO:",

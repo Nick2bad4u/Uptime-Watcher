@@ -23,9 +23,7 @@
     "projectDocuments": [
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Architecture/**/*.md",
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Guides/**/*.md",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Packages/**/*.md",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/TSDoc/**/*.md",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/*.md"
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/TSDoc/**/*.md",        
     ],
     "githubPages": true,
     "hideGenerator": false,
@@ -131,7 +129,7 @@
     "replaceText": {
         "inCodeCommentText": true,
         "inCodeCommentTags": true,
-        "inIncludedFiles": true,
+        "inMarkdownText": false,
         "replacements": [
             {
                 "pattern": "\\bTODO:",

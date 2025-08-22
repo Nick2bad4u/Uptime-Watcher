@@ -694,9 +694,25 @@ describe("Monitor Configuration Types", () => {
 
         it("should provide discriminated union support", () => {
             const configs: MonitorConfig[] = [
-                DEFAULT_MONITOR_CONFIG.http as MonitorConfig,
-                DEFAULT_MONITOR_CONFIG.ping as MonitorConfig,
-                DEFAULT_MONITOR_CONFIG.port as MonitorConfig,
+                {
+                    ...DEFAULT_MONITOR_CONFIG.http,
+                    id: "http1",
+                    name: "HTTP Monitor", 
+                    url: "https://example.com"
+                } as HttpMonitorConfig,
+                {
+                    ...DEFAULT_MONITOR_CONFIG.ping,
+                    id: "ping1",
+                    name: "Ping Monitor",
+                    host: "example.com"
+                } as PingMonitorConfig,
+                {
+                    ...DEFAULT_MONITOR_CONFIG.port,
+                    id: "port1", 
+                    name: "Port Monitor",
+                    host: "example.com",
+                    port: 80
+                } as PortMonitorConfig,
             ];
 
             // Each config should be properly typed based on its type field
