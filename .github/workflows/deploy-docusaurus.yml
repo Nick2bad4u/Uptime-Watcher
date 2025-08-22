@@ -62,15 +62,17 @@ jobs:
                   # Build files
                   npm run build:electron-vite
 
-            - name: Generate unified TypeDoc documentation
+            - name: Generate TypeDoc docs and build Docusaurus
               run: |
-                  # Generate unified TypeDoc documentation for all source code (Frontend, Backend, Shared)
-                  npm run docs:typedoc
+                  # Use the existing workflow: Generate TypeDoc first, then build Docusaurus
+                  npm run docs:typedoc && cd docs/docusaurus && npm run build:fast
               continue-on-error: true
 
-            - name: List TypeDoc output directories
+            - name: List Docusaurus build output
               run: |
-                  echo "TypeDoc output directories:"
+                  echo "Docusaurus build output:"
+                  ls -la docs/docusaurus/build
+                  echo "Files count: $(find docs/docusaurus/build -type f | wc -l)"
                   ls -la docs/docusaurus/docs
                   echo "Files count: $(find docs/docusaurus/docs -type f | wc -l)"
               continue-on-error: true
@@ -81,7 +83,7 @@ jobs:
             - name: Upload build artifact
               uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
               with:
-                  path: docs/docusaurus
+                  path: docs/docusaurus/build
 
     # Deployment job
     deploy:

@@ -100,13 +100,7 @@ modules:
     - name: nodejs
       buildsystem: simple
       build-commands:
-          # Ensure Node.js SDK extension is installed
-          - |
-              if ! flatpak info org.freedesktop.Sdk.Extension.node24 >/dev/null 2>&1; then
-                echo "ERROR: Required Flatpak extension org.freedesktop.Sdk.Extension.node24 is not installed."
-                echo "Install it with: flatpak install flathub org.freedesktop.Sdk.Extension.node24//24.08"
-                exit 1
-              fi
+          # Node.js SDK extension is available via sdk-extensions declaration
           - echo "Using Node.js $(node --version) from SDK extension"
           - echo "npm version: $(npm --version)"
       sources: []
@@ -117,7 +111,6 @@ modules:
       build-options:
           env:
               # Additional build-time environment
-              ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: "true"
               ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
 
       build-commands:
