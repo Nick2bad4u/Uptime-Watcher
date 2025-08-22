@@ -34,3 +34,4 @@ package.json
 
 # Ignore Sonar properties (not compatible with prettier-ini parser)
 sonar-project.properties
+*.mdx

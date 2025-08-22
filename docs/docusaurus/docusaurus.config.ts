@@ -6,7 +6,8 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
     title: "Uptime Watcher",
-    tagline: "Cross-platform desktop application for monitoring website uptime and server availability",
+    tagline:
+        "Cross-platform desktop application for monitoring website uptime and server availability",
     favicon: "img/favicon.ico",
 
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
@@ -15,7 +16,21 @@ const config: Config = {
         // Removed docusaurus-plugin-typedoc to avoid conflicts with standalone generation
     ],
 
-
+    markdown: {
+        format: "detect",
+        mermaid: true,
+        preprocessor: ({ filePath, fileContent }) => {
+            return fileContent.replaceAll("{{MY_VAR}}", "MY_VALUE");
+        },
+        mdx1Compat: {
+            comments: true,
+            admonitions: true,
+            headingIds: true,
+        },
+        anchors: {
+            maintainCase: true,
+        },
+    },
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         v4: true, // Improve compatibility with the upcoming Docusaurus v4
@@ -44,7 +59,8 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: "./sidebars.ts",
-                    editUrl: "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/",
+                    editUrl:
+                        "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/",
                     routeBasePath: "docs",
                     include: ["**/*.md", "**/*.mdx"],
                     exclude: [
@@ -72,7 +88,11 @@ const config: Config = {
     themeConfig: {
         image: "img/uptime-watcher-social-card.jpg",
         metadata: [
-            { name: "keywords", content: "uptime monitoring, website monitoring, server monitoring, electron app" },
+            {
+                name: "keywords",
+                content:
+                    "uptime monitoring, website monitoring, server monitoring, electron app",
+            },
             {
                 name: "description",
                 content:
@@ -149,7 +169,12 @@ const config: Config = {
         prism: {
             theme: prismThemes.github,
             darkTheme: prismThemes.dracula,
-            additionalLanguages: ["typescript", "javascript", "json", "yaml"],
+            additionalLanguages: [
+                "typescript",
+                "javascript",
+                "json",
+                "yaml",
+            ],
         },
     } satisfies Preset.ThemeConfig,
 };
