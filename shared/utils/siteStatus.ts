@@ -40,7 +40,7 @@ export function calculateSiteMonitoringStatus(
 ): "partial" | "running" | "stopped" {
     const { monitors } = site;
 
-    if (monitors.length === 0) {
+    if (!monitors || monitors.length === 0) {
         return "stopped";
     }
 

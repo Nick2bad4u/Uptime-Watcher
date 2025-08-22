@@ -350,8 +350,31 @@ export function safeGetRowProperty<T>(
     property: string,
     defaultValue: T
 ): T {
+    // Handle null/undefined row objects
+    if (!row || typeof row !== 'object') {
+        return defaultValue;
+    }
+
+    // First check for exact property name match (including properties with dots)
     if (property in row && row[property] !== undefined) {
         return row[property] as T;
     }
+
+    // Handle nested property access with dot notation
+    if (property.includes('.')) {
+        const parts = property.split('.');
+        let current: any = row;
+        
+        for (const part of parts) {
+            if (current && typeof current === 'object' && part in current && current[part] !== undefined) {
+                current = current[part];
+            } else {
+                return defaultValue;
+            }
+        }
+        
+        return current as T;
+    }
+
     return defaultValue;
 }

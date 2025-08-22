@@ -28,3 +28,53 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* -------------------------------------------------- */
+/* Sidebar Enhancements                               */
+/* -------------------------------------------------- */
+/* Base spacing tweaks */
+.theme-doc-sidebar-menu .menu__list-item { margin-top: 2px; }
+
+/* Category header accent classes */
+.sb-cat-guides > .menu__list-item-collapsible .menu__link,
+.sb-cat-guides .menu__link--sublist { font-weight: 600; }
+
+.sb-cat-frontend > .menu__list-item-collapsible .menu__link { border-left: 4px solid #4dabf7; }
+.sb-cat-backend > .menu__list-item-collapsible .menu__link { border-left: 4px solid #ffa94d; }
+.sb-cat-shared > .menu__list-item-collapsible .menu__link { border-left: 4px solid #51cf66; }
+.sb-cat-internal > .menu__list-item-collapsible .menu__link { border-left: 4px solid #868e96; }
+
+[data-theme='dark'] .sb-cat-frontend > .menu__list-item-collapsible .menu__link { border-color: #339af0; }
+[data-theme='dark'] .sb-cat-backend > .menu__list-item-collapsible .menu__link { border-color: #fd7e14; }
+[data-theme='dark'] .sb-cat-shared > .menu__list-item-collapsible .menu__link { border-color: #40c057; }
+[data-theme='dark'] .sb-cat-internal > .menu__list-item-collapsible .menu__link { border-color: #adb5bd; }
+
+/* Overview doc styling */
+.sb-doc-overview .theme-doc-sidebar-item-link a { font-weight: 700; }
+
+/* Badge rendering using customProps + data attributes if later we add them */
+.menu__list-item[data-badge] > .menu__link::after,
+.menu__list-item-collapsible[data-badge] > .menu__link::after {
+  content: attr(data-badge);
+  background: var(--ifm-color-primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* Specific badge color mapping (applied by class fallback) */
+.menu__list-item[data-badge='api'] > .menu__link::after { background:#5966d6; }
+.menu__list-item[data-badge='core'] > .menu__link::after { background:#2e8555; }
+.menu__list-item[data-badge='internal'] > .menu__link::after { background:#868e96; }
+
+/* Subtle hover elevation */
+.theme-doc-sidebar-menu .menu__link:hover { background: rgba(0,0,0,0.04); }
+[data-theme='dark'] .theme-doc-sidebar-menu .menu__link:hover { background: rgba(255,255,255,0.06); }
+
+/* Generated index pages heading spacing tweak */
+.theme-doc-markdown h1:first-of-type { margin-top: .5rem; }

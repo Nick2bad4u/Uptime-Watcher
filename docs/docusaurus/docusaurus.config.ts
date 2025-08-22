@@ -13,8 +13,28 @@ const config: Config = {
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
-        // Removed docusaurus-plugin-typedoc to avoid conflicts with standalone generation
+        // [
+        //     "docusaurus-plugin-typedoc",
+        //     {
+        //         sidebar: {
+        //             autoConfiguration: false,
+        //             pretty: true,
+        //             typescript: true,
+        //             deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
+
+        //         },
+        //         entryPoints: [
+        //             "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
+        //             "../../electron/**/*.{ts,mts,cts,tsx,js,jsx}",
+        //             "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
+        //         ],
+        //         tsconfig: "tsconfig.typedoc.json",
+        //         plugin: ["typedoc-plugin-markdown"],
+        //         gitRevision: "main",
+        //     },
+        // ],
     ],
+
 
     markdown: {
         format: "detect",

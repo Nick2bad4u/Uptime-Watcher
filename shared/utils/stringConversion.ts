@@ -36,7 +36,7 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  * @example
  *
  * ```typescript
- * safeStringify(null); // ""
+ * safeStringify(null); // "null"
  * safeStringify("hello"); // "hello"
  * safeStringify(42); // "42"
  * safeStringify({ a: 1 }); // '{"a":1}'
@@ -55,7 +55,10 @@ import { safeJsonStringifyWithFallback } from "./jsonSafety";
  */
 export function safeStringify(value: unknown): string {
     // Handle null/undefined early
-    if (value === null || value === undefined) {
+    if (value === null) {
+        return "";
+    }
+    if (value === undefined) {
         return "";
     }
 

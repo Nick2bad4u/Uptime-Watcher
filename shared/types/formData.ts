@@ -252,7 +252,16 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
 export function isHttpFormData(
     formData: MonitorFormData
 ): formData is HttpFormData {
-    return formData.type === "http";
+    if (formData === null || formData === undefined) {
+        return false;
+    }
+    return formData && 
+        typeof formData === 'object' && 
+        formData.type === "http" &&
+        typeof formData.checkInterval === 'number' &&
+        typeof formData.retryAttempts === 'number' &&
+        typeof formData.timeout === 'number' &&
+        typeof formData.url === 'string';
 }
 
 /**
@@ -267,7 +276,16 @@ export function isHttpFormData(
 export function isPingFormData(
     formData: MonitorFormData
 ): formData is PingFormData {
-    return formData.type === "ping";
+    if (formData === null || formData === undefined) {
+        return false;
+    }
+    return formData && 
+        typeof formData === 'object' && 
+        formData.type === "ping" &&
+        typeof formData.checkInterval === 'number' &&
+        typeof formData.retryAttempts === 'number' &&
+        typeof formData.timeout === 'number' &&
+        typeof formData.host === 'string';
 }
 
 /**
@@ -282,7 +300,17 @@ export function isPingFormData(
 export function isPortFormData(
     formData: MonitorFormData
 ): formData is PortFormData {
-    return formData.type === "port";
+    if (formData === null || formData === undefined) {
+        return false;
+    }
+    return formData && 
+        typeof formData === 'object' && 
+        formData.type === "port" &&
+        typeof formData.checkInterval === 'number' &&
+        typeof formData.retryAttempts === 'number' &&
+        typeof formData.timeout === 'number' &&
+        typeof formData.host === 'string' &&
+        typeof formData.port === 'number';
 }
 
 /**

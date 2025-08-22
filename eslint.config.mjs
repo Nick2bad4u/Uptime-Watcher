@@ -536,6 +536,9 @@ export default [
             ...cssPlugin.configs["flat/standard"].rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
 
+            // Disable undefined-css-classes as it's producing false positives for valid Tailwind classes
+            "undefined-css-classes/no-undefined-css-classes": "off",
+
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
             //     {

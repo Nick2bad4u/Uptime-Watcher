@@ -106,6 +106,6 @@
         "coverage",
         "../../electron/dist/**",
         "../../src/services/dist/**",
-        "../../src/theme/dist/**",
+        "../../src/theme/dist/**"
     ]
 }
