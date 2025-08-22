@@ -1,5 +1,5 @@
-# Deploy Docusaurus site to GitHub Pages
-name: Deploy Docusaurus to GitHub Pages
+# Deploy TypeDoc documentation to GitHub Pages
+name: Deploy TypeDoc Documentation to GitHub Pages
 
 on:
     # Runs on pushes targeting the default branch
@@ -30,7 +30,7 @@ concurrency:
 jobs:
     # Build job
     build:
-        name: Build Docusaurus
+        name: Build TypeDoc Documentation
         runs-on: ubuntu-latest
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -48,11 +48,14 @@ jobs:
               with:
                   node-version: "latest"
 
-            - name: Install dependencies
-              run: npm install --force
+            - name: Cache node modules
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
             - name: Install dependencies
-              run: npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
+              run: npm install --force
 
             - name: Build before TypeDoc
               run: |
@@ -68,11 +71,8 @@ jobs:
             - name: List TypeDoc output directories
               run: |
                   echo "TypeDoc output directories:"
-                  ls -l docs/docusaurus/docs
-                  ls -l docs
-
-            - name: Build Docusaurus website
-              run: npm run docusaurus:build
+                  ls -la docs/docusaurus/docs
+                  echo "Files count: $(find docs/docusaurus/docs -type f | wc -l)"
               continue-on-error: true
 
             - name: Setup Pages
@@ -81,7 +81,7 @@ jobs:
             - name: Upload build artifact
               uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
               with:
-                  path: docs/docusaurus/build
+                  path: docs/docusaurus/docs
 
     # Deployment job
     deploy:

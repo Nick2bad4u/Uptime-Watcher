@@ -51,12 +51,12 @@
     },
     "include": [
         "../../src/**/*.ts",
-        "../../src/**/*.tsx", 
+        "../../src/**/*.tsx",
         "../../src/**/*.js",
         "../../src/**/*.jsx",
         "../../electron/**/*.ts",
         "../../electron/**/*.tsx",
-        "../../electron/**/*.js", 
+        "../../electron/**/*.js",
         "../../electron/**/*.jsx",
         "../../shared/**/*.ts",
         "../../shared/**/*.tsx",
@@ -101,11 +101,11 @@
         "../../**/.turbo/**",
         "../../**/.docusaurus/**",
         "node_modules",
-        "dist", 
+        "dist",
         "build",
         "coverage",
         "../../electron/dist/**",
         "../../src/services/dist/**",
-        "../../src/theme/dist/**"
+        "../../src/theme/dist/**",
     ]
 }

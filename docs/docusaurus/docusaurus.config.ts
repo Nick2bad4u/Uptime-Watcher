@@ -11,7 +11,29 @@ const config: Config = {
 
     // TypeDoc documentation is now generated via npm scripts using unified config
     // See: docs/docusaurus/typedoc.config.json and npm run docs:typedoc
-    plugins: [],
+    plugins: [
+        [
+            "docusaurus-plugin-typedoc",
+            {
+                sidebar: {
+                    autoConfiguration: false,
+                    pretty: true,
+                    typescript: true,
+                    deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
+
+                },
+                entryPoints: [
+                    "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
+                    "../../electron/**/*.{ts,mts,cts,tsx,js,jsx}",
+                    "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
+                ],
+                tsconfig: "tsconfig.typedoc.json",
+                plugin: ["typedoc-plugin-markdown"],
+                gitRevision: "main",
+            },
+        ],
+    ],
+
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {

@@ -96,12 +96,12 @@
         "**/report/**": true,
         "**/docs/Packages/**": true,
         "**/docs/Archive/**": true,
-        "**/docs/docusaurus/**": true
+        "**/docs/docusaurus/docs/**": true
     },
     "search.exclude": {
         "**/docs/Packages/**": true,
         "**/docs/Archive/**": true,
-        "**/docs/docusaurus/**": true,
+        "**/docs/docusaurus/docs/**": true,
         "**/.husky/**": true,
         "**/coverage/**": true,
         "**/dist-electron/**": true,

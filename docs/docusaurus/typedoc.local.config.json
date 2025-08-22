@@ -1,5 +1,5 @@
 {
-    "$schema": "https://typedoc.org/schema.json",
+    "$schema": "https://typedoc-plugin-markdown.org/schema.json",
     "name": "Uptime Watcher - Complete Documentation",
     "entryPointStrategy": "expand",
     "entryPoints": [
@@ -105,16 +105,28 @@
         "alphabetical"
     ],
     "plugin": [
+        "typedoc-plugin-remark",
+        "typedoc-plugin-missing-exports",
+        "typedoc-plugin-replace-text",
         "typedoc-plugin-markdown",
-        "typedoc-docusaurus-theme",
-        "typedoc-plugin-zod",
         "typedoc-plugin-mdn-links",
         "typedoc-plugin-dt-links",
         "typedoc-plugin-external-package-links",
+        "typedoc-plugin-rename-defaults",
         "typedoc-plugin-coverage",
-        "typedoc-plugin-replace-text",
-        "typedoc-plugin-rename-defaults"
+        "typedoc-docusaurus-theme"
     ],
+    "placeInternalsInOwningModule": true,
+    "includeDocCommentReferences": false,
+    "expandObjects": true,
+    "expandParameters": true,
+    "strikeDeprecatedPageTitles": true,
+    "formatWithPrettier": true,
+    "prettierConfigFile": "../../.prettierrc",
+    "useCustomAnchors": true,
+    "customAnchorsFormat": "escapedCurlyBrace",
+    "useHTMLAnchors": true,
+    "sanitizeComments": false,
     "resolveUtilityTypes": true,
     "replaceText": {
         "inCodeCommentText": true,
@@ -237,6 +249,10 @@
         },
         "chart.js": {
             "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
+            "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
+            "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
+            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
+            "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
             "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html",
             "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html"
         },
