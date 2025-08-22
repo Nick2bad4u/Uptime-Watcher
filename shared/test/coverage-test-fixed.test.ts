@@ -1,6 +1,6 @@
 /**
- * Fixed Coverage Tests for Shared Module
- * Targeting the exact uncovered lines to achieve 100% coverage
+ * Fixed Coverage Tests for Shared Module Targeting the exact uncovered lines to
+ * achieve 100% coverage
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -34,9 +34,15 @@ describe("Fixed Coverage Tests", () => {
     describe("schemas.ts - Line 399 (Unknown field error)", () => {
         it("should trigger unknown field error for truly unknown field", () => {
             // Test with a field that doesn't exist in any schema
-            const result = validateMonitorField("http", "totallyUnknownField", "value");
+            const result = validateMonitorField(
+                "http",
+                "totallyUnknownField",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Field validation failed: Unknown field: totallyUnknownField");
+            expect(result.errors).toContain(
+                "Field validation failed: Unknown field: totallyUnknownField"
+            );
         });
     });
 
@@ -63,7 +69,11 @@ describe("Fixed Coverage Tests", () => {
             };
 
             // Access property path that leads to null/undefined
-            const result = safeGetRowProperty(row, "nested.value.nonexistent", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.value.nonexistent",
+                "default"
+            );
             expect(result).toBe("default");
         });
     });
@@ -73,14 +83,17 @@ describe("Fixed Coverage Tests", () => {
             const mockStore = {
                 clearError: vi.fn(),
                 setError: vi.fn(),
-                setLoading: vi.fn()
+                setLoading: vi
+                    .fn()
                     .mockImplementationOnce(() => {}) // First call (start) succeeds
                     .mockImplementationOnce(() => {
                         throw new Error("setLoading failed in finally");
                     }), // Second call (finally) fails
             };
 
-            const operation = vi.fn().mockRejectedValue(new Error("Operation failed"));
+            const operation = vi
+                .fn()
+                .mockRejectedValue(new Error("Operation failed"));
 
             // This should cover the error handling in the finally block
             await expect(
@@ -97,7 +110,11 @@ describe("Fixed Coverage Tests", () => {
     describe("schemas.ts - Lines 478-479, 482 (Error categorization)", () => {
         it("should handle validation error categorization", () => {
             // Test with invalid data that should trigger the path length conditions
-            const result = validateMonitorField("http", "checkInterval", "not-a-number");
+            const result = validateMonitorField(
+                "http",
+                "checkInterval",
+                "not-a-number"
+            );
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });

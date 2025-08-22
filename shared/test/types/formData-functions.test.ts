@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared/types/formData.ts functions
+ * @file Tests for shared/types/formData.ts functions
  */
 
 import { describe, expect, it } from "vitest";
@@ -378,12 +378,16 @@ describe("shared/types/formData function coverage", () => {
                 userAgent: "UptimeBot/2.0 (Health Check)",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer token123",
+                    Authorization: "Bearer token123",
                     "X-API-Version": "v1",
                 },
-                expectedStatusCodes: [200, 201, 202],
+                expectedStatusCodes: [
+                    200,
+                    201,
+                    202,
+                ],
                 expectedResponseTime: 2000,
-                bodyMatch: "\"status\":\"healthy\"",
+                bodyMatch: '"status":"healthy"',
                 bodyNotMatch: "maintenance",
             };
 

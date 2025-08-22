@@ -29,11 +29,11 @@ describe("Function Coverage Validation", () => {
             checkInterval: 30000,
             enabled: true,
             retryAttempts: 3,
-            timeout: 5000
+            timeout: 5000,
         } as any;
-        
+
         const pingConfig = {
-            id: "ping1", 
+            id: "ping1",
             name: "Ping Monitor",
             type: "ping",
             host: "example.com",
@@ -43,12 +43,12 @@ describe("Function Coverage Validation", () => {
             checkInterval: 30000,
             enabled: true,
             retryAttempts: 3,
-            timeout: 5000
+            timeout: 5000,
         } as any;
-        
+
         const portConfig = {
             id: "port1",
-            name: "Port Monitor", 
+            name: "Port Monitor",
             type: "port",
             host: "example.com",
             port: 80,
@@ -56,7 +56,7 @@ describe("Function Coverage Validation", () => {
             checkInterval: 30000,
             enabled: true,
             retryAttempts: 3,
-            timeout: 5000
+            timeout: 5000,
         } as any;
 
         monitorConfig.isHttpMonitorConfig(httpConfig);

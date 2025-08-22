@@ -697,21 +697,21 @@ describe("Monitor Configuration Types", () => {
                 {
                     ...DEFAULT_MONITOR_CONFIG.http,
                     id: "http1",
-                    name: "HTTP Monitor", 
-                    url: "https://example.com"
+                    name: "HTTP Monitor",
+                    url: "https://example.com",
                 } as HttpMonitorConfig,
                 {
                     ...DEFAULT_MONITOR_CONFIG.ping,
                     id: "ping1",
                     name: "Ping Monitor",
-                    host: "example.com"
+                    host: "example.com",
                 } as PingMonitorConfig,
                 {
                     ...DEFAULT_MONITOR_CONFIG.port,
-                    id: "port1", 
+                    id: "port1",
                     name: "Port Monitor",
                     host: "example.com",
-                    port: 80
+                    port: 80,
                 } as PortMonitorConfig,
             ];
 

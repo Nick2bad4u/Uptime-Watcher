@@ -41,15 +41,16 @@ The main configuration file that sets up:
 - **Markdown processing**: MDX support with preprocessors
 
 Key settings:
+
 ```typescript
 export default {
-  title: "Uptime Watcher",
-  url: "https://nick2bad4u.github.io",
-  baseUrl: "/Uptime-Watcher/",
-  organizationName: "Nick2bad4u",
-  projectName: "Uptime-Watcher",
-  // ... other configuration
-}
+ title: "Uptime Watcher",
+ url: "https://nick2bad4u.github.io",
+ baseUrl: "/Uptime-Watcher/",
+ organizationName: "Nick2bad4u",
+ projectName: "Uptime-Watcher",
+ // ... other configuration
+};
 ```
 
 ### 2. Sidebar Configuration (`sidebars.ts`)
@@ -77,39 +78,46 @@ const sidebars: SidebarsConfig = {
 Two configuration files provide flexibility:
 
 #### `typedoc.config.json` (Standard)
+
 - Uses relative paths for cross-platform compatibility
 - Configured for CI/CD environments
 - Standard output directory: `docs`
 
 #### `typedoc.local.config.json` (Development)
+
 - Uses absolute paths for local development
 - Optimized for Windows development environment
 - Direct output to Docusaurus docs directory
 
 Key TypeDoc settings:
+
 ```json
 {
-  "entryPointStrategy": "expand",
-  "entryPoints": ["../../src/**/*.{ts,tsx}", "../../electron/**/*.{ts,tsx}", "../../shared/**/*.{ts,tsx}"],
-  "projectDocuments": [
-    "../../docs/Architecture/**/*.md",
-    "../../docs/Guides/**/*.md",
-    "../../docs/Packages/**/*.md",
-    "../../docs/TSDoc/**/*.md",
-    "../../docs/*.md"
-  ],
-  "plugin": [
-    "typedoc-plugin-remark",
-    "typedoc-plugin-missing-exports",
-    "typedoc-plugin-replace-text",
-    "typedoc-plugin-markdown",
-    "typedoc-plugin-mdn-links",
-    "typedoc-plugin-dt-links",
-    "typedoc-plugin-external-package-links",
-    "typedoc-plugin-rename-defaults",
-    "typedoc-plugin-coverage",
-    "typedoc-docusaurus-theme"
-  ]
+ "entryPointStrategy": "expand",
+ "entryPoints": [
+  "../../src/**/*.{ts,tsx}",
+  "../../electron/**/*.{ts,tsx}",
+  "../../shared/**/*.{ts,tsx}"
+ ],
+ "plugin": [
+  "typedoc-plugin-remark",
+  "typedoc-plugin-missing-exports",
+  "typedoc-plugin-replace-text",
+  "typedoc-plugin-markdown",
+  "typedoc-plugin-mdn-links",
+  "typedoc-plugin-dt-links",
+  "typedoc-plugin-external-package-links",
+  "typedoc-plugin-rename-defaults",
+  "typedoc-plugin-coverage",
+  "typedoc-docusaurus-theme"
+ ],
+ "projectDocuments": [
+  "../../docs/Architecture/**/*.md",
+  "../../docs/Guides/**/*.md",
+  "../../docs/Packages/**/*.md",
+  "../../docs/TSDoc/**/*.md",
+  "../../docs/*.md"
+ ]
 }
 ```
 
@@ -135,7 +143,7 @@ The `projectDocuments` feature in TypeDoc allows including standalone markdown f
 ### Document Categories
 
 - **Architecture/**: ADRs, patterns, templates, and architectural decisions
-- **Guides/**: Development guides, testing methodology, and feature guides  
+- **Guides/**: Development guides, testing methodology, and feature guides
 - **Packages/**: Third-party package documentation and examples
 - **TSDoc/**: TypeScript documentation standards and examples
 - **Root level**: High-level project documentation
@@ -157,7 +165,7 @@ npm run docs:build
 
 ### 2. Generation Steps
 
-1. **TypeDoc Generation**: 
+1. **TypeDoc Generation**:
    - Parses TypeScript source files
    - Processes project documents from markdown files
    - Generates unified documentation in `docs/` directory
@@ -172,6 +180,7 @@ npm run docs:build
 ### 3. Deployment
 
 The documentation is deployed to GitHub Pages via:
+
 - **Base URL**: `/Uptime-Watcher/`
 - **Organization**: `Nick2bad4u`
 - **Repository**: `Uptime-Watcher`
@@ -182,6 +191,7 @@ The documentation is deployed to GitHub Pages via:
 ### 1. Unified Navigation
 
 The sidebar integrates:
+
 - Project documentation (from markdown files)
 - API documentation (from TypeScript source)
 - Cross-references between different documentation types
@@ -189,6 +199,7 @@ The sidebar integrates:
 ### 2. Advanced Search
 
 Powered by Docusaurus search with:
+
 - Full-text search across all documentation
 - Category-specific search boosts
 - Document type filtering
@@ -216,6 +227,7 @@ Powered by Docusaurus search with:
 ### Modifying Sidebar Structure
 
 The sidebar structure is controlled by:
+
 1. **TypeDoc generation**: Creates base navigation from projectDocuments
 2. **Sidebar configuration**: Adds custom categories and ordering
 3. **Category options**: Collapse/expand behavior and labeling
@@ -223,6 +235,7 @@ The sidebar structure is controlled by:
 ### Theme Customization
 
 Customize appearance via:
+
 - `src/css/custom.css`: Global style overrides
 - Theme configuration in `docusaurus.config.ts`
 - Custom React components in `src/components/`

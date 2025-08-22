@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared/types/validation.ts functions
+ * @file Tests for shared/types/validation.ts functions
  */
 
 import { describe, expect, it } from "vitest";

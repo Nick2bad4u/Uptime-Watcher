@@ -1,6 +1,6 @@
 /**
- * Complete 100% Coverage Tests for Shared Module
- * Targeting specific uncovered lines to achieve 100% coverage
+ * Complete 100% Coverage Tests for Shared Module Targeting specific uncovered
+ * lines to achieve 100% coverage
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -46,7 +46,11 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // Try to validate a field that doesn't exist in any schema
             // Using a field name that's not in http schema or base schema
             expect(() => {
-                validateMonitorField("unknownCustomField", "http", "invalidValue");
+                validateMonitorField(
+                    "unknownCustomField",
+                    "http",
+                    "invalidValue"
+                );
             }).toThrow("Unknown field: unknownCustomField");
         });
 
@@ -91,7 +95,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
         it("should handle RowValidationUtils.isValidTimestamp false case (line 208)", () => {
             // Test the case where isValidTimestamp returns false
             const invalidTimestamp = "not-a-number";
-            const result = RowValidationUtils.isValidTimestamp(invalidTimestamp);
+            const result =
+                RowValidationUtils.isValidTimestamp(invalidTimestamp);
             expect(result).toBe(false);
         });
 
@@ -104,7 +109,11 @@ describe("Complete 100% Coverage - Final Tests", () => {
             };
 
             // This should hit the line where current is null/undefined
-            const result = safeGetRowProperty(row, "nested.value.deep", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.value.deep",
+                "default"
+            );
             expect(result).toBe("default");
         });
     });

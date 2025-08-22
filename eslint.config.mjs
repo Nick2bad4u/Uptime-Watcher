@@ -198,6 +198,7 @@ export default [
     // Global ignores - must be first and more comprehensive
     {
         ignores: [
+            "CHANGELOG.md",
             "_ZENTASKS*",
             ".agentic-tools*",
             ".devskim.json",

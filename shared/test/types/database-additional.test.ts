@@ -1,5 +1,6 @@
 /**
- * @fileoverview Additional tests for shared/types/database.ts functions to achieve 100% coverage
+ * @file Additional tests for shared/types/database.ts functions to achieve 100%
+ *   coverage
  */
 
 import { describe, expect, it } from "vitest";
@@ -197,7 +198,11 @@ describe("shared/types/database additional function coverage", () => {
                 stringProp: "text",
                 numberProp: 42,
                 booleanProp: true,
-                arrayProp: [1, 2, 3],
+                arrayProp: [
+                    1,
+                    2,
+                    3,
+                ],
                 objectProp: { nested: "value" },
                 nullProp: null,
                 undefinedProp: undefined,
@@ -215,11 +220,13 @@ describe("shared/types/database additional function coverage", () => {
                 true
             );
             expect(safeGetRowProperty(mixedRow, "arrayProp", [])).toEqual([
-                1, 2, 3,
+                1,
+                2,
+                3,
             ]);
-            expect(
-                safeGetRowProperty(mixedRow, "objectProp", {})
-            ).toEqual({ nested: "value" });
+            expect(safeGetRowProperty(mixedRow, "objectProp", {})).toEqual({
+                nested: "value",
+            });
 
             // Test falsy values
             expect(safeGetRowProperty(mixedRow, "nullProp", "default")).toBe(
@@ -259,7 +266,7 @@ describe("shared/types/database additional function coverage", () => {
             const specialRow = {
                 "prop with spaces": "value1",
                 "prop-with-dashes": "value2",
-                "prop_with_underscores": "value3",
+                prop_with_underscores: "value3",
                 "123numeric": "value4",
                 "": "empty string key",
                 "prop.with.dots": "value5",
@@ -300,9 +307,9 @@ describe("shared/types/database additional function coverage", () => {
             expect(safeGetRowProperty(circularRow, "name", "default")).toBe(
                 "test"
             );
-            expect(
-                safeGetRowProperty(circularRow, "circular", {})
-            ).toBe(circularRow);
+            expect(safeGetRowProperty(circularRow, "circular", {})).toBe(
+                circularRow
+            );
         });
 
         it("should handle array-like objects", () => {
@@ -410,10 +417,13 @@ describe("shared/types/database additional function coverage", () => {
                 }, // invalid
             ];
 
-            const results = mixedData.map((item) =>
-                isValidHistoryRow(item)
-            );
-            expect(results).toEqual([true, false, false, false]);
+            const results = mixedData.map((item) => isValidHistoryRow(item));
+            expect(results).toEqual([
+                true,
+                false,
+                false,
+                false,
+            ]);
         });
     });
 });

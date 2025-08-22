@@ -351,7 +351,7 @@ export function safeGetRowProperty<T>(
     defaultValue: T
 ): T {
     // Handle null/undefined row objects
-    if (!row || typeof row !== 'object') {
+    if (!row || typeof row !== "object") {
         return defaultValue;
     }
 
@@ -361,18 +361,23 @@ export function safeGetRowProperty<T>(
     }
 
     // Handle nested property access with dot notation
-    if (property.includes('.')) {
-        const parts = property.split('.');
+    if (property.includes(".")) {
+        const parts = property.split(".");
         let current: any = row;
-        
+
         for (const part of parts) {
-            if (current && typeof current === 'object' && part in current && current[part] !== undefined) {
+            if (
+                current &&
+                typeof current === "object" &&
+                part in current &&
+                current[part] !== undefined
+            ) {
                 current = current[part];
             } else {
                 return defaultValue;
             }
         }
-        
+
         return current as T;
     }
 

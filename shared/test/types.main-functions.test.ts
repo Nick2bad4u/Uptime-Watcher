@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared/types.ts functions
+ * @file Tests for shared/types.ts functions
  */
 
 import { describe, expect, it } from "vitest";
@@ -117,7 +117,7 @@ describe("shared/types.ts function coverage", () => {
             expect(isSiteStatus("down")).toBe(true);
             expect(isSiteStatus("pending")).toBe(true);
             expect(isSiteStatus("paused")).toBe(true);
-            
+
             // Computed site statuses
             expect(isSiteStatus("mixed")).toBe(true);
             expect(isSiteStatus("unknown")).toBe(true);
@@ -417,7 +417,11 @@ describe("shared/types.ts function coverage", () => {
                 history: [],
                 url: "https://example.com",
                 monitoring: true,
-                activeOperations: ["check", "", "retry"], // contains empty string
+                activeOperations: [
+                    "check",
+                    "",
+                    "retry",
+                ], // contains empty string
             };
 
             expect(validateMonitor(invalidMonitor)).toBe(false);
@@ -473,7 +477,12 @@ describe("shared/types.ts function coverage", () => {
 
     describe("integration tests", () => {
         it("should work with all type guards together", () => {
-            const monitorStatuses: MonitorStatus[] = ["up", "down", "pending", "paused"];
+            const monitorStatuses: MonitorStatus[] = [
+                "up",
+                "down",
+                "pending",
+                "paused",
+            ];
             const computedStatuses = ["mixed", "unknown"];
             const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
 
@@ -492,7 +501,12 @@ describe("shared/types.ts function coverage", () => {
             }
 
             // Test invalid statuses
-            const invalidStatuses = ["invalid", "", "online", "offline"];
+            const invalidStatuses = [
+                "invalid",
+                "",
+                "online",
+                "offline",
+            ];
             for (const status of invalidStatuses) {
                 expect(isMonitorStatus(status)).toBe(false);
                 expect(isSiteStatus(status)).toBe(false);
@@ -516,7 +530,10 @@ describe("shared/types.ts function coverage", () => {
                     ...(type === "http" && { url: "https://example.com" }),
                     ...(type === "port" && { host: "example.com", port: 443 }),
                     ...(type === "ping" && { host: "example.com" }),
-                    ...(type === "dns" && { host: "example.com", recordType: "A" }),
+                    ...(type === "dns" && {
+                        host: "example.com",
+                        recordType: "A",
+                    }),
                 };
 
                 expect(validateMonitor(monitor)).toBe(true);

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests to achieve 100% coverage for remaining uncovered lines
+ * @file Tests to achieve 100% coverage for remaining uncovered lines
  */
 
 import { describe, expect, it } from "vitest";
@@ -19,11 +19,11 @@ describe("100% Coverage - Remaining Lines", () => {
             // Create an object that might trigger the default case
             // by manipulating typeof behavior
             const weirdValue = Object.create(null);
-            
+
             // Add properties that might confuse typeof
             Object.defineProperty(weirdValue, Symbol.toStringTag, {
                 value: "CustomType",
-                configurable: true
+                configurable: true,
             });
 
             const result = safeStringify(weirdValue);
@@ -73,7 +73,9 @@ describe("100% Coverage - Remaining Lines", () => {
                 nonExistentField: "value",
             });
             expect(result.success).toBe(false);
-            expect(result.errors.some(error => error.includes("Unknown field"))).toBe(true);
+            expect(
+                result.errors.some((error) => error.includes("Unknown field"))
+            ).toBe(true);
         });
 
         it("should trigger unknown field error for field not in any schema", () => {
@@ -81,7 +83,9 @@ describe("100% Coverage - Remaining Lines", () => {
                 totallyMadeUpField: "value",
             });
             expect(result.success).toBe(false);
-            expect(result.errors.some(error => error.includes("Unknown field"))).toBe(true);
+            expect(
+                result.errors.some((error) => error.includes("Unknown field"))
+            ).toBe(true);
         });
     });
 
@@ -91,7 +95,7 @@ describe("100% Coverage - Remaining Lines", () => {
             const result = validateMonitorField("http", "url", {
                 url: undefined, // This should trigger an optional field warning
             });
-            
+
             // Should return a validation result
             expect(result).toBeDefined();
             expect(typeof result.success).toBe("boolean");
@@ -102,7 +106,7 @@ describe("100% Coverage - Remaining Lines", () => {
             const result = validateMonitorField("http", "userAgent", {
                 userAgent: undefined, // Optional field with undefined value
             });
-            
+
             // Should return a validation result
             expect(result).toBeDefined();
             expect(typeof result.success).toBe("boolean");
@@ -114,7 +118,7 @@ describe("100% Coverage - Remaining Lines", () => {
             // Test undefined in stringConversion
             expect(safeStringify(undefined)).toBe("");
 
-            // Test unknown field in schemas  
+            // Test unknown field in schemas
             const result = validateMonitorField("http", "unknownField", {
                 unknownField: "test",
             });
@@ -128,7 +132,7 @@ describe("100% Coverage - Remaining Lines", () => {
             // the error vs warning categorization logic
             const testFields = [
                 "url",
-                "method", 
+                "method",
                 "timeout",
                 "userAgent",
                 "headers",

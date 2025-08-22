@@ -255,13 +255,15 @@ export function isHttpFormData(
     if (formData === null || formData === undefined) {
         return false;
     }
-    return formData && 
-        typeof formData === 'object' && 
+    return (
+        formData &&
+        typeof formData === "object" &&
         formData.type === "http" &&
-        typeof formData.checkInterval === 'number' &&
-        typeof formData.retryAttempts === 'number' &&
-        typeof formData.timeout === 'number' &&
-        typeof formData.url === 'string';
+        typeof formData.checkInterval === "number" &&
+        typeof formData.retryAttempts === "number" &&
+        typeof formData.timeout === "number" &&
+        typeof formData.url === "string"
+    );
 }
 
 /**
@@ -279,13 +281,15 @@ export function isPingFormData(
     if (formData === null || formData === undefined) {
         return false;
     }
-    return formData && 
-        typeof formData === 'object' && 
+    return (
+        formData &&
+        typeof formData === "object" &&
         formData.type === "ping" &&
-        typeof formData.checkInterval === 'number' &&
-        typeof formData.retryAttempts === 'number' &&
-        typeof formData.timeout === 'number' &&
-        typeof formData.host === 'string';
+        typeof formData.checkInterval === "number" &&
+        typeof formData.retryAttempts === "number" &&
+        typeof formData.timeout === "number" &&
+        typeof formData.host === "string"
+    );
 }
 
 /**
@@ -303,14 +307,16 @@ export function isPortFormData(
     if (formData === null || formData === undefined) {
         return false;
     }
-    return formData && 
-        typeof formData === 'object' && 
+    return (
+        formData &&
+        typeof formData === "object" &&
         formData.type === "port" &&
-        typeof formData.checkInterval === 'number' &&
-        typeof formData.retryAttempts === 'number' &&
-        typeof formData.timeout === 'number' &&
-        typeof formData.host === 'string' &&
-        typeof formData.port === 'number';
+        typeof formData.checkInterval === "number" &&
+        typeof formData.retryAttempts === "number" &&
+        typeof formData.timeout === "number" &&
+        typeof formData.host === "string" &&
+        typeof formData.port === "number"
+    );
 }
 
 /**

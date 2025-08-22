@@ -62,7 +62,7 @@ jobs:
                   flatpak info org.freedesktop.Sdk.Extension.node24//24.08 || (echo "node24 extension missing" && exit 1)
               continue-on-error: true
 
-        # Removed duplicate SDK extension install step (handled above system-wide)
+            # Removed duplicate SDK extension install step (handled above system-wide)
 
             - name: Set up Node.js
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0

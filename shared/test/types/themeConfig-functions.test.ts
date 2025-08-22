@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared/types/themeConfig.ts functions
+ * @file Tests for shared/types/themeConfig.ts functions
  */
 
 import { describe, expect, it } from "vitest";
@@ -72,9 +72,9 @@ describe("shared/types/themeConfig function coverage", () => {
 
         it("should handle edge cases with color values", () => {
             const edgeCasePalette: ColorPalette = {
-                primary: "#ff0000",  // valid color
+                primary: "#ff0000", // valid color
                 secondary: "#666666",
-                error: "#cc0000", 
+                error: "#cc0000",
                 warning: "#ffaa00",
                 success: "#00aa00",
                 info: "#00aaff",
@@ -91,7 +91,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 animation: {
                     duration: {
                         fast: "150ms",
-                        normal: "300ms", 
+                        normal: "300ms",
                         slow: "500ms",
                     },
                     easing: {
@@ -173,7 +173,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 spacing: {
                     none: "0px",
                     xs: "4px",
-                    sm: "8px", 
+                    sm: "8px",
                     md: "16px",
                     lg: "24px",
                     xl: "32px",
@@ -330,35 +330,109 @@ describe("shared/types/themeConfig function coverage", () => {
             const themeConfig: ThemeConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
-                    easing: { linear: "linear", easeIn: "ease-in", easeOut: "ease-out", easeInOut: "ease-in-out" },
+                    easing: {
+                        linear: "linear",
+                        easeIn: "ease-in",
+                        easeOut: "ease-out",
+                        easeInOut: "ease-in-out",
+                    },
                 },
-                borderRadius: { none: "0px", sm: "4px", md: "8px", lg: "12px", xl: "16px", full: "9999px" },
+                borderRadius: {
+                    none: "0px",
+                    sm: "4px",
+                    md: "8px",
+                    lg: "12px",
+                    xl: "16px",
+                    full: "9999px",
+                },
                 colors: {
-                    background: { default: "#ffffff", elevated: "#f5f5f5", paper: "#ffffff" },
-                    border: { default: "#e0e0e0", focus: "#0066cc", hover: "#cccccc" },
+                    background: {
+                        default: "#ffffff",
+                        elevated: "#f5f5f5",
+                        paper: "#ffffff",
+                    },
+                    border: {
+                        default: "#e0e0e0",
+                        focus: "#0066cc",
+                        hover: "#cccccc",
+                    },
                     hover: { primary: "#0052a3", secondary: "#525252" },
                     primary: {
                         error: "#cc0000",
-                        info: "#00aaff", 
+                        info: "#00aaff",
                         primary: "#0066cc",
                         secondary: "#666666",
                         success: "#00aa00",
                         warning: "#ffaa00",
                     },
-                    status: { error: "#ff4444", info: "#44aaff", success: "#44aa44", warning: "#ffaa44" },
-                    text: { disabled: "#cccccc", hint: "#999999", primary: "#000000", secondary: "#666666" },
+                    status: {
+                        error: "#ff4444",
+                        info: "#44aaff",
+                        success: "#44aa44",
+                        warning: "#ffaa44",
+                    },
+                    text: {
+                        disabled: "#cccccc",
+                        hint: "#999999",
+                        primary: "#000000",
+                        secondary: "#666666",
+                    },
                 },
                 components: {
-                    button: { borderRadius: "8px", fontSize: "14px", fontWeight: 500, padding: "8px 16px" },
-                    card: { borderRadius: "12px", padding: "16px", shadow: "0 2px 4px rgba(0,0,0,0.1)" },
-                    input: { borderRadius: "6px", fontSize: "14px", padding: "8px 12px" },
+                    button: {
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        padding: "8px 16px",
+                    },
+                    card: {
+                        borderRadius: "12px",
+                        padding: "16px",
+                        shadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    },
+                    input: {
+                        borderRadius: "6px",
+                        fontSize: "14px",
+                        padding: "8px 12px",
+                    },
                 },
-                shadows: { none: "none", sm: "0 1px 2px rgba(0,0,0,0.1)", md: "0 2px 4px rgba(0,0,0,0.1)", lg: "0 4px 8px rgba(0,0,0,0.1)", xl: "0 8px 16px rgba(0,0,0,0.1)" },
-                spacing: { none: "0px", xs: "4px", sm: "8px", md: "16px", lg: "24px", xl: "32px", "2xl": "48px" },
+                shadows: {
+                    none: "none",
+                    sm: "0 1px 2px rgba(0,0,0,0.1)",
+                    md: "0 2px 4px rgba(0,0,0,0.1)",
+                    lg: "0 4px 8px rgba(0,0,0,0.1)",
+                    xl: "0 8px 16px rgba(0,0,0,0.1)",
+                },
+                spacing: {
+                    none: "0px",
+                    xs: "4px",
+                    sm: "8px",
+                    md: "16px",
+                    lg: "24px",
+                    xl: "32px",
+                    "2xl": "48px",
+                },
                 typography: {
-                    fontFamily: { primary: "Arial, sans-serif", secondary: "Georgia, serif", monospace: "Monaco, monospace" },
-                    fontSize: { xs: "12px", sm: "14px", md: "16px", lg: "18px", xl: "20px", "2xl": "24px" },
-                    fontWeight: { light: 300, normal: 400, medium: 500, semibold: 600, bold: 700 },
+                    fontFamily: {
+                        primary: "Arial, sans-serif",
+                        secondary: "Georgia, serif",
+                        monospace: "Monaco, monospace",
+                    },
+                    fontSize: {
+                        xs: "12px",
+                        sm: "14px",
+                        md: "16px",
+                        lg: "18px",
+                        xl: "20px",
+                        "2xl": "24px",
+                    },
+                    fontWeight: {
+                        light: 300,
+                        normal: 400,
+                        medium: 500,
+                        semibold: 600,
+                        bold: 700,
+                    },
                     lineHeight: { tight: 1.25, normal: 1.5, relaxed: 1.75 },
                 },
             };
@@ -372,35 +446,78 @@ describe("shared/types/themeConfig function coverage", () => {
             const minimalValidTheme: ThemeConfig = {
                 animation: {
                     duration: { fast: "0ms", normal: "0ms", slow: "0ms" },
-                    easing: { linear: "", easeIn: "", easeOut: "", easeInOut: "" },
+                    easing: {
+                        linear: "",
+                        easeIn: "",
+                        easeOut: "",
+                        easeInOut: "",
+                    },
                 },
-                borderRadius: { none: "", sm: "", md: "", lg: "", xl: "", full: "" },
+                borderRadius: {
+                    none: "",
+                    sm: "",
+                    md: "",
+                    lg: "",
+                    xl: "",
+                    full: "",
+                },
                 colors: {
                     background: { default: "", elevated: "", paper: "" },
                     border: { default: "", focus: "", hover: "" },
                     hover: { primary: "", secondary: "" },
                     primary: {
                         error: "red",
-                        info: "blue", 
+                        info: "blue",
                         primary: "green",
                         secondary: "gray",
                         success: "green",
                         warning: "orange",
                     },
                     status: { error: "", info: "", success: "", warning: "" },
-                    text: { disabled: "", hint: "", primary: "", secondary: "" },
+                    text: {
+                        disabled: "",
+                        hint: "",
+                        primary: "",
+                        secondary: "",
+                    },
                 },
                 components: {
-                    button: { borderRadius: "", fontSize: "", fontWeight: 0, padding: "" },
+                    button: {
+                        borderRadius: "",
+                        fontSize: "",
+                        fontWeight: 0,
+                        padding: "",
+                    },
                     card: { borderRadius: "", padding: "", shadow: "" },
                     input: { borderRadius: "", fontSize: "", padding: "" },
                 },
                 shadows: { none: "", sm: "", md: "", lg: "", xl: "" },
-                spacing: { none: "", xs: "", sm: "", md: "", lg: "", xl: "", "2xl": "" },
+                spacing: {
+                    none: "",
+                    xs: "",
+                    sm: "",
+                    md: "",
+                    lg: "",
+                    xl: "",
+                    "2xl": "",
+                },
                 typography: {
                     fontFamily: { primary: "", secondary: "", monospace: "" },
-                    fontSize: { xs: "", sm: "", md: "", lg: "", xl: "", "2xl": "" },
-                    fontWeight: { light: 0, normal: 0, medium: 0, semibold: 0, bold: 0 },
+                    fontSize: {
+                        xs: "",
+                        sm: "",
+                        md: "",
+                        lg: "",
+                        xl: "",
+                        "2xl": "",
+                    },
+                    fontWeight: {
+                        light: 0,
+                        normal: 0,
+                        medium: 0,
+                        semibold: 0,
+                        bold: 0,
+                    },
                     lineHeight: { tight: 0, normal: 0, relaxed: 0 },
                 },
             };

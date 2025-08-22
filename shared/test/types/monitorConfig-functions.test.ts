@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for shared/types/monitorConfig.ts functions
+ * @file Tests for shared/types/monitorConfig.ts functions
  */
 
 import { describe, expect, it } from "vitest";
@@ -332,11 +332,15 @@ describe("shared/types/monitorConfig function coverage", () => {
                 url: "https://api.example.com/health",
                 method: "POST",
                 followRedirects: true,
-                expectedStatusCodes: [200, 201, 202],
+                expectedStatusCodes: [
+                    200,
+                    201,
+                    202,
+                ],
                 userAgent: "UptimeBot/2.0 (Health Check)",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer token123",
+                    Authorization: "Bearer token123",
                 },
                 auth: {
                     type: "basic",
