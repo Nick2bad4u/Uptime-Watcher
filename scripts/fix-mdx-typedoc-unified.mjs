@@ -1,4 +1,11 @@
-import { readFileSync, writeFileSync, renameSync, existsSync, readdirSync, statSync } from "fs";
+import {
+    readFileSync,
+    writeFileSync,
+    renameSync,
+    existsSync,
+    readdirSync,
+    statSync,
+} from "fs";
 import { join } from "path";
 
 // Unified docs directory
@@ -44,6 +51,7 @@ function fixFile(filePath) {
 
 /**
  * Recursively walks through a directory and fixes markdown files.
+ *
  * @param {string} dir - The directory path to walk.
  */
 function walk(dir) {

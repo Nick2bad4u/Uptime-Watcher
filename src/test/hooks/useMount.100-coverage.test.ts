@@ -1,6 +1,6 @@
 /**
- * @fileoverview Tests to reach 100% coverage for useMount.ts lines 97 and 113
- * Targeting the strict mode duplicate mount handling and error handling
+ * @file Tests to reach 100% coverage for useMount.ts lines 97 and 113 Targeting
+ *   the strict mode duplicate mount handling and error handling
  */
 
 import { describe, expect, test, vi } from "vitest";
@@ -8,12 +8,12 @@ import { renderHook } from "@testing-library/react";
 
 // Mock the logger at module level
 vi.mock("../../services/logger", () => ({
-	default: {
-		error: vi.fn(),
-		warn: vi.fn(),
-		info: vi.fn(),
-		debug: vi.fn(),
-	},
+    default: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+    },
 }));
 
 import logger from "../../services/logger";
@@ -22,89 +22,87 @@ import { useMount } from "../../hooks/useMount";
 const mockLogger = vi.mocked(logger);
 
 describe("useMount - 100% Coverage Tests", () => {
-	describe("Targeting Lines 97,113", () => {
-		test("should handle strict mode duplicate mount (line 97)", () => {
-			const mountCallback = vi.fn();
-			const unmountCallback = vi.fn();
+    describe("Targeting Lines 97,113", () => {
+        test("should handle strict mode duplicate mount (line 97)", () => {
+            const mountCallback = vi.fn();
+            const unmountCallback = vi.fn();
 
-			// First render - should execute mount callback
-			const { rerender } = renderHook(() => 
-				useMount(mountCallback, unmountCallback)
-			);
+            // First render - should execute mount callback
+            const { rerender } = renderHook(() =>
+                useMount(mountCallback, unmountCallback)
+            );
 
-			expect(mountCallback).toHaveBeenCalledTimes(1);
+            expect(mountCallback).toHaveBeenCalledTimes(1);
 
-			// Simulate StrictMode double mount by re-rendering
-			// This should trigger the hasMountedRef.current check on line 97
-			rerender();
+            // Simulate StrictMode double mount by re-rendering
+            // This should trigger the hasMountedRef.current check on line 97
+            rerender();
 
-			// Mount callback should not be called again due to duplicate prevention
-			expect(mountCallback).toHaveBeenCalledTimes(1);
-		});
+            // Mount callback should not be called again due to duplicate prevention
+            expect(mountCallback).toHaveBeenCalledTimes(1);
+        });
 
-		test("should handle async mount callback errors (line 113)", async () => {
-			const errorMessage = "Mount callback error";
-			const asyncMountCallback = vi.fn().mockRejectedValue(new Error(errorMessage));
-			const unmountCallback = vi.fn();
+        test("should handle async mount callback errors (line 113)", async () => {
+            const errorMessage = "Mount callback error";
+            const asyncMountCallback = vi
+                .fn()
+                .mockRejectedValue(new Error(errorMessage));
+            const unmountCallback = vi.fn();
 
-			const { unmount } = renderHook(() => 
-				useMount(asyncMountCallback, unmountCallback)
-			);
+            const { unmount } = renderHook(() =>
+                useMount(asyncMountCallback, unmountCallback)
+            );
 
-			// Wait for async error handling
-			await new Promise(resolve => setTimeout(resolve, 10));
+            // Wait for async error handling
+            await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(asyncMountCallback).toHaveBeenCalledTimes(1);
-			// The error should be caught and logged
-			expect(mockLogger.error).toHaveBeenCalledWith(
-				"Error in useMount callback:",
-				expect.any(Error)
-			);
+            expect(asyncMountCallback).toHaveBeenCalledTimes(1);
+            // The error should be caught and logged
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Error in useMount callback:",
+                expect.any(Error)
+            );
 
-			unmount();
-		});
+            unmount();
+        });
 
-		test("should handle promise-returning mount callback", async () => {
-			const promiseMountCallback = vi.fn().mockResolvedValue("success");
-			const unmountCallback = vi.fn();
+        test("should handle promise-returning mount callback", async () => {
+            const promiseMountCallback = vi.fn().mockResolvedValue("success");
+            const unmountCallback = vi.fn();
 
-			renderHook(() => 
-				useMount(promiseMountCallback, unmountCallback)
-			);
+            renderHook(() => useMount(promiseMountCallback, unmountCallback));
 
-			// Wait for promise resolution
-			await new Promise(resolve => setTimeout(resolve, 0));
+            // Wait for promise resolution
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
-			expect(promiseMountCallback).toHaveBeenCalledTimes(1);
-		});
+            expect(promiseMountCallback).toHaveBeenCalledTimes(1);
+        });
 
-		test("should handle unmount callback execution", () => {
-			const mountCallback = vi.fn();
-			const unmountCallback = vi.fn();
+        test("should handle unmount callback execution", () => {
+            const mountCallback = vi.fn();
+            const unmountCallback = vi.fn();
 
-			const { unmount } = renderHook(() => 
-				useMount(mountCallback, unmountCallback)
-			);
+            const { unmount } = renderHook(() =>
+                useMount(mountCallback, unmountCallback)
+            );
 
-			expect(mountCallback).toHaveBeenCalledTimes(1);
+            expect(mountCallback).toHaveBeenCalledTimes(1);
 
-			// Unmount the component to trigger cleanup
-			unmount();
+            // Unmount the component to trigger cleanup
+            unmount();
 
-			expect(unmountCallback).toHaveBeenCalledTimes(1);
-		});
+            expect(unmountCallback).toHaveBeenCalledTimes(1);
+        });
 
-		test("should handle synchronous mount callback", () => {
-			const syncMountCallback = vi.fn(() => {
-				// Synchronous callback that returns void
-			});
-			const unmountCallback = vi.fn();
+        test("should handle synchronous mount callback", () => {
+            const syncMountCallback = vi.fn(() => {
+                // Synchronous callback that returns void
+            });
+            const unmountCallback = vi.fn();
 
-			renderHook(() => 
-				useMount(syncMountCallback, unmountCallback)
-			);
+            renderHook(() => useMount(syncMountCallback, unmountCallback));
 
-			expect(syncMountCallback).toHaveBeenCalledTimes(1);
-		});
-	});
+            expect(syncMountCallback).toHaveBeenCalledTimes(1);
+        });
+    });
 });

@@ -18,14 +18,14 @@ describe("String Conversion - Final 100% Coverage", () => {
             // This is very difficult to achieve in normal TypeScript/JavaScript
             // but we can try to manipulate the typeof behavior
             const weirdObject = Object.create(null);
-            
+
             // Try to override toString to make typeof return something unexpected
             try {
                 Object.defineProperty(weirdObject, Symbol.toPrimitive, {
                     value: () => "[Weird Object]",
-                    configurable: true
+                    configurable: true,
                 });
-                
+
                 const result = safeStringify(weirdObject);
                 // This should hit either the object case or potentially the default case
                 expect(typeof result).toBe("string");
@@ -60,14 +60,17 @@ describe("String Conversion - Final 100% Coverage", () => {
 
         it("should attempt to reach the default case through type manipulation", () => {
             // Create a proxy that might confuse typeof
-            const proxy = new Proxy({}, {
-                get(target, prop) {
-                    if (prop === Symbol.toPrimitive) {
-                        return () => "[Proxy Object]";
-                    }
-                    return target[prop as keyof typeof target];
+            const proxy = new Proxy(
+                {},
+                {
+                    get(target, prop) {
+                        if (prop === Symbol.toPrimitive) {
+                            return () => "[Proxy Object]";
+                        }
+                        return target[prop as keyof typeof target];
+                    },
                 }
-            });
+            );
 
             const result = safeStringify(proxy);
             expect(typeof result).toBe("string");

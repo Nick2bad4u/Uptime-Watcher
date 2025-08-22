@@ -15,7 +15,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             // We need to bypass the early return, so we'll mock/patch the function
             // Since the function has an early return for null/undefined,
             // we need to test a different path that reaches the switch default
-            
+
             // Let's test with a symbol that's not handled explicitly
             const symbolValue = Symbol("test");
             const result = safeStringify(symbolValue);
@@ -26,7 +26,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             // We need to create a scenario where typeof returns something unexpected
             // This is difficult as TypeScript/JavaScript has limited primitive types
             // But we can test edge cases that might hit the default branch
-            
+
             // Test with a primitive wrapper object that might behave unexpectedly
             const weirdValue = new Object(Symbol("test"));
             const result = safeStringify(weirdValue);
@@ -38,16 +38,28 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("schemas.ts - Line 399 (throw error for unknown field)", () => {
         test("should trigger unknown field error for invalid field name", () => {
             // This should call validateFieldWithSchema internally and trigger line 399
-            const result = validateMonitorField("http", "completelyInvalidFieldName", "value");
+            const result = validateMonitorField(
+                "http",
+                "completelyInvalidFieldName",
+                "value"
+            );
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Field validation failed: Unknown field: completelyInvalidFieldName");
+            expect(result.errors).toContain(
+                "Field validation failed: Unknown field: completelyInvalidFieldName"
+            );
         });
 
         test("should trigger unknown field error for field not in any schema", () => {
             // Test with a field name that doesn't exist in any schema
-            const result = validateMonitorField("ping", "nonExistentField123", 123);
+            const result = validateMonitorField(
+                "ping",
+                "nonExistentField123",
+                123
+            );
             expect(result.success).toBe(false);
-            expect(result.errors).toContain("Field validation failed: Unknown field: nonExistentField123");
+            expect(result.errors).toContain(
+                "Field validation failed: Unknown field: nonExistentField123"
+            );
         });
     });
 
@@ -55,9 +67,13 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
         test("should categorize validation issues correctly", () => {
             // We need to trigger validation that creates both errors and warnings
             // to hit the categorization logic on line 482
-            
+
             // Try to validate with a field that has the wrong type
-            const result = validateMonitorField("http", "timeout", "invalid_number");
+            const result = validateMonitorField(
+                "http",
+                "timeout",
+                "invalid_number"
+            );
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
@@ -65,9 +81,13 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
         test("should handle optional field validation warnings", () => {
             // Try to test the warning path vs error path
             // This is tricky as we need to trigger the specific condition on line 481-482
-            
+
             // Test with undefined value which might trigger the warning path
-            const result = validateMonitorField("port", "retryAttempts", undefined);
+            const result = validateMonitorField(
+                "port",
+                "retryAttempts",
+                undefined
+            );
             // This should either pass or categorize undefined appropriately
             expect(result).toBeDefined();
         });

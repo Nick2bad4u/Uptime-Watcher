@@ -1,8 +1,16 @@
-import { readFileSync, writeFileSync, renameSync, existsSync, readdirSync, statSync } from "fs";
+import {
+    readFileSync,
+    writeFileSync,
+    renameSync,
+    existsSync,
+    readdirSync,
+    statSync,
+} from "fs";
 import { join } from "path";
 
 // Unified docs directory
-const DOCS_DIR = "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs";
+const DOCS_DIR =
+    "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs";
 
 function fixFile(filePath) {
     let content = readFileSync(filePath, "utf8");
@@ -44,6 +52,7 @@ function fixFile(filePath) {
 
 /**
  * Recursively walks through a directory and fixes markdown files.
+ *
  * @param {string} dir - The directory path to walk.
  */
 function walk(dir) {
