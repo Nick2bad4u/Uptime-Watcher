@@ -7,14 +7,63 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[bdc2abe](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)...
-[bdc2abe](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bdc2abe8e761db2df9fd4dc264049f98a7a18908...bdc2abe8e761db2df9fd4dc264049f98a7a18908))
+[[7aed5b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)...
+[7aed5b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7aed5b0803ecd12d2e0dd6202173c235efd22d6c...7aed5b0803ecd12d2e0dd6202173c235efd22d6c))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.1.0 [`(7aed5b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)
+
+
+
+
+
+
+## [12.1.0] - 2025-08-22
+
+
+[[3ef48a9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ef48a9c796f223daa4fff17295610a954b4cc2d)...
+[bea593d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bea593db46beae95c63792067fd3218e6392c311)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3ef48a9c796f223daa4fff17295610a954b4cc2d...bea593db46beae95c63792067fd3218e6392c311))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.0.0 [`(bdc2abe)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve formatting of imports and logging
+
+- Updates import statements across scripts for better readability by expanding multiline imports.
+- Refines logging output for enhanced clarity in script execution.
+- Makes code more maintainable and consistent with formatting standards.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3ef48a9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ef48a9c796f223daa4fff17295610a954b4cc2d)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Achieve 100% coverage for key modules and improve TypeDoc workflow
+
+- Adds comprehensive unit tests to reach full coverage for utility, store, schema validation, monitor forms, and React hooks, targeting previously uncovered lines and edge cases.
+- Refactors TypeDoc configuration and build workflow to leverage markdown plugins, update schemas, and enhance MDX compatibility.
+- Cleans up legacy scripts, replaces CommonJS with ESM for documentation post-processing, and updates npm dependencies to support new markdown and remark plugins.
+- Improves CI and build pipeline for documentation deployments, switches artifact output to unified docs, and updates VS Code settings to reflect new documentation structure.
+- Motivated by the need for robust code quality metrics and seamless documentation generation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e2f6d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e2f6d073f8ec8731d960a03d45befaa109901a2)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.0.0 [skip ci] [`(70ade80)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/70ade80c98d5cb12712af6eed86b5dc0bccb7c41)
 
 
 
