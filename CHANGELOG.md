@@ -7,14 +7,99 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[5ccc0a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)...
-[5ccc0a6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7...5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7))
+[[bdc2abe](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)...
+[bdc2abe](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bdc2abe8e761db2df9fd4dc264049f98a7a18908...bdc2abe8e761db2df9fd4dc264049f98a7a18908))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 12.0.0 [`(bdc2abe)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdc2abe8e761db2df9fd4dc264049f98a7a18908)
+
+
+
+
+
+
+## [12.0.0] - 2025-08-21
+
+
+[[1f60aa6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1f60aa6df81d5a2b5abb2f7b4fef42f50dfb3338)...
+[36f12f4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36f12f4ebb80ead80437ddd0a1d9526a227c994c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1f60aa6df81d5a2b5abb2f7b4fef42f50dfb3338...36f12f4ebb80ead80437ddd0a1d9526a227c994c))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 13 updates (#51) [`(d6e1e3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6e1e3d9bf73dd6b8e9a78b1a7a902817775043d)
+
+
 - [dependency] Update version 11.9.0 [`(5ccc0a6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ccc0a615bc43e73ddd2b0a8b6b29681928ff1a7)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Docusaurus Generated Removal - Remove internal architecture & guide documentation
+
+Removes extensive architecture, API, pattern, template, and onboarding documentation from the project docs.
+
+ - Streamlines the documentation set to focus on external or essential resources
+ - Addresses maintenance overhead and potential redundancy
+ - May improve build performance and reduce repository size for contributors
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7ed72fa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ed72fa9b84e4e53385f28f87c7313be583aeb3f)
+
+
+- 📝 [docs] Update documentation index and Typedoc configs
+
+- Removes archived documentation section to simplify the docs index and focus on relevant materials
+- Fixes glob patterns in Typedoc configs to ensure recursive markdown inclusion
+- Adds external Axios error documentation link for improved reference
+- Optimizes reference ordering for clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(352fc94)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/352fc94d214a652384658253e37c00300ec3bfe1)
+
+
+- 📝 [docs] Improve documentation clarity and TypeScript typing
+
+- Enhances code and configuration comments for better clarity and maintainability.
+- Updates TypeScript config to emit declarations, improving API documentation generation and type safety.
+- Expands JSDoc and inline comments for interfaces, event payloads, and manager/service dependencies.
+- Refines external link mapping, event priorities, and validation configuration for more accurate docs and validation checks.
+- Makes types and validation results more explicit and descriptive for easier understanding and usage.
+Relates to documentation and developer experience improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1f60aa6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1f60aa6df81d5a2b5abb2f7b4fef42f50dfb3338)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improves documentation formatting and updates build deps
+
+- Refines JSDoc comments for better readability and consistency, improving line wrapping and parameter description clarity throughout core, store, and utility modules.
+- Updates build and packaging dependencies to latest major versions for Electron ecosystem, including electron-builder, dmg-builder, and related tools.
+- Refactors ESLint config to simplify plugin usage and file matching, and bumps granular-selectors plugin version.
+- Enhances Typedoc config with new replacements for better docs linking and markdown handling.
+- Removes deprecated dependencies from lockfile for cleaner builds.
+- No logic changes; focuses solely on style, documentation, and build ecosystem maintenance.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(36f12f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36f12f4ebb80ead80437ddd0a1d9526a227c994c)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Ignore generated Docusaurus docs directory
+
+- Prevents accidental commits of built documentation files.
+- Keeps repository clean by excluding generated output.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f974146)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f974146fe27abd0f59687adcbbe18f5ba3e70161)
+
+
+- Update changelogs for v11.9.0 [skip ci] [`(67b9c6f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67b9c6f47b96f1f54da9407167132425583e229b)
 
 
 
