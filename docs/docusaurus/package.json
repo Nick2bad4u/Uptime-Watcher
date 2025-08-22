@@ -3,20 +3,20 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "docusaurus": "npx docusaurus",
-        "start": "npx docusaurus start",
-        "build": "npm run generate-docs && npx docusaurus build",
-        "build:fast": "npx docusaurus build",
-        "generate-docs": "npx typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
-        "generate-docs:app": "npx typedoc --options ../../typedoc.json",
-        "generate-docs:electron": "npx typedoc --options ../../typedoc.electron.json",
-        "swizzle": "npx docusaurus swizzle",
-        "deploy": "npx docusaurus deploy",
-        "clear": "npx docusaurus clear",
-        "serve": "npx docusaurus serve",
-        "write-translations": "npx docusaurus write-translations",
-        "write-heading-ids": "npx docusaurus write-heading-ids",
-        "npx typecheck": "tsc"
+        "docusaurus": "docusaurus",
+        "start": "docusaurus start",
+        "build": "npm run generate-docs && docusaurus build",
+        "build:fast": "docusaurus build",
+        "generate-docs": "typedoc --options typedoc.config.json && node ../../scripts/fix-mdx-typedoc-unified.js",
+        "generate-docs:app": "typedoc --options ../../typedoc.json",
+        "generate-docs:electron": "typedoc --options ../../typedoc.electron.json",
+        "swizzle": "docusaurus swizzle",
+        "deploy": "docusaurus deploy",
+        "clear": "docusaurus clear",
+        "serve": "docusaurus serve",
+        "write-translations": "docusaurus write-translations",
+        "write-heading-ids": "docusaurus write-heading-ids",
+        "typecheck": "tsc"
     },
     "dependencies": {
         "@docusaurus/core": "3.8.1",
@@ -31,10 +31,10 @@
         "@docusaurus/module-type-aliases": "3.8.1",
         "@docusaurus/tsconfig": "3.8.1",
         "@docusaurus/types": "3.8.1",
-        "npx typedoc": "^0.28.7",
-        "npx typedoc-docusaurus-theme": "^1.4.0",
-        "npx typedoc-plugin-markdown": "^4.7.1",
-        "npx typescript": "~5.6.2"
+        "typedoc": "^0.28.7",
+        "typedoc-docusaurus-theme": "^1.4.0",
+        "typedoc-plugin-markdown": "^4.7.1",
+        "typescript": "~5.6.2"
     },
     "browserslist": {
         "production": [
