@@ -8,7 +8,7 @@
         "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
     ],
     "tsconfig": "tsconfig.typedoc.json",
-    "out": "docs/docusaurus/docs",
+    "out": "docs",
     "cleanOutputDir": true,
     "commentStyle": "all",
     "excludeInternal": false,
