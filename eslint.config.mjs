@@ -139,6 +139,7 @@ import pluginLoadableImports from "eslint-plugin-loadable-imports";
 import zod from "eslint-plugin-zod";
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import css from "@eslint/css";
+import * as mdx from "eslint-plugin-mdx";
 // import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 import * as publint from "eslint-plugin-publint";
@@ -296,8 +297,11 @@ export default [
         plugins: { eslintPluginYml: eslintPluginYml },
         files: ["*.yaml", "*.yml"],
         ignores: ["docs/docusaurus/**"],
-        ...eslintPluginYml.configs["flat/prettier"].rules,
-        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
+        rules: {
+            ...eslintPluginYml.configs["flat/prettier"].rules,
+            ...eslintPluginJsonSchemaValidator.configs["flat/recommended"]
+                .rules,
+        },
         languageOptions: {
             parser: yamlEslintParser,
             // Options used with yaml-eslint-parser.
@@ -390,12 +394,40 @@ export default [
         },
     },
 
+    // MDX files
+    {
+        files: ["**/*.mdx"],
+        plugins: { mdx: mdx },
+
+        rules: {
+            ...mdx.flat.rules,
+            ...mdx.flatCodeBlocks.rules,
+
+            "no-var": "error",
+            "prefer-const": "error",
+        },
+        settings: {
+            processor: mdx.createRemarkProcessor({
+                lintCodeBlocks: true,
+                // optional, if you want to disable language mapper, set it to `false`
+                // if you want to override the default language mapper inside, you can provide your own
+                languageMapper: {},
+                // optional, same as the `parserOptions.ignoreRemarkConfig`, you have to specify it twice unfortunately
+                ignoreRemarkConfig: true,
+                // optional, same as the `parserOptions.remarkConfigPath`, you have to specify it twice unfortunately
+                // remarkConfigPath: "path/to/your/remarkrc",
+            }),
+        },
+    },
+
     // Markdown files
     {
         files: ["**/*.md"],
-        ignores: ["docs/docusaurus/**"],
-        ...markdown.configs.recommended[0],
-        ...eslintPluginJsonSchemaValidator.configs["flat/recommended"].rules,
+        rules: {
+            ...markdown.configs.recommended.rules,
+            ...eslintPluginJsonSchemaValidator.configs["flat/recommended"]
+                .rules,
+        },
         plugins: { markdown },
         language: "markdown/gfm",
     },
