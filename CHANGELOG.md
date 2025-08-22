@@ -7,14 +7,65 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7aed5b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)...
-[7aed5b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7aed5b0803ecd12d2e0dd6202173c235efd22d6c...7aed5b0803ecd12d2e0dd6202173c235efd22d6c))
+[[e279a7c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)...
+[e279a7c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e279a7c10ffce7a73578c269655521923a79048a...e279a7c10ffce7a73578c269655521923a79048a))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 12.2.0 [`(e279a7c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)
+
+
+
+
+
+
+## [12.2.0] - 2025-08-22
+
+
+[[a7de6b2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a7de6b2bd2bc2d6b99cc406fcc6ed40871b8352f)...
+[d320f48](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d320f480ac33914bfbfdac7c7a604d513afa9090)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/a7de6b2bd2bc2d6b99cc406fcc6ed40871b8352f...d320f480ac33914bfbfdac7c7a604d513afa9090))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#52) [`(8f1c92e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8f1c92e30dbc1affdb665f865131489b395e2000)
+
+
 - [dependency] Update version 12.1.0 [`(7aed5b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7aed5b0803ecd12d2e0dd6202173c235efd22d6c)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Improve formatting and coverage for 100% test suites
+
+Updates test files to enhance code formatting, readability, and consistency with project standards.
+
+Expands and clarifies coverage for edge cases in utility, validation, hook, store, and component logic, focusing on dynamic handlers, error categorization, and strict mode behaviors.
+
+Facilitates future maintenance and ensures robust coverage for targeted lines by using explicit structure, type assertions, and more comprehensive input scenarios.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a7de6b2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a7de6b2bd2bc2d6b99cc406fcc6ed40871b8352f)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.1.0 [skip ci] [`(9884b3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9884b3d7f255fb200fdecb067aacad6b0072988f)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update artifact path and refine file exclusions
+
+- Changes artifact upload path to improve deployment accuracy for documentation.
+- Restricts type definition file exclusions to the source directory, ensuring other type files remain included where necessary.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(78fffcd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/78fffcd5035337e266184b173361cc39112698da)
 
 
 
