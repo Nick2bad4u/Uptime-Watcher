@@ -503,7 +503,7 @@ export default defineConfig(({}) => {
                     "**/index.ts", // Exclude all barrel export files
                     "**/index.tsx", // Exclude JSX barrel export files
                     "**/node_modules/**",
-                    "**/types.ts", // Exclude type definition files
+                    "src/**/types.ts", // Exclude type definition files only in src directory
                     "**/types.tsx", // Exclude type definition files with JSX
                     "src/test/**",
                     "shared/test",
