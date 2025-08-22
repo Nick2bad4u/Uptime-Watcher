@@ -1,5 +1,5 @@
-# Deploy TypeDoc documentation to GitHub Pages
-name: Deploy TypeDoc Documentation to GitHub Pages
+# Deploy Docusaurus site to GitHub Pages
+name: Deploy Docusaurus to GitHub Pages
 
 on:
     # Runs on pushes targeting the default branch
@@ -30,7 +30,7 @@ concurrency:
 jobs:
     # Build job
     build:
-        name: Build TypeDoc Documentation
+        name: Build Docusaurus
         runs-on: ubuntu-latest
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -48,33 +48,31 @@ jobs:
               with:
                   node-version: "latest"
 
-            - name: Cache node modules
-              uses: actions/cache@v4
-              with:
-                  path: node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-
             - name: Install dependencies
               run: npm install --force
+
+            - name: Install dependencies
+              run: npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
 
             - name: Build before TypeDoc
               run: |
                   # Build files
                   npm run build:electron-vite
 
-            - name: Generate TypeDoc docs and build Docusaurus
+            - name: Generate unified TypeDoc documentation
               run: |
-                  # Use the existing workflow: Generate TypeDoc first, then build Docusaurus
-                  npm run docs:typedoc && cd docs/docusaurus && npm run build:fast
+                  # Generate unified TypeDoc documentation for all source code (Frontend, Backend, Shared)
+                  npm run docs:typedoc
               continue-on-error: true
 
-            - name: List Docusaurus build output
+            - name: List TypeDoc output directories
               run: |
-                  echo "Docusaurus build output:"
-                  ls -la docs/docusaurus/build
-                  echo "Files count: $(find docs/docusaurus/build -type f | wc -l)"
-                  ls -la docs/docusaurus/docs
-                  echo "Files count: $(find docs/docusaurus/docs -type f | wc -l)"
+                  echo "TypeDoc output directories:"
+                  ls -l docs/docusaurus/docs
+                  ls -l docs
+
+            - name: Build Docusaurus website
+              run: npm run docusaurus:build
               continue-on-error: true
 
             - name: Setup Pages
