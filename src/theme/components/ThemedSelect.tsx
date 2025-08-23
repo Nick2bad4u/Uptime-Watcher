@@ -44,6 +44,8 @@
  * @public
  */
 
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
@@ -70,11 +72,11 @@ export interface ThemedSelectProperties {
     /** Unique identifier for the select element */
     readonly id?: string;
     /** Change handler for selection updates */
-    readonly onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly onChange?: EventHandlers.ChangeWithEvent<HTMLSelectElement>;
     /** Click handler for the select element */
-    readonly onClick?: (e: React.MouseEvent<HTMLSelectElement>) => void;
+    readonly onClick?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
     /** Mouse down handler for the select element */
-    readonly onMouseDown?: (e: React.MouseEvent<HTMLSelectElement>) => void;
+    readonly onMouseDown?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
     /** Whether the select is required for form validation */
     readonly required?: boolean;
     /** Tooltip text that appears on hover */

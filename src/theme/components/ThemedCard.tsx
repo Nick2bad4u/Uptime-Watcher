@@ -54,6 +54,8 @@
  * @public
  */
 
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import type { BoxPadding, BoxRounded, BoxShadow, BoxVariant } from "./types";
@@ -83,7 +85,7 @@ export interface ThemedCardProperties {
     /** Color theme for the icon (uses theme color names) */
     readonly iconColor?: string;
     /** Click handler for the card */
-    readonly onClick?: () => void;
+    readonly onClick?: EventHandlers.Click;
     /** Mouse enter handler for hover effects */
     readonly onMouseEnter?: () => void;
     /** Mouse leave handler for hover effects */
@@ -168,7 +170,12 @@ const ThemedCard = ({
             style={cardStyles}
             surface="elevated"
             variant={variant}
-            {...(clickable && onClick && { onClick })}
+            {...(clickable &&
+                onClick && {
+                    onClick: (): void => {
+                        onClick();
+                    },
+                })}
             {...(onMouseEnter && { onMouseEnter })}
             {...(onMouseLeave && { onMouseLeave })}
         >

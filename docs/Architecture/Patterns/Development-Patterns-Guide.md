@@ -9,9 +9,10 @@ This guide documents the established architectural patterns used throughout the 
 3. [Error Handling Patterns](#error-handling-patterns)
 4. [Frontend State Management](#frontend-state-management)
 5. [IPC Communication](#ipc-communication)
-6. [Memory Management](#memory-management)
-7. [Race Condition Prevention](#race-condition-prevention)
-8. [Testing Patterns](#testing-patterns)
+6. [Standardized Cache Configuration](#standardized-cache-configuration)
+7. [Memory Management](#memory-management)
+8. [Race Condition Prevention](#race-condition-prevention)
+9. [Testing Patterns](#testing-patterns)
 
 ## Repository Pattern
 
@@ -550,6 +551,119 @@ describe("ExampleRepository", () => {
 - ✅ Test both success and error paths
 - ❌ Don't test implementation details
 - ❌ Don't share state between test cases
+
+## Standardized Cache Configuration
+
+### Overview
+
+All caching in the application uses standardized configurations to ensure consistent performance, predictable behavior, and maintainable cache management across all managers and services.
+
+### Key Characteristics
+
+- **Centralized configuration**: All cache settings defined in `shared/constants/cacheConfig.ts`
+- **Domain-specific configs**: Separate configurations for SITES, MONITORS, SETTINGS, VALIDATION, and TEMPORARY caches
+- **Consistent TTL values**: Standardized expiration times based on data freshness requirements
+- **Standardized naming**: Consistent cache naming patterns with helper functions
+- **Type safety**: Full TypeScript support with proper interfaces
+
+### Configuration Structure
+
+```typescript
+import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
+
+// Standard cache creation
+const sitesCache = new StandardizedCache<Site>({
+ ...CACHE_CONFIG.SITES,
+ eventEmitter: this.eventEmitter,
+});
+
+// Temporary cache with custom naming
+const tempCache = new StandardizedCache<Site>({
+ ...CACHE_CONFIG.TEMPORARY,
+ name: CACHE_NAMES.temporary("import"),
+ eventEmitter: this.eventEmitter,
+});
+```
+
+### Cache Type Guidelines
+
+| Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled |
+| -------------- | ------ | -------- | -------------------------- | ------------- |
+| **SITES**      | 10 min | 500      | Site management operations | ✓             |
+| **MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
+| **SETTINGS**   | 30 min | 100      | Application configuration  | ✓             |
+| **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
+| **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
+
+### Implementation Template
+
+```typescript
+import { StandardizedCache } from "@electron/utils/cache/StandardizedCache";
+import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
+
+export class ExampleManager {
+ private readonly dataCache: StandardizedCache<DataType>;
+
+ constructor(dependencies: Dependencies) {
+  // Standard domain cache
+  this.dataCache = new StandardizedCache<DataType>({
+   ...CACHE_CONFIG.SITES, // Choose appropriate config
+   eventEmitter: dependencies.eventEmitter,
+  });
+ }
+
+ private createTemporaryCache(operation: string): StandardizedCache<DataType> {
+  return new StandardizedCache<DataType>({
+   ...CACHE_CONFIG.TEMPORARY,
+   name: CACHE_NAMES.temporary(operation),
+   eventEmitter: this.eventEmitter,
+  });
+ }
+}
+```
+
+### Usage Guidelines
+
+- ✅ Always use `CACHE_CONFIG` constants instead of hardcoded values
+- ✅ Use `CACHE_NAMES` functions for consistent naming
+- ✅ Choose the appropriate cache type based on data characteristics
+- ✅ Include `eventEmitter` for cache event integration
+- ✅ Use temporary caches for short-lived operations
+- ❌ Don't hardcode TTL values or cache sizes
+- ❌ Don't create caches without following naming conventions
+- ❌ Don't bypass standardized configurations for production code
+
+### Cache Selection Guide
+
+**Use SITES config when:**
+
+- Caching site-related data that changes moderately
+- Need balance between freshness and performance
+- Expected volume is moderate (< 500 items)
+
+**Use MONITORS config when:**
+
+- Caching real-time monitoring data
+- Need shorter expiration for accuracy
+- Expected high volume (< 1000 items)
+
+**Use SETTINGS config when:**
+
+- Caching configuration values
+- Data changes infrequently
+- Small dataset size (< 100 items)
+
+**Use VALIDATION config when:**
+
+- Caching validation results
+- Need to balance accuracy with performance
+- Moderate dataset size (< 200 items)
+
+**Use TEMPORARY config when:**
+
+- Short-lived operations (import, export, sync)
+- Performance is critical (stats disabled)
+- Large buffer needed (< 1000 items)
 
 ## Memory Management
 

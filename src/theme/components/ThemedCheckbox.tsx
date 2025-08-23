@@ -1,3 +1,5 @@
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import { ARIA_LABEL } from "../../constants";
@@ -17,7 +19,7 @@ export interface ThemedCheckboxProperties {
     /** Whether the checkbox is disabled */
     readonly disabled?: boolean;
     /** Callback fired when checkbox state changes */
-    readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly onChange?: EventHandlers.ChangeWithEvent;
     /** Whether the checkbox is required for form submission */
     readonly required?: boolean;
 }

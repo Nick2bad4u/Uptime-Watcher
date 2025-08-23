@@ -51,6 +51,8 @@
  * @public
  */
 
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React, { useCallback } from "react";
 
 import type { ButtonSize, ButtonVariant } from "./types";
@@ -86,7 +88,7 @@ export interface ThemedButtonProperties {
     /** Whether the button is in a loading state (shows spinner) */
     readonly loading?: boolean;
     /** Click handler for the button */
-    readonly onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
+    readonly onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
     /** Size variant for the button */
     readonly size?: ButtonSize;
     /** Inline styles to apply to the button */

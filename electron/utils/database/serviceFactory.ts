@@ -11,6 +11,8 @@
 
 import type { Site } from "@shared/types";
 
+import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
+
 import type { monitorLogger } from "../logger";
 
 import { StandardizedCache } from "../cache/StandardizedCache";
@@ -59,9 +61,7 @@ export class LoggerAdapter {
  */
 export function createSiteCache(): StandardizedCache<Site> {
     return new StandardizedCache<Site>({
-        defaultTTL: 300_000, // 5 minutes for temporary operations
-        enableStats: false, // Disabled for performance in temporary caches
-        maxSize: 1000,
-        name: "temporary-sites",
+        ...CACHE_CONFIG.TEMPORARY,
+        name: CACHE_NAMES.temporary("sites"),
     });
 }

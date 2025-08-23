@@ -53,6 +53,9 @@
  *
  * @public
  */
+
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
@@ -81,7 +84,7 @@ export interface ThemedInputProperties {
     /** Minimum value (for number inputs) or minimum length (for text inputs) */
     readonly min?: number | string;
     /** Change handler for input value updates */
-    readonly onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readonly onChange?: EventHandlers.ChangeWithEvent;
     /** Placeholder text displayed when input is empty */
     readonly placeholder?: string;
     /** Whether the input is required for form validation */

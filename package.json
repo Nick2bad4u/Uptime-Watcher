@@ -430,6 +430,7 @@
     "@shared/types": "file:./shared/types",
     "@shared/utils": "file:./shared/utils",
     "@shared/validation": "file:./shared/validation",
+    "@shared/constants": "file:./shared/constants",
     "axios": "^1.11.0",
     "chart.js": "^4.5.0",
     "chartjs-adapter-date-fns": "^3.0.0",

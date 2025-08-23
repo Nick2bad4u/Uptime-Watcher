@@ -9,6 +9,8 @@
  * accessibility attributes when used as an interactive control.
  */
 
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import type {
@@ -74,7 +76,7 @@ export interface ThemedBoxProperties {
      * When provided the component will add keyboard handling and ARIA
      * attributes for accessibility if the rendered element is a `div`.
      */
-    readonly onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
+    readonly onClick?: EventHandlers.Click;
 
     /**
      * Mouse enter callback.
@@ -209,21 +211,7 @@ const ThemedBox = ({
     surface = "base",
     tabIndex,
     variant = "primary",
-}: ThemedBoxProperties): React.DetailedReactHTMLElement<
-    {
-        "aria-label"?: string;
-        className: string;
-        onClick: ((e: React.MouseEvent<HTMLElement>) => void) | undefined;
-        onKeyDown?: (e: React.KeyboardEvent) => void;
-        onMouseEnter: (() => void) | undefined;
-        onMouseLeave: (() => void) | undefined;
-        role?: string;
-        style: React.CSSProperties;
-        tabIndex?: number;
-        type?: "button";
-    },
-    HTMLElement
-> => {
+}: ThemedBoxProperties): React.ReactElement => {
     const classNames = [
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
@@ -237,38 +225,48 @@ const ThemedBox = ({
         .filter(Boolean)
         .join(" ");
 
-    // For interactive elements, add proper accessibility attributes
     const isInteractive = Boolean(onClick);
-    const elementProperties = {
+
+    // Handle keyboard interactions for interactive divs
+    const handleKeyDown = (e: React.KeyboardEvent): void => {
+        if ((e.key === "Enter" || e.key === " ") && onClick) {
+            e.preventDefault();
+
+            onClick();
+        }
+    };
+
+    // Base props for all element types
+    const baseProps = {
         className: classNames,
-        onClick: onClick
-            ? (e: React.MouseEvent<HTMLElement>): void => {
-                  onClick(e);
-              }
-            : undefined,
         onMouseEnter,
         onMouseLeave,
         style,
-        ...(isInteractive &&
-            Component === "div" && {
-                "aria-label": ariaLabel,
-                onKeyDown: (e: React.KeyboardEvent): void => {
-                    if ((e.key === "Enter" || e.key === " ") && onClick) {
-                        e.preventDefault();
-                        onClick();
-                    }
-                },
-                role: role ?? "button",
-                tabIndex: tabIndex ?? 0,
-            }),
-        ...(isInteractive &&
-            Component === "button" && {
-                "aria-label": ariaLabel,
-                type: "button" as const,
-            }),
     };
 
-    return React.createElement(Component, elementProperties, children);
+    // Interactive props for clickable elements
+    const interactiveProps = isInteractive
+        ? {
+              onClick,
+              ...(Component === "div" && {
+                  "aria-label": ariaLabel,
+                  onKeyDown: handleKeyDown,
+                  role: role ?? "button",
+                  tabIndex: tabIndex ?? 0,
+              }),
+              ...(Component === "button" && {
+                  "aria-label": ariaLabel,
+                  type: "button" as const,
+              }),
+          }
+        : {};
+
+    const allProps = {
+        ...baseProps,
+        ...interactiveProps,
+    };
+
+    return React.createElement(Component, allProps, children);
 };
 
 export default ThemedBox;

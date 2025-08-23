@@ -215,15 +215,15 @@ describe("Electron Constants", () => {
                 "operation"
             );
             await annotate(
-                "Expected Values: 50 config, 100 validation",
+                "Expected Values: 100 config, 200 validation",
                 "expected"
             );
             await annotate("Priority: Medium - Memory Management", "priority");
 
             expect(CACHE_SIZE_LIMITS).toBeDefined();
             expect(typeof CACHE_SIZE_LIMITS).toBe("object");
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(50);
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(100);
+            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(100);
+            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(200);
 
             // Verify object is frozen
             expect(Object.isFrozen(CACHE_SIZE_LIMITS)).toBe(true);

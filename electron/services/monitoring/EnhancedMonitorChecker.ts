@@ -951,11 +951,10 @@ export class EnhancedMonitorChecker {
             this.config.operationRegistry.initiateCheck(monitorId);
 
         // Calculate operation timeout with buffer for cleanup
-        const monitorTimeoutSeconds =
-            monitor.timeout || DEFAULT_MONITOR_TIMEOUT_SECONDS;
-        const timeoutMs =
-            monitorTimeoutSeconds * SECONDS_TO_MS_MULTIPLIER +
-            MONITOR_TIMEOUT_BUFFER_MS;
+        const monitorTimeoutMs =
+            monitor.timeout ||
+            DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
+        const timeoutMs = monitorTimeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
         this.config.timeoutManager.scheduleTimeout(operationId, timeoutMs);
 
         // Add operation to monitor's active operations

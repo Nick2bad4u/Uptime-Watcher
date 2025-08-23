@@ -35,6 +35,8 @@
 
 import type { CacheValue } from "@shared/types/configTypes";
 
+import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+
 /**
  * Predefined application cache collection interface.
  *
@@ -321,22 +323,13 @@ export class TypedCache<K, V> {
  */
 export const AppCaches: AppCachesInterface = {
     /** General purpose cache for common values */
-    general: new TypedCache<string, CacheValue>({
-        maxSize: 200,
-        ttl: 2 * 60 * 1000,
-    }), // 2 minutes
+    general: new TypedCache<string, CacheValue>(CACHE_CONFIG.TEMPORARY),
 
     /** Monitor type configurations and related data */
-    monitorTypes: new TypedCache<string, CacheValue>({
-        maxSize: 50,
-        ttl: 5 * 60 * 1000,
-    }), // 5 minutes
+    monitorTypes: new TypedCache<string, CacheValue>(CACHE_CONFIG.MONITORS),
 
     /** UI helper data and component state */
-    uiHelpers: new TypedCache<string, CacheValue>({
-        maxSize: 100,
-        ttl: 10 * 60 * 1000,
-    }), // 10 minutes
+    uiHelpers: new TypedCache<string, CacheValue>(CACHE_CONFIG.VALIDATION),
 } as const;
 
 /**

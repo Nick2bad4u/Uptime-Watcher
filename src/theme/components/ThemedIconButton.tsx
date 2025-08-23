@@ -1,3 +1,5 @@
+import type { EventHandlers } from "@shared/types/componentProps";
+
 import React from "react";
 
 import type { ButtonSize, ButtonVariant } from "./types";
@@ -21,7 +23,7 @@ export interface ThemedIconButtonProperties {
     /** Whether the button is in a loading state */
     readonly loading?: boolean;
     /** Callback fired when button is clicked */
-    readonly onClick?: () => void;
+    readonly onClick?: EventHandlers.Click;
     /** Size variant for the button */
     readonly size?: ButtonSize;
     /** Tooltip text to display on hover */

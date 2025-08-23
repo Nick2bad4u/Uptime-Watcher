@@ -4,6 +4,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { EventHandlers } from "@shared/types/componentProps";
 
 import React, { useCallback } from "react";
 
@@ -20,7 +21,7 @@ export interface MonitorSelectorProperties {
     /** Array of available monitors to choose from */
     readonly monitors: Monitor[];
     /** Callback function for selection change events */
-    readonly onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+    readonly onChange: EventHandlers.ChangeWithEvent<HTMLSelectElement>;
     /** ID of the currently selected monitor */
     readonly selectedMonitorId: string;
 }

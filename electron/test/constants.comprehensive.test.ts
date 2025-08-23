@@ -140,6 +140,9 @@ describe("Backend Constants", () => {
             expect(CACHE_TTL).toBeDefined();
             expect(typeof CACHE_TTL).toBe("object");
             expect(CACHE_TTL).toHaveProperty("CONFIGURATION_VALUES");
+            expect(CACHE_TTL).toHaveProperty("MONITORS");
+            expect(CACHE_TTL).toHaveProperty("SITES");
+            expect(CACHE_TTL).toHaveProperty("TEMPORARY");
             expect(CACHE_TTL).toHaveProperty("VALIDATION_RESULTS");
         });
 
@@ -147,6 +150,24 @@ describe("Backend Constants", () => {
             expect(CACHE_TTL.CONFIGURATION_VALUES).toBe(1_800_000); // 30 minutes
             expect(typeof CACHE_TTL.CONFIGURATION_VALUES).toBe("number");
             expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(0);
+        });
+
+        it("should have correct MONITORS TTL", () => {
+            expect(CACHE_TTL.MONITORS).toBe(300_000); // 5 minutes
+            expect(typeof CACHE_TTL.MONITORS).toBe("number");
+            expect(CACHE_TTL.MONITORS).toBeGreaterThan(0);
+        });
+
+        it("should have correct SITES TTL", () => {
+            expect(CACHE_TTL.SITES).toBe(600_000); // 10 minutes
+            expect(typeof CACHE_TTL.SITES).toBe("number");
+            expect(CACHE_TTL.SITES).toBeGreaterThan(0);
+        });
+
+        it("should have correct TEMPORARY TTL", () => {
+            expect(CACHE_TTL.TEMPORARY).toBe(300_000); // 5 minutes
+            expect(typeof CACHE_TTL.TEMPORARY).toBe("number");
+            expect(CACHE_TTL.TEMPORARY).toBeGreaterThan(0);
         });
 
         it("should have correct VALIDATION_RESULTS TTL", () => {
@@ -182,11 +203,14 @@ describe("Backend Constants", () => {
             expect(CACHE_SIZE_LIMITS).toBeDefined();
             expect(typeof CACHE_SIZE_LIMITS).toBe("object");
             expect(CACHE_SIZE_LIMITS).toHaveProperty("CONFIGURATION_VALUES");
+            expect(CACHE_SIZE_LIMITS).toHaveProperty("MONITORS");
+            expect(CACHE_SIZE_LIMITS).toHaveProperty("SITES");
+            expect(CACHE_SIZE_LIMITS).toHaveProperty("TEMPORARY");
             expect(CACHE_SIZE_LIMITS).toHaveProperty("VALIDATION_RESULTS");
         });
 
         it("should have correct CONFIGURATION_VALUES limit", () => {
-            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(50);
+            expect(CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(100);
             expect(typeof CACHE_SIZE_LIMITS.CONFIGURATION_VALUES).toBe(
                 "number"
             );
@@ -194,9 +218,27 @@ describe("Backend Constants", () => {
         });
 
         it("should have correct VALIDATION_RESULTS limit", () => {
-            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(100);
+            expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe(200);
             expect(typeof CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBe("number");
             expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeGreaterThan(0);
+        });
+
+        it("should have correct MONITORS limit", () => {
+            expect(CACHE_SIZE_LIMITS.MONITORS).toBe(1000);
+            expect(typeof CACHE_SIZE_LIMITS.MONITORS).toBe("number");
+            expect(CACHE_SIZE_LIMITS.MONITORS).toBeGreaterThan(0);
+        });
+
+        it("should have correct SITES limit", () => {
+            expect(CACHE_SIZE_LIMITS.SITES).toBe(500);
+            expect(typeof CACHE_SIZE_LIMITS.SITES).toBe("number");
+            expect(CACHE_SIZE_LIMITS.SITES).toBeGreaterThan(0);
+        });
+
+        it("should have correct TEMPORARY limit", () => {
+            expect(CACHE_SIZE_LIMITS.TEMPORARY).toBe(1000);
+            expect(typeof CACHE_SIZE_LIMITS.TEMPORARY).toBe("number");
+            expect(CACHE_SIZE_LIMITS.TEMPORARY).toBeGreaterThan(0);
         });
 
         it("should be frozen to prevent modification", () => {

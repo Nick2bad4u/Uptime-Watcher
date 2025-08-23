@@ -51,6 +51,7 @@
 
 import type { Site } from "@shared/types";
 
+import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -572,11 +573,9 @@ export class SiteManager {
     public async updateSitesCache(sites: Site[]): Promise<void> {
         // Create temporary cache for atomic replacement
         const tempCache = new StandardizedCache<Site>({
-            defaultTTL: 600_000, // 10 minutes
-            enableStats: true,
+            ...CACHE_CONFIG.SITES,
             eventEmitter: this.eventEmitter,
-            maxSize: 500,
-            name: "sites-temp",
+            name: CACHE_NAMES.sites("temp"),
         });
 
         // Populate temporary cache
@@ -763,11 +762,8 @@ export class SiteManager {
 
         // Initialize StandardizedCache for sites
         this.sitesCache = new StandardizedCache<Site>({
-            defaultTTL: 600_000, // 10 minutes
-            enableStats: true,
+            ...CACHE_CONFIG.SITES,
             eventEmitter: this.eventEmitter,
-            maxSize: 500,
-            name: "sites",
         });
 
         // Create the new service-based orchestrators

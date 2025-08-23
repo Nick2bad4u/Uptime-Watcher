@@ -7,14 +7,15 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 1. [Architecture Overview](#architecture-overview)
 2. [Development Process](#development-process)
 3. [Component Creation Guidelines](#component-creation-guidelines)
-4. [State Management](#state-management)
-5. [Event Handling](#event-handling)
-6. [Modal Development](#modal-development)
-7. [Reusable Components](#reusable-components)
-8. [Validation Best Practices](#validation-best-practices)
-9. [Testing Strategy](#testing-strategy)
-10. [Documentation Requirements](#documentation-requirements)
-11. [Common Pitfalls](#common-pitfalls)
+4. [Component Props Standards](#component-props-standards)
+5. [State Management](#state-management)
+6. [Event Handling](#event-handling)
+7. [Modal Development](#modal-development)
+8. [Reusable Components](#reusable-components)
+9. [Validation Best Practices](#validation-best-practices)
+10. [Testing Strategy](#testing-strategy)
+11. [Documentation Requirements](#documentation-requirements)
+12. [Common Pitfalls](#common-pitfalls)
 
 ## Architecture Overview
 
@@ -160,38 +161,69 @@ Always follow this order to minimize breaking changes:
 
 ````tsx
 
+// Import standardized prop types for consistency
+import type {
+ CoreComponentProperties,
+ EventHandlers,
+ ComponentProperties,
+} from "shared/types/componentProps";
+
 /**
  * Component description following TSDoc guidelines
  *
  * @remarks
- * Detailed remarks about the component's purpose and behavior
+ * Detailed remarks about the component's purpose and behavior. See
+ * {@link https://github.com/nick2bad4u/uptime-watcher/blob/main/docs/Architecture/Patterns/Component-Props-Standards.md | Component Props Standards}
+ * for prop naming and structure guidelines.
  *
  * @example
  *
  * ```tsx
- * <MyComponent prop="value" />;
+ * <MyComponent
+ *  identifier="unique-id"
+ *  onClick={handleClick}
+ *  isLoading={false}
+ * />;
  * ```
  *
- * @param props - Component props description
+ * @param props - Component props following standardized patterns
  *
  * @returns JSX element description
  *
  * @public
  */
 export const MyComponent = React.memo(function MyComponent({
- prop1,
- prop2,
+ // Core props (always first)
+ identifier,
+ className = "",
+ isDisabled = false,
+
+ // Event handlers (using standardized signatures)
+ onClick,
+ onChange,
+
+ // Component-specific props
+ customProp,
 }: MyComponentProperties) {
  // State and hooks
  const { state } = useAppropriateStore();
 
- // Event handlers with useCallback
- const handleEvent = useCallback(
-  (event: React.MouseEvent) => {
+ // Event handlers with standardized patterns
+ const handleClick = useCallback<EventHandlers.ClickHandler>(
+  (event) => {
    event?.stopPropagation(); // Prevent event bubbling
-   // Handle event
+   if (isDisabled) return;
+   onClick?.(event);
   },
-  [dependencies]
+  [onClick, isDisabled]
+ );
+
+ const handleChange = useCallback<EventHandlers.ChangeHandler<string>>(
+  (event) => {
+   const value = event.target.value;
+   onChange?.(value, event);
+  },
+  [onChange]
  );
 
  // Early returns
@@ -200,35 +232,181 @@ export const MyComponent = React.memo(function MyComponent({
  }
 
  // Main render
- return <ThemedBox>{/* Component content */}</ThemedBox>;
+ return (
+  <ThemedBox className={className} data-testid={`my-component-${identifier}`}>
+   {/* Component content */}
+  </ThemedBox>
+ );
 });
 ````
+
+// Main render
+return <ThemedBox>{/_ Component content _/}</ThemedBox>;
+});
+
+`````
 
 ### Props Interface
 
 ```tsx
 /**
- * Props for the MyComponent component.
+ * Props for the MyComponent component following standardized patterns.
+ *
+ * @remarks
+ * Extends CoreComponentProperties for consistent base props across all components.
+ * Uses standardized event handler signatures from EventHandlers namespace.
  *
  * @public
  */
-export interface MyComponentProperties {
- /** Required prop description */
- requiredProp: string;
- /** Optional prop description */
- optionalProp?: boolean;
- /** Callback prop description */
- onEvent: (value: string) => void;
+export interface MyComponentProperties
+  extends ComponentProperties<{
+    /** Component-specific prop with clear description */
+    customProp: string;
+    /** Optional configuration prop */
+    enableFeature?: boolean;
+  }> {
+  /** Standard click handler following EventHandlers pattern */
+  onClick?: EventHandlers.ClickHandler;
+  /** Standard change handler with typed value */
+  onChange?: EventHandlers.ChangeHandler<string>;
+}
+
+// Alternative: For components with extensive props, use intersection types
+export interface MyComplexComponentProperties
+  extends CoreComponentProperties,
+          AccessibilityProperties {
+  /** Event handlers group */
+  onClick?: EventHandlers.ClickHandler;
+  onSubmit?: EventHandlers.SubmitHandler;
+  onKeyDown?: EventHandlers.KeyboardHandler;
+
+  /** Component configuration */
+  variant?: "primary" | "secondary" | "danger";
+  size?: "sm" | "md" | "lg";
+
+  /** Data props */
+  items: Array<{ id: string; label: string }>;
+  selectedItemId?: string;
 }
 ```
 
 ### Key Guidelines
 
 - **Always use React.memo**: Prevents unnecessary re-renders
-- **Alphabetical prop ordering**: Maintain consistent prop order
-- **Event handler naming**: Use `handle` prefix for event handlers
-- **Proper prop typing**: Never use `any` or `unknown`
+- **Extend standardized interfaces**: Use `ComponentProperties<T>` or intersect with `CoreComponentProperties`
+- **Standardized event handlers**: Use types from `EventHandlers` namespace for consistent signatures
+- **Alphabetical prop ordering**: Core props first, then event handlers, then component-specific props
+- **Event handler naming**: Use `handle` prefix for internal handlers, standardized signatures for props
+- **Proper prop typing**: Never use `any` or `unknown`, leverage standardized types
 - **Stop event propagation**: Add `event?.stopPropagation()` in button click handlers within cards
+- **Accessibility first**: Include `data-testid` attributes using component identifier
+- **Import standardized types**: Always import from `shared/types/componentProps` for consistency
+
+## Component Props Standards
+
+For comprehensive prop interface guidelines, see the [Component Props Standards](../Architecture/Patterns/Component-Props-Standards.md) documentation.
+
+### Using Standardized Prop Types
+
+The application provides reusable prop type definitions in `shared/types/componentProps.ts`:
+
+#### Core Properties
+
+```tsx
+import type {
+  CoreComponentProperties,
+  AccessibilityProperties,
+  ComponentProperties
+} from "shared/types/componentProps";
+
+// Simple component extending core properties
+interface SimpleButtonProperties extends CoreComponentProperties {
+  label: string;
+  onClick?: EventHandlers.ClickHandler;
+}
+
+// Component with accessibility features
+interface AccessibleFormProperties
+  extends CoreComponentProperties,
+          AccessibilityProperties {
+  onSubmit: EventHandlers.SubmitHandler;
+}
+
+// Complex component using utility type
+interface ComplexComponentProperties extends ComponentProperties<{
+  items: Array<{ id: string; name: string }>;
+  selectedId?: string;
+  onSelectionChange: (id: string) => void;
+}> {
+  // Event handlers are included via ComponentProperties
+  // Core props (className, isDisabled, etc.) are included
+}
+```
+
+#### Event Handler Standards
+
+```tsx
+import type { EventHandlers } from "shared/types/componentProps";
+
+// Standard click handler
+const handleClick: EventHandlers.ClickHandler = useCallback(
+  (event) => {
+    event?.stopPropagation();
+    // Handle click logic
+  },
+  []
+);
+
+// Change handler with typed value
+const handleNameChange: EventHandlers.ChangeHandler<string> = useCallback(
+  (value, event) => {
+    setName(value);
+    onChange?.(value, event);
+  },
+  [onChange]
+);
+
+// Submit handler with form data
+const handleSubmit: EventHandlers.SubmitHandler = useCallback(
+  (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    onSubmit?.(formData, event);
+  },
+  [onSubmit]
+);
+```
+
+#### Standard Button Properties
+
+```tsx
+import type { StandardButtonProperties } from "shared/types/componentProps";
+
+// Button component using standard properties
+interface ActionButtonProperties extends StandardButtonProperties {
+  action: "save" | "cancel" | "delete";
+  confirmationRequired?: boolean;
+}
+
+const ActionButton: React.FC<ActionButtonProperties> = ({
+  // Standard button props
+  variant = "primary",
+  size = "md",
+  isLoading = false,
+  isDisabled = false,
+  onClick,
+
+  // Component-specific props
+  action,
+  confirmationRequired = false,
+
+  // Core props
+  className = "",
+  children,
+}) => {
+  // Implementation using standardized patterns
+};
+```
 
 ## State Management
 
@@ -462,50 +640,61 @@ Extract components when:
 
 ```tsx
 // components/common/ReusableButton/ReusableButton.tsx
-export interface ReusableButtonProperties {
- /** Core functionality props */
- onClick: () => void;
- isLoading: boolean;
+import type {
+  StandardButtonProperties,
+  EventHandlers
+} from "shared/types/componentProps";
 
- /** Configuration props */
- variant?: "primary" | "secondary";
- compact?: boolean;
- className?: string;
-
- /** Context-specific props */
- label?: string;
- icon?: string;
+export interface ReusableButtonProperties extends StandardButtonProperties {
+  /** Context-specific props */
+  label?: string;
+  icon?: string;
+  compact?: boolean;
 }
 
 export const ReusableButton = React.memo(function ReusableButton({
- className = "",
- compact = false,
- icon,
- isLoading,
- label,
- onClick,
- variant = "primary",
-}: ReusableButtonProperties) {
- const handleClick = useCallback(
-  (event: React.MouseEvent) => {
-   event?.stopPropagation();
-   onClick();
-  },
-  [onClick]
- );
+  // Standard button props (from StandardButtonProperties)
+  variant = "primary",
+  size = "md",
+  isLoading = false,
+  isDisabled = false,
+  onClick,
 
- return (
-  <ThemedButton
-   className={`flex items-center gap-1 ${className}`}
-   disabled={isLoading}
-   onClick={handleClick}
-   size="sm"
-   variant={variant}
-  >
-   {icon && <span>{icon}</span>}
-   {!compact && label && <span>{label}</span>}
-  </ThemedButton>
- );
+  // Core props (from CoreComponentProperties)
+  className = "",
+  identifier,
+
+  // Component-specific props
+  compact = false,
+  icon,
+  label,
+
+  // Children from StandardButtonProperties
+  children,
+}: ReusableButtonProperties) {
+  const handleClick = useCallback<EventHandlers.ClickHandler>(
+    (event) => {
+      event?.stopPropagation();
+      if (isDisabled || isLoading) return;
+      onClick?.(event);
+    },
+    [onClick, isDisabled, isLoading]
+  );
+
+  return (
+    <ThemedButton
+      className={`flex items-center gap-1 ${className}`}
+      disabled={isDisabled || isLoading}
+      onClick={handleClick}
+      size={size}
+      variant={variant}
+      data-testid={identifier ? `button-${identifier}` : undefined}
+    >
+      {icon && <span>{icon}</span>}
+      {!compact && label && <span>{label}</span>}
+      {children}
+    </ThemedButton>
+  );
 });
 ```
 
@@ -514,14 +703,24 @@ export const ReusableButton = React.memo(function ReusableButton({
 ```tsx
 // Import and use reusable component
 import { ReusableButton } from "../common/ReusableButton/ReusableButton";
+import type { EventHandlers } from "shared/types/componentProps";
 
 // In parent component
+const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>(
+  (event) => {
+    // Handle start monitoring logic
+  },
+  []
+);
+
 <ReusableButton
- icon="🚀"
- isLoading={isLoading}
- label="Start Monitoring"
- onClick={handleStartMonitoring}
- variant="success"
+  identifier="start-monitoring-btn"
+  icon="🚀"
+  isLoading={isLoading}
+  label="Start Monitoring"
+  onClick={handleStartMonitoring}
+  variant="primary" // Using standardized variant values
+  size="md"
 />;
 ```
 
@@ -576,7 +775,7 @@ Follow the base tag guidelines in `docs/TSDoc/`:
  *
  * @public
  */
-````
+`````
 
 ### Code Comments
 
