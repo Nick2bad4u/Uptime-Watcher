@@ -291,6 +291,10 @@ export default [
                         "tsconfig.test.json",
                         "tsconfig.shared.json",
                         "tsconfig.shared.test.json",
+                        "docs/docusaurus/tsconfig.json",
+                        "docs/docusaurus/tsconfig.eslint.json",
+                        "docs/docusaurus/tsconfig.typedoc.json",
+                        "docs/docusaurus/tsconfig.local.typedoc.json",
                     ],
                 }),
             ],
@@ -301,7 +305,7 @@ export default [
     {
         plugins: { eslintPluginYml: eslintPluginYml },
         files: ["*.yaml", "*.yml"],
-        ignores: ["docs/docusaurus/**"],
+        ignores: [],
         rules: {
             ...eslintPluginYml.configs["flat/prettier"].rules,
             ...eslintPluginJsonSchemaValidator.configs["flat/recommended"]
@@ -331,7 +335,7 @@ export default [
             "*.htm",
             "*.xhtml",
         ],
-        ignores: ["docs/docusaurus/**", "report/**"],
+        ignores: ["report/**"],
         rules: {
             ...html.configs["flat/recommended"].rules,
             "@html-eslint/indent": "error",
@@ -466,7 +470,7 @@ export default [
             "*.json5",
             "*.jsonc",
         ],
-        ignores: ["docs/docusaurus/**"],
+        ignores: [],
         plugins: { eslintPluginJsonc: eslintPluginJsonc },
         ...json.configs.recommended[0],
         ...eslintPluginJsonc.configs["flat/prettier"][0],
@@ -613,13 +617,104 @@ export default [
                 window: "readonly",
             },
         },
-        settings: {},
+        settings: {
+            "import-x/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: true,
+                node: true,
+                project: ["./docs/docusaurus/tsconfig.eslint.json"],
+            },
+            "import/resolver": {
+                // You will also need to install and configure the TypeScript resolver
+                // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
+                typescript: {
+                    alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
+                    project: ["./docs/docusaurus/tsconfig.eslint.json"],
+                },
+            },
+        },
         plugins: {
-            "@docusaurus": pluginDocusaurus,
             "@typescript-eslint": tseslint,
+            "jsx-a11y": jsxA11y,
+            "no-unsanitized": nounsanitized,
+            "prefer-arrow": pluginPreferArrow,
+            "react-hooks": reactHooks,
+            "sort-class-members": pluginSortClassMembers,
+            "unused-imports": pluginUnusedImports,
+            "write-good-comments": pluginWriteGood,
+            boundaries: pluginBoundaries,
+            compat: pluginCompat,
+            css: css,
+            depend: depend,
+            functional: pluginFunctional,
             js: js,
+            math: eslintPluginMath,
+            n: nodePlugin,
+            perfectionist: pluginPerfectionist,
+            "import-x": importX,
+            prettier: pluginPrettier,
+            promise: pluginPromise,
+            putout: putout,
+            react: pluginReact,
+            redos: pluginRedos,
+            regexp: pluginRegexp,
+            security: pluginSecurity,
+            sonarjs: pluginSonarjs,
+            tsdoc: pluginTsdoc,
+            unicorn: pluginUnicorn,
+            "eslint-comments": pluginComments,
+            ex: ex,
+            canonical: pluginCanonical,
+            "@eslint-react": eslintReact,
+            "@eslint-react/dom": eslintReactDom,
+            "@eslint-react/web-api": eslintReactWeb,
+            "@eslint-react/hooks-extra": eslintReactHooksExtra,
+            "react-hooks-addons": reactHooksAddons,
+            "@eslint-react/naming-convention": eslintReactNamingConvention,
+            xss: xss,
+            "array-func": arrayFunc,
+            "no-use-extend-native": eslintPluginNoUseExtendNative,
+            "@microsoft/sdl": pluginMicrosoftSdl,
+            "sort-destructure-keys": pluginSortDestructure,
+            istanbul: istanbul,
+            observers: observers,
+            "@jcoreio/implicit-dependencies": implicitDependencies,
+            listeners: listeners,
+            "sql-template": sqlTemplate,
+            "no-function-declare-after-return": pluginNFDAR,
+            "require-jsdoc": pluginJSDoc,
+            "comment-length": eslintPluginCommentLength,
+            "no-lookahead-lookbehind-regexp": pluginRegexLook,
+            "@metamask/design-tokens": pluginDesignTokens,
+            "function-name": pluginFunctionNames,
+            "clean-code": pluginCleanCode,
+            "import-zod": importZod,
+            "usememo-recommendations": pluginUseMemo,
+            "eslint-plugin-goodeffects": pluginGoodEffects,
+            "jsx-plus": pluginJsxPlus,
+            "no-unary-plus": pluginNoUnary,
+            "module-interop": moduleInterop,
+            "granular-selectors": pluginGranular,
+            "no-unawaited-dot-catch-throw": pluginNoUnwaited,
+            "eslint-plugin-toplevel": pluginTopLevel,
+            "format-sql": pluginFormatSQL,
+            neverthrow: fixupPluginRules(pluginNeverThrow),
+            "no-explicit-type-exports": pluginNoExplicitTypeExports,
+            deprecation: fixupPluginRules(pluginDeprecation),
+            "no-constructor-bind": pluginNoConstructBind,
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
+            "validate-jsx-nesting": pluginValidateJSX,
+            "styled-components-a11y": styledA11y,
+            "ssr-friendly": fixupPluginRules(pluginSSR),
+            etc: fixupPluginRules(etc),
+            "safe-jsx": pluginSafeJSX,
+            "loadable-imports": pluginLoadableImports,
+            zod: zod,
+            "@docusaurus": pluginDocusaurus,
         },
         rules: {
+            // TypeScript backend rules
             ...js.configs.all.rules,
             ...tseslint.configs.recommendedTypeChecked,
             ...tseslint.configs.recommended.rules,
@@ -627,23 +722,926 @@ export default [
             ...tseslint.configs.strict.rules,
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
+            ...pluginRegexp.configs["flat/all"].rules,
+            ...importX.flatConfigs.recommended.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...importX.flatConfigs.react.rules,
+            ...importX.flatConfigs.typescript.rules,
+            ...importX.flatConfigs.electron.rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
+            ...pluginUnicorn.configs["flat/all"].rules,
+            ...pluginReact.configs.all.rules,
+            ...reactHooks.configs["recommended-latest"].rules,
+            ...jsxA11y.flatConfigs.strict.rules,
+            ...pluginSonarjs.configs.recommended.rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
+            ...pluginBoundaries.configs.recommended.rules,
+            ...pluginRedos.configs.recommended.rules,
+            ...pluginSecurity.configs.recommended.rules,
+            ...nodePlugin.configs["flat/all"].rules,
+            ...depend.configs["flat/recommended"].rules,
+            ...eslintPluginMath.configs.recommended.rules,
+            ...css.configs.recommended.rules,
+            ...pluginComments.configs.recommended.rules,
+            ...pluginCanonical.configs.recommended.rules,
+            ...eslintReact.configs["recommended-typescript"].rules,
+            ...arrayFunc.configs.all.rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            ...pluginMicrosoftSdl.configs.required.rules,
+            ...listeners.configs.strict.rules,
+            ...pluginNFDAR.rules,
+            ...pluginJSDoc.rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
+            ...pluginRegexLook.configs.recommended.rules,
+            ...pluginJsxPlus.configs.all.rules,
+            ...moduleInterop.configs.recommended.rules,
+            ...pluginTotalFunctions.configs.recommended.rules,
+            ...styledA11y.flatConfigs.strict.rules,
+            ...etc.configs.recommended.rules,
+
+            "no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp": "off",
 
             "css/no-invalid-properties": "off",
-            
+
             // Docusaurus Rules
             "@docusaurus/string-literal-i18n-messages": "off",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/prefer-docusaurus-heading": "warn",
 
-            // "no-hardcoded-strings/no-hardcoded-strings": [
-            //     "warn",
-            //     {
-            //         allowedFunctionNames: ["t", "translate", "i18n"],
-            //         ignoreStrings: ["OK", "Cancel"],
-            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
-            //     },
-            // ],
+            "react-hooks-addons/no-unused-deps": "warn",
+
+            "comment-length/limit-single-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
+
+            "comment-length/limit-multi-line-comments": [
+                "warn",
+                {
+                    mode: "compact-on-overflow",
+                    maxLength: 120,
+                    logicalWrap: true,
+                    ignoreUrls: true,
+                    ignoreCommentsWithCode: true,
+                    tabSize: 2,
+                },
+            ],
+
+            "zod/prefer-enum": "error",
+            "zod/require-strict": "error",
+
+            "loadable-imports/sort": "error",
+
+            "safe-jsx/jsx-explicit-boolean": "error",
+
+            "etc/no-internal": "off",
+            "etc/no-t": "off",
+            "etc/no-const-enum": "warn",
+            "etc/no-misused-generics": "warn",
+            "etc/prefer-interface": "warn",
+            "etc/throw-error": "warn",
+
+            "ssr-friendly/no-dom-globals-in-module-scope": "error",
+            "ssr-friendly/no-dom-globals-in-constructor": "error",
+            "ssr-friendly/no-dom-globals-in-react-cc-render": "error",
+            "ssr-friendly/no-dom-globals-in-react-fc": "error",
+
+            "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
+
+            "total-functions/no-unsafe-type-assertion": "off",
+            "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-url-constructor": "off",
+
+            "no-constructor-bind/no-constructor-bind": "error",
+            "no-constructor-bind/no-constructor-state": "error",
+
+            "one-var": "off",
+            "no-magic-numbers": "off",
+            "func-style": "off",
+            "capitalized-comments": "off",
+            "class-methods-use-this": "off",
+            "sort-imports": "off",
+            "no-inline-comments": "off",
+            "require-await": "off",
+            "no-ternary": "off",
+            "max-lines": "off",
+            "id-length": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+            "max-params": "off",
+            "sort-keys": "off",
+            "dot-notation": "off",
+            "no-console": "off",
+            "no-plusplus": "off",
+            "no-undefined": "off",
+            "no-void": "off",
+            "require-unicode-regexp": "off",
+            "prefer-arrow-callback": "off",
+            "no-undef-init": "off",
+            "object-shorthand": "off",
+            camelcase: "off",
+            "max-classes-per-file": "off",
+
+            "deprecation/deprecation": "error",
+
+            "no-explicit-type-exports/no-explicit-type-exports": "error",
+
+            "neverthrow/must-use-result": "error",
+
+            "format-sql/format": "warn",
+
+            "eslint-plugin-toplevel/no-toplevel-var": "error",
+            "eslint-plugin-toplevel/no-toplevel-let": "error",
+            "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
+
+            "no-unawaited-dot-catch-throw/enforce-no-unawaited-dot-catch-throw":
+                "error",
+
+            "no-unary-plus/no-unary-plus": "error",
+
+            // Note: granular-selectors plugin rules need to be added manually since
+            // Note: The plugin config are not available after fixupPluginRules wrapping (Below)
+
+            "granular-selectors/granular-selectors": "error",
+
+            "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
+
+            "usememo-recommendations/detect-heavy-operations": "warn",
+
+            "import-zod/prefer-zod-namespace": "error",
+
+            // "clean-code/feature-envy": "error",
+            // "clean-code/exception-handling": "error",
+
+            "function-name/starts-with-verb": [
+                "error",
+                {
+                    whitelist: [
+                        "success",
+                        "all",
+                        "supports",
+                        "safe",
+                        "timeout",
+                        "with",
+                        "cleanup",
+                        "deep",
+                        "handler",
+                        "component",
+                        "typed",
+                        "persist",
+                        "invalidate",
+                        "bulk",
+                        "evict",
+                        "migrate",
+                        "rows",
+                        "row",
+                        "settings",
+                        "shutdown",
+                        "configure",
+                        "rollback",
+                        "prune",
+                        "upsert",
+                        "exists",
+                        "history",
+                        "increment",
+                    ],
+                },
+            ],
+
+            "@metamask/design-tokens/no-deprecated-classnames": [
+                "warn",
+                {
+                    "bg-opacity-*": "Use opacity modifiers like 'bg-black/50'.",
+                    "text-opacity-*":
+                        "Use opacity modifiers like 'text-black/50'.",
+                    "border-opacity-*":
+                        "Use opacity modifiers like 'border-black/50'.",
+                    "divide-opacity-*":
+                        "Use opacity modifiers like 'divide-black/50'.",
+                    "ring-opacity-*":
+                        "Use opacity modifiers like 'ring-black/50'.",
+                    "placeholder-opacity-*":
+                        "Use opacity modifiers like 'placeholder-black/50'.",
+                    "flex-shrink-*": "Use 'shrink-*' instead.",
+                    "flex-grow-*": "Use 'grow-*' instead.",
+                    "overflow-ellipsis": "Use 'text-ellipsis' instead.",
+                    "decoration-slice": "Use 'box-decoration-slice' instead.",
+                    "decoration-clone": "Use 'box-decoration-clone' instead.",
+
+                    "shadow-sm": "Use 'shadow-xs' instead.",
+                    shadow: "Use 'shadow-sm' instead.",
+                    "drop-shadow-sm": "Use 'drop-shadow-xs' instead.",
+                    "drop-shadow": "Use 'drop-shadow-sm' instead.",
+                    "blur-sm": "Use 'blur-xs' instead.",
+                    blur: "Use 'blur-sm' instead.",
+                    "backdrop-blur-sm": "Use 'backdrop-blur-xs' instead.",
+                    "backdrop-blur": "Use 'backdrop-blur-sm' instead.",
+                    "rounded-sm": "Use 'rounded-xs' instead.",
+                    rounded: "Use 'rounded-sm' instead.",
+                    "outline-none": "Use 'outline-hidden' instead.",
+                    ring: "Use 'ring-3' instead.",
+                },
+            ],
+            "@metamask/design-tokens/prefer-theme-color-classnames": "error",
+            "@metamask/design-tokens/color-no-hex": "error",
+
+            "sql-template/no-unsafe-query": "error",
+
+            "@jcoreio/implicit-dependencies/no-implicit": [
+                "error",
+                {
+                    ignore: [
+                        "@shared",
+                        "electron-devtools-installer",
+                        "electron",
+                    ],
+                },
+            ],
+
+            "observers/no-missing-unobserve-or-disconnect": "error",
+            "observers/matching-unobserve-target": "error",
+
+            "istanbul/no-ignore-file": "error",
+            "istanbul/prefer-ignore-reason": "error",
+
+            "sort-destructure-keys/sort-destructure-keys": "off",
+
+            "@eslint-react/naming-convention/component-name": "warn",
+            "@eslint-react/naming-convention/context-name": "warn",
+            "@eslint-react/naming-convention/use-state": "warn",
+
+            "sort-class-members/sort-class-members": [
+                "warn",
+                {
+                    accessorPairPositioning: "together",
+                    stopAfterFirstProblem: false,
+                    sortInterfaces: true,
+                    order: [
+                        "[static-properties]",
+                        "[properties]",
+                        "[conventional-private-properties]",
+                        "[arrow-function-properties]",
+                        "[everything-else]",
+                        "[accessor-pairs]",
+                        "[getters]",
+                        "[setters]",
+                        "[static-methods]",
+                        "[async-methods]",
+                        "[methods]",
+                        "[conventional-private-methods]",
+                    ],
+                },
+            ],
+            "perfectionist/sort-classes": "off",
+            "perfectionist/sort-modules": [
+                "off",
+                {
+                    type: "alphabetical",
+                    order: "asc",
+                    ignoreCase: true,
+                    specialCharacters: "keep",
+                    partitionByComment: false,
+                    partitionByNewLine: false,
+                    newlinesBetween: "ignore",
+                    groups: [
+                        "declare-enum",
+                        "declare-export-enum",
+                        "enum",
+                        "export-enum",
+                        "declare-interface",
+                        "declare-export-interface",
+                        "declare-default-interface",
+                        "export-declare-interface",
+                        "default-interface",
+                        "export-default-interface",
+                        "interface",
+                        "export-interface",
+                        "declare-type",
+                        "declare-export-type",
+                        "type",
+                        "export-type",
+                        "declare-class",
+                        "declare-export-class",
+                        "declare-default-class",
+                        "declare-default-decorated-class",
+                        "declare-default-export-class",
+                        "declare-default-export-decorated-class",
+                        "export-declare-class",
+                        "export-declare-decorated-class",
+                        "export-default-class",
+                        "export-default-decorated-class",
+                        "default-class",
+                        "default-decorated-class",
+                        "class",
+                        "export-class",
+                        "decorated-class",
+                        "export-decorated-class",
+                        "declare-function",
+                        "declare-async-function",
+                        "declare-export-function",
+                        "declare-export-async-function",
+                        "declare-default-function",
+                        "declare-default-async-function",
+                        "declare-default-export-function",
+                        "declare-default-export-async-function",
+                        "export-declare-function",
+                        "export-declare-async-function",
+                        "export-default-function",
+                        "export-default-async-function",
+                        "default-function",
+                        "default-async-function",
+                        "function",
+                        "async-function",
+                        "export-function",
+                        "export-async-function",
+                    ],
+                    customGroups: [],
+                },
+            ],
+
+            "xss/no-location-href-assign": "error",
+
+            "canonical/destructuring-property-newline": "off",
+            "canonical/export-specifier-newline": "off",
+            "canonical/filename-match-exported": "warn",
+            "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
+            "canonical/filename-no-index": "error",
+            "canonical/import-specifier-newline": "off",
+            "canonical/no-barrel-import": "error",
+            "canonical/no-export-all": "error",
+            "canonical/no-re-export": "warn",
+            "canonical/no-reassign-imports": "error",
+            "canonical/prefer-inline-type-import": "off",
+            "canonical/prefer-use-mount": "warn",
+            "canonical/sort-react-dependencies": "warn",
+            "canonical/prefer-import-alias": [
+                "error",
+                {
+                    aliases: [
+                        {
+                            alias: "@shared/",
+                            matchParent: path.resolve(import.meta.dirname),
+                            matchPath: "^shared/",
+                            maxRelativeDepth: 0,
+                        },
+                    ],
+                },
+            ],
+
+            "ex/no-unhandled": "warn",
+
+            "no-unsanitized/method": "error",
+            "no-unsanitized/property": "error",
+
+            "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+            "n/no-missing-import": "off", // Allow missing imports for dynamic imports
+            "n/no-unsupported-features/es-syntax": "off", // Allow modern ES2024+ syntax
+
+            // "write-good-comments/write-good-comments": "warn",
+
+            "unicorn/no-null": "off", // Null is common in SQLite and IPC
+            "unicorn/prefer-global-this": "off", // Not suitable for Electron
+            "unicorn/prevent-abbreviations": "off", // Too many false positives
+            "unicorn/prefer-spread": "off", // Prefer Array.From for readability
+
+            // Node.js specific
+            complexity: "off",
+
+            // Core quality rules
+            // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
+            "consistent-return": "warn",
+            "no-debugger": "error",
+            "no-duplicate-imports": [
+                "error",
+                {
+                    allowSeparateTypeImports: true,
+                },
+            ],
+            "prefer-const": "error",
+            "prefer-template": "warn",
+            curly: ["error", "all"],
+            eqeqeq: ["error", "always"],
+
+            // Code spacing and formatting rules
+            "lines-around-comment": [
+                "error",
+                {
+                    beforeBlockComment: true,
+                    afterBlockComment: false,
+                    beforeLineComment: true,
+                    afterLineComment: false,
+                    allowBlockStart: true,
+                    allowBlockEnd: false,
+                    allowObjectStart: true,
+                    allowObjectEnd: false,
+                    allowArrayStart: true,
+                    allowArrayEnd: false,
+                    allowClassStart: true,
+                    allowClassEnd: false,
+                    applyDefaultIgnorePatterns: true,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "lines-between-class-members": [
+                "error",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "padding-line-between-statements": [
+                "error",
+                {
+                    blankLine: "always",
+                    prev: "function",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "function",
+                },
+                {
+                    blankLine: "always",
+                    prev: "class",
+                    next: "*",
+                },
+                {
+                    blankLine: "always",
+                    prev: "*",
+                    next: "class",
+                },
+            ],
+
+            "putout/align-spaces": "off",
+            "putout/array-element-newline": "off",
+            "putout/destructuring-as-function-argument": "off",
+            "putout/function-declaration-paren-newline": "off",
+            "putout/long-properties-destructuring": "off",
+            "putout/multiple-properties-destructuring": "off",
+            "putout/newline-function-call-arguments": "off",
+            "putout/object-property-newline": "error",
+            "putout/objects-braces-inside-array": "error",
+            "putout/single-property-destructuring": "off",
+            // Import management
+            "unused-imports/no-unused-imports": "error",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                },
+            ],
+
+            // Architecture boundaries for Electron
+            "boundaries/element-types": [
+                "error",
+                {
+                    default: "disallow",
+                    rules: [
+                        { from: "events", allow: ["types"] },
+                        {
+                            from: "main",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "managers",
+                            allow: [
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        {
+                            from: "preload",
+                            allow: ["utils", "types"],
+                        },
+                        {
+                            from: "services",
+                            allow: [
+                                "services",
+                                "utils",
+                                "types",
+                            ],
+                        },
+                        { from: "types", allow: [] },
+                        {
+                            from: "utils",
+                            allow: [
+                                "managers",
+                                "services",
+                                "utils",
+                                "events",
+                                "types",
+                            ],
+                        },
+                        { from: "utils", allow: ["types"] },
+                    ],
+                },
+            ],
+
+            // Backend-specific unicorn rules
+            "unicorn/filename-case": [
+                "warn",
+                {
+                    cases: {
+                        camelCase: true,
+                        pascalCase: true, // Service classes
+                    },
+                },
+            ],
+            "unicorn/no-keyword-prefix": [
+                "error",
+                {
+                    disallowedPrefixes: [
+                        "interface",
+                        "type",
+                        "enum",
+                    ],
+                    checkProperties: false,
+                },
+            ],
+            "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-negated-condition": "warn", // Sometimes clearer
+            "unicorn/prefer-includes": "warn",
+            "unicorn/prefer-string-slice": "warn",
+            "unicorn/prefer-string-starts-ends-with": "warn",
+            "unicorn/prefer-ternary": "off", // Can hurt readability
+            "unicorn/prefer-module": "warn", // CommonJS required for Electron
+            "unicorn/prefer-node-protocol": "error", // Enforce for backend
+            "unicorn/prefer-top-level-await": "off", // Not suitable for Electron main
+
+            // Security for backend
+            "redos/no-vulnerable": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "security/detect-non-literal-require": "error",
+            "security/detect-non-literal-regexp": "warn",
+            "security/detect-object-injection": "off",
+
+            // Documentation
+            "tsdoc/syntax": "warn",
+
+            // Allow more flexibility for backend patterns
+            "@typescript-eslint/no-explicit-any": "warn",
+            "functional/functional-parameters": "off",
+            "functional/immutable-data": "off",
+            "functional/no-class-inheritance": "off", // Classes are common in Electron services
+            "functional/no-classes": "off", // Classes are common in Electron services
+            "functional/no-conditional-statement": "off",
+            "functional/no-conditional-statements": "off",
+            "functional/no-expression-statements": "off",
+            "functional/no-let": "off",
+            "functional/no-loop-statements": "off",
+            "functional/no-mixed-types": "off", // Mixed types are common in Electron services
+            "functional/no-return-void": "off",
+            "functional/no-throw-statements": "off", // Throwing errors is common in Electron
+            "functional/prefer-immutable-types": "off",
+
+            // Function and type safety rules (same as frontend)
+            "@typescript-eslint/consistent-type-assertions": "error",
+            "@typescript-eslint/no-restricted-types": [
+                "error",
+                {
+                    types: {
+                        Function: {
+                            message: [
+                                "The `Function` type accepts any function-like value.",
+                                "It provides no type safety when calling the function, which can be a common source of bugs.",
+                                "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
+                                "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
+                            ].join("\n"),
+                        },
+                    },
+                },
+            ],
+            "@typescript-eslint/no-empty-object-type": "error",
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error",
+            "@typescript-eslint/prefer-function-type": "error",
+            "@typescript-eslint/no-empty-function": [
+                "error",
+                {
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
+                },
+            ],
+
+            "prettier/prettier": ["warn", { usePrettierrc: true }],
+
+            // Advanced type-checked rules for backend async safety and runtime error prevention
+            "@typescript-eslint/no-floating-promises": [
+                "error",
+                {
+                    ignoreVoid: true, // Allow void for intentionally ignored promises
+                    ignoreIIFE: false, // Catch floating IIFEs which can cause issues in Node.js
+                },
+            ],
+            "@typescript-eslint/await-thenable": "error", // Prevent awaiting non-promises
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                {
+                    checksConditionals: true, // Check if Promises used in conditionals
+                    checksSpreads: true, // Check Promise spreads
+                    checksVoidReturn: true, // Critical for Electron IPC handlers
+                },
+            ],
+            "@typescript-eslint/require-await": "error", // Functions marked async must use await
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
+
+            // Enhanced type safety for backend services
+            "@typescript-eslint/no-unnecessary-type-assertion": "error", // Remove redundant type assertions
+            "@typescript-eslint/no-unsafe-argument": "warn", // Warn on passing any to typed parameters
+            "@typescript-eslint/no-unsafe-assignment": "warn", // Warn on unsafe assignments to any
+            "@typescript-eslint/no-unsafe-call": "warn", // Warn on calling any-typed functions
+            "@typescript-eslint/no-unsafe-member-access": "warn", // Warn on accessing any-typed properties
+            "@typescript-eslint/no-unsafe-return": "warn", // Warn on returning any from typed functions
+
+            // Backend-specific type safety
+            "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
+            "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
+
+            // Null safety for backend operations
+            "@typescript-eslint/no-unnecessary-condition": [
+                "warn",
+                {
+                    allowConstantLoopConditions: true, // Allow while(true) patterns in services
+                },
+            ],
+            "@typescript-eslint/prefer-nullish-coalescing": [
+                "error",
+                {
+                    ignoreConditionalTests: false, // Check conditionals for nullish coalescing opportunities
+                    ignoreMixedLogicalExpressions: false, // Check complex logical expressions
+                },
+            ],
+            "@typescript-eslint/prefer-optional-chain": "error", // Use optional chaining instead of logical AND,
+            "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
+            "@typescript-eslint/array-type": [
+                "error",
+                { default: "array-simple" },
+            ], // Prefer T[] for simple types, Array<T> for complex types
+
+            "@typescript-eslint/adjacent-overload-signatures": "warn",
+            "@typescript-eslint/ban-ts-comment": "warn",
+            "@typescript-eslint/ban-tslint-comment": "warn",
+            "@typescript-eslint/class-literal-property-style": "warn",
+            "@typescript-eslint/class-methods-use-this": "off",
+            "@typescript-eslint/consistent-generic-constructors": "warn",
+            "@typescript-eslint/consistent-indexed-object-style": "warn",
+            "@typescript-eslint/consistent-return": "warn",
+            "@typescript-eslint/consistent-type-definitions": "warn",
+            "@typescript-eslint/consistent-type-exports": "warn",
+            "@typescript-eslint/consistent-type-imports": "warn",
+            "@typescript-eslint/default-param-last": "warn",
+            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/explicit-function-return-type": [
+                "warn",
+                {
+                    allowConciseArrowFunctionExpressionsStartingWithVoid: false,
+                    allowDirectConstAssertionInArrowFunctions: true,
+                    allowedNames: [],
+                    allowExpressions: false,
+                    allowFunctionsWithoutTypeParameters: false,
+                    allowHigherOrderFunctions: true,
+                    allowIIFEs: false,
+                    allowTypedFunctionExpressions: true,
+                },
+            ],
+            "@typescript-eslint/explicit-member-accessibility": "warn",
+            "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "init-declarations": "off",
+            "@typescript-eslint/init-declarations": "warn",
+            "@typescript-eslint/max-params": "off",
+            "@typescript-eslint/member-ordering": "off",
+            "@typescript-eslint/method-signature-style": "warn",
+            "@typescript-eslint/naming-convention": "off",
+            "@typescript-eslint/no-array-constructor": "warn",
+            "@typescript-eslint/no-array-delete": "warn",
+            "@typescript-eslint/no-base-to-string": "warn",
+            "@typescript-eslint/no-confusing-non-null-assertion": "warn",
+            "@typescript-eslint/no-confusing-void-expression": "warn",
+            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-dupe-class-members": "warn",
+            "@typescript-eslint/no-duplicate-enum-values": "warn",
+            "@typescript-eslint/no-duplicate-type-constituents": "warn",
+            "@typescript-eslint/no-dynamic-delete": "warn",
+            "@typescript-eslint/no-extra-non-null-assertion": "warn",
+            "@typescript-eslint/no-extraneous-class": "warn",
+            "@typescript-eslint/no-for-in-array": "warn",
+            "@typescript-eslint/no-implied-eval": "warn",
+            // Keep enabled: Helps with bundle optimization and makes type vs runtime imports clearer.
+            // Can be resolved incrementally as warnings.
+            "@typescript-eslint/no-import-type-side-effects": "warn",
+            "@typescript-eslint/no-invalid-this": "warn",
+            "@typescript-eslint/no-invalid-void-type": "warn",
+            "@typescript-eslint/no-loop-func": "warn",
+            "@typescript-eslint/no-magic-numbers": "off",
+            "@typescript-eslint/no-meaningless-void-operator": "warn",
+            "@typescript-eslint/no-misused-new": "warn",
+            "@typescript-eslint/no-misused-spread": "warn",
+            "@typescript-eslint/no-mixed-enums": "warn",
+            "@typescript-eslint/no-namespace": "warn",
+            "@typescript-eslint/no-non-null-asserted-nullish-coalescing":
+                "warn",
+            "@typescript-eslint/no-non-null-asserted-optional-chain": "warn",
+            "@typescript-eslint/no-redeclare": "warn",
+            "@typescript-eslint/no-redundant-type-constituents": "warn",
+            "@typescript-eslint/no-require-imports": "warn",
+            "@typescript-eslint/no-restricted-imports": "warn",
+            "@typescript-eslint/no-shadow": "warn",
+            "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
+            "@typescript-eslint/no-unnecessary-parameter-property-assignment":
+                "warn",
+            "@typescript-eslint/no-unnecessary-qualifier": "warn",
+            "@typescript-eslint/no-unnecessary-template-expression": "warn",
+            "@typescript-eslint/no-unnecessary-type-arguments": "warn",
+            "@typescript-eslint/no-unnecessary-type-constraint": "warn",
+            "@typescript-eslint/no-unnecessary-type-conversion": "warn",
+            "@typescript-eslint/no-unnecessary-type-parameters": "warn",
+
+            "@typescript-eslint/no-unsafe-declaration-merging": "warn",
+            "@typescript-eslint/no-unsafe-enum-comparison": "warn",
+
+            "@typescript-eslint/no-unsafe-type-assertion": "warn",
+            "@typescript-eslint/no-unsafe-unary-minus": "warn",
+            "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-vars": "warn",
+            // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
+            // For Electron projects that often organize helper functions after main functions for better readability
+            "@typescript-eslint/no-use-before-define": "off",
+            "@typescript-eslint/no-useless-constructor": "warn",
+            "@typescript-eslint/no-useless-empty-export": "warn",
+            "@typescript-eslint/non-nullable-type-assertion-style": "warn",
+            "@typescript-eslint/only-throw-error": "warn",
+            "@typescript-eslint/parameter-properties": "warn",
+            "@typescript-eslint/prefer-as-const": "warn",
+            "@typescript-eslint/prefer-destructuring": "warn",
+            "@typescript-eslint/prefer-enum-initializers": "warn",
+            "@typescript-eslint/prefer-find": "warn",
+            "@typescript-eslint/prefer-for-of": "warn",
+            "@typescript-eslint/prefer-includes": "warn",
+            "@typescript-eslint/prefer-literal-enum-member": "warn",
+            "@typescript-eslint/prefer-namespace-keyword": "warn",
+            "@typescript-eslint/prefer-promise-reject-errors": "warn",
+            // Disabled: Too noisy for Electron projects with React/Zustand stores.
+            // Readonly parameters are often impractical and TypeScript already provides strong typing.
+            "@typescript-eslint/prefer-readonly-parameter-types": "off",
+            "@typescript-eslint/prefer-reduce-type-parameter": "warn",
+            "@typescript-eslint/prefer-regexp-exec": "warn",
+            "@typescript-eslint/prefer-return-this-type": "warn",
+            "@typescript-eslint/prefer-string-starts-ends-with": "warn",
+            // Configured: Allows non-async functions that return promises (like utility wrappers around Promise.all)
+            // But encourages async for most cases. This is more flexible for Electron projects.
+            "@typescript-eslint/promise-function-async": [
+                "warn",
+                {
+                    allowAny: true,
+                    allowedPromiseNames: ["Promise"],
+                    checkArrowFunctions: false,
+                },
+            ],
+            "@typescript-eslint/related-getter-setter-pairs": "warn",
+            "@typescript-eslint/require-array-sort-compare": "warn",
+            "@typescript-eslint/restrict-plus-operands": "warn",
+            "@typescript-eslint/restrict-template-expressions": "warn",
+            "@typescript-eslint/strict-boolean-expressions": "off",
+            "@typescript-eslint/triple-slash-reference": "warn",
+            "@typescript-eslint/unbound-method": "warn",
+            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
+
+            // RegExp
+            "regexp/grapheme-string-literal": "warn",
+            "regexp/hexadecimal-escape": "warn",
+            "regexp/letter-case": "warn",
+            "regexp/no-control-character": "warn",
+            "regexp/no-octal": "warn",
+            "regexp/no-standalone-backslash": "warn",
+            "regexp/no-super-linear-move": "warn",
+            "regexp/prefer-escape-replacement-dollar-char": "warn",
+            "regexp/prefer-lookaround": "warn",
+            "regexp/prefer-named-backreference": "warn",
+            "regexp/prefer-named-capture-group": "warn",
+            "regexp/prefer-named-replacement": "warn",
+            "regexp/prefer-quantifier": "warn",
+            "regexp/prefer-regexp-exec": "warn",
+            "regexp/prefer-regexp-test": "warn",
+            "regexp/prefer-result-array-groups": "warn",
+            "regexp/require-unicode-regexp": "off",
+            "regexp/require-unicode-sets-regexp": "warn",
+            "regexp/sort-alternatives": "warn",
+            "regexp/sort-character-class-elements": "off",
+            "regexp/unicode-escape": "warn",
+            "regexp/unicode-property": "warn",
+
+            // Import Rules
+            "import-x/consistent-type-specifier-style": "off",
+            "import-x/default": "warn",
+            "import-x/dynamic-import-chunkname": "warn",
+            "import-x/export": "warn",
+            "import-x/exports-last": "off",
+            "import-x/extensions": "warn",
+            "import-x/first": "warn",
+            "import-x/group-exports": "off",
+            "import-x/max-dependencies": "off",
+            "import-x/namespace": "warn",
+            "import-x/newline-after-import": "warn",
+            "import-x/no-absolute-path": "warn",
+            "import-x/no-amd": "warn",
+            "import-x/no-anonymous-default-export": "warn",
+            "import-x/no-commonjs": "warn",
+            "import-x/no-cycle": "warn",
+            "import-x/no-default-export": "off",
+            "import-x/no-deprecated": "warn",
+            "import-x/no-duplicates": "warn",
+            "import-x/no-dynamic-require": "warn",
+            "import-x/no-empty-named-blocks": "warn",
+            "import-x/no-extraneous-dependencies": "warn",
+            "import-x/no-import-module-exports": "warn",
+            "import-x/no-internal-modules": "off",
+            "import-x/no-mutable-exports": "warn",
+            "import-x/no-named-as-default": "warn",
+            "import-x/no-named-as-default-member": "off",
+            "import-x/no-named-default": "warn",
+            "import-x/no-named-export": "off",
+            "import-x/no-namespace": "off",
+            "import-x/no-nodejs-modules": "off", // Allow Node.js modules for Electron backend
+            "import-x/no-relative-packages": "warn",
+            "import-x/no-relative-parent-imports": "off",
+            "import-x/no-rename-default": "warn",
+            "import-x/no-restricted-paths": "warn",
+            "import-x/no-self-import": "warn",
+            "import-x/no-unresolved": "warn",
+            "import-x/no-unused-modules": "warn",
+            "import-x/no-useless-path-segments": "warn",
+            "import-x/no-webpack-loader-syntax": "warn",
+            "import-x/order": "off", // Conflicts with other rules
+            "import-x/prefer-default-export": "off",
+            "import-x/prefer-namespace-import": "warn",
+            "import-x/unambiguous": "warn",
+
+            // Accessibility (jsx-a11y)
+            "jsx-a11y/lang": "warn",
+            "jsx-a11y/no-aria-hidden-on-focusable": "warn",
+            "jsx-a11y/prefer-tag-over-role": "warn",
+
+            // Math
+            "math/abs": "warn",
+            "math/prefer-exponentiation-operator": "warn",
+            "math/prefer-math-sum-precise": "warn",
+
+            // Node
+            "n/callback-return": "warn",
+            "n/exports-style": "warn",
+            "n/global-require": "warn",
+            "n/handle-callback-err": "warn",
+            "n/no-callback-literal": "warn",
+            "n/no-mixed-requires": "warn",
+            "n/no-new-require": "warn",
+            "n/no-path-concat": "warn",
+            "n/no-process-env": "warn",
+            "n/no-restricted-import": "warn",
+            "n/no-restricted-require": "warn",
+            "n/no-sync": "warn",
+            "n/no-top-level-await": "warn",
+            "n/prefer-global/buffer": "warn",
+            "n/prefer-global/console": "warn",
+            "n/prefer-global/process": "warn",
+            "n/prefer-global/text-decoder": "warn",
+            "n/prefer-global/text-encoder": "warn",
+            "n/prefer-global/url": "warn",
+            "n/prefer-global/url-search-params": "warn",
+            "n/prefer-node-protocol": "warn",
+            "n/prefer-promises/dns": "warn",
+            "n/prefer-promises/fs": "warn",
+
+            // Promise
+            "promise/no-multiple-resolved": "warn",
+            "promise/prefer-await-to-callbacks": "off",
+            "promise/prefer-await-to-then": "warn",
+            "promise/prefer-catch": "warn",
+            "promise/spec-only": "warn",
         },
     },
 
@@ -680,6 +1678,10 @@ export default [
 
             "undefined-css-classes/no-undefined-css-classes": "warn",
 
+            // CSS Rules - Allow Docusaurus CSS variables and !important
+            "css/no-invalid-properties": "off", // Disable for Docusaurus CSS custom properties
+            "css/no-important": "off", // Allow !important in Docusaurus CSS
+
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
             //     {
@@ -688,7 +1690,6 @@ export default [
             //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
             //     },
             // ],
-
         },
     },
 
@@ -3028,7 +4029,6 @@ export default [
             "regexp/sort-character-class-elements": "off",
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
-
 
             // Import Rules
             "import-x/consistent-type-specifier-style": "off",

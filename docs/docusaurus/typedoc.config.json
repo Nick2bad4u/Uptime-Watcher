@@ -23,7 +23,7 @@
     "projectDocuments": [
         "../../docs/Architecture/**/*.md",
         "../../docs/Guides/**/*.md",
-        "../../docs/TSDoc/**/*.md",
+        "../../docs/TSDoc/**/*.md"
     ],
     "githubPages": true,
     "hideGenerator": false,

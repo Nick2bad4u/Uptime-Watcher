@@ -41,11 +41,7 @@
         "src/**/*",
         "static/**/*",
         "sidebars.ts",
-        "docusaurus.config.ts",
-        "**/*.css",
-        "**/*.scss",
-        "**/*.md",
-        "**/*.mdx"
+        "docusaurus.config.ts"
     ],
     "exclude": [
         "node_modules/**",
