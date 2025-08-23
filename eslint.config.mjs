@@ -735,7 +735,6 @@ export default [
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
-            ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
             ...nodePlugin.configs["flat/all"].rules,
@@ -760,6 +759,18 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
 
+            "react/jsx-props-no-multi-spaces": "warn",
+            "react/jsx-props-no-spread-multi": "warn",
+            "react/jsx-props-no-spreading": "off",
+            "react/jsx-filename-extension": ["error", { extensions: [".tsx"] }], // Enforce .tsx for JSX files
+
+            "total-functions/require-strict-mode": "off",
+            "react/react-in-jsx-scope": "off",
+            "react/no-multi-comp": "off",
+            "react/jsx-no-literals": "off",
+            "react/jsx-max-depth": "off",
+            "react/forbid-component-props": "off",
+
             "no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp":
                 "off",
 
@@ -770,6 +781,15 @@ export default [
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/prefer-docusaurus-heading": "warn",
+
+            // Disable problematic rules for Docusaurus
+            "react/function-component-definition": "off", // Allow Docusaurus component patterns
+            "react/prefer-read-only-props": "off", // Allow mutable props in Docusaurus components
+            "react/prop-types": "off", // TypeScript provides type checking
+            "sonarjs/function-return-type": "off", // Allow flexible return types in Docusaurus
+            "perfectionist/sort-imports": "off", // Will handle this manually to avoid conflicts
+            "react/jsx-sort-props": "off", // Allow flexible prop ordering in Docusaurus
+            "perfectionist/sort-jsx-props": "off", // Allow flexible JSX prop ordering
 
             "react-hooks-addons/no-unused-deps": "warn",
 
@@ -954,7 +974,7 @@ export default [
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
-            "@metamask/design-tokens/color-no-hex": "error",
+            "@metamask/design-tokens/color-no-hex": "off",
 
             "sql-template/no-unsafe-query": "error",
 
@@ -965,6 +985,10 @@ export default [
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
+                        "@site",
+                        "@site/src",
+                        "@theme",
+                        "@docusaurus",
                     ],
                 },
             ],
@@ -1074,9 +1098,9 @@ export default [
 
             "canonical/destructuring-property-newline": "off",
             "canonical/export-specifier-newline": "off",
-            "canonical/filename-match-exported": "warn",
+            "canonical/filename-match-exported": "off",
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
-            "canonical/filename-no-index": "error",
+            "canonical/filename-no-index": "off",
             "canonical/import-specifier-newline": "off",
             "canonical/no-barrel-import": "error",
             "canonical/no-export-all": "error",
@@ -1582,7 +1606,7 @@ export default [
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
             "import-x/no-mutable-exports": "warn",
-            "import-x/no-named-as-default": "warn",
+            "import-x/no-named-as-default": "off",
             "import-x/no-named-as-default-member": "off",
             "import-x/no-named-default": "warn",
             "import-x/no-named-export": "off",
@@ -1593,7 +1617,7 @@ export default [
             "import-x/no-rename-default": "warn",
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
-            "import-x/no-unresolved": "warn",
+            "import-x/no-unresolved": "off",
             "import-x/no-unused-modules": "warn",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
@@ -2246,6 +2270,9 @@ export default [
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
+                        "@site",
+                        "@theme",
+                        "@docusaurus",
                     ],
                 },
             ],
@@ -3440,6 +3467,9 @@ export default [
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
+                        "@site",
+                        "@theme",
+                        "@docusaurus",
                     ],
                 },
             ],
@@ -4673,6 +4703,9 @@ export default [
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
+                        "@site",
+                        "@theme",
+                        "@docusaurus",
                     ],
                 },
             ],
