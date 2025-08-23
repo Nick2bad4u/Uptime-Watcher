@@ -10,11 +10,7 @@ describe("Schemas - Missing Coverage", () => {
             // This should test the internal validateFieldWithSchema function
 
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "unknown_field",
-                    "test-value"
-                );
+                validateMonitorField("http", "unknown_field", "test-value");
             }).toThrow("Unknown field: unknown_field");
         });
 

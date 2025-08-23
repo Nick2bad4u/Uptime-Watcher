@@ -7,7 +7,7 @@
         "jsx": "react-jsx",
         "module": "ESNext",
         "moduleDetection": "auto",
-        "moduleResolution": "bundler", 
+        "moduleResolution": "bundler",
         "target": "ESNext",
         "lib": [
             "DOM",

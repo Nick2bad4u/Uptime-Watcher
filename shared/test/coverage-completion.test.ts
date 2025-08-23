@@ -131,7 +131,11 @@ describe("100% Coverage - Remaining Lines", () => {
             ];
 
             for (const field of testFields) {
-                const result = validateMonitorField("http", field, field === "url" ? "https://example.com" : 30000);
+                const result = validateMonitorField(
+                    "http",
+                    field,
+                    field === "url" ? "https://example.com" : 30000
+                );
                 // Each validation should return a result for valid fields
                 expect(result).toBeDefined();
                 expect(typeof result.success).toBe("boolean");

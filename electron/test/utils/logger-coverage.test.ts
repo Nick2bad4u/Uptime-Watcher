@@ -17,7 +17,7 @@ describe("Logger Implementation Coverage", () => {
         // Get the mocked electron-log instance from the module
         const electronLogModule = await import("electron-log/main");
         mockElectronLog = electronLogModule.default;
-        
+
         // Clear all mock function call history
         vi.clearAllMocks();
     });
@@ -109,9 +109,12 @@ describe("Logger Implementation Coverage", () => {
         it("should call warn method with DB prefix", () => {
             dbLogger.warn("Slow query detected", { duration: 5000 });
 
-            expect(mockElectronLog.warn).toHaveBeenCalledWith("[DB] Slow query detected", {
-                duration: 5000,
-            });
+            expect(mockElectronLog.warn).toHaveBeenCalledWith(
+                "[DB] Slow query detected",
+                {
+                    duration: 5000,
+                }
+            );
         });
 
         it("should call error method with Error object and DB prefix", () => {
@@ -251,7 +254,10 @@ describe("Logger Implementation Coverage", () => {
             expect(mockElectronLog.debug).toHaveBeenCalledWith("[BACKEND] ");
             expect(mockElectronLog.info).toHaveBeenCalledWith("[BACKEND] ");
             expect(mockElectronLog.warn).toHaveBeenCalledWith("[BACKEND] ");
-            expect(mockElectronLog.error).toHaveBeenCalledWith("[BACKEND] ", undefined);
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
+                "[BACKEND] ",
+                undefined
+            );
         });
     });
 

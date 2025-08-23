@@ -1,7 +1,7 @@
 /**
- * Comprehensive function coverage tests for shared/types/database.ts
- * Target: 56.25% function coverage -> 100%
- * Missing lines: 281,312-313,317,354-355,359-360
+ * Comprehensive function coverage tests for shared/types/database.ts Target:
+ * 56.25% function coverage -> 100% Missing lines:
+ * 281,312-313,317,354-355,359-360
  */
 
 import { describe, expect, it } from "vitest";
@@ -18,7 +18,7 @@ describe("Database Types - Complete Function Coverage", () => {
         it("should return true for valid settings row", () => {
             const validRow = {
                 key: "historyLimit",
-                value: "100"
+                value: "100",
             };
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
@@ -62,7 +62,7 @@ describe("Database Types - Complete Function Coverage", () => {
             const validRow = {
                 identifier: "test-site",
                 name: "Test Site",
-                url: "https://test.com"
+                url: "https://test.com",
             };
             expect(isValidSiteRow(validRow)).toBe(true);
         });
@@ -107,17 +107,29 @@ describe("Database Types - Complete Function Coverage", () => {
 
     describe("safeGetRowProperty (lines 354-355, 359-360 coverage)", () => {
         it("should return default value for null row", () => {
-            const result = safeGetRowProperty(null as any, "property", "default");
+            const result = safeGetRowProperty(
+                null as any,
+                "property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
         it("should return default value for undefined row", () => {
-            const result = safeGetRowProperty(undefined as any, "property", "default");
+            const result = safeGetRowProperty(
+                undefined as any,
+                "property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
         it("should return default value for non-object row", () => {
-            const result = safeGetRowProperty("string" as any, "property", "default");
+            const result = safeGetRowProperty(
+                "string" as any,
+                "property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
@@ -142,38 +154,58 @@ describe("Database Types - Complete Function Coverage", () => {
         it("should handle nested property access with dot notation", () => {
             const row = {
                 nested: {
-                    property: "nested-value"
-                }
+                    property: "nested-value",
+                },
             };
-            const result = safeGetRowProperty(row, "nested.property", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.property",
+                "default"
+            );
             expect(result).toBe("nested-value");
         });
 
         it("should return default for nested property when parent doesn't exist", () => {
             const row = { other: "value" };
-            const result = safeGetRowProperty(row, "nested.property", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
         it("should return default for nested property when parent is null", () => {
             const row = { nested: null };
-            const result = safeGetRowProperty(row, "nested.property", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
         it("should return default for nested property when parent is not object", () => {
             const row = { nested: "string" };
-            const result = safeGetRowProperty(row, "nested.property", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
         it("should return default for nested property when property is undefined", () => {
             const row = {
                 nested: {
-                    property: undefined
-                }
+                    property: undefined,
+                },
             };
-            const result = safeGetRowProperty(row, "nested.property", "default");
+            const result = safeGetRowProperty(
+                row,
+                "nested.property",
+                "default"
+            );
             expect(result).toBe("default");
         });
 
@@ -181,17 +213,25 @@ describe("Database Types - Complete Function Coverage", () => {
             const row = {
                 level1: {
                     level2: {
-                        level3: "deep-value"
-                    }
-                }
+                        level3: "deep-value",
+                    },
+                },
             };
-            const result = safeGetRowProperty(row, "level1.level2.level3", "default");
+            const result = safeGetRowProperty(
+                row,
+                "level1.level2.level3",
+                "default"
+            );
             expect(result).toBe("deep-value");
         });
 
         it("should handle property names that include dots as exact matches", () => {
             const row = { "property.with.dots": "exact-match" };
-            const result = safeGetRowProperty(row, "property.with.dots", "default");
+            const result = safeGetRowProperty(
+                row,
+                "property.with.dots",
+                "default"
+            );
             expect(result).toBe("exact-match");
         });
     });
@@ -199,29 +239,39 @@ describe("Database Types - Complete Function Coverage", () => {
     describe("All Database Type Guards Coverage", () => {
         it("should exercise all type guard functions", () => {
             // Test all validation functions to ensure complete coverage
-            expect(isValidHistoryRow({
-                id: "1",
-                monitorId: "monitor-1",
-                timestamp: Date.now(),
-                status: "up",
-                responseTime: 100
-            })).toBe(true);
+            expect(
+                isValidHistoryRow({
+                    id: "1",
+                    monitorId: "monitor-1",
+                    timestamp: Date.now(),
+                    status: "up",
+                    responseTime: 100,
+                })
+            ).toBe(true);
 
-            expect(isValidMonitorRow({
-                id: 1,
-                site_identifier: "site-1",
-                type: "http"
-            })).toBe(true);
+            expect(
+                isValidMonitorRow({
+                    id: 1,
+                    site_identifier: "site-1",
+                    type: "http",
+                })
+            ).toBe(true);
 
-            expect(isValidSettingsRow({
-                key: "test-setting"
-            })).toBe(true);
+            expect(
+                isValidSettingsRow({
+                    key: "test-setting",
+                })
+            ).toBe(true);
 
-            expect(isValidSiteRow({
-                identifier: "test-site"
-            })).toBe(true);
+            expect(
+                isValidSiteRow({
+                    identifier: "test-site",
+                })
+            ).toBe(true);
 
-            expect(safeGetRowProperty({ test: "value" }, "test", "default")).toBe("value");
+            expect(
+                safeGetRowProperty({ test: "value" }, "test", "default")
+            ).toBe("value");
         });
     });
 });

@@ -50,11 +50,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
         test("should trigger unknown field error for field not in any schema", () => {
             // Test with a field name that doesn't exist in any schema
             expect(() => {
-                validateMonitorField(
-                    "ping",
-                    "nonExistentField123",
-                    123
-                );
+                validateMonitorField("ping", "nonExistentField123", 123);
             }).toThrow("Unknown field: nonExistentField123");
         });
     });

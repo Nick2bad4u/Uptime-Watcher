@@ -25,7 +25,9 @@ import type { Logger } from "../../../utils/interfaces";
 import type { MonitoringConfig } from "../../../utils/database/interfaces";
 
 // Helper function to create complete Monitor objects
-const createCompleteMonitor = (overrides: Partial<Site["monitors"][0]> = {}): Site["monitors"][0] => ({
+const createCompleteMonitor = (
+    overrides: Partial<Site["monitors"][0]> = {}
+): Site["monitors"][0] => ({
     id: "monitor-1",
     type: "http",
     url: "https://example.com",
@@ -366,7 +368,9 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => await callback(mockDb));
+            ).mockImplementation(
+                async (callback: any) => await callback(mockDb)
+            );
             (mockDb.all as MockedFunction<any>).mockReturnValue([
                 {
                     id: 1,
@@ -776,7 +780,9 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => await callback(mockDb));
+            ).mockImplementation(
+                async (callback: any) => await callback(mockDb)
+            );
             (mockDb.all as MockedFunction<any>).mockReturnValue([
                 {
                     id: 1,

@@ -74,11 +74,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
         it("should test validateFieldWithSchema with unknown field error", () => {
             // Test completely unknown field to trigger the error case
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "completelyUnknownField",
-                    "value"
-                );
+                validateMonitorField("http", "completelyUnknownField", "value");
             }).toThrow("Unknown field: completelyUnknownField");
         });
 

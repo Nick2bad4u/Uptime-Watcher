@@ -27,15 +27,19 @@ describe("Logger Mock Test", () => {
 
     it("should call the mocked debug function when logger.debug is called", () => {
         logger.debug("test message");
-        
+
         expect(mockElectronLog.debug).toHaveBeenCalledTimes(1);
-        expect(mockElectronLog.debug).toHaveBeenCalledWith("[BACKEND] test message");
+        expect(mockElectronLog.debug).toHaveBeenCalledWith(
+            "[BACKEND] test message"
+        );
     });
 
     it("should call the mocked info function when logger.info is called", () => {
         logger.info("test info");
-        
+
         expect(mockElectronLog.info).toHaveBeenCalledTimes(1);
-        expect(mockElectronLog.info).toHaveBeenCalledWith("[BACKEND] test info");
+        expect(mockElectronLog.info).toHaveBeenCalledWith(
+            "[BACKEND] test info"
+        );
     });
 });

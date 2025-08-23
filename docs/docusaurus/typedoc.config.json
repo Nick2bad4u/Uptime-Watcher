@@ -1,44 +1,30 @@
 {
     "$schema": "https://typedoc-plugin-markdown.org/schema.json",
-    "name": "Uptime Watcher - Complete Documentation",
+    "categoryOrder": [
+        "Frontend Components",
+        "Frontend Stores",
+        "Frontend Hooks",
+        "Frontend Utils",
+        "Backend Services",
+        "Backend Managers",
+        "Backend Database",
+        "Backend Events",
+        "Backend Utils",
+        "Shared Types",
+        "Shared Utils",
+        "Shared Validation",
+        "Constants",
+        "*"
+    ],
+    "cleanOutputDir": true,
+    "commentStyle": "all",
+    "customAnchorsFormat": "escapedCurlyBrace",
     "entryPointStrategy": "expand",
     "entryPoints": [
         "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
         "../../electron/**/*.{ts,mts,cts,tsx,js,jsx}",
         "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
     ],
-    "tsconfig": "tsconfig.typedoc.json",
-    "out": "docs",
-    "cleanOutputDir": true,
-    "commentStyle": "all",
-    "excludeInternal": false,
-    "excludeNotDocumented": false,
-    "excludePrivate": false,
-    "excludeProtected": false,
-    "excludeReferences": false,
-    "includeVersion": true,
-    "pretty": true,
-    "readme": "../../README.md",
-    "treatWarningsAsErrors": false,
-    "projectDocuments": [
-        "../../docs/Architecture/**/*.md",
-        "../../docs/Guides/**/*.md",
-        "../../docs/TSDoc/**/*.md"
-    ],
-    "githubPages": true,
-    "hideGenerator": false,
-    "gitRemote": "origin",
-    "gitRevision": "main",
-    "searchInComments": true,
-    "useTsLinkResolution": true,
-    "preserveLinkText": true,
-    "searchInDocuments": true,
-    "jsDocCompatibility": {
-        "exampleTag": true,
-        "defaultTag": true,
-        "inheritDocTag": true,
-        "ignoreUnescapedBraces": true
-    },
     "exclude": [
         "**/dist/**",
         "**/dist-electron/**",
@@ -59,111 +45,13 @@
         "**/test-*",
         "**/setupTests*"
     ],
-    "categoryOrder": [
-        "Frontend Components",
-        "Frontend Stores",
-        "Frontend Hooks",
-        "Frontend Utils",
-        "Backend Services",
-        "Backend Managers",
-        "Backend Database",
-        "Backend Events",
-        "Backend Utils",
-        "Shared Types",
-        "Shared Utils",
-        "Shared Validation",
-        "Constants",
-        "*"
-    ],
-    "kindSortOrder": [
-        "Document",
-        "Project",
-        "Module",
-        "Namespace",
-        "Enum",
-        "EnumMember",
-        "Class",
-        "Interface",
-        "TypeAlias",
-        "Constructor",
-        "Property",
-        "Variable",
-        "Function",
-        "Method",
-        "Parameter",
-        "TypeParameter",
-        "Accessor",
-        "GetSignature",
-        "SetSignature",
-        "CallSignature",
-        "IndexSignature"
-    ],
-    "sort": [
-        "source-order",
-        "alphabetical"
-    ],
-    "plugin": [
-        "typedoc-plugin-remark",
-        "typedoc-plugin-missing-exports",
-        "typedoc-plugin-replace-text",
-        "typedoc-plugin-markdown",
-        "typedoc-plugin-mdn-links",
-        "typedoc-plugin-dt-links",
-        "typedoc-plugin-external-package-links",
-        "typedoc-plugin-rename-defaults",
-        "typedoc-plugin-coverage",
-        "typedoc-docusaurus-theme"
-    ],
-    "placeInternalsInOwningModule": true,
-    "includeDocCommentReferences": false,
+    "excludeInternal": false,
+    "excludeNotDocumented": false,
+    "excludePrivate": false,
+    "excludeProtected": false,
+    "excludeReferences": false,
     "expandObjects": true,
     "expandParameters": true,
-    "strikeDeprecatedPageTitles": true,
-    "formatWithPrettier": true,
-    "prettierConfigFile": "../../.prettierrc",
-    "useCustomAnchors": true,
-    "customAnchorsFormat": "escapedCurlyBrace",
-    "useHTMLAnchors": true,
-    "sanitizeComments": false,
-    "resolveUtilityTypes": true,
-    "replaceText": {
-        "inCodeCommentText": true,
-        "inCodeCommentTags": true,
-        "inMarkdownText": false,
-        "replacements": [
-            {
-                "pattern": "\\bTODO:",
-                "replace": "**TODO:**"
-            },
-            {
-                "pattern": "\\bFIXME:",
-                "replace": "**FIXME:**"
-            },
-            {
-                "pattern": "\\bz\\.ZodError\\b",
-                "replace": "https://zod.dev/basics?id=handling-errors"
-            },
-            {
-                "pattern": "\\bError\\b",
-                "replace": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
-            },
-            {
-                "pattern": "\\bAxiosError\\b",
-                "replace": "https://axios-http.com/docs/handling_errors"
-            },
-            {
-                "pattern": "\"is-port-reachable\"",
-                "replace": "https://www.npmjs.com/package/is-port-reachable"
-            }
-        ]
-    },
-    "favicon": "../../icons/favicon.ico",
-    "searchGroupBoosts": {
-        "Classes": 1.5,
-        "Interfaces": 1.3,
-        "Functions": 1.2,
-        "Types": 1.1
-    },
     "externalSymbolLinkMappings": {
         "@types/react": {
             "React.Component.render": "https://react.dev/reference/react/Component#render",
@@ -367,6 +255,118 @@
             "AxiosError": "https://axios-http.com/docs/handling_errors"
         }
     },
+    "favicon": "../../icons/favicon.ico",
+    "formatWithPrettier": true,
+    "gitRemote": "origin",
+    "gitRevision": "main",
+    "githubPages": true,
+    "hideGenerator": false,
+    "includeDocCommentReferences": false,
+    "includeVersion": true,
+    "jsDocCompatibility": {
+        "exampleTag": true,
+        "defaultTag": true,
+        "inheritDocTag": true,
+        "ignoreUnescapedBraces": true
+    },
+    "kindSortOrder": [
+        "Document",
+        "Project",
+        "Module",
+        "Namespace",
+        "Enum",
+        "EnumMember",
+        "Class",
+        "Interface",
+        "TypeAlias",
+        "Constructor",
+        "Property",
+        "Variable",
+        "Function",
+        "Method",
+        "Parameter",
+        "TypeParameter",
+        "Accessor",
+        "GetSignature",
+        "SetSignature",
+        "CallSignature",
+        "IndexSignature"
+    ],
+    "name": "Uptime Watcher - Complete Documentation",
+    "out": "docs",
+    "placeInternalsInOwningModule": true,
+    "plugin": [
+        "typedoc-plugin-remark",
+        "typedoc-plugin-missing-exports",
+        "typedoc-plugin-replace-text",
+        "typedoc-plugin-markdown",
+        "typedoc-plugin-mdn-links",
+        "typedoc-plugin-dt-links",
+        "typedoc-plugin-external-package-links",
+        "typedoc-plugin-rename-defaults",
+        "typedoc-plugin-coverage",
+        "typedoc-docusaurus-theme"
+    ],
+    "preserveLinkText": true,
+    "prettierConfigFile": "../../.prettierrc",
+    "pretty": true,
+    "projectDocuments": [
+        "../../docs/Architecture/**/*.md",
+        "../../docs/Guides/**/*.md",
+        "../../docs/TSDoc/**/*.md"
+    ],
+    "readme": "../../README.md",
+    "replaceText": {
+        "inCodeCommentText": true,
+        "inCodeCommentTags": true,
+        "inMarkdownText": false,
+        "replacements": [
+            {
+                "pattern": "\\bTODO:",
+                "replace": "**TODO:**"
+            },
+            {
+                "pattern": "\\bFIXME:",
+                "replace": "**FIXME:**"
+            },
+            {
+                "pattern": "\\bz\\.ZodError\\b",
+                "replace": "https://zod.dev/basics?id=handling-errors"
+            },
+            {
+                "pattern": "\\bError\\b",
+                "replace": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error"
+            },
+            {
+                "pattern": "\\bAxiosError\\b",
+                "replace": "https://axios-http.com/docs/handling_errors"
+            },
+            {
+                "pattern": "\"is-port-reachable\"",
+                "replace": "https://www.npmjs.com/package/is-port-reachable"
+            }
+        ]
+    },
+    "resolveUtilityTypes": true,
+    "sanitizeComments": false,
+    "searchGroupBoosts": {
+        "Classes": 1.5,
+        "Interfaces": 1.3,
+        "Functions": 1.2,
+        "Types": 1.1
+    },
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "sort": [
+        "source-order",
+        "alphabetical"
+    ],
+    "strikeDeprecatedPageTitles": true,
+    "treatWarningsAsErrors": false,
+    "tsconfig": "tsconfig.typedoc.json",
+    "useCustomAnchors": true,
+    "useHTMLAnchors": true,
+    "useTsLinkResolution": true,
     "validation": {
         "notExported": false,
         "invalidLink": true,

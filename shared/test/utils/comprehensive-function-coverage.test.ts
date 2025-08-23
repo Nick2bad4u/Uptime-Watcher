@@ -563,9 +563,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             expect(validatorUtilsModule.isValidUrl("https://example.com")).toBe(
                 true
             );
-            expect(
-                validatorUtilsModule.safeInteger("123", 0, 0, 1000)
-            ).toBe(123);
+            expect(validatorUtilsModule.safeInteger("123", 0, 0, 1000)).toBe(
+                123
+            );
         });
     });
 

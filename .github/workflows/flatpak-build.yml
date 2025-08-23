@@ -41,20 +41,20 @@ jobs:
               run: |
                   sudo apt-get update
                   sudo apt-get install -y flatpak flatpak-builder elfutils libarchive-tools
-                  
+
                   # Configure Flatpak for user (not system-wide)
                   flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-                  
+
                   # Install required runtimes and SDKs for user
                   flatpak install --user -y --noninteractive flathub \
                     org.freedesktop.Platform//24.08 \
                     org.freedesktop.Sdk//24.08 \
                     org.electronjs.Electron2.BaseApp//24.08 \
                     org.freedesktop.Sdk.Extension.node24//24.08
-                  
+
                   # Update all installed packages for user
                   flatpak update --user -y
-                  
+
                   # Verify installations
                   flatpak list --user --runtime
               continue-on-error: true
@@ -131,17 +131,17 @@ jobs:
                   echo "Starting Flatpak build process..."
                   echo "Current directory contents:"
                   ls -la
-                  
+
                   echo "Verifying flatpak-build.yml exists:"
                   cat flatpak-build.yml || (echo "flatpak-build.yml not found!" && exit 1)
-                  
+
                   echo "Available Flatpak runtimes:"
                   flatpak list --runtime
-                  
+
                   echo "Building Flatpak package..."
                   # Build into a proper flatpak repo directory
                   flatpak-builder --verbose --repo=flatpak-repo --force-clean build-dir flatpak-build.yml
-                  
+
                   echo "Build completed. Checking outputs:"
                   ls -la flatpak-repo/ || echo "flatpak-repo not created"
                   ls -la build-dir/ || echo "build-dir not created"

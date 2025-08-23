@@ -34,7 +34,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
             };
 
             const result = validateSiteData(validSite);
-            
+
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
             expect(result.metadata?.siteIdentifier).toBe("test-site");
@@ -58,12 +58,12 @@ describe("schemas.ts - Function Coverage Completion", () => {
                         monitoring: false,
                         status: "pending",
                         responseTime: -1,
-                    }
-                ]
+                    },
+                ],
             };
 
             const result = validateSiteData(validSiteMinimal);
-            
+
             expect(result.success).toBe(true);
             expect(result.metadata?.monitorCount).toBe(1);
         });
@@ -85,7 +85,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
             };
 
             const result = validateMonitorData("http", validHttpMonitor);
-            
+
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
         });
@@ -107,7 +107,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
             };
 
             const result = validateMonitorData("dns", validDnsMonitor);
-            
+
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
         });
@@ -128,7 +128,7 @@ describe("schemas.ts - Function Coverage Completion", () => {
             };
 
             const result = validateMonitorData("port", validPortMonitor);
-            
+
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
         });
@@ -137,7 +137,11 @@ describe("schemas.ts - Function Coverage Completion", () => {
     describe("validateMonitorField - Known Field Coverage", () => {
         it("should validate HTTP monitor specific fields successfully", () => {
             // HTTP monitors only have 'url' as type-specific field
-            const result = validateMonitorField("http", "url", "https://example.com");
+            const result = validateMonitorField(
+                "http",
+                "url",
+                "https://example.com"
+            );
             expect(result.success).toBe(true);
             expect(result.metadata?.fieldName).toBe("url");
         });
@@ -146,9 +150,9 @@ describe("schemas.ts - Function Coverage Completion", () => {
             const dnsFields = [
                 { field: "host", value: "example.com" },
                 { field: "recordType", value: "A" },
-                { field: "expectedValue", value: "192.0.2.1" }
+                { field: "expectedValue", value: "192.0.2.1" },
             ];
-            
+
             dnsFields.forEach(({ field, value }) => {
                 const result = validateMonitorField("dns", field, value);
                 expect(result.success).toBe(true);
@@ -159,9 +163,9 @@ describe("schemas.ts - Function Coverage Completion", () => {
         it("should validate PORT monitor specific fields successfully", () => {
             const portFields = [
                 { field: "host", value: "example.com" },
-                { field: "port", value: 443 }
+                { field: "port", value: 443 },
             ];
-            
+
             portFields.forEach(({ field, value }) => {
                 const result = validateMonitorField("port", field, value);
                 expect(result.success).toBe(true);
@@ -177,19 +181,31 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 { field: "responseTime", value: 200 },
                 { field: "retryAttempts", value: 3 },
                 { field: "status", value: "up" },
-                { field: "timeout", value: 5000 }
+                { field: "timeout", value: 5000 },
             ];
 
-            ["http", "dns", "port"].forEach(monitorType => {
+            [
+                "http",
+                "dns",
+                "port",
+            ].forEach((monitorType) => {
                 // Test common fields (excluding type)
                 commonFieldsWithoutType.forEach(({ field, value }) => {
-                    const result = validateMonitorField(monitorType, field, value);
+                    const result = validateMonitorField(
+                        monitorType,
+                        field,
+                        value
+                    );
                     expect(result.success).toBe(true);
                     expect(result.metadata?.fieldName).toBe(field);
                 });
-                
+
                 // Test type field with correct value for each monitor type
-                const typeResult = validateMonitorField(monitorType, "type", monitorType);
+                const typeResult = validateMonitorField(
+                    monitorType,
+                    "type",
+                    monitorType
+                );
                 expect(typeResult.success).toBe(true);
                 expect(typeResult.metadata?.fieldName).toBe("type");
             });
@@ -214,9 +230,9 @@ describe("schemas.ts - Function Coverage Completion", () => {
                         history: [],
                         monitoring: true,
                         status: "up",
-                        responseTime: 150
-                    }
-                ]
+                        responseTime: 150,
+                    },
+                ],
             };
             const siteResult = validateSiteData(site);
             expect(siteResult.success).toBe(true);
@@ -232,13 +248,17 @@ describe("schemas.ts - Function Coverage Completion", () => {
                 history: [],
                 monitoring: true,
                 status: "up",
-                responseTime: 150
+                responseTime: 150,
             };
             const monitorResult = validateMonitorData("http", monitor);
             expect(monitorResult.success).toBe(true);
 
             // Test validateMonitorField success path
-            const fieldResult = validateMonitorField("http", "url", "https://test.com");
+            const fieldResult = validateMonitorField(
+                "http",
+                "url",
+                "https://test.com"
+            );
             expect(fieldResult.success).toBe(true);
         });
     });

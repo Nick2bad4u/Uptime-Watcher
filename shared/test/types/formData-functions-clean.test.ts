@@ -28,9 +28,9 @@ describe("shared/types/formData function coverage", () => {
                 headers: {},
                 auth: {
                     username: "user",
-                    password: "pass"
+                    password: "pass",
                 },
-                expectedContent: "Success"
+                expectedContent: "Success",
             };
 
             expect(isHttpFormData(validFormData)).toBe(true);
@@ -44,7 +44,7 @@ describe("shared/types/formData function coverage", () => {
                 timeout: 0,
                 checkInterval: 0,
                 retryAttempts: 0,
-                followRedirects: false
+                followRedirects: false,
             };
 
             expect(isHttpFormData(minimalFormData)).toBe(true);
@@ -83,7 +83,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
                 followRedirects: true,
                 expectedStatusCode: 200,
-                headers: {}
+                headers: {},
             };
 
             expect(isHttpFormData(wrongTypeFormData as any)).toBe(false);
@@ -99,7 +99,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
                 followRedirects: true,
                 expectedStatusCode: 200,
-                headers: {}
+                headers: {},
             };
 
             expect(isHttpFormData(invalidFormData as any)).toBe(false);
@@ -116,7 +116,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
                 packetCount: 4,
                 packetSize: 64,
-                maxPacketLoss: 25
+                maxPacketLoss: 25,
             };
 
             expect(isPingFormData(validFormData)).toBe(true);
@@ -128,7 +128,7 @@ describe("shared/types/formData function coverage", () => {
                 host: "",
                 timeout: 0,
                 checkInterval: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(isPingFormData(minimalFormData)).toBe(true);
@@ -164,7 +164,7 @@ describe("shared/types/formData function coverage", () => {
                 timeout: 5000,
                 checkInterval: 30,
                 retryAttempts: 3,
-                packetSize: 64
+                packetSize: 64,
             };
 
             expect(isPingFormData(wrongTypeFormData as any)).toBe(false);
@@ -180,7 +180,7 @@ describe("shared/types/formData function coverage", () => {
                 timeout: 5000,
                 checkInterval: 30,
                 retryAttempts: 3,
-                connectionTimeout: 3000
+                connectionTimeout: 3000,
             };
 
             expect(isPortFormData(validFormData)).toBe(true);
@@ -193,7 +193,7 @@ describe("shared/types/formData function coverage", () => {
                 port: 0,
                 timeout: 0,
                 checkInterval: 0,
-                retryAttempts: 0
+                retryAttempts: 0,
             };
 
             expect(isPortFormData(minimalFormData)).toBe(true);
@@ -230,7 +230,7 @@ describe("shared/types/formData function coverage", () => {
                 port: 443,
                 timeout: 5000,
                 checkInterval: 30,
-                retryAttempts: 3
+                retryAttempts: 3,
             };
 
             expect(isPortFormData(wrongTypeFormData as any)).toBe(false);
@@ -243,7 +243,7 @@ describe("shared/types/formData function coverage", () => {
                 port: "443", // should be number
                 timeout: 5000,
                 checkInterval: 30,
-                retryAttempts: 3
+                retryAttempts: 3,
             };
 
             expect(isPortFormData(invalidFormData as any)).toBe(false);
@@ -262,7 +262,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
                 followRedirects: true,
                 expectedStatusCode: 200,
-                headers: {}
+                headers: {},
             };
 
             // Valid ping form data
@@ -274,7 +274,7 @@ describe("shared/types/formData function coverage", () => {
                 retryAttempts: 3,
                 packetCount: 4,
                 packetSize: 64,
-                maxPacketLoss: 25
+                maxPacketLoss: 25,
             };
 
             // Valid port form data
@@ -285,7 +285,7 @@ describe("shared/types/formData function coverage", () => {
                 timeout: 5000,
                 checkInterval: 30,
                 retryAttempts: 3,
-                connectionTimeout: 3000
+                connectionTimeout: 3000,
             };
 
             // Each type guard should only return true for its own type

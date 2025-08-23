@@ -35,11 +35,7 @@ describe("Fixed Coverage Tests", () => {
         it("should trigger unknown field error for truly unknown field", () => {
             // Test with a field that doesn't exist in any schema
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "totallyUnknownField",
-                    "value"
-                );
+                validateMonitorField("http", "totallyUnknownField", "value");
             }).toThrow("Unknown field: totallyUnknownField");
         });
     });

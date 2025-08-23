@@ -767,11 +767,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         it("should handle edge cases and internal function coverage", () => {
             // Test validateFieldWithSchema with unknown field name
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "unknownField",
-                    "value"
-                );
+                validateMonitorField("http", "unknownField", "value");
             }).toThrow("Unknown field: unknownField");
         });
 
@@ -1148,11 +1144,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             it("should throw error for completely unknown fields", () => {
                 // This tests the final throw for unknown fields
                 expect(() => {
-                    validateMonitorField(
-                        "http",
-                        "nonExistentField",
-                        "value"
-                    );
+                    validateMonitorField("http", "nonExistentField", "value");
                 }).toThrow("Unknown field: nonExistentField");
             });
 

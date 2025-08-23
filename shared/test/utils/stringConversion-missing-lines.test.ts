@@ -1,6 +1,6 @@
 /**
- * Test to cover the missing lines 89-92 in stringConversion.ts
- * Target the default case in the switch statement
+ * Test to cover the missing lines 89-92 in stringConversion.ts Target the
+ * default case in the switch statement
  */
 
 import { describe, expect, it } from "vitest";
@@ -12,12 +12,12 @@ describe("StringConversion - Missing Lines Coverage", () => {
             // Create an object with unusual typeof behavior
             // This attempts to create a value that would hit the default case
             const weirdObject = Object.create(null);
-            
+
             // Override the valueOf method to potentially cause unusual behavior
             weirdObject.valueOf = () => "weird-value";
-            
+
             const result = safeStringify(weirdObject);
-            
+
             // The function should still handle it gracefully
             expect(typeof result).toBe("string");
         });
@@ -28,11 +28,14 @@ describe("StringConversion - Missing Lines Coverage", () => {
                 Object.create(null),
                 { toString: null },
                 { valueOf: null },
-                new Proxy({}, {
-                    get() {
-                        throw new Error("Proxy error");
+                new Proxy(
+                    {},
+                    {
+                        get() {
+                            throw new Error("Proxy error");
+                        },
                     }
-                })
+                ),
             ];
 
             edgeCases.forEach((edgeCase, _index) => {
@@ -49,10 +52,10 @@ describe("StringConversion - Missing Lines Coverage", () => {
         it("should attempt to reach default case through type manipulation", () => {
             // Create a custom object that might have unusual typeof behavior
             const customObject = Object.create(null);
-            
+
             // Test the actual function behavior
             const result = safeStringify(customObject);
-            
+
             // Should return a valid string regardless
             expect(typeof result).toBe("string");
         });
@@ -65,15 +68,15 @@ describe("StringConversion - Missing Lines Coverage", () => {
                 Object.setPrototypeOf({}, null),
                 (() => {
                     const obj = {};
-                    Object.defineProperty(obj, 'toString', {
+                    Object.defineProperty(obj, "toString", {
                         value: null,
-                        writable: false
+                        writable: false,
                     });
                     return obj;
-                })()
+                })(),
             ];
 
-            testValues.forEach(value => {
+            testValues.forEach((value) => {
                 const result = safeStringify(value);
                 expect(typeof result).toBe("string");
                 // The result should be a meaningful string representation

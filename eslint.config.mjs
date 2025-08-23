@@ -760,7 +760,8 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
 
-            "no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp": "off",
+            "no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp":
+                "off",
 
             "css/no-invalid-properties": "off",
 

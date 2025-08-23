@@ -232,7 +232,11 @@ describe("PortMonitor Coverage Tests", () => {
         it("should handle monitor with missing host", async () => {
             const { host, ...monitorWithoutHost } = validPortMonitor;
 
-            expect(await portMonitor.check(monitorWithoutHost as Site["monitors"][0])).toBeDefined();
+            expect(
+                await portMonitor.check(
+                    monitorWithoutHost as Site["monitors"][0]
+                )
+            ).toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -243,7 +247,11 @@ describe("PortMonitor Coverage Tests", () => {
         it("should handle monitor with missing port", async () => {
             const { port, ...monitorWithoutPort } = validPortMonitor;
 
-            expect(await portMonitor.check(monitorWithoutPort as Site["monitors"][0])).toBeDefined();
+            expect(
+                await portMonitor.check(
+                    monitorWithoutPort as Site["monitors"][0]
+                )
+            ).toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -363,7 +371,9 @@ describe("PortMonitor Coverage Tests", () => {
         it("should use service default timeout when monitor timeout is undefined", async () => {
             const { timeout, ...monitorWithoutTimeout } = validPortMonitor;
 
-            await portMonitor.check(monitorWithoutTimeout as Site["monitors"][0]);
+            await portMonitor.check(
+                monitorWithoutTimeout as Site["monitors"][0]
+            );
 
             expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
                 monitorWithoutTimeout,

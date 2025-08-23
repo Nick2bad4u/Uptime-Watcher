@@ -1,7 +1,6 @@
 /**
- * Comprehensive function coverage tests for shared/types/formData.ts
- * Target: 50% function coverage -> 100%
- * Missing lines: 279-280,303-306,321
+ * Comprehensive function coverage tests for shared/types/formData.ts Target:
+ * 50% function coverage -> 100% Missing lines: 279-280,303-306,321
  */
 
 import { describe, expect, it } from "vitest";
@@ -21,7 +20,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 retryAttempts: 3,
                 timeout: 5000,
                 method: "GET" as const,
-                expectedStatusCode: 200
+                expectedStatusCode: 200,
             };
             expect(isHttpFormData(validData)).toBe(true);
         });
@@ -40,7 +39,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 name: "Test",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isHttpFormData(data as any)).toBe(false);
         });
@@ -53,7 +52,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(validData)).toBe(true);
         });
@@ -76,7 +75,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -86,7 +85,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 type: "ping",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -97,7 +96,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: 123,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -108,7 +107,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: "60000",
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -119,7 +118,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: 60000,
                 retryAttempts: "3",
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -130,7 +129,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: "5000"
+                timeout: "5000",
             };
             expect(isPingFormData(data as any)).toBe(false);
         });
@@ -144,7 +143,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(validData)).toBe(true);
         });
@@ -168,7 +167,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -179,7 +178,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -191,7 +190,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -202,7 +201,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 host: "example.com",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -214,7 +213,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: "443",
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -226,7 +225,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: "60000",
                 retryAttempts: 3,
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -238,7 +237,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: "3",
-                timeout: 5000
+                timeout: 5000,
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -250,7 +249,7 @@ describe("FormData Types - Complete Function Coverage", () => {
                 port: 443,
                 checkInterval: 60000,
                 retryAttempts: 3,
-                timeout: "5000"
+                timeout: "5000",
             };
             expect(isPortFormData(data as any)).toBe(false);
         });
@@ -259,34 +258,40 @@ describe("FormData Types - Complete Function Coverage", () => {
     describe("All Form Data Type Guards Coverage", () => {
         it("should exercise all form data type guard functions", () => {
             // Test HTTP form data
-            expect(isHttpFormData({
-                type: "http" as const,
-                url: "https://test.com",
-                checkInterval: 60000,
-                retryAttempts: 3,
-                timeout: 5000,
-                method: "GET" as const,
-                expectedStatusCode: 200
-            })).toBe(true);
+            expect(
+                isHttpFormData({
+                    type: "http" as const,
+                    url: "https://test.com",
+                    checkInterval: 60000,
+                    retryAttempts: 3,
+                    timeout: 5000,
+                    method: "GET" as const,
+                    expectedStatusCode: 200,
+                })
+            ).toBe(true);
 
             // Test ping form data
-            expect(isPingFormData({
-                type: "ping" as const,
-                host: "test.com",
-                checkInterval: 60000,
-                retryAttempts: 3,
-                timeout: 5000
-            })).toBe(true);
+            expect(
+                isPingFormData({
+                    type: "ping" as const,
+                    host: "test.com",
+                    checkInterval: 60000,
+                    retryAttempts: 3,
+                    timeout: 5000,
+                })
+            ).toBe(true);
 
             // Test port form data
-            expect(isPortFormData({
-                type: "port" as const,
-                host: "test.com",
-                port: 80,
-                checkInterval: 60000,
-                retryAttempts: 3,
-                timeout: 5000
-            })).toBe(true);
+            expect(
+                isPortFormData({
+                    type: "port" as const,
+                    host: "test.com",
+                    port: 80,
+                    checkInterval: 60000,
+                    retryAttempts: 3,
+                    timeout: 5000,
+                })
+            ).toBe(true);
         });
     });
 });

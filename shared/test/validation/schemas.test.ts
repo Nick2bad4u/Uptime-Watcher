@@ -912,11 +912,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
         it("should handle unknown field names", () => {
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "unknownField",
-                    "value"
-                );
+                validateMonitorField("http", "unknownField", "value");
             }).toThrow("Unknown field: unknownField");
         });
 
@@ -1203,11 +1199,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             // This test covers line 484 - unknown field error
             // validateFieldWithSchema throws error which validateMonitorField catches and wraps
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "unknownField",
-                    "value"
-                );
+                validateMonitorField("http", "unknownField", "value");
             }).toThrow("Unknown field: unknownField");
         });
 

@@ -91,11 +91,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
         it("should handle unknown field in both specific and base schemas", () => {
             // Test with field that exists in neither the specific nor base schema
             expect(() => {
-                validateMonitorField(
-                    "port",
-                    "nonExistentField",
-                    "value"
-                );
+                validateMonitorField("port", "nonExistentField", "value");
             }).toThrow("Unknown field: nonExistentField");
         });
     });

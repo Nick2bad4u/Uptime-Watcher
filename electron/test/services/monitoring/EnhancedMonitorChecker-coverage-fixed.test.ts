@@ -96,16 +96,16 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
 
         // Replace the actual monitor instances with mocks
         (enhancedChecker as any).httpMonitor = {
-            check: vi.fn()
+            check: vi.fn(),
         };
         (enhancedChecker as any).pingMonitor = {
-            check: vi.fn()
+            check: vi.fn(),
         };
         (enhancedChecker as any).portMonitor = {
-            check: vi.fn()
+            check: vi.fn(),
         };
         (enhancedChecker as any).dnsMonitor = {
-            check: vi.fn()
+            check: vi.fn(),
         };
     });
 
@@ -166,9 +166,11 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 responseTime: 200,
                 status: "up" as const,
             };
-            
+
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(mockCheckResult);
+            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(
+                mockCheckResult
+            );
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -209,9 +211,11 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 responseTime: -1,
                 status: "down" as const,
             };
-            
+
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(mockCheckResult);
+            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(
+                mockCheckResult
+            );
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
