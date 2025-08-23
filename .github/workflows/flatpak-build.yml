@@ -26,40 +26,51 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-            - name: Cache node modules (non-Windows)
-              id: cache_node_modules_non_windows
-              if: runner.os != 'Windows'
+            - name: Cache Flatpak runtimes and SDKs
               uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
               with:
-                  path: ./node_modules
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  path: |
+                      /var/lib/flatpak
+                      ~/.local/share/flatpak
+                  key: ${{ runner.os }}-flatpak-runtimes-24.08
                   restore-keys: |
-                      ${{ runner.os }}-node-
-                  enableCrossOsArchive: true
+                      ${{ runner.os }}-flatpak-runtimes-
               continue-on-error: true
 
             - name: Install Flatpak and flatpak-builder
               run: |
                   sudo apt-get update
                   sudo apt-get install -y flatpak flatpak-builder elfutils libarchive-tools
-                  # IMPORTANT: Install EVERYTHING system-wide (no --user) so flatpak-builder sandbox can see extensions.
-                  # --user installs are NOT visible inside the build sandbox -> caused missing org.freedesktop.Sdk.Extension.node24.
-                  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-                  flatpak install -y --noninteractive flathub \
+                  
+                  # Configure Flatpak for user (not system-wide)
+                  flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+                  
+                  # Install required runtimes and SDKs for user
+                  flatpak install --user -y --noninteractive flathub \
                     org.freedesktop.Platform//24.08 \
                     org.freedesktop.Sdk//24.08 \
                     org.electronjs.Electron2.BaseApp//24.08 \
                     org.freedesktop.Sdk.Extension.node24//24.08
-                  flatpak update -y
+                  
+                  # Update all installed packages for user
+                  flatpak update --user -y
+                  
+                  # Verify installations
+                  flatpak list --user --runtime
               continue-on-error: true
 
             - name: Verify Flatpak components
               run: |
-                  echo "Verifying required Flatpak components are available (system scope)";
-                  flatpak info org.freedesktop.Platform//24.08 || exit 1
-                  flatpak info org.freedesktop.Sdk//24.08 || exit 1
-                  flatpak info org.electronjs.Electron2.BaseApp//24.08 || exit 1
-                  flatpak info org.freedesktop.Sdk.Extension.node24//24.08 || (echo "node24 extension missing" && exit 1)
+                  echo "Verifying required Flatpak components are available (user scope)"
+                  echo "Available runtimes:"
+                  flatpak list --user --runtime
+                  echo ""
+                  echo "Checking specific components:"
+                  flatpak info --user org.freedesktop.Platform//24.08 || (echo "Platform missing" && exit 1)
+                  flatpak info --user org.freedesktop.Sdk//24.08 || (echo "SDK missing" && exit 1)
+                  flatpak info --user org.electronjs.Electron2.BaseApp//24.08 || (echo "Electron BaseApp missing" && exit 1)
+                  flatpak info --user org.freedesktop.Sdk.Extension.node24//24.08 || (echo "Node24 extension missing" && exit 1)
+                  echo "All required components verified successfully"
               continue-on-error: true
 
             # Removed duplicate SDK extension install step (handled above system-wide)
@@ -68,11 +79,30 @@ jobs:
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
                   node-version: "latest"
+                  cache: "npm"
+
+            - name: Cache build artifacts and dependencies
+              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                      .cache
+                      node_modules/.cache
+                      dist-electron
+                      **/.rspack-cache
+                      **/.webpack-cache
+                  key: ${{ runner.os }}-flatpak-build-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-flatpak-build-
+                      ${{ runner.os }}-node-
+                  enableCrossOsArchive: true
 
             - name: Install dependencies
               run: |
-                  cd .
-                  npm install --force
+                  echo "Installing Node.js dependencies..."
+                  npm ci --prefer-offline --no-audit --progress=false
+                  echo "Dependencies installed successfully"
 
             - name: Build application
               run: |
@@ -98,12 +128,24 @@ jobs:
 
             - name: Build Flatpak
               run: |
-                  cd .
-                  ls -l
+                  echo "Starting Flatpak build process..."
+                  echo "Current directory contents:"
+                  ls -la
+                  
+                  echo "Verifying flatpak-build.yml exists:"
+                  cat flatpak-build.yml || (echo "flatpak-build.yml not found!" && exit 1)
+                  
+                  echo "Available Flatpak runtimes:"
+                  flatpak list --runtime
+                  
+                  echo "Building Flatpak package..."
                   # Build into a proper flatpak repo directory
-                  flatpak-builder --repo=flatpak-repo --force-clean build-dir flatpak-build.yml
-                  ls -l
-                  ls -l dist-electron || true
+                  flatpak-builder --verbose --repo=flatpak-repo --force-clean build-dir flatpak-build.yml
+                  
+                  echo "Build completed. Checking outputs:"
+                  ls -la flatpak-repo/ || echo "flatpak-repo not created"
+                  ls -la build-dir/ || echo "build-dir not created"
+                  ls -la dist-electron/ || echo "dist-electron not found"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

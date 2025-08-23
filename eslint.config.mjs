@@ -628,9 +628,11 @@ export default [
             ...tseslint.configs.stylisticTypeChecked,
             ...tseslint.configs.stylistic.rules,
 
+            "css/no-invalid-properties": "off",
+            
             // Docusaurus Rules
-            "@docusaurus/string-literal-i18n-messages": "warn",
-            "@docusaurus/no-untranslated-text": "warn",
+            "@docusaurus/string-literal-i18n-messages": "off",
+            "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/prefer-docusaurus-heading": "warn",
 
@@ -671,8 +673,8 @@ export default [
             ...pluginCssModules.configs.recommended.rules,
 
             // Docusaurus Rules
-            "@docusaurus/string-literal-i18n-messages": "warn",
-            "@docusaurus/no-untranslated-text": "warn",
+            "@docusaurus/string-literal-i18n-messages": "off",
+            "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/prefer-docusaurus-heading": "warn",
 

@@ -47,6 +47,26 @@ jobs:
               uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
                   node-version: "latest"
+                  cache: "npm"
+
+            - name: Cache dependencies and build artifacts
+              uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+              with:
+                  path: |
+                      node_modules
+                      ~/.npm
+                      docs/docusaurus/node_modules
+                      docs/docusaurus/.cache
+                      .cache
+                      node_modules/.cache
+                      docs/docusaurus/node_modules/.cache
+                      docs/docusaurus/build/.cache
+                      **/.rspack-cache
+                      **/.webpack-cache
+                  key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}-
+                      ${{ runner.os }}-build-
 
             - name: Install dependencies
               run: npm install --force
