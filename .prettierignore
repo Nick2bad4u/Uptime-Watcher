@@ -11,7 +11,9 @@ coverage/
 *.min.css
 dist/
 dist-electron/
-docs/docusaurus/**/**
+docs/docusaurus/docs/
+docs/docusaurus/build/
+docs/docusaurus/.docusaurus/
 docs/packages/
 
 # Ignore Change Logs

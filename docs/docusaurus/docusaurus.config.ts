@@ -8,7 +8,7 @@ const config: Config = {
     title: "Uptime Watcher",
     tagline:
         "Cross-platform desktop application for monitoring website uptime and server availability",
-    favicon: "img/favicon.ico",
+    favicon: "../../icons/favicon.ico",
 
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
@@ -21,7 +21,6 @@ const config: Config = {
         //             pretty: true,
         //             typescript: true,
         //             deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
-
         //         },
         //         entryPoints: [
         //             "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
@@ -35,13 +34,9 @@ const config: Config = {
         // ],
     ],
 
-
     markdown: {
         format: "detect",
         mermaid: true,
-        preprocessor: ({ filePath, fileContent }) => {
-            return fileContent.replaceAll("{{MY_VAR}}", "MY_VALUE");
-        },
         mdx1Compat: {
             comments: true,
             admonitions: true,
@@ -54,6 +49,12 @@ const config: Config = {
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         v4: true, // Improve compatibility with the upcoming Docusaurus v4
+        //@ts-expect-error
+        removeLegacyPostBuildHeadAttributes: true, // Remove legacy head attributes added during post-build
+        useCssCascadeLayers: true, // Enable CSS cascade layers for better style management
+    },
+    experimental_faster: {
+        ssgWorkerThreads: true,
     },
 
     // Set the production url of your site here
@@ -67,6 +68,8 @@ const config: Config = {
 
     onBrokenLinks: "warn",
     onBrokenMarkdownLinks: "warn",
+    onBrokenAnchors: "warn",
+    onDuplicateRoutes: "warn",
 
     i18n: {
         defaultLocale: "en",
@@ -107,6 +110,28 @@ const config: Config = {
 
     themeConfig: {
         image: "img/uptime-watcher-social-card.jpg",
+        colorMode: {
+            defaultMode: "dark",
+            disableSwitch: false,
+            respectPrefersColorScheme: true,
+        },
+        announcementBar: {
+            id: "announcement_bar",
+            content:
+                'Project is still in development! ⭐️ Report any issues to <a target="_blank" rel="noopener noreferrer" href="https://github.com/Nick2bad4u/Uptime-Watcher/issues">the issue tracker</a>',
+            backgroundColor: "#000000",
+            textColor: "#460e63ff",
+            isCloseable: true,
+        },
+
+        docs: {
+            versionPersistence: "localStorage",
+            sidebar: {
+                hideable: true,
+                autoCollapseCategories: true,
+            },
+        },
+
         metadata: [
             {
                 name: "keywords",
@@ -121,6 +146,7 @@ const config: Config = {
         ],
         navbar: {
             title: "Uptime Watcher",
+            hideOnScroll: true,
             logo: {
                 alt: "Uptime Watcher Logo",
                 src: "img/logo.svg",
@@ -137,6 +163,21 @@ const config: Config = {
                 {
                     href: "https://github.com/Nick2bad4u/Uptime-Watcher",
                     label: "GitHub",
+                    position: "right",
+                },
+                {
+                    href: "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
+                    label: "Issues",
+                    position: "right",
+                },
+                {
+                    href: "https://github.com/Nick2bad4u/Uptime-Watcher/pulls?q=sort%3Aupdated-desc+is%3Apr+is%3Aopen",
+                    label: "PRs",
+                    position: "right",
+                },
+                {
+                    href: "https://github.com/Nick2bad4u/Uptime-Watcher/actions",
+                    label: "CI",
                     position: "right",
                 },
                 {
@@ -184,16 +225,41 @@ const config: Config = {
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} Uptime Watcher. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()} Uptime Watcher. Built with 🦖 Docusaurus. ©️`,
         },
         prism: {
             theme: prismThemes.github,
             darkTheme: prismThemes.dracula,
+            defaultLanguage: "typescript",
             additionalLanguages: [
-                "typescript",
+                "actionscript",
+                "atom",
+                "bash",
+                "css",
+                "git",
+                "hsts",
+                "html",
+                "http",
                 "javascript",
                 "json",
+                "json5",
+                "jsx",
+                "log",
+                "markdown",
+                "jsdoc",
+                "markup",
+                "mathml",
+                "md",
+                "powershell",
+                "rss",
+                "scss",
+                "ssml",
+                "svg",
+                "tsx",
+                "typescript",
+                "xml",
                 "yaml",
+                "yml",
             ],
         },
     } satisfies Preset.ThemeConfig,

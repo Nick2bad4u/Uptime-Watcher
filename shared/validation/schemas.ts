@@ -563,6 +563,11 @@ export function validateMonitorField(
             };
         }
 
+        // Re-throw unknown field errors as documented in JSDoc
+        if (error instanceof Error && error.message.includes("Unknown field")) {
+            throw error;
+        }
+
         return {
             errors: [
                 `Field validation failed: ${error instanceof Error ? error.message : String(error)}`,

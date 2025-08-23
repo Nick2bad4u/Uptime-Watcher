@@ -178,10 +178,8 @@ export interface SiteRow extends BaseRow {
 /**
  * Validation utilities for database row type checking. Provides atomic
  * validation functions that can be composed for complex validation.
- *
- * @internal
  */
-const RowValidationUtils = {
+export const RowValidationUtils = {
     /**
      * Validates that a value is a non-null object.
      */

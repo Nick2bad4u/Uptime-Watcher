@@ -139,15 +139,18 @@ import pluginLoadableImports from "eslint-plugin-loadable-imports";
 import zod from "eslint-plugin-zod";
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import css from "@eslint/css";
+// * as cssPlugin from "eslint-plugin-css"
+
 import * as mdx from "eslint-plugin-mdx";
 // import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 import * as publint from "eslint-plugin-publint";
+import pluginCssModules from "eslint-plugin-css-modules";
+
+import pluginDocusaurus from "@docusaurus/eslint-plugin";
 
 import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-
-import * as cssPlugin from "eslint-plugin-css";
 
 import { fixupPluginRules } from "@eslint/compat";
 
@@ -156,7 +159,6 @@ import { fixupPluginRules } from "@eslint/compat";
 // eslint-find-rules
 // eslint-formatter-compact -- Built into eslint
 // eslint-import-resolver-node -- Replaced by import-x
-// eslint-plugin-css-modules -- Replaced by css-plugin
 // eslint-plugin-json
 // eslint-plugin-no-inferred-method-name
 // eslint-plugin-react-native
@@ -226,7 +228,9 @@ export default [
             "dist-electron/",
             "dist/",
             "shared/",
-            "docs/docusaurus/**",
+            "docs/docusaurus/docs/**",
+            "docs/docusaurus/build/**",
+            "docs/docusaurus/.docusaurus/**",
             "docs/Archive/**",
             "docs/Packages/**",
             "docs/Reviews/**",
@@ -445,8 +449,11 @@ export default [
             tolerant: true,
         },
         rules: {
-            // ...css.configs.recommended.rules,
+            ...css.configs.recommended.rules,
             "css/no-empty-blocks": "error",
+            "css/no-invalid-properties": "off",
+            "css/use-baseline": "off",
+            "css/no-invalid-at-rules": "off",
         },
     },
     // JSON files
@@ -483,7 +490,7 @@ export default [
         },
     },
 
-    // TSX Tailwind Linting files
+    // TSX Tailwind +Linting files
     {
         files: ["src/**/*.tsx"],
         ignores: [],
@@ -526,7 +533,7 @@ export default [
             ],
         },
         plugins: {
-            css: cssPlugin,
+            css: css,
             tailwind: tailwind,
             "undefined-css-classes": pluginUndefinedCss,
             "no-hardcoded-strings": pluginNoHardcoded,
@@ -534,7 +541,7 @@ export default [
         rules: {
             // TypeScript rules
             ...tailwind.configs["flat/recommended"].rules,
-            ...cssPlugin.configs["flat/standard"].rules,
+            ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
 
             // Disable undefined-css-classes as it's producing false positives for valid Tailwind classes
@@ -563,17 +570,123 @@ export default [
                 },
             ],
             "tailwind/no-unnecessary-arbitrary-value": "warn",
+        },
+    },
 
-            "css/color-hex-style": "warn",
-            "css/named-color": "warn",
-            "css/no-dupe-properties": "warn",
-            "css/no-invalid-color-hex": "warn",
-            "css/no-length-zero-unit": "warn",
-            "css/no-number-trailing-zeros": "warn",
-            "css/no-shorthand-property-overrides": "warn",
-            "css/no-unknown-property": "warn",
-            "css/no-unknown-unit": "warn",
-            "css/no-useless-color-alpha": "warn",
+    // Docusaurus files
+    {
+        files: [
+            "docs/docusaurus/**/*.ts",
+            "docs/docusaurus/**/*.tsx",
+            "docs/docusaurus/**/*.mjs",
+            "docs/docusaurus/**/*.cjs",
+            "docs/docusaurus/**/*.js",
+            "docs/docusaurus/**/*.jsx",
+            "docs/docusaurus/**/*.mts",
+            "docs/docusaurus/**/*.cts",
+        ],
+        ignores: [
+            "docs/docusaurus/docs/**",
+            "docs/docusaurus/build/**",
+            "docs/docusaurus/.docusaurus/**",
+            "docs/docusaurus/**/*.css",
+        ],
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                project: "./docs/docusaurus/tsconfig.eslint.json",
+                sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
+                ecmaFeatures: {
+                    jsx: true,
+                    impliedStrict: true,
+                },
+                jsDocParsingMode: "all",
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                document: "readonly",
+                globalThis: "readonly",
+                window: "readonly",
+            },
+        },
+        settings: {},
+        plugins: {
+            "@docusaurus": pluginDocusaurus,
+            "@typescript-eslint": tseslint,
+            js: js,
+        },
+        rules: {
+            ...js.configs.all.rules,
+            ...tseslint.configs.recommendedTypeChecked,
+            ...tseslint.configs.recommended.rules,
+            ...tseslint.configs.strictTypeChecked,
+            ...tseslint.configs.strict.rules,
+            ...tseslint.configs.stylisticTypeChecked,
+            ...tseslint.configs.stylistic.rules,
+
+            // Docusaurus Rules
+            "@docusaurus/string-literal-i18n-messages": "warn",
+            "@docusaurus/no-untranslated-text": "warn",
+            "@docusaurus/no-html-links": "warn",
+            "@docusaurus/prefer-docusaurus-heading": "warn",
+
+            // "no-hardcoded-strings/no-hardcoded-strings": [
+            //     "warn",
+            //     {
+            //         allowedFunctionNames: ["t", "translate", "i18n"],
+            //         ignoreStrings: ["OK", "Cancel"],
+            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
+            //     },
+            // ],
+        },
+    },
+
+    // Docusaurus CSS
+    {
+        files: ["docs/docusaurus/**/*.css"],
+        ignores: [
+            "docs/docusaurus/docs/**",
+            "docs/docusaurus/build/**",
+            "docs/docusaurus/.docusaurus/**",
+        ],
+        language: "css/css",
+        languageOptions: {
+            tolerant: true,
+        },
+        settings: {},
+        plugins: {
+            css: css,
+            "undefined-css-classes": pluginUndefinedCss,
+            "no-hardcoded-strings": pluginNoHardcoded,
+            "@docusaurus": pluginDocusaurus,
+            "css-modules": pluginCssModules,
+        },
+        rules: {
+            ...css.configs.recommended.rules,
+            ...pluginUndefinedCss.configs.recommended.rules,
+            ...pluginCssModules.configs.recommended.rules,
+
+            // Docusaurus Rules
+            "@docusaurus/string-literal-i18n-messages": "warn",
+            "@docusaurus/no-untranslated-text": "warn",
+            "@docusaurus/no-html-links": "warn",
+            "@docusaurus/prefer-docusaurus-heading": "warn",
+
+            "undefined-css-classes/no-undefined-css-classes": "warn",
+
+            // "no-hardcoded-strings/no-hardcoded-strings": [
+            //     "warn",
+            //     {
+            //         allowedFunctionNames: ["t", "translate", "i18n"],
+            //         ignoreStrings: ["OK", "Cancel"],
+            //         ignorePatterns: [/^[\s\d\-:]+$/v], // Ignore dates, times, numbers
+            //     },
+            // ],
+
         },
     },
 
@@ -666,7 +779,7 @@ export default [
             "write-good-comments": pluginWriteGood,
             boundaries: pluginBoundaries,
             compat: pluginCompat,
-            css: cssPlugin,
+            css: css,
             depend: depend,
             functional: pluginFunctional,
             js: js,
@@ -772,7 +885,7 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
-            ...cssPlugin.configs["flat/standard"].rules,
+            ...css.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
@@ -1861,12 +1974,6 @@ export default [
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
 
             // CSS
-            "css/color-hex-style": "warn",
-            "css/named-color": "warn",
-            "css/no-dupe-properties": "warn",
-            "css/no-invalid-color-hex": "warn",
-            "css/no-length-zero-unit": "warn",
-            "css/no-number-trailing-zeros": "warn",
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
@@ -2021,7 +2128,7 @@ export default [
             "write-good-comments": pluginWriteGood,
             boundaries: pluginBoundaries,
             compat: pluginCompat,
-            css: cssPlugin,
+            css: css,
             depend: depend,
             functional: pluginFunctional,
             js: js,
@@ -2116,7 +2223,7 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
-            ...cssPlugin.configs["flat/standard"].rules,
+            ...css.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
@@ -2920,20 +3027,6 @@ export default [
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
 
-            // CSS
-            "css/color-hex-style": "warn",
-            "css/named-color": "warn",
-            "css/no-dupe-properties": "warn",
-            "css/no-invalid-color-hex": "warn",
-            "css/no-length-zero-unit": "warn",
-            "css/no-number-trailing-zeros": "warn",
-            "css/no-shorthand-property-overrides": "warn",
-            "css/no-unknown-property": "warn",
-            "css/no-unknown-unit": "warn",
-            "css/no-useless-color-alpha": "warn",
-            "css/number-leading-zero": "warn",
-            "css/prefer-reduce-shorthand-property-box-values": "warn",
-            "css/property-casing": "warn",
 
             // Import Rules
             "import-x/consistent-type-specifier-style": "off",
@@ -3114,7 +3207,7 @@ export default [
             "write-good-comments": pluginWriteGood,
             boundaries: pluginBoundaries,
             compat: pluginCompat,
-            css: cssPlugin,
+            css: css,
             depend: depend,
             functional: pluginFunctional,
             js: js,
@@ -3220,7 +3313,7 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
-            ...cssPlugin.configs["flat/standard"].rules,
+            ...css.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-typescript"].rules,
@@ -4309,12 +4402,6 @@ export default [
             // "tailwind/no-unnecessary-arbitrary-value": "warn",
 
             // CSS
-            "css/color-hex-style": "warn",
-            "css/named-color": "warn",
-            "css/no-dupe-properties": "warn",
-            "css/no-invalid-color-hex": "warn",
-            "css/no-length-zero-unit": "warn",
-            "css/no-number-trailing-zeros": "warn",
             "import-x/no-extraneous-dependencies": "warn",
             "import-x/no-import-module-exports": "warn",
             "import-x/no-internal-modules": "off",
@@ -5162,7 +5249,7 @@ export default [
             "write-good-comments": pluginWriteGood,
             boundaries: pluginBoundaries,
             compat: pluginCompat,
-            css: cssPlugin,
+            css: css,
             depend: depend,
             functional: pluginFunctional,
             js: js,
@@ -5210,7 +5297,7 @@ export default [
             ...nodePlugin.configs["flat/all"].rules,
             ...depend.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
-            ...cssPlugin.configs["flat/standard"].rules,
+            ...css.configs.recommended.rules,
             ...pluginComments.configs.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...arrayFunc.configs.all.rules,
@@ -5523,21 +5610,6 @@ export default [
             "regexp/unicode-escape": "warn",
             "regexp/unicode-property": "warn",
 
-            // CSS
-            "css/color-hex-style": "warn",
-            "css/named-color": "warn",
-            "css/no-dupe-properties": "warn",
-            "css/no-invalid-color-hex": "warn",
-            "css/no-length-zero-unit": "warn",
-            "css/no-number-trailing-zeros": "warn",
-            "css/no-shorthand-property-overrides": "warn",
-            "css/no-unknown-property": "warn",
-            "css/no-unknown-unit": "warn",
-            "css/no-useless-color-alpha": "warn",
-            "css/number-leading-zero": "warn",
-            "css/prefer-reduce-shorthand-property-box-values": "warn",
-            "css/property-casing": "warn",
-
             // Import Rules
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
@@ -5652,7 +5724,7 @@ export default [
             "write-good-comments": pluginWriteGood,
             boundaries: pluginBoundaries,
             compat: pluginCompat,
-            css: cssPlugin,
+            css: css,
             depend: depend,
             functional: pluginFunctional,
             js: js,
