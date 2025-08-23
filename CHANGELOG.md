@@ -7,14 +7,81 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[ec283de](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)...
-[ec283de](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ec283de22feae4919462494e4c883595f850e428...ec283de22feae4919462494e4c883595f850e428))
+[[f438c69](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)...
+[f438c69](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f438c698b047108f2246583af83ded71daba4a68...f438c698b047108f2246583af83ded71daba4a68))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.4.0 [`(f438c69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)
+
+
+
+
+
+
+## [12.4.0] - 2025-08-23
+
+
+[[76e2c5a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/76e2c5a23a2ddd5adfaf5750ce325a4ecb56cd28)...
+[071ef3d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/071ef3d230b0e6c369af39331ffbfe895fc2f4aa)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/76e2c5a23a2ddd5adfaf5750ce325a4ecb56cd28...071ef3d230b0e6c369af39331ffbfe895fc2f4aa))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.3.0 [`(ec283de)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Improve Docusaurus docs metadata and homepage sections
+
+- Adds author, description, keywords, and bug URL to documentation metadata for better discoverability and project tracking
+- Refactors homepage structure for clearer feature presentation, setup guides, and quick stats via modular React components
+- Updates sidebar configuration for improved API categorization and navigation consistency
+- Introduces a new TypeScript config for documentation, aligning ESLint and Typedoc settings for maintainability
+- Enhances ESLint configuration to properly lint docs, TypeScript, CSS, and JSON files, supporting Docusaurus and custom paths
+- Improves clarity, accessibility, and future scalability across documentation and code quality workflows
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(76e2c5a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/76e2c5a23a2ddd5adfaf5750ce325a4ecb56cd28)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardizes code formatting across docs and tests
+
+- Applies consistent indentation and spacing to documentation, CSS, TypeScript, and test files for improved readability and maintainability
+- Switches to double quotes in TypeScript/React files to unify import and JSX style
+- Reformats test cases and config files for better alignment and clarity
+- No functional or logic changes; focuses solely on code style and formatting for future ease of collaboration
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a71ae02)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a71ae02aad25c2df191685b462780c9a53ed510c)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.3.0 [skip ci] [`(fbd3438)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fbd3438d30b707d078c2e6c84690d5dc41de16ef)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Docusaurus docs dependencies and ESLint config
+
+- Adds new Docusaurus plugins and supporting packages to enhance documentation features and build performance.
+- Upgrades and introduces related dependencies for faster builds, module federation, and improved CSS processing.
+- Refines ESLint config by disabling rules that conflict with Docusaurus patterns, relaxing strictness for JSX, import resolution, and filename enforcement, and improving compatibility for docs development.
+- Expands allowed import paths for custom Docusaurus aliases.
+- Updates Typedoc plugin versions for better markdown support.
+
+These changes improve maintainability, build efficiency, and developer experience for documentation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f14f43d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f14f43df58180d5a3fca560b39e9a8b352d3bc04)
 
 
 
