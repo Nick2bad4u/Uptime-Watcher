@@ -766,17 +766,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
         it("should handle edge cases and internal function coverage", () => {
             // Test validateFieldWithSchema with unknown field name
-            const result = validateMonitorField(
-                "http",
-                "unknownField",
-                "value"
-            );
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((error) =>
-                    error.includes("Field validation failed")
-                )
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "unknownField",
+                    "value"
+                );
+            }).toThrow("Unknown field: unknownField");
         });
 
         it("should handle field validation for common base fields", () => {
@@ -1151,19 +1147,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             it("should throw error for completely unknown fields", () => {
                 // This tests the final throw for unknown fields
-                const result = validateMonitorField(
-                    "http",
-                    "nonExistentField",
-                    "value"
-                );
-                expect(result.success).toBe(false);
-                expect(
-                    result.errors.some(
-                        (error) =>
-                            error.includes("Unknown field") ||
-                            error.includes("nonExistentField")
-                    )
-                ).toBe(true);
+                expect(() => {
+                    validateMonitorField(
+                        "http",
+                        "nonExistentField",
+                        "value"
+                    );
+                }).toThrow("Unknown field: nonExistentField");
             });
 
             it("should handle fields that exist in specific schema shape", () => {

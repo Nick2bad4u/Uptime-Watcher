@@ -38,28 +38,24 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("schemas.ts - Line 399 (throw error for unknown field)", () => {
         test("should trigger unknown field error for invalid field name", () => {
             // This should call validateFieldWithSchema internally and trigger line 399
-            const result = validateMonitorField(
-                "http",
-                "completelyInvalidFieldName",
-                "value"
-            );
-            expect(result.success).toBe(false);
-            expect(result.errors).toContain(
-                "Field validation failed: Unknown field: completelyInvalidFieldName"
-            );
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "completelyInvalidFieldName",
+                    "value"
+                );
+            }).toThrow("Unknown field: completelyInvalidFieldName");
         });
 
         test("should trigger unknown field error for field not in any schema", () => {
             // Test with a field name that doesn't exist in any schema
-            const result = validateMonitorField(
-                "ping",
-                "nonExistentField123",
-                123
-            );
-            expect(result.success).toBe(false);
-            expect(result.errors).toContain(
-                "Field validation failed: Unknown field: nonExistentField123"
-            );
+            expect(() => {
+                validateMonitorField(
+                    "ping",
+                    "nonExistentField123",
+                    123
+                );
+            }).toThrow("Unknown field: nonExistentField123");
         });
     });
 

@@ -17,15 +17,7 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect(() => {
                 // Create a scenario that will trigger line 399 in validateFieldWithSchema
                 validateMonitorField("http", "unknownField", "test");
-            }).not.toThrow(); // The function should return validation result, not throw
-
-            // Instead, test the actual line 399 path
-            const result = validateMonitorField("http", "unknownField", "test");
-            expect(result.success).toBe(false);
-            // Check for the actual error message format
-            expect(result.errors).toContain(
-                "Field validation failed: Unknown field: unknownField"
-            );
+            }).toThrow("Unknown field: unknownField");
         });
 
         test("should handle validation error categorization at line 482", () => {

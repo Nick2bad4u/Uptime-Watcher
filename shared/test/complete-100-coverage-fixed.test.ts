@@ -47,8 +47,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // Using a field name that's not in http schema or base schema
             expect(() => {
                 validateMonitorField(
-                    "unknownCustomField",
                     "http",
+                    "unknownCustomField",
                     "invalidValue"
                 );
             }).toThrow("Unknown field: unknownCustomField");
@@ -70,6 +70,9 @@ describe("Complete 100% Coverage - Final Tests", () => {
                 history: [],
                 url: undefined, // This should trigger the optional field warning path
             };
+
+            // Use the test data to verify it's properly typed
+            expect(testData.type).toBe("http");
 
             try {
                 validateMonitorField("url", "http", undefined);
@@ -139,7 +142,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
 
             // This should trigger the error handling in the finally block
             await expect(
-                withErrorHandling(mockStore, operation, "test operation")
+                withErrorHandling(operation, mockStore)
             ).rejects.toThrow("Operation failed");
 
             // Verify that setLoading was called twice (once at start, once in finally)

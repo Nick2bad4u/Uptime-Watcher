@@ -18,7 +18,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     let mockMonitorRepository: any;
     let mockHistoryRepository: any;
     let mockOperationRegistry: any;
-    let mockMonitorFactory: any;
     let mockTimeoutManager: any;
     let mockStatusUpdateService: any;
 
@@ -93,10 +92,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             getAllOperations: vi.fn(),
         };
 
-        mockMonitorFactory = {
-            getMonitor: vi.fn(),
-        };
-
         mockTimeoutManager = {
             scheduleTimeout: vi.fn(),
             clearTimeout: vi.fn(),
@@ -120,7 +115,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             monitorRepository: mockMonitorRepository,
             historyRepository: mockHistoryRepository,
             operationRegistry: mockOperationRegistry,
-            monitorFactory: mockMonitorFactory,
             timeoutManager: mockTimeoutManager,
             statusUpdateService: mockStatusUpdateService,
             getHistoryLimit: () => 100,
@@ -149,7 +143,6 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 monitorRepository: mockMonitorRepository,
                 historyRepository: mockHistoryRepository,
                 operationRegistry: mockOperationRegistry,
-                monitorFactory: mockMonitorFactory,
                 timeoutManager: mockTimeoutManager,
                 statusUpdateService: mockStatusUpdateService,
                 getHistoryLimit: () => 100,
@@ -168,8 +161,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 {
                     id: "monitor-1",
                     type: "http",
-                    host: "example.com",
-                    path: "/",
+                    url: "https://example.com/",
                     status: "pending",
                     lastChecked: new Date(),
                     checkInterval: 30_000,

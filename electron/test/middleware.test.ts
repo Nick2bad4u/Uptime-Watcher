@@ -30,7 +30,7 @@ import {
 import { logger } from "../utils/logger";
 
 // Mock logger
-vi.mock("../utils/index", () => ({
+vi.mock("../utils/logger", () => ({
     logger: {
         debug: vi.fn(),
         info: vi.fn(),

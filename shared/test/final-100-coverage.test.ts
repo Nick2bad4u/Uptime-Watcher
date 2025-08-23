@@ -43,22 +43,13 @@ describe("Final 100% Coverage Tests", () => {
 
         it("should handle validation error categorization at line 482", () => {
             // Test with field that doesn't exist to trigger different error path
-            const result = validateMonitorField(
-                "http",
-                "nonExistentField" as any,
-                "someValue"
-            );
-            expect(result).toEqual({
-                errors: [
-                    "Field validation failed: Unknown field: nonExistentField",
-                ],
-                metadata: {
-                    fieldName: "nonExistentField",
-                    monitorType: "http",
-                },
-                success: false,
-                warnings: [],
-            });
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "nonExistentField" as any,
+                    "someValue"
+                );
+            }).toThrow("Unknown field: nonExistentField");
         });
     });
 });

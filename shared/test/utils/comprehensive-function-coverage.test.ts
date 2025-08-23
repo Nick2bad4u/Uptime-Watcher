@@ -378,7 +378,7 @@ describe("Shared Module - 100% Function Coverage", () => {
                 siteStatusModule.getSiteStatusDescription(mockSite)
             ).toBeDefined();
             expect(
-                siteStatusModule.getSiteStatusVariant(mockSite)
+                siteStatusModule.getSiteStatusVariant("unknown")
             ).toBeDefined();
         });
     });
@@ -463,13 +463,13 @@ describe("Shared Module - 100% Function Coverage", () => {
             const mockStore = {
                 setLoading: () => {},
                 clearError: () => {},
+                setError: () => {},
             };
 
             // Test withErrorHandling function
             const result = await errorHandlingModule.withErrorHandling(
                 () => Promise.resolve("success"),
-                mockStore,
-                "test operation"
+                mockStore
             );
             expect(result).toBe("success");
         });
@@ -515,7 +515,7 @@ describe("Shared Module - 100% Function Coverage", () => {
                 cacheKeysModule.CacheKeys.monitor.operation("test")
             ).toBeDefined();
             expect(
-                cacheKeysModule.CacheKeys.site.bulkOperation("test")
+                cacheKeysModule.CacheKeys.site.bulkOperation()
             ).toBeDefined();
             expect(
                 cacheKeysModule.CacheKeys.site.byIdentifier("test")
@@ -524,7 +524,7 @@ describe("Shared Module - 100% Function Coverage", () => {
                 cacheKeysModule.CacheKeys.site.loading("test")
             ).toBeDefined();
             expect(
-                cacheKeysModule.CacheKeys.validation.byType("test")
+                cacheKeysModule.CacheKeys.validation.byType("test", "id")
             ).toBeDefined();
             expect(
                 cacheKeysModule.CacheKeys.validation.monitorType("test")
@@ -564,7 +564,7 @@ describe("Shared Module - 100% Function Coverage", () => {
                 true
             );
             expect(
-                validatorUtilsModule.safeInteger("123", { min: 0, max: 1000 })
+                validatorUtilsModule.safeInteger("123", 0, 0, 1000)
             ).toBe(123);
         });
     });

@@ -63,8 +63,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // Using a field name that's not in http schema or base schema
             expect(() => {
                 validateMonitorField(
-                    "unknownCustomField",
                     "http",
+                    "unknownCustomField",
                     "invalidValue"
                 );
             }).toThrow("Unknown field: unknownCustomField");
@@ -121,7 +121,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
     });
 
     describe("errorHandling.ts - Uncovered Branch", () => {
-        it("should handle error in finally block setLoading (line 183)", () => {
+        it("should handle error in finally block setLoading (line 183)", async () => {
             const mockStore = {
                 setError: vi.fn(),
                 setLoading: vi
@@ -138,12 +138,9 @@ describe("Complete 100% Coverage - Final Tests", () => {
                 .mockRejectedValue(new Error("Operation failed"));
 
             // This should trigger the error handling path in the finally block
-            expect(async () => {
-                await withErrorHandling(operation, {
-                    store: mockStore,
-                    operationName: "test-operation",
-                });
-            }).rejects.toThrow("Operation failed");
+            await expect(
+                withErrorHandling(operation, mockStore)
+            ).rejects.toThrow("Operation failed");
 
             // Verify that setLoading was called twice (once at start, once in finally)
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);

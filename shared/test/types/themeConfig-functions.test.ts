@@ -8,7 +8,6 @@ import {
     isColorPalette,
     isThemeConfig,
     type ColorPalette,
-    type ThemeConfig,
 } from "../../types/themeConfig";
 
 describe("shared/types/themeConfig function coverage", () => {
@@ -87,7 +86,7 @@ describe("shared/types/themeConfig function coverage", () => {
 
     describe("isThemeConfig", () => {
         it("should return true for valid ThemeConfig object", () => {
-            const validConfig: ThemeConfig = {
+            const validConfig = {
                 animation: {
                     duration: {
                         fast: "150ms",
@@ -208,7 +207,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(validConfig)).toBe(true);
+            expect(isThemeConfig(validConfig as any)).toBe(true);
         });
 
         it("should return false for null", () => {
@@ -327,7 +326,7 @@ describe("shared/types/themeConfig function coverage", () => {
 
     describe("integration tests", () => {
         it("should validate complete theme structure", () => {
-            const themeConfig: ThemeConfig = {
+            const themeConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
                     easing: {
@@ -437,13 +436,13 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(themeConfig)).toBe(true);
+            expect(isThemeConfig(themeConfig as any)).toBe(true);
             expect(isColorPalette(themeConfig.colors.primary)).toBe(true); // Test the actual ColorPalette
         });
 
         it("should handle edge cases with both validators", () => {
             // Test with minimum valid structure - valid ThemeConfig with minimal ColorPalette
-            const minimalValidTheme: ThemeConfig = {
+            const minimalValidTheme = {
                 animation: {
                     duration: { fast: "0ms", normal: "0ms", slow: "0ms" },
                     easing: {
@@ -522,7 +521,7 @@ describe("shared/types/themeConfig function coverage", () => {
                 },
             };
 
-            expect(isThemeConfig(minimalValidTheme)).toBe(true);
+            expect(isThemeConfig(minimalValidTheme as any)).toBe(true);
         });
     });
 });

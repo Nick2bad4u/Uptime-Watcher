@@ -11,18 +11,33 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
-import type { Monitor, Site } from "@shared/types";
-import type { MonitorRow } from "@shared/types/database";
+import type { Site } from "../../../../shared/types";
+import type { MonitorRow } from "../../../../shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import { SiteWriterService } from "../../../utils/database/SiteWriterService";
 import { SiteNotFoundError } from "../../../utils/database/interfaces";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
-import type { DatabaseService } from "../../services/database/DatabaseService";
-import type { MonitorRepository } from "../../services/database/MonitorRepository";
-import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Logger } from "../../utils/interfaces";
-import type { MonitoringConfig } from "../../utils/database/interfaces";
+import type { DatabaseService } from "../../../services/database/DatabaseService";
+import type { MonitorRepository } from "../../../services/database/MonitorRepository";
+import type { SiteRepository } from "../../../services/database/SiteRepository";
+import type { Logger } from "../../../utils/interfaces";
+import type { MonitoringConfig } from "../../../utils/database/interfaces";
+
+// Helper function to create complete Monitor objects
+const createCompleteMonitor = (overrides: Partial<Site["monitors"][0]> = {}): Site["monitors"][0] => ({
+    id: "monitor-1",
+    type: "http",
+    url: "https://example.com",
+    checkInterval: 30_000,
+    timeout: 5000,
+    retryAttempts: 3,
+    monitoring: false,
+    status: "pending",
+    responseTime: 0,
+    history: [],
+    ...overrides,
+});
 
 // Mock the rowsToMonitors function
 vi.mock("../../../services/database/utils/monitorMapper", () => ({
@@ -56,7 +71,6 @@ describe("SiteWriterService Coverage Tests", () => {
                 monitoring: false,
                 status: "pending",
                 responseTime: 0,
-                lastChecked: undefined,
                 history: [],
             },
         ],
@@ -145,14 +159,12 @@ describe("SiteWriterService Coverage Tests", () => {
         beforeEach(() => {
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => {
-                await callback(mockDb);
-            });
+            ).mockImplementation(async (callback: any) => callback(mockDb));
         });
 
         it("should create a new site successfully", async () => {
             const siteData = { ...mockSite };
-            siteData.monitors[0].id = ""; // New monitor without ID
+            siteData.monitors[0]!.id = ""; // New monitor without ID
 
             const result = await siteWriterService.createSite(siteData);
 
@@ -167,9 +179,9 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockMonitorRepository.createInternal).toHaveBeenCalledWith(
                 mockDb,
                 siteData.identifier,
-                siteData.monitors[0]
+                siteData.monitors[0]!
             );
-            expect(result.monitors[0].id).toBe("new-monitor-id");
+            expect(result.monitors[0]!.id).toBe("new-monitor-id");
             expect(mockLogger.info).toHaveBeenCalledWith(
                 `Creating new site in database: ${siteData.identifier}`
             );
@@ -179,21 +191,16 @@ describe("SiteWriterService Coverage Tests", () => {
             const siteData = {
                 ...mockSite,
                 monitors: [
-                    { ...mockSite.monitors[0], id: "" },
-                    {
+                    createCompleteMonitor({ id: "" }),
+                    createCompleteMonitor({
                         id: "",
-                        type: "port" as const,
+                        type: "port",
                         host: "example.com",
                         port: 443,
                         checkInterval: 60_000,
                         timeout: 10_000,
                         retryAttempts: 2,
-                        monitoring: false,
-                        status: "pending" as const,
-                        responseTime: 0,
-                        lastChecked: undefined,
-                        history: [],
-                    },
+                    }),
                 ],
             };
 
@@ -203,8 +210,8 @@ describe("SiteWriterService Coverage Tests", () => {
                 2
             );
             expect(result.monitors).toHaveLength(2);
-            expect(result.monitors[0].id).toBe("new-monitor-id");
-            expect(result.monitors[1].id).toBe("new-monitor-id");
+            expect(result.monitors[0]!.id).toBe("new-monitor-id");
+            expect(result.monitors[1]!.id).toBe("new-monitor-id");
         });
 
         it("should handle site creation with empty monitors array", async () => {
@@ -232,9 +239,7 @@ describe("SiteWriterService Coverage Tests", () => {
         beforeEach(() => {
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => {
-                await callback(mockDb);
-            });
+            ).mockImplementation(async (callback: any) => callback(mockDb));
         });
 
         it("should delete site successfully when found in cache", async () => {
@@ -302,13 +307,11 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => {
-                await callback(mockDb);
-            });
+            ).mockImplementation(async (callback: any) => callback(mockDb));
             // Set up default DB mock that will be overridden by specific tests
             (mockDb.all as MockedFunction<any>).mockReturnValue([
                 {
-                    id: "monitor-1",
+                    id: 1,
                     site_identifier: "test-site",
                     type: "http",
                     url: "https://example.com",
@@ -363,10 +366,10 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => await callback(mockDb));
+            ).mockImplementation(async (callback: any) => await callback(mockDb));
             (mockDb.all as MockedFunction<any>).mockReturnValue([
                 {
-                    id: "monitor-1",
+                    id: 1,
                     site_identifier: "test-site",
                     type: "http",
                     url: "https://example.com",
@@ -394,11 +397,11 @@ describe("SiteWriterService Coverage Tests", () => {
                 },
             ]);
 
-            const updatedMonitor = {
-                ...mockSite.monitors[0], // This has id: 'monitor-1'
+            const updatedMonitor = createCompleteMonitor({
+                id: "monitor-1", // This has id: 'monitor-1'
                 checkInterval: 60_000,
                 timeout: 10_000,
-            };
+            });
             const updates = { monitors: [updatedMonitor] };
 
             const result = await siteWriterService.updateSite(
@@ -413,24 +416,19 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             // The monitor should be updated since it has same ID but different checkInterval and timeout
             expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
-            expect(result.monitors[0].checkInterval).toBe(60_000);
+            expect(result.monitors[0]!.checkInterval).toBe(60_000);
         });
 
         it("should create new monitors when updating", async () => {
-            const newMonitor = {
+            const newMonitor = createCompleteMonitor({
                 id: "",
-                type: "port" as const,
+                type: "port",
                 host: "newhost.com",
                 port: 80,
                 checkInterval: 45_000,
                 timeout: 8000,
                 retryAttempts: 2,
-                monitoring: false,
-                status: "pending" as const,
-                responseTime: 0,
-                lastChecked: undefined,
-                history: [],
-            };
+            });
             const updates = { monitors: [...mockSite.monitors, newMonitor] };
 
             await siteWriterService.updateSite(
@@ -497,6 +495,8 @@ describe("SiteWriterService Coverage Tests", () => {
 
         beforeEach(() => {
             mockMonitoringConfig = {
+                setHistoryLimit: vi.fn(),
+                setupNewMonitors: vi.fn().mockResolvedValue(undefined),
                 startMonitoring: vi.fn().mockResolvedValue(undefined),
                 stopMonitoring: vi.fn().mockResolvedValue(undefined),
             };
@@ -506,20 +506,19 @@ describe("SiteWriterService Coverage Tests", () => {
             const originalSite = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createCompleteMonitor({
                         id: "monitor-1",
                         checkInterval: 30_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
 
             const newMonitors = [
-                {
-                    ...originalSite.monitors[0],
+                createCompleteMonitor({
+                    id: "monitor-1",
                     checkInterval: 60_000, // Changed interval
-                },
+                }),
             ];
 
             await siteWriterService.handleMonitorIntervalChanges(
@@ -546,20 +545,19 @@ describe("SiteWriterService Coverage Tests", () => {
             const originalSite = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createCompleteMonitor({
                         id: "monitor-1",
                         checkInterval: 30_000,
                         monitoring: false, // Not monitoring
-                    },
+                    }),
                 ],
             };
 
             const newMonitors = [
-                {
-                    ...originalSite.monitors[0],
+                createCompleteMonitor({
+                    id: "monitor-1",
                     checkInterval: 60_000,
-                },
+                }),
             ];
 
             await siteWriterService.handleMonitorIntervalChanges(
@@ -579,11 +577,10 @@ describe("SiteWriterService Coverage Tests", () => {
         it("should handle monitors without IDs gracefully", async () => {
             const originalSite = { ...mockSite };
             const newMonitors = [
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "", // No ID
                     checkInterval: 60_000,
-                },
+                }),
             ];
 
             await siteWriterService.handleMonitorIntervalChanges(
@@ -606,15 +603,14 @@ describe("SiteWriterService Coverage Tests", () => {
             const originalSite = {
                 ...mockSite,
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createCompleteMonitor({
                         checkInterval: 30_000,
                         monitoring: true,
-                    },
+                    }),
                 ],
             };
             const newMonitors = [
-                { ...originalSite.monitors[0], checkInterval: 60_000 },
+                createCompleteMonitor({ checkInterval: 60_000 }),
             ];
 
             // Should not throw
@@ -652,11 +648,11 @@ describe("SiteWriterService Coverage Tests", () => {
     describe("detectNewMonitors", () => {
         it("should detect new monitors with IDs", () => {
             const originalMonitors = [
-                { ...mockSite.monitors[0], id: "monitor-1" },
+                createCompleteMonitor({ id: "monitor-1" }),
             ];
             const updatedMonitors = [
                 ...originalMonitors,
-                { ...mockSite.monitors[0], id: "monitor-2" },
+                createCompleteMonitor({ id: "monitor-2" }),
             ];
 
             const newIds = siteWriterService.detectNewMonitors(
@@ -669,19 +665,17 @@ describe("SiteWriterService Coverage Tests", () => {
 
         it("should detect new monitors without IDs by signature", () => {
             const originalMonitors = [
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "monitor-1",
                     url: "https://example.com",
-                },
+                }),
             ];
             const updatedMonitors = [
                 ...originalMonitors,
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "", // No ID
                     url: "https://newsite.com", // Different URL
-                },
+                }),
             ];
 
             const newIds = siteWriterService.detectNewMonitors(
@@ -694,19 +688,17 @@ describe("SiteWriterService Coverage Tests", () => {
 
         it("should not detect existing monitors without IDs", () => {
             const originalMonitors = [
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "monitor-1",
                     url: "https://example.com",
-                },
+                }),
             ];
             const updatedMonitors = [
                 ...originalMonitors,
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "", // No ID but same signature
                     url: "https://example.com",
-                },
+                }),
             ];
 
             const newIds = siteWriterService.detectNewMonitors(
@@ -724,20 +716,18 @@ describe("SiteWriterService Coverage Tests", () => {
 
         it("should handle mixed scenarios", () => {
             const originalMonitors = [
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "monitor-1",
                     url: "https://example.com",
-                },
+                }),
             ];
             const updatedMonitors = [
                 ...originalMonitors,
-                {
-                    ...mockSite.monitors[0],
+                createCompleteMonitor({
                     id: "monitor-2",
                     url: "https://example.com",
-                }, // New with ID
-                { ...mockSite.monitors[0], id: "", url: "https://newsite.com" }, // New without ID
+                }), // New with ID
+                createCompleteMonitor({ id: "", url: "https://newsite.com" }), // New without ID
             ];
 
             const newIds = siteWriterService.detectNewMonitors(
@@ -756,9 +746,7 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => {
-                await callback(mockDb);
-            });
+            ).mockImplementation(async (callback: any) => callback(mockDb));
 
             // Set up default rowsToMonitors mock for this describe block
             (rowsToMonitors as MockedFunction<any>).mockReturnValue([
@@ -788,10 +776,10 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => await callback(mockDb));
+            ).mockImplementation(async (callback: any) => await callback(mockDb));
             (mockDb.all as MockedFunction<any>).mockReturnValue([
                 {
-                    id: "monitor-1",
+                    id: 1,
                     site_identifier: "test-site",
                     type: "http",
                     url: "https://example.com",
@@ -819,14 +807,14 @@ describe("SiteWriterService Coverage Tests", () => {
                 },
             ]);
 
-            const updatedMonitor = {
-                ...mockSite.monitors[0], // This has id: 'monitor-1'
+            const updatedMonitor = createCompleteMonitor({
+                id: "monitor-1", // This has id: 'monitor-1'
                 checkInterval: 60_000,
                 timeout: 10_000,
                 host: "newhost.com",
                 port: 443,
                 url: "https://newurl.com",
-            };
+            });
 
             await siteWriterService.updateSite(mockSitesCache, "test-site", {
                 monitors: [updatedMonitor],
@@ -836,24 +824,22 @@ describe("SiteWriterService Coverage Tests", () => {
         });
 
         it("should cover createMonitorSignature via detectNewMonitors", () => {
-            const monitor1 = {
-                ...mockSite.monitors[0],
+            const monitor1 = createCompleteMonitor({
                 id: "monitor-1",
-                type: "http" as const,
+                type: "http",
                 url: "https://example.com",
                 checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
-            };
+            });
 
-            const monitor2 = {
+            const monitor2 = createCompleteMonitor({
                 ...monitor1,
                 id: "monitor-2",
-                type: "port" as const,
+                type: "port",
                 host: "example.com",
                 port: 443,
-                url: undefined,
-            };
+            });
 
             const newIds = siteWriterService.detectNewMonitors(
                 [monitor1],
@@ -866,7 +852,7 @@ describe("SiteWriterService Coverage Tests", () => {
         it("should cover updateExistingMonitor warning path", async () => {
             // This test covers a defensive programming scenario in updateExistingMonitor
             // where a monitor somehow loses its ID during processing
-            const monitorWithoutId = { ...mockSite.monitors[0], id: "" };
+            const monitorWithoutId = createCompleteMonitor({ id: "" });
 
             // Set up rowsToMonitors to return an existing monitor
             (rowsToMonitors as MockedFunction<any>).mockReturnValueOnce([
@@ -897,10 +883,9 @@ describe("SiteWriterService Coverage Tests", () => {
         it("should cover orphaned monitor handling in handleExistingMonitor", async () => {
             (mockDb.all as MockedFunction<any>).mockReturnValue([]); // No existing monitors
 
-            const orphanedMonitor = {
-                ...mockSite.monitors[0],
+            const orphanedMonitor = createCompleteMonitor({
                 id: "orphaned-id",
-            };
+            });
 
             await siteWriterService.updateSite(mockSitesCache, "test-site", {
                 monitors: [orphanedMonitor],
@@ -995,9 +980,7 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback) => {
-                await callback(mockDb);
-            });
+            ).mockImplementation(async (callback: any) => callback(mockDb));
 
             // Set up rowsToMonitors to return two existing monitors
             (rowsToMonitors as MockedFunction<any>).mockReturnValueOnce([
@@ -1032,17 +1015,15 @@ describe("SiteWriterService Coverage Tests", () => {
 
             const updates = {
                 monitors: [
-                    {
-                        ...mockSite.monitors[0],
+                    createCompleteMonitor({
                         id: "monitor-1",
                         checkInterval: 60_000,
-                    }, // Update existing
+                    }), // Update existing
                     // Remove monitor-2 (not included)
-                    {
-                        ...mockSite.monitors[0],
+                    createCompleteMonitor({
                         id: "",
                         url: "https://newsite.com",
-                    }, // Add new
+                    }), // Add new
                 ],
             };
 

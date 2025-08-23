@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 
@@ -41,7 +41,6 @@ describe("PortMonitor Coverage Tests", () => {
         monitoring: false,
         status: "pending",
         responseTime: 0,
-        lastChecked: undefined,
         history: [],
     };
 
@@ -171,9 +170,9 @@ describe("PortMonitor Coverage Tests", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle undefined timeout in config", () => {
-            portMonitor.updateConfig({ timeout: undefined });
-            // Should not throw for undefined
+        it("should handle empty config update", () => {
+            portMonitor.updateConfig({});
+            // Should not throw for empty config
             expect(true).toBe(true);
         });
 
@@ -232,12 +231,9 @@ describe("PortMonitor Coverage Tests", () => {
         });
 
         it("should handle monitor with missing host", async () => {
-            const monitorWithoutHost: Site["monitors"][0] = {
-                ...validPortMonitor,
-                host: undefined,
-            };
+            const { host, ...monitorWithoutHost } = validPortMonitor;
 
-            const result = await portMonitor.check(monitorWithoutHost);
+            expect(await portMonitor.check(monitorWithoutHost as Site["monitors"][0])).toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -246,12 +242,9 @@ describe("PortMonitor Coverage Tests", () => {
         });
 
         it("should handle monitor with missing port", async () => {
-            const monitorWithoutPort: Site["monitors"][0] = {
-                ...validPortMonitor,
-                port: undefined,
-            };
+            const { port, ...monitorWithoutPort } = validPortMonitor;
 
-            const result = await portMonitor.check(monitorWithoutPort);
+            expect(await portMonitor.check(monitorWithoutPort as Site["monitors"][0])).toBeDefined();
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -265,7 +258,7 @@ describe("PortMonitor Coverage Tests", () => {
                 host: "",
             };
 
-            const result = await portMonitor.check(monitorWithEmptyHost);
+            await portMonitor.check(monitorWithEmptyHost);
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -279,7 +272,7 @@ describe("PortMonitor Coverage Tests", () => {
                 port: 0,
             };
 
-            const result = await portMonitor.check(monitorWithZeroPort);
+            await portMonitor.check(monitorWithZeroPort);
 
             expect(vi.mocked(createMonitorErrorResult)).toHaveBeenCalledWith(
                 "Port monitor missing valid host or port",
@@ -379,12 +372,9 @@ describe("PortMonitor Coverage Tests", () => {
         });
 
         it("should use service default timeout when monitor timeout is undefined", async () => {
-            const monitorWithoutTimeout: Site["monitors"][0] = {
-                ...validPortMonitor,
-                timeout: undefined,
-            };
+            const { timeout, ...monitorWithoutTimeout } = validPortMonitor;
 
-            await portMonitor.check(monitorWithoutTimeout);
+            await portMonitor.check(monitorWithoutTimeout as Site["monitors"][0]);
 
             expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
                 monitorWithoutTimeout,
@@ -469,6 +459,8 @@ describe("PortMonitor Coverage Tests", () => {
                 host: "test.com",
                 port: 80,
                 checkInterval: 30_000,
+                retryAttempts: 3,
+                timeout: 5000,
                 monitoring: false,
                 status: "pending",
                 responseTime: 0,

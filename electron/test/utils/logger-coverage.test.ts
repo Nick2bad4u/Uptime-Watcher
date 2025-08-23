@@ -6,23 +6,19 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import log from "electron-log/main";
 
-// Mock electron-log before importing the logger
-vi.mock("electron-log/main", () => ({
-    default: {
-        debug: vi.fn(),
-        error: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-    },
-}));
-
-// Import after mocking
+// Import the logger utilities - electron-log is already mocked in setup.ts
 import { dbLogger, logger, monitorLogger } from "../../utils/logger";
 
 describe("Logger Implementation Coverage", () => {
-    beforeEach(() => {
+    let mockElectronLog: any;
+
+    beforeEach(async () => {
+        // Get the mocked electron-log instance from the module
+        const electronLogModule = await import("electron-log/main");
+        mockElectronLog = electronLogModule.default;
+        
+        // Clear all mock function call history
         vi.clearAllMocks();
     });
 
@@ -30,7 +26,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call debug method with correct prefix and arguments", () => {
             logger.debug("Test debug message", { key: "value" });
 
-            expect(log.debug).toHaveBeenCalledWith(
+            expect(mockElectronLog.debug).toHaveBeenCalledWith(
                 "[BACKEND] Test debug message",
                 { key: "value" }
             );
@@ -39,7 +35,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call info method with correct prefix and arguments", () => {
             logger.info("Test info message", { data: 123 });
 
-            expect(log.info).toHaveBeenCalledWith(
+            expect(mockElectronLog.info).toHaveBeenCalledWith(
                 "[BACKEND] Test info message",
                 { data: 123 }
             );
@@ -48,7 +44,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call warn method with correct prefix and arguments", () => {
             logger.warn("Test warning message", "extra", "args");
 
-            expect(log.warn).toHaveBeenCalledWith(
+            expect(mockElectronLog.warn).toHaveBeenCalledWith(
                 "[BACKEND] Test warning message",
                 "extra",
                 "args"
@@ -61,7 +57,7 @@ describe("Logger Implementation Coverage", () => {
 
             logger.error("Test error message", testError, { context: "test" });
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Test error message",
                 { message: "Test error", stack: "Stack trace here" },
                 { context: "test" }
@@ -73,7 +69,7 @@ describe("Logger Implementation Coverage", () => {
 
             logger.error("Test error message", nonError, "additional");
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Test error message",
                 nonError,
                 "additional"
@@ -83,7 +79,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call error method without error object", () => {
             logger.error("Test error message without error object");
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Test error message without error object",
                 undefined
             );
@@ -96,7 +92,7 @@ describe("Logger Implementation Coverage", () => {
                 sql: "SELECT * FROM sites",
             });
 
-            expect(log.debug).toHaveBeenCalledWith(
+            expect(mockElectronLog.debug).toHaveBeenCalledWith(
                 "[DB] Database query executed",
                 { sql: "SELECT * FROM sites" }
             );
@@ -105,7 +101,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call info method with DB prefix", () => {
             dbLogger.info("Database connected successfully");
 
-            expect(log.info).toHaveBeenCalledWith(
+            expect(mockElectronLog.info).toHaveBeenCalledWith(
                 "[DB] Database connected successfully"
             );
         });
@@ -113,7 +109,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call warn method with DB prefix", () => {
             dbLogger.warn("Slow query detected", { duration: 5000 });
 
-            expect(log.warn).toHaveBeenCalledWith("[DB] Slow query detected", {
+            expect(mockElectronLog.warn).toHaveBeenCalledWith("[DB] Slow query detected", {
                 duration: 5000,
             });
         });
@@ -124,7 +120,7 @@ describe("Logger Implementation Coverage", () => {
 
             dbLogger.error("Database operation failed", dbError);
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[DB] Database operation failed",
                 { message: "Connection failed", stack: "Database stack trace" }
             );
@@ -135,7 +131,7 @@ describe("Logger Implementation Coverage", () => {
                 code: "UNIQUE_VIOLATION",
             });
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[DB] Database constraint violation",
                 { code: "UNIQUE_VIOLATION" }
             );
@@ -148,7 +144,7 @@ describe("Logger Implementation Coverage", () => {
                 siteId: "abc123",
             });
 
-            expect(log.debug).toHaveBeenCalledWith(
+            expect(mockElectronLog.debug).toHaveBeenCalledWith(
                 "[MONITOR] Monitor check initiated",
                 { siteId: "abc123" }
             );
@@ -157,7 +153,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call info method with MONITOR prefix", () => {
             monitorLogger.info("All monitors healthy");
 
-            expect(log.info).toHaveBeenCalledWith(
+            expect(mockElectronLog.info).toHaveBeenCalledWith(
                 "[MONITOR] All monitors healthy"
             );
         });
@@ -165,7 +161,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call warn method with MONITOR prefix", () => {
             monitorLogger.warn("High response time detected", { time: 3000 });
 
-            expect(log.warn).toHaveBeenCalledWith(
+            expect(mockElectronLog.warn).toHaveBeenCalledWith(
                 "[MONITOR] High response time detected",
                 { time: 3000 }
             );
@@ -179,7 +175,7 @@ describe("Logger Implementation Coverage", () => {
                 retries: 3,
             });
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[MONITOR] Monitor check failed",
                 { message: "Timeout", stack: "Monitor error stack" },
                 { retries: 3 }
@@ -189,7 +185,7 @@ describe("Logger Implementation Coverage", () => {
         it("should call error method with string error and MONITOR prefix", () => {
             monitorLogger.error("Service unavailable", "Connection refused");
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[MONITOR] Service unavailable",
                 "Connection refused"
             );
@@ -203,7 +199,7 @@ describe("Logger Implementation Coverage", () => {
 
             logger.error("Error without stack", errorNoStack);
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Error without stack",
                 { message: "Error without stack", stack: undefined }
             );
@@ -212,7 +208,7 @@ describe("Logger Implementation Coverage", () => {
         it("should handle null error object", () => {
             logger.error("Null error test", null);
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Null error test",
                 null
             );
@@ -221,7 +217,7 @@ describe("Logger Implementation Coverage", () => {
         it("should handle undefined error object explicitly", () => {
             logger.error("Undefined error test", undefined, { extra: "data" });
 
-            expect(log.error).toHaveBeenCalledWith(
+            expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Undefined error test",
                 undefined,
                 { extra: "data" }
@@ -237,7 +233,7 @@ describe("Logger Implementation Coverage", () => {
                 123
             );
 
-            expect(log.info).toHaveBeenCalledWith(
+            expect(mockElectronLog.info).toHaveBeenCalledWith(
                 "[BACKEND] Multiple args test",
                 "arg1",
                 "arg2",
@@ -252,10 +248,10 @@ describe("Logger Implementation Coverage", () => {
             logger.warn("");
             logger.error("");
 
-            expect(log.debug).toHaveBeenCalledWith("[BACKEND] ");
-            expect(log.info).toHaveBeenCalledWith("[BACKEND] ");
-            expect(log.warn).toHaveBeenCalledWith("[BACKEND] ");
-            expect(log.error).toHaveBeenCalledWith("[BACKEND] ", undefined);
+            expect(mockElectronLog.debug).toHaveBeenCalledWith("[BACKEND] ");
+            expect(mockElectronLog.info).toHaveBeenCalledWith("[BACKEND] ");
+            expect(mockElectronLog.warn).toHaveBeenCalledWith("[BACKEND] ");
+            expect(mockElectronLog.error).toHaveBeenCalledWith("[BACKEND] ", undefined);
         });
     });
 
@@ -283,13 +279,13 @@ describe("Logger Implementation Coverage", () => {
             logger.info("Info only message");
             logger.warn("Warn only message");
 
-            expect(log.debug).toHaveBeenCalledWith(
+            expect(mockElectronLog.debug).toHaveBeenCalledWith(
                 "[BACKEND] Debug only message"
             );
-            expect(log.info).toHaveBeenCalledWith(
+            expect(mockElectronLog.info).toHaveBeenCalledWith(
                 "[BACKEND] Info only message"
             );
-            expect(log.warn).toHaveBeenCalledWith(
+            expect(mockElectronLog.warn).toHaveBeenCalledWith(
                 "[BACKEND] Warn only message"
             );
         });

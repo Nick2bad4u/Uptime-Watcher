@@ -24,7 +24,7 @@ describe("Object Safety - Final 100% Coverage", () => {
             // Should have the regular prop and testSymbol but not omitSymbol
             expect(result.regularProp).toBe("value");
             expect(result[testSymbol]).toBe("symbol value");
-            expect(result[omitSymbol]).toBeUndefined();
+            expect((result as any)[omitSymbol]).toBeUndefined();
         });
 
         it("should handle omitting multiple symbol properties", () => {
@@ -48,8 +48,8 @@ describe("Object Safety - Final 100% Coverage", () => {
             // Should have regularProp and keepSymbol
             expect(result.regularProp).toBe("value");
             expect(result[keepSymbol]).toBe("keep this");
-            expect(result[testSymbol1]).toBeUndefined();
-            expect(result[testSymbol2]).toBeUndefined();
+            expect((result as any)[testSymbol1]).toBeUndefined();
+            expect((result as any)[testSymbol2]).toBeUndefined();
         });
 
         it("should handle objects with symbol properties when none are omitted", () => {
@@ -87,7 +87,7 @@ describe("Object Safety - Final 100% Coverage", () => {
             expect(result.normal).toBe("value");
             expect(result[symbol1]).toBe("first value");
             expect(result[symbol3]).toBe("third value");
-            expect(result[symbol2]).toBeUndefined();
+            expect((result as any)[symbol2]).toBeUndefined();
         });
 
         it("should ensure both branches of line 142 are covered", () => {
@@ -105,7 +105,7 @@ describe("Object Safety - Final 100% Coverage", () => {
             // 1. The if condition on line 142 evaluates to false for omitSymbol (symbol is in keysToOmit)
             // 2. The if condition on line 142 evaluates to true for includeSymbol (symbol is NOT in keysToOmit)
             expect(result[includeSymbol]).toBe("should be included");
-            expect(result[omitSymbol]).toBeUndefined();
+            expect((result as any)[omitSymbol]).toBeUndefined();
         });
     });
 });

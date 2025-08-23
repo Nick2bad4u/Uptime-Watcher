@@ -79,32 +79,24 @@ describe("Validation Schemas - Final Branch Coverage", () => {
     describe("Field validation error handling (line 484)", () => {
         it("should throw error for completely unknown field in validateFieldWithSchema", () => {
             // Test with a field that doesn't exist in any schema
-            const result = validateMonitorField(
-                "http",
-                "completelyUnknownFieldName",
-                "value"
-            );
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((error) =>
-                    error.includes("Field validation failed")
-                )
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "completelyUnknownFieldName",
+                    "value"
+                );
+            }).toThrow("Unknown field: completelyUnknownFieldName");
         });
 
         it("should handle unknown field in both specific and base schemas", () => {
             // Test with field that exists in neither the specific nor base schema
-            const result = validateMonitorField(
-                "port",
-                "nonExistentField",
-                "value"
-            );
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((error) =>
-                    error.includes("Field validation failed")
-                )
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField(
+                    "port",
+                    "nonExistentField",
+                    "value"
+                );
+            }).toThrow("Unknown field: nonExistentField");
         });
     });
 
@@ -149,12 +141,22 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             ];
 
             for (const testCase of edgeCases) {
-                const result = validateMonitorField(
-                    testCase.type,
-                    testCase.field,
-                    testCase.value
-                );
-                expect(result.success).toBe(false);
+                if (testCase.field === "unknownField") {
+                    expect(() => {
+                        validateMonitorField(
+                            testCase.type,
+                            testCase.field,
+                            testCase.value
+                        );
+                    }).toThrow("Unknown field: unknownField");
+                } else {
+                    const result = validateMonitorField(
+                        testCase.type,
+                        testCase.field,
+                        testCase.value
+                    );
+                    expect(result.success).toBe(false);
+                }
             }
         });
     });

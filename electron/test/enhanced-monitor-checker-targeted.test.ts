@@ -10,7 +10,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     beforeEach(() => {
         mockConfig = {
             historyRepository: {
-                addHistoryEntry: vi.fn().mockResolvedValue(true),
+                addEntry: vi.fn().mockResolvedValue(true),
                 getHistoryCount: vi.fn().mockResolvedValue(100),
                 pruneHistory: vi.fn().mockResolvedValue(true),
             },
@@ -42,12 +42,13 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 30,
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
                 activeOperations: ["existing-op"],
             };
 
@@ -78,15 +79,17 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     describe("saveHistoryEntry missing monitor ID", () => {
         it("should handle monitor without ID gracefully", async () => {
             const monitor: Monitor = {
-                // Missing id field
+                // Missing id field - using empty string
+                id: "",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 30,
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
             } as Monitor;
 
             const checkResult = {
@@ -99,9 +102,9 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             const saveMethod = (checker as any).saveHistoryEntry.bind(checker);
             await saveMethod(monitor, checkResult);
 
-            // Should not call addHistoryEntry when monitor has no ID
+            // Should not call addEntry when monitor has no ID
             expect(
-                mockConfig.historyRepository.addHistoryEntry
+                mockConfig.historyRepository.addEntry
             ).not.toHaveBeenCalled();
         });
     });
@@ -112,19 +115,21 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 identifier: "test-site",
                 name: "Test Site",
                 monitors: [],
-                isMonitoring: true,
+                monitoring: true,
             };
 
             const monitor: Monitor = {
-                // Missing id field
+                // Missing id field - using empty string
+                id: "",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 30,
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
             } as Monitor;
 
             // Call the private method through reflection - note correct method name
@@ -143,12 +148,13 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 30,
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
             };
 
             const checkResult = {
@@ -187,12 +193,13 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 30,
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
             };
 
             const checkResult = {
@@ -201,8 +208,8 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 timestamp: new Date(),
             };
 
-            // Make addHistoryEntry throw an error
-            mockConfig.historyRepository.addHistoryEntry = vi
+            // Make addEntry throw an error
+            mockConfig.historyRepository.addEntry = vi
                 .fn()
                 .mockRejectedValue(new Error("DB error"));
 
@@ -221,12 +228,13 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 id: "monitor-1",
                 type: "http",
                 url: "https://example.com",
-                name: "Test Monitor",
-                checkInterval: 300,
-                timeout: 45, // Custom timeout
-                isMonitoring: true,
-                isEnabled: true,
+                checkInterval: 300_000,
+                timeout: 45_000, // Custom timeout
+                retryAttempts: 3,
+                monitoring: true,
                 status: "up",
+                responseTime: 150,
+                history: [],
                 activeOperations: [],
             };
 

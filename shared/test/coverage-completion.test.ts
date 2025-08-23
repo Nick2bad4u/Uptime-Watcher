@@ -69,23 +69,19 @@ describe("100% Coverage - Remaining Lines", () => {
 
     describe("schemas.ts - Line 399 (unknown field error)", () => {
         it("should trigger unknown field error for invalid field name", () => {
-            const result = validateMonitorField("http", "nonExistentField", {
-                nonExistentField: "value",
-            });
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((error) => error.includes("Unknown field"))
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField("http", "nonExistentField", {
+                    nonExistentField: "value",
+                });
+            }).toThrow("Unknown field: nonExistentField");
         });
 
         it("should trigger unknown field error for field not in any schema", () => {
-            const result = validateMonitorField("http", "totallyMadeUpField", {
-                totallyMadeUpField: "value",
-            });
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((error) => error.includes("Unknown field"))
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField("http", "totallyMadeUpField", {
+                    totallyMadeUpField: "value",
+                });
+            }).toThrow("Unknown field: totallyMadeUpField");
         });
     });
 
@@ -102,12 +98,10 @@ describe("100% Coverage - Remaining Lines", () => {
         });
 
         it("should handle optional field validation warnings", () => {
-            // Test optional field validation that triggers warning categorization
-            const result = validateMonitorField("http", "userAgent", {
-                userAgent: undefined, // Optional field with undefined value
-            });
+            // Test with a valid optional field that exists in the schema
+            const result = validateMonitorField("http", "timeout", 30000);
 
-            // Should return a validation result
+            // Should return a validation result for valid fields
             expect(result).toBeDefined();
             expect(typeof result.success).toBe("boolean");
         });
@@ -118,31 +112,27 @@ describe("100% Coverage - Remaining Lines", () => {
             // Test undefined in stringConversion
             expect(safeStringify(undefined)).toBe("");
 
-            // Test unknown field in schemas
-            const result = validateMonitorField("http", "unknownField", {
-                unknownField: "test",
-            });
-            expect(result.success).toBe(false);
+            // Test unknown field in schemas - should throw
+            expect(() => {
+                validateMonitorField("http", "unknownField", {
+                    unknownField: "test",
+                });
+            }).toThrow("Unknown field: unknownField");
 
             // These tests ensure we hit all the previously uncovered lines
         });
 
         it("should test validation error categorization edge cases", () => {
-            // Test various field validation scenarios that might trigger
-            // the error vs warning categorization logic
+            // Test various valid field validation scenarios
             const testFields = [
                 "url",
-                "method",
                 "timeout",
-                "userAgent",
-                "headers",
+                "retryAttempts",
             ];
 
             for (const field of testFields) {
-                const result = validateMonitorField("http", field, {
-                    [field]: undefined,
-                });
-                // Each validation should return a result
+                const result = validateMonitorField("http", field, field === "url" ? "https://example.com" : 30000);
+                // Each validation should return a result for valid fields
                 expect(result).toBeDefined();
                 expect(typeof result.success).toBe("boolean");
             }

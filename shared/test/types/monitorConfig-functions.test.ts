@@ -54,17 +54,17 @@ describe("shared/types/monitorConfig function coverage", () => {
         });
 
         it("should return false for null", () => {
-            expect(isHttpMonitorConfig(null)).toBe(false);
+            expect(isHttpMonitorConfig(null as any)).toBe(false);
         });
 
         it("should return false for undefined", () => {
-            expect(isHttpMonitorConfig(undefined)).toBe(false);
+            expect(isHttpMonitorConfig(undefined as any)).toBe(false);
         });
 
         it("should return false for primitive types", () => {
-            expect(isHttpMonitorConfig("string")).toBe(false);
-            expect(isHttpMonitorConfig(123)).toBe(false);
-            expect(isHttpMonitorConfig(true)).toBe(false);
+            expect(isHttpMonitorConfig("string" as any)).toBe(false);
+            expect(isHttpMonitorConfig(123 as any)).toBe(false);
+            expect(isHttpMonitorConfig(true as any)).toBe(false);
         });
 
         it("should return false for object missing required properties", () => {
@@ -73,7 +73,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isHttpMonitorConfig(incompleteConfig)).toBe(false);
+            expect(isHttpMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
         it("should return false for object with wrong property types", () => {
@@ -92,7 +92,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 bodyNotMatch: "",
             };
 
-            expect(isHttpMonitorConfig(invalidConfig)).toBe(false);
+            expect(isHttpMonitorConfig(invalidConfig as any)).toBe(false);
         });
     });
 
@@ -134,17 +134,17 @@ describe("shared/types/monitorConfig function coverage", () => {
         });
 
         it("should return false for null", () => {
-            expect(isPingMonitorConfig(null)).toBe(false);
+            expect(isPingMonitorConfig(null as any)).toBe(false);
         });
 
         it("should return false for undefined", () => {
-            expect(isPingMonitorConfig(undefined)).toBe(false);
+            expect(isPingMonitorConfig(undefined as any)).toBe(false);
         });
 
         it("should return false for primitive types", () => {
-            expect(isPingMonitorConfig("string")).toBe(false);
-            expect(isPingMonitorConfig(123)).toBe(false);
-            expect(isPingMonitorConfig(true)).toBe(false);
+            expect(isPingMonitorConfig("string" as any)).toBe(false);
+            expect(isPingMonitorConfig(123 as any)).toBe(false);
+            expect(isPingMonitorConfig(true as any)).toBe(false);
         });
 
         it("should return false for object missing required properties", () => {
@@ -153,7 +153,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isPingMonitorConfig(incompleteConfig)).toBe(false);
+            expect(isPingMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
         it("should return false for object with wrong property types", () => {
@@ -166,7 +166,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 expectedResponseTime: 100,
             };
 
-            expect(isPingMonitorConfig(invalidConfig)).toBe(false);
+            expect(isPingMonitorConfig(invalidConfig as any)).toBe(false);
         });
     });
 
@@ -210,17 +210,17 @@ describe("shared/types/monitorConfig function coverage", () => {
         });
 
         it("should return false for null", () => {
-            expect(isPortMonitorConfig(null)).toBe(false);
+            expect(isPortMonitorConfig(null as any)).toBe(false);
         });
 
         it("should return false for undefined", () => {
-            expect(isPortMonitorConfig(undefined)).toBe(false);
+            expect(isPortMonitorConfig(undefined as any)).toBe(false);
         });
 
         it("should return false for primitive types", () => {
-            expect(isPortMonitorConfig("string")).toBe(false);
-            expect(isPortMonitorConfig(123)).toBe(false);
-            expect(isPortMonitorConfig(true)).toBe(false);
+            expect(isPortMonitorConfig("string" as any)).toBe(false);
+            expect(isPortMonitorConfig(123 as any)).toBe(false);
+            expect(isPortMonitorConfig(true as any)).toBe(false);
         });
 
         it("should return false for object missing required properties", () => {
@@ -230,7 +230,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 // missing other required properties
             };
 
-            expect(isPortMonitorConfig(incompleteConfig)).toBe(false);
+            expect(isPortMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
         it("should return false for object with wrong property types", () => {
@@ -242,7 +242,7 @@ describe("shared/types/monitorConfig function coverage", () => {
                 protocol: "tcp",
             };
 
-            expect(isPortMonitorConfig(invalidConfig)).toBe(false);
+            expect(isPortMonitorConfig(invalidConfig as any)).toBe(false);
         });
 
         it("should handle edge case ports", () => {

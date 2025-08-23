@@ -65,7 +65,6 @@ describe("Schemas - Complete Function Coverage", () => {
                 id: "dns-id",
                 type: "dns",
                 host: "example.com",
-                dnsServer: "8.8.8.8",
                 recordType: "A",
                 checkInterval: 60000,
                 timeout: 30000,
@@ -89,7 +88,17 @@ describe("Schemas - Complete Function Coverage", () => {
             schemasModule.validateMonitorField("port", "host", "example.com");
             schemasModule.validateMonitorField("port", "port", 80);
             schemasModule.validateMonitorField("ping", "host", "example.com");
-            schemasModule.validateMonitorField("dns", "dnsServer", "8.8.8.8");
+            
+            // Test DNS with valid field
+            schemasModule.validateMonitorField("dns", "recordType", "A");
+            
+            // Test invalid DNS field - this should throw
+            try {
+                schemasModule.validateMonitorField("dns", "dnsServer", "8.8.8.8");
+            } catch (error) {
+                expect((error as Error).message).toContain("Unknown field: dnsServer");
+            }
+            
             schemasModule.validateMonitorField("dns", "recordType", "A");
 
             // Call with invalid data to exercise error paths
@@ -226,8 +235,15 @@ describe("Schemas - Complete Function Coverage", () => {
                 "url",
                 "https://example.com"
             );
-            schemasModule.validateMonitorField("http", "method", "GET");
-            schemasModule.validateMonitorField("http", "expectedStatus", 200);
+            // Test invalid HTTP field - this should throw
+            try {
+                schemasModule.validateMonitorField("http", "method", "GET");
+            } catch (error) {
+                expect((error as Error).message).toContain("Unknown field: method");
+            }
+            
+            // Test HTTP with valid field
+            schemasModule.validateMonitorField("http", "url", "https://example.com");
 
             // Test Port-specific fields
             schemasModule.validateMonitorField("port", "host", "example.com");
@@ -238,7 +254,14 @@ describe("Schemas - Complete Function Coverage", () => {
 
             // Test DNS-specific fields
             schemasModule.validateMonitorField("dns", "host", "example.com");
-            schemasModule.validateMonitorField("dns", "dnsServer", "8.8.8.8");
+            
+            // Test invalid DNS field - this should throw  
+            try {
+                schemasModule.validateMonitorField("dns", "dnsServer", "8.8.8.8");
+            } catch (error) {
+                expect((error as Error).message).toContain("Unknown field: dnsServer");
+            }
+            
             schemasModule.validateMonitorField("dns", "recordType", "A");
             schemasModule.validateMonitorField(
                 "dns",

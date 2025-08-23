@@ -137,33 +137,8 @@ globalThis.console = {
     info: vi.fn(),
 };
 
-// Mock logger module
-vi.mock("../utils/logger", () => ({
-    logger: {
-        info: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        debug: vi.fn(),
-        silly: vi.fn(),
-        verbose: vi.fn(),
-    },
-    dbLogger: {
-        info: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        debug: vi.fn(),
-        silly: vi.fn(),
-        verbose: vi.fn(),
-    },
-    monitorLogger: {
-        info: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        debug: vi.fn(),
-        silly: vi.fn(),
-        verbose: vi.fn(),
-    },
-}));
+// Note: Logger module is NOT mocked globally to allow individual test files
+// to test the actual logger implementation with mocked electron-log
 
 // Note: Repository classes are NOT mocked globally to allow individual test files
 // to provide their own mocks for better test isolation and control

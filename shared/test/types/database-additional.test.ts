@@ -359,7 +359,7 @@ describe("shared/types/database additional function coverage", () => {
             };
 
             const validMonitorRow: MonitorRow = {
-                id: "monitor1",
+                id: 1,
                 site_identifier: "site1",
                 type: "http",
                 status: "up",
@@ -377,16 +377,12 @@ describe("shared/types/database additional function coverage", () => {
             const validSettingsRow: SettingsRow = {
                 key: "history_limit",
                 value: "1000",
-                created_at: Date.now() - 86400000,
-                updated_at: Date.now(),
             };
 
             const validSiteRow: SiteRow = {
                 identifier: "site1",
                 name: "Example Site",
                 monitoring: 1,
-                created_at: Date.now() - 86400000,
-                updated_at: Date.now(),
             };
 
             expect(isValidHistoryRow(validHistoryRow)).toBe(true);

@@ -25,7 +25,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     beforeEach(() => {
         // Create mock dependencies
         mockEventBus = {
-            emit: vi.fn(),
+            emit: vi.fn().mockResolvedValue(undefined),
+            emitTyped: vi.fn().mockResolvedValue(undefined),
         };
 
         mockSitesCache = {
@@ -37,18 +38,33 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         };
 
         mockMonitorRepository = {
-            update: vi.fn(),
+            update: vi.fn().mockResolvedValue(true),
+            findByIdentifier: vi.fn().mockResolvedValue({
+                id: "monitor-1",
+                type: "http",
+                url: "https://example.com/",
+                status: "up",
+                lastChecked: new Date(),
+                checkInterval: 30_000,
+                history: [],
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                timeout: 10_000,
+            }),
+            create: vi.fn(),
         };
 
         mockHistoryRepository = {
             create: vi.fn(),
+            addEntry: vi.fn().mockResolvedValue(undefined),
         };
 
         mockOperationRegistry = {
             initiateCheck: vi.fn(),
             validateOperation: vi.fn(),
             completeOperation: vi.fn(),
-            cancelOperations: vi.fn(),
+            cancelOperations: vi.fn().mockReturnValue(undefined),
         };
 
         mockMonitorFactory = {
@@ -57,6 +73,8 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
 
         mockTimeoutManager = {
             createTimeout: vi.fn(),
+            scheduleTimeout: vi.fn(),
+            clearTimeout: vi.fn(),
         };
 
         mockStatusUpdateService = {
@@ -65,30 +83,44 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
 
         // Create the EnhancedMonitorChecker instance
         enhancedChecker = new EnhancedMonitorChecker({
-            eventBus: mockEventBus,
-            sitesCache: mockSitesCache,
-            siteRepository: mockSiteRepository,
-            monitorRepository: mockMonitorRepository,
+            eventEmitter: mockEventBus,
+            getHistoryLimit: () => 100,
             historyRepository: mockHistoryRepository,
+            monitorRepository: mockMonitorRepository,
             operationRegistry: mockOperationRegistry,
-            monitorFactory: mockMonitorFactory,
-            timeoutManager: mockTimeoutManager,
+            siteRepository: mockSiteRepository,
+            sites: mockSitesCache,
             statusUpdateService: mockStatusUpdateService,
+            timeoutManager: mockTimeoutManager,
         });
+
+        // Replace the actual monitor instances with mocks
+        (enhancedChecker as any).httpMonitor = {
+            check: vi.fn()
+        };
+        (enhancedChecker as any).pingMonitor = {
+            check: vi.fn()
+        };
+        (enhancedChecker as any).portMonitor = {
+            check: vi.fn()
+        };
+        (enhancedChecker as any).dnsMonitor = {
+            check: vi.fn()
+        };
     });
 
     describe("Constructor and Initialization", () => {
         it("should initialize with all dependencies", () => {
             const checker = new EnhancedMonitorChecker({
-                eventBus: mockEventBus,
-                sitesCache: mockSitesCache,
-                siteRepository: mockSiteRepository,
-                monitorRepository: mockMonitorRepository,
+                eventEmitter: mockEventBus,
+                getHistoryLimit: () => 100,
                 historyRepository: mockHistoryRepository,
+                monitorRepository: mockMonitorRepository,
                 operationRegistry: mockOperationRegistry,
-                monitorFactory: mockMonitorFactory,
-                timeoutManager: mockTimeoutManager,
+                siteRepository: mockSiteRepository,
+                sites: mockSitesCache,
                 statusUpdateService: mockStatusUpdateService,
+                timeoutManager: mockTimeoutManager,
             });
 
             expect(checker).toBeDefined();
@@ -104,8 +136,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 {
                     id: "monitor-1",
                     type: "http",
-                    host: "example.com",
-                    path: "/",
+                    url: "https://example.com/",
                     status: "pending",
                     lastChecked: new Date(),
                     checkInterval: 30_000,
@@ -119,19 +150,25 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         };
 
         it("should handle manual check with valid site and monitor", async () => {
-            const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            // Mock the repository methods that are called
+            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue({
+                ...mockSite.monitors[0],
+                status: "up",
+                lastChecked: new Date(),
+                responseTime: 200,
+            });
+            mockHistoryRepository.create.mockResolvedValue(undefined);
 
-            const mockMonitorService = {
-                check: vi.fn().mockResolvedValue({
-                    success: true,
-                    status: "up",
-                    responseTime: 200,
-                }),
+            // Mock the HTTP monitor check method to return success
+            const mockCheckResult = {
+                details: "Check successful",
+                responseTime: 200,
+                status: "up" as const,
             };
-            mockMonitorFactory.getMonitor.mockReturnValue(mockMonitorService);
-            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(true);
+            
+            // Mock the HTTP monitor's check method directly
+            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -140,8 +177,9 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
 
             expect(result).toBeDefined();
-            expect(mockOperationRegistry.initiateCheck).toHaveBeenCalled();
-            expect(mockMonitorService.check).toHaveBeenCalled();
+            expect(result?.status).toBe("up");
+            expect(result?.monitorId).toBe("monitor-1");
+            expect(mockMonitorRepository.update).toHaveBeenCalled();
         });
 
         it("should return undefined for non-existent monitor", async () => {
@@ -155,19 +193,25 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         });
 
         it("should handle monitor check failure", async () => {
-            const operationId = "op-123";
-            mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
-            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            // Mock the repository methods that are called
+            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue({
+                ...mockSite.monitors[0],
+                status: "down",
+                lastChecked: new Date(),
+                responseTime: -1,
+            });
+            mockHistoryRepository.create.mockResolvedValue(undefined);
 
-            const mockMonitorService = {
-                check: vi.fn().mockResolvedValue({
-                    success: false,
-                    status: "down",
-                    error: "Connection timeout",
-                }),
+            // Mock the internal monitor check to return failure
+            const mockCheckResult = {
+                details: "Connection timeout",
+                responseTime: -1,
+                status: "down" as const,
             };
-            mockMonitorFactory.getMonitor.mockReturnValue(mockMonitorService);
-            mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(true);
+            
+            // Mock the HTTP monitor's check method directly
+            (enhancedChecker as any).httpMonitor.check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -265,7 +309,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
 
             expect(result).toBe(true);
-            expect(mockEventBus.emit).toHaveBeenCalledWith(
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.objectContaining({
                     identifier: "test-site",
@@ -276,7 +320,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
         });
 
         it("should handle event emission error gracefully", async () => {
-            mockEventBus.emit.mockRejectedValue(
+            mockEventBus.emitTyped.mockRejectedValue(
                 new Error("Event emission failed")
             );
 
@@ -316,7 +360,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
 
             expect(result).toBe(true);
-            expect(mockEventBus.emit).toHaveBeenCalledWith(
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:stopped",
                 expect.objectContaining({
                     identifier: "test-site",
@@ -385,8 +429,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     {
                         id: "monitor-1",
                         type: "http",
-                        host: "example.com",
-                        path: "/",
+                        url: "https://example.com/",
                         status: "pending",
                         lastChecked: new Date(),
                         checkInterval: 30_000,
@@ -422,8 +465,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     {
                         id: "monitor-1",
                         type: "http",
-                        host: "example.com",
-                        path: "/",
+                        url: "https://example.com/",
                         status: "pending",
                         lastChecked: new Date(),
                         checkInterval: 30_000,

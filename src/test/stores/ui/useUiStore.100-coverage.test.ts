@@ -36,6 +36,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
             const mockSite = {
                 identifier: "test-site-1",
                 name: "Test Site",
+                monitoring: true,
                 monitors: [],
             };
 
@@ -64,6 +65,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
             const mockSite = {
                 identifier: "test-site-2",
                 name: "Test Site 2",
+                monitoring: true,
                 monitors: [],
             };
 

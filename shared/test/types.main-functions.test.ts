@@ -11,8 +11,6 @@ import {
     validateMonitor,
     type MonitorStatus,
     type Monitor,
-    type SiteStatus,
-    type ComputedSiteStatus,
     BASE_MONITOR_TYPES,
     MONITOR_STATUS,
     DEFAULT_MONITOR_STATUS,
@@ -196,7 +194,7 @@ describe("shared/types.ts function coverage", () => {
                 history: [],
                 url: "https://example.com",
                 monitoring: true,
-                activeOperations: undefined,
+                activeOperations: [],
             };
 
             expect(validateMonitor(validMonitor)).toBe(true);
@@ -485,6 +483,9 @@ describe("shared/types.ts function coverage", () => {
             ];
             const computedStatuses = ["mixed", "unknown"];
             const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
+
+            // Verify all site statuses are properly defined
+            expect(allSiteStatuses).toHaveLength(6);
 
             // Test all monitor statuses
             for (const status of monitorStatuses) {

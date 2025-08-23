@@ -9,15 +9,13 @@ describe("Schemas - Missing Coverage", () => {
             // Test a field that might trigger the fallback to base schema logic
             // This should test the internal validateFieldWithSchema function
 
-            const result = validateMonitorField(
-                "http",
-                "unknown_field",
-                "test-value"
-            );
-
-            // Should fail validation for unknown field
-            expect(result.success).toBe(false);
-            expect(result.errors.length).toBeGreaterThan(0);
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "unknown_field",
+                    "test-value"
+                );
+            }).toThrow("Unknown field: unknown_field");
         });
 
         test("should test various field scenarios", () => {
@@ -29,9 +27,9 @@ describe("Schemas - Missing Coverage", () => {
             ];
 
             testCases.forEach(({ type, field, value }) => {
-                const result = validateMonitorField(type, field, value);
-                expect(result.success).toBe(false);
-                expect(result.errors.length).toBeGreaterThan(0);
+                expect(() => {
+                    validateMonitorField(type, field, value);
+                }).toThrow(`Unknown field: ${field}`);
             });
         });
     });

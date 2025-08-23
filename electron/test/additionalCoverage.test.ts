@@ -20,16 +20,17 @@ import * as fs from "node:fs";
 import path from "node:path";
 
 // Mock dependencies
-vi.mock("../utils", () => ({
-    isDev: vi.fn(() => false),
+vi.mock("../utils/logger", () => ({
     logger: {
         info: vi.fn(),
         error: vi.fn(),
         debug: vi.fn(),
         warn: vi.fn(),
     },
+}));
+
+vi.mock("../utils/correlation", () => ({
     generateCorrelationId: vi.fn(() => "test-correlation-id"),
-    calculateSiteStatus: vi.fn(() => ({ status: "mixed" })),
 }));
 
 describe("Additional Coverage Tests", () => {

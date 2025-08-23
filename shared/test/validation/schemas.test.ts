@@ -911,16 +911,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         it("should handle unknown field names", () => {
-            const result = validateMonitorField(
-                "http",
-                "unknownField",
-                "value"
-            );
-
-            expect(result.success).toBe(false);
-            expect(
-                result.errors.some((err) => err.includes("Unknown field"))
-            ).toBe(true);
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "unknownField",
+                    "value"
+                );
+            }).toThrow("Unknown field: unknownField");
         });
 
         it("should handle non-Zod errors", () => {
@@ -1204,14 +1201,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
         it("should throw error for unknown field in validateFieldWithSchema", () => {
             // This test covers line 484 - unknown field error
-            // validateMonitorField handles the error and returns a result, doesn't throw
-            const result = validateMonitorField(
-                "http",
-                "unknownField",
-                "value"
-            );
-            expect(result.success).toBe(false);
-            expect(result.errors[0]).toContain("Unknown field: unknownField");
+            // validateFieldWithSchema throws error which validateMonitorField catches and wraps
+            expect(() => {
+                validateMonitorField(
+                    "http",
+                    "unknownField",
+                    "value"
+                );
+            }).toThrow("Unknown field: unknownField");
         });
 
         it("should handle undefined received type in Zod validation", () => {

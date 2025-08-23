@@ -274,7 +274,7 @@ export type MonitorConfig =
 export function isHttpMonitorConfig(
     config: MonitorConfig
 ): config is HttpMonitorConfig {
-    return config.type === "http";
+    return config?.type === "http";
 }
 
 /**
@@ -289,7 +289,7 @@ export function isHttpMonitorConfig(
 export function isPingMonitorConfig(
     config: MonitorConfig
 ): config is PingMonitorConfig {
-    return config.type === "ping";
+    return config?.type === "ping";
 }
 
 /**
@@ -304,7 +304,7 @@ export function isPingMonitorConfig(
 export function isPortMonitorConfig(
     config: MonitorConfig
 ): config is PortMonitorConfig {
-    return config.type === "port";
+    return config?.type === "port";
 }
 
 /**
