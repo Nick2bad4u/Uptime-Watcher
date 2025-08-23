@@ -29,7 +29,7 @@ import {
     DB_FILE_NAME,
     DEFAULT_SITE_NAME,
     BACKUP_DB_FILE_NAME,
-} from "../constants.js";
+} from "../constants";
 
 describe("Backend Constants", () => {
     describe("Network and Request Constants", () => {

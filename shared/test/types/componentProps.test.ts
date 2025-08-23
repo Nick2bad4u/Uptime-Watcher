@@ -224,7 +224,9 @@ describe("Component Props - EventHandlers Namespace", () => {
 
         it("should support conditional event handlers", () => {
             interface ConditionalComponentProperties {
-                onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement> | undefined;
+                onClick?:
+                    | EventHandlers.ClickWithEvent<HTMLButtonElement>
+                    | undefined;
                 disabled?: boolean;
             }
 
