@@ -7,14 +7,198 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e279a7c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)...
-[e279a7c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e279a7c10ffce7a73578c269655521923a79048a...e279a7c10ffce7a73578c269655521923a79048a))
+[[ec283de](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)...
+[ec283de](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ec283de22feae4919462494e4c883595f850e428...ec283de22feae4919462494e4c883595f850e428))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.3.0 [`(ec283de)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec283de22feae4919462494e4c883595f850e428)
+
+
+
+
+
+
+## [12.3.0] - 2025-08-23
+
+
+[[52b5dcb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/52b5dcb80717241b550e4990d83a0e3d0077f460)...
+[766e53e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/766e53e5fbc701eabdbc404d81062dc0ab2a524a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/52b5dcb80717241b550e4990d83a0e3d0077f460...766e53e5fbc701eabdbc404d81062dc0ab2a524a))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.2.0 [`(e279a7c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e279a7c10ffce7a73578c269655521923a79048a)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add Docusaurus setup guide and improve sidebar UX
+
+- Introduces a comprehensive documentation setup guide detailing architecture, configuration, build process, and best practices for unified Docusaurus and TypeDoc usage.
+- Enhances sidebar structure with clearer categories, badges, and improved navigation, including onboarding guides, API sections, and advanced internals.
+- Updates custom CSS for sidebar visual cues and badge styling to improve discoverability and organization.
+- Refines type guards for form data validation, increases robustness of property access in database utilities, and corrects monitoring status logic for edge cases.
+- Disables problematic ESLint CSS class rule to reduce false positives.
+- Fixes documentation example for string conversion utility to accurately reflect null handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6ddd33a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ddd33a57ffdfcd36ce44ce367cba9aadc79cb00)
+
+
+- 📝 [docs] Update TypeDoc output directory path
+
+- Changes documentation output location for generated TypeDoc files to streamline doc structure and simplify navigation.
+- Ensures consistency between documentation tools and reduces potential confusion for contributors.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c567001)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c567001639f042bcc4703436ed76448096539571)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Achieves 100% function and branch coverage for shared modules
+
+- Ensures all type guards, validation functions, and utility methods in shared modules are fully covered by tests.
+- Refactors tests to assert thrown errors for unknown field validation, improving coverage accuracy.
+- Adds dedicated test files targeting previously uncovered lines and scenarios in database, formData, schemas, and string conversion modules.
+- Updates mock and assertion patterns for consistency and reliability in edge case handling.
+- Simplifies type guard checks to prevent false negatives for null/undefined configs.
+- Improves maintainability and future regression prevention for schema validation and object safety logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9a3cac6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a3cac643a64e180e81a3ddefb6a0e80ae5a7f1f)
+
+
+- 🧪 [test] Achieves 100% test coverage and improves consistency
+
+- Expands and refines test suites across shared and electron modules to ensure full coverage for all functions, type guards, edge cases, and error handling paths.
+- Updates formatting, whitespace, and test data for improved readability and consistency.
+- Fixes missed edge cases and unreachable lines, increasing reliability of validation, logging, monitor management, and database utilities.
+- Enhances maintainability and future-proofing by covering private methods and strict type scenarios.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c46c1bf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c46c1bfa2db13e766e5f5cdd050e7e6cb749ccea)
+
+
+- 🧪 [test] Achieve 100% coverage for shared and electron modules
+
+- Adds comprehensive and targeted unit tests to electron and shared modules, covering all public methods, type guards, validators, and error handling branches.
+- Fixes missing test coverage for logger interfaces, core validation logic, shared utility functions, and database service helpers.
+- Refactors sidebar configuration and documentation file structure to improve organization and maintainability.
+- Updates TypeDoc configs for more precise documentation generation and markdown processing.
+- Ensures rigorous edge case testing for schema validators, type guards, and conversion utilities.
+- Motivated by the need to boost overall test coverage to 100% and strengthen code reliability for future development.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(476fd08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/476fd08a30a77d83fdcf0f81bde692971a468db7)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.2.0 [skip ci] [`(5abac33)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abac33cc37aaf0540a06cc99f29ef4e73e4cf1a)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Improve caching and Flatpak setup in workflows
+
+- Optimizes CI by expanding caching for Node.js dependencies, build artifacts, and Flatpak runtimes.
+- Switches Flatpak runtime/SDK installation and verification to user scope for better build sandbox compatibility.
+- Refines Flatpak build output logging and error handling for improved diagnostics.
+- Updates Docusaurus config for enhanced future compatibility and caching, adds experimental flags, and improves config structure.
+- Adds Docusaurus faster plugin to dependencies for build performance.
+- Disables Docusaurus i18n lint rules in lint config to reduce noisy warnings.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(766e53e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/766e53e5fbc701eabdbc404d81062dc0ab2a524a)
+
+
+- 👷 [ci] Install Flatpak dependencies system-wide for reliable builds
+
+- Ensures all required Flatpak components and SDK extensions are installed system-wide,
+  avoiding issues with build sandbox visibility and missing extensions.
+- Removes redundant extension installation steps and improves verification by explicitly
+  checking component presence, providing clearer feedback during CI runs.
+- Relaxes node and npm version checks in the build config to allow for more forgiving local builds,
+  since CI workflow guarantees required extensions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4490ff4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4490ff422f63f7a5d161849076cc3d86faa86409)
+
+
+- 👷 [ci] Update workflow for Docusaurus deployment
+
+- Shifts workflow focus from TypeDoc docs to Docusaurus site deployment and build
+- Removes redundant steps and improves dependency installation for Docusaurus
+- Separates unified TypeDoc generation from Docusaurus build for better clarity
+- Refines output listing to emphasize documentation directories
+
+Improves workflow maintainability and streamlines deployment process.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(28ecda8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28ecda8e60feb157721c3156f930eaca3ec52b16)
+
+
+- 👷 [ci] Update docs build workflow and cleanup configs
+
+- Removes Docusaurus TypeDoc plugin to resolve conflicts with standalone TypeDoc generation.
+- Switches Docusaurus npm scripts to use npx for improved reliability and version control.
+- Refines CI deploy workflow to generate TypeDoc docs first, then build Docusaurus, and uploads only the final build output.
+- Simplifies Flatpak Node.js SDK extension handling and environment setup.
+
+Improves documentation build consistency and deployment robustness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(52b5dcb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/52b5dcb80717241b550e4990d83a0e3d0077f460)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Enhance Docusaurus ESLint config and plugin setup
+
+- Integrates dedicated Docusaurus ESLint plugin and CSS modules linting for improved doc code quality.
+- Refines ignore patterns for Prettier and ESLint to better target build artifacts and generated docs.
+- Expands Docusaurus site configuration with new UI, navigation, and future/experimental flags.
+- Promotes internal validation utilities for broader, type-safe reuse.
+- Improves field validation error handling for stricter schema compliance.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c88b5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6c88b5ba2f9fab10c4a20ca21778a9bc568a0121)
+
+
+- 🔧 [build] Add MDX linting support and refine rule configs
+
+- Introduces configuration for linting MDX files to improve code quality and consistency in documentation and content files.
+- Refactors Markdown and YAML linting rules to use explicit rules objects, enhancing maintainability and clarity.
+- Expands linting coverage to ensure best practices are enforced across more file types.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9b19b71)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9b19b71e1790bef80500975533ce12c58cc54efb)
+
+
+- 🔧 [build] Add MDX linting and update docs config
+
+- Integrates eslint-plugin-mdx and configures linting for MDX files, improving code quality for Markdown+JS/TS documentation.
+- Updates docs config to enhance Markdown/MDX handling, enabling features like mermaid diagrams and custom preprocessing.
+- Ignores .mdx files in prettier to avoid formatting conflicts.
+- Removes post-typedoc scripts from docs workflow for streamlined documentation generation.
+- [dependency] Updates package version and updates dependencies to support new linting and doc features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1e01a8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e01a8eac1259bdd9179e7c3daa2bd4590f605d0)
+
+
+- 🔧 [build] Remove redundant npx usage in scripts and deps
+
+Simplifies scripts and dependencies by eliminating unnecessary 'npx' prefixes.
+Improves consistency with standard npm usage and reduces potential execution overhead.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(12321c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/12321c7380232cda895473df7563dcd27a589ab6)
+
+
+- 🔧 [build] Use npx for all package scripts and dependencies
+
+- Ensures consistent execution environment by invoking CLI tools via npx.
+- Updates dependencies to use npx-prefixed versions, reducing reliance on global installs and improving developer experience.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(339100f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/339100fa5382ffc0da3be35c26ed93b1ab99cdfc)
 
 
 
