@@ -16,8 +16,8 @@ const config: Config = {
     future: {
         experimental_faster: {
             mdxCrossCompilerCache: true,
-            rspackBundler: true,
-            rspackPersistentCache: true,
+            rspackBundler: false,
+            rspackPersistentCache: false,
             ssgWorkerThreads: true,
         },
         experimental_storage: {
