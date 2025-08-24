@@ -24,10 +24,10 @@ const config: Config = {
             namespace: true,
             type: "localStorage",
         },
-        //@ts-expect-error -- Not known by Schemas Yet
-        removeLegacyPostBuildHeadAttributes: true, // Remove legacy head attributes added during post-build
-        useCssCascadeLayers: true, // Enable CSS cascade layers for better style management
-        v4: true, // Improve compatibility with the upcoming Docusaurus v4
+        v4: {
+            removeLegacyPostBuildHeadAttribute: true,
+            useCssCascadeLayers: true,
+        },
     },
     i18n: {
         defaultLocale: "en",
