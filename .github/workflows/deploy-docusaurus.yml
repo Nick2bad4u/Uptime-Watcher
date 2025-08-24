@@ -69,10 +69,10 @@ jobs:
                       ${{ runner.os }}-build-
 
             - name: Install dependencies
-              run: npm install --force
+              run: cd docs/docusaurus && npm install --force
 
             - name: Install dependencies
-              run: npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
+              run: cd docs/docusaurus && npm install prism-react-renderer @docusaurus/preset-classic @docusaurus/core @docusaurus/module-type-aliases @docusaurus/tsconfig @docusaurus/types --force
 
             - name: Build before TypeDoc
               run: |
