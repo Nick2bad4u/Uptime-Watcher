@@ -233,7 +233,6 @@ const config: Config = {
                 "css",
                 "git",
                 "powershell",
-                "logs",
             ],
             darkTheme: prismThemes.dracula,
             defaultLanguage: "typescript",
