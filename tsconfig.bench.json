@@ -5,7 +5,7 @@
         "baseUrl": ".",
         "outDir": "dist-bench",
         "tsBuildInfoFile": "./dist-bench/tsconfig.bench.tsbuildinfo",
-        "target": "ES2022",
+        "target": "es2024",
         "module": "ESNext",
         "moduleResolution": "bundler",
         "allowJs": true,

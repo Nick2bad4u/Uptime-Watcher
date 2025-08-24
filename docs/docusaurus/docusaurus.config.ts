@@ -111,12 +111,12 @@ const config: Config = {
         "Cross-platform desktop application for monitoring website uptime and server availability",
     themeConfig: {
         announcementBar: {
-            backgroundColor: "#000000",
+            backgroundColor: "#000000b1",
             content:
                 'Project is still in development! ⭐️ Report any issues to <a target="_blank" rel="noopener noreferrer" href="https://github.com/Nick2bad4u/Uptime-Watcher/issues">the issue tracker</a>',
             id: "announcement_bar",
             isCloseable: true,
-            textColor: "#460e63ff",
+            textColor: "#6aca20ff",
         },
         colorMode: {
             defaultMode: "dark",
