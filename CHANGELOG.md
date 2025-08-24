@@ -7,14 +7,117 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[f438c69](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)...
-[f438c69](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f438c698b047108f2246583af83ded71daba4a68...f438c698b047108f2246583af83ded71daba4a68))
+[[1e19e13](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e19e137ae9641cd1d831332cbbd35050744f205)...
+[0d2f664](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d2f664fbd7326a2a5ded4181bf25c0f33bd226d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1e19e137ae9641cd1d831332cbbd35050744f205...0d2f664fbd7326a2a5ded4181bf25c0f33bd226d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.5.0 [`(822f6ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/822f6efac389e90ebb9f9d19ce5523fbd6645dae)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update dependency install step for main app
+
+- Moves main app dependency installation to the workspace root.
+- Prevents redundant directory navigation and streamlines workflow steps.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0d2f664)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d2f664fbd7326a2a5ded4181bf25c0f33bd226d)
+
+
+- 👷 [ci] Simplifies Docusaurus dependency installation steps
+
+- Consolidates and renames dependency installation actions for clarity.
+- Removes redundant explicit package installs, relying solely on general install.
+- Improves workflow readability and reduces maintenance overhead.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1db6d9b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1db6d9b0927e5a542d97e5f9bef1f670332186aa)
+
+
+- 👷 [ci] Update Docusaurus deployment to install deps in subdir
+
+- Ensures all dependency installations in CI workflow run within the Docusaurus docs directory.
+- Improves reliability of deployment by scoping installs, reducing risk of misconfigured dependencies.
+- Reformats keywords in documentation package manifest for improved readability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2460c78)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2460c78a84c58919eb3645e3ac510744dde6308c)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update config for improved v4 compatibility
+
+- Refactors configuration to nest legacy head attribute removal and CSS cascade layer options under the upcoming v4 compatibility flag.
+- Prepares for future Docusaurus v4 upgrades by aligning with expected schema structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1e19e13)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e19e137ae9641cd1d831332cbbd35050744f205)
+
+
+
+
+
+
+## [12.5.0] - 2025-08-23
+
+
+[[79948fe](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79948fe3f621450792103a76d090c50d4d2479bc)...
+[136f147](https://github.com/Nick2bad4u/Uptime-Watcher/commit/136f147fa99d65299d926ff52d957ce5a6a7893b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/79948fe3f621450792103a76d090c50d4d2479bc...136f147fa99d65299d926ff52d957ce5a6a7893b))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.4.0 [`(f438c69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f438c698b047108f2246583af83ded71daba4a68)
+
+
+
+### � Other Changes
+
+- Priority 1.2: Component Props Standards - Documentation & Templates
+
+- Created comprehensive Component Props Standards documentation
+- Added reusable prop type definitions in shared/types/componentProps.ts
+- Updated UI Feature Development Guide with standardized component templates
+- Added standardized event handler patterns and prop interface examples
+- Documented consistent naming conventions and accessibility patterns
+
+Part of consistency improvement roadmap Priority 1.2
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(79948fe)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79948fe3f621450792103a76d090c50d4d2479bc)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Reformat and align benchmark and test files
+
+- Updates benchmark file indentation and formatting for consistency, readability, and maintainability.
+ - Refactors type/interface declarations, arrays, and simulation blocks using aligned indentation and standard code style.
+ - Corrects import path format in test file to ensure compatibility with module resolution.
+ - Adjusts multi-line TypeScript interface property declarations for improved clarity in test types.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c1e1280)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c1e1280f8c6a6a8c47ca89fdd88a86cb59e38a29)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.4.0 [skip ci] [`(0a53a82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0a53a826feb6f66d1af780dcc0cf5e82347bead1)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Update cache action to v4.2.4 for workflow
+
+- Keeps CI dependencies and build artifact caching up to date with the latest stable version, ensuring improved reliability and maintenance.
+- May include bug fixes and performance enhancements from the updated cache action.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(73d6896)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/73d68961811ec2ce1be59d646580ac03d045584b)
 
 
 
