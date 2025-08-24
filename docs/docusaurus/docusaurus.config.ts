@@ -29,10 +29,6 @@ const config: Config = {
             useCssCascadeLayers: true,
         },
     },
-    i18n: {
-        defaultLocale: "en",
-        locales: ["en"],
-    },
     markdown: {
         anchors: {
             maintainCase: true,
