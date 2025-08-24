@@ -16,8 +16,8 @@ const config: Config = {
     future: {
         experimental_faster: {
             mdxCrossCompilerCache: true,
-            rspackBundler: false,
-            rspackPersistentCache: false,
+            rspackBundler: true,
+            rspackPersistentCache: true,
             ssgWorkerThreads: true,
         },
         experimental_storage: {
@@ -28,6 +28,10 @@ const config: Config = {
             removeLegacyPostBuildHeadAttribute: true,
             useCssCascadeLayers: true,
         },
+    },
+    i18n: {
+        defaultLocale: "en",
+        locales: ["en"],
     },
     markdown: {
         anchors: {
@@ -226,12 +230,8 @@ const config: Config = {
         },
         prism: {
             additionalLanguages: [
-                "actionscript",
-                "atom",
-                "bash",
                 "css",
                 "git",
-                "hsts",
                 "html",
                 "http",
                 "javascript",
@@ -242,12 +242,10 @@ const config: Config = {
                 "markdown",
                 "jsdoc",
                 "markup",
-                "mathml",
                 "md",
                 "powershell",
                 "rss",
                 "scss",
-                "ssml",
                 "svg",
                 "tsx",
                 "typescript",
