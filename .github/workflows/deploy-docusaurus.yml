@@ -69,7 +69,7 @@ jobs:
                       ${{ runner.os }}-build-
 
             - name: Install dependencies - Main App
-              run: cd docs/docusaurus && npm install --force
+              run: npm install --force
 
             - name: Install dependencies - Docusaurus
               run: cd docs/docusaurus && npm install --force
