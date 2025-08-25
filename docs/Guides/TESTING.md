@@ -9,6 +9,7 @@ This project uses Vitest for testing with separate configurations for frontend (
 The project has two separate Vitest configurations:
 
 1. **Frontend Tests** (`vitest.config.ts`):
+
    - Tests React components in `src/` directory
    - Merges configuration from `vite.config.ts`
    - Uses jsdom environment

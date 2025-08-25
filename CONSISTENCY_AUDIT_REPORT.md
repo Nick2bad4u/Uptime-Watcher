@@ -242,6 +242,7 @@ registerStandardizedIpcHandler(
 ### 🎯 **Priority 1: High Impact, Low Effort**
 
 1. **Standardize Cache TTL Values**
+
    - **Issue**: Different cache instances use varying TTL values
    - **Solution**: Define standard cache configuration constants
    - **Files**: `electron/utils/cache/StandardizedCache.ts`
@@ -254,6 +255,7 @@ registerStandardizedIpcHandler(
 ### 🎯 **Priority 2: Medium Impact, Medium Effort**
 
 3. **Extend Service Factory Pattern**
+
    - **Issue**: Manager constructors could be simplified
    - **Solution**: Expand factory pattern usage
    - **Files**: `electron/services/database/DatabaseServiceFactory.ts`
