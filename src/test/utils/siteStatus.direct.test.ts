@@ -4,6 +4,8 @@
  *   Tests the frontend re-export wrapper to ensure coverage
  */
 
+import { describe, expect, it } from "vitest";
+
 // Import directly from the frontend re-export file (src/utils/siteStatus.ts)
 import {
     calculateSiteMonitoringStatus,

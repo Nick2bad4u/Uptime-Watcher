@@ -1,6 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { lightTheme, darkTheme } from "../../theme/themes";
 import { useTheme } from "../../theme/useTheme";
+import { describe, expect, it } from "vitest";
 
 describe("Debug Theme Structure", () => {
     it("should log actual light theme structure", async ({

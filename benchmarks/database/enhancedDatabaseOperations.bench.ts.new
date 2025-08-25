@@ -1,12 +1,11 @@
 import { tmpdir } from "node:os";
-import path from "node:path";
+import * as path from "node:path";
 
 import { DatabaseService } from "../../electron/services/database/DatabaseService";
 import { HistoryRepository } from "../../electron/services/database/HistoryRepository";
 import { MonitorRepository } from "../../electron/services/database/MonitorRepository";
 import { SiteRepository } from "../../electron/services/database/SiteRepository";
-import type { Monitor, Site, StatusHistory } from "../../shared/types";
-import type { SiteRow } from "../../electron/services/database/utils/siteMapper";
+import type { Monitor, Site, SiteRow, StatusHistory } from "../../shared/types";
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
 
@@ -46,7 +45,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
         };
     }
 
-    function generateMonitor(siteId: string, monitorId: number): Monitor {
+    function generateMonitor(siteId: string, monitorId: number): Omit<Monitor, "id" | "history"> {
         const types = [
             "http",
             "ping",
@@ -55,7 +54,6 @@ describe("Enhanced Database Operations Benchmarks", () => {
         const type = types[monitorId % types.length];
 
         return {
-            id: `benchmark-monitor-${monitorId}`,
             type,
             url:
                 type === "http" ? `https://example${monitorId}.com` : undefined,
@@ -83,7 +81,6 @@ describe("Enhanced Database Operations Benchmarks", () => {
             status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
             responseTime: Math.floor(Math.random() * 500) + 10,
             lastChecked: new Date(Date.now() - Math.random() * 3_600_000),
-            history: [],
         };
     }
 
@@ -121,7 +118,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
 
                 // Create monitors for each site
                 for (let i = 0; i < 10; i++) {
-                    const monitors: Monitor[] = [];
+                    const monitors = [];
                     for (let j = 0; j < 5; j++) {
                         monitors.push(generateMonitor(sites[i].identifier, i * 5 + j));
                     }
@@ -162,7 +159,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
                 await siteRepository.bulkInsert(sites);
 
                 for (const site of sites) {
-                    const monitors: Monitor[] = [];
+                    const monitors = [];
                     for (let j = 0; j < 10; j++) {
                         monitors.push(generateMonitor(site.identifier, j));
                     }
@@ -206,7 +203,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
                 await siteRepository.bulkInsert(sites);
 
                 for (const site of sites) {
-                    const monitors: Monitor[] = [];
+                    const monitors = [];
                     for (let j = 0; j < 5; j++) {
                         monitors.push(generateMonitor(site.identifier, j));
                     }
@@ -255,7 +252,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
                     const site = generateSite(9999);
                     siteRepository.upsertInternal(db, site);
 
-                    const monitors: Monitor[] = [];
+                    const monitors = [];
                     for (let i = 0; i < 5; i++) {
                         monitors.push(generateMonitor(site.identifier, i));
                     }

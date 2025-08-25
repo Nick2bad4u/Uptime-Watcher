@@ -88,8 +88,8 @@ describe("Object Safety - Final 100% Coverage", () => {
             const result = safeObjectOmit(testObject, []);
 
             // Should see both the regular property and the symbol property
-            expect(result.regularProp).toBe("value");
-            expect(result[testSymbol]).toBe("symbol value");
+            expect((result as any).regularProp).toBe("value");
+            expect((result as any)[testSymbol]).toBe("symbol value");
         });
 
         it("should handle edge case with symbol property names and ensure line 142 coverage", async ({

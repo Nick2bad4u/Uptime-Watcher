@@ -63,11 +63,8 @@ web_modules/
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
-.eslintcache
-
-# Optional stylelint cache
-.stylelintcache
+# Optional cache directory
+.cache/
 
 # Microbundle cache
 .rpt2_cache/
@@ -554,11 +551,5 @@ docs/docusaurus/build
 _ZENTASKS
 repomix-output.xml
 
-# Cache files
-.stylelintcache
-stylelintcache
-.cspellcache
-.prettier-cache
-.lycheecache
 # Allow custom OhMyPosh theme
 !.vscode/OhMyPosh-Atomic-Custom.json

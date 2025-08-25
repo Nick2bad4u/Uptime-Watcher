@@ -13,9 +13,9 @@ import { defineConfig } from "vitest/config";
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@shared": normalizePath(path.resolve(__dirname, "shared")),
-            "@electron": normalizePath(path.resolve(__dirname, "electron")),
-            "@app": normalizePath(path.resolve(__dirname, "src")),
+            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
+            "@electron": normalizePath(path.resolve(__dirname, "../../electron")),
+            "@app": normalizePath(path.resolve(__dirname, "../../src")),
         },
     },
     test: {
@@ -23,32 +23,32 @@ const vitestConfig = defineConfig({
         coverage: {
             all: false, // Disable all file coverage, only test loaded files
             exclude: [
-                "**/*.config.*",
-                "**/*.d.ts",
-                "**/dist/**", // Exclude any dist folder anywhere
-                "**/docs/**",
-                "**/index.ts", // Exclude all barrel export files
-                "**/index.tsx", // Exclude JSX barrel export files
-                "**/node_modules/**",
-                "**/types.ts", // Exclude type definition files
-                "**/types.tsx", // Exclude type definition files with JSX
-                "coverage/**",
-                "dist-electron/**",
-                "shared/test",
-                "dist-shared/**",
-                "dist/**",
-                "src/**", // Exclude all src files from electron coverage
-                "index.ts", // Barrel export file at root
-                "release/**",
-                "scripts/**",
-                "report/**", // Exclude report files
-                "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "../../**/*.config.*",
+                "../../**/*.d.ts",
+                "../../**/dist/**", // Exclude any dist folder anywhere
+                "../../**/docs/**",
+                "../../**/index.ts", // Exclude all barrel export files
+                "../../**/index.tsx", // Exclude JSX barrel export files
+                "../../**/node_modules/**",
+                "../../**/types.ts", // Exclude type definition files
+                "../../**/types.tsx", // Exclude type definition files with JSX
+                "../../coverage/**",
+                "../../dist-electron/**",
+                "../../shared/test",
+                "../../dist-shared/**",
+                "../../dist/**",
+                "../../src/**", // Exclude all src files from electron coverage
+                "../../index.ts", // Barrel export file at root
+                "../../release/**",
+                "../../scripts/**",
+                "../../report/**", // Exclude report files
+                "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
             ],
             include: [
-                "electron/**/*.ts", // Include all electron source files only
-                "electron/**/*.mts", // Include MTS files
-                "electron/**/*.cts", // Include CTS files
-                "electron/**/*.mjs", // Include MJS files
+                "../../electron/**/*.ts", // Include all electron source files only
+                "../../electron/**/*.mts", // Include MTS files
+                "../../electron/**/*.cts", // Include CTS files
+                "../../electron/**/*.mjs", // Include MJS files
                 // Shared files now have their own dedicated coverage config
             ],
 
@@ -89,12 +89,12 @@ const vitestConfig = defineConfig({
         },
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
-            "electron/**/*.test.ts",
-            "electron/**/*.test.mts",
-            "electron/**/*.test.cts",
-            "electron/**/*.spec.ts",
-            "electron/**/*.spec.mts",
-            "electron/**/*.spec.cts",
+            "../../electron/**/*.test.ts",
+            "../../electron/**/*.test.mts",
+            "../../electron/**/*.test.cts",
+            "../../electron/**/*.spec.ts",
+            "../../electron/**/*.spec.mts",
+            "../../electron/**/*.spec.cts",
             // Shared tests now have their own dedicated config (vitest.shared.config.ts)
         ],
         name: {
@@ -126,7 +126,7 @@ const vitestConfig = defineConfig({
             "html",
         ],
         restoreMocks: true,
-        setupFiles: ["./electron/test/setup.ts"],
+        setupFiles: ["../../electron/test/setup.ts"],
         testTimeout: 15_000, // Set Vitest timeout to 15 seconds
         typecheck: { enabled: true, tsconfig: "./tsconfig.electron.json" },
     },

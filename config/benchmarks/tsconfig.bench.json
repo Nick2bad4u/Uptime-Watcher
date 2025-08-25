@@ -1,0 +1,65 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "extends": "../../tsconfig.shared.json",
+    "compilerOptions": {
+        "rootDir": "../..",
+        "baseUrl": "../..",
+        "outDir": "../../dist-bench",
+        "tsBuildInfoFile": "../../dist-bench/tsconfig.bench.tsbuildinfo",
+        "composite": true,
+        "incremental": true,
+        "isolatedDeclarations": false,
+        "exactOptionalPropertyTypes": false,
+        "noUncheckedIndexedAccess": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noPropertyAccessFromIndexSignature": false,
+        "noImplicitAny": false,
+        "useUnknownInCatchVariables": false,
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
+        "paths": {
+            "@shared/*": [
+                "shared/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@app/*": [
+                "src/*"
+            ]
+        }
+    },
+    "include": [
+        "../../benchmarks/**/*.ts",
+        "../../benchmarks/**/*.mts",
+        "../../benchmarks/**/*.cts",
+        "../../benchmarks/**/*.tsx",
+        "../../benchmarks/**/*.bench.ts",
+        "../../shared/**/*.ts",
+        "../../shared/**/*.mts",
+        "../../shared/**/*.cts",
+        "../../shared/**/*.tsx",
+        "../../electron/**/*.ts",
+        "../../electron/**/*.mts",
+        "../../electron/**/*.cts",
+        "../../electron/**/*.tsx",
+        "../../src/**/*.ts",
+        "../../src/**/*.mts",
+        "../../src/**/*.cts",
+        "../../src/**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dist-*",
+        "coverage",
+        "**/*.d.ts",
+        "**/*.js",
+        "**/*.mjs"
+    ],
+    "ts-node": {
+        "esm": true,
+        "experimentalSpecifierResolution": "node"
+    }
+}

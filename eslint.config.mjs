@@ -222,7 +222,8 @@ export default [
             "**/release/**",
             "vite.config.ts", // Ignore vite config due to parsing issues
             "vitest.config.ts", // Ignore vitest config due to parsing issues
-            "vitest.electron.config.ts", // Ignore vitest electron config
+            "config/testing/vitest.electron.config.ts", // Ignore vitest electron config
+            "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             "Coverage/",
             "coverage/",
             "dist-electron/",
@@ -286,11 +287,11 @@ export default [
                     // Use an array
                     project: [
                         "tsconfig.electron.json",
-                        "tsconfig.electron.test.json",
+                        "config/testing/tsconfig.electron.test.json",
                         "tsconfig.json",
-                        "tsconfig.test.json",
+                        "config/testing/tsconfig.test.json",
                         "tsconfig.shared.json",
-                        "tsconfig.shared.test.json",
+                        "config/testing/tsconfig.shared.test.json",
                         "docs/docusaurus/tsconfig.json",
                         "docs/docusaurus/tsconfig.eslint.json",
                         "docs/docusaurus/tsconfig.typedoc.json",
@@ -5523,7 +5524,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: "tsconfig.test.json",
+                project: "config/testing/tsconfig.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
@@ -5564,14 +5565,14 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.test.json"],
+                project: ["config/testing/tsconfig.test.json"],
             },
             "import/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: ["tsconfig.test.json"],
+                    project: ["config/testing/tsconfig.test.json"],
                 },
             },
         },
@@ -5706,7 +5707,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: "tsconfig.electron.test.json",
+                project: "config/testing/tsconfig.electron.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
@@ -5859,14 +5860,14 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.electron.test.json"],
+                project: ["config/testing/tsconfig.electron.test.json"],
             },
             "import/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: ["tsconfig.electron.test.json"],
+                    project: ["config/testing/tsconfig.electron.test.json"],
                 },
             },
         },
@@ -5883,7 +5884,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: "tsconfig.shared.test.json",
+                project: "config/testing/tsconfig.shared.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
@@ -5924,14 +5925,14 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.shared.test.json"],
+                project: ["config/testing/tsconfig.shared.test.json"],
             },
             "import/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: ["tsconfig.shared.test.json"],
+                    project: ["config/testing/tsconfig.shared.test.json"],
                 },
             },
         },
@@ -6040,7 +6041,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: ["tsconfig.bench.json"],
+                project: ["config/benchmarks/tsconfig.bench.json"],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
@@ -6083,8 +6084,8 @@ export default [
                 node: true,
                 project: [
                     "tsconfig.json",
-                    "tsconfig.test.json",
-                    "tsconfig.bench.json",
+                    "config/testing/tsconfig.test.json",
+                    "config/benchmarks/tsconfig.bench.json",
                 ],
             },
             "import/resolver": {
@@ -6092,8 +6093,8 @@ export default [
                     alwaysTryTypes: true,
                     project: [
                         "tsconfig.json",
-                        "tsconfig.test.json",
-                        "tsconfig.bench.json",
+                        "config/testing/tsconfig.test.json",
+                        "config/benchmarks/tsconfig.bench.json",
                     ],
                 },
             },
@@ -6223,7 +6224,7 @@ export default [
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: "tsconfig.electron.test.json",
+                project: "config/testing/tsconfig.electron.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 ecmaFeatures: {
@@ -6267,14 +6268,14 @@ export default [
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
                 node: true,
-                project: ["tsconfig.electron.test.json"],
+                project: ["config/testing/tsconfig.electron.test.json"],
             },
             "import/resolver": {
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: ["tsconfig.electron.test.json"],
+                    project: ["config/testing/tsconfig.electron.test.json"],
                 },
             },
         },

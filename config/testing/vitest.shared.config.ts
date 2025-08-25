@@ -11,9 +11,9 @@ import { defineConfig } from "vitest/config";
 const vitestConfig = defineConfig({
     resolve: {
         alias: {
-            "@app": normalizePath(path.resolve(__dirname, "src")),
-            "@electron": normalizePath(path.resolve(__dirname, "electron")),
-            "@shared": normalizePath(path.resolve(__dirname, "shared")),
+            "@app": normalizePath(path.resolve(__dirname, "../../src")),
+            "@electron": normalizePath(path.resolve(__dirname, "../../electron")),
+            "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
         },
     },
     test: {
@@ -21,47 +21,47 @@ const vitestConfig = defineConfig({
         coverage: {
             all: false, // Only test loaded files, not all files
             exclude: [
-                "**/*.config.*",
-                "**/*.d.ts",
-                "**/dist/**",
-                "**/dist-shared/**",
-                "**/docs/**",
-                "**/index.ts", // Exclude barrel export files
-                "**/index.tsx",
-                "**/node_modules/**",
+                "../../**/*.config.*",
+                "../../**/*.d.ts",
+                "../../**/dist/**",
+                "../../**/dist-shared/**",
+                "../../**/docs/**",
+                "../../**/index.ts", // Exclude barrel export files
+                "../../**/index.tsx",
+                "../../**/node_modules/**",
                 // NOTE: Don't exclude all types.ts files since shared/types.ts contains actual functions
-                "src/**/types.ts", // Only exclude frontend type definition files
-                "electron/**/types.ts", // Only exclude electron type definition files
-                "**/types.tsx",
-                "coverage/**",
-                "dist-electron/**",
-                "dist/**",
-                "src/**", // Exclude frontend files
-                "electron/**", // Exclude electron files
-                "release/**",
-                "scripts/**",
-                "shared/test",
-                "report/**",
-                "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                "shared/**/*.test.ts", // Exclude test files from coverage
-                "shared/**/*.test.mts", // Exclude MTS test files from coverage
-                "shared/**/*.test.cts", // Exclude CTS test files from coverage
-                "shared/**/*.spec.ts", // Exclude spec files from coverage
-                "shared/**/*.spec.mts", // Exclude MTS spec files from coverage
-                "shared/**/*.spec.cts", // Exclude CTS spec files from coverage
-                "shared/test/**", // Exclude test directory
+                "../../src/**/types.ts", // Only exclude frontend type definition files
+                "../../electron/**/types.ts", // Only exclude electron type definition files
+                "../../**/types.tsx",
+                "../../coverage/**",
+                "../../dist-electron/**",
+                "../../dist/**",
+                "../../src/**", // Exclude frontend files
+                "../../electron/**", // Exclude electron files
+                "../../release/**",
+                "../../scripts/**",
+                "../../shared/test",
+                "../../report/**",
+                "../../**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+                "../../shared/**/*.test.ts", // Exclude test files from coverage
+                "../../shared/**/*.test.mts", // Exclude MTS test files from coverage
+                "../../shared/**/*.test.cts", // Exclude CTS test files from coverage
+                "../../shared/**/*.spec.ts", // Exclude spec files from coverage
+                "../../shared/**/*.spec.mts", // Exclude MTS spec files from coverage
+                "../../shared/**/*.spec.cts", // Exclude CTS spec files from coverage
+                "../../shared/test/**", // Exclude test directory
             ],
             include: [
-                "shared/**/*.ts", // Only include shared source files
-                "shared/**/*.mts", // Include MTS source files
-                "shared/**/*.cts", // Include CTS source files
+                "../../shared/**/*.ts", // Only include shared source files
+                "../../shared/**/*.mts", // Include MTS source files
+                "../../shared/**/*.cts", // Include CTS source files
             ],
             provider: "v8" as const, // Use V8 provider for consistency
             reporter: [
-                "text",
-                "json",
-                "lcov",
-                "html",
+                "../../text",
+                "../../json",
+                "../../lcov",
+                "../../html",
             ],
             reportOnFailure: true,
             reportsDirectory: "./coverage/shared",
@@ -94,13 +94,13 @@ const vitestConfig = defineConfig({
         },
         globals: true, // Enable global test functions
         include: [
-            "shared/**/*.test.ts", // Include shared tests only
-            "shared/**/*.test.mts", // Include MTS tests
-            "shared/**/*.test.cts", // Include CTS tests
-            "shared/**/*.spec.ts", // Include shared specs only
-            "shared/**/*.spec.mts", // Include MTS specs
-            "shared/**/*.spec.cts", // Include CTS specs
-            "shared/**/*.test.mjs", // Include MJS tests
+            "../../shared/**/*.test.ts", // Include shared tests only
+            "../../shared/**/*.test.mts", // Include MTS tests
+            "../../shared/**/*.test.cts", // Include CTS tests
+            "../../shared/**/*.spec.ts", // Include shared specs only
+            "../../shared/**/*.spec.mts", // Include MTS specs
+            "../../shared/**/*.spec.cts", // Include CTS specs
+            "../../shared/**/*.test.mjs", // Include MJS tests
         ],
         name: {
             color: "yellow",

@@ -965,9 +965,9 @@ describe("React Hook Performance", () => {
 
                 return () => {
                     // Simulate cleanup work without real timers
-                    Math.random() * 1000; // Simulate clearInterval work
+                    void (Math.random() * 1000); // Simulate clearInterval work
                     subscription.unsubscribe();
-                    const cleanupWork = Math.random() * 5; // Simulate work
+                    void (Math.random() * 5); // Simulate work
                 };
             }, [isActive]);
 

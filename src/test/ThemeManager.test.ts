@@ -239,8 +239,8 @@ describe("ThemeManager", () => {
             await annotate("Type: Business Logic", "type");
 
             const originalWindow = globalThis.window;
-            // @ts-expect-error - intentionally deleting window for testing
-            delete globalThis.window;
+            // Intentionally deleting window for testing fallback behavior
+            delete (globalThis as any).window;
 
             const preference = themeManager.getSystemThemePreference();
 
@@ -341,8 +341,8 @@ describe("ThemeManager", () => {
             await annotate("Type: Business Logic", "type");
 
             const originalWindow = globalThis.window;
-            // @ts-expect-error - intentionally deleting window for testing
-            delete globalThis.window;
+            // Intentionally deleting window for testing fallback behavior
+            delete (globalThis as any).window;
 
             const callback = vi.fn();
             const cleanup = themeManager.onSystemThemeChange(callback);

@@ -3,7 +3,7 @@
     "allowCompoundWords": true,
     "cache": {
         "cacheFormat": "universal",
-        "cacheLocation": ".cspellcache",
+        "cacheLocation": ".cache/.cspellcache",
         "cacheStrategy": "metadata",
         "useCache": true
     },

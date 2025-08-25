@@ -223,8 +223,8 @@ describe("ThemeManager", () => {
             await annotate("Type: Business Logic", "type");
 
             const originalMatchMedia = globalThis.matchMedia;
-            // @ts-expect-error Testing missing matchMedia
-            globalThis.matchMedia = undefined;
+            // Testing missing matchMedia for fallback behavior
+            (globalThis as any).matchMedia = undefined;
 
             const preference = themeManager.getSystemThemePreference();
             expect(preference).toBe("light"); // default fallback

@@ -14,7 +14,7 @@ The project has two separate Vitest configurations:
    - Uses jsdom environment
    - Coverage reports to `./coverage/`
 
-2. **Backend Tests** (`vitest.electron.config.ts`):
+2. **Backend Tests** (`config/testing/vitest.electron.config.ts`):
    - Tests Electron main process code in `electron/` directory
    - Uses Node.js environment
    - Coverage reports to `./coverage/electron/`
@@ -22,7 +22,7 @@ The project has two separate Vitest configurations:
 ### Files Created/Modified
 
 1. **`vitest.config.ts`** - Vitest configuration for frontend tests (merges with vite.config.ts)
-2. **`vitest.electron.config.ts`** - Vitest configuration for Electron backend
+2. **`config/testing/vitest.electron.config.ts`** - Vitest configuration for Electron backend
 3. **`codecov.yml`** - Codecov configuration for multi-flag reporting
 4. **`src/test/setup.ts`** - Test setup file for React components
 5. **`electron/test/setup.ts`** - Test setup file for Electron tests
