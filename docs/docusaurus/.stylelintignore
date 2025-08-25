@@ -31,4 +31,10 @@ license
 **/*.desktop
 **/*.txt
 CNAME
-docs/**
+**/*.ico
+stylelintcache
+Tutorial
+**/docs/_media/**
+**/docs/documents/**
+**/static/img/**
+build.log

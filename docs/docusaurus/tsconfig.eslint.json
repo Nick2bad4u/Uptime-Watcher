@@ -45,7 +45,8 @@
         "**/*.css",
         "**/*.scss",
         "**/*.md",
-        "**/*.mdx"
+        "**/*.mdx",
+        "**/*.mjs"
     ],
     "exclude": [
         "node_modules/**",

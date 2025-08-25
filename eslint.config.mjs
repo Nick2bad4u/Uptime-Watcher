@@ -708,7 +708,7 @@ export default [
             "styled-components-a11y": styledA11y,
             "ssr-friendly": fixupPluginRules(pluginSSR),
             etc: fixupPluginRules(etc),
-            "safe-jsx": pluginSafeJSX,
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             "loadable-imports": pluginLoadableImports,
             zod: zod,
             "@docusaurus": pluginDocusaurus,
@@ -1695,6 +1695,13 @@ export default [
             ...pluginUndefinedCss.configs.recommended.rules,
             ...pluginCssModules.configs.recommended.rules,
 
+            // Docusaurus CSS Rules
+            "css/no-empty-blocks": "error",
+            "css/no-invalid-properties": "off",
+            "css/use-baseline": "off",
+            "css/no-invalid-at-rules": "off",
+            "css/no-important": "off", // Allow !important in Docusaurus CSS
+
             // Docusaurus Rules
             "@docusaurus/string-literal-i18n-messages": "off",
             "@docusaurus/no-untranslated-text": "off",
@@ -1702,10 +1709,6 @@ export default [
             "@docusaurus/prefer-docusaurus-heading": "warn",
 
             "undefined-css-classes/no-undefined-css-classes": "warn",
-
-            // CSS Rules - Allow Docusaurus CSS variables and !important
-            "css/no-invalid-properties": "off", // Disable for Docusaurus CSS custom properties
-            "css/no-important": "off", // Allow !important in Docusaurus CSS
 
             // "no-hardcoded-strings/no-hardcoded-strings": [
             //     "warn",
@@ -1881,7 +1884,7 @@ export default [
             "react-perf": reactPerfPlugin,
             "@arthurgeron/react-usememo": pluginUseMemo2,
             etc: fixupPluginRules(etc),
-            "safe-jsx": pluginSafeJSX,
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             "loadable-imports": pluginLoadableImports,
             zod: zod,
         },
@@ -3222,7 +3225,7 @@ export default [
             "styled-components-a11y": styledA11y,
             "ssr-friendly": fixupPluginRules(pluginSSR),
             etc: fixupPluginRules(etc),
-            "safe-jsx": pluginSafeJSX,
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             "loadable-imports": pluginLoadableImports,
             zod: zod,
         },
@@ -4314,7 +4317,7 @@ export default [
             "react-perf": reactPerfPlugin,
             "@arthurgeron/react-usememo": pluginUseMemo2,
             etc: fixupPluginRules(etc),
-            "safe-jsx": pluginSafeJSX,
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             "loadable-imports": pluginLoadableImports,
             zod: zod,
         },

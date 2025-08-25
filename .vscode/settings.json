@@ -81,7 +81,9 @@
         "**/dist-electron-test/**": true,
         "**/dist-test-electron/**": true,
         "**/html/**": true,
-        "**/report/**": true
+        "**/report/**": true,
+        "**/docs/docusaurus/docs/**": true,
+        "**/docs/docusaurus/build/**": true
     },
     "files.watcherExclude": {
         "**/.husky/**": true,
@@ -96,7 +98,8 @@
         "**/report/**": true,
         "**/docs/Packages/**": true,
         "**/docs/Archive/**": true,
-        "**/docs/docusaurus/docs/**": true
+        "**/docs/docusaurus/docs/**": true,
+        "**/docs/docusaurus/build/**": true
     },
     "search.exclude": {
         "**/docs/Packages/**": true,

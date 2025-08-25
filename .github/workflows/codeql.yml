@@ -15,7 +15,7 @@
 #   - Harden runner (security best practice).
 #   - Checkout repo (full history, no credential persistence).
 #   - Initialize CodeQL for matrix languages.
-#   - Setup Node.js v20 (current LTS).
+#   - Setup Node.js v24 (current LTS).
 #   - Cache node_modules for faster builds.
 #   - Install dependencies with npm ci --force (robust for CI).
 #   - Build Electron Vite project (matches architecture).
@@ -101,7 +101,7 @@ jobs:
             security-events: write
 
         concurrency:
-            group: codeql-${{ github.ref }}
+            group: codeql-${{ github.ref }}-${{ matrix.language }}
             cancel-in-progress: true
 
         strategy:

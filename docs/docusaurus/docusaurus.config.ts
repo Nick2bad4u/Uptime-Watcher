@@ -8,10 +8,11 @@ import { themes as prismThemes } from "prism-react-renderer";
 const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl: "/Uptime-Watcher/",
+    clientModules: [require.resolve("./src/js/modernEnhancements.ts")],
+
     deploymentBranch: "gh-pages",
 
     favicon: "../../icons/favicon.ico",
-
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
         experimental_faster: {
@@ -20,10 +21,10 @@ const config: Config = {
             rspackPersistentCache: true,
             ssgWorkerThreads: true,
         },
-        experimental_storage: {
-            namespace: true,
-            type: "localStorage",
-        },
+        // experimental_storage: {
+        //     namespace: true,
+        //     type: "localStorage",
+        // },
         v4: {
             removeLegacyPostBuildHeadAttribute: true,
             useCssCascadeLayers: true,
@@ -33,6 +34,7 @@ const config: Config = {
         defaultLocale: "en",
         locales: ["en"],
     },
+
     markdown: {
         anchors: {
             maintainCase: true,
@@ -45,12 +47,12 @@ const config: Config = {
         },
         mermaid: true,
     },
-
     onBrokenAnchors: "warn",
     onBrokenLinks: "warn",
     onBrokenMarkdownLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName: "Nick2bad4u",
+
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
@@ -74,7 +76,6 @@ const config: Config = {
         //     },
         // ],
     ],
-
     presets: [
         [
             "classic",
@@ -107,16 +108,17 @@ const config: Config = {
         ],
     ],
     projectName: "Uptime-Watcher",
+
     tagline:
         "Cross-platform desktop application for monitoring website uptime and server availability",
     themeConfig: {
         announcementBar: {
-            backgroundColor: "#000000b1",
+            backgroundColor: "#2E2A33",
             content:
                 'Project is still in development! ⭐️ Report any issues to <a target="_blank" rel="noopener noreferrer" href="https://github.com/Nick2bad4u/Uptime-Watcher/issues">the issue tracker</a>',
             id: "announcement_bar",
             isCloseable: true,
-            textColor: "#6aca20ff",
+            textColor: "#71B041",
         },
         colorMode: {
             defaultMode: "dark",
@@ -132,41 +134,70 @@ const config: Config = {
         },
 
         footer: {
-            copyright: `Copyright © ${new Date().getFullYear()} Uptime Watcher. Built with 🦖 Docusaurus. ©️`,
+            copyright: `© ${new Date().getFullYear()} Nick2bad4u. 💻 Website Built and Powered by 🦖 Docusaurus.`,
             links: [
                 {
                     items: [
                         {
-                            label: "Frontend (React)",
-                            to: "/docs/src",
+                            label: "📖 Getting Started",
+                            to: "/docs",
                         },
                         {
-                            label: "Backend (Electron)",
-                            to: "/docs/electron",
+                            label: "🧩 Frontend API",
+                            to: "docs/category/-frontend-react",
                         },
                         {
-                            label: "Shared Code",
-                            to: "/docs/shared",
+                            label: "⚙️ Backend API",
+                            to: "docs/category/%EF%B8%8F-backend-electron",
+                        },
+                        {
+                            label: "🔗 Shared Code",
+                            to: "docs/category/-shared-code",
                         },
                     ],
-                    title: "Documentation",
+                    title: "📚 Documentation",
                 },
                 {
                     items: [
                         {
+                            label: "🛠️ Development Guide",
+                            to: "docs/category/-guides--package-docs",
+                        },
+                        {
+                            label: "🏗️ Architecture",
+                            to: "/docs/documents/Architecture",
+                        },
+                        {
+                            label: "🧪 Advanced Internals",
+                            to: "/docs/category/-advanced-internals",
+                        },
+                        {
+                            label: "📝 TSDoc Standards",
+                            to: "/docs/category/-tsdoc-documentation",
+                        },
+                    ],
+                    title: "🧠 Deep Dive",
+                },
+                {
+                    items: [
+                        {
+                            href: "https://github.com/Nick2bad4u/Uptime-Watcher/releases",
+                            label: "📦 Download Latest",
+                        },
+                        {
                             href: "https://github.com/Nick2bad4u/Uptime-Watcher",
-                            label: "GitHub Repository",
+                            label: "💻 Source Code",
                         },
                         {
                             href: "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
-                            label: "Issues",
+                            label: "🐛 Report Issues",
                         },
                         {
-                            href: "https://github.com/Nick2bad4u/Uptime-Watcher/releases",
-                            label: "Releases",
+                            href: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE",
+                            label: "⚖️ UnLicense",
                         },
                     ],
-                    title: "Project",
+                    title: "🚀 Get Involved",
                 },
             ],
             style: "dark",

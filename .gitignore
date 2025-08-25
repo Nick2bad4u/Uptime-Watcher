@@ -546,6 +546,8 @@ report/
 # Docusaurus documentation
 docs/docusaurus/docs
 **/docs/docusaurus/docs
+docs/docusaurus/build
+**/docs/docusaurus/build
 
 # AI tools
 .agentic-tools*
