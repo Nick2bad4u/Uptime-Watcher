@@ -7,14 +7,99 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[ae4f213](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae4f213604ff79a8b5084b93e0bf84a6890c0f98)...
+[ae4f213](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae4f213604ff79a8b5084b93e0bf84a6890c0f98)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/ae4f213604ff79a8b5084b93e0bf84a6890c0f98...ae4f213604ff79a8b5084b93e0bf84a6890c0f98))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.6.0 [`(ae4f213)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae4f213604ff79a8b5084b93e0bf84a6890c0f98)
+
+
+
+
+
+
+## [12.6.0] - 2025-08-25
+
+
 [[1e19e13](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e19e137ae9641cd1d831332cbbd35050744f205)...
-[0d2f664](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0d2f664fbd7326a2a5ded4181bf25c0f33bd226d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1e19e137ae9641cd1d831332cbbd35050744f205...0d2f664fbd7326a2a5ded4181bf25c0f33bd226d))
+[9016fd0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9016fd09d46afe287ddedba3bfbb49fe0a7d4272)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/1e19e137ae9641cd1d831332cbbd35050744f205...9016fd09d46afe287ddedba3bfbb49fe0a7d4272))
+
+
+### ✨ Features
+
+- ✨ [feat] Modernize docs UI with advanced CSS, JS, and interactivity
+
+- Overhauls documentation site styling with advanced CSS: glassmorphism, gradient backgrounds, animated cards, improved sidebar, and responsive design
+- Adds interactive JS micro-interactions: scroll indicator, magnetic buttons, animated tilt, cursor gradients, and performance optimizations
+- Introduces GitHub stats and live version display on homepage for project transparency
+- Refactors homepage content for clarity and developer-centric messaging; improves demo UI mockup and feature descriptions
+- Expands documentation navigation, sidebar categories, and TSDoc standards section for easier discovery
+- Upgrades workflow to Node.js v24, enhances caching, and improves CI concurrency
+- Adds stylelint config and scripts for docs CSS linting and automated formatting
+- Updates TypeScript config for stricter type safety and DX
+- Improves accessibility, color contrast, and keyboard navigation throughout
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9016fd0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9016fd09d46afe287ddedba3bfbb49fe0a7d4272)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.5.0 [`(822f6ef)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/822f6efac389e90ebb9f9d19ce5523fbd6645dae)
+
+
+
+### � Other Changes
+
+- Update docusaurus.config.ts [`(f0b02f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0b02f4461dc920e3d2cb58103b694cd8064d09d)
+
+
+- Update docusaurus.config.ts [`(ea8c779)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea8c779fa5d78a5b962ed5b3264e7fbec2b0195e)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update Prism language support for syntax highlighting
+
+Removes several unused or redundant languages from syntax highlighting configuration to streamline supported languages.
+
+Adds "logs" language support to improve documentation relevance and clarity for log examples.
+
+ - Enhances maintainability and reduces overhead from unnecessary language definitions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e05ac1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e05ac10f0bfcd427d52852884138c96611425ec)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Update UI colors and TypeScript target
+
+- Improves visual appearance of announcement bar with new background and text colors for better readability and emphasis.
+- Upgrades TypeScript benchmark configuration to use latest language features by targeting ES2024.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1340c36)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1340c3637b9c9463d87ff3b38479f481e81e4b18)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove legacy ESLint config and unused Prism language
+
+- Eliminates the shared ESLint configuration for Uptime Watcher projects, streamlining project dependencies and maintenance.
+- Removes the "logs" language from Prism syntax highlighting, reducing unnecessary code highlighting options.
+
+Helps reduce maintenance overhead and potential confusion from obsolete linting configurations.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(855093c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/855093c739a0000754bb712d1daf2a2ddfa2fa4a)
+
+
+- Update changelogs for v12.5.0 [skip ci] [`(ee856cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee856cbb8c40f54433aa40f3eab11512ca080009)
 
 
 
@@ -48,6 +133,15 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2460
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Enable Rspack bundler, persistent cache, and i18n
+
+- Switches to Rspack bundler with persistent caching for improved build performance.
+- Adds internationalization configuration with English as the default locale.
+- Removes unused Prism language definitions to streamline syntax highlighting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(89d52ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89d52ee86ce6174dd2cd4e94babcab0d8f7673d2)
+
 
 - 🔧 [build] Update config for improved v4 compatibility
 
