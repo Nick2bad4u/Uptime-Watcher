@@ -125,14 +125,30 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with all required dependencies", () => {
+        it("should initialize with all required dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(service).toBeInstanceOf(DataImportExportService);
             // Verify constructor properly assigned dependencies (tested through method calls)
         });
     });
 
     describe("exportAllData", () => {
-        it("should export all data successfully with complete metadata", async () => {
+        it("should export all data successfully with complete metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             const { safeJsonStringifyWithFallback } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -169,7 +185,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(result).toBe('{"exported": true}');
         });
 
-        it("should handle export errors and emit database error event", async () => {
+        it("should handle export errors and emit database error event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const exportError = new Error("Database export failed");
             mockRepositories.site.exportAll.mockRejectedValue(exportError);
 
@@ -195,7 +219,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle non-Error objects in export failure", async () => {
+        it("should handle non-Error objects in export failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const nonErrorObject = "String error message";
             mockRepositories.site.exportAll.mockRejectedValue(nonErrorObject);
 
@@ -217,7 +249,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle settings.getAll failure during export", async () => {
+        it("should handle settings.getAll failure during export", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const settingsError = new Error("Settings retrieval failed");
             mockRepositories.site.exportAll.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockRejectedValue(settingsError);
@@ -234,7 +274,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("importDataFromJson", () => {
-        it("should successfully parse and validate import data", async () => {
+        it("should successfully parse and validate import data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const { safeJsonParse } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -262,7 +310,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle parsing failure with invalid JSON", async () => {
+        it("should handle parsing failure with invalid JSON", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { safeJsonParse } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -296,7 +352,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle parsing success but no data returned", async () => {
+        it("should handle parsing success but no data returned", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { safeJsonParse } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -319,7 +383,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should return empty settings when not provided in import data", async () => {
+        it("should return empty settings when not provided in import data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { safeJsonParse } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -342,7 +414,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle non-Error objects in parsing failure", async () => {
+        it("should handle non-Error objects in parsing failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { safeJsonParse } = await import(
                 "../../../../shared/utils/jsonSafety"
             );
@@ -369,7 +449,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("persistImportedData", () => {
-        it("should successfully persist sites and settings in transaction", async () => {
+        it("should successfully persist sites and settings in transaction", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -428,7 +516,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle sites without names during persistence", async () => {
+        it("should handle sites without names during persistence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -451,7 +547,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ]);
         });
 
-        it("should handle empty sites and settings arrays", async () => {
+        it("should handle empty sites and settings arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -475,7 +579,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("importMonitorsWithHistory - Integration Testing", () => {
-        it("should import monitors with history for sites with monitor data", async () => {
+        it("should import monitors with history for sites with monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -556,7 +668,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle sites without monitors gracefully", async () => {
+        it("should handle sites without monitors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -577,7 +697,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle monitor creation errors and continue with other sites", async () => {
+        it("should handle monitor creation errors and continue with other sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -624,7 +752,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should match monitors correctly for history import", async () => {
+        it("should match monitors correctly for history import", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -697,7 +833,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle monitors without IDs during history import", async () => {
+        it("should handle monitors without IDs during history import", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -744,7 +888,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle numeric monitor IDs correctly", async () => {
+        it("should handle numeric monitor IDs correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -797,7 +949,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("Type Guard Function - isImportData", () => {
-        it("should be tested through importDataFromJson integration", async () => {
+        it("should be tested through importDataFromJson integration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { safeJsonParse } = await import("@shared/utils/jsonSafety");
 
             // The type guard is passed to safeJsonParse, so we test it indirectly
@@ -834,7 +994,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("Error Handling Edge Cases", () => {
-        it("should handle withDatabaseOperation errors during persist", async () => {
+        it("should handle withDatabaseOperation errors during persist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -849,7 +1017,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle transaction callback errors", async () => {
+        it("should handle transaction callback errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const transactionError = new Error("Transaction failed");
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 transactionError
@@ -867,7 +1043,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle repository method failures during transaction", async () => {
+        it("should handle repository method failures during transaction", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const deleteError = new Error("Delete operation failed");
             mockRepositories.site.deleteAllInternal.mockImplementation(() => {
                 throw deleteError;
@@ -887,7 +1071,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     });
 
     describe("Integration and Edge Cases", () => {
-        it("should handle complex import data with multiple sites and monitors", async () => {
+        it("should handle complex import data with multiple sites and monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
             const { withDatabaseOperation } = await import(
                 "../../../utils/operationalHooks"
             );
@@ -971,7 +1163,15 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
-        it("should maintain proper error context throughout operations", async () => {
+        it("should maintain proper error context throughout operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test that errors maintain proper context and don't lose information
             const originalError = new Error("Original database error");
             originalError.stack =

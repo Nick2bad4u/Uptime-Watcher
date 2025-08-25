@@ -12,7 +12,15 @@ import {
 
 describe("FormData Types - Complete Function Coverage", () => {
     describe("isHttpFormData", () => {
-        it("should return true for valid HTTP form data", () => {
+        it("should return true for valid HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validData = {
                 type: "http" as const,
                 url: "https://example.com",
@@ -25,15 +33,39 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isHttpFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for wrong type", () => {
+        it("should return false for wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "dns",
                 name: "Test",
@@ -46,7 +78,15 @@ describe("FormData Types - Complete Function Coverage", () => {
     });
 
     describe("isPingFormData (lines 279-280 coverage)", () => {
-        it("should return true for valid ping form data", () => {
+        it("should return true for valid ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validData = {
                 type: "ping" as const,
                 host: "example.com",
@@ -57,19 +97,51 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for non-object", () => {
+        it("should return false for non-object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingFormData("string" as any)).toBe(false);
         });
 
-        it("should return false for wrong type", () => {
+        it("should return false for wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "http",
                 host: "example.com",
@@ -80,7 +152,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(data as any)).toBe(false);
         });
 
-        it("should return false for missing host", () => {
+        it("should return false for missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 checkInterval: 60000,
@@ -90,7 +170,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-string host", () => {
+        it("should return false for non-string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: 123,
@@ -101,7 +189,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number checkInterval", () => {
+        it("should return false for non-number checkInterval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: "example.com",
@@ -112,7 +208,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number retryAttempts", () => {
+        it("should return false for non-number retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: "example.com",
@@ -123,7 +227,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number timeout", () => {
+        it("should return false for non-number timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: "example.com",
@@ -136,7 +248,15 @@ describe("FormData Types - Complete Function Coverage", () => {
     });
 
     describe("isPortFormData (lines 303-306, 321 coverage)", () => {
-        it("should return true for valid port form data", () => {
+        it("should return true for valid port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validData = {
                 type: "port" as const,
                 host: "example.com",
@@ -148,19 +268,51 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for non-object", () => {
+        it("should return false for non-object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortFormData("string" as any)).toBe(false);
         });
 
-        it("should return false for wrong type", () => {
+        it("should return false for wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: "example.com",
@@ -172,7 +324,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for missing host", () => {
+        it("should return false for missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 port: 443,
@@ -183,7 +343,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-string host", () => {
+        it("should return false for non-string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: 123,
@@ -195,7 +363,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for missing port", () => {
+        it("should return false for missing port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -206,7 +382,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number port", () => {
+        it("should return false for non-number port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -218,7 +402,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number checkInterval", () => {
+        it("should return false for non-number checkInterval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -230,7 +422,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number retryAttempts", () => {
+        it("should return false for non-number retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -242,7 +442,15 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(data as any)).toBe(false);
         });
 
-        it("should return false for non-number timeout", () => {
+        it("should return false for non-number timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -256,7 +464,15 @@ describe("FormData Types - Complete Function Coverage", () => {
     });
 
     describe("All Form Data Type Guards Coverage", () => {
-        it("should exercise all form data type guard functions", () => {
+        it("should exercise all form data type guard functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test HTTP form data
             expect(
                 isHttpFormData({

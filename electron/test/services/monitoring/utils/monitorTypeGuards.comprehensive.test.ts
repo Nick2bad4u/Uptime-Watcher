@@ -72,7 +72,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("getMonitorRetryAttempts", () => {
-        it("should return monitor's retry attempts when valid", () => {
+        it("should return monitor's retry attempts when valid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 5 });
 
             const result = getMonitorRetryAttempts(monitor, 3);
@@ -80,7 +88,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(5);
         });
 
-        it("should return default retry attempts when monitor doesn't have them", () => {
+        it("should return default retry attempts when monitor doesn't have them", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createTestMonitor(); // no retryAttempts property
 
             const result = getMonitorRetryAttempts(monitor, 3);
@@ -88,7 +104,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(3);
         });
 
-        it("should return default retry attempts when monitor has invalid retry attempts", () => {
+        it("should return default retry attempts when monitor has invalid retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createTestMonitor({ retryAttempts: -1 });
 
             const result = getMonitorRetryAttempts(monitor, 3);
@@ -96,7 +120,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(3);
         });
 
-        it("should return default retry attempts when retryAttempts is not a number", () => {
+        it("should return default retry attempts when retryAttempts is not a number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({
                 retryAttempts: "invalid" as any,
             });
@@ -106,7 +138,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(2);
         });
 
-        it("should handle zero retry attempts correctly", () => {
+        it("should handle zero retry attempts correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 0 });
 
             const result = getMonitorRetryAttempts(monitor, 3);
@@ -114,7 +154,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(0);
         });
 
-        it("should handle large retry attempts correctly", () => {
+        it("should handle large retry attempts correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 100 });
 
             const result = getMonitorRetryAttempts(monitor, 3);
@@ -122,7 +170,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(100);
         });
 
-        it("should handle undefined retryAttempts property", () => {
+        it("should handle undefined retryAttempts property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({
                 retryAttempts: undefined as any,
             });
@@ -132,7 +188,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(5);
         });
 
-        it("should handle null retryAttempts property", () => {
+        it("should handle null retryAttempts property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: null as any });
 
             const result = getMonitorRetryAttempts(monitor, 4);
@@ -142,7 +206,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("getMonitorTimeout", () => {
-        it("should return monitor's timeout when valid", () => {
+        it("should return monitor's timeout when valid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createTestMonitor({ timeout: 5000 });
 
             const result = getMonitorTimeout(monitor, 3000);
@@ -150,7 +222,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(5000);
         });
 
-        it("should return default timeout when monitor doesn't have one", () => {
+        it("should return default timeout when monitor doesn't have one", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Create a monitor without a timeout property
             const { timeout, ...monitorWithoutTimeout } = createTestMonitor();
             const monitor = monitorWithoutTimeout as Site["monitors"][0];
@@ -160,7 +240,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(3000);
         });
 
-        it("should return default timeout when monitor has invalid timeout", () => {
+        it("should return default timeout when monitor has invalid timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createTestMonitor({ timeout: 0 });
 
             const result = getMonitorTimeout(monitor, 3000);
@@ -168,7 +256,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(3000);
         });
 
-        it("should return default timeout when timeout is negative", () => {
+        it("should return default timeout when timeout is negative", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: -1000 });
 
             const result = getMonitorTimeout(monitor, 3000);
@@ -176,7 +272,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(3000);
         });
 
-        it("should return default timeout when timeout is not a number", () => {
+        it("should return default timeout when timeout is not a number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: "invalid" as any });
 
             const result = getMonitorTimeout(monitor, 2000);
@@ -184,7 +288,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(2000);
         });
 
-        it("should handle very small positive timeout correctly", () => {
+        it("should handle very small positive timeout correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: 1 });
 
             const result = getMonitorTimeout(monitor, 3000);
@@ -192,7 +304,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(1);
         });
 
-        it("should handle large timeout values correctly", () => {
+        it("should handle large timeout values correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: 60_000 });
 
             const result = getMonitorTimeout(monitor, 3000);
@@ -200,7 +320,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(60_000);
         });
 
-        it("should handle undefined timeout property", () => {
+        it("should handle undefined timeout property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: undefined as any });
 
             const result = getMonitorTimeout(monitor, 5000);
@@ -208,7 +336,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(5000);
         });
 
-        it("should handle null timeout property", () => {
+        it("should handle null timeout property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: null as any });
 
             const result = getMonitorTimeout(monitor, 4000);
@@ -218,7 +354,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("hasValidHost", () => {
-        it("should return true for valid FQDN host", () => {
+        it("should return true for valid FQDN host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "example.com" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(true);
@@ -232,7 +376,15 @@ describe("Monitor Type Guards", () => {
             });
         });
 
-        it("should return true for valid hostname that matches regex pattern", () => {
+        it("should return true for valid hostname that matches regex pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "localhost" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(false); // not a FQDN
@@ -246,7 +398,15 @@ describe("Monitor Type Guards", () => {
             });
         });
 
-        it("should return true for valid IP address", () => {
+        it("should return true for valid IP address", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "192.168.1.1" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(false);
@@ -256,7 +416,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(true);
         });
 
-        it("should return true for hostname with hyphens", () => {
+        it("should return true for hostname with hyphens", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "test-server" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(false);
@@ -266,7 +434,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(true);
         });
 
-        it("should return true for hostname with underscores", () => {
+        it("should return true for hostname with underscores", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "test_server" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(false);
@@ -276,7 +452,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when isNonEmptyString returns false", () => {
+        it("should return false when isNonEmptyString returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "" });
             vi.mocked(isNonEmptyString).mockReturnValue(false);
 
@@ -286,7 +470,15 @@ describe("Monitor Type Guards", () => {
             expect(isNonEmptyString).toHaveBeenCalledWith("");
         });
 
-        it("should return false for host with invalid characters", () => {
+        it("should return false for host with invalid characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "invalid@host" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(false);
@@ -296,7 +488,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when host is undefined", () => {
+        it("should return false when host is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: undefined as any });
             vi.mocked(isNonEmptyString).mockReturnValue(false);
 
@@ -305,7 +505,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when host is null", () => {
+        it("should return false when host is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: null as any });
             vi.mocked(isNonEmptyString).mockReturnValue(false);
 
@@ -314,7 +522,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when host is not a string", () => {
+        it("should return false when host is not a string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: 123 as any });
             vi.mocked(isNonEmptyString).mockReturnValue(false);
 
@@ -323,7 +539,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle complex FQDN validation scenarios", () => {
+        it("should handle complex FQDN validation scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const testCases = [
                 { host: "sub.example.com", isValidFQDN: true, expected: true },
                 { host: "example.co.uk", isValidFQDN: true, expected: true },
@@ -344,7 +568,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("hasValidPort", () => {
-        it("should return true for valid port numbers", () => {
+        it("should return true for valid port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPorts = [
                 1,
                 22,
@@ -362,7 +594,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false for port number 0", () => {
+        it("should return false for port number 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ port: 0 });
 
             const result = hasValidPort(monitor);
@@ -370,7 +610,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false for negative port numbers", () => {
+        it("should return false for negative port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidPorts = [
                 -1,
                 -100,
@@ -384,7 +632,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false for port numbers greater than 65_535", () => {
+        it("should return false for port numbers greater than 65_535", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidPorts = [
                 65_536,
                 70_000,
@@ -398,7 +654,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when port is not a number", () => {
+        it("should return false when port is not a number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidPorts = [
                 "80",
                 null,
@@ -415,7 +679,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when port is NaN", () => {
+        it("should return false when port is NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ port: Number.NaN });
 
             const result = hasValidPort(monitor);
@@ -423,7 +695,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when port is Infinity", () => {
+        it("should return false when port is Infinity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = createTestMonitor({ port: Infinity });
 
             const result = hasValidPort(monitor);
@@ -431,7 +711,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when port is -Infinity", () => {
+        it("should return false when port is -Infinity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = createTestMonitor({ port: -Infinity });
 
             const result = hasValidPort(monitor);
@@ -439,7 +727,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle edge cases at boundaries", () => {
+        it("should handle edge cases at boundaries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const edgeCases = [
                 { port: 1, expected: true },
                 { port: 65_535, expected: true },
@@ -454,7 +750,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle floating point numbers", () => {
+        it("should handle floating point numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const floatingPoints = [
                 80.5,
                 443.1,
@@ -472,7 +776,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("hasValidRetryAttempts", () => {
-        it("should return true for valid retry attempts", () => {
+        it("should return true for valid retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRetryAttempts = [
                 0,
                 1,
@@ -489,7 +801,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false for negative retry attempts", () => {
+        it("should return false for negative retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRetryAttempts = [
                 -1,
                 -5,
@@ -503,7 +823,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when retryAttempts is not a number", () => {
+        it("should return false when retryAttempts is not a number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRetryAttempts = [
                 "3",
                 null,
@@ -522,7 +850,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when retryAttempts is NaN", () => {
+        it("should return false when retryAttempts is NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: Number.NaN });
 
             const result = hasValidRetryAttempts(monitor);
@@ -530,7 +866,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when retryAttempts is Infinity", () => {
+        it("should return false when retryAttempts is Infinity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = createTestMonitor({ retryAttempts: Infinity });
 
             const result = hasValidRetryAttempts(monitor);
@@ -538,7 +882,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle floating point retry attempts", () => {
+        it("should handle floating point retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const floatingPoints = [
                 1.5,
                 3.7,
@@ -552,7 +904,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle zero retry attempts specifically", () => {
+        it("should handle zero retry attempts specifically", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 0 });
 
             const result = hasValidRetryAttempts(monitor);
@@ -560,7 +920,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle very large retry attempts", () => {
+        it("should handle very large retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 999_999 });
 
             const result = hasValidRetryAttempts(monitor);
@@ -570,7 +938,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("hasValidTimeout", () => {
-        it("should return true for valid timeout values", () => {
+        it("should return true for valid timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validTimeouts = [
                 1,
                 100,
@@ -587,7 +963,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false for timeout value 0", () => {
+        it("should return false for timeout value 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: 0 });
 
             const result = hasValidTimeout(monitor);
@@ -595,7 +979,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false for negative timeout values", () => {
+        it("should return false for negative timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidTimeouts = [
                 -1,
                 -1000,
@@ -609,7 +1001,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when timeout is not a number", () => {
+        it("should return false when timeout is not a number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidTimeouts = [
                 "1000",
                 null,
@@ -626,7 +1026,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should return false when timeout is NaN", () => {
+        it("should return false when timeout is NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: Number.NaN });
 
             const result = hasValidTimeout(monitor);
@@ -634,7 +1042,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when timeout is Infinity", () => {
+        it("should return false when timeout is Infinity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = createTestMonitor({ timeout: Infinity });
 
             const result = hasValidTimeout(monitor);
@@ -642,7 +1058,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when timeout is -Infinity", () => {
+        it("should return false when timeout is -Infinity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = createTestMonitor({ timeout: -Infinity });
 
             const result = hasValidTimeout(monitor);
@@ -650,7 +1074,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle very small positive timeouts", () => {
+        it("should handle very small positive timeouts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const smallTimeouts = [
                 0.1,
                 0.5,
@@ -664,7 +1096,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle very large timeout values", () => {
+        it("should handle very large timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: 999_999_999 });
 
             const result = hasValidTimeout(monitor);
@@ -672,7 +1112,15 @@ describe("Monitor Type Guards", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle edge case at boundary", () => {
+        it("should handle edge case at boundary", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const edgeCases = [
                 { timeout: 0, expected: false },
                 { timeout: 0.001, expected: true },
@@ -690,7 +1138,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("hasValidUrl", () => {
-        it("should return true when isValidUrl returns true", () => {
+        it("should return true when isValidUrl returns true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: "https://example.com" });
             vi.mocked(isValidUrl).mockReturnValue(true);
 
@@ -700,7 +1156,15 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith("https://example.com");
         });
 
-        it("should return false when isValidUrl returns false", () => {
+        it("should return false when isValidUrl returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: "invalid-url" });
             vi.mocked(isValidUrl).mockReturnValue(false);
 
@@ -710,7 +1174,15 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith("invalid-url");
         });
 
-        it("should handle different URL formats", () => {
+        it("should handle different URL formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const urlTestCases = [
                 { url: "https://example.com", isValid: true, expected: true },
                 {
@@ -744,7 +1216,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle undefined url", () => {
+        it("should handle undefined url", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: undefined as any });
             vi.mocked(isValidUrl).mockReturnValue(false);
 
@@ -754,7 +1234,15 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith(undefined);
         });
 
-        it("should handle null url", () => {
+        it("should handle null url", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: null as any });
             vi.mocked(isValidUrl).mockReturnValue(false);
 
@@ -764,7 +1252,15 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith(null);
         });
 
-        it("should handle non-string url", () => {
+        it("should handle non-string url", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: 123 as any });
             vi.mocked(isValidUrl).mockReturnValue(false);
 
@@ -774,7 +1270,15 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith(123);
         });
 
-        it("should delegate all validation logic to isValidUrl", () => {
+        it("should delegate all validation logic to isValidUrl", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const testUrls = [
                 "https://example.com",
                 "https://test.local",
@@ -799,7 +1303,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("Type guard behavior and integration", () => {
-        it("should properly type narrow with hasValidHost", () => {
+        it("should properly type narrow with hasValidHost", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ host: "example.com" });
             vi.mocked(isNonEmptyString).mockReturnValue(true);
             vi.mocked(isValidFQDN).mockReturnValue(true);
@@ -811,7 +1323,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should properly type narrow with hasValidPort", () => {
+        it("should properly type narrow with hasValidPort", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ port: 443 });
 
             if (hasValidPort(monitor)) {
@@ -821,7 +1341,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should properly type narrow with hasValidRetryAttempts", () => {
+        it("should properly type narrow with hasValidRetryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ retryAttempts: 3 });
 
             if (hasValidRetryAttempts(monitor)) {
@@ -831,7 +1359,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should properly type narrow with hasValidTimeout", () => {
+        it("should properly type narrow with hasValidTimeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ timeout: 5000 });
 
             if (hasValidTimeout(monitor)) {
@@ -841,7 +1377,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should properly type narrow with hasValidUrl", () => {
+        it("should properly type narrow with hasValidUrl", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({ url: "https://example.com" });
             vi.mocked(isValidUrl).mockReturnValue(true);
 
@@ -852,7 +1396,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should work with complex monitor configurations", () => {
+        it("should work with complex monitor configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const complexMonitor = createTestMonitor({
                 host: "api.example.com",
                 port: 443,
@@ -872,7 +1424,15 @@ describe("Monitor Type Guards", () => {
             expect(hasValidUrl(complexMonitor)).toBe(true);
         });
 
-        it("should handle monitors with mixed valid and invalid properties", () => {
+        it("should handle monitors with mixed valid and invalid properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mixedMonitor = createTestMonitor({
                 host: "valid.com", // valid
                 port: -1, // invalid
@@ -894,7 +1454,15 @@ describe("Monitor Type Guards", () => {
     });
 
     describe("Performance and edge cases", () => {
-        it("should handle rapid successive calls efficiently", () => {
+        it("should handle rapid successive calls efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createTestMonitor({
                 host: "test.com",
                 port: 80,
@@ -917,7 +1485,15 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle malformed monitor objects gracefully", () => {
+        it("should handle malformed monitor objects gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const malformedMonitor = {} as Site["monitors"][0];
 
             vi.mocked(isNonEmptyString).mockReturnValue(false);
@@ -931,7 +1507,15 @@ describe("Monitor Type Guards", () => {
             expect(hasValidUrl(malformedMonitor)).toBe(false);
         });
 
-        it("should handle monitors with all properties undefined", () => {
+        it("should handle monitors with all properties undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeGuards", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const undefinedMonitor = createTestMonitor({
                 host: undefined,
                 port: undefined,

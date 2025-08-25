@@ -72,7 +72,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("State Management", () => {
-        it("should initialize with default settings", () => {
+        it("should initialize with default settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const state = useSettingsStore.getState();
             expect(state.settings).toEqual({
                 autoStart: false,
@@ -84,7 +92,15 @@ describe("useSettingsStore", () => {
             });
         });
 
-        it("should update settings", () => {
+        it("should update settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const updates: Partial<AppSettings> = {
                 notifications: false,
                 soundAlerts: true,
@@ -100,7 +116,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.autoStart).toBe(false); // unchanged
         });
 
-        it("should reset settings to defaults", async () => {
+        it("should reset settings to defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Configure mocks for reset operation
             mockElectronAPI.settings.resetSettings.mockResolvedValue({
                 success: true,
@@ -134,7 +158,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("initializeSettings", () => {
-        it("should initialize settings from backend", async () => {
+        it("should initialize settings from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 250,
@@ -148,7 +180,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.historyLimit).toBe(250);
         });
 
-        it("should handle initialization errors", async () => {
+        it("should handle initialization errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
                 new Error("Backend error")
             );
@@ -160,21 +200,45 @@ describe("useSettingsStore", () => {
     });
 
     describe("Setting Individual Properties", () => {
-        it("should update autoStart via updateSettings", () => {
+        it("should update autoStart via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore.getState().updateSettings({ autoStart: true });
 
             const state = useSettingsStore.getState();
             expect(state.settings.autoStart).toBe(true);
         });
 
-        it("should update historyLimit via updateSettings", () => {
+        it("should update historyLimit via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore.getState().updateSettings({ historyLimit: 500 });
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(500);
         });
 
-        it("should update minimizeToTray via updateSettings", () => {
+        it("should update minimizeToTray via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore
                 .getState()
                 .updateSettings({ minimizeToTray: false });
@@ -183,7 +247,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.minimizeToTray).toBe(false);
         });
 
-        it("should update notifications via updateSettings", () => {
+        it("should update notifications via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore
                 .getState()
                 .updateSettings({ notifications: false });
@@ -192,14 +264,30 @@ describe("useSettingsStore", () => {
             expect(state.settings.notifications).toBe(false);
         });
 
-        it("should update soundAlerts via updateSettings", () => {
+        it("should update soundAlerts via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore.getState().updateSettings({ soundAlerts: true });
 
             const state = useSettingsStore.getState();
             expect(state.settings.soundAlerts).toBe(true);
         });
 
-        it("should update theme via updateSettings", () => {
+        it("should update theme via updateSettings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             useSettingsStore.getState().updateSettings({ theme: "dark" });
 
             const state = useSettingsStore.getState();
@@ -208,7 +296,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("updateHistoryLimitValue", () => {
-        it("should update history limit with backend sync", async () => {
+        it("should update history limit with backend sync", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
                 undefined
             );
@@ -228,7 +324,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.historyLimit).toBe(300);
         });
 
-        it("should handle backend errors when updating history limit", async () => {
+        it("should handle backend errors when updating history limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
                 new Error("Backend error")
             );
@@ -240,7 +344,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Persistence", () => {
-        it("should persist settings changes", () => {
+        it("should persist settings changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalSettings = useSettingsStore.getState().settings;
 
             useSettingsStore.getState().updateSettings({
@@ -258,7 +370,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle partial updates", () => {
+        it("should handle partial updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const originalSettings = useSettingsStore.getState().settings;
 
             useSettingsStore.getState().updateSettings({
@@ -281,7 +401,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.theme).toBe(originalSettings.theme);
         });
 
-        it("should handle empty updates", () => {
+        it("should handle empty updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const originalSettings = useSettingsStore.getState().settings;
 
             useSettingsStore.getState().updateSettings({});
@@ -290,7 +418,15 @@ describe("useSettingsStore", () => {
             expect(state.settings).toEqual(originalSettings);
         });
 
-        it("should handle invalid theme values gracefully", () => {
+        it("should handle invalid theme values gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // TypeScript would prevent this, but testing runtime behavior
             useSettingsStore.getState().updateSettings({
                 theme: "invalid-theme" as never,
@@ -300,21 +436,45 @@ describe("useSettingsStore", () => {
             expect(state.settings.theme).toBe("invalid-theme");
         });
 
-        it("should handle negative historyLimit", () => {
+        it("should handle negative historyLimit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             useSettingsStore.getState().updateSettings({ historyLimit: -10 });
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(-10);
         });
 
-        it("should handle zero historyLimit", () => {
+        it("should handle zero historyLimit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             useSettingsStore.getState().updateSettings({ historyLimit: 0 });
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(0);
         });
 
-        it("should handle very large historyLimit", () => {
+        it("should handle very large historyLimit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             useSettingsStore
                 .getState()
                 .updateSettings({ historyLimit: 999_999 });
@@ -325,7 +485,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Store Behavior", () => {
-        it("should maintain state across multiple calls", () => {
+        it("should maintain state across multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             useSettingsStore.getState().updateSettings({ autoStart: true });
             useSettingsStore
                 .getState()
@@ -338,7 +506,15 @@ describe("useSettingsStore", () => {
             expect(state.settings.theme).toBe("dark");
         });
 
-        it("should allow chaining updates", () => {
+        it("should allow chaining updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const store = useSettingsStore.getState();
 
             store.updateSettings({ autoStart: true });
@@ -355,7 +531,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Type Safety", () => {
-        it("should accept valid theme values", () => {
+        it("should accept valid theme values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validThemes = [
                 "system",
                 "light",
@@ -369,7 +553,15 @@ describe("useSettingsStore", () => {
             }
         });
 
-        it("should handle boolean settings correctly", () => {
+        it("should handle boolean settings correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const store = useSettingsStore.getState();
 
             // Test autoStart

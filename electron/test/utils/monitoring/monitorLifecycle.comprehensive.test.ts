@@ -114,7 +114,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     });
 
     describe("startAllMonitoring", () => {
-        it("should return current state when monitoring is already running", async () => {
+        it("should return current state when monitoring is already running", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await startAllMonitoring(config, true);
 
             expect(result).toBe(true);
@@ -123,7 +131,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should start monitoring for all sites and monitors", async () => {
+        it("should start monitoring for all sites and monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor1 = createMockMonitor("monitor1");
             const monitor2 = createMockMonitor("monitor2");
             const site1 = createMockSite("site1", [monitor1]);
@@ -161,7 +177,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle monitors without IDs gracefully", async () => {
+        it("should handle monitors without IDs gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorWithoutId = createMockMonitor("");
             monitorWithoutId.id = undefined as any;
             const site = createMockSite("site1", [monitorWithoutId]);
@@ -175,7 +199,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockMonitorScheduler.startSite).toHaveBeenCalledWith(site);
         });
 
-        it("should handle database errors during monitor updates", async () => {
+        it("should handle database errors during monitor updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -193,7 +225,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle empty sites cache", async () => {
+        it("should handle empty sites cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const result = await startAllMonitoring(config, false);
 
             expect(result).toBe(true);
@@ -205,7 +245,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     });
 
     describe("startMonitoringForSite", () => {
-        it("should return false when site is not found", async () => {
+        it("should return false when site is not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await startMonitoringForSite(
                 config,
                 "nonexistent-site"
@@ -217,7 +265,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should start monitoring for specific monitor when monitorId provided", async () => {
+        it("should start monitoring for specific monitor when monitorId provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -247,7 +303,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should start monitoring for all site monitors when no monitorId provided", async () => {
+        it("should start monitoring for all site monitors when no monitorId provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor1 = createMockMonitor("monitor1");
             const monitor2 = createMockMonitor("monitor2");
             const site = createMockSite("site1", [monitor1, monitor2]);
@@ -261,7 +325,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle monitor not found in site", async () => {
+        it("should handle monitor not found in site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -279,7 +351,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should use callback for recursive operations", async () => {
+        it("should use callback for recursive operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -302,7 +382,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     });
 
     describe("stopAllMonitoring", () => {
-        it("should stop monitoring for all sites and set monitors to paused", async () => {
+        it("should stop monitoring for all sites and set monitors to paused", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor1 = createMockMonitor(
                 "monitor1",
                 true,
@@ -344,7 +432,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle monitors without IDs gracefully", async () => {
+        it("should handle monitors without IDs gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorWithoutId = createMockMonitor("", true);
             monitorWithoutId.id = undefined as any;
             const site = createMockSite("site1", [monitorWithoutId]);
@@ -358,7 +454,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockMonitorScheduler.stopAll).toHaveBeenCalledOnce();
         });
 
-        it("should handle database errors during monitor updates", async () => {
+        it("should handle database errors during monitor updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = createMockMonitor("monitor1", true);
             const site = createMockSite("site1", [monitor]);
 
@@ -376,14 +480,30 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle empty sites cache", async () => {
+        it("should handle empty sites cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const result = await stopAllMonitoring(config);
 
             expect(result).toBe(false);
             expect(mockMonitorScheduler.stopAll).toHaveBeenCalledOnce();
         });
 
-        it("should only update monitors that are currently monitoring", async () => {
+        it("should only update monitors that are currently monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const monitorActive = createMockMonitor(
                 "monitor1",
                 true,
@@ -419,7 +539,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     });
 
     describe("stopMonitoringForSite", () => {
-        it("should return false when site is not found", async () => {
+        it("should return false when site is not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await stopMonitoringForSite(
                 config,
                 "nonexistent-site"
@@ -431,7 +559,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should stop monitoring for specific monitor when monitorId provided", async () => {
+        it("should stop monitoring for specific monitor when monitorId provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor(
                 "monitor1",
                 true,
@@ -465,7 +601,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should stop monitoring for all site monitors when no monitorId provided", async () => {
+        it("should stop monitoring for all site monitors when no monitorId provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor1 = createMockMonitor(
                 "monitor1",
                 true,
@@ -487,7 +631,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle monitor not found in site", async () => {
+        it("should handle monitor not found in site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor("monitor1");
             const site = createMockSite("site1", [monitor]);
 
@@ -505,7 +657,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should only stop monitors that are currently monitoring", async () => {
+        it("should only stop monitors that are currently monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorActive = createMockMonitor(
                 "monitor1",
                 true,
@@ -539,7 +699,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockCallback).toHaveBeenCalledTimes(2);
         });
 
-        it("should use callback for recursive operations", async () => {
+        it("should use callback for recursive operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor("monitor1", true);
             const site = createMockSite("site1", [monitor]);
 
@@ -560,7 +728,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockCallback).toHaveBeenCalledWith("site1", "monitor1");
         });
 
-        it("should handle database errors during stop operations", async () => {
+        it("should handle database errors during stop operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = createMockMonitor("monitor1", true);
             const site = createMockSite("site1", [monitor]);
 
@@ -584,7 +760,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle undefined monitor properties gracefully", async () => {
+        it("should handle undefined monitor properties gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = {
                 type: "http",
                 url: "https://example.com",
@@ -599,7 +783,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockMonitorRepository.updateInternal).not.toHaveBeenCalled();
         });
 
-        it("should handle sites with empty monitor arrays", async () => {
+        it("should handle sites with empty monitor arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite("site1", []);
 
             mockSitesCache.set("site1", site);
@@ -611,7 +803,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             expect(mockMonitorRepository.updateInternal).not.toHaveBeenCalled();
         });
 
-        it("should handle database service returning null", async () => {
+        it("should handle database service returning null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockDatabaseService.getDatabase = vi.fn().mockReturnValue(null);
 
             const monitor = createMockMonitor("monitor1");
@@ -632,7 +832,15 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle concurrent operations", async () => {
+        it("should handle concurrent operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor1 = createMockMonitor("monitor1");
             const monitor2 = createMockMonitor("monitor2");
             const site = createMockSite("site1", [monitor1, monitor2]);

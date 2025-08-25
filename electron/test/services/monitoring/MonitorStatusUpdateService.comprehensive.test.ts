@@ -111,13 +111,29 @@ describe("MonitorStatusUpdateService", () => {
     });
 
     describe("Constructor", () => {
-        it("should create instance with all required dependencies", () => {
+        it("should create instance with all required dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(service).toBeInstanceOf(MonitorStatusUpdateService);
         });
     });
 
     describe("updateMonitorStatus", () => {
-        it("should successfully update monitor status when operation is valid", async () => {
+        it("should successfully update monitor status when operation is valid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             // Arrange
             const testMonitor = createTestMonitor();
             const testResult = createTestResult();
@@ -158,7 +174,15 @@ describe("MonitorStatusUpdateService", () => {
             ).toHaveBeenCalledWith("op-123");
         });
 
-        it("should return false when operation is invalid", async () => {
+        it("should return false when operation is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const testResult = createTestResult();
             mockOperationRegistry.validateOperation.mockReturnValue(false);
@@ -176,7 +200,15 @@ describe("MonitorStatusUpdateService", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should return false when monitor is not found", async () => {
+        it("should return false when monitor is not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Arrange
             const testResult = createTestResult();
             mockOperationRegistry.validateOperation.mockReturnValue(true);
@@ -192,7 +224,15 @@ describe("MonitorStatusUpdateService", () => {
             ).toHaveBeenCalledWith("op-123");
         });
 
-        it("should return false when monitor is not actively monitoring", async () => {
+        it("should return false when monitor is not actively monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Arrange
             const testMonitor = createTestMonitor({ monitoring: false });
             const testResult = createTestResult();
@@ -211,7 +251,15 @@ describe("MonitorStatusUpdateService", () => {
             ).toHaveBeenCalledWith("op-123");
         });
 
-        it("should handle 'down' status correctly", async () => {
+        it("should handle 'down' status correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const testMonitor = createTestMonitor();
             const testResult = createTestResult({ status: "down" });
@@ -240,7 +288,15 @@ describe("MonitorStatusUpdateService", () => {
             );
         });
 
-        it("should handle monitor with no active operations", async () => {
+        it("should handle monitor with no active operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Arrange
             const testMonitor = createTestMonitor({
                 activeOperations: [],
@@ -271,7 +327,15 @@ describe("MonitorStatusUpdateService", () => {
             );
         });
 
-        it("should handle database errors gracefully", async () => {
+        it("should handle database errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const testMonitor = createTestMonitor();
             const testResult = createTestResult();
@@ -293,7 +357,15 @@ describe("MonitorStatusUpdateService", () => {
             ).toHaveBeenCalledWith("op-123");
         });
 
-        it("should handle site not found in cache", async () => {
+        it("should handle site not found in cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Caching", "type");
+
             // Arrange
             const testMonitor = createTestMonitor();
             const testResult = createTestResult();
@@ -313,7 +385,15 @@ describe("MonitorStatusUpdateService", () => {
             expect(mockSitesCache.set).not.toHaveBeenCalled();
         });
 
-        it("should handle cache refresh errors gracefully", async () => {
+        it("should handle cache refresh errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const testMonitor = createTestMonitor();
             const testSite = createTestSite();
@@ -339,7 +419,15 @@ describe("MonitorStatusUpdateService", () => {
     });
 
     describe("StatusUpdateMonitorCheckResult interface", () => {
-        it("should support all required fields", () => {
+        it("should support all required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result: StatusUpdateMonitorCheckResult = {
                 monitorId: "test-monitor",
                 operationId: "test-operation",
@@ -355,7 +443,15 @@ describe("MonitorStatusUpdateService", () => {
             expect(result.timestamp).toBeInstanceOf(Date);
         });
 
-        it("should support optional fields", () => {
+        it("should support optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result: StatusUpdateMonitorCheckResult = {
                 monitorId: "test-monitor",
                 operationId: "test-operation",

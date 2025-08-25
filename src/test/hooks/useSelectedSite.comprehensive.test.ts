@@ -82,7 +82,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should return undefined when no site is selected", () => {
+        it("should return undefined when no site is selected", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue(null); // selectedSiteId is null
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -94,7 +102,15 @@ describe("useSelectedSite", () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should return undefined when selectedSiteId is undefined", () => {
+        it("should return undefined when selectedSiteId is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue(undefined); // selectedSiteId is undefined
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -106,7 +122,15 @@ describe("useSelectedSite", () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should return undefined when selectedSiteId is empty string", () => {
+        it("should return undefined when selectedSiteId is empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue(""); // selectedSiteId is empty string
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -118,7 +142,15 @@ describe("useSelectedSite", () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should return the correct site when a valid site is selected", () => {
+        it("should return the correct site when a valid site is selected", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-2");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -132,7 +164,15 @@ describe("useSelectedSite", () => {
             expect(result.current?.name).toBe("Test Site 2");
         });
 
-        it("should return undefined when selected site does not exist in sites array", () => {
+        it("should return undefined when selected site does not exist in sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("non-existent-site");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -146,7 +186,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Store Integration", () => {
-        it("should call useUIStore with correct selector", () => {
+        it("should call useUIStore with correct selector", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -166,7 +214,15 @@ describe("useSelectedSite", () => {
             expect(selector(mockState)).toBe("test-id");
         });
 
-        it("should call useSitesStore with correct selector", () => {
+        it("should call useSitesStore with correct selector", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -187,7 +243,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Memoization Behavior", () => {
-        it("should use useMemo with correct dependencies", () => {
+        it("should use useMemo with correct dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const selectedSiteId = "site-1";
             mockUseUIStore.mockReturnValue(selectedSiteId);
@@ -203,7 +267,15 @@ describe("useSelectedSite", () => {
             ]);
         });
 
-        it("should pass correct computation function to useMemo", () => {
+        it("should pass correct computation function to useMemo", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const selectedSiteId = "site-2";
             mockUseUIStore.mockReturnValue(selectedSiteId);
@@ -222,7 +294,15 @@ describe("useSelectedSite", () => {
             expect(result).toEqual(mockSites[1]);
         });
 
-        it("should handle memoization with null selectedSiteId", () => {
+        it("should handle memoization with null selectedSiteId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue(null);
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -244,7 +324,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty sites array", () => {
+        it("should handle empty sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue([]);
@@ -256,7 +344,15 @@ describe("useSelectedSite", () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should handle undefined sites array", () => {
+        it("should handle undefined sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(undefined as any);
@@ -267,7 +363,15 @@ describe("useSelectedSite", () => {
             }).toThrow("Cannot read properties of undefined");
         });
 
-        it("should handle null sites array", () => {
+        it("should handle null sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(null as any);
@@ -278,7 +382,15 @@ describe("useSelectedSite", () => {
             }).toThrow("Cannot read properties of null");
         });
 
-        it("should handle sites with malformed identifiers", () => {
+        it("should handle sites with malformed identifiers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const malformedSites = [
                 { identifier: null, name: "Bad Site 1" },
@@ -298,7 +410,15 @@ describe("useSelectedSite", () => {
             expect(result.current?.identifier).toBe("site-1");
         });
 
-        it("should handle very large sites array efficiently", () => {
+        it("should handle very large sites array efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const largeSitesArray = Array.from({ length: 10_000 }, (_, i) => ({
                 identifier: `site-${i}`,
@@ -335,7 +455,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("State Changes", () => {
-        it("should update when selectedSiteId changes", () => {
+        it("should update when selectedSiteId changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             // Arrange
             mockUseSitesStore.mockReturnValue(mockSites);
             mockUseUIStore.mockReturnValue("site-1");
@@ -354,7 +482,15 @@ describe("useSelectedSite", () => {
             expect(result.current?.identifier).toBe("site-2");
         });
 
-        it("should update when sites array changes", () => {
+        it("should update when sites array changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -383,7 +519,15 @@ describe("useSelectedSite", () => {
             expect(result.current?.name).toBe("Updated Site 1");
         });
 
-        it("should clear selection when selected site is removed from sites", () => {
+        it("should clear selection when selected site is removed from sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-2");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -407,7 +551,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Type Safety", () => {
-        it("should return correct TypeScript types", () => {
+        it("should return correct TypeScript types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -424,7 +576,15 @@ describe("useSelectedSite", () => {
             }
         });
 
-        it("should handle undefined return type correctly", () => {
+        it("should handle undefined return type correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockUseUIStore.mockReturnValue(null);
             mockUseSitesStore.mockReturnValue(mockSites);
@@ -444,7 +604,15 @@ describe("useSelectedSite", () => {
     });
 
     describe("Performance", () => {
-        it("should not cause unnecessary recalculations with same dependencies", () => {
+        it("should not cause unnecessary recalculations with same dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSelectedSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const selectedSiteId = "site-1";
             mockUseUIStore.mockReturnValue(selectedSiteId);

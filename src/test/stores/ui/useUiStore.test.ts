@@ -65,7 +65,15 @@ describe("useUIStore", () => {
     });
 
     describe("Initial State", () => {
-        it("should initialize with correct default values", () => {
+        it("should initialize with correct default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             expect(result.current.activeSiteDetailsTab).toBe("site-overview");
@@ -76,7 +84,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
         });
 
-        it("should have all required action methods", () => {
+        it("should have all required action methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             expect(typeof result.current.setActiveSiteDetailsTab).toBe(
@@ -95,7 +111,15 @@ describe("useUIStore", () => {
     });
 
     describe("Site Details Tab Management", () => {
-        it("should set active site details tab", () => {
+        it("should set active site details tab", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -105,7 +129,15 @@ describe("useUIStore", () => {
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
         });
 
-        it("should handle different tab names", () => {
+        it("should handle different tab names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const tabs = [
@@ -123,7 +155,15 @@ describe("useUIStore", () => {
             }
         });
 
-        it("should handle empty string tab", () => {
+        it("should handle empty string tab", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -133,7 +173,15 @@ describe("useUIStore", () => {
             expect(result.current.activeSiteDetailsTab).toBe("");
         });
 
-        it("should handle special characters in tab names", () => {
+        it("should handle special characters in tab names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const specialTab = "tab-with-special-chars!@#$%";
@@ -147,7 +195,15 @@ describe("useUIStore", () => {
     });
 
     describe("Site Selection Management", () => {
-        it("should set selected site with site object", () => {
+        it("should set selected site with site object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -157,7 +213,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBe(mockSite.identifier);
         });
 
-        it("should clear selected site with undefined", () => {
+        it("should clear selected site with undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // First set a site
@@ -173,7 +237,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBeUndefined();
         });
 
-        it("should handle site with different identifier", () => {
+        it("should handle site with different identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const differentSite: Site = {
@@ -188,7 +260,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBe("different-site-456");
         });
 
-        it("should handle site with empty identifier", () => {
+        it("should handle site with empty identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const emptySite: Site = {
@@ -203,7 +283,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBe("");
         });
 
-        it("should overwrite previous selection", () => {
+        it("should overwrite previous selection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const site1: Site = { ...mockSite, identifier: "site-1" };
@@ -222,7 +310,15 @@ describe("useUIStore", () => {
     });
 
     describe("Advanced Metrics Visibility", () => {
-        it("should show advanced metrics", () => {
+        it("should show advanced metrics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -232,7 +328,15 @@ describe("useUIStore", () => {
             expect(result.current.showAdvancedMetrics).toBe(true);
         });
 
-        it("should hide advanced metrics", () => {
+        it("should hide advanced metrics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // First show them
@@ -248,7 +352,15 @@ describe("useUIStore", () => {
             expect(result.current.showAdvancedMetrics).toBe(false);
         });
 
-        it("should toggle advanced metrics multiple times", () => {
+        it("should toggle advanced metrics multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             for (let i = 0; i < 5; i++) {
@@ -266,7 +378,15 @@ describe("useUIStore", () => {
     });
 
     describe("Settings Modal Management", () => {
-        it("should show settings modal", () => {
+        it("should show settings modal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -276,7 +396,15 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(true);
         });
 
-        it("should hide settings modal", () => {
+        it("should hide settings modal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // First show it
@@ -292,7 +420,15 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(false);
         });
 
-        it("should toggle settings modal multiple times", () => {
+        it("should toggle settings modal multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             for (let i = 0; i < 3; i++) {
@@ -310,7 +446,15 @@ describe("useUIStore", () => {
     });
 
     describe("Site Details Modal Management", () => {
-        it("should show site details modal", () => {
+        it("should show site details modal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -320,7 +464,15 @@ describe("useUIStore", () => {
             expect(result.current.showSiteDetails).toBe(true);
         });
 
-        it("should hide site details modal", () => {
+        it("should hide site details modal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // First show it
@@ -336,7 +488,15 @@ describe("useUIStore", () => {
             expect(result.current.showSiteDetails).toBe(false);
         });
 
-        it("should handle simultaneous modal states", () => {
+        it("should handle simultaneous modal states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -350,7 +510,15 @@ describe("useUIStore", () => {
     });
 
     describe("Chart Time Range Management", () => {
-        it("should set chart time range to 1h", () => {
+        it("should set chart time range to 1h", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -360,7 +528,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("1h");
         });
 
-        it("should set chart time range to 24h", () => {
+        it("should set chart time range to 24h", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -370,7 +546,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
         });
 
-        it("should set chart time range to 7d", () => {
+        it("should set chart time range to 7d", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -380,7 +564,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
 
-        it("should set chart time range to 30d", () => {
+        it("should set chart time range to 30d", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -390,7 +582,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("30d");
         });
 
-        it("should handle all valid time ranges", () => {
+        it("should handle all valid time ranges", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const timeRanges = [
@@ -408,7 +608,15 @@ describe("useUIStore", () => {
             }
         });
 
-        it("should change time range multiple times", () => {
+        it("should change time range multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -429,7 +637,15 @@ describe("useUIStore", () => {
     });
 
     describe("State Persistence and Reactivity", () => {
-        it("should maintain state across multiple hook instances", () => {
+        it("should maintain state across multiple hook instances", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: result1 } = renderHook(() => useUIStore());
             const { result: result2 } = renderHook(() => useUIStore());
 
@@ -440,7 +656,15 @@ describe("useUIStore", () => {
             expect(result2.current.showAdvancedMetrics).toBe(true);
         });
 
-        it("should react to state changes immediately", () => {
+        it("should react to state changes immediately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             expect(result.current.showSettings).toBe(false);
@@ -452,7 +676,15 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(true);
         });
 
-        it("should handle rapid state changes", () => {
+        it("should handle rapid state changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
@@ -472,7 +704,15 @@ describe("useUIStore", () => {
     });
 
     describe("Complex Scenarios", () => {
-        it("should handle full workflow scenario", () => {
+        it("should handle full workflow scenario", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // User opens settings
@@ -530,7 +770,15 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
 
-        it("should handle multiple site selections", () => {
+        it("should handle multiple site selections", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const sites = [
@@ -553,7 +801,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBeUndefined();
         });
 
-        it("should handle edge case with multiple simultaneous changes", () => {
+        it("should handle edge case with multiple simultaneous changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // Simulate rapid UI interactions
@@ -574,7 +830,15 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(false);
         });
 
-        it("should maintain independent state for different properties", () => {
+        it("should maintain independent state for different properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // Set some state
@@ -605,7 +869,15 @@ describe("useUIStore", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle setting same values multiple times", () => {
+        it("should handle setting same values multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // Set the same value multiple times
@@ -624,7 +896,15 @@ describe("useUIStore", () => {
             }
         });
 
-        it("should handle undefined site selection gracefully", () => {
+        it("should handle undefined site selection gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             // Set a site first
@@ -642,7 +922,15 @@ describe("useUIStore", () => {
             expect(result.current.selectedSiteId).toBeUndefined();
         });
 
-        it("should handle boolean state transitions correctly", () => {
+        it("should handle boolean state transitions correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUIStore());
 
             const booleanActions = [

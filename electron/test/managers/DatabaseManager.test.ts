@@ -211,18 +211,43 @@ describe("DatabaseManager", () => {
     });
 
     describe("Constructor", () => {
-        it("should create DatabaseManager with valid dependencies", () => {
+        it("should create DatabaseManager with valid dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(databaseManager).toBeDefined();
             expect(databaseManager.getHistoryLimit()).toBe(500);
         });
 
-        it("should initialize with default history limit", () => {
+        it("should initialize with default history limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(databaseManager.getHistoryLimit()).toBe(500);
         });
     });
 
     describe("Backup Operations", () => {
-        it("should download backup successfully", async () => {
+        it("should download backup successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Backup Operation", "type");
+            await annotate("Operation: Download", "operation");
+
             // Mock the LoggerAdapter
             const mockLoggerAdapter = {
                 debug: vi.fn(),

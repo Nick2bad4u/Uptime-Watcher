@@ -46,7 +46,15 @@ describe("ElectronUtils", () => {
     });
 
     describe("isDev", () => {
-        it("should return true when both isDevelopment is true and app is not packaged", () => {
+        it("should return true when both isDevelopment is true and app is not packaged", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -59,7 +67,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledOnce();
         });
 
-        it("should return false when isDevelopment is true but app is packaged", () => {
+        it("should return false when isDevelopment is true but app is packaged", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = true;
@@ -72,7 +88,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledOnce();
         });
 
-        it("should return false when isDevelopment is false and app is not packaged", () => {
+        it("should return false when isDevelopment is false and app is not packaged", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
             (app as any).isPackaged = false;
@@ -85,7 +109,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledOnce();
         });
 
-        it("should return false when both isDevelopment is false and app is packaged", () => {
+        it("should return false when both isDevelopment is false and app is packaged", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
             (app as any).isPackaged = true;
@@ -98,7 +130,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledOnce();
         });
 
-        it("should always call isDevelopment function", () => {
+        it("should always call isDevelopment function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
             (app as any).isPackaged = true;
@@ -111,7 +151,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledWith();
         });
 
-        it("should handle edge case with boolean type checking", () => {
+        it("should handle edge case with boolean type checking", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange - test boolean coercion
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -124,7 +172,15 @@ describe("ElectronUtils", () => {
             expect(result).toBe(true);
         });
 
-        it("should return consistent results for same input conditions", () => {
+        it("should return consistent results for same input conditions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -140,7 +196,15 @@ describe("ElectronUtils", () => {
             expect(result1).toBe(true);
         });
 
-        it("should properly use logical AND operation", () => {
+        it("should properly use logical AND operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange & Act & Assert - test all truth table combinations
             const testCases = [
                 {
@@ -180,7 +244,15 @@ describe("ElectronUtils", () => {
             }
         });
 
-        it("should handle isDevelopment returning different truthy/falsy values", () => {
+        it("should handle isDevelopment returning different truthy/falsy values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with different truthy values
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -191,7 +263,15 @@ describe("ElectronUtils", () => {
             expect(isDev()).toBe(false);
         });
 
-        it("should handle app.isPackaged with different truthy/falsy values", () => {
+        it("should handle app.isPackaged with different truthy/falsy values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
 
@@ -206,7 +286,15 @@ describe("ElectronUtils", () => {
     });
 
     describe("Function behavior and integration", () => {
-        it("should properly integrate with Electron app module", () => {
+        it("should properly integrate with Electron app module", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -220,7 +308,15 @@ describe("ElectronUtils", () => {
             expect(app.isPackaged).toBeDefined();
         });
 
-        it("should properly integrate with shared environment utilities", () => {
+        it("should properly integrate with shared environment utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -233,7 +329,15 @@ describe("ElectronUtils", () => {
             expect(isDevelopment).toHaveBeenCalledOnce();
         });
 
-        it("should return boolean type for all valid inputs", () => {
+        it("should return boolean type for all valid inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testCases = [
                 { isDev: true, isPackaged: false },
                 { isDev: true, isPackaged: true },
@@ -255,7 +359,15 @@ describe("ElectronUtils", () => {
     });
 
     describe("Performance and reliability", () => {
-        it("should execute quickly and not have performance issues", () => {
+        it("should execute quickly and not have performance issues", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;
@@ -269,7 +381,15 @@ describe("ElectronUtils", () => {
             expect(endTime - startTime).toBeLessThan(10); // Should complete in under 10ms
         });
 
-        it("should handle multiple rapid calls without issues", () => {
+        it("should handle multiple rapid calls without issues", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: electronUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
             (app as any).isPackaged = false;

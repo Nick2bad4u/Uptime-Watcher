@@ -70,14 +70,30 @@ describe("PingMonitor", () => {
     });
 
     describe("constructor", () => {
-        it("should initialize with default configuration when no config provided", () => {
+        it("should initialize with default configuration when no config provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = new PingMonitor();
             const config = monitor.getConfig();
 
             expect(config.timeout).toBe(10_000); // DEFAULT_REQUEST_TIMEOUT
         });
 
-        it("should merge provided configuration with defaults", () => {
+        it("should merge provided configuration with defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customConfig: MonitorConfig = {
                 timeout: 15_000,
             };
@@ -87,7 +103,15 @@ describe("PingMonitor", () => {
             expect(config.timeout).toBe(15_000);
         });
 
-        it("should override only specified configuration values", () => {
+        it("should override only specified configuration values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const partialConfig: MonitorConfig = {
                 timeout: 20_000,
             };
@@ -99,13 +123,29 @@ describe("PingMonitor", () => {
     });
 
     describe("getType", () => {
-        it("should return 'ping' as the monitor type", () => {
+        it("should return 'ping' as the monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(pingMonitor.getType()).toBe("ping");
         });
     });
 
     describe("updateConfig", () => {
-        it("should update configuration values", () => {
+        it("should update configuration values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             const newConfig: Partial<MonitorConfig> = {
                 timeout: 8000,
             };
@@ -116,7 +156,15 @@ describe("PingMonitor", () => {
             expect(config.timeout).toBe(8000);
         });
 
-        it("should only update specified configuration values", () => {
+        it("should only update specified configuration values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             const partialUpdate: Partial<MonitorConfig> = {
                 timeout: 12_000,
             };
@@ -147,7 +195,15 @@ describe("PingMonitor", () => {
             mockPerformPingCheckWithRetry.mockResolvedValue(successResult);
         });
 
-        it("should successfully ping a valid host", async () => {
+        it("should successfully ping a valid host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockPingMonitor({
                 host: "google.com",
                 timeout: 5000,
@@ -164,7 +220,15 @@ describe("PingMonitor", () => {
             );
         });
 
-        it("should reject non-ping monitor types", async () => {
+        it("should reject non-ping monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor = createMockPingMonitor({
                 type: "http" as any,
             });
@@ -175,7 +239,15 @@ describe("PingMonitor", () => {
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
         });
 
-        it("should reject monitors without valid host", async () => {
+        it("should reject monitors without valid host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor = createMockPingMonitor({
                 host: "",
             });
@@ -187,7 +259,15 @@ describe("PingMonitor", () => {
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
         });
 
-        it("should handle ping failure", async () => {
+        it("should handle ping failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockPerformPingCheckWithRetry.mockResolvedValue(failureResult);
             const monitor = createMockPingMonitor();
 
@@ -197,7 +277,15 @@ describe("PingMonitor", () => {
             expect(result.status).toBe("down");
         });
 
-        it("should use monitor-specific timeout and retry settings", async () => {
+        it("should use monitor-specific timeout and retry settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockPingMonitor({
                 host: "test.example.com",
                 timeout: 8000,
@@ -213,7 +301,15 @@ describe("PingMonitor", () => {
             );
         });
 
-        it("should handle different host types", async () => {
+        it("should handle different host types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testCases = [
                 { host: "example.com", description: "domain name" },
                 { host: "192.168.1.1", description: "IPv4 address" },
@@ -234,7 +330,15 @@ describe("PingMonitor", () => {
             }
         });
 
-        it("should propagate ping retry errors", async () => {
+        it("should propagate ping retry errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Network unreachable");
             mockPerformPingCheckWithRetry.mockRejectedValue(error);
 
@@ -247,7 +351,15 @@ describe("PingMonitor", () => {
     });
 
     describe("configuration edge cases", () => {
-        it("should handle undefined timeout gracefully", async () => {
+        it("should handle undefined timeout gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockPingMonitor({
                 timeout: undefined as any,
             });
@@ -262,7 +374,15 @@ describe("PingMonitor", () => {
             );
         });
 
-        it("should handle undefined retry attempts gracefully", async () => {
+        it("should handle undefined retry attempts gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockPingMonitor({
                 retryAttempts: undefined as any,
             });
@@ -290,7 +410,15 @@ describe("PingMonitor", () => {
             mockPerformPingCheckWithRetry.mockResolvedValue(successResult);
         });
 
-        it("should complete quickly for successful pings", async () => {
+        it("should complete quickly for successful pings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockPingMonitor();
             const startTime = Date.now();
 
@@ -300,7 +428,15 @@ describe("PingMonitor", () => {
             expect(duration).toBeLessThan(100); // Should be very fast since we're mocking
         });
 
-        it("should handle concurrent ping checks", async () => {
+        it("should handle concurrent ping checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PingMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor1 = createMockPingMonitor({ host: "host1.com" });
             const monitor2 = createMockPingMonitor({ host: "host2.com" });
             const monitor3 = createMockPingMonitor({ host: "host3.com" });

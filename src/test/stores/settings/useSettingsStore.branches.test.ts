@@ -111,7 +111,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
     });
 
     describe("syncSettingsAfterRehydration branches", () => {
-        it("should handle null state parameter (first branch)", async () => {
+        it("should handle null state parameter (first branch)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration
             // We need to test it via the rehydration mechanism since it's not a public method
 
@@ -133,7 +141,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle successful API response in async rehydration", async () => {
+        it("should handle successful API response in async rehydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock a successful response
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
@@ -158,7 +174,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(2000);
         });
 
-        it("should handle API failure in catch block", async () => {
+        it("should handle API failure in catch block", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock console.warn to avoid noise in test output
             const consoleSpy = vi
                 .spyOn(console, "warn")
@@ -194,7 +218,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
     });
 
     describe("Ternary operator branches in updateHistoryLimitValue", () => {
-        it("should use backend limit when it's a valid positive number", async () => {
+        it("should use backend limit when it's a valid positive number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
@@ -215,7 +247,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(5000);
         });
 
-        it("should use provided limit when backend returns invalid number", async () => {
+        it("should use provided limit when backend returns invalid number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
@@ -236,7 +276,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(3000);
         });
 
-        it("should use provided limit when backend returns zero", async () => {
+        it("should use provided limit when backend returns zero", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
@@ -257,7 +305,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(2500);
         });
 
-        it("should use provided limit when backend returns non-number", async () => {
+        it("should use provided limit when backend returns non-number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
@@ -280,7 +336,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
     });
 
     describe("Logical operator branches", () => {
-        it("should handle backendLimit type check - first condition false", async () => {
+        it("should handle backendLimit type check - first condition false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
@@ -301,7 +365,15 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(4000);
         });
 
-        it("should handle backendLimit value check - second condition false", async () => {
+        it("should handle backendLimit value check - second condition false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore.branches", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Configuration", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({

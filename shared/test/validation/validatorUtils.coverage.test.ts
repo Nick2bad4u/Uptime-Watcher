@@ -8,7 +8,15 @@ import { isValidHost, isValidPort } from "../../validation/validatorUtils";
 
 describe("ValidatorUtils - Complete Coverage", () => {
     describe("isValidHost - Complete Edge Cases", () => {
-        it("should reject non-string values (line 203)", () => {
+        it("should reject non-string values (line 203)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test non-string types to hit the return false on line 203
             expect(isValidHost(123)).toBe(false);
             expect(isValidHost(null)).toBe(false);
@@ -20,7 +28,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost(() => {})).toBe(false);
         });
 
-        it("should validate valid hosts", () => {
+        it("should validate valid hosts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Valid IP addresses
             expect(isValidHost("127.0.0.1")).toBe(true);
             expect(isValidHost("192.168.1.1")).toBe(true);
@@ -34,7 +50,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost("localhost")).toBe(true);
         });
 
-        it("should reject invalid string hosts", () => {
+        it("should reject invalid string hosts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Invalid hostnames that are strings but not valid hosts
             expect(isValidHost("")).toBe(false);
             expect(isValidHost("invalid..host")).toBe(false);
@@ -44,7 +68,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
     });
 
     describe("isValidPort - Complete Edge Cases", () => {
-        it("should reject non-number, non-string values (lines 250-253)", () => {
+        it("should reject non-number, non-string values (lines 250-253)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test various non-number, non-string types to hit line 253 (return false)
             expect(isValidPort(null)).toBe(false);
             expect(isValidPort(undefined)).toBe(false);
@@ -58,7 +90,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(new Date())).toBe(false);
         });
 
-        it("should validate number ports", () => {
+        it("should validate number ports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Valid number ports (line 249)
             expect(isValidPort(80)).toBe(true);
             expect(isValidPort(443)).toBe(true);
@@ -71,7 +111,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(70_000)).toBe(false);
         });
 
-        it("should validate string ports", () => {
+        it("should validate string ports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Valid string ports (line 251)
             expect(isValidPort("80")).toBe(true);
             expect(isValidPort("443")).toBe(true);
@@ -86,7 +134,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort("")).toBe(false);
         });
 
-        it("should handle edge case port values", () => {
+        it("should handle edge case port values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test edge cases that might behave differently
             expect(isValidPort(1)).toBe(true);
             expect(isValidPort("1")).toBe(true);
@@ -97,7 +153,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
     });
 
     describe("Type coercion edge cases", () => {
-        it("should handle objects that might coerce to strings/numbers", () => {
+        it("should handle objects that might coerce to strings/numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Objects with custom toString/valueOf
             const customStringObj = {
                 toString() {
@@ -124,7 +188,15 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost(customNumberObj)).toBe(false);
         });
 
-        it("should handle primitive wrapper objects", () => {
+        it("should handle primitive wrapper objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Primitive wrappers are objects, not primitives
             expect(isValidPort(Number(80))).toBe(true);
             expect(isValidPort(String("80"))).toBe(true);

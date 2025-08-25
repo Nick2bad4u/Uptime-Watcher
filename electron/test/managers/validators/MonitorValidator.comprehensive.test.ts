@@ -77,28 +77,60 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
     });
 
     describe("shouldApplyDefaultInterval", () => {
-        it("should return true when checkInterval is 0", () => {
+        it("should return true when checkInterval is 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor({ checkInterval: 0 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
             expect(result).toBe(true);
         });
 
-        it("should return false when checkInterval is not 0", () => {
+        it("should return false when checkInterval is not 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor({ checkInterval: 30_000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
             expect(result).toBe(false);
         });
 
-        it("should return false when checkInterval is a positive number", () => {
+        it("should return false when checkInterval is a positive number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor({ checkInterval: 60_000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
             expect(result).toBe(false);
         });
 
-        it("should return false when checkInterval is negative", () => {
+        it("should return false when checkInterval is negative", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor({ checkInterval: -1000 });
 
             const result = validator.shouldApplyDefaultInterval(monitor);
@@ -107,7 +139,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
     });
 
     describe("validateMonitorConfiguration", () => {
-        it("should return valid result for a properly configured HTTP monitor", () => {
+        it("should return valid result for a properly configured HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 id: "test-http",
                 type: "http",
@@ -120,7 +160,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should return valid result for a properly configured port monitor", () => {
+        it("should return valid result for a properly configured port monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 id: "test-port",
                 type: "port",
@@ -135,7 +183,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should return invalid result for an unsupported monitor type", () => {
+        it("should return invalid result for an unsupported monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 id: "test-invalid",
                 type: "invalid" as any,
@@ -150,7 +206,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors[0]).toContain("Available types:");
         });
 
-        it("should return invalid result for monitor with validation errors", () => {
+        it("should return invalid result for monitor with validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = createMockMonitor({
                 id: "test-failing",
                 type: "http",
@@ -166,7 +230,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle monitors with all status types", () => {
+        it("should handle monitors with all status types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const statuses: Site["monitors"][0]["status"][] = [
                 "pending",
                 "up",
@@ -185,7 +257,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle monitors with different monitoring states", () => {
+        it("should handle monitors with different monitoring states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitoringStates = [true, false];
 
             for (const monitoring of monitoringStates) {
@@ -199,7 +279,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle monitors with optional lastChecked field", () => {
+        it("should handle monitors with optional lastChecked field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 id: "test-with-lastchecked",
                 lastChecked: new Date(),
@@ -209,7 +297,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle monitors with different responseTime values", () => {
+        it("should handle monitors with different responseTime values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const responseTimes = [
                 -1,
                 0,
@@ -231,7 +327,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
     });
 
     describe("validateMonitorTypeSpecific (private method integration)", () => {
-        it("should validate monitor type against registry", () => {
+        it("should validate monitor type against registry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             const validHttpMonitor = createMockMonitor();
 
             // This calls validateMonitorTypeSpecific internally
@@ -240,7 +344,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should provide list of available types in error message", () => {
+        it("should provide list of available types in error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidMonitor = createMockMonitor({
                 type: "invalid-type" as any,
             });
@@ -252,7 +364,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors[0]).toContain("http, port");
         });
 
-        it("should handle Zod validation errors from registry", async () => {
+        it("should handle Zod validation errors from registry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitorWithBadData = createMockMonitor({
                 type: "invalid" as any,
             });
@@ -268,7 +388,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        it("should handle empty monitor object", () => {
+        it("should handle empty monitor object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emptyMonitor = {} as Site["monitors"][0];
 
             const result = validator.validateMonitorConfiguration(emptyMonitor);
@@ -276,7 +404,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should handle monitor with null/undefined properties", () => {
+        it("should handle monitor with null/undefined properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const nullPropsMonitor = {
                 id: null,
                 type: undefined,
@@ -295,7 +431,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should handle monitor with extreme values", () => {
+        it("should handle monitor with extreme values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const extremeMonitor = createMockMonitor({
                 checkInterval: Number.MAX_SAFE_INTEGER,
                 timeout: Number.MAX_SAFE_INTEGER,
@@ -311,7 +455,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             expect(result).toHaveProperty("errors");
         });
 
-        it("should handle port monitor with specific port configurations", () => {
+        it("should handle port monitor with specific port configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portConfigurations = [
                 { host: "localhost", port: 80 },
                 { host: "127.0.0.1", port: 443 },
@@ -333,7 +485,15 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle HTTP monitor with various URL configurations", () => {
+        it("should handle HTTP monitor with various URL configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const urlConfigurations = [
                 "https://example.com",
                 "https://subdomain.example.com",

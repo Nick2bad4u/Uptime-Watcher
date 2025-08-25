@@ -202,12 +202,28 @@ describe("DatabaseManager Foundation Tests", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should create DatabaseManager successfully", () => {
+        it("should create DatabaseManager successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(databaseManager).toBeDefined();
             expect(databaseManager.getHistoryLimit()).toBe(500);
         });
 
-        it("should download backup with proper return type and events", async () => {
+        it("should download backup with proper return type and events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const result = await databaseManager.downloadBackup();
 
             expect(result).toEqual({
@@ -224,7 +240,15 @@ describe("DatabaseManager Foundation Tests", () => {
             );
         });
 
-        it("should export data with proper return type and events", async () => {
+        it("should export data with proper return type and events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Export Operation", "type");
+
             const result = await databaseManager.exportData();
 
             expect(result).toBe('{"sites": [], "settings": []}');
@@ -237,7 +261,15 @@ describe("DatabaseManager Foundation Tests", () => {
             );
         });
 
-        it("should import data with proper return type and events", async () => {
+        it("should import data with proper return type and events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Import Operation", "type");
+
             const testData = '{"sites": [], "settings": []}';
             const result = await databaseManager.importData(testData);
 
@@ -251,11 +283,27 @@ describe("DatabaseManager Foundation Tests", () => {
             );
         });
 
-        it("should initialize successfully", async () => {
+        it("should initialize successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             await expect(databaseManager.initialize()).resolves.not.toThrow();
         });
 
-        it("should set history limit successfully", async () => {
+        it("should set history limit successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             await databaseManager.setHistoryLimit(1000);
             expect(databaseManager.getHistoryLimit()).toBe(1000);
         });

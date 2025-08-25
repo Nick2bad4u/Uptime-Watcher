@@ -301,7 +301,15 @@ describe("ServiceContainer - Fixed Tests", () => {
     });
 
     describe("Service Creation Tests", () => {
-        it("should create UptimeOrchestrator singleton with dependencies", () => {
+        it("should create UptimeOrchestrator singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             const orchestrator = container.getUptimeOrchestrator();
@@ -310,7 +318,15 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(mockUptimeOrchestrator).toHaveBeenCalled();
         });
 
-        it("should create IpcService singleton with dependencies", () => {
+        it("should create IpcService singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             const ipcService = container.getIpcService();
@@ -319,7 +335,15 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(mockIpcService).toHaveBeenCalled();
         });
 
-        it("should create MonitorManager singleton with complex dependencies", () => {
+        it("should create MonitorManager singleton with complex dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             // Ensure SiteManager is created first
@@ -331,7 +355,15 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(mockMonitorManager).toHaveBeenCalled();
         });
 
-        it("should create SiteManager with getSitesCache method", () => {
+        it("should create SiteManager with getSitesCache method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             const siteManager = container.getSiteManager();
@@ -348,7 +380,15 @@ describe("ServiceContainer - Fixed Tests", () => {
     });
 
     describe("Initialization Process", () => {
-        it("should initialize all services in correct order", async () => {
+        it("should initialize all services in correct order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             // Create all services first to get their instances
@@ -366,7 +406,15 @@ describe("ServiceContainer - Fixed Tests", () => {
     });
 
     describe("Status and Diagnostics", () => {
-        it("should return correct initialization status for services", () => {
+        it("should return correct initialization status for services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             // Create services
@@ -381,7 +429,15 @@ describe("ServiceContainer - Fixed Tests", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle orchestrator access when initialized", () => {
+        it("should handle orchestrator access when initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             // Create orchestrator first
@@ -391,7 +447,15 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(mockUptimeOrchestrator).toHaveBeenCalled();
         });
 
-        it("should handle service creation order independence", () => {
+        it("should handle service creation order independence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             container = ServiceContainer.getInstance(mockConfig);
 
             // Create services in different order
@@ -404,7 +468,15 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(orchestrator).toBeDefined();
         });
 
-        it("should handle empty configuration", () => {
+        it("should handle empty configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyConfig = {} as ServiceContainerConfig;
             container = ServiceContainer.getInstance(emptyConfig);
 

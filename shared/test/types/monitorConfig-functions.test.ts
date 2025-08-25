@@ -15,7 +15,15 @@ import {
 
 describe("shared/types/monitorConfig function coverage", () => {
     describe("isHttpMonitorConfig", () => {
-        it("should return true for valid HttpMonitorConfig", () => {
+        it("should return true for valid HttpMonitorConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validConfig: HttpMonitorConfig = {
                 id: "http-monitor-1",
                 name: "HTTP Monitor",
@@ -35,7 +43,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(validConfig)).toBe(true);
         });
 
-        it("should return true for minimal valid HttpMonitorConfig", () => {
+        it("should return true for minimal valid HttpMonitorConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const minimalConfig: HttpMonitorConfig = {
                 id: "http-monitor-minimal",
                 name: "Minimal HTTP Monitor",
@@ -53,21 +69,53 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(minimalConfig)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpMonitorConfig(undefined as any)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpMonitorConfig("string" as any)).toBe(false);
             expect(isHttpMonitorConfig(123 as any)).toBe(false);
             expect(isHttpMonitorConfig(true as any)).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteConfig = {
                 url: "https://example.com",
                 // missing other required properties
@@ -76,7 +124,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
-        it("should return false for object with wrong property types", () => {
+        it("should return false for object with wrong property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidConfig = {
                 url: 123, // should be string
                 method: "GET",
@@ -97,7 +153,15 @@ describe("shared/types/monitorConfig function coverage", () => {
     });
 
     describe("isPingMonitorConfig", () => {
-        it("should return true for valid PingMonitorConfig", () => {
+        it("should return true for valid PingMonitorConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validConfig: PingMonitorConfig = {
                 id: "ping-monitor-1",
                 name: "Ping Monitor",
@@ -115,7 +179,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPingMonitorConfig(validConfig)).toBe(true);
         });
 
-        it("should return true for minimal valid PingMonitorConfig", () => {
+        it("should return true for minimal valid PingMonitorConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const minimalConfig: PingMonitorConfig = {
                 id: "ping-monitor-minimal",
                 name: "Minimal Ping Monitor",
@@ -133,21 +205,53 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPingMonitorConfig(minimalConfig)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingMonitorConfig(undefined as any)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingMonitorConfig("string" as any)).toBe(false);
             expect(isPingMonitorConfig(123 as any)).toBe(false);
             expect(isPingMonitorConfig(true as any)).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteConfig = {
                 host: "example.com",
                 // missing other required properties
@@ -156,7 +260,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPingMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
-        it("should return false for object with wrong property types", () => {
+        it("should return false for object with wrong property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidConfig = {
                 host: 123, // should be string
                 timeout: 5000,
@@ -171,7 +283,15 @@ describe("shared/types/monitorConfig function coverage", () => {
     });
 
     describe("isPortMonitorConfig", () => {
-        it("should return true for valid PortMonitorConfig", () => {
+        it("should return true for valid PortMonitorConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validConfig: PortMonitorConfig = {
                 id: "port-monitor-1",
                 name: "Port Monitor",
@@ -188,7 +308,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(validConfig)).toBe(true);
         });
 
-        it("should return true for different protocol", () => {
+        it("should return true for different protocol", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const udpConfig: PortMonitorConfig = {
                 id: "port-monitor-udp",
                 name: "UDP Port Monitor",
@@ -209,21 +337,53 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(udpConfig)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortMonitorConfig(undefined as any)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortMonitorConfig("string" as any)).toBe(false);
             expect(isPortMonitorConfig(123 as any)).toBe(false);
             expect(isPortMonitorConfig(true as any)).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteConfig = {
                 host: "example.com",
                 port: 80,
@@ -233,7 +393,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(incompleteConfig as any)).toBe(false);
         });
 
-        it("should return false for object with wrong property types", () => {
+        it("should return false for object with wrong property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidConfig = {
                 host: "example.com",
                 port: "80", // should be number
@@ -245,7 +413,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(invalidConfig as any)).toBe(false);
         });
 
-        it("should handle edge case ports", () => {
+        it("should handle edge case ports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const edgeCaseConfig: PortMonitorConfig = {
                 id: "port-monitor-edge",
                 name: "Edge Case Port Monitor",
@@ -264,7 +440,15 @@ describe("shared/types/monitorConfig function coverage", () => {
     });
 
     describe("integration tests", () => {
-        it("should differentiate between different monitor config types", () => {
+        it("should differentiate between different monitor config types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpConfig: HttpMonitorConfig = {
                 id: "http-test",
                 name: "HTTP Test",
@@ -320,7 +504,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(portConfig)).toBe(true);
         });
 
-        it("should handle complex real-world configurations", () => {
+        it("should handle complex real-world configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexHttpConfig: HttpMonitorConfig = {
                 id: "complex-http",
                 name: "Complex HTTP Monitor",
@@ -352,7 +544,15 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(complexHttpConfig)).toBe(true);
         });
 
-        it("should handle boundary values", () => {
+        it("should handle boundary values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with extreme but valid values
             const extremeConfig: PingMonitorConfig = {
                 id: "extreme-ping",

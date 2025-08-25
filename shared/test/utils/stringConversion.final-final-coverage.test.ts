@@ -7,13 +7,29 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Final Final Coverage", () => {
     describe("Targeting Lines 86-89 (undefined and default cases)", () => {
-        it("should handle undefined values explicitly (line 86-87)", () => {
+        it("should handle undefined values explicitly (line 86-87)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This should hit the "undefined" case in the switch statement
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        it("should handle the default case for unknown types (line 89)", () => {
+        it("should handle the default case for unknown types (line 89)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object with a Symbol.toStringTag to make its typeof return something unusual
             const weirdObject = {};
             Object.defineProperty(weirdObject, Symbol.toStringTag, {
@@ -30,7 +46,15 @@ describe("String Conversion - Final Final Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should test with document/DOM objects if available", () => {
+        it("should test with document/DOM objects if available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // In a Node.js environment, we might not have DOM objects
             // But let's test what we can
 
@@ -42,7 +66,15 @@ describe("String Conversion - Final Final Coverage", () => {
             expect(result2).toBe("");
         });
 
-        it("should attempt to create an edge case that hits default", () => {
+        it("should attempt to create an edge case that hits default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // The default case is very hard to hit because typeof only returns:
             // "string", "number", "bigint", "boolean", "symbol", "undefined", "object", "function"
             // Let's make sure we're covering the undefined case thoroughly

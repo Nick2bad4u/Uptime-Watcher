@@ -115,7 +115,15 @@ describe("IPC Standardization Concepts", () => {
     }
 
     describe("Response Format Validation", () => {
-        it("should validate successful response format", async () => {
+        it("should validate successful response format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const mockHandler = createMockStandardizedHandler(
                 async (data: string) => ({ result: data })
             );
@@ -129,7 +137,15 @@ describe("IPC Standardization Concepts", () => {
             expect(response.metadata?.["duration"]).toBeTypeOf("number");
         });
 
-        it("should validate error response format", async () => {
+        it("should validate error response format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockHandler = createMockStandardizedHandler(async () => {
                 throw new Error("Test error");
             });
@@ -143,7 +159,15 @@ describe("IPC Standardization Concepts", () => {
             expect(response.metadata?.["duration"]).toBeTypeOf("number");
         });
 
-        it("should validate parameter validation error format", async () => {
+        it("should validate parameter validation error format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator = (params: unknown[]) => {
                 if (params.length === 0) return ["Parameter required"];
                 if (typeof params[0] !== "string")
@@ -168,7 +192,15 @@ describe("IPC Standardization Concepts", () => {
     });
 
     describe("Parameter Validation Patterns", () => {
-        it("should demonstrate string validation", () => {
+        it("should demonstrate string validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const validateString = (
                 value: unknown,
                 paramName: string
@@ -188,7 +220,15 @@ describe("IPC Standardization Concepts", () => {
             expect(validateString("  ", "param")).toBe("param cannot be empty");
         });
 
-        it("should demonstrate number validation", () => {
+        it("should demonstrate number validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const validateNumber = (
                 value: unknown,
                 paramName: string
@@ -218,7 +258,15 @@ describe("IPC Standardization Concepts", () => {
             );
         });
 
-        it("should demonstrate object validation", () => {
+        it("should demonstrate object validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const validateObject = (
                 value: unknown,
                 paramName: string
@@ -247,7 +295,15 @@ describe("IPC Standardization Concepts", () => {
     });
 
     describe("Error Handling Consistency", () => {
-        it("should handle different error types consistently", async () => {
+        it("should handle different error types consistently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testErrors = [
                 new Error("Standard error"),
                 "String error",
@@ -270,7 +326,15 @@ describe("IPC Standardization Concepts", () => {
             }
         });
 
-        it("should provide consistent metadata across responses", async () => {
+        it("should provide consistent metadata across responses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const successHandler = createMockStandardizedHandler(
                 async () => "success"
             );
@@ -293,7 +357,15 @@ describe("IPC Standardization Concepts", () => {
     });
 
     describe("Performance Monitoring", () => {
-        it("should track execution time for all operations", async () => {
+        it("should track execution time for all operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const slowHandler = createMockStandardizedHandler(async () => {
                 await new Promise((resolve) => setTimeout(resolve, 10));
                 return "completed";
@@ -306,7 +378,15 @@ describe("IPC Standardization Concepts", () => {
             expect(response.metadata?.["duration"]).toBeGreaterThan(5); // Should take at least 5ms
         });
 
-        it("should include performance metadata even for errors", async () => {
+        it("should include performance metadata even for errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorHandler = createMockStandardizedHandler(async () => {
                 await new Promise((resolve) => setTimeout(resolve, 5));
                 throw new Error("Delayed error");
@@ -321,7 +401,15 @@ describe("IPC Standardization Concepts", () => {
     });
 
     describe("Standardization Guidelines", () => {
-        it("should provide guidelines for implementing standardized handlers", () => {
+        it("should provide guidelines for implementing standardized handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const guidelines = [
                 "All handlers must return IpcResponse<T> format",
                 "Parameter validation must be performed before processing",
@@ -342,7 +430,15 @@ describe("IPC Standardization Concepts", () => {
             expect(guidelines.length).toBe(8);
         });
 
-        it("should demonstrate handler registration pattern", () => {
+        it("should demonstrate handler registration pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const registrationPattern = `
 // Example standardized handler registration
 registerStandardizedIpcHandler(
@@ -379,7 +475,15 @@ registerStandardizedIpcHandler(
     });
 
     describe("Testing Patterns", () => {
-        it("should demonstrate comprehensive handler testing", () => {
+        it("should demonstrate comprehensive handler testing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: standardization", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testingApproaches = [
                 {
                     name: "Response Format Validation",

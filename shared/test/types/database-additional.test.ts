@@ -19,7 +19,15 @@ import {
 
 describe("shared/types/database additional function coverage", () => {
     describe("isValidHistoryRow - additional coverage", () => {
-        it("should handle string timestamps that become NaN", () => {
+        it("should handle string timestamps that become NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidTimestampRow = {
                 id: 1,
                 monitor_id: "monitor1",
@@ -34,7 +42,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(isValidHistoryRow(invalidTimestampRow)).toBe(false);
         });
 
-        it("should handle non-numeric string timestamps", () => {
+        it("should handle non-numeric string timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const nonNumericRow = {
                 id: 1,
                 monitor_id: "monitor1",
@@ -49,7 +65,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(isValidHistoryRow(nonNumericRow)).toBe(false);
         });
 
-        it("should handle empty string timestamp", () => {
+        it("should handle empty string timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyTimestampRow = {
                 id: 1,
                 monitor_id: "monitor1",
@@ -66,7 +90,15 @@ describe("shared/types/database additional function coverage", () => {
     });
 
     describe("isValidMonitorRow - additional coverage", () => {
-        it("should handle string timestamps that become NaN", () => {
+        it("should handle string timestamps that become NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidTimestampRow = {
                 id: "monitor1",
                 site_id: "site1",
@@ -89,7 +121,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(isValidMonitorRow(invalidTimestampRow)).toBe(false);
         });
 
-        it("should handle various invalid timestamp formats", () => {
+        it("should handle various invalid timestamp formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testCases = [
                 "not-a-number",
                 "",
@@ -124,7 +164,15 @@ describe("shared/types/database additional function coverage", () => {
     });
 
     describe("isValidSiteRow - additional coverage", () => {
-        it("should handle string timestamps that become NaN", () => {
+        it("should handle string timestamps that become NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidTimestampRow = {
                 id: "site1",
                 name: "Test Site",
@@ -138,7 +186,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(isValidSiteRow(invalidTimestampRow)).toBe(false);
         });
 
-        it("should handle edge case string timestamps", () => {
+        it("should handle edge case string timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const edgeCases = [
                 "NaN",
                 "Infinity",
@@ -166,7 +222,15 @@ describe("shared/types/database additional function coverage", () => {
     });
 
     describe("safeGetRowProperty - comprehensive coverage", () => {
-        it("should handle deeply nested property access", () => {
+        it("should handle deeply nested property access", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexRow = {
                 user: {
                     profile: {
@@ -193,7 +257,15 @@ describe("shared/types/database additional function coverage", () => {
             ).toBe("1.0.0");
         });
 
-        it("should handle various property types", () => {
+        it("should handle various property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mixedRow = {
                 stringProp: "text",
                 numberProp: 42,
@@ -242,7 +314,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(safeGetRowProperty(mixedRow, "falseProp", true)).toBe(false);
         });
 
-        it("should handle empty and invalid row objects", () => {
+        it("should handle empty and invalid row objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyRow = {};
             const nullRow = null as any;
             const undefinedRow = undefined as any;
@@ -262,7 +342,15 @@ describe("shared/types/database additional function coverage", () => {
             );
         });
 
-        it("should handle special property names", () => {
+        it("should handle special property names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const specialRow = {
                 "prop with spaces": "value1",
                 "prop-with-dashes": "value2",
@@ -296,7 +384,15 @@ describe("shared/types/database additional function coverage", () => {
             ).toBe("value5");
         });
 
-        it("should handle circular references gracefully", () => {
+        it("should handle circular references gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const circularRow: any = {
                 name: "test",
                 circular: null,
@@ -312,7 +408,15 @@ describe("shared/types/database additional function coverage", () => {
             );
         });
 
-        it("should handle array-like objects", () => {
+        it("should handle array-like objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const arrayLikeRow = {
                 0: "first",
                 1: "second",
@@ -330,7 +434,15 @@ describe("shared/types/database additional function coverage", () => {
             );
         });
 
-        it("should handle different default value types", () => {
+        it("should handle different default value types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyRow = {};
 
             // Test different default value types
@@ -349,7 +461,15 @@ describe("shared/types/database additional function coverage", () => {
     });
 
     describe("integration tests for all database validators", () => {
-        it("should validate complete database row structures", () => {
+        it("should validate complete database row structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validHistoryRow: HistoryRow = {
                 monitorId: "monitor1",
                 status: "up",
@@ -391,7 +511,15 @@ describe("shared/types/database additional function coverage", () => {
             expect(isValidSiteRow(validSiteRow)).toBe(true);
         });
 
-        it("should handle mixed valid and invalid data", () => {
+        it("should handle mixed valid and invalid data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mixedData = [
                 {
                     monitorId: "monitor1",

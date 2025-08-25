@@ -14,7 +14,15 @@ import {
 
 describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     describe("safeJsonParse", () => {
-        it("should parse valid JSON and validate with type guard", () => {
+        it("should parse valid JSON and validate with type guard", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const validator = (data: unknown): data is { name: string } => {
                 return (
                     typeof data === "object" &&
@@ -29,7 +37,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeUndefined();
         });
 
-        it("should return error for invalid JSON", () => {
+        it("should return error for invalid JSON", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator = (_data: unknown): _data is any => true;
             const result = safeJsonParse("invalid json", validator);
 
@@ -38,7 +54,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toContain("JSON parsing failed");
         });
 
-        it("should return error when parsed data doesn't match type", () => {
+        it("should return error when parsed data doesn't match type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator = (data: unknown): data is { name: string } => {
                 return (
                     typeof data === "object" &&
@@ -55,7 +79,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle null JSON values", () => {
+        it("should handle null JSON values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is null => data === null;
             const result = safeJsonParse("null", validator);
 
@@ -63,7 +95,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(null);
         });
 
-        it("should handle boolean JSON values", () => {
+        it("should handle boolean JSON values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is boolean =>
                 typeof data === "boolean";
             const result = safeJsonParse("true", validator);
@@ -72,7 +112,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(true);
         });
 
-        it("should handle number JSON values", () => {
+        it("should handle number JSON values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is number =>
                 typeof data === "number";
             const result = safeJsonParse("42", validator);
@@ -81,7 +129,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(42);
         });
 
-        it("should handle array JSON values", () => {
+        it("should handle array JSON values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is number[] => {
                 return (
                     Array.isArray(data) &&
@@ -100,7 +156,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeJsonParseArray", () => {
-        it("should parse valid JSON array with element validation", () => {
+        it("should parse valid JSON array with element validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const elementValidator = (
                 data: unknown
             ): data is { id: number } => {
@@ -123,7 +187,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             }
         });
 
-        it("should return error for invalid JSON", () => {
+        it("should return error for invalid JSON", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("invalid json", elementValidator);
 
@@ -131,7 +203,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toContain("JSON parsing failed");
         });
 
-        it("should return error when parsed data is not an array", () => {
+        it("should return error when parsed data is not an array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray(
                 '{"not":"array"}',
@@ -142,7 +222,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBe("Parsed data is not an array");
         });
 
-        it("should return error when array elements don't match type", () => {
+        it("should return error when array elements don't match type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const elementValidator = (
                 data: unknown
             ): data is { name: string } => {
@@ -161,7 +249,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toContain("Array element at index 1");
         });
 
-        it("should handle empty arrays", () => {
+        it("should handle empty arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const elementValidator = (_data: unknown): _data is any => true;
             const result = safeJsonParseArray("[]", elementValidator);
 
@@ -169,7 +265,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toEqual([]);
         });
 
-        it("should validate all elements correctly", () => {
+        it("should validate all elements correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const elementValidator = (data: unknown): data is string =>
                 typeof data === "string";
             const result = safeJsonParseArray(
@@ -187,13 +291,29 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeJsonStringifyWithFallback", () => {
-        it("should stringify simple objects", () => {
+        it("should stringify simple objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { name: "test", value: 42 };
             const result = safeJsonStringifyWithFallback(obj, "fallback");
             expect(result).toBe('{"name":"test","value":42}');
         });
 
-        it("should return fallback for circular references", () => {
+        it("should return fallback for circular references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj: any = { name: "test" };
             obj.self = obj;
             const result = safeJsonStringifyWithFallback(
@@ -203,7 +323,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("circular_fallback");
         });
 
-        it("should return fallback for objects with non-serializable properties", () => {
+        it("should return fallback for objects with non-serializable properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = {
                 name: "test",
                 func: () => "function",
@@ -217,7 +345,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle arrays", () => {
+        it("should handle arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const arr = [
                 1,
                 2,
@@ -228,12 +364,28 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe('[1,2,3,"test"]');
         });
 
-        it("should handle null values", () => {
+        it("should handle null values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeJsonStringifyWithFallback(null, "fallback");
             expect(result).toBe("null");
         });
 
-        it("should handle undefined values with fallback", () => {
+        it("should handle undefined values with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeJsonStringifyWithFallback(
                 undefined,
                 "undefined_fallback"
@@ -241,7 +393,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("undefined_fallback");
         });
 
-        it("should handle primitive values", () => {
+        it("should handle primitive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeJsonStringifyWithFallback("string", "fallback")).toBe(
                 '"string"'
             );
@@ -251,7 +411,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle complex nested objects", () => {
+        it("should handle complex nested objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complex = {
                 level1: {
                     level2: {
@@ -269,7 +437,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toContain("nested");
         });
 
-        it("should handle objects with special values", () => {
+        it("should handle objects with special values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = {
                 date: new Date("2023-01-01"),
                 regex: /test/g,
@@ -281,7 +457,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toContain("text");
         });
 
-        it("should use fallback when JSON.stringify throws", () => {
+        it("should use fallback when JSON.stringify throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const problematic = {
                 get trouble() {
                     throw new Error("Cannot serialize");
@@ -294,7 +478,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("error_fallback");
         });
 
-        it("should handle BigInt with fallback", () => {
+        it("should handle BigInt with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { bigInt: BigInt(123) };
             const result = safeJsonStringifyWithFallback(
                 obj,
@@ -303,7 +495,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("bigint_fallback");
         });
 
-        it("should handle functions with fallback", () => {
+        it("should handle functions with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { func: () => "test" };
             const result = safeJsonStringifyWithFallback(
                 obj,
@@ -312,21 +512,45 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("{}"); // Functions are not serialized
         });
 
-        it("should respect space parameter", () => {
+        it("should respect space parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2 };
             const result = safeJsonStringifyWithFallback(obj, "fallback", 2);
             expect(result).toContain("\n");
             expect(result).toContain("  ");
         });
 
-        it("should handle empty objects and arrays", () => {
+        it("should handle empty objects and arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeJsonStringifyWithFallback({}, "fallback")).toBe("{}");
             expect(safeJsonStringifyWithFallback([], "fallback")).toBe("[]");
         });
     });
 
     describe("safeJsonParseWithFallback", () => {
-        it("should return parsed data on successful parsing", () => {
+        it("should return parsed data on successful parsing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is { name: string } => {
                 return (
                     typeof data === "object" &&
@@ -343,7 +567,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.name).toBe("test");
         });
 
-        it("should return fallback on parsing failure", () => {
+        it("should return fallback on parsing failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator = (data: unknown): data is { name: string } => {
                 return (
                     typeof data === "object" &&
@@ -361,7 +593,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe(fallback);
         });
 
-        it("should return fallback when data doesn't match type", () => {
+        it("should return fallback when data doesn't match type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is { name: string } => {
                 return (
                     typeof data === "object" &&
@@ -379,14 +619,30 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe(fallback);
         });
 
-        it("should handle primitive types", () => {
+        it("should handle primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is number =>
                 typeof data === "number";
             const result = safeJsonParseWithFallback("42", validator, 0);
             expect(result).toBe(42);
         });
 
-        it("should return fallback for undefined data", () => {
+        it("should return fallback for undefined data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = (data: unknown): data is string =>
                 typeof data === "string";
             const fallback = "fallback";
@@ -400,7 +656,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeJsonStringify", () => {
-        it("should stringify simple objects successfully", () => {
+        it("should stringify simple objects successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { name: "test", value: 42 };
             const result = safeJsonStringify(obj);
             expect(result.success).toBe(true);
@@ -408,7 +672,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeUndefined();
         });
 
-        it("should stringify arrays successfully", () => {
+        it("should stringify arrays successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const arr = [
                 1,
                 2,
@@ -420,20 +692,44 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe('[1,2,3,"test"]');
         });
 
-        it("should handle null values", () => {
+        it("should handle null values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeJsonStringify(null);
             expect(result.success).toBe(true);
             expect(result.data).toBe("null");
         });
 
-        it("should handle primitive values", () => {
+        it("should handle primitive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeJsonStringify("string").data).toBe('"string"');
             expect(safeJsonStringify(42).data).toBe("42");
             expect(safeJsonStringify(true).data).toBe("true");
             expect(safeJsonStringify(false).data).toBe("false");
         });
 
-        it("should handle undefined values", () => {
+        it("should handle undefined values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeJsonStringify(undefined);
             expect(result.success).toBe(false); // JSON.stringify(undefined) returns undefined, not a string
             expect(result.error).toContain(
@@ -441,7 +737,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle circular references", () => {
+        it("should handle circular references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj: any = { name: "test" };
             obj.self = obj;
             const result = safeJsonStringify(obj);
@@ -449,7 +753,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toContain("JSON stringification failed");
         });
 
-        it("should handle objects with non-serializable properties", () => {
+        it("should handle objects with non-serializable properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = {
                 func: () => "test",
                 symbol: Symbol("test"),
@@ -461,14 +773,30 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).not.toContain("func");
         });
 
-        it("should handle BigInt values", () => {
+        it("should handle BigInt values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { bigInt: BigInt(123) };
             const result = safeJsonStringify(obj);
             expect(result.success).toBe(false);
             expect(result.error).toContain("JSON stringification failed");
         });
 
-        it("should respect space parameter for formatting", () => {
+        it("should respect space parameter for formatting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2 };
             const result = safeJsonStringify(obj, 2);
             expect(result.success).toBe(true);
@@ -476,14 +804,30 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toContain("  ");
         });
 
-        it("should handle space parameter as string", () => {
+        it("should handle space parameter as string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1 };
             const result = safeJsonStringify(obj, "\t");
             expect(result.success).toBe(true);
             expect(result.data).toContain("\t");
         });
 
-        it("should handle empty objects and arrays", () => {
+        it("should handle empty objects and arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyObj = safeJsonStringify({});
             expect(emptyObj.success).toBe(true);
             expect(emptyObj.data).toBe("{}");
@@ -493,7 +837,15 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(emptyArr.data).toBe("[]");
         });
 
-        it("should handle nested objects", () => {
+        it("should handle nested objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const nested = {
                 level1: {
                     level2: {
@@ -506,14 +858,30 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe('{"level1":{"level2":{"value":"deep"}}}');
         });
 
-        it("should handle Date objects", () => {
+        it("should handle Date objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const date = new Date("2023-01-01T00:00:00.000Z");
             const result = safeJsonStringify(date);
             expect(result.success).toBe(true);
             expect(result.data).toContain("2023-01-01");
         });
 
-        it("should handle objects with getters that throw", () => {
+        it("should handle objects with getters that throw", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const obj = {
                 get problematic() {
                     throw new Error("getter error");

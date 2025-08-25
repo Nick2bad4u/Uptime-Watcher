@@ -14,20 +14,44 @@ import {
 
 describe("Time Utilities", () => {
     describe("formatDuration", () => {
-        it("should format seconds only", () => {
+        it("should format seconds only", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(5000)).toBe("5s");
             expect(formatDuration(30_000)).toBe("30s");
             expect(formatDuration(59_000)).toBe("59s");
         });
 
-        it("should format minutes and seconds", () => {
+        it("should format minutes and seconds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(60_000)).toBe("1m 0s");
             expect(formatDuration(90_000)).toBe("1m 30s");
             expect(formatDuration(150_000)).toBe("2m 30s");
             expect(formatDuration(3_540_000)).toBe("59m 0s");
         });
 
-        it("should format hours and minutes", () => {
+        it("should format hours and minutes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(3_600_000)).toBe("1h 0m");
             expect(formatDuration(3_690_000)).toBe("1h 1m");
             expect(formatDuration(5_400_000)).toBe("1h 30m");
@@ -35,25 +59,57 @@ describe("Time Utilities", () => {
             expect(formatDuration(7_380_000)).toBe("2h 3m");
         });
 
-        it("should handle zero and very small values", () => {
+        it("should handle zero and very small values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(0)).toBe("0s");
             expect(formatDuration(500)).toBe("0s");
             expect(formatDuration(999)).toBe("0s");
         });
 
-        it("should handle very large values", () => {
+        it("should handle very large values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(86_400_000)).toBe("24h 0m"); // 1 day
             expect(formatDuration(90_061_000)).toBe("25h 1m"); // 25 hours 1 minute
         });
 
-        it("should handle edge cases with rounding", () => {
+        it("should handle edge cases with rounding", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatDuration(1500)).toBe("1s"); // 1.5 seconds rounds down
             expect(formatDuration(61_500)).toBe("1m 1s"); // 61.5 seconds = 1m 1s
         });
     });
 
     describe("formatFullTimestamp", () => {
-        it("should format timestamp as locale string", () => {
+        it("should format timestamp as locale string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamp = 1_640_995_200_000; // January 1, 2022 00:00:00 UTC
             const result = formatFullTimestamp(timestamp);
 
@@ -64,7 +120,15 @@ describe("Time Utilities", () => {
             expect(result.length).toBeGreaterThan(5);
         });
 
-        it("should handle different timestamps", () => {
+        it("should handle different timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamps = [
                 Date.now(),
                 1_577_836_800_000, // Jan 1, 2020
@@ -78,7 +142,15 @@ describe("Time Utilities", () => {
             }
         });
 
-        it("should handle zero timestamp", () => {
+        it("should handle zero timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = formatFullTimestamp(0);
             expect(typeof result).toBe("string");
             expect(result).toMatch(/1969|1970|69|70/); // Unix epoch (timezone dependent)
@@ -86,34 +158,74 @@ describe("Time Utilities", () => {
     });
 
     describe("formatIntervalDuration", () => {
-        it("should format seconds for values under 1 minute", () => {
+        it("should format seconds for values under 1 minute", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatIntervalDuration(5000)).toBe("5s");
             expect(formatIntervalDuration(30_000)).toBe("30s");
             expect(formatIntervalDuration(59_999)).toBe("60s"); // Rounds up
         });
 
-        it("should format minutes for values under 1 hour", () => {
+        it("should format minutes for values under 1 hour", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatIntervalDuration(60_000)).toBe("1m");
             expect(formatIntervalDuration(150_000)).toBe("3m"); // 2.5 minutes rounds up
             expect(formatIntervalDuration(1_800_000)).toBe("30m");
             expect(formatIntervalDuration(3_599_999)).toBe("60m"); // Just under 1 hour
         });
 
-        it("should format hours for values 1 hour and above", () => {
+        it("should format hours for values 1 hour and above", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatIntervalDuration(3_600_000)).toBe("1h");
             expect(formatIntervalDuration(5_400_000)).toBe("2h"); // 1.5 hours rounds up
             expect(formatIntervalDuration(7_200_000)).toBe("2h");
             expect(formatIntervalDuration(86_400_000)).toBe("24h"); // 1 day
         });
 
-        it("should handle edge cases and rounding", () => {
+        it("should handle edge cases and rounding", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatIntervalDuration(0)).toBe("0s");
             expect(formatIntervalDuration(500)).toBe("1s"); // 0.5 seconds rounds up
             expect(formatIntervalDuration(59_500)).toBe("60s"); // 59.5 seconds rounds up
             expect(formatIntervalDuration(119_500)).toBe("2m"); // 1.99 minutes rounds up
         });
 
-        it("should handle very large values", () => {
+        it("should handle very large values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatIntervalDuration(172_800_000)).toBe("48h"); // 2 days
             expect(formatIntervalDuration(604_800_000)).toBe("168h"); // 1 week
         });
@@ -131,7 +243,15 @@ describe("Time Utilities", () => {
             mockNow.mockRestore();
         });
 
-        it("should return 'Just now' for recent timestamps", () => {
+        it("should return 'Just now' for recent timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const recentTimestamp = 1_640_995_200_000 - 30_000; // 30 seconds ago
             expect(formatRelativeTimestamp(recentTimestamp)).toBe("Just now");
 
@@ -141,7 +261,15 @@ describe("Time Utilities", () => {
             );
         });
 
-        it("should format seconds ago for timestamps 31+ seconds old", () => {
+        it("should format seconds ago for timestamps 31+ seconds old", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamp = 1_640_995_200_000 - 45_000; // 45 seconds ago
             expect(formatRelativeTimestamp(timestamp)).toBe("45 seconds ago");
 
@@ -149,7 +277,15 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp2)).toBe("59 seconds ago");
         });
 
-        it("should format minutes ago", () => {
+        it("should format minutes ago", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamp1 = 1_640_995_200_000 - 60_000; // 1 minute ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 minute ago");
 
@@ -160,7 +296,15 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("30 minutes ago");
         });
 
-        it("should format hours ago", () => {
+        it("should format hours ago", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamp1 = 1_640_995_200_000 - 3_600_000; // 1 hour ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 hour ago");
 
@@ -171,7 +315,15 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("6 hours ago");
         });
 
-        it("should format days ago", () => {
+        it("should format days ago", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timestamp1 = 1_640_995_200_000 - 86_400_000; // 1 day ago
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 day ago");
 
@@ -182,7 +334,15 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("7 days ago");
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Exactly 30 seconds
             const thirtySecondsAgo = 1_640_995_200_000 - 30_000;
             expect(formatRelativeTimestamp(thirtySecondsAgo)).toBe("Just now");
@@ -197,7 +357,15 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(1_640_995_200_000)).toBe("Just now");
         });
 
-        it("should handle future timestamps gracefully", () => {
+        it("should handle future timestamps gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const futureTimestamp = 1_640_995_200_000 + 60_000; // 1 minute in future
             // Should handle negative differences gracefully (implementation dependent)
             const result = formatRelativeTimestamp(futureTimestamp);
@@ -206,85 +374,189 @@ describe("Time Utilities", () => {
     });
 
     describe("formatResponseDuration", () => {
-        it("should format milliseconds for values under 1 second", () => {
+        it("should format milliseconds for values under 1 second", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseDuration(0)).toBe("0ms");
             expect(formatResponseDuration(123)).toBe("123ms");
             expect(formatResponseDuration(500)).toBe("500ms");
             expect(formatResponseDuration(999)).toBe("999ms");
         });
 
-        it("should format seconds for values under 1 minute", () => {
+        it("should format seconds for values under 1 minute", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseDuration(1000)).toBe("1s");
             expect(formatResponseDuration(5000)).toBe("5s");
             expect(formatResponseDuration(30_000)).toBe("30s");
             expect(formatResponseDuration(59_999)).toBe("60s"); // Rounds up
         });
 
-        it("should format minutes for values under 1 hour", () => {
+        it("should format minutes for values under 1 hour", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseDuration(60_000)).toBe("1m");
             expect(formatResponseDuration(150_000)).toBe("3m"); // 2.5 minutes rounds up
             expect(formatResponseDuration(1_800_000)).toBe("30m");
             expect(formatResponseDuration(3_599_999)).toBe("60m");
         });
 
-        it("should format hours for values 1 hour and above", () => {
+        it("should format hours for values 1 hour and above", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseDuration(3_600_000)).toBe("1h");
             expect(formatResponseDuration(5_400_000)).toBe("2h"); // 1.5 hours rounds up
             expect(formatResponseDuration(7_200_000)).toBe("2h");
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseDuration(999.9)).toBe("999.9ms");
             expect(formatResponseDuration(1000.1)).toBe("1s");
         });
     });
 
     describe("formatResponseTime", () => {
-        it("should return 'N/A' for undefined, null, or missing values", () => {
+        it("should return 'N/A' for undefined, null, or missing values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(undefined)).toBe("N/A");
             expect(formatResponseTime()).toBe("N/A");
             expect(formatResponseTime(null as any)).toBe("N/A");
         });
 
-        it("should format zero as milliseconds", () => {
+        it("should format zero as milliseconds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(0)).toBe("0ms");
         });
 
-        it("should format values under 1000ms as milliseconds", () => {
+        it("should format values under 1000ms as milliseconds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(1)).toBe("1ms");
             expect(formatResponseTime(123)).toBe("123ms");
             expect(formatResponseTime(500)).toBe("500ms");
             expect(formatResponseTime(999)).toBe("999ms");
         });
 
-        it("should format values 1000ms and above as seconds with decimal", () => {
+        it("should format values 1000ms and above as seconds with decimal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(1000)).toBe("1.00s");
             expect(formatResponseTime(1234)).toBe("1.23s");
             expect(formatResponseTime(5000)).toBe("5.00s");
             expect(formatResponseTime(12_345)).toBe("12.35s"); // Rounds to 2 decimal places
         });
 
-        it("should handle edge cases with rounding", () => {
+        it("should handle edge cases with rounding", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(999.9)).toBe("999.9ms");
             expect(formatResponseTime(1000.1)).toBe("1.00s");
             expect(formatResponseTime(1234.567)).toBe("1.23s"); // Rounds down
             expect(formatResponseTime(1234.999)).toBe("1.23s"); // Rounds down
         });
 
-        it("should handle very large values", () => {
+        it("should handle very large values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatResponseTime(60_000)).toBe("60.00s");
             expect(formatResponseTime(123_456)).toBe("123.46s");
         });
     });
 
     describe("getIntervalLabel", () => {
-        it("should format numeric intervals using formatIntervalDuration", () => {
+        it("should format numeric intervals using formatIntervalDuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getIntervalLabel(5000)).toBe("5s");
             expect(getIntervalLabel(60_000)).toBe("1m");
             expect(getIntervalLabel(3_600_000)).toBe("1h");
         });
 
-        it("should use custom label when provided", () => {
+        it("should use custom label when provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 getIntervalLabel({ value: 5000, label: "Every 5 seconds" })
             ).toBe("Every 5 seconds");
@@ -296,13 +568,29 @@ describe("Time Utilities", () => {
             ).toBe("Hourly Check");
         });
 
-        it("should fall back to formatIntervalDuration when label is empty", () => {
+        it("should fall back to formatIntervalDuration when label is empty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getIntervalLabel({ value: 5000, label: "" })).toBe("5s");
             expect(getIntervalLabel({ value: 60_000 })).toBe("1m");
             expect(getIntervalLabel({ value: 3_600_000 })).toBe("1h");
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getIntervalLabel(0)).toBe("0s");
             expect(getIntervalLabel({ value: 0, label: "Instant" })).toBe(
                 "Instant"
@@ -312,19 +600,43 @@ describe("Time Utilities", () => {
     });
 
     describe("formatRetryAttemptsText", () => {
-        it("should return special message for 0 attempts", () => {
+        it("should return special message for 0 attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatRetryAttemptsText(0)).toBe(
                 "(Retry disabled - immediate failure detection)"
             );
         });
 
-        it("should use singular 'time' for 1 attempt", () => {
+        it("should use singular 'time' for 1 attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatRetryAttemptsText(1)).toBe(
                 "(Retry 1 time before marking down)"
             );
         });
 
-        it("should use plural 'times' for multiple attempts", () => {
+        it("should use plural 'times' for multiple attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatRetryAttemptsText(2)).toBe(
                 "(Retry 2 times before marking down)"
             );
@@ -339,7 +651,15 @@ describe("Time Utilities", () => {
             );
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test negative values (not expected but should be handled)
             expect(formatRetryAttemptsText(-1)).toBe(
                 "(Retry -1 times before marking down)"
@@ -351,7 +671,15 @@ describe("Time Utilities", () => {
             );
         });
 
-        it("should handle decimal values (though not expected in normal use)", () => {
+        it("should handle decimal values (though not expected in normal use)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(formatRetryAttemptsText(1.5)).toBe(
                 "(Retry 1.5 times before marking down)"
             );
@@ -362,7 +690,15 @@ describe("Time Utilities", () => {
     });
 
     describe("TIME_PERIOD_LABELS", () => {
-        it("should contain all expected time period labels", () => {
+        it("should contain all expected time period labels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(TIME_PERIOD_LABELS).toEqual({
                 "1h": "Last Hour",
                 "7d": "Last 7 Days",
@@ -372,7 +708,15 @@ describe("Time Utilities", () => {
             });
         });
 
-        it("should have correct types for all keys", () => {
+        it("should have correct types for all keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const periods: TimePeriod[] = [
                 "1h",
                 "12h",
@@ -387,7 +731,15 @@ describe("Time Utilities", () => {
             }
         });
 
-        it("should provide meaningful labels", () => {
+        it("should provide meaningful labels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             for (const label of Object.values(TIME_PERIOD_LABELS)) {
                 expect(label).toMatch(/^Last/); // All labels start with "Last"
                 expect(label.length).toBeGreaterThan(5); // Meaningful length
@@ -396,7 +748,15 @@ describe("Time Utilities", () => {
     });
 
     describe("Edge cases and robustness", () => {
-        it("should handle very large numbers gracefully", () => {
+        it("should handle very large numbers gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const largeNumber = Number.MAX_SAFE_INTEGER;
 
             // These should not throw errors
@@ -406,7 +766,15 @@ describe("Time Utilities", () => {
             expect(() => formatResponseTime(largeNumber)).not.toThrow();
         });
 
-        it("should handle negative numbers gracefully", () => {
+        it("should handle negative numbers gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // These should not throw errors, though behavior may vary
             expect(() => formatDuration(-1000)).not.toThrow();
             expect(() => formatIntervalDuration(-1000)).not.toThrow();
@@ -414,7 +782,15 @@ describe("Time Utilities", () => {
             expect(() => formatResponseTime(-1000)).not.toThrow();
         });
 
-        it("should handle floating point precision issues", () => {
+        it("should handle floating point precision issues", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test common floating point edge cases
             const result1 = formatResponseTime(0.1 + 0.2); // Often equals 0.30000000000000004
             expect(result1).toBe("0.30000000000000004ms");

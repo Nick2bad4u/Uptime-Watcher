@@ -65,7 +65,15 @@ describe("Additional Uncovered Lines Tests", () => {
     });
 
     describe("useSiteDetails.ts - Line 250 (timeout handling with undefined monitor timeout)", () => {
-        it("should handle monitor with undefined timeout in handleTimeoutChange", () => {
+        it("should handle monitor with undefined timeout in handleTimeoutChange", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockSite: Site = {
                 identifier: "test-site-id",
                 monitors: [
@@ -93,7 +101,15 @@ describe("Additional Uncovered Lines Tests", () => {
     });
 
     describe("fileDownload.ts - Lines 61-63, 71-82 (error handling paths)", () => {
-        it("should handle blob creation failure", async () => {
+        it("should handle blob creation failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Failed to create object URL");
             });
@@ -113,7 +129,15 @@ describe("Additional Uncovered Lines Tests", () => {
             }).rejects.toThrow("Failed to create object URL");
         });
 
-        it("should handle appendChild error with fallback", async () => {
+        it("should handle appendChild error with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockAppendChild = vi.fn(() => {
                 throw new Error("appendChild failed");
             });
@@ -139,7 +163,15 @@ describe("Additional Uncovered Lines Tests", () => {
             expect(mockClick).toHaveBeenCalled();
         });
 
-        it("should handle non-DOM related errors", async () => {
+        it("should handle non-DOM related errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Network error");
             });
@@ -161,7 +193,15 @@ describe("Additional Uncovered Lines Tests", () => {
     });
 
     describe("statusUpdateHandler.ts - Lines 64-66, 73, 97-99 (error handling)", () => {
-        it("should handle network error in updateSiteHistory", async () => {
+        it("should handle network error in updateSiteHistory", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock updateSiteHistory to throw network error
             const mockUpdateSiteHistory = vi.fn(() => {
                 throw new Error("Network error");
@@ -175,7 +215,15 @@ describe("Additional Uncovered Lines Tests", () => {
     });
 
     describe("useSiteStats.ts - Line 47 (edge case handling)", () => {
-        it("should handle sites with no monitors", () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockSite: Site = {
                 identifier: "test-site-id",
                 monitors: [], // Empty monitors array

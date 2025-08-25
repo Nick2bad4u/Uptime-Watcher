@@ -9,7 +9,15 @@ import { generateCorrelationId, ValidationError } from "../utils/correlation";
 
 describe("correlationUtils", () => {
     describe("generateCorrelationId", () => {
-        it("should generate a unique correlation ID", () => {
+        it("should generate a unique correlation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const id1 = generateCorrelationId();
             const id2 = generateCorrelationId();
 
@@ -18,14 +26,30 @@ describe("correlationUtils", () => {
             expect(id1).not.toBe(id2);
         });
 
-        it("should generate a correlation ID with expected format", () => {
+        it("should generate a correlation ID with expected format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const id = generateCorrelationId();
 
             // Should be a 16-character hex string (8 bytes * 2 hex chars per byte)
             expect(id).toMatch(/^[\da-f]{16}$/);
         });
 
-        it("should generate different IDs on multiple calls", () => {
+        it("should generate different IDs on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const ids = new Set();
             for (let i = 0; i < 100; i++) {
                 ids.add(generateCorrelationId());
@@ -37,7 +61,15 @@ describe("correlationUtils", () => {
     });
 
     describe("ValidationError", () => {
-        it("should create a validation error with error messages", () => {
+        it("should create a validation error with error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const errors = ["Field is required", "Invalid format"];
             const error = new ValidationError(errors);
 
@@ -49,7 +81,15 @@ describe("correlationUtils", () => {
             );
         });
 
-        it("should handle single error message", () => {
+        it("should handle single error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errors = ["Single error"];
             const error = new ValidationError(errors);
 
@@ -57,7 +97,15 @@ describe("correlationUtils", () => {
             expect(error.errors).toEqual(errors);
         });
 
-        it("should handle empty error array", () => {
+        it("should handle empty error array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: correlationUtils", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errors: string[] = [];
             const error = new ValidationError(errors);
 

@@ -11,7 +11,15 @@ import * as stringConversionModule from "@shared/utils/stringConversion";
 
 describe("StringConversion - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Verify the module exports we expect
             expect(typeof stringConversionModule).toBe("object");
             expect(stringConversionModule).toBeDefined();
@@ -129,7 +137,15 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(typeof regexResult).toBe("string");
         });
 
-        it("should handle complex objects and edge cases", () => {
+        it("should handle complex objects and edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test complex objects that might fail serialization
             const complexObject = {
                 func: () => "test",
@@ -187,7 +203,15 @@ describe("StringConversion - Complete Function Coverage", () => {
             );
         });
 
-        it("should be consistent and deterministic", () => {
+        it("should be consistent and deterministic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that the function always returns a string
             const testValues = [
                 null,
@@ -225,7 +249,15 @@ describe("StringConversion - Complete Function Coverage", () => {
             });
         });
 
-        it("should cover all switch case branches", () => {
+        it("should cover all switch case branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test to ensure all typeof cases are covered for 100% branch coverage
 
             // The switch statement has these cases:

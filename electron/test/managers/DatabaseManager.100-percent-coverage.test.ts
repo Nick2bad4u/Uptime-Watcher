@@ -271,12 +271,28 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with provided dependencies", () => {
+        it("should initialize with provided dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(databaseManager).toBeDefined();
             expect(databaseManager).toBeInstanceOf(DatabaseManager);
         });
 
-        it("should set default history limit", () => {
+        it("should set default history limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             expect((databaseManager as any).historyLimit).toBe(
                 DEFAULT_HISTORY_LIMIT
             );
@@ -284,7 +300,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("initialize", () => {
-        it("should initialize database and load sites successfully", async () => {
+        it("should initialize database and load sites successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Arrange
             const mockLoadSites = vi
                 .spyOn(databaseManager as any, "loadSites")
@@ -305,7 +329,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
         });
 
-        it("should load history limit from settings during initialization", async () => {
+        it("should load history limit from settings during initialization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Arrange
             const mockHistoryLimit = 750;
             (
@@ -328,7 +360,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(mockLoadSites).toHaveBeenCalled();
         });
 
-        it("should handle settings.get error and use default limit", async () => {
+        it("should handle settings.get error and use default limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             (
                 mockSettingsRepository.get as MockedFunction<any>
@@ -347,7 +387,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(mockLoadSites).toHaveBeenCalled();
         });
 
-        it("should handle event emission error gracefully", async () => {
+        it("should handle event emission error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const mockLoadSites = vi
                 .spyOn(databaseManager as any, "loadSites")
@@ -363,7 +411,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("downloadBackup", () => {
-        it("should execute DownloadBackupCommand successfully", async () => {
+        it("should execute DownloadBackupCommand successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Backup Operation", "type");
+
             // Arrange
             const mockBackupResult = {
                 buffer: Buffer.from("backup-data"),
@@ -379,7 +435,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
         });
 
-        it("should handle backup command execution errors", async () => {
+        it("should handle backup command execution errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const backupError = new Error("Backup failed");
             mockCommandExecutor.execute.mockRejectedValue(backupError);
@@ -392,7 +456,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("exportData", () => {
-        it("should execute ExportDataCommand successfully", async () => {
+        it("should execute ExportDataCommand successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Arrange
             const mockExportData = JSON.stringify({ sites: [], settings: [] });
             mockCommandExecutor.execute.mockResolvedValue(mockExportData);
@@ -405,7 +477,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
         });
 
-        it("should handle export command execution errors", async () => {
+        it("should handle export command execution errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const exportError = new Error("Export failed");
             mockCommandExecutor.execute.mockRejectedValue(exportError);
@@ -418,7 +498,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("importData", () => {
-        it("should successfully import data and return true", async () => {
+        it("should successfully import data and return true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Import Operation", "type");
+
             // Arrange
             const importData = JSON.stringify({ sites: [], settings: [] });
             mockCommandExecutor.execute.mockResolvedValue(undefined);
@@ -431,7 +519,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
         });
 
-        it("should handle import errors and emit failure event", async () => {
+        it("should handle import errors and emit failure event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const importData = JSON.stringify({ sites: [], settings: [] });
             mockCommandExecutor.execute.mockRejectedValue(
@@ -452,7 +548,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
         });
 
-        it("should handle event emission errors during import failure", async () => {
+        it("should handle event emission errors during import failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const importData = JSON.stringify({ sites: [], settings: [] });
             mockCommandExecutor.execute.mockRejectedValue(
@@ -473,7 +577,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("refreshSites", () => {
-        it("should load sites and return them from cache", async () => {
+        it("should load sites and return them from cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const mockSites: Site[] = [
                 {
@@ -521,7 +633,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
         });
 
-        it("should handle cache access errors and return empty array", async () => {
+        it("should handle cache access errors and return empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const { siteCache } = databaseManager as any;
             if (!siteCache) {
@@ -553,7 +673,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("setHistoryLimit", () => {
-        it("should set valid history limit successfully", async () => {
+        it("should set valid history limit successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Arrange
             const newLimit = 1000;
             const { setHistoryLimit: mockSetHistoryLimit } = await import(
@@ -568,7 +696,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect((databaseManager as any).historyLimit).toBe(newLimit);
         });
 
-        it("should reject non-number values", async () => {
+        it("should reject non-number values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Act & Assert
             await expect(
                 databaseManager.setHistoryLimit("invalid" as any)
@@ -584,7 +720,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should reject non-integer values", async () => {
+        it("should reject non-integer values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Act & Assert
             await expect(
                 databaseManager.setHistoryLimit(123.45)
@@ -594,7 +738,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
         });
 
-        it("should reject negative values", async () => {
+        it("should reject negative values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Act & Assert
             await expect(databaseManager.setHistoryLimit(-1)).rejects.toThrow(
                 RangeError
@@ -604,7 +756,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
         });
 
-        it("should reject infinite values", async () => {
+        it("should reject infinite values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Act & Assert - Infinity is caught by integer check first, so TypeError is expected
             await expect(
                 databaseManager.setHistoryLimit(Infinity)
@@ -614,7 +774,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should reject values exceeding maximum limit", async () => {
+        it("should reject values exceeding maximum limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Arrange
             const maxLimit = 10_000;
             (
@@ -633,7 +801,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("resetSettings", () => {
-        it("should reset history limit to default", async () => {
+        it("should reset history limit to default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Arrange
             const mockSetHistoryLimit = vi
                 .spyOn(databaseManager, "setHistoryLimit")
@@ -650,7 +826,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("getHistoryLimit", () => {
-        it("should return current history limit", () => {
+        it("should return current history limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Arrange
             const testLimit = 750;
             (databaseManager as any).historyLimit = testLimit;
@@ -665,7 +849,15 @@ describe("DatabaseManager - 100% Coverage", () => {
 
     describe("Private Methods", () => {
         describe("emitHistoryLimitUpdated", () => {
-            it("should emit history limit updated event successfully", async () => {
+            it("should emit history limit updated event successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
                 // Arrange
                 const limit = 500;
 
@@ -682,7 +874,15 @@ describe("DatabaseManager - 100% Coverage", () => {
                 );
             });
 
-            it("should handle event emission errors gracefully", async () => {
+            it("should handle event emission errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Arrange
                 const limit = 500;
                 (
@@ -697,7 +897,15 @@ describe("DatabaseManager - 100% Coverage", () => {
         });
 
         describe("emitSitesCacheUpdateRequested", () => {
-            it("should emit sites cache update requested event successfully", async () => {
+            it("should emit sites cache update requested event successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
                 // Arrange
                 const mockSites = [
                     {
@@ -725,7 +933,15 @@ describe("DatabaseManager - 100% Coverage", () => {
                 );
             });
 
-            it("should handle event emission errors gracefully", async () => {
+            it("should handle event emission errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Arrange
                 (
                     mockEventEmitter.emitTyped as MockedFunction<any>
@@ -739,7 +955,15 @@ describe("DatabaseManager - 100% Coverage", () => {
         });
 
         describe("loadSites", () => {
-            it("should load sites from database successfully", async () => {
+            it("should load sites from database successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
                 // Arrange
                 const mockSiteLoadingOrchestrator = (databaseManager as any)
                     .siteLoadingOrchestrator;
@@ -761,7 +985,15 @@ describe("DatabaseManager - 100% Coverage", () => {
                 ).toHaveBeenCalled();
             });
 
-            it("should handle site loading errors", async () => {
+            it("should handle site loading errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Arrange
                 const mockSiteLoadingOrchestrator = (databaseManager as any)
                     .siteLoadingOrchestrator;
@@ -779,7 +1011,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("Edge Cases and Integration", () => {
-        it("should handle concurrent operations gracefully", async () => {
+        it("should handle concurrent operations gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange - these are actual method calls, not mocked spies
             const promises = [
                 databaseManager.initialize(),
@@ -792,7 +1032,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             await expect(Promise.all(promises)).resolves.toBeDefined();
         });
 
-        it("should maintain state consistency across operations", async () => {
+        it("should maintain state consistency across operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const newLimit = 800;
 
@@ -804,7 +1052,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             expect(retrievedLimit).toBe(newLimit);
         });
 
-        it("should handle dependencies being null gracefully", () => {
+        it("should handle dependencies being null gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This tests constructor robustness with minimal dependencies
             const minimalDeps: DatabaseManagerDependencies = {
                 configurationManager: mockConfigurationManager,
@@ -824,7 +1080,15 @@ describe("DatabaseManager - 100% Coverage", () => {
     });
 
     describe("Error Handling Integration", () => {
-        it("should properly wrap operations with error handling", async () => {
+        it("should properly wrap operations with error handling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // This test verifies that error handling is working by ensuring operations
             // complete successfully even with potential errors in dependencies
 
@@ -838,7 +1102,15 @@ describe("DatabaseManager - 100% Coverage", () => {
             // The fact that these complete without throwing proves error handling is active
         });
 
-        it("should handle complex error scenarios", async () => {
+        it("should handle complex error scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager.100-percent-coverage", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const complexError = new Error("Complex error");
             mockCommandExecutor.execute.mockRejectedValue(complexError);

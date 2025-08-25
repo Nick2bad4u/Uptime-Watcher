@@ -115,14 +115,30 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteRepositoryService - Constructor", () => {
-        it("should create instance with all dependencies", () => {
+        it("should create instance with all dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(siteRepositoryService).toBeDefined();
             expect(siteRepositoryService).toBeInstanceOf(SiteRepositoryService);
         });
     });
 
     describe("SiteRepositoryService - getHistoryLimitSetting", () => {
-        it("should return valid history limit from settings", async () => {
+        it("should return valid history limit from settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue("100");
 
             const result = await siteRepositoryService.getHistoryLimitSetting();
@@ -133,7 +149,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should return undefined when no setting exists", async () => {
+        it("should return undefined when no setting exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue(
                 undefined
             );
@@ -143,7 +167,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(result).toBeUndefined();
         });
 
-        it("should return undefined for non-numeric setting", async () => {
+        it("should return undefined for non-numeric setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue(
                 "invalid"
             );
@@ -156,7 +188,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should return undefined for negative setting", async () => {
+        it("should return undefined for negative setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue("-10");
 
             const result = await siteRepositoryService.getHistoryLimitSetting();
@@ -167,7 +207,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should return undefined for zero setting", async () => {
+        it("should return undefined for zero setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue("0");
 
             const result = await siteRepositoryService.getHistoryLimitSetting();
@@ -178,7 +226,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle database error gracefully", async () => {
+        it("should handle database error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Database connection failed");
             vi.mocked(mockRepositories.settings.get).mockRejectedValue(error);
 
@@ -193,7 +249,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteRepositoryService - applyHistoryLimitSetting", () => {
-        it("should apply valid history limit to monitoring config", async () => {
+        it("should apply valid history limit to monitoring config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue("50");
 
             await siteRepositoryService.applyHistoryLimitSetting(
@@ -208,7 +272,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should not apply when no limit setting exists", async () => {
+        it("should not apply when no limit setting exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue(
                 undefined
             );
@@ -221,7 +293,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(mockLogger.info).not.toHaveBeenCalled();
         });
 
-        it("should not apply invalid limit setting", async () => {
+        it("should not apply invalid limit setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(mockRepositories.settings.get).mockResolvedValue(
                 "invalid"
             );
@@ -236,7 +316,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteRepositoryService - getSitesFromDatabase", () => {
-        it("should get sites with monitors and history", async () => {
+        it("should get sites with monitors and history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const siteRows: SiteRow[] = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
                 { identifier: "site2", name: "Site 2", monitoring: false },
@@ -333,7 +421,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteRows: SiteRow[] = [
                 {
                     identifier: "empty-site",
@@ -360,7 +456,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should use default name when name is null", async () => {
+        it("should use default name when name is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteRows: SiteRow[] = [
                 { identifier: "no-name", monitoring: true },
             ];
@@ -377,7 +481,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(sites[0]?.name).toBe("Unknown Site");
         });
 
-        it("should use default monitoring status when monitoring is null", async () => {
+        it("should use default monitoring status when monitoring is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteRows: SiteRow[] = [
                 {
                     identifier: "no-monitoring",
@@ -397,7 +509,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(sites[0]?.monitoring).toBe(true);
         });
 
-        it("should handle monitor without ID", async () => {
+        it("should handle monitor without ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteRows: SiteRow[] = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
             ];
@@ -432,7 +552,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             ).not.toHaveBeenCalled();
         });
 
-        it("should throw SiteLoadingError on database error", async () => {
+        it("should throw SiteLoadingError on database error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Database error");
             vi.mocked(mockRepositories.site.findAll).mockRejectedValue(error);
 
@@ -445,7 +573,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle non-Error exceptions", async () => {
+        it("should handle non-Error exceptions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockRepositories.site.findAll).mockRejectedValue(
                 "String error"
             );
@@ -461,7 +597,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteRepositoryService - loadSitesIntoCache", () => {
-        it("should load sites into cache successfully", async () => {
+        it("should load sites into cache successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             const sites: Site[] = [
                 {
                     identifier: "site1",
@@ -494,7 +638,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle empty sites array", async () => {
+        it("should handle empty sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.spyOn(
                 siteRepositoryService,
                 "getSitesFromDatabase"
@@ -510,7 +662,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle error and emit database error event", async () => {
+        it("should handle error and emit database error event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Cache error");
             vi.spyOn(
                 siteRepositoryService,
@@ -536,7 +696,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle non-Error exceptions", async () => {
+        it("should handle non-Error exceptions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorString = "String error";
             vi.spyOn(
                 siteRepositoryService,
@@ -564,7 +732,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteLoadingOrchestrator - Constructor", () => {
-        it("should create instance with site repository service", () => {
+        it("should create instance with site repository service", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(siteLoadingOrchestrator).toBeDefined();
             expect(siteLoadingOrchestrator).toBeInstanceOf(
                 SiteLoadingOrchestrator
@@ -573,7 +749,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteLoadingOrchestrator - loadSitesFromDatabase", () => {
-        it("should successfully load sites and apply settings", async () => {
+        it("should successfully load sites and apply settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             Object.defineProperty(mockSiteCache, "size", { value: 3 });
             vi.spyOn(
                 siteRepositoryService,
@@ -602,7 +786,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             ).toHaveBeenCalledWith(mockMonitoringConfig);
         });
 
-        it("should handle zero sites loaded", async () => {
+        it("should handle zero sites loaded", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             Object.defineProperty(mockSiteCache, "size", { value: 0 });
             vi.spyOn(
                 siteRepositoryService,
@@ -625,7 +817,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should handle error during site loading", async () => {
+        it("should handle error during site loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Loading failed");
             vi.spyOn(
                 siteRepositoryService,
@@ -644,7 +844,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should handle error during settings application", async () => {
+        it("should handle error during settings application", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Settings failed");
             vi.spyOn(
                 siteRepositoryService,
@@ -667,7 +875,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should handle non-Error exceptions", async () => {
+        it("should handle non-Error exceptions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.spyOn(
                 siteRepositoryService,
                 "loadSitesIntoCache"
@@ -687,14 +903,30 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteLoadingError", () => {
-        it("should create error with message", () => {
+        it("should create error with message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const error = new SiteLoadingError("Test error");
 
             expect(error.name).toBe("SiteLoadingError");
             expect(error.message).toBe("Failed to load sites: Test error");
         });
 
-        it("should preserve cause error stack trace", () => {
+        it("should preserve cause error stack trace", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const cause = new Error("Original error");
             const error = new SiteLoadingError("Test error", cause);
 
@@ -703,7 +935,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(error.stack).toContain("Original error");
         });
 
-        it("should work without cause error", () => {
+        it("should work without cause error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new SiteLoadingError("Test error");
 
             expect(error.name).toBe("SiteLoadingError");
@@ -713,7 +953,15 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("Integration Tests", () => {
-        it("should handle complete workflow with complex data", async () => {
+        it("should handle complete workflow with complex data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Setup complex site data
             const siteRows: SiteRow[] = [
                 {

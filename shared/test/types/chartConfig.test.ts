@@ -11,7 +11,15 @@ import {
 
 describe("Chart Config Utilities", () => {
     describe("hasPlugins", () => {
-        it("should return true for object with plugins property", () => {
+        it("should return true for object with plugins property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 plugins: {
                     legend: { display: true },
@@ -22,7 +30,15 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(config)).toBe(true);
         });
 
-        it("should return false for object without plugins property", () => {
+        it("should return false for object without plugins property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {},
                 responsive: true,
@@ -31,21 +47,53 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(config)).toBe(false);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasPlugins(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasPlugins(undefined)).toBe(false);
         });
 
-        it("should return false for primitive values", () => {
+        it("should return false for primitive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasPlugins("string")).toBe(false);
             expect(hasPlugins(123)).toBe(false);
             expect(hasPlugins(true)).toBe(false);
         });
 
-        it("should return false for object with plugins as non-object", () => {
+        it("should return false for object with plugins as non-object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 plugins: "not an object",
             };
@@ -53,7 +101,15 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(config)).toBe(false);
         });
 
-        it("should return false for object with plugins as null", () => {
+        it("should return false for object with plugins as null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 plugins: null,
             };
@@ -61,7 +117,15 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(config)).toBe(false);
         });
 
-        it("should return true for object with empty plugins object", () => {
+        it("should return true for object with empty plugins object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 plugins: {},
             };
@@ -71,7 +135,15 @@ describe("Chart Config Utilities", () => {
     });
 
     describe("hasScales", () => {
-        it("should return true for object with scales property", () => {
+        it("should return true for object with scales property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { type: "linear" },
@@ -82,7 +154,15 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(true);
         });
 
-        it("should return false for object without scales property", () => {
+        it("should return false for object without scales property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 plugins: {},
                 responsive: true,
@@ -91,21 +171,53 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales(undefined)).toBe(false);
         });
 
-        it("should return false for primitive values", () => {
+        it("should return false for primitive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales("string")).toBe(false);
             expect(hasScales(123)).toBe(false);
             expect(hasScales(true)).toBe(false);
         });
 
-        it("should return false for object with scales as non-object", () => {
+        it("should return false for object with scales as non-object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: "not an object",
             };
@@ -113,7 +225,15 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return false for object with scales as null", () => {
+        it("should return false for object with scales as null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: null,
             };
@@ -121,7 +241,15 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return true for object with empty scales object", () => {
+        it("should return true for object with empty scales object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {},
             };
@@ -129,7 +257,15 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(true);
         });
 
-        it("should handle complex nested scales configuration", () => {
+        it("should handle complex nested scales configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: {
@@ -156,7 +292,15 @@ describe("Chart Config Utilities", () => {
     });
 
     describe("DEFAULT_CHART_THEMES", () => {
-        it("should have dark theme configuration", () => {
+        it("should have dark theme configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_CHART_THEMES.dark).toBeDefined();
             expect(DEFAULT_CHART_THEMES.dark.backgroundColors).toBeDefined();
             expect(DEFAULT_CHART_THEMES.dark.borderColors).toBeDefined();
@@ -168,7 +312,15 @@ describe("Chart Config Utilities", () => {
             );
         });
 
-        it("should have light theme configuration", () => {
+        it("should have light theme configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_CHART_THEMES.light).toBeDefined();
             expect(DEFAULT_CHART_THEMES.light.backgroundColors).toBeDefined();
             expect(DEFAULT_CHART_THEMES.light.borderColors).toBeDefined();
@@ -180,7 +332,15 @@ describe("Chart Config Utilities", () => {
             );
         });
 
-        it("should have multiple colors in each theme", () => {
+        it("should have multiple colors in each theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 DEFAULT_CHART_THEMES.dark.backgroundColors.length
             ).toBeGreaterThan(0);
@@ -195,7 +355,15 @@ describe("Chart Config Utilities", () => {
             ).toBeGreaterThan(0);
         });
 
-        it("should have matching number of background and border colors", () => {
+        it("should have matching number of background and border colors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_CHART_THEMES.dark.backgroundColors.length).toBe(
                 DEFAULT_CHART_THEMES.dark.borderColors.length
             );
@@ -204,7 +372,15 @@ describe("Chart Config Utilities", () => {
             );
         });
 
-        it("should have valid color strings", () => {
+        it("should have valid color strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const colorRegex = /^rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*[\d.]+)?\)$/;
 
             DEFAULT_CHART_THEMES.dark.backgroundColors.forEach((color) => {
@@ -220,7 +396,15 @@ describe("Chart Config Utilities", () => {
     });
 
     describe("Type Guards Integration", () => {
-        it("should work together with complete chart config", () => {
+        it("should work together with complete chart config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const fullConfig = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -238,7 +422,15 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(fullConfig)).toBe(true);
         });
 
-        it("should handle partial configurations correctly", () => {
+        it("should handle partial configurations correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pluginsOnlyConfig = {
                 plugins: { legend: { display: false } },
             };

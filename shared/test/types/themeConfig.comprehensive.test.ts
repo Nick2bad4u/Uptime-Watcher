@@ -31,7 +31,15 @@ import {
 
 describe("Theme Config Types - Comprehensive Coverage", () => {
     describe("AnimationConfig Interface", () => {
-        it("should create valid AnimationConfig object", () => {
+        it("should create valid AnimationConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const animation: AnimationConfig = {
                 duration: {
                     fast: "150ms",
@@ -55,7 +63,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(animation.easing.linear).toBe("linear");
         });
 
-        it("should validate all required animation properties", () => {
+        it("should validate all required animation properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const animation: AnimationConfig = {
                 duration: {
                     fast: "100ms",
@@ -85,7 +101,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("BackgroundColors Interface", () => {
-        it("should create valid BackgroundColors object", () => {
+        it("should create valid BackgroundColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const background: BackgroundColors = {
                 default: "#ffffff",
                 elevated: "#f9fafb",
@@ -101,7 +125,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(background.secondary).toBe("#f3f4f6");
         });
 
-        it("should support different color formats", () => {
+        it("should support different color formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const background: BackgroundColors = {
                 default: "rgb(255, 255, 255)",
                 elevated: "rgba(249, 250, 251, 0.9)",
@@ -119,7 +151,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("BorderColors Interface", () => {
-        it("should create valid BorderColors object", () => {
+        it("should create valid BorderColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const border: BorderColors = {
                 default: "#e5e7eb",
                 disabled: "#d1d5db",
@@ -141,7 +181,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("BorderRadiusConfig Interface", () => {
-        it("should create valid BorderRadiusConfig object", () => {
+        it("should create valid BorderRadiusConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const borderRadius: BorderRadiusConfig = {
                 full: "9999px",
                 lg: "8px",
@@ -161,7 +209,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ColorPalette Interface", () => {
-        it("should create valid ColorPalette object", () => {
+        it("should create valid ColorPalette object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const palette: ColorPalette = {
                 error: "#ef4444",
                 info: "#3b82f6",
@@ -179,7 +235,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(palette.warning).toBe("#f59e0b");
         });
 
-        it("should validate isColorPalette type guard", () => {
+        it("should validate isColorPalette type guard", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validPalette: ColorPalette = {
                 error: "#ef4444",
                 info: "#3b82f6",
@@ -204,7 +268,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ComponentConfig Interface", () => {
-        it("should create valid ComponentConfig object", () => {
+        it("should create valid ComponentConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const components: ComponentConfig = {
                 button: {
                     borderRadius: "6px",
@@ -242,7 +314,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ShadowConfig Interface", () => {
-        it("should create valid ShadowConfig object", () => {
+        it("should create valid ShadowConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const shadows: ShadowConfig = {
                 lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                 md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
@@ -260,7 +340,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("SpacingConfig Interface", () => {
-        it("should create valid SpacingConfig object", () => {
+        it("should create valid SpacingConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const spacing: SpacingConfig = {
                 lg: "16px",
                 md: "12px",
@@ -282,7 +370,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("StatusColors Interface", () => {
-        it("should create valid StatusColors object", () => {
+        it("should create valid StatusColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const status: StatusColors = {
                 down: "#ef4444",
                 paused: "#f59e0b",
@@ -300,7 +396,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("TextColors Interface", () => {
-        it("should create valid TextColors object", () => {
+        it("should create valid TextColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const text: TextColors = {
                 disabled: "#9ca3af",
                 error: "#ef4444",
@@ -322,7 +426,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ThemeColors Interface", () => {
-        it("should create valid ThemeColors object", () => {
+        it("should create valid ThemeColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const colors: ThemeColors = {
                 background: {
                     default: "#ffffff",
@@ -382,7 +494,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("TypographyConfig Interface", () => {
-        it("should create valid TypographyConfig object", () => {
+        it("should create valid TypographyConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const typography: TypographyConfig = {
                 fontFamily: {
                     body: "system-ui, -apple-system, sans-serif",
@@ -427,7 +547,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ThemeConfig Interface", () => {
-        it("should create valid complete ThemeConfig object", () => {
+        it("should create valid complete ThemeConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: ThemeConfig = {
                 animation: {
                     duration: {
@@ -580,7 +708,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(config.typography.fontFamily.body).toContain("system-ui");
         });
 
-        it("should validate isThemeConfig type guard with simplified config", () => {
+        it("should validate isThemeConfig type guard with simplified config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
@@ -730,7 +866,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ThemeConfigWithModes Interface", () => {
-        it("should create valid ThemeConfigWithModes object", () => {
+        it("should create valid ThemeConfigWithModes object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const lightConfig: ThemeConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
@@ -902,7 +1046,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("ThemeOverride Interface", () => {
-        it("should create valid ThemeOverride object", () => {
+        it("should create valid ThemeOverride object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const override: ThemeOverride = {
                 animation: {
                     duration: {
@@ -942,7 +1094,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(override.typography?.fontSize?.body).toBe("16px");
         });
 
-        it("should support partial overrides", () => {
+        it("should support partial overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const override: ThemeOverride = {
                 spacing: {
                     lg: "20px",
@@ -958,7 +1118,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("DefaultThemeConfig Constant", () => {
-        it("should provide valid default theme configuration", () => {
+        it("should provide valid default theme configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_THEME_CONFIG).toBeDefined();
             expect(DEFAULT_THEME_CONFIG.animation).toBeDefined();
             expect(DEFAULT_THEME_CONFIG.borderRadius).toBeDefined();
@@ -968,7 +1136,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(DEFAULT_THEME_CONFIG.typography).toBeDefined();
         });
 
-        it("should have correct default animation values", () => {
+        it("should have correct default animation values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_THEME_CONFIG.animation.duration.fast).toBe("150ms");
             expect(DEFAULT_THEME_CONFIG.animation.duration.normal).toBe(
                 "300ms"
@@ -977,7 +1153,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(DEFAULT_THEME_CONFIG.animation.easing.linear).toBe("linear");
         });
 
-        it("should have correct default spacing values", () => {
+        it("should have correct default spacing values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_THEME_CONFIG.spacing.xs).toBe("4px");
             expect(DEFAULT_THEME_CONFIG.spacing.sm).toBe("8px");
             expect(DEFAULT_THEME_CONFIG.spacing.md).toBe("12px");
@@ -985,7 +1169,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(DEFAULT_THEME_CONFIG.spacing.xl).toBe("24px");
         });
 
-        it("should have correct default typography values", () => {
+        it("should have correct default typography values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_THEME_CONFIG.typography.fontSize.body).toBe("14px");
             expect(DEFAULT_THEME_CONFIG.typography.fontWeight.normal).toBe(400);
             expect(DEFAULT_THEME_CONFIG.typography.lineHeight.body).toBe("1.5");
@@ -993,7 +1185,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("Type Validation Edge Cases", () => {
-        it("should handle edge cases for isColorPalette", () => {
+        it("should handle edge cases for isColorPalette", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isColorPalette({})).toBe(false);
             expect(isColorPalette({ 50: "" })).toBe(false);
             expect(isColorPalette({ 50: "#fff", 100: null })).toBe(false);
@@ -1001,7 +1201,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(isColorPalette(123)).toBe(false);
         });
 
-        it("should handle edge cases for isThemeConfig", () => {
+        it("should handle edge cases for isThemeConfig", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isThemeConfig({})).toBe(false);
             expect(isThemeConfig({ animation: {} })).toBe(false);
             expect(isThemeConfig({ animation: null })).toBe(false);
@@ -1011,7 +1219,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("HoverColors Interface", () => {
-        it("should create valid HoverColors object", () => {
+        it("should create valid HoverColors object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const hover: HoverColors = {
                 background: "#f9fafb",
                 border: "#e5e7eb",
@@ -1029,7 +1245,15 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
     });
 
     describe("Complex Integration Tests", () => {
-        it("should support nested theme configuration", () => {
+        it("should support nested theme configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexConfig: ThemeConfig = {
                 animation: DEFAULT_THEME_CONFIG.animation,
                 borderRadius: DEFAULT_THEME_CONFIG.borderRadius,

@@ -63,37 +63,85 @@ describe("ServiceContainer - Core Services", () => {
     });
 
     describe("Database Core Services", () => {
-        it("should create DatabaseService singleton", () => {
+        it("should create DatabaseService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getDatabaseService();
             }).not.toThrow();
         });
 
-        it("should create HistoryRepository singleton", () => {
+        it("should create HistoryRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getHistoryRepository();
             }).not.toThrow();
         });
 
-        it("should create MonitorRepository singleton", () => {
+        it("should create MonitorRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getMonitorRepository();
             }).not.toThrow();
         });
 
-        it("should create SettingsRepository singleton", () => {
+        it("should create SettingsRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getSettingsRepository();
             }).not.toThrow();
         });
 
-        it("should create SiteRepository singleton", () => {
+        it("should create SiteRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getSiteRepository();
             }).not.toThrow();
         });
 
-        it("should return same instance on multiple calls", () => {
+        it("should return same instance on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const db1 = container.getDatabaseService();
             const db2 = container.getDatabaseService();
             expect(db1).toBe(db2);
@@ -101,7 +149,15 @@ describe("ServiceContainer - Core Services", () => {
     });
 
     describe("Service Singleton Pattern", () => {
-        it("should maintain singleton across all core services", () => {
+        it("should maintain singleton across all core services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history1 = container.getHistoryRepository();
             const history2 = container.getHistoryRepository();
             const monitor1 = container.getMonitorRepository();
@@ -111,7 +167,15 @@ describe("ServiceContainer - Core Services", () => {
             expect(monitor1).toBe(monitor2);
         });
 
-        it("should handle service dependencies without circular references", () => {
+        it("should handle service dependencies without circular references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(() => {
                 container.getDatabaseService();
                 container.getHistoryRepository();
@@ -123,14 +187,30 @@ describe("ServiceContainer - Core Services", () => {
     });
 
     describe("Service Management", () => {
-        it("should handle service creation without errors", () => {
+        it("should handle service creation without errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 container.getDatabaseService();
                 container.getHistoryRepository();
             }).not.toThrow();
         });
 
-        it("should maintain service state across calls", () => {
+        it("should maintain service state across calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const db1 = container.getDatabaseService();
             const db2 = container.getDatabaseService();
             expect(db1).toBe(db2);

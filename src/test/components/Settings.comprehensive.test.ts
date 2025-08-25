@@ -6,7 +6,15 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("Settings Component Coverage Tests", () => {
     describe("Component Props", () => {
-        it("should handle SettingsProperties interface", () => {
+        it("should handle SettingsProperties interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const onClose = vi.fn();
             const props = { onClose };
 
@@ -18,7 +26,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Allowed Settings Keys", () => {
-        it("should validate allowed settings keys", () => {
+        it("should validate allowed settings keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const ALLOWED_SETTINGS_KEYS = new Set([
                 "autoStart",
                 "historyLimit",
@@ -54,7 +70,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Store Integration", () => {
-        it("should integrate with useErrorStore", () => {
+        it("should integrate with useErrorStore", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorStore = {
                 clearError: vi.fn(),
                 isLoading: false,
@@ -74,7 +98,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(errorStore.setError).toHaveBeenCalledWith(expect.any(Error));
         });
 
-        it("should integrate with useSettingsStore", () => {
+        it("should integrate with useSettingsStore", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const settingsStore = {
                 resetSettings: vi.fn(),
                 settings: {
@@ -101,7 +133,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(settingsStore.settings.theme).toBe("system");
         });
 
-        it("should integrate with useSitesStore", () => {
+        it("should integrate with useSitesStore", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sitesStore = {
                 downloadSQLiteBackup: vi.fn(),
                 fullSyncFromBackend: vi.fn(),
@@ -117,7 +157,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(sitesStore.fullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should integrate with useTheme", () => {
+        it("should integrate with useTheme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = {
                 availableThemes: [
                     "light",
@@ -138,7 +186,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Loading States", () => {
-        it("should handle loading state management", () => {
+        it("should handle loading state management", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Data Loading", "type");
+
             const loadingStates = {
                 isLoading: false,
                 showButtonLoading: false,
@@ -148,7 +204,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(typeof loadingStates.showButtonLoading).toBe("boolean");
         });
 
-        it("should handle loading state transitions", () => {
+        it("should handle loading state transitions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Data Loading", "type");
+
             const setShowButtonLoading = vi.fn();
 
             // Simulate loading state changes
@@ -159,7 +223,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(setShowButtonLoading).toHaveBeenCalledWith(false);
         });
 
-        it("should handle timeout cleanup", () => {
+        it("should handle timeout cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const clearTimeout = vi.fn();
             const _timeoutId = vi.fn(() => 123);
             void _timeoutId;
@@ -175,7 +247,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Sync Success State", () => {
-        it("should handle sync success state", () => {
+        it("should handle sync success state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setSyncSuccess = vi.fn();
 
             setSyncSuccess(true);
@@ -187,7 +267,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Settings Validation", () => {
-        it("should validate settings change handler", () => {
+        it("should validate settings change handler", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const ALLOWED_SETTINGS_KEYS = new Set([
                 "autoStart",
                 "historyLimit",
@@ -214,7 +302,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(handleSettingChange("notAllowed", 123)).toBe(false);
         });
 
-        it("should handle different value types", () => {
+        it("should handle different value types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testValues = [
                 { key: "autoStart", value: true, type: "boolean" },
                 { key: "historyLimit", value: 100, type: "number" },
@@ -231,7 +327,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("History Limit Handling", () => {
-        it("should handle history limit options", () => {
+        it("should handle history limit options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Configuration", "type");
+
             const HISTORY_LIMIT_OPTIONS = [
                 25,
                 50,
@@ -255,7 +359,15 @@ describe("Settings Component Coverage Tests", () => {
             }
         });
 
-        it("should validate safe integer conversion", () => {
+        it("should validate safe integer conversion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const safeInteger = (
                 value: string,
                 min: number,
@@ -308,7 +420,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Theme Handling", () => {
-        it("should handle theme names", () => {
+        it("should handle theme names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const themeNames = [
                 "light",
                 "dark",
@@ -327,7 +447,15 @@ describe("Settings Component Coverage Tests", () => {
             }
         });
 
-        it("should handle theme selection", () => {
+        it("should handle theme selection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setTheme = vi.fn();
 
             const themes = [
@@ -343,7 +471,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle error utilities", () => {
+        it("should handle error utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Error Handling", "type");
+
             const ensureError = (error: unknown) => {
                 if (error instanceof Error) {
                     return error;
@@ -360,7 +496,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(ensureError(actualError)).toBe(actualError);
         });
 
-        it("should handle error clearing", () => {
+        it("should handle error clearing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Error Handling", "type");
+
             const clearError = vi.fn();
             const setError = vi.fn();
 
@@ -373,7 +517,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Data Operations", () => {
-        it("should handle SQLite backup operations", () => {
+        it("should handle SQLite backup operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const downloadSQLiteBackup = vi.fn().mockResolvedValue(undefined);
 
             const handleBackup = async () => {
@@ -384,7 +536,15 @@ describe("Settings Component Coverage Tests", () => {
             return expect(handleBackup()).resolves.toBeUndefined();
         });
 
-        it("should handle full sync operations", () => {
+        it("should handle full sync operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const fullSyncFromBackend = vi.fn().mockResolvedValue(undefined);
 
             const handleSync = async () => {
@@ -395,7 +555,15 @@ describe("Settings Component Coverage Tests", () => {
             return expect(handleSync()).resolves.toBeUndefined();
         });
 
-        it("should handle settings reset", () => {
+        it("should handle settings reset", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const resetSettings = vi.fn();
 
             resetSettings();
@@ -404,7 +572,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("UI Constants", () => {
-        it("should use correct UI delays", () => {
+        it("should use correct UI delays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const UI_DELAYS = {
                 LOADING_BUTTON: 100,
                 STATE_UPDATE_DEFER: 0,
@@ -418,7 +594,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Component State", () => {
-        it("should handle component state changes", () => {
+        it("should handle component state changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const useState = (initialValue: any) => {
                 const state = initialValue;
                 const setState = vi.fn();
@@ -436,7 +620,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Callbacks", () => {
-        it("should handle useCallback optimization", () => {
+        it("should handle useCallback optimization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const useCallback = (fn: Function, _deps: any[]) => fn;
 
             const clearButtonLoading = useCallback(() => {}, []);
@@ -448,7 +640,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("App Settings Interface", () => {
-        it("should handle AppSettings type", () => {
+        it("should handle AppSettings type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const appSettings = {
                 autoStart: false,
                 historyLimit: 100,
@@ -468,7 +668,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Logger Integration", () => {
-        it("should handle logger calls", () => {
+        it("should handle logger calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = {
                 error: vi.fn(),
                 info: vi.fn(),
@@ -487,7 +695,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Component Features", () => {
-        it("should list all component features", () => {
+        it("should list all component features", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const features = [
                 "Theme selection (light/dark/system)",
                 "History retention limits (25-unlimited records)",
@@ -511,7 +727,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Themed Components", () => {
-        it("should use themed components", () => {
+        it("should use themed components", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const themedComponents = [
                 "StatusIndicator",
                 "ThemedBox",
@@ -532,7 +756,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Event Handling", () => {
-        it("should handle close event", () => {
+        it("should handle close event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Event Processing", "type");
+
             const onClose = vi.fn();
 
             // Simulate close button click
@@ -541,7 +773,15 @@ describe("Settings Component Coverage Tests", () => {
             expect(onClose).toHaveBeenCalled();
         });
 
-        it("should handle setting changes", () => {
+        it("should handle setting changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const updateSettings = vi.fn();
 
             const settingChanges = [
@@ -558,7 +798,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Validation Utils", () => {
-        it("should validate safeInteger utility", () => {
+        it("should validate safeInteger utility", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             // Mock implementation of safeInteger since we can't import it directly
             const mockSafeInteger = (input: string, options: any = {}) => {
                 const num = Number.parseInt(input, 10);
@@ -573,7 +821,15 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Component Architecture", () => {
-        it("should follow component architecture patterns", () => {
+        it("should follow component architecture patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Settings", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const architectureElements = {
                 storeIntegration: true,
                 errorHandling: true,

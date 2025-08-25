@@ -11,7 +11,15 @@ import * as typesModule from "../types";
 
 describe("Shared Types - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Verify the module exports we expect
             expect(typeof typesModule).toBe("object");
             expect(typesModule).toBeDefined();
@@ -257,7 +265,15 @@ describe("Shared Types - Complete Function Coverage", () => {
             ).toBe(false);
         });
 
-        it("should test constants and type definitions", () => {
+        it("should test constants and type definitions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Initialization", "type");
+
             // Test BASE_MONITOR_TYPES constant
             expect(Array.isArray(typesModule.BASE_MONITOR_TYPES)).toBe(true);
             expect(typesModule.BASE_MONITOR_TYPES).toContain("http");
@@ -279,7 +295,15 @@ describe("Shared Types - Complete Function Coverage", () => {
             expect(typesModule.DEFAULT_SITE_STATUS).toBe("unknown");
         });
 
-        it("should test all monitor types from BASE_MONITOR_TYPES", () => {
+        it("should test all monitor types from BASE_MONITOR_TYPES", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Ensure all base monitor types are valid in validateMonitor
             for (const monitorType of typesModule.BASE_MONITOR_TYPES) {
                 const testMonitor = {
@@ -297,7 +321,15 @@ describe("Shared Types - Complete Function Coverage", () => {
             }
         });
 
-        it("should test all status values from MONITOR_STATUS", () => {
+        it("should test all status values from MONITOR_STATUS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Ensure all monitor status values work with type guards
             const statusValues = Object.values(typesModule.MONITOR_STATUS);
 
@@ -321,7 +353,15 @@ describe("Shared Types - Complete Function Coverage", () => {
             }
         });
 
-        it("should test edge cases and comprehensive coverage", () => {
+        it("should test edge cases and comprehensive coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test type guards with various non-string inputs
             const nonStringInputs = [
                 null,

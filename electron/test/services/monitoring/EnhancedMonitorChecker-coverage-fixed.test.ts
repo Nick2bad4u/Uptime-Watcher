@@ -110,7 +110,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     });
 
     describe("Constructor and Initialization", () => {
-        it("should initialize with all dependencies", () => {
+        it("should initialize with all dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const checker = new EnhancedMonitorChecker({
                 eventEmitter: mockEventBus,
                 getHistoryLimit: () => 100,
@@ -149,7 +157,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             ],
         };
 
-        it("should handle manual check with valid site and monitor", async () => {
+        it("should handle manual check with valid site and monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Mock the repository methods that are called
             mockMonitorRepository.update.mockResolvedValue(true);
             mockMonitorRepository.findByIdentifier.mockResolvedValue({
@@ -184,7 +200,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(mockMonitorRepository.update).toHaveBeenCalled();
         });
 
-        it("should return undefined for non-existent monitor", async () => {
+        it("should return undefined for non-existent monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
                 "non-existent-monitor",
@@ -194,7 +218,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle monitor check failure", async () => {
+        it("should handle monitor check failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock the repository methods that are called
             mockMonitorRepository.update.mockResolvedValue(true);
             mockMonitorRepository.findByIdentifier.mockResolvedValue({
@@ -227,7 +259,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result?.status).toBe("down");
         });
 
-        it("should handle monitor check returning null result", async () => {
+        it("should handle monitor check returning null result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId = "op-123";
             mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
             mockOperationRegistry.validateOperation.mockReturnValue(true);
@@ -246,7 +286,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle status update service throwing error", async () => {
+        it("should handle status update service throwing error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const operationId = "op-123";
             mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
             mockOperationRegistry.validateOperation.mockReturnValue(true);
@@ -274,7 +322,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     });
 
     describe("startMonitoring Method Coverage", () => {
-        it("should start monitoring successfully", async () => {
+        it("should start monitoring successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-1"
@@ -293,7 +349,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor update failure", async () => {
+        it("should handle monitor update failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockMonitorRepository.update.mockRejectedValue(
                 new Error("Database error")
             );
@@ -306,7 +370,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle successful monitoring start with event emission", async () => {
+        it("should handle successful monitoring start with event emission", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-2"
@@ -323,7 +395,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
         });
 
-        it("should handle event emission error gracefully", async () => {
+        it("should handle event emission error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockEventBus.emitTyped.mockRejectedValue(
                 new Error("Event emission failed")
             );
@@ -338,7 +418,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     });
 
     describe("stopMonitoring Method Coverage", () => {
-        it("should stop monitoring and cancel operations", async () => {
+        it("should stop monitoring and cancel operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-1"
@@ -357,7 +445,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle successful stop with event emission", async () => {
+        it("should handle successful stop with event emission", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const result = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-2"
@@ -375,7 +471,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             );
         });
 
-        it("should handle stop monitoring errors", async () => {
+        it("should handle stop monitoring errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockMonitorRepository.update.mockRejectedValue(
                 new Error("Database update failed")
             );
@@ -390,7 +494,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     });
 
     describe("Operation Registry Integration", () => {
-        it("should cover operation registry cancellation", async () => {
+        it("should cover operation registry cancellation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-3"
@@ -402,7 +514,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBe(true);
         });
 
-        it("should cover repository integration", async () => {
+        it("should cover repository integration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-1"
@@ -420,7 +540,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle operation validation failure", async () => {
+        it("should handle operation validation failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const operationId = "op-123";
             mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
             mockOperationRegistry.validateOperation.mockReturnValue(false);
@@ -455,7 +583,15 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle monitor factory returning null", async () => {
+        it("should handle monitor factory returning null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker-coverage-fixed", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId = "op-123";
             mockOperationRegistry.initiateCheck.mockReturnValue(operationId);
             mockOperationRegistry.validateOperation.mockReturnValue(true);

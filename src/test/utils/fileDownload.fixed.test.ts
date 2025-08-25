@@ -64,7 +64,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
     });
 
     describe("downloadFile Function", () => {
-        it("should successfully download file with all parameters", () => {
+        it("should successfully download file with all parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
             const mimeType = "text/plain";
@@ -88,7 +96,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
         });
 
-        it("should use default mimeType when not provided", () => {
+        it("should use default mimeType when not provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -99,7 +115,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             });
         });
 
-        it("should handle DOM manipulation errors with fallback", () => {
+        it("should handle DOM manipulation errors with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -114,7 +138,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
-        it("should handle createObjectURL errors", () => {
+        it("should handle createObjectURL errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -125,7 +157,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(() => downloadFile({ buffer, fileName })).toThrow();
         });
 
-        it("should handle createElement errors", () => {
+        it("should handle createElement errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -138,7 +178,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(() => downloadFile({ buffer, fileName })).toThrow();
         });
 
-        it("should handle appendChild errors with fallback attempt", () => {
+        it("should handle appendChild errors with fallback attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -157,7 +205,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(globalThis.document.body.append).toHaveBeenCalled();
         });
 
-        it("should clean up object URL even when errors occur", () => {
+        it("should clean up object URL even when errors occur", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -176,7 +232,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
         });
 
-        it("should handle non-Error objects in catch blocks", () => {
+        it("should handle non-Error objects in catch blocks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
@@ -190,39 +254,95 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
     });
 
     describe("generateBackupFileName Function", () => {
-        it("should generate filename with default parameters", () => {
+        it("should generate filename with default parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName();
             expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/);
         });
 
-        it("should generate filename with custom prefix", () => {
+        it("should generate filename with custom prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName("custom");
             expect(result).toMatch(/^custom-\d{4}-\d{2}-\d{2}\.sqlite$/);
         });
 
-        it("should generate filename with custom extension", () => {
+        it("should generate filename with custom extension", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName("backup", "db");
             expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.db$/);
         });
 
-        it("should generate filename with both custom parameters", () => {
+        it("should generate filename with both custom parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName("myapp", "sqlite3");
             expect(result).toMatch(/^myapp-\d{4}-\d{2}-\d{2}\.sqlite3$/);
         });
 
-        it("should handle empty string parameters", () => {
+        it("should handle empty string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName("", "");
             expect(result).toMatch(/^-\d{4}-\d{2}-\d{2}\.$/);
         });
 
-        it("should handle special characters in parameters", () => {
+        it("should handle special characters in parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateBackupFileName("test-app", "db.sqlite");
             expect(result).toMatch(/^test-app-\d{4}-\d{2}-\d{2}\.db\.sqlite$/);
         });
     });
 
     describe("handleSQLiteBackupDownload Function", () => {
-        it("should handle successful backup download", async () => {
+        it("should handle successful backup download", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const mockData = new Uint8Array([
                 1,
                 2,
@@ -243,7 +363,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
-        it("should throw TypeError for invalid backup data type", async () => {
+        it("should throw TypeError for invalid backup data type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDownloadFunction = vi
                 .fn()
                 .mockResolvedValue("invalid data");
@@ -256,7 +384,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow("Invalid backup data received");
         });
 
-        it("should throw TypeError for null backup data", async () => {
+        it("should throw TypeError for null backup data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDownloadFunction = vi.fn().mockResolvedValue(null);
 
             await expect(
@@ -264,7 +400,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should throw TypeError for undefined backup data", async () => {
+        it("should throw TypeError for undefined backup data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDownloadFunction = vi.fn().mockResolvedValue(undefined);
 
             await expect(
@@ -272,7 +416,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should throw TypeError for array instead of Uint8Array", async () => {
+        it("should throw TypeError for array instead of Uint8Array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDownloadFunction = vi.fn().mockResolvedValue([
                 1,
                 2,
@@ -285,7 +437,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should handle empty Uint8Array", async () => {
+        it("should handle empty Uint8Array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockData = new Uint8Array(0);
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
@@ -297,7 +457,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
-        it("should handle click errors with proper error message", async () => {
+        it("should handle click errors with proper error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockData = new Uint8Array([
                 1,
                 2,
@@ -315,7 +483,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow("Download trigger failed");
         });
 
-        it("should handle non-Error click failures", async () => {
+        it("should handle non-Error click failures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockData = new Uint8Array([
                 1,
                 2,
@@ -333,7 +509,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow("Download trigger failed");
         });
 
-        it("should clean up object URL even when click fails", async () => {
+        it("should clean up object URL even when click fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockData = new Uint8Array([
                 1,
                 2,
@@ -357,7 +541,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
         });
 
-        it("should use correct filename format", async () => {
+        it("should use correct filename format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockData = new Uint8Array([
                 1,
                 2,
@@ -373,7 +565,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
         });
 
-        it("should handle download function rejection", async () => {
+        it("should handle download function rejection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockDownloadFunction = vi
                 .fn()
                 .mockRejectedValue(new Error("Download failed"));
@@ -383,7 +583,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow("Download failed");
         });
 
-        it("should handle large backup data", async () => {
+        it("should handle large backup data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const mockData = new Uint8Array(1_000_000); // 1MB
             const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
 
@@ -397,7 +605,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
     });
 
     describe("Edge Cases and Integration Tests", () => {
-        it("should handle multiple sequential downloads", () => {
+        it("should handle multiple sequential downloads", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Loading", "type");
+
             const buffer1 = new ArrayBuffer(10);
             const buffer2 = new ArrayBuffer(20);
 
@@ -409,7 +625,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle Blob creation with different data types", () => {
+        it("should handle Blob creation with different data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const buffer = new ArrayBuffer(10);
             const view = new Uint8Array(buffer);
             view[0] = 255;
@@ -425,7 +649,15 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             });
         });
 
-        it("should properly set anchor properties", () => {
+        it("should properly set anchor properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const buffer = new ArrayBuffer(10);
             const fileName = "test-file.txt";
             const mimeType = "text/plain";

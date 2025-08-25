@@ -25,7 +25,15 @@ describe("Error Handling Utils", () => {
             vi.clearAllMocks();
         });
 
-        it("should handle successful operation", async () => {
+        it("should handle successful operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operation = vi.fn().mockResolvedValue("success");
 
             const result = await withErrorHandling(
@@ -41,7 +49,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should handle operation failure with Error object", async () => {
+        it("should handle operation failure with Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
 
@@ -58,7 +74,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should handle operation failure with string error", async () => {
+        it("should handle operation failure with string error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = "String error";
             const operation = vi.fn().mockRejectedValue(error);
 
@@ -75,7 +99,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should handle operation failure with unknown error", async () => {
+        it("should handle operation failure with unknown error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = { custom: "error" };
             const operation = vi.fn().mockRejectedValue(error);
 
@@ -92,7 +124,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should set loading to false even if clearError throws", async () => {
+        it("should set loading to false even if clearError throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockFrontendStore.clearError).mockImplementation(() => {
                 throw new Error("Clear error failed");
             });
@@ -122,7 +162,15 @@ describe("Error Handling Utils", () => {
             vi.clearAllMocks();
         });
 
-        it("should handle successful operation", async () => {
+        it("should handle successful operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operation = vi.fn().mockResolvedValue("success");
 
             const result = await withErrorHandling(
@@ -135,7 +183,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should handle operation failure and log error with operation name", async () => {
+        it("should handle operation failure and log error with operation name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
 
@@ -150,7 +206,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should handle operation failure and log error without operation name", async () => {
+        it("should handle operation failure and log error without operation name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const contextWithoutName = { logger: mockLogger };
             const error = new Error("Test error");
             const operation = vi.fn().mockRejectedValue(error);
@@ -166,7 +230,15 @@ describe("Error Handling Utils", () => {
             expect(operation).toHaveBeenCalledOnce();
         });
 
-        it("should preserve original error type and details", async () => {
+        it("should preserve original error type and details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const originalError = new TypeError("Type error");
             originalError.stack = "original stack trace";
             const operation = vi.fn().mockRejectedValue(originalError);
@@ -186,7 +258,15 @@ describe("Error Handling Utils", () => {
     });
 
     describe("Context detection", () => {
-        it("should correctly identify frontend store", async () => {
+        it("should correctly identify frontend store", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const frontendStore: ErrorHandlingFrontendStore = {
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -199,7 +279,15 @@ describe("Error Handling Utils", () => {
             expect(frontendStore.clearError).toHaveBeenCalled();
         });
 
-        it("should correctly identify backend context", async () => {
+        it("should correctly identify backend context", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const backendContext: ErrorHandlingBackendContext = {
                 logger: { error: vi.fn() },
                 operationName: "test",

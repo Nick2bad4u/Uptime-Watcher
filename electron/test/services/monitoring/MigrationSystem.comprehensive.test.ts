@@ -71,7 +71,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
     describe("MigrationRegistry", () => {
         describe("registerMigration", () => {
-            it("should register a migration rule successfully", () => {
+            it("should register a migration rule successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule = createTestMigrationRule("1.0.0", "1.1.0");
 
                 expect(() => {
@@ -79,7 +87,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).not.toThrow();
             });
 
-            it("should register multiple rules and sort them by version", () => {
+            it("should register multiple rules and sort them by version", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule1 = createTestMigrationRule("1.0.0", "1.1.0");
                 const rule2 = createTestMigrationRule("1.1.0", "1.2.0");
                 const rule3 = createTestMigrationRule("0.9.0", "1.0.0");
@@ -99,7 +115,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(path[2]?.fromVersion).toBe("1.1.0");
             });
 
-            it("should handle creating migration rules for new monitor type", () => {
+            it("should handle creating migration rules for new monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const rule = createTestMigrationRule("1.0.0", "1.1.0");
 
                 expect(() => {
@@ -109,7 +133,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("getMigrationPath", () => {
-            it("should return empty path for same versions", () => {
+            it("should return empty path for same versions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const path = migrationRegistry.getMigrationPath(
                     "http",
                     "1.0.0",
@@ -118,7 +150,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(path).toEqual([]);
             });
 
-            it("should return correct migration path for valid route", () => {
+            it("should return correct migration path for valid route", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule1 = createTestMigrationRule("1.0.0", "1.1.0");
                 const rule2 = createTestMigrationRule("1.1.0", "1.2.0");
 
@@ -135,7 +175,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(path[1]).toBe(rule2);
             });
 
-            it("should throw error for invalid version strings", () => {
+            it("should throw error for invalid version strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath(
                         "http",
@@ -157,7 +205,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should throw error for empty version strings", () => {
+            it("should throw error for empty version strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath("http", "", "1.1.0");
                 }).toThrow("fromVersion must be a non-empty string");
@@ -167,7 +223,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("toVersion must be a non-empty string");
             });
 
-            it("should throw error for non-string version parameters", () => {
+            it("should throw error for non-string version parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath(
                         "http",
@@ -185,7 +249,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("toVersion must be a non-empty string");
             });
 
-            it("should throw error when no migration path exists", () => {
+            it("should throw error when no migration path exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath(
                         "http",
@@ -195,7 +267,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("No migration path from 1.0.0 to 2.0.0 for http");
             });
 
-            it("should detect circular migration paths", () => {
+            it("should detect circular migration paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule1 = createTestMigrationRule("1.0.0", "1.1.0");
                 const rule2 = createTestMigrationRule("1.1.0", "1.0.0"); // Creates a cycle
 
@@ -211,7 +291,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("Circular migration path detected");
             });
 
-            it("should throw error for paths exceeding maximum steps", () => {
+            it("should throw error for paths exceeding maximum steps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Create a long chain of migrations exceeding MAX_MIGRATION_STEPS (100)
                 for (let i = 0; i < 105; i++) {
                     const rule = createTestMigrationRule(
@@ -230,7 +318,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("Migration path too long for http");
             });
 
-            it("should validate version string with numeric parts", () => {
+            it("should validate version string with numeric parts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath(
                         "http",
@@ -240,7 +336,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 }).toThrow("contains invalid numeric parts");
             });
 
-            it("should validate semantic version format", () => {
+            it("should validate semantic version format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
                 expect(() => {
                     migrationRegistry.getMigrationPath("http", "1.0", "1.1.0");
                 }).toThrow("is not a valid semantic version");
@@ -248,7 +352,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("canMigrate", () => {
-            it("should return true when migration path exists", () => {
+            it("should return true when migration path exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule = createTestMigrationRule("1.0.0", "1.1.0");
                 migrationRegistry.registerMigration("http", rule);
 
@@ -257,19 +369,43 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 ).toBe(true);
             });
 
-            it("should return false when no migration path exists", () => {
+            it("should return false when no migration path exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(
                     migrationRegistry.canMigrate("http", "1.0.0", "2.0.0")
                 ).toBe(false);
             });
 
-            it("should return true for same versions", () => {
+            it("should return true for same versions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(
                     migrationRegistry.canMigrate("http", "1.0.0", "1.0.0")
                 ).toBe(true);
             });
 
-            it("should return false for invalid version strings", () => {
+            it("should return false for invalid version strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(
                     migrationRegistry.canMigrate("http", "invalid", "1.1.0")
                 ).toBe(false);
@@ -277,14 +413,30 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("version comparison and validation", () => {
-            it("should handle version comparison with pre-release tags", () => {
+            it("should handle version comparison with pre-release tags", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule = createTestMigrationRule("1.0.0-alpha", "1.0.0");
                 expect(() => {
                     migrationRegistry.registerMigration("http", rule);
                 }).not.toThrow();
             });
 
-            it("should handle version comparison with build metadata", () => {
+            it("should handle version comparison with build metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule = createTestMigrationRule("1.0.0+build.1", "1.0.1");
                 expect(() => {
                     migrationRegistry.registerMigration("http", rule);
@@ -295,16 +447,40 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
     describe("VersionManager", () => {
         describe("setVersion and getVersion", () => {
-            it("should set and get version correctly", () => {
+            it("should set and get version correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
                 versionManager.setVersion("http", "1.1.0");
                 expect(versionManager.getVersion("http")).toBe("1.1.0");
             });
 
-            it("should return undefined for unset monitor type", () => {
+            it("should return undefined for unset monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
                 expect(versionManager.getVersion("unknown")).toBeUndefined();
             });
 
-            it("should update existing version", () => {
+            it("should update existing version", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
                 versionManager.setVersion("http", "1.0.0");
                 versionManager.setVersion("http", "1.1.0");
                 expect(versionManager.getVersion("http")).toBe("1.1.0");
@@ -312,21 +488,45 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("isVersionApplied", () => {
-            it("should return true for applied version", () => {
+            it("should return true for applied version", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 versionManager.setVersion("http", "1.1.0");
                 expect(versionManager.isVersionApplied("http", "1.1.0")).toBe(
                     true
                 );
             });
 
-            it("should return false for different version", () => {
+            it("should return false for different version", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 versionManager.setVersion("http", "1.1.0");
                 expect(versionManager.isVersionApplied("http", "1.0.0")).toBe(
                     false
                 );
             });
 
-            it("should return false for unset monitor type", () => {
+            it("should return false for unset monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
                 expect(
                     versionManager.isVersionApplied("unknown", "1.0.0")
                 ).toBe(false);
@@ -334,12 +534,28 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("getAllVersions", () => {
-            it("should return empty map when no versions set", () => {
+            it("should return empty map when no versions set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const versions = versionManager.getAllVersions();
                 expect(versions.size).toBe(0);
             });
 
-            it("should return all set versions", () => {
+            it("should return all set versions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 versionManager.setVersion("http", "1.1.0");
                 versionManager.setVersion("port", "2.0.0");
 
@@ -349,7 +565,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(versions.get("port")?.version).toBe("2.0.0");
             });
 
-            it("should return a copy of the versions map", () => {
+            it("should return a copy of the versions map", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 versionManager.setVersion("http", "1.1.0");
 
                 const versions1 = versionManager.getAllVersions();
@@ -359,7 +583,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(versions1.get("http")).toEqual(versions2.get("http"));
             });
 
-            it("should include timestamp and applied status", () => {
+            it("should include timestamp and applied status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const beforeTime = Date.now();
                 versionManager.setVersion("http", "1.1.0");
                 const afterTime = Date.now();
@@ -384,7 +616,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("migrateMonitorData", () => {
-            it("should return success for same versions", async () => {
+            it("should return success for same versions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = createTestData();
                 const result = await orchestrator.migrateMonitorData(
                     "http",
@@ -400,7 +640,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(result.warnings).toEqual([]);
             });
 
-            it("should apply single migration successfully", async () => {
+            it("should apply single migration successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const transformFn = vi.fn((data) =>
                     Promise.resolve({ ...data, timeout: 30_000 })
                 );
@@ -428,7 +676,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(transformFn).toHaveBeenCalledWith(data);
             });
 
-            it("should apply multiple migrations in sequence", async () => {
+            it("should apply multiple migrations in sequence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule1 = createTestMigrationRule(
                     "1.0.0",
                     "1.1.0",
@@ -467,7 +723,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should handle breaking migration with warning", async () => {
+            it("should handle breaking migration with warning", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const rule = createTestMigrationRule(
                     "1.0.0",
                     "2.0.0",
@@ -490,7 +754,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should handle migration transform error", async () => {
+            it("should handle migration transform error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const errorMessage = "Transform failed";
                 const rule = createTestMigrationRule(
                     "1.0.0",
@@ -518,7 +790,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(result.data).toBe(data); // Should return original data
             });
 
-            it("should handle non-Error exceptions in transform", async () => {
+            it("should handle non-Error exceptions in transform", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const rule = createTestMigrationRule(
                     "1.0.0",
                     "1.1.0",
@@ -540,7 +820,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(result.errors[0]).toContain("String error");
             });
 
-            it("should stop applying migrations after first error", async () => {
+            it("should stop applying migrations after first error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const rule1 = createTestMigrationRule(
                     "1.0.0",
                     "1.1.0",
@@ -572,7 +860,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(result.errors).toHaveLength(1);
             });
 
-            it("should handle orchestration errors gracefully", async () => {
+            it("should handle orchestration errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Create a scenario where getMigrationPath throws
                 const data = createTestData();
                 const result = await orchestrator.migrateMonitorData(
@@ -589,7 +885,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should update version manager on successful migration", async () => {
+            it("should update version manager on successful migration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
                 const rule = createTestMigrationRule("1.0.0", "1.1.0");
                 migrationRegistry.registerMigration("http", rule);
 
@@ -607,7 +911,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should not update version on migration failure", async () => {
+            it("should not update version on migration failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const rule = createTestMigrationRule(
                     "1.0.0",
                     "1.1.0",
@@ -628,7 +940,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(versionManager.getVersion("http")).toBeUndefined();
             });
 
-            it("should not update version when no migrations applied", async () => {
+            it("should not update version when no migrations applied", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
                 const data = createTestData();
                 await orchestrator.migrateMonitorData(
                     "http",
@@ -644,13 +964,29 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
     describe("Factory Functions", () => {
         describe("createMigrationOrchestrator", () => {
-            it("should create orchestrator instance", () => {
+            it("should create orchestrator instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
                 const orchestrator = createMigrationOrchestrator();
                 expect(orchestrator).toBeDefined();
                 expect(typeof orchestrator.migrateMonitorData).toBe("function");
             });
 
-            it("should create different instances on multiple calls", () => {
+            it("should create different instances on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
                 const orchestrator1 = createMigrationOrchestrator();
                 const orchestrator2 = createMigrationOrchestrator();
                 expect(orchestrator1).not.toBe(orchestrator2);
@@ -660,7 +996,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
 
     describe("Example Migrations", () => {
         describe("httpV1_0_to_1_1", () => {
-            it("should add default timeout when missing", async () => {
+            it("should add default timeout when missing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { url: "https://example.com" };
                 const result =
                     await exampleMigrations.httpV1_0_to_1_1.transform(data);
@@ -671,7 +1015,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should preserve existing timeout", async () => {
+            it("should preserve existing timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { url: "https://example.com", timeout: 60_000 };
                 const result =
                     await exampleMigrations.httpV1_0_to_1_1.transform(data);
@@ -682,7 +1034,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should have correct migration properties", () => {
+            it("should have correct migration properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(exampleMigrations.httpV1_0_to_1_1.fromVersion).toBe(
                     "1.0.0"
                 );
@@ -699,7 +1059,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
         });
 
         describe("portV1_0_to_1_1", () => {
-            it("should convert string port to number", async () => {
+            it("should convert string port to number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: "8080" };
                 const result =
                     await exampleMigrations.portV1_0_to_1_1.transform(data);
@@ -710,7 +1078,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should preserve numeric port", async () => {
+            it("should preserve numeric port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: 8080 };
                 const result =
                     await exampleMigrations.portV1_0_to_1_1.transform(data);
@@ -721,7 +1097,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should throw for invalid string port", () => {
+            it("should throw for invalid string port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: "invalid" };
 
                 expect(() =>
@@ -729,7 +1113,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 ).toThrow("Invalid port value: invalid. Must be 1-65535.");
             });
 
-            it("should throw for out-of-range numeric port", () => {
+            it("should throw for out-of-range numeric port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: 70_000 };
 
                 expect(() =>
@@ -737,7 +1129,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 ).toThrow("Invalid port number: 70000. Must be 1-65535.");
             });
 
-            it("should throw for negative port", () => {
+            it("should throw for negative port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: -1 };
 
                 expect(() =>
@@ -745,7 +1145,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 ).toThrow("Invalid port number: -1. Must be 1-65535.");
             });
 
-            it("should throw for non-numeric port type", () => {
+            it("should throw for non-numeric port type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data = { host: "localhost", port: true };
 
                 expect(() =>
@@ -755,7 +1163,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should handle edge case ports (1 and 65535)", async () => {
+            it("should handle edge case ports (1 and 65535)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data1 = { host: "localhost", port: "1" };
                 const result1 =
                     await exampleMigrations.portV1_0_to_1_1.transform(data1);
@@ -767,7 +1183,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
                 expect(result2["port"]).toBe(65_535);
             });
 
-            it("should have correct migration properties", () => {
+            it("should have correct migration properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(exampleMigrations.portV1_0_to_1_1.fromVersion).toBe(
                     "1.0.0"
                 );
@@ -785,7 +1209,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should handle complete migration workflow with example migrations", async () => {
+        it("should handle complete migration workflow with example migrations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Register example migrations
             migrationRegistry.registerMigration(
                 "http",
@@ -827,7 +1259,15 @@ describe("MigrationSystem - Comprehensive Coverage", () => {
             expect(versionManager.isVersionApplied("port", "1.1.0")).toBe(true);
         });
 
-        it("should handle complex migration chains", async () => {
+        it("should handle complex migration chains", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MigrationSystem", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a chain of migrations
             const rules = [
                 createTestMigrationRule(

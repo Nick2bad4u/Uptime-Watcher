@@ -15,7 +15,15 @@ import {
 
 describe("Test Helpers - Comprehensive Coverage", () => {
     describe("createValidBaseMonitor", () => {
-        it("should create a valid base monitor with default values", () => {
+        it("should create a valid base monitor with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor = createValidBaseMonitor();
 
             expect(monitor).toMatchObject({
@@ -32,7 +40,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.lastChecked).toBeInstanceOf(Date);
         });
 
-        it("should apply overrides correctly", () => {
+        it("should apply overrides correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const overrides = {
                 id: "custom-monitor",
                 checkInterval: 60_000,
@@ -52,21 +68,45 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle partial overrides", () => {
+        it("should handle partial overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidBaseMonitor({ id: "partial-override" });
 
             expect(monitor.id).toBe("partial-override");
             expect(monitor.checkInterval).toBe(30_000); // Default value preserved
         });
 
-        it("should handle empty overrides object", () => {
+        it("should handle empty overrides object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidBaseMonitor({});
 
             expect(monitor.id).toBe("test-monitor");
             expect(monitor.history).toEqual([]);
         });
 
-        it("should handle all monitor types", () => {
+        it("should handle all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor = createValidBaseMonitor({ type: "http" });
             const portMonitor = createValidBaseMonitor({ type: "port" });
             const pingMonitor = createValidBaseMonitor({ type: "ping" });
@@ -76,7 +116,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(pingMonitor.type).toBe("ping");
         });
 
-        it("should handle all status types", () => {
+        it("should handle all status types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const upMonitor = createValidBaseMonitor({ status: "up" });
             const downMonitor = createValidBaseMonitor({ status: "down" });
             const pendingMonitor = createValidBaseMonitor({
@@ -90,21 +138,45 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(pausedMonitor.status).toBe("paused");
         });
 
-        it("should handle history override", () => {
+        it("should handle history override", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history = [{ timestamp: Date.now(), status: "up" }];
             const monitor = createValidBaseMonitor({ history });
 
             expect(monitor.history).toBe(history);
         });
 
-        it("should handle lastChecked override", () => {
+        it("should handle lastChecked override", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customDate = new Date("2023-01-01");
             const monitor = createValidBaseMonitor({ lastChecked: customDate });
 
             expect(monitor.lastChecked).toBe(customDate);
         });
 
-        it("should handle undefined lastChecked", () => {
+        it("should handle undefined lastChecked", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidBaseMonitor({});
 
             expect(monitor.lastChecked).toBeUndefined();
@@ -112,7 +184,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("createValidHttpMonitor", () => {
-        it("should create a valid HTTP monitor with default values", () => {
+        it("should create a valid HTTP monitor with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor = createValidHttpMonitor();
 
             expect(monitor).toMatchObject({
@@ -129,7 +209,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
         });
 
-        it("should apply HTTP-specific overrides", () => {
+        it("should apply HTTP-specific overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidHttpMonitor({
                 url: "https://custom.com",
                 id: "http-monitor",
@@ -140,7 +228,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("http");
         });
 
-        it("should handle complex URL overrides", () => {
+        it("should handle complex URL overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexUrl =
                 "https://api.example.com:8080/v1/health?check=true";
             const monitor = createValidHttpMonitor({ url: complexUrl });
@@ -148,7 +244,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.url).toBe(complexUrl);
         });
 
-        it("should preserve HTTP type even with overrides", () => {
+        it("should preserve HTTP type even with overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidHttpMonitor({ type: "port" as any });
 
             expect(monitor.type).toBe("http"); // Should be overridden back to http
@@ -156,7 +260,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("createValidPortMonitor", () => {
-        it("should create a valid port monitor with default values", () => {
+        it("should create a valid port monitor with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor = createValidPortMonitor();
 
             expect(monitor).toMatchObject({
@@ -174,7 +286,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
         });
 
-        it("should apply port-specific overrides", () => {
+        it("should apply port-specific overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidPortMonitor({
                 host: "custom-host.com",
                 port: 443,
@@ -187,7 +307,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("port");
         });
 
-        it("should handle various port numbers", () => {
+        it("should handle various port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpMonitor = createValidPortMonitor({ port: 80 });
             const httpsMonitor = createValidPortMonitor({ port: 443 });
             const customMonitor = createValidPortMonitor({ port: 8080 });
@@ -197,7 +325,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(customMonitor.port).toBe(8080);
         });
 
-        it("should handle localhost and IP addresses", () => {
+        it("should handle localhost and IP addresses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const localhostMonitor = createValidPortMonitor({
                 host: "localhost",
             });
@@ -207,7 +343,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(ipMonitor.host).toBe("192.168.1.1");
         });
 
-        it("should preserve port type even with overrides", () => {
+        it("should preserve port type even with overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidPortMonitor({ type: "http" as any });
 
             expect(monitor.type).toBe("port"); // Should be overridden back to port
@@ -215,7 +359,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("createValidPingMonitor", () => {
-        it("should create a valid ping monitor with default values", () => {
+        it("should create a valid ping monitor with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor = createValidPingMonitor();
 
             expect(monitor).toMatchObject({
@@ -232,7 +384,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
         });
 
-        it("should apply ping-specific overrides", () => {
+        it("should apply ping-specific overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidPingMonitor({
                 host: "ping-host.com",
                 id: "ping-monitor",
@@ -243,7 +403,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("ping");
         });
 
-        it("should handle various host formats", () => {
+        it("should handle various host formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const domainMonitor = createValidPingMonitor({
                 host: "google.com",
             });
@@ -257,7 +425,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(subdomainMonitor.host).toBe("api.example.com");
         });
 
-        it("should preserve ping type even with overrides", () => {
+        it("should preserve ping type even with overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidPingMonitor({ type: "http" as any });
 
             expect(monitor.type).toBe("ping"); // Should be overridden back to ping
@@ -265,7 +441,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("createValidSite", () => {
-        it("should create a valid site with default values", () => {
+        it("should create a valid site with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const site = createValidSite();
 
             expect(site).toMatchObject({
@@ -283,7 +467,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.updatedAt).toBeInstanceOf(Date);
         });
 
-        it("should apply site-specific overrides", () => {
+        it("should apply site-specific overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customMonitors = [
                 createValidPortMonitor({ id: "port-1" }),
                 createValidPingMonitor({ id: "ping-1" }),
@@ -302,13 +494,29 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.monitors).toBe(customMonitors);
         });
 
-        it("should handle empty monitors array", () => {
+        it("should handle empty monitors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite({ monitors: [] });
 
             expect(site.monitors).toEqual([]);
         });
 
-        it("should handle custom timestamps", () => {
+        it("should handle custom timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customDate = new Date("2023-01-01");
             const site = createValidSite({
                 createdAt: customDate,
@@ -319,7 +527,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.updatedAt).toBe(customDate);
         });
 
-        it("should handle all status types", () => {
+        it("should handle all status types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const upSite = createValidSite({ status: "up" });
             const downSite = createValidSite({ status: "down" });
             const pendingSite = createValidSite({ status: "pending" });
@@ -331,7 +547,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(pausedSite.status).toBe("paused");
         });
 
-        it("should handle multiple monitors of different types", () => {
+        it("should handle multiple monitors of different types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = [
                 createValidHttpMonitor({ id: "http-1" }),
                 createValidPortMonitor({ id: "port-1" }),
@@ -348,7 +572,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("createValidStatusHistory", () => {
-        it("should create a valid status history with default values", () => {
+        it("should create a valid status history with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const history = createValidStatusHistory();
 
             expect(history).toMatchObject({
@@ -360,7 +592,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(history.timestamp).toBeGreaterThan(0);
         });
 
-        it("should apply status history overrides", () => {
+        it("should apply status history overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customTimestamp = Date.now() - 10_000;
             const history = createValidStatusHistory({
                 responseTime: 500,
@@ -375,7 +615,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(history.details).toBe("Connection timeout");
         });
 
-        it("should handle both status types", () => {
+        it("should handle both status types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const upHistory = createValidStatusHistory({ status: "up" });
             const downHistory = createValidStatusHistory({ status: "down" });
 
@@ -383,7 +631,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(downHistory.status).toBe("down");
         });
 
-        it("should handle various response times", () => {
+        it("should handle various response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const fastHistory = createValidStatusHistory({ responseTime: 50 });
             const slowHistory = createValidStatusHistory({
                 responseTime: 5000,
@@ -395,19 +651,43 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(zeroHistory.responseTime).toBe(0);
         });
 
-        it("should handle undefined details", () => {
+        it("should handle undefined details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history = createValidStatusHistory({});
 
             expect(history.details).toBeUndefined();
         });
 
-        it("should handle empty details", () => {
+        it("should handle empty details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history = createValidStatusHistory({ details: "" });
 
             expect(history.details).toBe("");
         });
 
-        it("should handle custom details messages", () => {
+        it("should handle custom details messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customDetails = "Custom error message with specific details";
             const history = createValidStatusHistory({
                 details: customDetails,
@@ -418,7 +698,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should create consistent monitor structures across helper functions", () => {
+        it("should create consistent monitor structures across helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             const httpMonitor = createValidHttpMonitor();
             const portMonitor = createValidPortMonitor();
             const pingMonitor = createValidPingMonitor();
@@ -444,7 +732,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             }
         });
 
-        it("should work with real validation schemas", () => {
+        it("should work with real validation schemas", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // This tests the actual purpose of the helper functions
             const site = createValidSite({
                 monitors: [
@@ -459,7 +755,15 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.monitors.every((m) => m.id)).toBe(true);
         });
 
-        it("should handle complex nested overrides", () => {
+        it("should handle complex nested overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseOverrides = {
                 checkInterval: 120_000,
                 monitoring: false,

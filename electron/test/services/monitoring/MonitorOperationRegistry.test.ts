@@ -48,7 +48,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("initiateCheck", () => {
-        it("should create and register a new operation", () => {
+        it("should create and register a new operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             expect(operationId).toBe("test-uuid-1");
@@ -65,7 +73,15 @@ describe("MonitorOperationRegistry", () => {
             expect(operation?.initiatedAt).toBeInstanceOf(Date);
         });
 
-        it("should generate unique operation IDs for multiple operations", () => {
+        it("should generate unique operation IDs for multiple operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId1 = registry.initiateCheck(mockMonitorId);
             const operationId2 = registry.initiateCheck("monitor-456");
 
@@ -77,7 +93,15 @@ describe("MonitorOperationRegistry", () => {
             expect(registry.getOperation(operationId2)).toBeDefined();
         });
 
-        it("should handle UUID collision by retrying", () => {
+        it("should handle UUID collision by retrying", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock to simulate collision on first attempt
             mockRandomUUID
                 .mockReturnValueOnce("collision-uuid") // First call - will collide
@@ -102,7 +126,15 @@ describe("MonitorOperationRegistry", () => {
             expect(registry.getOperation(operationId)).toBeDefined();
         });
 
-        it("should throw error after multiple failed UUID generation attempts", () => {
+        it("should throw error after multiple failed UUID generation attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock to always return the same UUID (collision every time)
             mockRandomUUID.mockReturnValue("always-collision");
 
@@ -124,7 +156,15 @@ describe("MonitorOperationRegistry", () => {
             expect(mockRandomUUID).toHaveBeenCalledTimes(5); // Should try 5 times
         });
 
-        it("should handle empty monitor ID", () => {
+        it("should handle empty monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId = registry.initiateCheck("");
 
             expect(operationId).toBe("test-uuid-1");
@@ -133,7 +173,15 @@ describe("MonitorOperationRegistry", () => {
             expect(operation?.monitorId).toBe("");
         });
 
-        it("should set accurate timestamps", () => {
+        it("should set accurate timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const beforeTime = new Date();
             const operationId = registry.initiateCheck(mockMonitorId);
             const afterTime = new Date();
@@ -150,7 +198,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("getOperation", () => {
-        it("should return operation when it exists", () => {
+        it("should return operation when it exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             const operation = registry.getOperation(operationId);
@@ -160,13 +216,29 @@ describe("MonitorOperationRegistry", () => {
             expect(operation?.monitorId).toBe(mockMonitorId);
         });
 
-        it("should return undefined when operation does not exist", () => {
+        it("should return undefined when operation does not exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operation = registry.getOperation("non-existent-id");
 
             expect(operation).toBeUndefined();
         });
 
-        it("should return undefined for empty operation ID", () => {
+        it("should return undefined for empty operation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operation = registry.getOperation("");
 
             expect(operation).toBeUndefined();
@@ -174,7 +246,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("validateOperation", () => {
-        it("should return true for active, non-cancelled operation", () => {
+        it("should return true for active, non-cancelled operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             const isValid = registry.validateOperation(operationId);
@@ -182,13 +262,29 @@ describe("MonitorOperationRegistry", () => {
             expect(isValid).toBe(true);
         });
 
-        it("should return false for non-existent operation", () => {
+        it("should return false for non-existent operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const isValid = registry.validateOperation("non-existent-id");
 
             expect(isValid).toBe(false);
         });
 
-        it("should return false for cancelled operation", () => {
+        it("should return false for cancelled operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             // Cancel the operation
@@ -199,7 +295,15 @@ describe("MonitorOperationRegistry", () => {
             expect(isValid).toBe(false);
         });
 
-        it("should return false for empty operation ID", () => {
+        it("should return false for empty operation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const isValid = registry.validateOperation("");
 
             expect(isValid).toBe(false);
@@ -207,7 +311,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("cancelOperations", () => {
-        it("should cancel all operations for a specific monitor", () => {
+        it("should cancel all operations for a specific monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId1 = registry.initiateCheck(mockMonitorId);
             const operationId2 = registry.initiateCheck(mockMonitorId);
             const operationId3 = registry.initiateCheck("other-monitor");
@@ -227,7 +339,15 @@ describe("MonitorOperationRegistry", () => {
             );
         });
 
-        it("should not log when no operations to cancel", () => {
+        it("should not log when no operations to cancel", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Clear any previous debug calls
             vi.clearAllMocks();
 
@@ -237,7 +357,15 @@ describe("MonitorOperationRegistry", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle empty monitor ID", () => {
+        it("should handle empty monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId = registry.initiateCheck("");
 
             registry.cancelOperations("");
@@ -245,7 +373,15 @@ describe("MonitorOperationRegistry", () => {
             expect(registry.getOperation(operationId)?.cancelled).toBe(true);
         });
 
-        it("should cancel only one operation when only one exists", () => {
+        it("should cancel only one operation when only one exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             registry.cancelOperations(mockMonitorId);
@@ -256,7 +392,15 @@ describe("MonitorOperationRegistry", () => {
             );
         });
 
-        it("should not affect operations after they are cancelled", () => {
+        it("should not affect operations after they are cancelled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             registry.cancelOperations(mockMonitorId);
@@ -269,7 +413,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("completeOperation", () => {
-        it("should remove operation from registry when completed", () => {
+        it("should remove operation from registry when completed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             // Verify operation exists
@@ -284,7 +436,15 @@ describe("MonitorOperationRegistry", () => {
             );
         });
 
-        it("should not log or error when completing non-existent operation", () => {
+        it("should not log or error when completing non-existent operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Clear any previous debug calls
             vi.clearAllMocks();
 
@@ -294,7 +454,15 @@ describe("MonitorOperationRegistry", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle empty operation ID", () => {
+        it("should handle empty operation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Clear any previous debug calls
             vi.clearAllMocks();
 
@@ -304,7 +472,15 @@ describe("MonitorOperationRegistry", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should complete operation even if it was cancelled", () => {
+        it("should complete operation even if it was cancelled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             // Cancel then complete
@@ -317,14 +493,30 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("getActiveOperations", () => {
-        it("should return empty map when no operations exist", () => {
+        it("should return empty map when no operations exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const activeOps = registry.getActiveOperations();
 
             expect(activeOps).toBeInstanceOf(Map);
             expect(activeOps.size).toBe(0);
         });
 
-        it("should return all active operations", () => {
+        it("should return all active operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId1 = registry.initiateCheck(mockMonitorId);
             const operationId2 = registry.initiateCheck("monitor-456");
 
@@ -337,7 +529,15 @@ describe("MonitorOperationRegistry", () => {
             expect(activeOps.get(operationId2)?.monitorId).toBe("monitor-456");
         });
 
-        it("should return reference to actual internal map", () => {
+        it("should return reference to actual internal map", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             const activeOps1 = registry.getActiveOperations();
@@ -348,7 +548,15 @@ describe("MonitorOperationRegistry", () => {
             expect(activeOps1.has(operationId)).toBe(true);
         });
 
-        it("should reflect changes when operations are completed", () => {
+        it("should reflect changes when operations are completed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             let activeOps = registry.getActiveOperations();
@@ -360,7 +568,15 @@ describe("MonitorOperationRegistry", () => {
             expect(activeOps.size).toBe(0);
         });
 
-        it("should include cancelled operations until they are completed", () => {
+        it("should include cancelled operations until they are completed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             registry.cancelOperations(mockMonitorId);
@@ -372,7 +588,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should handle complete operation lifecycle", () => {
+        it("should handle complete operation lifecycle", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Initiate multiple operations
             const op1 = registry.initiateCheck("monitor-1");
             const op2 = registry.initiateCheck("monitor-2");
@@ -401,7 +625,15 @@ describe("MonitorOperationRegistry", () => {
             expect(registry.getActiveOperations().size).toBe(0);
         });
 
-        it("should handle multiple monitors with multiple operations", () => {
+        it("should handle multiple monitors with multiple operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = [
                 "monitor-1",
                 "monitor-2",
@@ -441,7 +673,15 @@ describe("MonitorOperationRegistry", () => {
             expect(activeCount).toBe(4);
         });
 
-        it("should maintain operation state consistency", () => {
+        it("should maintain operation state consistency", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             // Get operation reference
@@ -463,11 +703,27 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("Singleton operationRegistry", () => {
-        it("should export a singleton instance", () => {
+        it("should export a singleton instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(operationRegistry).toBeInstanceOf(MonitorOperationRegistry);
         });
 
-        it("should be the same instance across imports", () => {
+        it("should be the same instance across imports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Import Operation", "type");
+
             // This test ensures the singleton pattern works
             const operationId = operationRegistry.initiateCheck("test-monitor");
 
@@ -480,7 +736,15 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("Type definitions", () => {
-        it("should create MonitorCheckOperation with correct structure", () => {
+        it("should create MonitorCheckOperation with correct structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
             const operation = registry.getOperation(operationId);
 
@@ -492,7 +756,15 @@ describe("MonitorOperationRegistry", () => {
             });
         });
 
-        it("should work with MonitorCheckResult interface", () => {
+        it("should work with MonitorCheckResult interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operationId = registry.initiateCheck(mockMonitorId);
 
             // Simulate creating a result that would link to this operation

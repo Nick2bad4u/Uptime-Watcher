@@ -46,7 +46,15 @@ describe("Store Utils", () => {
     });
 
     describe("createBaseStore", () => {
-        it("should create a base store with proper initial values", () => {
+        it("should create a base store with proper initial values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
 
@@ -59,7 +67,15 @@ describe("Store Utils", () => {
             });
         });
 
-        it("should call setState when clearError is invoked", () => {
+        it("should call setState when clearError is invoked", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
 
@@ -68,7 +84,15 @@ describe("Store Utils", () => {
             expect(setState).toHaveBeenCalledWith({ lastError: undefined });
         });
 
-        it("should call setState when setError is invoked with error message", () => {
+        it("should call setState when setError is invoked with error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
             const errorMessage = "Test error message";
@@ -78,7 +102,15 @@ describe("Store Utils", () => {
             expect(setState).toHaveBeenCalledWith({ lastError: errorMessage });
         });
 
-        it("should call setState when setError is invoked with undefined", () => {
+        it("should call setState when setError is invoked with undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
 
@@ -87,7 +119,15 @@ describe("Store Utils", () => {
             expect(setState).toHaveBeenCalledWith({ lastError: undefined });
         });
 
-        it("should call setState when setLoading is invoked with true", () => {
+        it("should call setState when setLoading is invoked with true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
 
@@ -96,7 +136,15 @@ describe("Store Utils", () => {
             expect(setState).toHaveBeenCalledWith({ isLoading: true });
         });
 
-        it("should call setState when setLoading is invoked with false", () => {
+        it("should call setState when setLoading is invoked with false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const setState = vi.fn();
             const baseStore = createBaseStore(setState);
 
@@ -107,7 +155,15 @@ describe("Store Utils", () => {
     });
 
     describe("createPersistConfig", () => {
-        it("should create a persist config with prefixed name", () => {
+        it("should create a persist config with prefixed name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const config = createPersistConfig("test-store");
 
             expect(config).toEqual({
@@ -116,7 +172,15 @@ describe("Store Utils", () => {
             });
         });
 
-        it("should create a persist config with custom partialize function", () => {
+        it("should create a persist config with custom partialize function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const partializeFunction = (state: any) => ({ data: state.data });
             const config = createPersistConfig(
                 "test-store",
@@ -129,7 +193,15 @@ describe("Store Utils", () => {
             });
         });
 
-        it("should handle different store names", () => {
+        it("should handle different store names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config1 = createPersistConfig("sites");
             const config2 = createPersistConfig("settings");
 
@@ -139,7 +211,15 @@ describe("Store Utils", () => {
     });
 
     describe("debounce", () => {
-        it("should debounce function calls", () => {
+        it("should debounce function calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -155,7 +235,15 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledWith("arg1");
         });
 
-        it("should handle multiple different argument sets independently", () => {
+        it("should handle multiple different argument sets independently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -169,7 +257,15 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledWith("arg2");
         });
 
-        it("should reset timer when called again before timeout", () => {
+        it("should reset timer when called again before timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -185,7 +281,15 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle functions with no arguments", () => {
+        it("should handle functions with no arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -197,7 +301,15 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle functions with multiple arguments", () => {
+        it("should handle functions with multiple arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -208,7 +320,15 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledWith("arg1", "arg2", "arg3");
         });
 
-        it("should cleanup timeouts properly", () => {
+        it("should cleanup timeouts properly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockFunction = vi.fn();
             const debouncedFunction = debounce(mockFunction, 100);
 
@@ -224,13 +344,29 @@ describe("Store Utils", () => {
     });
 
     describe("logStoreAction", () => {
-        it("should log store action in development mode", () => {
+        it("should log store action in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             logStoreAction("TestStore", "testAction");
 
             expect(logger.info).toHaveBeenCalledWith("[TestStore] testAction");
         });
 
-        it("should log store action with data in development mode", () => {
+        it("should log store action with data in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = { id: "test-id", value: 123 };
             logStoreAction("TestStore", "testAction", data);
 
@@ -240,13 +376,29 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should not log when data is undefined", () => {
+        it("should not log when data is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             logStoreAction("TestStore", "testAction", undefined);
 
             expect(logger.info).toHaveBeenCalledWith("[TestStore] testAction");
         });
 
-        it("should handle different store names and actions", () => {
+        it("should handle different store names and actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             logStoreAction("SitesStore", "addSite", { id: "site-123" });
             logStoreAction("SettingsStore", "updateTheme");
 
@@ -258,7 +410,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should not log in production mode", async () => {
+        it("should not log in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { isDevelopment } = await vi.importMock(
                 "../../../shared/utils/environment"
             );
@@ -271,7 +431,15 @@ describe("Store Utils", () => {
     });
 
     describe("waitForElectronAPI", () => {
-        it("should resolve immediately when electronAPI is available", async () => {
+        it("should resolve immediately when electronAPI is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             (globalThis as any).electronAPI = {
                 sites: { getSites: vi.fn() },
             };
@@ -279,7 +447,15 @@ describe("Store Utils", () => {
             await expect(waitForElectronAPI()).resolves.toBeUndefined();
         });
 
-        it("should work with custom maxAttempts and baseDelay", async () => {
+        it("should work with custom maxAttempts and baseDelay", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             (globalThis as any).electronAPI = {
                 sites: { getSites: vi.fn() },
             };
@@ -287,7 +463,15 @@ describe("Store Utils", () => {
             await expect(waitForElectronAPI(10, 50)).resolves.toBeUndefined();
         });
 
-        it("should throw error when electronAPI is not available after max attempts", async () => {
+        it("should throw error when electronAPI is not available after max attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Use real timers for this test
             vi.useRealTimers();
 
@@ -303,7 +487,15 @@ describe("Store Utils", () => {
             vi.useFakeTimers();
         });
 
-        it("should throw error when electronAPI exists but sites.getSites is not a function", async () => {
+        it("should throw error when electronAPI exists but sites.getSites is not a function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Use real timers for this test
             vi.useRealTimers();
 
@@ -323,7 +515,15 @@ describe("Store Utils", () => {
             vi.useFakeTimers();
         });
 
-        it("should handle window.electronAPI access errors gracefully", async () => {
+        it("should handle window.electronAPI access errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Use real timers for this test
             vi.useRealTimers();
 

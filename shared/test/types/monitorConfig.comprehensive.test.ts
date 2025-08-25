@@ -25,7 +25,15 @@ import {
 
 describe("Monitor Configuration Types", () => {
     describe("AdvancedMonitorConfig", () => {
-        it("should define proper alerting structure", () => {
+        it("should define proper alerting structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: AdvancedMonitorConfig = {
                 alerting: {
                     alertTypes: [
@@ -51,7 +59,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.alerting?.recoveryThreshold).toBe(2);
         });
 
-        it("should define proper data retention structure", () => {
+        it("should define proper data retention structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: AdvancedMonitorConfig = {
                 dataRetention: {
                     aggregatedDataDays: 365,
@@ -65,7 +81,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.dataRetention?.detailedHistoryDays).toBe(90);
         });
 
-        it("should define proper performance thresholds", () => {
+        it("should define proper performance thresholds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: AdvancedMonitorConfig = {
                 performanceThresholds: {
                     responseTimeCritical: 5000,
@@ -85,7 +109,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.performanceThresholds?.uptimeWarning).toBe(98);
         });
 
-        it("should define proper scheduling configuration", () => {
+        it("should define proper scheduling configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: AdvancedMonitorConfig = {
                 scheduling: {
                     activeDays: [
@@ -129,7 +161,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("BaseMonitorConfig", () => {
-        it("should define proper base structure", () => {
+        it("should define proper base structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: BaseMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -149,7 +189,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.type).toBe("http");
         });
 
-        it("should be extended by specific monitor types", () => {
+        it("should be extended by specific monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpConfig: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -176,7 +224,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("HttpMonitorConfig", () => {
-        it("should define proper HTTP structure", () => {
+        it("should define proper HTTP structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -198,7 +254,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.method).toBe("GET");
         });
 
-        it("should support authentication configuration", () => {
+        it("should support authentication configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -223,7 +287,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.auth?.password).toBe("pass");
         });
 
-        it("should support certificate configuration", () => {
+        it("should support certificate configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -250,7 +322,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.certificate?.keyPath).toBe("/path/to/key.pem");
         });
 
-        it("should support expected content patterns", () => {
+        it("should support expected content patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -284,7 +364,15 @@ describe("Monitor Configuration Types", () => {
             ]);
         });
 
-        it("should support custom headers and request body", () => {
+        it("should support custom headers and request body", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -317,7 +405,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("PingMonitorConfig", () => {
-        it("should define proper ping structure", () => {
+        it("should define proper ping structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: PingMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -339,7 +435,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.packetSize).toBe(32);
         });
 
-        it("should support IP version and RTT configuration", () => {
+        it("should support IP version and RTT configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: PingMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -362,7 +466,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("PortMonitorConfig", () => {
-        it("should define proper port structure", () => {
+        it("should define proper port structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: PortMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -382,7 +494,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.connectionTimeout).toBe(10_000);
         });
 
-        it("should support IP version and protocol configuration", () => {
+        it("should support IP version and protocol configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: PortMonitorConfig = {
                 checkInterval: 300_000,
                 enabled: true,
@@ -413,7 +533,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("MonitorConfig Union Type", () => {
-        it("should accept all monitor types", () => {
+        it("should accept all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const configs: MonitorConfig[] = [
                 {
                     checkInterval: 300_000,
@@ -463,7 +591,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("MonitorConfigTemplate", () => {
-        it("should define proper template structure", () => {
+        it("should define proper template structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template: MonitorConfigTemplate = {
                 id: "web-server",
                 name: "Web Server Monitor",
@@ -495,7 +631,15 @@ describe("Monitor Configuration Types", () => {
             expect(template.config.type).toBe("http");
         });
 
-        it("should support different categories and tags", () => {
+        it("should support different categories and tags", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template: MonitorConfigTemplate = {
                 id: "database-port",
                 name: "Database Port Monitor",
@@ -564,25 +708,57 @@ describe("Monitor Configuration Types", () => {
             connectionTimeout: 10_000,
         };
 
-        it("should correctly identify HTTP configurations", () => {
+        it("should correctly identify HTTP configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isHttpMonitorConfig(httpConfig)).toBe(true);
             expect(isHttpMonitorConfig(pingConfig)).toBe(false);
             expect(isHttpMonitorConfig(portConfig)).toBe(false);
         });
 
-        it("should correctly identify ping configurations", () => {
+        it("should correctly identify ping configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPingMonitorConfig(pingConfig)).toBe(true);
             expect(isPingMonitorConfig(httpConfig)).toBe(false);
             expect(isPingMonitorConfig(portConfig)).toBe(false);
         });
 
-        it("should correctly identify port configurations", () => {
+        it("should correctly identify port configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isPortMonitorConfig(portConfig)).toBe(true);
             expect(isPortMonitorConfig(httpConfig)).toBe(false);
             expect(isPortMonitorConfig(pingConfig)).toBe(false);
         });
 
-        it("should provide type narrowing", () => {
+        it("should provide type narrowing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             if (isHttpMonitorConfig(httpConfig)) {
                 // TypeScript should now know this is HttpMonitorConfig
                 expect(httpConfig.url).toBeDefined();
@@ -604,7 +780,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("DEFAULT_MONITOR_CONFIG", () => {
-        it("should provide HTTP defaults", () => {
+        it("should provide HTTP defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaults = DEFAULT_MONITOR_CONFIG.http;
 
             expect(defaults.type).toBe("http");
@@ -617,7 +801,15 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.timeout).toBe(30_000);
         });
 
-        it("should provide ping defaults", () => {
+        it("should provide ping defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaults = DEFAULT_MONITOR_CONFIG.ping;
 
             expect(defaults.type).toBe("ping");
@@ -630,7 +822,15 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.timeout).toBe(30_000);
         });
 
-        it("should provide port defaults", () => {
+        it("should provide port defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaults = DEFAULT_MONITOR_CONFIG.port;
 
             expect(defaults.type).toBe("port");
@@ -641,7 +841,15 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.timeout).toBe(30_000);
         });
 
-        it("should have consistent default intervals across types", () => {
+        it("should have consistent default intervals across types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpInterval = DEFAULT_MONITOR_CONFIG.http.checkInterval;
             const pingInterval = DEFAULT_MONITOR_CONFIG.ping.checkInterval;
             const portInterval = DEFAULT_MONITOR_CONFIG.port.checkInterval;
@@ -651,7 +859,15 @@ describe("Monitor Configuration Types", () => {
             expect(httpInterval).toBe(300_000); // 5 minutes
         });
 
-        it("should have consistent timeout values", () => {
+        it("should have consistent timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpTimeout = DEFAULT_MONITOR_CONFIG.http.timeout;
             const pingTimeout = DEFAULT_MONITOR_CONFIG.ping.timeout;
             const portTimeout = DEFAULT_MONITOR_CONFIG.port.timeout;
@@ -661,7 +877,15 @@ describe("Monitor Configuration Types", () => {
             expect(httpTimeout).toBe(30_000); // 30 seconds
         });
 
-        it("should have consistent retry attempts", () => {
+        it("should have consistent retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpRetries = DEFAULT_MONITOR_CONFIG.http.retryAttempts;
             const pingRetries = DEFAULT_MONITOR_CONFIG.ping.retryAttempts;
             const portRetries = DEFAULT_MONITOR_CONFIG.port.retryAttempts;
@@ -673,7 +897,15 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce strict typing", () => {
+        it("should enforce strict typing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This test ensures TypeScript compilation catches type errors
             const config: HttpMonitorConfig = {
                 checkInterval: 300_000,
@@ -692,7 +924,15 @@ describe("Monitor Configuration Types", () => {
             expect(config.type).toBe("http");
         });
 
-        it("should provide discriminated union support", () => {
+        it("should provide discriminated union support", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const configs: MonitorConfig[] = [
                 {
                     ...DEFAULT_MONITOR_CONFIG.http,

@@ -16,7 +16,15 @@ import * as objectSafetyModule from "@shared/utils/objectSafety";
 
 describe("shared/utils/objectSafety Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
-        it("should call all exported functions to ensure 100% function coverage", () => {
+        it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Test safeObjectAccess function
             const testObj = { prop: "value", num: 42 };
             expect(

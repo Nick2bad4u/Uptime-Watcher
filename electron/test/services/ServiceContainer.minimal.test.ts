@@ -192,17 +192,41 @@ describe("ServiceContainer - Copy of Simple Test", () => {
         ServiceContainer.resetForTesting();
     });
 
-    it("should create ServiceContainer instance without errors", () => {
+    it("should create ServiceContainer instance without errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         expect(container).toBeDefined();
         expect(container).toBeInstanceOf(ServiceContainer);
     });
 
-    it("should have proper basic ServiceContainer methods", () => {
+    it("should have proper basic ServiceContainer methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(container.getDatabaseService).toBeDefined();
         expect(typeof container.getDatabaseService).toBe("function");
     });
 
-    it("should create SiteManager with getSitesCache method", () => {
+    it("should create SiteManager with getSitesCache method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const siteManager = container.getSiteManager();
         expect(siteManager).toBeDefined();
         expect(siteManager.getSitesCache).toBeInstanceOf(Function);

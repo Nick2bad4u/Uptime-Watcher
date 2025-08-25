@@ -22,7 +22,15 @@ import {
 
 describe("Monitor Form Data Types", () => {
     describe("Interface Compliance", () => {
-        it("should support BaseFormData interface", () => {
+        it("should support BaseFormData interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseForm: BaseFormData = {
                 checkInterval: 300_000,
                 monitoring: true,
@@ -38,7 +46,15 @@ describe("Monitor Form Data Types", () => {
             expect(baseForm.type).toBe("http");
         });
 
-        it("should support DynamicFormData interface", () => {
+        it("should support DynamicFormData interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const dynamicForm: DynamicFormData = {
                 checkInterval: 300_000,
                 customProperty: "custom value",
@@ -53,7 +69,15 @@ describe("Monitor Form Data Types", () => {
             expect(dynamicForm.monitoring).toBe(true);
         });
 
-        it("should support HttpFormData interface", () => {
+        it("should support HttpFormData interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpForm: HttpFormData = {
                 checkInterval: 300_000,
                 monitoring: true,
@@ -68,7 +92,15 @@ describe("Monitor Form Data Types", () => {
             expect(httpForm.checkInterval).toBe(300_000);
         });
 
-        it("should support PingFormData interface", () => {
+        it("should support PingFormData interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pingForm: PingFormData = {
                 checkInterval: 300_000,
                 host: "example.com",
@@ -83,7 +115,15 @@ describe("Monitor Form Data Types", () => {
             expect(pingForm.checkInterval).toBe(300_000);
         });
 
-        it("should support PortFormData interface", () => {
+        it("should support PortFormData interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const portForm: PortFormData = {
                 checkInterval: 300_000,
                 host: "example.com",
@@ -100,7 +140,15 @@ describe("Monitor Form Data Types", () => {
             expect(portForm.checkInterval).toBe(300_000);
         });
 
-        it("should support MonitorFormData union type", () => {
+        it("should support MonitorFormData union type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpData: MonitorFormData = {
                 checkInterval: 300_000,
                 monitoring: true,
@@ -136,7 +184,15 @@ describe("Monitor Form Data Types", () => {
     });
 
     describe("createDefaultFormData function", () => {
-        it("should create default HTTP form data", () => {
+        it("should create default HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const defaultHttp = createDefaultFormData("http");
 
             expect(defaultHttp.type).toBe("http");
@@ -146,7 +202,15 @@ describe("Monitor Form Data Types", () => {
             expect(defaultHttp.timeout).toBe(10_000);
         });
 
-        it("should create default ping form data", () => {
+        it("should create default ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const defaultPing = createDefaultFormData("ping");
 
             expect(defaultPing.type).toBe("ping");
@@ -156,7 +220,15 @@ describe("Monitor Form Data Types", () => {
             expect(defaultPing.timeout).toBe(10_000);
         });
 
-        it("should create default port form data", () => {
+        it("should create default port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const defaultPort = createDefaultFormData("port");
 
             expect(defaultPort.type).toBe("port");
@@ -166,7 +238,15 @@ describe("Monitor Form Data Types", () => {
             expect(defaultPort.timeout).toBe(10_000);
         });
 
-        it("should create default form data for any type", () => {
+        it("should create default form data for any type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const defaultCustom = (
                 createDefaultFormData as (type: string) => Partial<BaseFormData>
             )("custom");
@@ -181,7 +261,15 @@ describe("Monitor Form Data Types", () => {
 
     describe("Type Guard Functions", () => {
         describe("isHttpFormData", () => {
-            it("should return true for valid HTTP form data", () => {
+            it("should return true for valid HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const httpData: Partial<HttpFormData> = {
                     type: "http",
                     url: "https://example.com",
@@ -190,7 +278,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isHttpFormData(httpData)).toBe(true);
             });
 
-            it("should return false for data with wrong type", () => {
+            it("should return false for data with wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const wrongType = {
                     type: "ping" as const,
                     url: "https://example.com",
@@ -201,7 +297,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data missing URL", () => {
+            it("should return false for data missing URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const missingUrl = {
                     type: "http" as const,
                 };
@@ -211,7 +315,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data with invalid URL type", () => {
+            it("should return false for data with invalid URL type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const invalidUrl = {
                     type: "http" as const,
                     url: 123,
@@ -222,7 +334,15 @@ describe("Monitor Form Data Types", () => {
         });
 
         describe("isPingFormData", () => {
-            it("should return true for valid ping form data", () => {
+            it("should return true for valid ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const pingData: Partial<PingFormData> = {
                     host: "example.com",
                     type: "ping",
@@ -231,7 +351,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isPingFormData(pingData)).toBe(true);
             });
 
-            it("should return false for data with wrong type", () => {
+            it("should return false for data with wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const wrongType = {
                     host: "example.com",
                     type: "http" as const,
@@ -242,7 +370,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data missing host", () => {
+            it("should return false for data missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const missingHost = {
                     type: "ping" as const,
                 };
@@ -252,7 +388,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data with invalid host type", () => {
+            it("should return false for data with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const invalidHost = {
                     host: 123,
                     type: "ping" as const,
@@ -263,7 +407,15 @@ describe("Monitor Form Data Types", () => {
         });
 
         describe("isPortFormData", () => {
-            it("should return true for valid port form data", () => {
+            it("should return true for valid port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const portData: Partial<PortFormData> = {
                     host: "example.com",
                     port: 80,
@@ -273,7 +425,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isPortFormData(portData)).toBe(true);
             });
 
-            it("should return false for data with wrong type", () => {
+            it("should return false for data with wrong type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const wrongType = {
                     host: "example.com",
                     port: 80,
@@ -285,7 +445,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data missing host", () => {
+            it("should return false for data missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const missingHost = {
                     port: 80,
                     type: "port" as const,
@@ -296,7 +464,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data missing port", () => {
+            it("should return false for data missing port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const missingPort = {
                     host: "example.com",
                     type: "port" as const,
@@ -307,7 +483,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe(false);
             });
 
-            it("should return false for data with invalid host type", () => {
+            it("should return false for data with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const invalidHost = {
                     host: 123,
                     port: 80,
@@ -317,7 +501,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isPortFormData(invalidHost as any)).toBe(false);
             });
 
-            it("should return false for data with invalid port type", () => {
+            it("should return false for data with invalid port type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const invalidPort = {
                     host: "example.com",
                     port: "80",
@@ -329,7 +521,15 @@ describe("Monitor Form Data Types", () => {
         });
 
         describe("isValidMonitorFormData", () => {
-            it("should return true for valid HTTP form data", () => {
+            it("should return true for valid HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const httpData = {
                     type: "http",
                     url: "https://example.com",
@@ -338,7 +538,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(httpData)).toBe(true);
             });
 
-            it("should return true for valid ping form data", () => {
+            it("should return true for valid ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const pingData = {
                     host: "example.com",
                     type: "ping",
@@ -347,7 +555,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(pingData)).toBe(true);
             });
 
-            it("should return true for valid port form data", () => {
+            it("should return true for valid port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const portData = {
                     host: "example.com",
                     port: 80,
@@ -357,17 +573,41 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(portData)).toBe(true);
             });
 
-            it("should return false for null data", () => {
+            it("should return false for null data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isValidMonitorFormData(null)).toBe(false);
             });
 
-            it("should return false for non-object data", () => {
+            it("should return false for non-object data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isValidMonitorFormData("string")).toBe(false);
                 expect(isValidMonitorFormData(123)).toBe(false);
                 expect(isValidMonitorFormData(true)).toBe(false);
             });
 
-            it("should return false for data without type", () => {
+            it("should return false for data without type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const noType = {
                     url: "https://example.com",
                 };
@@ -375,7 +615,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(noType)).toBe(false);
             });
 
-            it("should return false for data with invalid type", () => {
+            it("should return false for data with invalid type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const invalidType = {
                     type: 123,
                     url: "https://example.com",
@@ -384,7 +632,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(invalidType)).toBe(false);
             });
 
-            it("should return false for unknown monitor type", () => {
+            it("should return false for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const unknownType = {
                     type: "unknown",
                     data: "some data",
@@ -393,7 +649,15 @@ describe("Monitor Form Data Types", () => {
                 expect(isValidMonitorFormData(unknownType)).toBe(false);
             });
 
-            it("should return false for incomplete valid type data", () => {
+            it("should return false for incomplete valid type data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const incompleteHttp = {
                     type: "http",
                     // Missing required URL
@@ -406,7 +670,15 @@ describe("Monitor Form Data Types", () => {
 
     describe("Safe Property Access Functions", () => {
         describe("safeGetFormProperty", () => {
-            it("should return property value when it exists", () => {
+            it("should return property value when it exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {
                     checkInterval: 5000,
                     customProperty: "test value",
@@ -420,7 +692,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe("test value");
             });
 
-            it("should return default value when property does not exist", () => {
+            it("should return default value when property does not exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {};
 
                 expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
@@ -431,7 +711,15 @@ describe("Monitor Form Data Types", () => {
                 ).toBe("default");
             });
 
-            it("should return default value when property is undefined", () => {
+            it("should return default value when property is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {};
 
                 expect(safeGetFormProperty(data, "checkInterval", 1000)).toBe(
@@ -439,7 +727,15 @@ describe("Monitor Form Data Types", () => {
                 );
             });
 
-            it("should return property value even if falsy (but not undefined)", () => {
+            it("should return property value even if falsy (but not undefined)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {
                     checkInterval: 0,
                     enabled: false,
@@ -455,7 +751,15 @@ describe("Monitor Form Data Types", () => {
         });
 
         describe("safeSetFormProperty", () => {
-            it("should set property on form data", () => {
+            it("should set property on form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {};
 
                 safeSetFormProperty(data, "checkInterval", 5000);
@@ -465,7 +769,15 @@ describe("Monitor Form Data Types", () => {
                 expect(data["customProperty"]).toBe("test value");
             });
 
-            it("should overwrite existing property", () => {
+            it("should overwrite existing property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {
                     checkInterval: 1000,
                 };
@@ -475,7 +787,15 @@ describe("Monitor Form Data Types", () => {
                 expect(data.checkInterval).toBe(5000);
             });
 
-            it("should set various data types", () => {
+            it("should set various data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const data: DynamicFormData = {};
 
                 safeSetFormProperty(data, "number", 123);
@@ -506,7 +826,15 @@ describe("Monitor Form Data Types", () => {
     });
 
     describe("Real-world Usage Patterns", () => {
-        it("should handle form data creation workflow", () => {
+        it("should handle form data creation workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Start with default data
             const baseData = createDefaultFormData("http");
 
@@ -522,7 +850,15 @@ describe("Monitor Form Data Types", () => {
             expect(isHttpFormData(dynamicData as any)).toBe(true);
         });
 
-        it("should handle form data editing workflow", () => {
+        it("should handle form data editing workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const existingData: HttpFormData = {
                 checkInterval: 300_000,
                 monitoring: true,
@@ -548,7 +884,15 @@ describe("Monitor Form Data Types", () => {
             expect(isValidMonitorFormData(editedData)).toBe(true);
         });
 
-        it("should handle different monitor type conversions", () => {
+        it("should handle different monitor type conversions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Start with HTTP monitor
             const httpData = createDefaultFormData("http");
             const dynamicHttp: DynamicFormData = { ...httpData };
@@ -570,7 +914,15 @@ describe("Monitor Form Data Types", () => {
             expect(isPortFormData(dynamicPort as any)).toBe(true);
         });
 
-        it("should handle validation error scenarios", () => {
+        it("should handle validation error scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidScenarios = [
                 { type: "http" }, // Missing URL
                 { type: "ping" }, // Missing host
@@ -588,7 +940,15 @@ describe("Monitor Form Data Types", () => {
             }
         });
 
-        it("should handle partial form data gracefully", () => {
+        it("should handle partial form data gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const partialHttp: Partial<HttpFormData> = {
                 type: "http",
                 url: "https://example.com",

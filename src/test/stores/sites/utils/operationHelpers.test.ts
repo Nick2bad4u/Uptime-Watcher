@@ -125,21 +125,45 @@ describe("OperationHelpers", () => {
     });
 
     describe("getSiteById", () => {
-        it("should return site when found", () => {
+        it("should return site when found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = getSiteById("site1", mockDeps);
 
             expect(result).toBe(mockSites[0]);
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
         });
 
-        it("should throw error when site not found", () => {
+        it("should throw error when site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => getSiteById("nonexistent", mockDeps)).toThrow(
                 "Site not found"
             );
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle empty sites array", () => {
+        it("should handle empty sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
             expect(() => getSiteById("site1", mockDeps)).toThrow(
@@ -150,7 +174,15 @@ describe("OperationHelpers", () => {
     });
 
     describe("updateMonitorAndSave", () => {
-        it("should update monitor and save successfully", async () => {
+        it("should update monitor and save successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Saving", "type");
+
             const updates = { timeout: 10_000 };
             const updatedSite = {
                 ...mockSites[0]!,
@@ -172,7 +204,15 @@ describe("OperationHelpers", () => {
             );
         });
 
-        it("should throw error when site not found", async () => {
+        it("should throw error when site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             await expect(
                 updateMonitorAndSave("nonexistent", "monitor1", {}, mockDeps)
             ).rejects.toThrow("Site not found");
@@ -182,7 +222,15 @@ describe("OperationHelpers", () => {
             expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
         });
 
-        it("should handle updateSite API errors", async () => {
+        it("should handle updateSite API errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const apiError = new Error("API Error");
             mockElectronAPI.sites.updateSite.mockRejectedValue(apiError);
 
@@ -197,7 +245,15 @@ describe("OperationHelpers", () => {
     });
 
     describe("withSiteOperation", () => {
-        it("should execute operation with sync by default", async () => {
+        it("should execute operation with sync by default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const params = { siteId: "site1" };
 
@@ -230,7 +286,15 @@ describe("OperationHelpers", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(2); // Once in main call, once in test
         });
 
-        it("should execute operation without sync when syncAfter is false", async () => {
+        it("should execute operation without sync when syncAfter is false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const params = { siteId: "site1" };
 
@@ -260,7 +324,15 @@ describe("OperationHelpers", () => {
             expect(mockDeps.syncSitesFromBackend).not.toHaveBeenCalled();
         });
 
-        it("should handle operation errors through withErrorHandling", async () => {
+        it("should handle operation errors through withErrorHandling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const operationError = new Error("Operation failed");
             const mockOperation = vi.fn().mockRejectedValue(operationError);
             const params = { siteId: "site1" };
@@ -285,7 +357,15 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle sync errors", async () => {
+        it("should handle sync errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
             mockDeps.syncSitesFromBackend = vi
@@ -313,7 +393,15 @@ describe("OperationHelpers", () => {
     });
 
     describe("withSiteOperationReturning", () => {
-        it("should execute operation with sync by default and return result", async () => {
+        it("should execute operation with sync by default and return result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const params = { siteId: "site1" };
@@ -352,7 +440,15 @@ describe("OperationHelpers", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(2); // Once in main call, once in test
         });
 
-        it("should execute operation without sync when syncAfter is false and return result", async () => {
+        it("should execute operation without sync when syncAfter is false and return result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const params = { siteId: "site1" };
@@ -388,7 +484,15 @@ describe("OperationHelpers", () => {
             expect(mockDeps.syncSitesFromBackend).not.toHaveBeenCalled();
         });
 
-        it("should handle operation errors through withErrorHandling", async () => {
+        it("should handle operation errors through withErrorHandling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const operationError = new Error("Operation failed");
             const mockOperation = vi.fn().mockRejectedValue(operationError);
             const params = { siteId: "site1" };
@@ -413,7 +517,15 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle sync errors when syncAfter is true", async () => {
+        it("should handle sync errors when syncAfter is true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
@@ -440,7 +552,15 @@ describe("OperationHelpers", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalledTimes(1);
         });
 
-        it("should return different types of results", async () => {
+        it("should return different types of results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with string result
             const stringOperation = vi.fn().mockResolvedValue("string result");
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
@@ -496,7 +616,15 @@ describe("OperationHelpers", () => {
             ]);
         });
 
-        it("should handle null and undefined results", async () => {
+        it("should handle null and undefined results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
 
             // Test with null result
@@ -524,7 +652,15 @@ describe("OperationHelpers", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        it("should handle getSiteById with sites array containing null/undefined entries", () => {
+        it("should handle getSiteById with sites array containing null/undefined entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const sitesWithNulls = [
                 null,
                 undefined,
@@ -538,7 +674,15 @@ describe("OperationHelpers", () => {
             expect(result).toBe(mockSites[0]);
         });
 
-        it("should handle updateMonitorAndSave with complex monitor updates", async () => {
+        it("should handle updateMonitorAndSave with complex monitor updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Saving", "type");
+
             const complexUpdates = {
                 timeout: 15_000,
                 checkInterval: 120_000,
@@ -573,7 +717,15 @@ describe("OperationHelpers", () => {
             );
         });
 
-        it("should handle operations with empty parameters object", async () => {
+        it("should handle operations with empty parameters object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
 
@@ -592,7 +744,15 @@ describe("OperationHelpers", () => {
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle operations with complex parameters object", async () => {
+        it("should handle operations with complex parameters object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexParams = {
                 siteId: "site1",
                 monitorId: "monitor1",

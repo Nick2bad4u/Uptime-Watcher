@@ -41,7 +41,15 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Basic logging methods", () => {
-        it("should have all basic logging methods", () => {
+        it("should have all basic logging methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(logger.debug).toBeInstanceOf(Function);
             expect(logger.info).toBeInstanceOf(Function);
             expect(logger.warn).toBeInstanceOf(Function);
@@ -50,7 +58,15 @@ describe("Frontend Logger Service", () => {
             expect(logger.silly).toBeInstanceOf(Function);
         });
 
-        it("should prefix messages correctly", () => {
+        it("should prefix messages correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.debug("test message");
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] test message"
@@ -67,7 +83,15 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should handle additional arguments", () => {
+        it("should handle additional arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const extraData = { key: "value" };
             logger.info("message with data", extraData);
 
@@ -79,7 +103,15 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Error logging", () => {
-        it("should handle Error objects", () => {
+        it("should handle Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Test error");
             error.stack = "Error stack trace";
 
@@ -95,7 +127,15 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should handle error without error object", () => {
+        it("should handle error without error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             logger.error("Simple error message");
 
             expect(mockLog.error).toHaveBeenCalledWith(
@@ -105,21 +145,45 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - App", () => {
-        it("should log application started", () => {
+        it("should log application started", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.app.started();
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Application started"
             );
         });
 
-        it("should log application stopped", () => {
+        it("should log application stopped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.app.stopped();
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Application stopped"
             );
         });
 
-        it("should log application errors with context", () => {
+        it("should log application errors with context", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("App error");
             logger.app.error("startup", error);
 
@@ -133,7 +197,15 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log performance metrics", () => {
+        it("should log performance metrics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.app.performance("database-query", 150);
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Performance: database-query took 150ms"
@@ -142,49 +214,105 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - Site", () => {
-        it("should log site added", () => {
+        it("should log site added", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.site.added("example.com");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site added: example.com"
             );
         });
 
-        it("should log site removed", () => {
+        it("should log site removed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             logger.site.removed("example.com");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site removed: example.com"
             );
         });
 
-        it("should log site check with response time", () => {
+        it("should log site check with response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.site.check("example.com", "up", 200);
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site check: example.com - Status: up (200ms)"
             );
         });
 
-        it("should log site check without response time", () => {
+        it("should log site check without response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.site.check("example.com", "down");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site check: example.com - Status: down"
             );
         });
 
-        it("should log site status changes", () => {
+        it("should log site status changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.site.statusChange("example.com", "down", "up");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site status change: example.com - down -> up"
             );
         });
 
-        it("should log site errors with string", () => {
+        it("should log site errors with string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             logger.site.error("example.com", "Connection timeout");
             expect(mockLog.error).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Site check error: example.com - Connection timeout"
             );
         });
 
-        it("should log site errors with Error object", () => {
+        it("should log site errors with Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Network error");
             logger.site.error("example.com", error);
             expect(mockLog.error).toHaveBeenCalledWith(
@@ -199,28 +327,60 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - System", () => {
-        it("should log notifications", () => {
+        it("should log notifications", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.system.notification("Site Down", "example.com is down");
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Notification sent: Site Down - example.com is down"
             );
         });
 
-        it("should log tray actions", () => {
+        it("should log tray actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.system.tray("show");
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Tray action: show"
             );
         });
 
-        it("should log window actions with name", () => {
+        it("should log window actions with name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.system.window("opened", "main");
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Window opened (main)"
             );
         });
 
-        it("should log window actions without name", () => {
+        it("should log window actions without name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.system.window("closed");
             expect(mockLog.debug).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Window closed"
@@ -229,7 +389,15 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - User", () => {
-        it("should log user actions without details", () => {
+        it("should log user actions without details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.user.action("button-click");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] User action: button-click",
@@ -237,7 +405,15 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log user actions with details", () => {
+        it("should log user actions with details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const details = { button: "add-site", page: "dashboard" };
             logger.user.action("button-click", details);
             expect(mockLog.info).toHaveBeenCalledWith(
@@ -246,14 +422,30 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log settings changes", () => {
+        it("should log settings changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.user.settingsChange("theme", "dark", "light");
             expect(mockLog.info).toHaveBeenCalledWith(
                 "[UPTIME-WATCHER] Settings change: theme - dark -> light"
             );
         });
 
-        it("should handle complex values in settings changes", () => {
+        it("should handle complex values in settings changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const oldValue = { interval: 300, timeout: 10 };
             const newValue = { interval: 600, timeout: 15 };
             logger.user.settingsChange("monitoring", oldValue, newValue);
@@ -264,18 +456,42 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Raw access", () => {
-        it("should provide raw access to electron-log", () => {
+        it("should provide raw access to electron-log", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(logger.raw).toBe(mockLog);
         });
 
-        it("should allow direct raw logging", () => {
+        it("should allow direct raw logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.raw.debug("Direct raw message");
             expect(mockLog.debug).toHaveBeenCalledWith("Direct raw message");
         });
     });
 
     describe("Type exports", () => {
-        it("should export Logger type", async () => {
+        it("should export Logger type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             const loggerModule = await import("../services/logger");
             // Type exports exist only at compile time, not runtime
             expect(loggerModule.default).toBeDefined();
@@ -283,7 +499,15 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Silly and Verbose logging", () => {
-        it("should call silly logging method", () => {
+        it("should call silly logging method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.silly("Silly message", "arg1", { data: "test" });
 
             expect(mockLog.silly).toHaveBeenCalledWith(
@@ -293,7 +517,15 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should call verbose logging method", () => {
+        it("should call verbose logging method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.verbose("Verbose message", "arg1", { data: "test" });
 
             expect(mockLog.verbose).toHaveBeenCalledWith(

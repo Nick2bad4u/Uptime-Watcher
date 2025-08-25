@@ -13,7 +13,15 @@ import type { Site } from "../../shared/types.js";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult interface", () => {
-        it("should create successful check result", () => {
+        it("should create successful check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const result: MonitorCheckResult = {
                 status: "up",
                 responseTime: 250,
@@ -25,7 +33,15 @@ describe("Monitoring Types", () => {
             expect(result.details).toBe("All good");
         });
 
-        it("should create failed check result", () => {
+        it("should create failed check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const result: MonitorCheckResult = {
                 status: "down",
                 responseTime: 0,
@@ -39,7 +55,15 @@ describe("Monitoring Types", () => {
             expect(result.details).toBe("Timeout after 5000ms");
         });
 
-        it("should support minimal check result", () => {
+        it("should support minimal check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result: MonitorCheckResult = {
                 status: "up",
                 responseTime: 100,
@@ -53,7 +77,15 @@ describe("Monitoring Types", () => {
     });
 
     describe("IMonitorService interface", () => {
-        it("should define monitor service contract", () => {
+        it("should define monitor service contract", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // This is a type check to ensure the interface compiles correctly
             const mockService: IMonitorService = {
                 async check(
@@ -76,7 +108,15 @@ describe("Monitoring Types", () => {
             expect(typeof mockService.check).toBe("function");
         });
 
-        it("should support HTTP monitor service", async () => {
+        it("should support HTTP monitor service", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockMonitor: Site["monitors"][0] = {
                 id: "test-monitor",
                 type: "http",
@@ -115,7 +155,15 @@ describe("Monitoring Types", () => {
             expect(httpService.getType()).toBe("http");
         });
 
-        it("should support port monitor service", async () => {
+        it("should support port monitor service", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockMonitor: Site["monitors"][0] = {
                 id: "test-port-monitor",
                 type: "port",
@@ -159,14 +207,30 @@ describe("Monitoring Types", () => {
     });
 
     describe("MonitorConfig interface", () => {
-        it("should create empty config", () => {
+        it("should create empty config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: MonitorConfig = {};
 
             expect(config.timeout).toBeUndefined();
             expect(config.userAgent).toBeUndefined();
         });
 
-        it("should create config with timeout", () => {
+        it("should create config with timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: MonitorConfig = {
                 timeout: 5000,
             };
@@ -175,7 +239,15 @@ describe("Monitoring Types", () => {
             expect(config.userAgent).toBeUndefined();
         });
 
-        it("should create config with user agent", () => {
+        it("should create config with user agent", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: MonitorConfig = {
                 userAgent: "Test Agent/1.0",
             };
@@ -184,7 +256,15 @@ describe("Monitoring Types", () => {
             expect(config.timeout).toBeUndefined();
         });
 
-        it("should create complete config", () => {
+        it("should create complete config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitoringTypes", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: MonitorConfig = {
                 timeout: 10_000,
                 userAgent: "Uptime Watcher/1.0",

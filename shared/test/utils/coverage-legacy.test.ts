@@ -6,7 +6,15 @@ import { describe, it, expect } from "vitest";
 
 describe("Shared Utils Coverage", () => {
     describe("CacheKeys Utilities", () => {
-        it("should generate cache keys with prefixes", () => {
+        it("should generate cache keys with prefixes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             // Test cacheKeys.ts functionality (lines 62,108-338)
             interface CacheKeyConfig {
                 sites: {
@@ -66,7 +74,15 @@ describe("Shared Utils Coverage", () => {
             );
         });
 
-        it("should handle cache key validation and normalization", () => {
+        it("should handle cache key validation and normalization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const validateCacheKey = (key: string): boolean => {
                 return (
                     key.length > 0 && key.includes(":") && !key.includes(" ")
@@ -95,7 +111,15 @@ describe("Shared Utils Coverage", () => {
             );
         });
 
-        it("should handle cache operations", () => {
+        it("should handle cache operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             // Mock cache operations
             interface CacheOperations {
                 set: (key: string, value: any, ttl?: number) => void;
@@ -156,7 +180,15 @@ describe("Shared Utils Coverage", () => {
     });
 
     describe("LogTemplates Utilities", () => {
-        it("should generate structured log templates", () => {
+        it("should generate structured log templates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test logTemplates.ts functionality (lines 29-357)
             interface LogTemplate {
                 level: "debug" | "info" | "warn" | "error";
@@ -226,7 +258,15 @@ describe("Shared Utils Coverage", () => {
             expect(withCorrelation.correlationId).toBe("req-456");
         });
 
-        it("should handle different log template categories", () => {
+        it("should handle different log template categories", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logCategories = {
                 SITE_MANAGEMENT: "SiteManager",
                 MONITOR_EXECUTION: "MonitorExecutor",
@@ -276,7 +316,15 @@ describe("Shared Utils Coverage", () => {
             ).toBe("failed");
         });
 
-        it("should handle log filtering and querying", () => {
+        it("should handle log filtering and querying", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface LogTemplate {
                 level: "debug" | "info" | "warn" | "error";
                 category: string;
@@ -350,7 +398,15 @@ describe("Shared Utils Coverage", () => {
     });
 
     describe("ErrorCatalog Utilities", () => {
-        it("should handle error catalog structures", () => {
+        it("should handle error catalog structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test errorCatalog.ts functionality (lines 356-390)
             interface ErrorCatalogEntry {
                 code: string;
@@ -423,7 +479,15 @@ describe("Shared Utils Coverage", () => {
             ).toContain("Check required fields");
         });
 
-        it("should handle error resolution and recovery", () => {
+        it("should handle error resolution and recovery", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             interface ErrorCatalogEntry {
                 code: string;
                 message: string;
@@ -481,7 +545,15 @@ describe("Shared Utils Coverage", () => {
             );
         });
 
-        it("should handle error formatting and localization", () => {
+        it("should handle error formatting and localization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             interface ErrorFormatter {
                 formatError: (
                     code: string,
@@ -541,7 +613,15 @@ describe("Shared Utils Coverage", () => {
     });
 
     describe("String Conversion Edge Cases", () => {
-        it("should handle string conversion edge cases", () => {
+        it("should handle string conversion edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test stringConversion.ts edge cases (lines 81-84)
             const stringUtils = {
                 safeToString: (value: any): string => {
@@ -585,7 +665,15 @@ describe("Shared Utils Coverage", () => {
     });
 
     describe("JSON Safety Edge Cases", () => {
-        it("should handle JSON safety edge cases", () => {
+        it("should handle JSON safety edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test jsonSafety.ts edge case (line 206)
             const jsonUtils = {
                 safeStringify: (value: any): string => {
@@ -620,7 +708,15 @@ describe("Shared Utils Coverage", () => {
     });
 
     describe("Safe Conversions Edge Cases", () => {
-        it("should handle safe conversion edge cases", () => {
+        it("should handle safe conversion edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-legacy", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test safeConversions.ts edge case (line 267)
             const conversionUtils = {
                 safeNumber: (value: any, fallback = 0): number => {

@@ -26,7 +26,15 @@ import type { ValidationResult } from "../../../../shared/types/validation";
 
 describe("IPC Types", () => {
     describe("IpcHandlerConfig", () => {
-        it("should define the correct interface structure", () => {
+        it("should define the correct interface structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockHandler = vi.fn().mockResolvedValue("test result");
             const mockValidator = vi.fn().mockReturnValue(null);
 
@@ -41,7 +49,15 @@ describe("IPC Types", () => {
             expect(config.validateParams).toBe(mockValidator);
         });
 
-        it("should allow configuration without optional validateParams", () => {
+        it("should allow configuration without optional validateParams", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const mockHandler = vi.fn().mockReturnValue("sync result");
 
             const config: IpcHandlerConfig = {
@@ -54,7 +70,15 @@ describe("IPC Types", () => {
             expect(config.validateParams).toBeUndefined();
         });
 
-        it("should support async handlers", () => {
+        it("should support async handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncHandler = vi.fn().mockResolvedValue(42);
 
             const config: IpcHandlerConfig = {
@@ -66,7 +90,15 @@ describe("IPC Types", () => {
             expect(typeof config.handler).toBe("function");
         });
 
-        it("should support sync handlers", () => {
+        it("should support sync handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const syncHandler = vi.fn().mockReturnValue("result");
 
             const config: IpcHandlerConfig = {
@@ -80,7 +112,15 @@ describe("IPC Types", () => {
     });
 
     describe("IpcResponse", () => {
-        it("should create a successful response with data", () => {
+        it("should create a successful response with data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const response: IpcResponse<string> = {
                 success: true,
                 data: "test data",
@@ -93,7 +133,15 @@ describe("IPC Types", () => {
             expect(response.metadata).toBeUndefined();
         });
 
-        it("should create an error response", () => {
+        it("should create an error response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const response: IpcResponse<void> = {
                 success: false,
                 error: "Something went wrong",
@@ -104,7 +152,15 @@ describe("IPC Types", () => {
             expect(response.data).toBeUndefined();
         });
 
-        it("should include warnings in response", () => {
+        it("should include warnings in response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const response: IpcResponse<number> = {
                 success: true,
                 data: 42,
@@ -119,7 +175,15 @@ describe("IPC Types", () => {
             ]);
         });
 
-        it("should include metadata in response", () => {
+        it("should include metadata in response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const metadata = {
                 executionTime: 150,
                 cacheHit: true,
@@ -137,7 +201,15 @@ describe("IPC Types", () => {
             expect(response.metadata).toEqual(metadata);
         });
 
-        it("should support complex data types", () => {
+        it("should support complex data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface ComplexData {
                 id: number;
                 name: string;
@@ -163,7 +235,15 @@ describe("IPC Types", () => {
             expect(response.data).toEqual(complexData);
         });
 
-        it("should support array data types", () => {
+        it("should support array data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const arrayData = [
                 1,
                 2,
@@ -181,7 +261,15 @@ describe("IPC Types", () => {
             expect(response.data).toEqual(arrayData);
         });
 
-        it("should support undefined generic for responses without data", () => {
+        it("should support undefined generic for responses without data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const response: IpcResponse = {
                 success: true,
             };
@@ -192,7 +280,15 @@ describe("IPC Types", () => {
     });
 
     describe("IpcValidationResponse", () => {
-        it("should create a successful validation response", () => {
+        it("should create a successful validation response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const validationResult: ValidationResult = {
                 success: true,
                 errors: [],
@@ -209,7 +305,15 @@ describe("IPC Types", () => {
             expect(response.errors).toEqual([]);
         });
 
-        it("should create a failed validation response", () => {
+        it("should create a failed validation response", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const validationResult: ValidationResult = {
                 success: false,
                 errors: ["Field is required", "Invalid format"],
@@ -229,7 +333,15 @@ describe("IPC Types", () => {
             ]);
         });
 
-        it("should extend IpcResponse interface", () => {
+        it("should extend IpcResponse interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const response: IpcValidationResponse = {
                 success: false,
                 data: {
@@ -259,7 +371,15 @@ describe("IPC Types", () => {
     });
 
     describe("IpcParameterValidator", () => {
-        it("should define a function that returns null for valid parameters", () => {
+        it("should define a function that returns null for valid parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator: IpcParameterValidator = (params: unknown[]) => {
                 if (params.length === 0) {
                     return ["No parameters provided"];
@@ -274,7 +394,15 @@ describe("IPC Types", () => {
             expect(invalidResult).toEqual(["No parameters provided"]);
         });
 
-        it("should define a function that returns error array for invalid parameters", () => {
+        it("should define a function that returns error array for invalid parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator: IpcParameterValidator = (params: unknown[]) => {
                 const errors: string[] = [];
 
@@ -304,7 +432,15 @@ describe("IPC Types", () => {
             ]);
         });
 
-        it("should handle complex parameter validation", () => {
+        it("should handle complex parameter validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             interface ExpectedParam {
                 id: number;
                 name: string;
@@ -353,7 +489,15 @@ describe("IPC Types", () => {
     });
 
     describe("Type compatibility and usage patterns", () => {
-        it("should demonstrate typical success response pattern", () => {
+        it("should demonstrate typical success response pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const createSuccessResponse = <T>(data: T): IpcResponse<T> => ({
                 success: true,
                 data,
@@ -376,7 +520,15 @@ describe("IPC Types", () => {
             expect(objectResponse.data).toEqual({ id: 1, name: "test" });
         });
 
-        it("should demonstrate typical error response pattern", () => {
+        it("should demonstrate typical error response pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const createErrorResponse = (error: string): IpcResponse<void> => ({
                 success: false,
                 error,
@@ -389,7 +541,15 @@ describe("IPC Types", () => {
             expect(errorResponse.data).toBeUndefined();
         });
 
-        it("should demonstrate IPC handler configuration patterns", () => {
+        it("should demonstrate IPC handler configuration patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Simple handler
             const simpleConfig: IpcHandlerConfig = {
                 channelName: "simple-operation",

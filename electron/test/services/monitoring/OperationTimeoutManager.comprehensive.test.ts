@@ -67,7 +67,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("Constructor", () => {
-        it("should create instance with operation registry", () => {
+        it("should create instance with operation registry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(operationTimeoutManager).toBeDefined();
             expect(operationTimeoutManager).toBeInstanceOf(
                 OperationTimeoutManager
@@ -76,7 +84,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("scheduleTimeout", () => {
-        it("should schedule timeout for operation", () => {
+        it("should schedule timeout for operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-123";
             const timeoutMs = 5000;
 
@@ -86,7 +102,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(1);
         });
 
-        it("should log debug message when timeout is scheduled", async () => {
+        it("should log debug message when timeout is scheduled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { monitorLogger } = await import("../../../utils/logger");
             const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
                 "@shared/utils/logTemplates"
@@ -104,7 +128,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(monitorLogger.debug).toHaveBeenCalled();
         });
 
-        it("should store multiple timeouts for different operations", () => {
+        it("should store multiple timeouts for different operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             operationTimeoutManager.scheduleTimeout("op-1", 1000);
             operationTimeoutManager.scheduleTimeout("op-2", 2000);
             operationTimeoutManager.scheduleTimeout("op-3", 3000);
@@ -112,7 +144,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(3);
         });
 
-        it("should replace existing timeout for same operation", () => {
+        it("should replace existing timeout for same operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-replace";
 
             // Schedule first timeout
@@ -126,7 +166,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("clearTimeout", () => {
-        it("should clear existing timeout", () => {
+        it("should clear existing timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-clear";
 
             // Schedule a timeout
@@ -138,7 +186,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should log debug message when timeout is cleared", async () => {
+        it("should log debug message when timeout is cleared", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { monitorLogger } = await import("../../../utils/logger");
             const operationId = "op-clear-log";
 
@@ -151,7 +207,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             );
         });
 
-        it("should do nothing when clearing non-existent timeout", async () => {
+        it("should do nothing when clearing non-existent timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { monitorLogger } = await import("../../../utils/logger");
 
             // Clear non-existent timeout (should not throw or log)
@@ -165,7 +229,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             );
         });
 
-        it("should clear specific timeout without affecting others", () => {
+        it("should clear specific timeout without affecting others", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             operationTimeoutManager.scheduleTimeout("op-1", 1000);
             operationTimeoutManager.scheduleTimeout("op-2", 2000);
             operationTimeoutManager.scheduleTimeout("op-3", 3000);
@@ -178,7 +250,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("handleTimeout (timeout execution)", () => {
-        it("should handle timeout for active operation", async () => {
+        it("should handle timeout for active operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { monitorLogger } = await import("../../../utils/logger");
             const { interpolateLogTemplate, LOG_TEMPLATES } = await import(
                 "@shared/utils/logTemplates"
@@ -223,7 +303,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             );
         });
 
-        it("should not cancel already cancelled operation", async () => {
+        it("should not cancel already cancelled operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-cancelled";
             const monitorId = "monitor-456";
 
@@ -256,7 +344,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle timeout for non-existent operation", async () => {
+        it("should handle timeout for non-existent operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-non-existent";
 
             // Mock registry returning null/undefined
@@ -281,7 +377,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should clear timeout after handling timeout", () => {
+        it("should clear timeout after handling timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-clear-after";
 
             // Mock operation
@@ -309,7 +413,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Conditions", () => {
-        it("should handle zero timeout", () => {
+        it("should handle zero timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-zero";
 
             operationTimeoutManager.scheduleTimeout(operationId, 0);
@@ -320,7 +432,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should handle negative timeout", () => {
+        it("should handle negative timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-negative";
 
             // Should still schedule timeout (setTimeout handles negative as 0)
@@ -328,7 +448,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(1);
         });
 
-        it("should handle very large timeout", () => {
+        it("should handle very large timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-large";
             const largeTimeout = Number.MAX_SAFE_INTEGER;
 
@@ -336,7 +464,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(1);
         });
 
-        it("should handle empty operation ID", () => {
+        it("should handle empty operation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "";
 
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -346,7 +482,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should handle special characters in operation ID", () => {
+        it("should handle special characters in operation ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-with-special-chars-!@#$%^&*()";
 
             operationTimeoutManager.scheduleTimeout(operationId, 1000);
@@ -358,7 +502,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("Integration Scenarios", () => {
-        it("should handle rapid schedule and clear cycles", () => {
+        it("should handle rapid schedule and clear cycles", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-rapid";
 
             // Rapid schedule/clear cycles
@@ -370,7 +522,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should handle concurrent operations with different timeouts", async () => {
+        it("should handle concurrent operations with different timeouts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock operations
             const operations = [
                 {
@@ -431,7 +591,15 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             ).toHaveBeenCalledTimes(3);
         });
 
-        it("should handle clearing timeout before it expires", () => {
+        it("should handle clearing timeout before it expires", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operationId = "op-clear-before-expire";
 
             // Mock operation

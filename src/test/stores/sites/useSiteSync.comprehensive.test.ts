@@ -94,7 +94,15 @@ describe("useSiteSync", () => {
     });
 
     describe("fullSyncFromBackend", () => {
-        it("should perform full sync successfully", async () => {
+        it("should perform full sync successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
 
             await syncActions.fullSyncFromBackend();
@@ -111,7 +119,15 @@ describe("useSiteSync", () => {
             syncActions = createSiteSyncActions(mockDeps);
         });
 
-        it("should get sync status successfully", async () => {
+        it("should get sync status successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockStatus = {
                 siteCount: 5,
                 synchronized: true,
@@ -129,7 +145,15 @@ describe("useSiteSync", () => {
             expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
         });
 
-        it("should handle getSyncStatus errors with fallback", async () => {
+        it("should handle getSyncStatus errors with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockElectronAPI.stateSync.getSyncStatus
             ).mockRejectedValue(new Error("Network error"));
@@ -145,7 +169,15 @@ describe("useSiteSync", () => {
             });
         });
 
-        it("should handle withErrorHandling exceptions and use fallback", async () => {
+        it("should handle withErrorHandling exceptions and use fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock withErrorHandling to throw an error (covering the catch block in getSyncStatus)
             const { withErrorHandling } = await import(
                 "../../../../shared/utils/errorHandling"
@@ -167,7 +199,15 @@ describe("useSiteSync", () => {
     });
 
     describe("subscribeToStatusUpdates", () => {
-        it("should subscribe to status updates successfully", () => {
+        it("should subscribe to status updates successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockCallback = vi.fn();
             const result = syncActions.subscribeToStatusUpdates(mockCallback);
 
@@ -181,7 +221,15 @@ describe("useSiteSync", () => {
             );
         });
 
-        it("should handle StatusUpdateManager subscription errors", async () => {
+        it("should handle StatusUpdateManager subscription errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCallback = vi.fn();
 
             // Mock StatusUpdateManager to throw an error during subscribe
@@ -212,7 +260,15 @@ describe("useSiteSync", () => {
     });
 
     describe("subscribeToSyncEvents", () => {
-        it("should subscribe to sync events successfully", () => {
+        it("should subscribe to sync events successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockCleanup = vi.fn();
             mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(
                 mockCleanup
@@ -226,7 +282,15 @@ describe("useSiteSync", () => {
             expect(typeof result).toBe("function");
         });
 
-        it("should handle bulk-sync events", () => {
+        it("should handle bulk-sync events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Event Processing", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -249,7 +313,15 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle bulk-sync events without sites", () => {
+        it("should handle bulk-sync events without sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Event Processing", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -273,7 +345,15 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
-        it("should handle delete events", async () => {
+        it("should handle delete events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // Test delete event handling by simulating the sync event subscription
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
@@ -299,7 +379,15 @@ describe("useSiteSync", () => {
             ).toHaveBeenCalled();
         });
 
-        it("should handle update events with syncSitesFromBackend error", async () => {
+        it("should handle update events with syncSitesFromBackend error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test error handling during update events by simulating sync subscription
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
@@ -338,7 +426,15 @@ describe("useSiteSync", () => {
             syncActions = createSiteSyncActions(mockDeps);
         });
 
-        it("should sync sites from backend successfully", async () => {
+        it("should sync sites from backend successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test successful sync from backend
             const mockSites = [
                 { id: "site-1", name: "Site 1" },
@@ -354,7 +450,15 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle sync errors", async () => {
+        it("should handle sync errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Sync failed");
             vi.mocked(SiteService.getSites).mockRejectedValue(error);
 
@@ -370,7 +474,15 @@ describe("useSiteSync", () => {
     });
 
     describe("unsubscribeFromStatusUpdates", () => {
-        it("should unsubscribe from status updates successfully", () => {
+        it("should unsubscribe from status updates successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const result = syncActions.unsubscribeFromStatusUpdates();
 
             expect(result).toEqual({
@@ -382,7 +494,15 @@ describe("useSiteSync", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should create independent instances with same dependencies", () => {
+        it("should create independent instances with same dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const instance1 = createSiteSyncActions(mockDeps);
             const instance2 = createSiteSyncActions(mockDeps);
 
@@ -391,7 +511,15 @@ describe("useSiteSync", () => {
             expect(typeof instance2.syncSitesFromBackend).toBe("function");
         });
 
-        it("should return all required action methods", () => {
+        it("should return all required action methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const actions = createSiteSyncActions(mockDeps);
 
             expect(actions).toHaveProperty("fullSyncFromBackend");

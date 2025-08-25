@@ -11,7 +11,15 @@ import { describe, it, expect } from "vitest";
 import * as monitorConfig from "@shared/types/monitorConfig";
 
 describe("Function Coverage Validation", () => {
-    it("should call all exported functions to ensure 100% function coverage", () => {
+    it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Export Operation", "type");
+
         // Verify all functions are accessible
         expect(typeof monitorConfig.isHttpMonitorConfig).toBe("function");
         expect(typeof monitorConfig.isPingMonitorConfig).toBe("function");

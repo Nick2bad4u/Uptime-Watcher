@@ -88,7 +88,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Basic functionality", () => {
-        it("should perform port check with correct parameters", async () => {
+        it("should perform port check with correct parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const host = "example.com";
             const port = 80;
@@ -115,7 +123,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should convert maxRetries to totalAttempts correctly", async () => {
+        it("should convert maxRetries to totalAttempts correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test cases: maxRetries -> totalAttempts
             const testCases = [
                 { maxRetries: 0, expectedTotal: 1 },
@@ -146,7 +162,15 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should pass the correct function to withOperationalHooks", async () => {
+        it("should pass the correct function to withOperationalHooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const host = "test.host";
             const port = 443;
@@ -175,7 +199,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Development mode behavior", () => {
-        it("should add debug logging when isDev returns true", async () => {
+        it("should add debug logging when isDev returns true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
 
@@ -194,7 +226,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should not add debug logging when isDev returns false", async () => {
+        it("should not add debug logging when isDev returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(false);
 
@@ -206,7 +246,15 @@ describe("performPortCheckWithRetry", () => {
             expect(config).not.toHaveProperty("onRetry");
         });
 
-        it("should call debug logger with correct message when onRetry is triggered", async () => {
+        it("should call debug logger with correct message when onRetry is triggered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
             const testError = new Error("Connection failed");
@@ -229,7 +277,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should handle non-Error objects in onRetry callback", async () => {
+        it("should handle non-Error objects in onRetry callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
 
@@ -253,7 +309,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Error handling", () => {
-        it("should handle errors from withOperationalHooks", async () => {
+        it("should handle errors from withOperationalHooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const testError = new Error("Operational hooks failed");
             vi.mocked(withOperationalHooks).mockRejectedValue(testError);
@@ -275,7 +339,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should handle different types of errors", async () => {
+        it("should handle different types of errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testCases = [
                 new Error("Network error"),
                 new TypeError("Type error"),
@@ -308,7 +380,15 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should pass through error results from handlePortCheckError", async () => {
+        it("should pass through error results from handlePortCheckError", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const customErrorResult = {
                 status: "down" as const,
@@ -335,7 +415,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Parameter validation and edge cases", () => {
-        it("should handle zero retries (single attempt)", async () => {
+        it("should handle zero retries (single attempt)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Act
             await performPortCheckWithRetry("single.example.com", 80, 5000, 0);
 
@@ -348,7 +436,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should handle different host formats", async () => {
+        it("should handle different host formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const hostFormats = [
                 "example.com",
                 "sub.example.com",
@@ -375,7 +471,15 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should handle different port numbers", async () => {
+        it("should handle different port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const ports = [
                 22,
                 80,
@@ -402,7 +506,15 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should handle different timeout values", async () => {
+        it("should handle different timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timeouts = [
                 100,
                 1000,
@@ -431,7 +543,15 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should handle large retry counts", async () => {
+        it("should handle large retry counts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Act
             await performPortCheckWithRetry("large.example.com", 80, 1000, 100);
 
@@ -446,7 +566,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Configuration object composition", () => {
-        it("should create base configuration correctly", async () => {
+        it("should create base configuration correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(false);
 
@@ -464,7 +592,15 @@ describe("performPortCheckWithRetry", () => {
             );
         });
 
-        it("should merge onRetry callback in dev mode", async () => {
+        it("should merge onRetry callback in dev mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
 
@@ -483,7 +619,15 @@ describe("performPortCheckWithRetry", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with successful port checks", async () => {
+        it("should work with successful port checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const successResult = {
                 status: "up" as const,
@@ -505,7 +649,15 @@ describe("performPortCheckWithRetry", () => {
             expect(handlePortCheckError).not.toHaveBeenCalled();
         });
 
-        it("should handle concurrent port checks", async () => {
+        it("should handle concurrent port checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const results = [
                 { status: "up" as const, responseTime: 100 },

@@ -114,11 +114,27 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("constructor", () => {
-        it("should create a factory instance with provided dependencies", () => {
+        it("should create a factory instance with provided dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(factory).toBeInstanceOf(DatabaseServiceFactory);
         });
 
-        it("should store dependencies internally", () => {
+        it("should store dependencies internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Since dependencies are private, we can verify they were stored by
             // checking that services can be created successfully
             expect(() => factory.createBackupService()).not.toThrow();
@@ -128,7 +144,15 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("createBackupService", () => {
-        it("should create a data backup service instance", () => {
+        it("should create a data backup service instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const backupService = factory.createBackupService();
 
             expect(backupService).toBeDefined();
@@ -137,7 +161,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should return a service that implements IDataBackupService interface", () => {
+        it("should return a service that implements IDataBackupService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const backupService = factory.createBackupService();
 
             // Verify the service has the required interface methods
@@ -147,7 +179,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should create a new instance each time", () => {
+        it("should create a new instance each time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = factory.createBackupService();
             const service2 = factory.createBackupService();
 
@@ -156,7 +196,15 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("createImportExportService", () => {
-        it("should create a data import/export service instance", () => {
+        it("should create a data import/export service instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const importExportService = factory.createImportExportService();
 
             expect(importExportService).toBeDefined();
@@ -169,7 +217,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should return a service that implements IDataImportExportService interface", () => {
+        it("should return a service that implements IDataImportExportService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const importExportService = factory.createImportExportService();
 
             // Verify the service has the required interface methods
@@ -185,7 +241,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should create a new instance each time", () => {
+        it("should create a new instance each time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = factory.createImportExportService();
             const service2 = factory.createImportExportService();
 
@@ -194,7 +258,15 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("createSiteRepositoryService", () => {
-        it("should create a site repository service instance", () => {
+        it("should create a site repository service instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteRepositoryService = factory.createSiteRepositoryService();
 
             expect(siteRepositoryService).toBeDefined();
@@ -203,7 +275,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should return a service that implements ISiteRepositoryService interface", () => {
+        it("should return a service that implements ISiteRepositoryService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteRepositoryService = factory.createSiteRepositoryService();
 
             // Verify the service has the required interface methods
@@ -215,7 +295,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should create a new instance each time", () => {
+        it("should create a new instance each time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = factory.createSiteRepositoryService();
             const service2 = factory.createSiteRepositoryService();
 
@@ -224,7 +312,15 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("service creation with dependencies", () => {
-        it("should pass event emitter to all created services", () => {
+        it("should pass event emitter to all created services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Create services to ensure dependencies are passed correctly
             const backupService = factory.createBackupService();
             const importExportService = factory.createImportExportService();
@@ -236,14 +332,30 @@ describe("DatabaseServiceFactory", () => {
             expect(siteRepositoryService).toBeDefined();
         });
 
-        it("should pass database service to import/export service", () => {
+        it("should pass database service to import/export service", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const importExportService = factory.createImportExportService();
 
             expect(importExportService).toBeDefined();
             // The database service dependency is verified through successful creation
         });
 
-        it("should pass repositories to import/export and site repository services", () => {
+        it("should pass repositories to import/export and site repository services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const importExportService = factory.createImportExportService();
             const siteRepositoryService = factory.createSiteRepositoryService();
 
@@ -254,7 +366,15 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("interface compliance", () => {
-        it("should ensure backup service matches IDataBackupService interface", () => {
+        it("should ensure backup service matches IDataBackupService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const backupService: IDataBackupService =
                 factory.createBackupService();
 
@@ -264,7 +384,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should ensure import/export service matches IDataImportExportService interface", () => {
+        it("should ensure import/export service matches IDataImportExportService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const importExportService: IDataImportExportService =
                 factory.createImportExportService();
 
@@ -280,7 +408,15 @@ describe("DatabaseServiceFactory", () => {
             );
         });
 
-        it("should ensure site repository service matches ISiteRepositoryService interface", () => {
+        it("should ensure site repository service matches ISiteRepositoryService interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteRepositoryService: ISiteRepositoryService =
                 factory.createSiteRepositoryService();
 
@@ -292,11 +428,27 @@ describe("DatabaseServiceFactory", () => {
     });
 
     describe("factory behavior", () => {
-        it("should initialize with valid dependencies", () => {
+        it("should initialize with valid dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(factory).toBeInstanceOf(DatabaseServiceFactory);
         });
 
-        it("should create different service instances consistently", () => {
+        it("should create different service instances consistently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseServiceFactory", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const backup1 = factory.createBackupService();
             const backup2 = factory.createBackupService();
             const importExport1 = factory.createImportExportService();

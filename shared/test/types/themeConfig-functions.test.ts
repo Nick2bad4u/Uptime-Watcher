@@ -12,7 +12,15 @@ import {
 
 describe("shared/types/themeConfig function coverage", () => {
     describe("isColorPalette", () => {
-        it("should return true for valid ColorPalette object", () => {
+        it("should return true for valid ColorPalette object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPalette: ColorPalette = {
                 primary: "#0066cc",
                 secondary: "#666666",
@@ -25,25 +33,65 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(validPalette)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isColorPalette(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isColorPalette(undefined)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isColorPalette("string")).toBe(false);
             expect(isColorPalette(123)).toBe(false);
             expect(isColorPalette(true)).toBe(false);
         });
 
-        it("should return false for array", () => {
+        it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isColorPalette([])).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompletePalette = {
                 background: "#ffffff",
                 text: "#000000",
@@ -53,7 +101,15 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(incompletePalette)).toBe(false);
         });
 
-        it("should return false for object with invalid property types", () => {
+        it("should return false for object with invalid property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidPalette = {
                 background: 123, // should be string
                 border: "#cccccc",
@@ -69,7 +125,15 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(invalidPalette)).toBe(false);
         });
 
-        it("should handle edge cases with color values", () => {
+        it("should handle edge cases with color values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const edgeCasePalette: ColorPalette = {
                 primary: "#ff0000", // valid color
                 secondary: "#666666",
@@ -85,7 +149,15 @@ describe("shared/types/themeConfig function coverage", () => {
     });
 
     describe("isThemeConfig", () => {
-        it("should return true for valid ThemeConfig object", () => {
+        it("should return true for valid ThemeConfig object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validConfig = {
                 animation: {
                     duration: {
@@ -210,25 +282,65 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(validConfig as any)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isThemeConfig(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isThemeConfig(undefined)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isThemeConfig("string")).toBe(false);
             expect(isThemeConfig(123)).toBe(false);
             expect(isThemeConfig(true)).toBe(false);
         });
 
-        it("should return false for array", () => {
+        it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isThemeConfig([])).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteConfig = {
                 colors: {
                     light: {
@@ -249,7 +361,15 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(incompleteConfig)).toBe(false);
         });
 
-        it("should return false for object with invalid nested structure", () => {
+        it("should return false for object with invalid nested structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidConfig = {
                 colors: {
                     light: "invalid", // should be ColorPalette object
@@ -286,7 +406,15 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(invalidConfig)).toBe(false);
         });
 
-        it("should return false for object missing color themes", () => {
+        it("should return false for object missing color themes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const configMissingThemes = {
                 colors: {
                     light: {
@@ -325,7 +453,15 @@ describe("shared/types/themeConfig function coverage", () => {
     });
 
     describe("integration tests", () => {
-        it("should validate complete theme structure", () => {
+        it("should validate complete theme structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const themeConfig = {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
@@ -440,7 +576,15 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(themeConfig.colors.primary)).toBe(true); // Test the actual ColorPalette
         });
 
-        it("should handle edge cases with both validators", () => {
+        it("should handle edge cases with both validators", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with minimum valid structure - valid ThemeConfig with minimal ColorPalette
             const minimalValidTheme = {
                 animation: {

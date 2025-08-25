@@ -4,12 +4,28 @@ import { validateMonitorField } from "../validation/schemas";
 
 describe("Final 100% Coverage Tests", () => {
     describe("stringConversion - Lines 86-89", () => {
-        it("should handle undefined case (line 86-87)", () => {
+        it("should handle undefined case (line 86-87)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-100-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeStringify(undefined);
             expect(result).toBe(""); // safeStringify returns empty string for undefined
         });
 
-        it("should handle default case for unknown types (line 89)", () => {
+        it("should handle default case for unknown types (line 89)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-100-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object with unusual typeof behavior to try to hit the default case
             const weirdObject = Object.create(null);
             Object.defineProperty(weirdObject, Symbol.toStringTag, {
@@ -23,7 +39,15 @@ describe("Final 100% Coverage Tests", () => {
     });
 
     describe("schemas - Lines 399,482", () => {
-        it("should handle field validation error at line 399", () => {
+        it("should handle field validation error at line 399", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-100-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test validateMonitorField with invalid monitor type to trigger error path
             const result = validateMonitorField(
                 "invalidType" as any,
@@ -41,7 +65,15 @@ describe("Final 100% Coverage Tests", () => {
             });
         });
 
-        it("should handle validation error categorization at line 482", () => {
+        it("should handle validation error categorization at line 482", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-100-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test with field that doesn't exist to trigger different error path
             expect(() => {
                 validateMonitorField(

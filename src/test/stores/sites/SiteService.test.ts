@@ -37,7 +37,15 @@ describe("SiteService", () => {
     });
 
     describe("getSites", () => {
-        it("should retrieve all sites successfully", async () => {
+        it("should retrieve all sites successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockSites: Site[] = [
                 {
                     identifier: "site1",
@@ -91,7 +99,15 @@ describe("SiteService", () => {
             expect(sites).toEqual(mockSites);
         });
 
-        it("should handle empty sites array", async () => {
+        it("should handle empty sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
 
             const sites = await SiteService.getSites();
@@ -99,7 +115,15 @@ describe("SiteService", () => {
             expect(sites).toEqual([]);
         });
 
-        it("should handle errors when retrieving sites", async () => {
+        it("should handle errors when retrieving sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Failed to fetch sites");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(error);
 
@@ -108,7 +132,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle network errors", async () => {
+        it("should handle network errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const networkError = new Error("Network error");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(networkError);
 
@@ -119,7 +151,15 @@ describe("SiteService", () => {
     });
 
     describe("addSite", () => {
-        it("should add a new site successfully", async () => {
+        it("should add a new site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const newSite: Omit<Site, "id"> = {
                 identifier: "new-site",
                 monitors: [
@@ -168,7 +208,15 @@ describe("SiteService", () => {
             expect(result).toEqual(createdSite);
         });
 
-        it("should handle creation errors", async () => {
+        it("should handle creation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const newSite: Omit<Site, "id"> = {
                 identifier: "new-site",
                 monitors: [],
@@ -184,7 +232,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle validation errors", async () => {
+        it("should handle validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidSite: Omit<Site, "id"> = {
                 identifier: "",
                 monitors: [],
@@ -202,7 +258,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle duplicate site errors", async () => {
+        it("should handle duplicate site errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const duplicateSite: Omit<Site, "id"> = {
                 identifier: "existing-site",
                 monitors: [],
@@ -220,7 +284,15 @@ describe("SiteService", () => {
     });
 
     describe("updateSite", () => {
-        it("should update an existing site successfully", async () => {
+        it("should update an existing site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const identifier = "site1";
             const updates: Partial<Site> = {
                 name: "Updated Site",
@@ -236,7 +308,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle update errors", async () => {
+        it("should handle update errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const identifier = "site1";
             const updates: Partial<Site> = {
                 name: "Updated Site",
@@ -250,7 +330,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Failed to update site");
         });
 
-        it("should handle non-existent site errors", async () => {
+        it("should handle non-existent site errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const identifier = "non-existent";
             const updates: Partial<Site> = {
                 name: "Non-existent Site",
@@ -266,7 +354,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Site not found");
         });
 
-        it("should handle partial updates", async () => {
+        it("should handle partial updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const identifier = "site1";
             const updates: Partial<Site> = {
                 name: "Partially Updated Site",
@@ -284,7 +380,15 @@ describe("SiteService", () => {
     });
 
     describe("removeSite", () => {
-        it("should remove a site successfully", async () => {
+        it("should remove a site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const identifier = "site-to-remove";
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
 
@@ -295,7 +399,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle removal errors", async () => {
+        it("should handle removal errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const identifier = "site-to-remove";
             const error = new Error("Failed to remove site");
             mockElectronAPI.sites.removeSite.mockRejectedValueOnce(error);
@@ -305,7 +417,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle non-existent site removal", async () => {
+        it("should handle non-existent site removal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const identifier = "non-existent-site";
             const notFoundError = new Error("Site not found");
             mockElectronAPI.sites.removeSite.mockRejectedValueOnce(
@@ -317,7 +437,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle empty site identifier", async () => {
+        it("should handle empty site identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const identifier = "";
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(undefined);
 
@@ -328,7 +456,15 @@ describe("SiteService", () => {
     });
 
     describe("checkSiteNow", () => {
-        it("should check a site now successfully", async () => {
+        it("should check a site now successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "site1";
             const monitorId = "monitor1";
             mockElectronAPI.sites.checkSiteNow.mockResolvedValueOnce(undefined);
@@ -341,7 +477,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle check errors", async () => {
+        it("should handle check errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "site1";
             const monitorId = "monitor1";
             const error = new Error("Failed to check site");
@@ -352,7 +496,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Failed to check site");
         });
 
-        it("should handle invalid site/monitor IDs", async () => {
+        it("should handle invalid site/monitor IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "invalid-site";
             const monitorId = "invalid-monitor";
             const error = new Error("Invalid site or monitor ID");
@@ -365,7 +517,15 @@ describe("SiteService", () => {
     });
 
     describe("downloadSQLiteBackup", () => {
-        it("should download SQLite backup successfully", async () => {
+        it("should download SQLite backup successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const backupData = {
                 buffer: new ArrayBuffer(100),
                 fileName: "backup.db",
@@ -383,7 +543,15 @@ describe("SiteService", () => {
             expect(result).toEqual(backupData);
         });
 
-        it("should handle download errors", async () => {
+        it("should handle download errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Failed to download backup");
             mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
                 error
@@ -396,7 +564,15 @@ describe("SiteService", () => {
     });
 
     describe("Service availability", () => {
-        it("should work when window.electronAPI is available", () => {
+        it("should work when window.electronAPI is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteService.getSites).toBeDefined();
             expect(SiteService.addSite).toBeDefined();
             expect(SiteService.updateSite).toBeDefined();
@@ -405,7 +581,15 @@ describe("SiteService", () => {
             expect(SiteService.downloadSQLiteBackup).toBeDefined();
         });
 
-        it("should handle undefined window.electronAPI gracefully", async () => {
+        it("should handle undefined window.electronAPI gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Import the mock so we can control it
             const { waitForElectronAPI } = await import(
                 "../../../stores/utils"
@@ -442,7 +626,15 @@ describe("SiteService", () => {
     });
 
     describe("Parameter validation", () => {
-        it("should accept valid site objects", async () => {
+        it("should accept valid site objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validSite: Omit<Site, "id"> = {
                 identifier: "valid-site",
                 monitors: [
@@ -474,7 +666,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle sites with multiple monitors", async () => {
+        it("should handle sites with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithMonitors: Omit<Site, "id"> = {
                 identifier: "site-with-monitors",
                 monitors: [
@@ -517,7 +717,15 @@ describe("SiteService", () => {
             expect(result).toEqual(siteWithMonitors);
         });
 
-        it("should handle special characters in site data", async () => {
+        it("should handle special characters in site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteWithSpecialChars: Omit<Site, "id"> = {
                 identifier: "site-with-special-chars",
                 monitors: [
@@ -547,7 +755,15 @@ describe("SiteService", () => {
             expect(result).toEqual(siteWithSpecialChars);
         });
 
-        it("should handle Unicode characters in site data", async () => {
+        it("should handle Unicode characters in site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteWithUnicode: Omit<Site, "id"> = {
                 identifier: "site-with-unicode",
                 monitors: [
@@ -579,7 +795,15 @@ describe("SiteService", () => {
     });
 
     describe("Error handling", () => {
-        it("should propagate network errors", async () => {
+        it("should propagate network errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const networkError = new Error("Network error");
             mockElectronAPI.sites.getSites.mockRejectedValueOnce(networkError);
 
@@ -588,7 +812,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should propagate validation errors from backend", async () => {
+        it("should propagate validation errors from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validationError = new Error("Invalid site data");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(
                 validationError
@@ -599,7 +831,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Invalid site data");
         });
 
-        it("should handle timeout errors", async () => {
+        it("should handle timeout errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const timeoutError = new Error("Request timeout");
             mockElectronAPI.sites.updateSite.mockRejectedValueOnce(
                 timeoutError
@@ -610,7 +850,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle database connection errors", async () => {
+        it("should handle database connection errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Database connection failed");
             mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
                 dbError

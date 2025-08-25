@@ -24,59 +24,171 @@ import {
 import * as types from "../types";
 
 describe("isComputedSiteStatus", () => {
-    it("should return true for 'mixed' status", () => {
+    it("should return true for 'mixed' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("mixed")).toBe(true);
     });
 
-    it("should return true for 'unknown' status", () => {
+    it("should return true for 'unknown' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("unknown")).toBe(true);
     });
 
-    it("should return false for 'up' status", () => {
+    it("should return false for 'up' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("up")).toBe(false);
     });
 
-    it("should return false for 'down' status", () => {
+    it("should return false for 'down' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("down")).toBe(false);
     });
 
-    it("should return false for 'pending' status", () => {
+    it("should return false for 'pending' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("pending")).toBe(false);
     });
 
-    it("should return false for 'paused' status", () => {
+    it("should return false for 'paused' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("paused")).toBe(false);
     });
 
-    it("should return false for empty string", () => {
+    it("should return false for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("")).toBe(false);
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus(null as any)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus(undefined as any)).toBe(false);
     });
 
-    it("should return false for number", () => {
+    it("should return false for number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus(123 as any)).toBe(false);
     });
 
-    it("should return false for boolean", () => {
+    it("should return false for boolean", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus(true as any)).toBe(false);
     });
 
-    it("should return false for object", () => {
+    it("should return false for object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus({} as any)).toBe(false);
     });
 
-    it("should return false for array", () => {
+    it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus([] as any)).toBe(false);
     });
 
-    it("should return false for invalid string values", () => {
+    it("should return false for invalid string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isComputedSiteStatus("invalid")).toBe(false);
         expect(isComputedSiteStatus("MIXED")).toBe(false);
         expect(isComputedSiteStatus("Unknown")).toBe(false);
@@ -98,56 +210,152 @@ describe("isMonitorStatus", () => {
         });
     });
 
-    it("should return false for 'mixed' status", () => {
+    it("should return false for 'mixed' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus("mixed")).toBe(false);
     });
 
-    it("should return false for 'unknown' status", () => {
+    it("should return false for 'unknown' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus("unknown")).toBe(false);
     });
 
-    it("should return false for empty string", () => {
+    it("should return false for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus("")).toBe(false);
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus(null as any)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus(undefined as any)).toBe(false);
     });
 
-    it("should return false for number", () => {
+    it("should return false for number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus(123 as any)).toBe(false);
     });
 
-    it("should return false for boolean", () => {
+    it("should return false for boolean", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus(false as any)).toBe(false);
     });
 
-    it("should return false for object", () => {
+    it("should return false for object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus({} as any)).toBe(false);
     });
 
-    it("should return false for array", () => {
+    it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus([] as any)).toBe(false);
     });
 
-    it("should return false for case variations", () => {
+    it("should return false for case variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus("UP")).toBe(false);
         expect(isMonitorStatus("Down")).toBe(false);
         expect(isMonitorStatus("PENDING")).toBe(false);
         expect(isMonitorStatus("Paused")).toBe(false);
     });
 
-    it("should return false for whitespace variations", () => {
+    it("should return false for whitespace variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus(" up ")).toBe(false);
         expect(isMonitorStatus("down ")).toBe(false);
         expect(isMonitorStatus(" pending")).toBe(false);
     });
 
-    it("should return false for invalid status strings", () => {
+    it("should return false for invalid status strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isMonitorStatus("invalid")).toBe(false);
         expect(isMonitorStatus("error")).toBe(false);
         expect(isMonitorStatus("running")).toBe(false);
@@ -170,55 +378,143 @@ describe("isSiteStatus", () => {
         });
     });
 
-    it("should return false for empty string", () => {
+    it("should return false for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus("")).toBe(false);
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(null as any)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(undefined as any)).toBe(false);
     });
 
-    it("should return false for number", () => {
+    it("should return false for number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(456 as any)).toBe(false);
     });
 
-    it("should return false for boolean", () => {
+    it("should return false for boolean", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(true as any)).toBe(false);
     });
 
-    it("should return false for object", () => {
+    it("should return false for object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus({ status: "up" } as any)).toBe(false);
     });
 
-    it("should return false for array", () => {
+    it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(["up"] as any)).toBe(false);
     });
 
-    it("should return false for case variations", () => {
+    it("should return false for case variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus("UP")).toBe(false);
         expect(isSiteStatus("Mixed")).toBe(false);
         expect(isSiteStatus("UNKNOWN")).toBe(false);
         expect(isSiteStatus("Down")).toBe(false);
     });
 
-    it("should return false for whitespace variations", () => {
+    it("should return false for whitespace variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus(" mixed ")).toBe(false);
         expect(isSiteStatus("unknown ")).toBe(false);
         expect(isSiteStatus(" up")).toBe(false);
     });
 
-    it("should return false for invalid status strings", () => {
+    it("should return false for invalid status strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(isSiteStatus("invalid")).toBe(false);
         expect(isSiteStatus("error")).toBe(false);
         expect(isSiteStatus("online")).toBe(false);
         expect(isSiteStatus("offline")).toBe(false);
     });
 
-    it("should include all monitor statuses plus computed statuses", () => {
+    it("should include all monitor statuses plus computed statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
         const monitorStatuses = [
             "down",
             "paused",
@@ -253,20 +549,52 @@ describe("validateMonitor", () => {
         lastChecked: new Date(),
     });
 
-    it("should return true for valid monitor", () => {
+    it("should return true for valid monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
         const monitor = createValidMonitor();
         expect(validateMonitor(monitor)).toBe(true);
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitor(null as any)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitor(undefined as any)).toBe(false);
     });
 
-    it("should return false for non-object values", () => {
+    it("should return false for non-object values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitor("string" as any)).toBe(false);
         expect(validateMonitor(123 as any)).toBe(false);
         expect(validateMonitor(true as any)).toBe(false);
@@ -274,19 +602,43 @@ describe("validateMonitor", () => {
     });
 
     describe("id validation", () => {
-        it("should return false for missing id", () => {
+        it("should return false for missing id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             delete (monitor as any).id;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should return false for non-string id", () => {
+        it("should return false for non-string id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             (monitor as any).id = 123;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should accept empty string id (only validates type)", () => {
+        it("should accept empty string id (only validates type)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor = createValidMonitor();
             monitor.id = "";
             expect(validateMonitor(monitor)).toBe(true);
@@ -294,19 +646,43 @@ describe("validateMonitor", () => {
     });
 
     describe("type validation", () => {
-        it("should return false for missing type", () => {
+        it("should return false for missing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             delete (monitor as any).type;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should return false for non-string type", () => {
+        it("should return false for non-string type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             (monitor as any).type = 123;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should validate against BASE_MONITOR_TYPES", () => {
+        it("should validate against BASE_MONITOR_TYPES", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor = createValidMonitor();
 
             // Test with first valid type if BASE_MONITOR_TYPES is available
@@ -322,19 +698,43 @@ describe("validateMonitor", () => {
     });
 
     describe("status validation", () => {
-        it("should return false for missing status", () => {
+        it("should return false for missing status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             delete (monitor as any).status;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should return false for non-string status", () => {
+        it("should return false for non-string status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
             (monitor as any).status = 123;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should validate using isMonitorStatus", () => {
+        it("should validate using isMonitorStatus", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor = createValidMonitor();
 
             // Valid statuses
@@ -361,19 +761,43 @@ describe("validateMonitor", () => {
     });
 
     describe("monitoring validation", () => {
-        it("should return false for missing monitoring", () => {
+        it("should return false for missing monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createValidMonitor();
             delete (monitor as any).monitoring;
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should return false for non-boolean monitoring", () => {
+        it("should return false for non-boolean monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createValidMonitor();
             (monitor as any).monitoring = "true";
             expect(validateMonitor(monitor)).toBe(false);
         });
 
-        it("should accept both true and false for monitoring", () => {
+        it("should accept both true and false for monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createValidMonitor();
             monitor.monitoring = true;
             expect(validateMonitor(monitor)).toBe(true);
@@ -424,7 +848,15 @@ describe("validateMonitor", () => {
         });
     });
 
-    it("should return false for partial monitor objects", () => {
+    it("should return false for partial monitor objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
         expect(validateMonitor({})).toBe(false);
         expect(validateMonitor({ id: "test" })).toBe(false);
         expect(validateMonitor({ id: "test", type: "http" })).toBe(false);
@@ -437,7 +869,15 @@ describe("validateMonitor", () => {
         ).toBe(false);
     });
 
-    it("should handle edge cases", () => {
+    it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
         const monitor = createValidMonitor();
 
         // Empty strings for numeric fields should fail
@@ -460,7 +900,15 @@ describe("validateMonitor", () => {
 
 // Function Coverage Validation: Ensure all exported functions are called for coverage
 describe("Function Coverage Validation", () => {
-    it("should call all exported functions to ensure 100% function coverage", () => {
+    it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Export Operation", "type");
+
         // Explicitly call each exported function to register coverage
         expect(typeof types.isComputedSiteStatus).toBe("function");
         expect(typeof types.isMonitorStatus).toBe("function");

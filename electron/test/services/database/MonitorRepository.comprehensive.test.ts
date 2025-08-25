@@ -57,7 +57,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         vi.clearAllMocks();
     });
     describe("bulkCreate", () => {
-        it("should create multiple monitors successfully", async () => {
+        it("should create multiple monitors successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteIdentifier = "site-123";
             const monitors: Site["monitors"][0][] = [
                 {
@@ -99,11 +107,27 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             expect(result).toHaveLength(2);
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle empty monitors array", async () => {
+        it("should handle empty monitors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await repository.bulkCreate("site-123", []);
             expect(result).toEqual([]);
         });
-        it("should handle database transaction errors", async () => {
+        it("should handle database transaction errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Transaction failed")
             );
@@ -127,14 +151,30 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("clearActiveOperations", () => {
-        it("should clear active operations for a monitor", async () => {
+        it("should clear active operations for a monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
             await repository.clearActiveOperations("monitor-123");
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle database errors during clear operations", async () => {
+        it("should handle database errors during clear operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Clear failed")
             );
@@ -145,7 +185,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("create", () => {
-        it("should create a new monitor successfully", async () => {
+        it("should create a new monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteIdentifier = "site-123";
             const monitor: Omit<Site["monitors"][0], "id"> = {
                 type: "http",
@@ -166,7 +214,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             expect(result).toBe("123");
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle port monitor creation", async () => {
+        it("should handle port monitor creation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteIdentifier = "site-123";
             const monitor: Omit<Site["monitors"][0], "id"> = {
                 type: "port",
@@ -187,7 +243,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(result).toBe("456");
         });
-        it("should handle creation errors", async () => {
+        it("should handle creation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Creation failed")
             );
@@ -208,7 +272,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("delete", () => {
-        it("should delete a monitor successfully", async () => {
+        it("should delete a monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 1 }) // Delete history
                 .mockReturnValueOnce({ changes: 1 }); // Delete monitor
@@ -218,7 +290,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             expect(result).toBe(true);
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should return false when monitor not found", async () => {
+        it("should return false when monitor not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockDatabase.run
                 .mockReturnValueOnce({ changes: 0 }) // No history
                 .mockReturnValueOnce({ changes: 0 }); // No monitor
@@ -227,7 +307,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(result).toBe(false);
         });
-        it("should handle deletion errors", async () => {
+        it("should handle deletion errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Deletion failed")
             );
@@ -238,14 +326,30 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all monitors", async () => {
+        it("should delete all monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             mockDatabase.run.mockReturnValue({ changes: 5 });
 
             await repository.deleteAll();
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle delete all errors", async () => {
+        it("should handle delete all errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Delete all failed")
             );
@@ -256,7 +360,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("deleteBySiteIdentifier", () => {
-        it("should delete monitors by site identifier", async () => {
+        it("should delete monitors by site identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // Mock the query for monitor rows first, then the delete operations
             mockDatabase.all.mockReturnValue([
                 { id: "monitor-1" },
@@ -269,7 +381,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle site deletion errors", async () => {
+        it("should handle site deletion errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Site deletion failed")
             );
@@ -280,7 +400,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("update", () => {
-        it("should update a monitor successfully", async () => {
+        it("should update a monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             const monitorId = "monitor-123";
             const updatedData = {
                 url: "https://updated.com",
@@ -298,7 +426,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle monitor not found for update", async () => {
+        it("should handle monitor not found for update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             const monitorId = "nonexistent";
             const updateData = { url: "https://example.com" };
 
@@ -309,7 +445,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle update errors", async () => {
+        it("should handle update errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 new Error("Update failed")
             );
@@ -318,7 +462,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 repository.update("monitor-123", { url: "https://example.com" })
             ).rejects.toThrow("Update failed");
         });
-        it("should handle monitors with different status values", async () => {
+        it("should handle monitors with different status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const statuses = [
                 "up",
                 "down",
@@ -341,7 +493,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("Edge Cases and Error Handling", () => {
-        it("should handle malformed monitor data gracefully", async () => {
+        it("should handle malformed monitor data gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test with minimal monitor data
             const monitor: Omit<Site["monitors"][0], "id"> = {
                 type: "http",
@@ -360,7 +520,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             const result = await repository.create("site-123", monitor);
             expect(result).toBe("789");
         });
-        it("should handle database connection errors", async () => {
+        it("should handle database connection errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.getDatabase.mockImplementation(() => {
                 throw new Error("Database connection failed");
             });
@@ -368,19 +536,43 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 repository.findByIdentifier("monitor-123")
             ).rejects.toThrow("Database connection failed");
         });
-        it("should handle null/undefined responses from database", async () => {
+        it("should handle null/undefined responses from database", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockDatabase.get.mockReturnValue(null);
 
             const result = await repository.findByIdentifier("monitor-123");
             expect(result).toBeUndefined();
         });
-        it("should handle empty result sets", async () => {
+        it("should handle empty result sets", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockDatabase.all.mockReturnValue([]);
 
             const result = await repository.findBySiteIdentifier("empty-site");
             expect(result).toEqual([]);
         });
-        it("should handle very large datasets", async () => {
+        it("should handle very large datasets", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
                 id: `monitor-${i}`,
                 site_identifier: "large-site",
@@ -402,7 +594,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("Internal Method Coverage", () => {
-        it("should cover clearActiveOperationsInternal through public method", async () => {
+        it("should cover clearActiveOperationsInternal through public method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This tests the internal method through the public interface
             mockDatabase.run.mockReturnValue({ changes: 1 });
 
@@ -410,7 +610,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should cover createInternal through public method", async () => {
+        it("should cover createInternal through public method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // This tests the internal method through the public interface
             mockDatabase.get.mockReturnValue({ id: 999 });
 
@@ -429,7 +637,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("Complex Scenarios", () => {
-        it("should handle mixed monitor types in bulk operations", async () => {
+        it("should handle mixed monitor types in bulk operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mixedMonitors: Site["monitors"][0][] = [
                 {
                     type: "http",
@@ -482,7 +698,15 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             );
             expect(result).toHaveLength(3);
         });
-        it("should handle concurrent operations correctly", async () => {
+        it("should handle concurrent operations correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Set up mock responses for concurrent calls
             mockDatabase.get
                 .mockReturnValueOnce({ id: "monitor-1" })

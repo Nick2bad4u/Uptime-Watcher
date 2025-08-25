@@ -32,7 +32,15 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
 describe("monitorTitleFormatters", () => {
     describe("formatTitleSuffix", () => {
         describe("HTTP monitor type", () => {
-            it("should return formatted URL suffix for HTTP monitor with URL", () => {
+            it("should return formatted URL suffix for HTTP monitor with URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                     url: "https://example.com/api",
@@ -43,7 +51,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (https://example.com/api)");
             });
 
-            it("should return empty string for HTTP monitor without URL", () => {
+            it("should return empty string for HTTP monitor without URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                 });
@@ -54,7 +70,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for HTTP monitor with null URL", () => {
+            it("should return empty string for HTTP monitor with null URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                 });
@@ -66,7 +90,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for HTTP monitor with undefined URL", () => {
+            it("should return empty string for HTTP monitor with undefined URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                 });
@@ -77,7 +109,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should handle HTTP monitor with special characters in URL", () => {
+            it("should handle HTTP monitor with special characters in URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                     url: "https://api.example.com:8080/v1/health?check=true",
@@ -92,7 +132,15 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("Port monitor type", () => {
-            it("should return formatted host:port suffix for port monitor with both host and port", () => {
+            it("should return formatted host:port suffix for port monitor with both host and port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "database.example.com",
@@ -104,7 +152,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (database.example.com:5432)");
             });
 
-            it("should return empty string for port monitor without host", () => {
+            it("should return empty string for port monitor without host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     port: 5432,
@@ -115,7 +171,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for port monitor without port", () => {
+            it("should return empty string for port monitor without port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "database.example.com",
@@ -126,7 +190,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for port monitor with null host", () => {
+            it("should return empty string for port monitor with null host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     port: 5432,
@@ -139,7 +211,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for port monitor with undefined host", () => {
+            it("should return empty string for port monitor with undefined host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     port: 5432,
@@ -151,7 +231,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for port monitor with null port", () => {
+            it("should return empty string for port monitor with null port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "database.example.com",
@@ -164,7 +252,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for port monitor with undefined port", () => {
+            it("should return empty string for port monitor with undefined port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "database.example.com",
@@ -176,7 +272,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should handle port monitor with IP address host", () => {
+            it("should handle port monitor with IP address host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "192.168.1.100",
@@ -188,7 +292,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (192.168.1.100:3306)");
             });
 
-            it("should handle port monitor with localhost", () => {
+            it("should handle port monitor with localhost", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "localhost",
@@ -200,7 +312,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (localhost:8080)");
             });
 
-            it("should handle port monitor with high port numbers", () => {
+            it("should handle port monitor with high port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "port",
                     host: "service.example.com",
@@ -214,7 +334,15 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("DNS monitor type", () => {
-            it("should return formatted recordType host suffix for DNS monitor with both host and recordType", () => {
+            it("should return formatted recordType host suffix for DNS monitor with both host and recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     host: "example.com",
@@ -226,7 +354,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (A example.com)");
             });
 
-            it("should return empty string for DNS monitor without host", () => {
+            it("should return empty string for DNS monitor without host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     recordType: "A",
@@ -237,7 +373,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for DNS monitor without recordType", () => {
+            it("should return empty string for DNS monitor without recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     host: "example.com",
@@ -248,7 +392,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for DNS monitor with null host", () => {
+            it("should return empty string for DNS monitor with null host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     recordType: "AAAA",
@@ -260,7 +412,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for DNS monitor with null recordType", () => {
+            it("should return empty string for DNS monitor with null recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     host: "example.com",
@@ -272,7 +432,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should handle various DNS record types", () => {
+            it("should handle various DNS record types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const recordTypes = [
                     "A",
                     "AAAA",
@@ -297,7 +465,15 @@ describe("monitorTitleFormatters", () => {
                 }
             });
 
-            it("should handle DNS monitor with subdomain", () => {
+            it("should handle DNS monitor with subdomain", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "dns",
                     host: "api.subdomain.example.com",
@@ -311,7 +487,15 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("Unknown monitor types", () => {
-            it("should return empty string for unknown monitor type", () => {
+            it("should return empty string for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     url: "https://example.com",
                 });
@@ -323,7 +507,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for custom monitor type without formatter", () => {
+            it("should return empty string for custom monitor type without formatter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     url: "https://example.com",
                 });
@@ -335,7 +527,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
-            it("should return empty string for empty monitor type", () => {
+            it("should return empty string for empty monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     url: "https://example.com",
                 });
@@ -349,7 +549,15 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("Edge cases", () => {
-            it("should handle monitor with mixed properties", () => {
+            it("should handle monitor with mixed properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     type: "http",
                     url: "https://mixed.example.com",
@@ -362,7 +570,15 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe(" (https://mixed.example.com)");
             });
 
-            it("should handle monitor type case sensitivity", () => {
+            it("should handle monitor type case sensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = createMockMonitor({
                     url: "https://example.com",
                 });
@@ -377,46 +593,102 @@ describe("monitorTitleFormatters", () => {
     });
 
     describe("getTitleSuffixFormatter", () => {
-        it("should return HTTP formatter for 'http' type", () => {
+        it("should return HTTP formatter for 'http' type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("http");
 
             expect(formatter).toBeDefined();
             expect(typeof formatter).toBe("function");
         });
 
-        it("should return port formatter for 'port' type", () => {
+        it("should return port formatter for 'port' type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("port");
 
             expect(formatter).toBeDefined();
             expect(typeof formatter).toBe("function");
         });
 
-        it("should return DNS formatter for 'dns' type", () => {
+        it("should return DNS formatter for 'dns' type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("dns");
 
             expect(formatter).toBeDefined();
             expect(typeof formatter).toBe("function");
         });
 
-        it("should return undefined for unknown type", () => {
+        it("should return undefined for unknown type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("unknown");
 
             expect(formatter).toBeUndefined();
         });
 
-        it("should return undefined for empty string type", () => {
+        it("should return undefined for empty string type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("");
 
             expect(formatter).toBeUndefined();
         });
 
-        it("should handle case sensitivity", () => {
+        it("should handle case sensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("HTTP");
 
             expect(formatter).toBeUndefined(); // Should not match "http"
         });
 
-        it("should return formatter function that works correctly", () => {
+        it("should return formatter function that works correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formatter = getTitleSuffixFormatter("http");
             const monitor = createMockMonitor({
                 type: "http",
@@ -435,7 +707,15 @@ describe("monitorTitleFormatters", () => {
             // This is done by overriding with undefined, which effectively removes them
         });
 
-        it("should register a new formatter for custom type", () => {
+        it("should register a new formatter for custom type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customFormatter: TitleSuffixFormatter = (monitor) =>
                 ` (Custom: ${(monitor as any).name})`;
 
@@ -446,7 +726,15 @@ describe("monitorTitleFormatters", () => {
             expect(formatter).toBe(customFormatter);
         });
 
-        it("should use registered custom formatter in formatTitleSuffix", () => {
+        it("should use registered custom formatter in formatTitleSuffix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customFormatter: TitleSuffixFormatter = (monitor) =>
                 ` [${monitor.url || "API Monitor"}]`;
 
@@ -462,7 +750,15 @@ describe("monitorTitleFormatters", () => {
             expect(result).toBe(" [API Monitor]");
         });
 
-        it("should replace existing formatter when registering same type", () => {
+        it("should replace existing formatter when registering same type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalFormatter: TitleSuffixFormatter = () => " (Original)";
             const newFormatter: TitleSuffixFormatter = () => " (New)";
 
@@ -479,7 +775,15 @@ describe("monitorTitleFormatters", () => {
             expect(result).toBe(" (New)");
         });
 
-        it("should register formatter that accesses monitor properties", () => {
+        it("should register formatter that accesses monitor properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const databaseFormatter: TitleSuffixFormatter = (monitor) => {
                 const host = monitor.host as string;
                 const database = (monitor as any).database as string;
@@ -498,7 +802,15 @@ describe("monitorTitleFormatters", () => {
             expect(result).toBe(" (db.example.com/users_db)");
         });
 
-        it("should register formatter that returns empty string conditionally", () => {
+        it("should register formatter that returns empty string conditionally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const conditionalFormatter: TitleSuffixFormatter = (monitor) => {
                 const status = (monitor as any).enabled;
                 return status ? " (Active)" : "http";
@@ -520,7 +832,15 @@ describe("monitorTitleFormatters", () => {
             expect(formatTitleSuffix(disabledMonitor)).toBe("http");
         });
 
-        it("should register formatter with complex logic", () => {
+        it("should register formatter with complex logic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexFormatter: TitleSuffixFormatter = (monitor) => {
                 const url = monitor.url as string;
                 const host = monitor.host as string;
@@ -575,7 +895,15 @@ describe("monitorTitleFormatters", () => {
             expect(formatTitleSuffix(noEndpointMonitor)).toBe(" (No endpoint)");
         });
 
-        it("should handle registration with empty type string", () => {
+        it("should handle registration with empty type string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyTypeFormatter: TitleSuffixFormatter = () =>
                 " (Empty type)";
 
@@ -586,7 +914,15 @@ describe("monitorTitleFormatters", () => {
             expect(formatter).toBe(emptyTypeFormatter);
         });
 
-        it("should not affect existing built-in formatters", () => {
+        it("should not affect existing built-in formatters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpMonitor = createMockMonitor({
                 type: "http",
                 url: "https://original.example.com",
@@ -614,7 +950,15 @@ describe("monitorTitleFormatters", () => {
     });
 
     describe("Integration tests", () => {
-        it("should work end-to-end with multiple monitor types", () => {
+        it("should work end-to-end with multiple monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = [
                 createMockMonitor({
                     type: "http",
@@ -642,7 +986,15 @@ describe("monitorTitleFormatters", () => {
             ]);
         });
 
-        it("should demonstrate formatter registration workflow", () => {
+        it("should demonstrate formatter registration workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTitleFormatters", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Register custom formatter
             registerTitleSuffixFormatter("ping", (monitor) => {
                 const host = monitor.host as string;

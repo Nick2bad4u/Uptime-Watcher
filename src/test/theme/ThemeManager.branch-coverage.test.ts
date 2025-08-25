@@ -17,7 +17,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
     });
 
     describe("SSR Environment Handling", () => {
-        it("should handle missing document in applyThemeClasses", () => {
+        it("should handle missing document in applyThemeClasses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock document as undefined to simulate SSR
             const originalDocument = globalThis.document;
             Object.defineProperty(globalThis, "document", {
@@ -53,7 +61,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             });
         });
 
-        it("should handle missing window in onSystemThemeChange", () => {
+        it("should handle missing window in onSystemThemeChange", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock window as undefined to simulate SSR
             const originalWindow = globalThis.window;
             Object.defineProperty(globalThis, "window", {
@@ -77,7 +93,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
     });
 
     describe("MediaQuery Event Handling", () => {
-        it("should properly handle media query events", () => {
+        it("should properly handle media query events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockCallback = vi.fn();
             const mockEventListener = vi.fn();
             const mockRemoveEventListener = vi.fn();
@@ -120,7 +144,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             );
         });
 
-        it("should handle theme change from light to dark", () => {
+        it("should handle theme change from light to dark", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockCallback = vi.fn();
             const mockEventListener = vi.fn();
 
@@ -152,7 +184,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
     });
 
     describe("Edge Cases in applyTheme", () => {
-        it("should handle applyTheme with all theme variants", () => {
+        it("should handle applyTheme with all theme variants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock document methods
             const mockBodyClassList = {
                 add: vi.fn(),
@@ -222,7 +262,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
     });
 
     describe("Complete Branch Coverage Scenarios", () => {
-        it("should exercise all conditional branches in theme application", () => {
+        it("should exercise all conditional branches in theme application", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test the conditional branches in applyThemeClasses that might be missed
             const mockRemove = vi.fn();
             const mockAdd = vi.fn();
@@ -269,7 +317,15 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(mockRemove).toHaveBeenCalled();
         });
 
-        it("should test cleanup function returned by onSystemThemeChange", () => {
+        it("should test cleanup function returned by onSystemThemeChange", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRemoveEventListener = vi.fn();
             const mockMediaQuery = {
                 matches: false,

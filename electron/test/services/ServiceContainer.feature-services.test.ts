@@ -55,19 +55,43 @@ describe("ServiceContainer - Feature Services", () => {
     });
 
     describe("Notification Services", () => {
-        it("should create NotificationService singleton", () => {
+        it("should create NotificationService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getNotificationService();
             }).not.toThrow();
         });
 
-        it("should create NotificationService with default settings", () => {
+        it("should create NotificationService with default settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getNotificationService();
             }).not.toThrow();
         });
 
-        it("should maintain NotificationService singleton pattern", () => {
+        it("should maintain NotificationService singleton pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const notification1 = container.getNotificationService();
             const notification2 = container.getNotificationService();
             expect(notification1).toBe(notification2);
@@ -75,26 +99,58 @@ describe("ServiceContainer - Feature Services", () => {
     });
 
     describe("Auto Updater Services", () => {
-        it("should create AutoUpdaterService singleton", () => {
+        it("should create AutoUpdaterService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getAutoUpdaterService();
             }).not.toThrow();
         });
 
-        it("should handle AutoUpdaterService initialization", () => {
+        it("should handle AutoUpdaterService initialization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const updater = container.getAutoUpdaterService();
             expect(updater).toBeDefined();
         });
     });
 
     describe("Window Services", () => {
-        it("should create WindowService singleton", () => {
+        it("should create WindowService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getWindowService();
             }).not.toThrow();
         });
 
-        it("should maintain WindowService singleton pattern", () => {
+        it("should maintain WindowService singleton pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window1 = container.getWindowService();
             const window2 = container.getWindowService();
             expect(window1).toBe(window2);
@@ -102,7 +158,15 @@ describe("ServiceContainer - Feature Services", () => {
     });
 
     describe("Feature Service Integration", () => {
-        it("should create all feature services without conflicts", () => {
+        it("should create all feature services without conflicts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getNotificationService();
                 container.getAutoUpdaterService();
@@ -110,7 +174,15 @@ describe("ServiceContainer - Feature Services", () => {
             }).not.toThrow();
         });
 
-        it("should handle service creation without configuration", () => {
+        it("should handle service creation without configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(() => {
                 container.getNotificationService();
                 container.getAutoUpdaterService();
@@ -118,7 +190,15 @@ describe("ServiceContainer - Feature Services", () => {
             }).not.toThrow();
         });
 
-        it("should maintain service independence", () => {
+        it("should maintain service independence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const notification = container.getNotificationService();
             const updater = container.getAutoUpdaterService();
             const window = container.getWindowService();
@@ -130,7 +210,15 @@ describe("ServiceContainer - Feature Services", () => {
     });
 
     describe("Service Error Handling", () => {
-        it("should handle repeated service creation calls", () => {
+        it("should handle repeated service creation calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(() => {
                 for (let i = 0; i < 3; i++) {
                     container.getNotificationService();
@@ -140,7 +228,15 @@ describe("ServiceContainer - Feature Services", () => {
             }).not.toThrow();
         });
 
-        it("should maintain service references across multiple calls", () => {
+        it("should maintain service references across multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const notification1 = container.getNotificationService();
             const notification2 = container.getNotificationService();
             const notification3 = container.getNotificationService();

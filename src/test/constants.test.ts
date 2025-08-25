@@ -29,25 +29,57 @@ import {
 
 describe("Application Constants", () => {
     describe("UI Animation Constants", () => {
-        it("should export TRANSITION_ALL with correct value", () => {
+        it("should export TRANSITION_ALL with correct value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(TRANSITION_ALL).toBe("all 0.2s ease-in-out");
             expect(typeof TRANSITION_ALL).toBe("string");
         });
 
-        it("should have valid CSS transition timing", () => {
+        it("should have valid CSS transition timing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Validate CSS transition syntax
             expect(TRANSITION_ALL).toMatch(/^all\s+[\d.]+s\s+ease-in-out$/);
         });
     });
 
     describe("Monitor Type Options", () => {
-        it("should export FALLBACK_MONITOR_TYPE_OPTIONS", () => {
+        it("should export FALLBACK_MONITOR_TYPE_OPTIONS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(FALLBACK_MONITOR_TYPE_OPTIONS).toBeDefined();
             expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBe(true);
             expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThan(0);
         });
 
-        it("should have valid monitor type structure", () => {
+        it("should have valid monitor type structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
                 expect(option).toHaveProperty("label");
                 expect(option).toHaveProperty("value");
@@ -58,7 +90,15 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should contain expected monitor types", () => {
+        it("should contain expected monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(
                 (option) => option.value
             );
@@ -67,7 +107,15 @@ describe("Application Constants", () => {
             expect(values).toContain("port");
         });
 
-        it("should have descriptive labels", () => {
+        it("should have descriptive labels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpOption = FALLBACK_MONITOR_TYPE_OPTIONS.find(
                 (opt) => opt.value === "http"
             );
@@ -86,19 +134,43 @@ describe("Application Constants", () => {
     });
 
     describe("Font Family Constants", () => {
-        it("should export FONT_FAMILY_MONO as array", () => {
+        it("should export FONT_FAMILY_MONO as array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(FONT_FAMILY_MONO).toBeDefined();
             expect(Array.isArray(FONT_FAMILY_MONO)).toBe(true);
             expect(FONT_FAMILY_MONO.length).toBeGreaterThan(0);
         });
 
-        it("should export FONT_FAMILY_SANS as array", () => {
+        it("should export FONT_FAMILY_SANS as array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(FONT_FAMILY_SANS).toBeDefined();
             expect(Array.isArray(FONT_FAMILY_SANS)).toBe(true);
             expect(FONT_FAMILY_SANS.length).toBeGreaterThan(0);
         });
 
-        it("should contain valid font names", () => {
+        it("should contain valid font names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             for (const font of FONT_FAMILY_MONO) {
                 expect(typeof font).toBe("string");
                 expect(font.length).toBeGreaterThan(0);
@@ -110,12 +182,28 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should include fallback fonts", () => {
+        it("should include fallback fonts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(FONT_FAMILY_MONO).toContain("monospace");
             expect(FONT_FAMILY_SANS).toContain("sans-serif");
         });
 
-        it("should have popular fonts", () => {
+        it("should have popular fonts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const lowercaseMonoFonts = FONT_FAMILY_MONO.map((f) =>
                 f.toLowerCase()
             );
@@ -135,13 +223,29 @@ describe("Application Constants", () => {
     });
 
     describe("Check Intervals", () => {
-        it("should export CHECK_INTERVALS as array", () => {
+        it("should export CHECK_INTERVALS as array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(CHECK_INTERVALS).toBeDefined();
             expect(Array.isArray(CHECK_INTERVALS)).toBe(true);
             expect(CHECK_INTERVALS.length).toBeGreaterThan(0);
         });
 
-        it("should have valid interval structure", () => {
+        it("should have valid interval structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             for (const interval of CHECK_INTERVALS) {
                 expect(interval).toHaveProperty("label");
                 expect(interval).toHaveProperty("value");
@@ -152,13 +256,29 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should have reasonable interval values", () => {
+        it("should have reasonable interval values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const values = CHECK_INTERVALS.map((interval) => interval.value);
             expect(Math.min(...values)).toBeGreaterThanOrEqual(5000); // At least 5 seconds
             expect(Math.max(...values)).toBeLessThanOrEqual(2_592_000_000); // At most 30 days
         });
 
-        it("should have sorted intervals", () => {
+        it("should have sorted intervals", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const values = CHECK_INTERVALS.map((interval) => interval.value);
             for (let i = 1; i < values.length; i++) {
                 const currentValue = values[i];
@@ -175,31 +295,71 @@ describe("Application Constants", () => {
     });
 
     describe("Default Values", () => {
-        it("should export DEFAULT_CHECK_INTERVAL", () => {
+        it("should export DEFAULT_CHECK_INTERVAL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(DEFAULT_CHECK_INTERVAL).toBeDefined();
             expect(typeof DEFAULT_CHECK_INTERVAL).toBe("number");
             expect(DEFAULT_CHECK_INTERVAL).toBe(300_000); // 5 minutes
         });
 
-        it("should export DEFAULT_REQUEST_TIMEOUT", () => {
+        it("should export DEFAULT_REQUEST_TIMEOUT", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(DEFAULT_REQUEST_TIMEOUT).toBeDefined();
             expect(typeof DEFAULT_REQUEST_TIMEOUT).toBe("number");
             expect(DEFAULT_REQUEST_TIMEOUT).toBe(10_000); // 10 seconds
         });
 
-        it("should export DEFAULT_REQUEST_TIMEOUT_SECONDS", () => {
+        it("should export DEFAULT_REQUEST_TIMEOUT_SECONDS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeDefined();
             expect(typeof DEFAULT_REQUEST_TIMEOUT_SECONDS).toBe("number");
             expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBe(10);
         });
 
-        it("should export DEFAULT_HISTORY_LIMIT", () => {
+        it("should export DEFAULT_HISTORY_LIMIT", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(DEFAULT_HISTORY_LIMIT).toBeDefined();
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
             expect(DEFAULT_HISTORY_LIMIT).toBe(500);
         });
 
-        it("should have consistent timeout values", () => {
+        it("should have consistent timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_REQUEST_TIMEOUT).toBe(
                 DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000
             );
@@ -207,13 +367,29 @@ describe("Application Constants", () => {
     });
 
     describe("History Limit Options", () => {
-        it("should export HISTORY_LIMIT_OPTIONS as array", () => {
+        it("should export HISTORY_LIMIT_OPTIONS as array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(HISTORY_LIMIT_OPTIONS).toBeDefined();
             expect(Array.isArray(HISTORY_LIMIT_OPTIONS)).toBe(true);
             expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
         });
 
-        it("should have valid history limit structure", () => {
+        it("should have valid history limit structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             for (const option of HISTORY_LIMIT_OPTIONS) {
                 expect(option).toHaveProperty("label");
                 expect(option).toHaveProperty("value");
@@ -224,7 +400,15 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should include unlimited option", () => {
+        it("should include unlimited option", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             const unlimitedOption = HISTORY_LIMIT_OPTIONS.find((opt) =>
                 opt.label.toLowerCase().includes("unlimited")
             );
@@ -234,7 +418,15 @@ describe("Application Constants", () => {
     });
 
     describe("Timeout Constraints", () => {
-        it("should export TIMEOUT_CONSTRAINTS", () => {
+        it("should export TIMEOUT_CONSTRAINTS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(TIMEOUT_CONSTRAINTS).toBeDefined();
             expect(typeof TIMEOUT_CONSTRAINTS).toBe("object");
             expect(TIMEOUT_CONSTRAINTS).toHaveProperty("MIN");
@@ -242,7 +434,15 @@ describe("Application Constants", () => {
             expect(TIMEOUT_CONSTRAINTS).toHaveProperty("STEP");
         });
 
-        it("should export TIMEOUT_CONSTRAINTS_MS", () => {
+        it("should export TIMEOUT_CONSTRAINTS_MS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(TIMEOUT_CONSTRAINTS_MS).toBeDefined();
             expect(typeof TIMEOUT_CONSTRAINTS_MS).toBe("object");
             expect(TIMEOUT_CONSTRAINTS_MS).toHaveProperty("MIN");
@@ -250,7 +450,15 @@ describe("Application Constants", () => {
             expect(TIMEOUT_CONSTRAINTS_MS).toHaveProperty("STEP");
         });
 
-        it("should have consistent timeout constraint values", () => {
+        it("should have consistent timeout constraint values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBe(
                 TIMEOUT_CONSTRAINTS.MIN * 1000
             );
@@ -262,7 +470,15 @@ describe("Application Constants", () => {
             );
         });
 
-        it("should have reasonable timeout constraints", () => {
+        it("should have reasonable timeout constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(TIMEOUT_CONSTRAINTS.MIN).toBeGreaterThanOrEqual(1);
             expect(TIMEOUT_CONSTRAINTS.MAX).toBeLessThanOrEqual(300);
             expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThan(
@@ -272,7 +488,15 @@ describe("Application Constants", () => {
     });
 
     describe("Retry Constraints", () => {
-        it("should export RETRY_CONSTRAINTS", () => {
+        it("should export RETRY_CONSTRAINTS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(RETRY_CONSTRAINTS).toBeDefined();
             expect(typeof RETRY_CONSTRAINTS).toBe("object");
             expect(RETRY_CONSTRAINTS).toHaveProperty("MIN");
@@ -281,14 +505,30 @@ describe("Application Constants", () => {
             expect(RETRY_CONSTRAINTS).toHaveProperty("STEP");
         });
 
-        it("should have reasonable retry constraint values", () => {
+        it("should have reasonable retry constraint values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(RETRY_CONSTRAINTS.MIN).toBe(0);
             expect(RETRY_CONSTRAINTS.MAX).toBe(10);
             expect(RETRY_CONSTRAINTS.DEFAULT).toBe(3);
             expect(RETRY_CONSTRAINTS.STEP).toBe(1);
         });
 
-        it("should have logical retry constraints", () => {
+        it("should have logical retry constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(RETRY_CONSTRAINTS.MIN).toBeLessThanOrEqual(
                 RETRY_CONSTRAINTS.DEFAULT
             );
@@ -299,7 +539,15 @@ describe("Application Constants", () => {
     });
 
     describe("UI Delays", () => {
-        it("should export UI_DELAYS", () => {
+        it("should export UI_DELAYS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(UI_DELAYS).toBeDefined();
             expect(typeof UI_DELAYS).toBe("object");
             expect(UI_DELAYS).toHaveProperty("LOADING_BUTTON");
@@ -307,7 +555,15 @@ describe("Application Constants", () => {
             expect(UI_DELAYS).toHaveProperty("STATE_UPDATE_DEFER");
         });
 
-        it("should have reasonable delay values", () => {
+        it("should have reasonable delay values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(UI_DELAYS.LOADING_BUTTON).toBeGreaterThanOrEqual(0);
             expect(UI_DELAYS.LOADING_OVERLAY).toBeGreaterThanOrEqual(0);
             expect(UI_DELAYS.STATE_UPDATE_DEFER).toBeGreaterThanOrEqual(0);
@@ -319,12 +575,28 @@ describe("Application Constants", () => {
     });
 
     describe("Chart Configuration", () => {
-        it("should export CHART_TIME_PERIODS", () => {
+        it("should export CHART_TIME_PERIODS", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(CHART_TIME_PERIODS).toBeDefined();
             expect(typeof CHART_TIME_PERIODS).toBe("object");
         });
 
-        it("should have valid chart time periods", () => {
+        it("should have valid chart time periods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const expectedPeriods = [
                 "1h",
                 "12h",
@@ -343,13 +615,29 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should export CHART_TIME_RANGES", () => {
+        it("should export CHART_TIME_RANGES", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(CHART_TIME_RANGES).toBeDefined();
             expect(Array.isArray(CHART_TIME_RANGES)).toBe(true);
             expect(CHART_TIME_RANGES.length).toBeGreaterThan(0);
         });
 
-        it("should have logical time period progression", () => {
+        it("should have logical time period progression", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(CHART_TIME_PERIODS["1h"]).toBeLessThan(
                 CHART_TIME_PERIODS["12h"]
             );
@@ -366,7 +654,15 @@ describe("Application Constants", () => {
     });
 
     describe("Accessibility", () => {
-        it("should export ARIA_LABEL", () => {
+        it("should export ARIA_LABEL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             expect(ARIA_LABEL).toBeDefined();
             expect(typeof ARIA_LABEL).toBe("string");
             expect(ARIA_LABEL).toBe("aria-label");
@@ -374,7 +670,15 @@ describe("Application Constants", () => {
     });
 
     describe("Type Definitions", () => {
-        it("should have valid ChartTimeRange type", () => {
+        it("should have valid ChartTimeRange type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRanges: ChartTimeRange[] = [
                 "1h",
                 "24h",
@@ -386,7 +690,15 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should have valid IntervalOption interface usage", () => {
+        it("should have valid IntervalOption interface usage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testInterval: IntervalOption = { label: "Test", value: 1000 };
             expect(testInterval).toHaveProperty("label");
             expect(testInterval).toHaveProperty("value");
@@ -396,7 +708,15 @@ describe("Application Constants", () => {
     });
 
     describe("Integration and Consistency", () => {
-        it("should have consistent monitor types across configurations", () => {
+        it("should have consistent monitor types across configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fallbackTypes = FALLBACK_MONITOR_TYPE_OPTIONS.map(
                 (opt) => opt.value
             );
@@ -406,7 +726,15 @@ describe("Application Constants", () => {
             expect(uniqueTypes.length).toBe(fallbackTypes.length);
         });
 
-        it("should have reasonable animation timing", () => {
+        it("should have reasonable animation timing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Extract timing from TRANSITION_ALL
             const timingMatch = TRANSITION_ALL.match(/(?<timing>[\d.]+)s/);
             expect(timingMatch).not.toBeNull();
@@ -418,7 +746,15 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should have default values within constraint ranges", () => {
+        it("should have default values within constraint ranges", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeGreaterThanOrEqual(
                 TIMEOUT_CONSTRAINTS.MIN
             );
@@ -434,14 +770,30 @@ describe("Application Constants", () => {
             );
         });
 
-        it("should have check interval available in options", () => {
+        it("should have check interval available in options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const intervalValues = CHECK_INTERVALS.map(
                 (interval) => interval.value
             );
             expect(intervalValues).toContain(DEFAULT_CHECK_INTERVAL);
         });
 
-        it("should have history limit available in options", () => {
+        it("should have history limit available in options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             const limitValues = HISTORY_LIMIT_OPTIONS.map(
                 (option) => option.value
             );
@@ -450,7 +802,15 @@ describe("Application Constants", () => {
     });
 
     describe("Error Handling and Fallbacks", () => {
-        it("should handle missing constants gracefully", () => {
+        it("should handle missing constants gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that critical constants are defined
             const criticalConstants = [
                 TRANSITION_ALL,
@@ -470,27 +830,67 @@ describe("Application Constants", () => {
     });
 
     describe("Constant Values Validation", () => {
-        it("should have valid transition timing", () => {
+        it("should have valid transition timing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(TRANSITION_ALL).toMatch(/^\w+\s+[\d.]+s\s+[\w-]+$/);
         });
 
-        it("should have non-empty monitor type options", () => {
+        it("should have non-empty monitor type options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(FALLBACK_MONITOR_TYPE_OPTIONS.length).toBeGreaterThanOrEqual(
                 3
             );
         });
 
-        it("should have at least one font in families", () => {
+        it("should have at least one font in families", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(FONT_FAMILY_MONO.length).toBeGreaterThanOrEqual(1);
             expect(FONT_FAMILY_SANS.length).toBeGreaterThanOrEqual(1);
         });
 
-        it("should have reasonable default timeout values", () => {
+        it("should have reasonable default timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThan(1000); // At least 1 second
             expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(60_000); // Less than 1 minute
         });
 
-        it("should have reasonable default check interval", () => {
+        it("should have reasonable default check interval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: constants", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEFAULT_CHECK_INTERVAL).toBeGreaterThan(5000); // At least 5 seconds
             expect(DEFAULT_CHECK_INTERVAL).toBeLessThan(3_600_000); // Less than 1 hour
         });

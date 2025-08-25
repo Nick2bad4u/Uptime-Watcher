@@ -102,7 +102,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
     });
 
     describe("Rehydration Error Handling (Line 75)", () => {
-        it("should handle errors during settings sync after rehydration", async () => {
+        it("should handle errors during settings sync after rehydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const consoleWarnSpy = vi
                 .spyOn(console, "warn")
                 .mockImplementation(() => {});
@@ -144,7 +152,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
             consoleWarnSpy.mockRestore();
         });
 
-        it("should handle safeExtractIpcData errors during rehydration", async () => {
+        it("should handle safeExtractIpcData errors during rehydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const consoleWarnSpy = vi
                 .spyOn(console, "warn")
                 .mockImplementation(() => {});
@@ -188,7 +204,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
     });
 
     describe("syncFromBackend Implementation (Lines 207-228)", () => {
-        it("should successfully sync settings from backend", async () => {
+        it("should successfully sync settings from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResponse = { success: true, data: 250 };
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(
                 mockResponse
@@ -221,7 +245,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
             );
         });
 
-        it("should handle backend errors in syncFromBackend", async () => {
+        it("should handle backend errors in syncFromBackend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockError = new Error("Backend sync failed");
             mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
                 mockError
@@ -254,7 +286,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
             );
         });
 
-        it("should preserve existing settings structure during sync", async () => {
+        it("should preserve existing settings structure during sync", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Set up initial custom settings
             const customSettings = {
                 autoStart: true,
@@ -289,7 +329,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
             });
         });
 
-        it("should handle data extraction errors in syncFromBackend", async () => {
+        it("should handle data extraction errors in syncFromBackend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockResponse = { success: true, data: 300 };
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(
                 mockResponse
@@ -327,7 +375,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
     });
 
     describe("Edge Cases for Complete Coverage", () => {
-        it("should handle syncFromBackend edge cases", async () => {
+        it("should handle syncFromBackend edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test successful sync scenario
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
@@ -346,7 +402,15 @@ describe("useSettingsStore - Targeted Coverage", () => {
             expect(result.message).toBe("Settings synchronized from backend");
         });
 
-        it("should handle concurrent syncFromBackend calls", async () => {
+        it("should handle concurrent syncFromBackend calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 success: true,
                 data: 400,

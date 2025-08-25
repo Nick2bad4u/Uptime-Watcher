@@ -208,12 +208,28 @@ describe("IpcService - Comprehensive Coverage", () => {
     });
 
     describe("Constructor and Basic Setup", () => {
-        it("should create instance with required dependencies", () => {
+        it("should create instance with required dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(ipcService).toBeDefined();
             expect(ipcService).toBeInstanceOf(IpcService);
         });
 
-        it("should initialize without registering handlers", () => {
+        it("should initialize without registering handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             // Constructor should not register handlers immediately
             expect(ipcMain.handle).not.toHaveBeenCalled();
             expect(ipcMain.on).not.toHaveBeenCalled();
@@ -221,7 +237,15 @@ describe("IpcService - Comprehensive Coverage", () => {
     });
 
     describe("Handler Setup - Complete Registration", () => {
-        it("should register all handler groups when setupHandlers is called", () => {
+        it("should register all handler groups when setupHandlers is called", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             ipcService.setupHandlers();
 
             // Verify multiple handlers are registered
@@ -274,7 +298,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle add-site with valid site data", async () => {
+        it("should handle add-site with valid site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "add-site");
@@ -302,7 +334,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle remove-site with site identifier", async () => {
+        it("should handle remove-site with site identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "remove-site");
@@ -324,7 +364,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle get-sites without parameters", async () => {
+        it("should handle get-sites without parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-sites");
@@ -344,7 +392,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle update-site with identifier and partial data", async () => {
+        it("should handle update-site with identifier and partial data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "update-site");
@@ -369,7 +425,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle remove-monitor with site and monitor identifiers", async () => {
+        it("should handle remove-monitor with site and monitor identifiers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "remove-monitor");
@@ -398,7 +462,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle start-monitoring globally", async () => {
+        it("should handle start-monitoring globally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "start-monitoring");
@@ -418,7 +490,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle stop-monitoring globally", async () => {
+        it("should handle stop-monitoring globally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "stop-monitoring");
@@ -438,7 +518,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle start-monitoring-for-site with identifier and optional monitor", async () => {
+        it("should handle start-monitoring-for-site with identifier and optional monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -462,7 +550,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle stop-monitoring-for-site with identifier and optional monitor", async () => {
+        it("should handle stop-monitoring-for-site with identifier and optional monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -486,7 +582,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle check-site-now with site and monitor identifiers", async () => {
+        it("should handle check-site-now with site and monitor identifiers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "check-site-now");
@@ -514,7 +618,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle get-monitor-types and serialize configurations", async () => {
+        it("should handle get-monitor-types and serialize configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
@@ -546,7 +658,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(httpConfig.validationSchema).toBeUndefined();
         });
 
-        it("should handle format-monitor-detail with known monitor type", async () => {
+        it("should handle format-monitor-detail with known monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "format-monitor-detail");
@@ -565,7 +685,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle format-monitor-detail with unknown monitor type", async () => {
+        it("should handle format-monitor-detail with unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "format-monitor-detail");
@@ -588,7 +716,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle format-monitor-title-suffix with known monitor type", async () => {
+        it("should handle format-monitor-title-suffix with known monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -622,7 +758,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle format-monitor-title-suffix with unknown monitor type", async () => {
+        it("should handle format-monitor-title-suffix with unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -656,7 +800,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle validate-monitor-data with valid data", async () => {
+        it("should handle validate-monitor-data with valid data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "validate-monitor-data");
@@ -673,7 +825,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result.data.metadata).toEqual({ validated: true });
         });
 
-        it("should handle validate-monitor-data with invalid data", async () => {
+        it("should handle validate-monitor-data with invalid data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "validate-monitor-data");
@@ -691,7 +851,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ]);
         });
 
-        it("should handle validate-monitor-data with warnings", async () => {
+        it("should handle validate-monitor-data with warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "validate-monitor-data");
@@ -712,7 +880,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle export-data without parameters", async () => {
+        it("should handle export-data without parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "export-data");
@@ -732,7 +908,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle import-data with data string", async () => {
+        it("should handle import-data with data string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Import Operation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "import-data");
@@ -754,7 +938,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle update-history-limit with number parameter", async () => {
+        it("should handle update-history-limit with number parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "update-history-limit");
@@ -775,7 +967,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle get-history-limit without parameters", async () => {
+        it("should handle get-history-limit without parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-history-limit");
@@ -795,7 +995,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle reset-settings without parameters", async () => {
+        it("should handle reset-settings without parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "reset-settings");
@@ -814,7 +1022,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle download-sqlite-backup without parameters", async () => {
+        it("should handle download-sqlite-backup without parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -842,7 +1058,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle request-full-sync and emit events", async () => {
+        it("should handle request-full-sync and emit events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "request-full-sync");
@@ -890,7 +1114,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle get-sync-status and return status info", async () => {
+        it("should handle get-sync-status and return status info", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-sync-status");
@@ -915,7 +1147,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should register quit-and-install event handler", () => {
+        it("should register quit-and-install event handler", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             expect(ipcMain.on).toHaveBeenCalledWith(
                 "quit-and-install",
                 expect.any(Function)
@@ -939,7 +1179,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should properly serialize UI config with all components", async () => {
+        it("should properly serialize UI config with all components", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
@@ -963,7 +1211,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should serialize UI config with minimal components", async () => {
+        it("should serialize UI config with minimal components", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
@@ -987,7 +1243,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle empty UI config serialization", () => {
+        it("should handle empty UI config serialization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This tests the internal serialization utilities through configuration
             const handleCall = vi
                 .mocked(ipcMain.handle)
@@ -1002,7 +1266,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should cleanup all registered handlers", () => {
+        it("should cleanup all registered handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             ipcService.cleanup();
 
             expect(ipcMain.removeHandler).toHaveBeenCalled();
@@ -1019,7 +1291,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(removedChannels.length).toBeGreaterThan(0);
         });
 
-        it("should handle errors in orchestrator methods gracefully", async () => {
+        it("should handle errors in orchestrator methods gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock an error in getSites
             mockUptimeOrchestrator.getSites = vi
                 .fn()
@@ -1040,7 +1320,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle async errors in monitoring operations", async () => {
+        it("should handle async errors in monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock an error in startMonitoring
             mockUptimeOrchestrator.startMonitoring = vi
                 .fn()
@@ -1067,7 +1355,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.setupHandlers();
         });
 
-        it("should handle empty sites array in sync operations", async () => {
+        it("should handle empty sites array in sync operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockUptimeOrchestrator.getSites = vi.fn().mockResolvedValue([]);
 
             const handleCall = vi
@@ -1079,7 +1375,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(result.data.siteCount).toBe(0);
         });
 
-        it("should handle monitor configuration without formatDetail function", async () => {
+        it("should handle monitor configuration without formatDetail function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "format-monitor-detail");
@@ -1095,7 +1399,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle monitor configuration without formatTitleSuffix function", async () => {
+        it("should handle monitor configuration without formatTitleSuffix function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find(
@@ -1126,7 +1438,15 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle whitespace in monitor type for trimming", async () => {
+        it("should handle whitespace in monitor type for trimming", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const handleCall = vi
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "format-monitor-detail");

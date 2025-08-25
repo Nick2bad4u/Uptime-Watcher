@@ -32,13 +32,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     };
 
     describe("safeObjectAccess", () => {
-        it("should return the property value when it exists and matches type", () => {
+        it("should return the property value when it exists and matches type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(testObj, "string", "default")).toBe("test");
             expect(safeObjectAccess(testObj, "number", 0)).toBe(42);
             expect(safeObjectAccess(testObj, "boolean", false)).toBe(true);
         });
 
-        it("should return fallback when object is not an object", () => {
+        it("should return fallback when object is not an object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(null, "key", "fallback")).toBe("fallback");
             expect(safeObjectAccess(undefined, "key", "fallback")).toBe(
                 "fallback"
@@ -50,14 +66,30 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(safeObjectAccess([], "key", "fallback")).toBe("fallback");
         });
 
-        it("should return fallback when property doesn't exist", () => {
+        it("should return fallback when property doesn't exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(testObj, "nonexistent", "fallback")).toBe(
                 "fallback"
             );
             expect(safeObjectAccess({}, "key", "fallback")).toBe("fallback");
         });
 
-        it("should return fallback when property type doesn't match fallback type", () => {
+        it("should return fallback when property type doesn't match fallback type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(testObj, "string", 42)).toBe(42); // string vs number
             expect(safeObjectAccess(testObj, "number", "default")).toBe(
                 "default"
@@ -67,7 +99,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             ); // boolean vs string
         });
 
-        it("should work with validator function", () => {
+        it("should work with validator function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const isString = (value: unknown): value is string =>
                 typeof value === "string";
             const isNumber = (value: unknown): value is number =>
@@ -100,7 +140,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             ).toBe(0);
         });
 
-        it("should handle null and undefined values correctly", () => {
+        it("should handle null and undefined values correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(testObj, "null", "fallback")).toBe(
                 "fallback"
             );
@@ -109,13 +157,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should work with symbol keys", () => {
+        it("should work with symbol keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeObjectAccess(objWithSymbol, symbolKey, "fallback")).toBe(
                 "symbol value"
             );
         });
 
-        it("should handle nested objects", () => {
+        it("should handle nested objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const isObject = (value: unknown): value is object =>
                 typeof value === "object" && value !== null;
 
@@ -124,7 +188,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle edge cases with validator", () => {
+        it("should handle edge cases with validator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const alwaysFails = (_value: unknown): _value is string => false;
             const alwaysPasses = (_value: unknown): _value is string => true;
 
@@ -138,7 +210,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeObjectIteration", () => {
-        it("should iterate over object entries successfully", () => {
+        it("should iterate over object entries successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockCallback = vi.fn();
 
             safeObjectIteration(testObj, mockCallback);
@@ -151,7 +231,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(mockCallback).toHaveBeenCalledWith("undefined", undefined);
         });
 
-        it("should handle non-object inputs gracefully", () => {
+        it("should handle non-object inputs gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockCallback = vi.fn();
             const consoleSpy = vi
                 .spyOn(console, "warn")
@@ -184,7 +272,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should use custom context in error messages", () => {
+        it("should use custom context in error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCallback = vi.fn();
             const consoleSpy = vi
                 .spyOn(console, "warn")
@@ -199,7 +295,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle callback errors gracefully", () => {
+        it("should handle callback errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorCallback = vi.fn().mockImplementation(() => {
                 throw new Error("Callback error");
             });
@@ -219,7 +323,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle callback errors with custom context", () => {
+        it("should handle callback errors with custom context", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorCallback = vi.fn().mockImplementation(() => {
                 throw new Error("Callback error");
             });
@@ -238,7 +350,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle empty objects", () => {
+        it("should handle empty objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockCallback = vi.fn();
 
             safeObjectIteration({}, mockCallback);
@@ -248,7 +368,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeObjectOmit", () => {
-        it("should omit specified keys from object", () => {
+        it("should omit specified keys from object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectOmit(testObj, ["string", "number"]);
 
             expect(result).not.toHaveProperty("string");
@@ -260,14 +388,30 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toHaveProperty("array");
         });
 
-        it("should return copy when omitting no keys", () => {
+        it("should return copy when omitting no keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectOmit(testObj, []);
 
             expect(result).toEqual(testObj);
             expect(result).not.toBe(testObj); // Should be a copy
         });
 
-        it("should handle omitting non-existent keys gracefully", () => {
+        it("should handle omitting non-existent keys gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectOmit(testObj, [
                 "nonexistent" as keyof typeof testObj,
             ]);
@@ -275,21 +419,45 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toEqual(testObj);
         });
 
-        it("should omit all keys when all are specified", () => {
+        it("should omit all keys when all are specified", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const smallObj = { a: 1, b: 2 };
             const result = safeObjectOmit(smallObj, ["a", "b"]);
 
             expect(result).toEqual({});
         });
 
-        it("should handle symbol keys", () => {
+        it("should handle symbol keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectOmit(objWithSymbol, ["string"]);
 
             expect(result).not.toHaveProperty("string");
             expect(result[symbolKey]).toBe("symbol value");
         });
 
-        it("should preserve nested object references", () => {
+        it("should preserve nested object references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectOmit(testObj, ["string"]);
 
             expect(result.nested).toBe(testObj.nested); // Same reference
@@ -298,7 +466,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeObjectPick", () => {
-        it("should pick specified keys from object", () => {
+        it("should pick specified keys from object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectPick(testObj, [
                 "string",
                 "number",
@@ -316,13 +492,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).not.toHaveProperty("array");
         });
 
-        it("should return empty object when picking no keys", () => {
+        it("should return empty object when picking no keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectPick(testObj, []);
 
             expect(result).toEqual({});
         });
 
-        it("should handle picking non-existent keys gracefully", () => {
+        it("should handle picking non-existent keys gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectPick(testObj, [
                 "nonexistent" as keyof typeof testObj,
             ]);
@@ -330,7 +522,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toEqual({});
         });
 
-        it("should pick all keys when all are specified", () => {
+        it("should pick all keys when all are specified", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const smallObj = { a: 1, b: 2 };
             const result = safeObjectPick(smallObj, ["a", "b"]);
 
@@ -338,20 +538,44 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).not.toBe(smallObj); // Should be a copy
         });
 
-        it("should handle symbol keys", () => {
+        it("should handle symbol keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectPick(objWithSymbol, [symbolKey]);
 
             expect(result).toEqual({ [symbolKey]: "symbol value" });
         });
 
-        it("should preserve nested object references", () => {
+        it("should preserve nested object references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeObjectPick(testObj, ["nested", "array"]);
 
             expect(result.nested).toBe(testObj.nested); // Same reference
             expect(result.array).toBe(testObj.array); // Same reference
         });
 
-        it("should only pick existing keys", () => {
+        it("should only pick existing keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const partialObj = { a: 1 };
             const result = safeObjectPick(partialObj, [
                 "a",
@@ -363,7 +587,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("typedObjectEntries", () => {
-        it("should return properly typed entries", () => {
+        it("should return properly typed entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const entries = typedObjectEntries(testObj);
 
             expect(entries).toContainEqual(["string", "test"]);
@@ -382,13 +614,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             ]);
         });
 
-        it("should handle empty objects", () => {
+        it("should handle empty objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const entries = typedObjectEntries({});
 
             expect(entries).toEqual([]);
         });
 
-        it("should handle objects with different value types", () => {
+        it("should handle objects with different value types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mixedObj = {
                 str: "string",
                 num: 123,
@@ -405,7 +653,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(entries.find(([key]) => key === "bool")?.[1]).toBe(false);
         });
 
-        it("should not include symbol keys", () => {
+        it("should not include symbol keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const entries = typedObjectEntries(objWithSymbol);
 
             // Symbol keys should not be included in Object.entries() result
@@ -414,7 +670,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("typedObjectKeys", () => {
-        it("should return properly typed keys", () => {
+        it("should return properly typed keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const keys = typedObjectKeys(testObj);
 
             expect(keys).toContain("string");
@@ -426,13 +690,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(keys).toContain("array");
         });
 
-        it("should handle empty objects", () => {
+        it("should handle empty objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const keys = typedObjectKeys({});
 
             expect(keys).toEqual([]);
         });
 
-        it("should return all enumerable string keys", () => {
+        it("should return all enumerable string keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testObject = {
                 first: 1,
                 second: 2,
@@ -451,7 +731,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should not include symbol keys", () => {
+        it("should not include symbol keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const keys = typedObjectKeys(objWithSymbol);
 
             // Symbol keys should not be included in Object.keys() result
@@ -460,7 +748,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("typedObjectValues", () => {
-        it("should return properly typed values", () => {
+        it("should return properly typed values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const values = typedObjectValues(testObj);
 
             expect(values).toContain("test");
@@ -472,13 +768,29 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(values).toContain(testObj.array);
         });
 
-        it("should handle empty objects", () => {
+        it("should handle empty objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const values = typedObjectValues({});
 
             expect(values).toEqual([]);
         });
 
-        it("should return all enumerable property values", () => {
+        it("should return all enumerable property values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testObject = {
                 first: "one",
                 second: "two",
@@ -497,7 +809,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should preserve object references", () => {
+        it("should preserve object references", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const nestedObj = { prop: "value" };
             const testObject = {
                 nested: nestedObj,
@@ -514,14 +834,30 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(values.find((v) => v === nestedObj)).toBe(nestedObj); // Same reference
         });
 
-        it("should not include symbol property values", () => {
+        it("should not include symbol property values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const values = typedObjectValues(objWithSymbol);
 
             // Symbol property values should not be included in Object.values() result
             expect(values).not.toContain("symbol value");
         });
 
-        it("should handle objects with duplicate values", () => {
+        it("should handle objects with duplicate values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testObject = {
                 first: "same",
                 second: "same",
@@ -537,7 +873,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("Integration and Edge Cases", () => {
-        it("should work together for complex object transformations", () => {
+        it("should work together for complex object transformations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const sourceObj = {
                 id: 1,
                 name: "John",
@@ -587,7 +931,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(entries).toHaveLength(4);
         });
 
-        it("should handle objects with complex nested structures", () => {
+        it("should handle objects with complex nested structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexObj = {
                 level1: {
                     level2: {
@@ -617,7 +969,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(picked.array).toBe(complexObj.array); // Same reference
         });
 
-        it("should handle prototype pollution safely", () => {
+        it("should handle prototype pollution safely", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const maliciousKey = "__proto__";
             const testObject = { normal: "value" };
 
@@ -639,7 +999,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(pickResult).toEqual({});
         });
 
-        it("should maintain performance with large objects", () => {
+        it("should maintain performance with large objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const largeObj = Object.fromEntries(
                 Array.from({ length: 1000 }, (_, i) => [`key${i}`, `value${i}`])
             );

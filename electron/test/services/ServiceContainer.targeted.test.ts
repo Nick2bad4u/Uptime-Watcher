@@ -170,7 +170,15 @@ describe("ServiceContainer - Targeted SiteManager Test", () => {
     });
 
     describe("SiteManager Creation", () => {
-        it("should create SiteManager without event bus errors", () => {
+        it("should create SiteManager without event bus errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             console.log("Starting SiteManager creation test");
             const container = ServiceContainer.getInstance();
 

@@ -31,7 +31,15 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Basic functionality", () => {
-        it("should return initial loading state", () => {
+        it("should return initial loading state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             vi.mocked(getMonitorHelpTexts).mockImplementation(
                 () => new Promise(() => {})
             ); // Never resolves
@@ -44,7 +52,15 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.secondary).toBeUndefined();
         });
 
-        it("should load help texts successfully", async () => {
+        it("should load help texts successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockHelpTexts = {
                 primary: "HTTP monitor primary help",
                 secondary: "HTTP monitor secondary help",
@@ -68,7 +84,15 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBeUndefined();
         });
 
-        it("should handle empty help texts", async () => {
+        it("should handle empty help texts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(getMonitorHelpTexts).mockResolvedValue({});
 
             const { result } = renderHook(() => useDynamicHelpText("http"));
@@ -82,7 +106,15 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBeUndefined();
         });
 
-        it("should handle partial help texts", async () => {
+        it("should handle partial help texts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(getMonitorHelpTexts).mockResolvedValue({
                 primary: "Only primary help text",
             });
@@ -102,7 +134,15 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Error handling", () => {
-        it("should handle Error instances", async () => {
+        it("should handle Error instances", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Network error");
             vi.mocked(getMonitorHelpTexts).mockRejectedValue(error);
 
@@ -121,7 +161,15 @@ describe("useDynamicHelpText Hook", () => {
             );
         });
 
-        it("should handle non-Error objects", async () => {
+        it("should handle non-Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(getMonitorHelpTexts).mockRejectedValue("String error");
 
             const { result } = renderHook(() =>
@@ -141,7 +189,15 @@ describe("useDynamicHelpText Hook", () => {
             );
         });
 
-        it("should handle null/undefined errors", async () => {
+        it("should handle null/undefined errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(getMonitorHelpTexts).mockRejectedValue(null);
 
             const { result } = renderHook(() => useDynamicHelpText("http"));
@@ -161,7 +217,15 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Monitor type changes", () => {
-        it("should reload help texts when monitor type changes", async () => {
+        it("should reload help texts when monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             vi.mocked(getMonitorHelpTexts)
                 .mockResolvedValueOnce({ primary: "HTTP help" })
                 .mockResolvedValueOnce({ primary: "Ping help" });
@@ -202,7 +266,15 @@ describe("useDynamicHelpText Hook", () => {
             );
         });
 
-        it("should reset error state when monitor type changes", async () => {
+        it("should reset error state when monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(getMonitorHelpTexts)
                 .mockRejectedValueOnce(new Error("First error"))
                 .mockResolvedValueOnce({ primary: "Success help" });
@@ -236,7 +308,15 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Cleanup and cancellation", () => {
-        it("should cancel pending requests on unmount", async () => {
+        it("should cancel pending requests on unmount", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             let resolvePromise: (value: {
                 primary?: string;
                 secondary?: string;
@@ -270,7 +350,15 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.primary).toBeUndefined();
         });
 
-        it("should cancel pending requests when monitor type changes", async () => {
+        it("should cancel pending requests when monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             let resolveFirstPromise: (value: {
                 primary?: string;
                 secondary?: string;
@@ -346,7 +434,15 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("State transitions", () => {
-        it("should properly transition through loading states", async () => {
+        it("should properly transition through loading states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             let resolvePromise: (value: {
                 primary?: string;
                 secondary?: string;
@@ -381,7 +477,15 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.primary).toBe("Loaded help");
         });
 
-        it("should handle rapid monitor type changes", async () => {
+        it("should handle rapid monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Mock multiple quick responses
             vi.mocked(getMonitorHelpTexts)
                 .mockResolvedValueOnce({ primary: "HTTP help" })

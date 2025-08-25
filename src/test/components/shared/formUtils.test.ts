@@ -15,7 +15,15 @@ import {
 
 describe("Form Utilities", () => {
     describe("createInputChangeHandler", () => {
-        it("should create handler that sets value without validation", () => {
+        it("should create handler that sets value without validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const handler = createInputChangeHandler(setValue);
 
@@ -28,7 +36,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("test value");
         });
 
-        it("should create handler that sets value with successful validation", () => {
+        it("should create handler that sets value with successful validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const validator = vi.fn().mockReturnValue(true);
             const handler = createInputChangeHandler(setValue, validator);
@@ -43,7 +59,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("valid value");
         });
 
-        it("should create handler that skips setting value with failed validation", () => {
+        it("should create handler that skips setting value with failed validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const validator = vi.fn().mockReturnValue(false);
             const handler = createInputChangeHandler(setValue, validator);
@@ -58,7 +82,15 @@ describe("Form Utilities", () => {
             expect(setValue).not.toHaveBeenCalled();
         });
 
-        it("should handle numeric input values", () => {
+        it("should handle numeric input values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setValue = vi.fn();
             const handler = createInputChangeHandler<number>(setValue);
 
@@ -71,7 +103,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("123");
         });
 
-        it("should handle empty string values", () => {
+        it("should handle empty string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setValue = vi.fn();
             const handler = createInputChangeHandler(setValue);
 
@@ -84,7 +124,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("");
         });
 
-        it("should work with custom validation functions", () => {
+        it("should work with custom validation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const setValue = vi.fn();
             const minLengthValidator = (value: string) => value.length >= 3;
             const handler = createInputChangeHandler(
@@ -112,7 +160,15 @@ describe("Form Utilities", () => {
     });
 
     describe("createSelectChangeHandler", () => {
-        it("should create handler that sets value without conversion", () => {
+        it("should create handler that sets value without conversion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const handler = createSelectChangeHandler(setValue);
 
@@ -125,7 +181,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("option1");
         });
 
-        it("should create handler that converts string to number", () => {
+        it("should create handler that converts string to number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const converter = (value: string) => Number.parseInt(value, 10);
             const handler = createSelectChangeHandler(setValue, converter);
@@ -139,7 +203,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith(123);
         });
 
-        it("should create handler that converts string to boolean", () => {
+        it("should create handler that converts string to boolean", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const converter = (value: string) => value === "true";
             const handler = createSelectChangeHandler(setValue, converter);
@@ -153,7 +225,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith(true);
         });
 
-        it("should handle empty select values", () => {
+        it("should handle empty select values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setValue = vi.fn();
             const handler = createSelectChangeHandler(setValue);
 
@@ -166,7 +246,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("");
         });
 
-        it("should handle converter that returns complex objects", () => {
+        it("should handle converter that returns complex objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setValue = vi.fn();
             const converter = (value: string) => ({
                 id: value,
@@ -183,7 +271,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith({ id: "1", name: "Item 1" });
         });
 
-        it("should handle converter that returns undefined", () => {
+        it("should handle converter that returns undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setValue = vi.fn();
             const converter = () => undefined;
             const handler = createSelectChangeHandler(setValue, converter);
@@ -199,7 +295,15 @@ describe("Form Utilities", () => {
     });
 
     describe("createCheckboxChangeHandler", () => {
-        it("should create handler that sets checked state to true", () => {
+        it("should create handler that sets checked state to true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const handler = createCheckboxChangeHandler(setValue);
 
@@ -212,7 +316,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith(true);
         });
 
-        it("should create handler that sets checked state to false", () => {
+        it("should create handler that sets checked state to false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
             const setValue = vi.fn();
             const handler = createCheckboxChangeHandler(setValue);
 
@@ -225,7 +337,15 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith(false);
         });
 
-        it("should handle multiple checkbox events", () => {
+        it("should handle multiple checkbox events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Event Processing", "type");
+
             const setValue = vi.fn();
             const handler = createCheckboxChangeHandler(setValue);
 
@@ -251,7 +371,15 @@ describe("Form Utilities", () => {
 
     describe("validationPatterns", () => {
         describe("nonEmptyString", () => {
-            it("should return true for non-empty strings", () => {
+            it("should return true for non-empty strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(validationPatterns.nonEmptyString("hello")).toBe(true);
                 expect(validationPatterns.nonEmptyString("a")).toBe(true);
                 expect(validationPatterns.nonEmptyString("   content   ")).toBe(
@@ -259,13 +387,29 @@ describe("Form Utilities", () => {
                 );
             });
 
-            it("should return false for empty strings", () => {
+            it("should return false for empty strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(validationPatterns.nonEmptyString("")).toBe(false);
                 expect(validationPatterns.nonEmptyString("   ")).toBe(false);
                 expect(validationPatterns.nonEmptyString("\t\n")).toBe(false);
             });
 
-            it("should handle special characters and unicode", () => {
+            it("should handle special characters and unicode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(validationPatterns.nonEmptyString("🎉")).toBe(true);
                 expect(validationPatterns.nonEmptyString("@#$%")).toBe(true);
                 expect(validationPatterns.nonEmptyString("你好")).toBe(true);
@@ -273,7 +417,15 @@ describe("Form Utilities", () => {
         });
 
         describe("numberInRange", () => {
-            it("should create validator that accepts numbers in range", () => {
+            it("should create validator that accepts numbers in range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.numberInRange(1, 10);
 
                 expect(validator(1)).toBe(true);
@@ -281,7 +433,15 @@ describe("Form Utilities", () => {
                 expect(validator(10)).toBe(true);
             });
 
-            it("should create validator that rejects numbers outside range", () => {
+            it("should create validator that rejects numbers outside range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.numberInRange(1, 10);
 
                 expect(validator(0)).toBe(false);
@@ -290,7 +450,15 @@ describe("Form Utilities", () => {
                 expect(validator(100)).toBe(false);
             });
 
-            it("should handle negative ranges", () => {
+            it("should handle negative ranges", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.numberInRange(-10, -1);
 
                 expect(validator(-5)).toBe(true);
@@ -300,7 +468,15 @@ describe("Form Utilities", () => {
                 expect(validator(-11)).toBe(false);
             });
 
-            it("should handle floating point numbers", () => {
+            it("should handle floating point numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.numberInRange(0.1, 0.9);
 
                 expect(validator(0.5)).toBe(true);
@@ -310,7 +486,15 @@ describe("Form Utilities", () => {
                 expect(validator(1)).toBe(false);
             });
 
-            it("should handle single-point range", () => {
+            it("should handle single-point range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.numberInRange(5, 5);
 
                 expect(validator(5)).toBe(true);
@@ -320,7 +504,15 @@ describe("Form Utilities", () => {
         });
 
         describe("oneOfNumbers", () => {
-            it("should create validator that accepts allowed numbers", () => {
+            it("should create validator that accepts allowed numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.oneOfNumbers([
                     1,
                     3,
@@ -334,7 +526,15 @@ describe("Form Utilities", () => {
                 expect(validator(7)).toBe(true);
             });
 
-            it("should create validator that rejects non-allowed numbers", () => {
+            it("should create validator that rejects non-allowed numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.oneOfNumbers([
                     1,
                     3,
@@ -349,7 +549,15 @@ describe("Form Utilities", () => {
                 expect(validator(0)).toBe(false);
             });
 
-            it("should handle empty array", () => {
+            it("should handle empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfNumbers([]);
 
                 expect(validator(1)).toBe(false);
@@ -357,7 +565,15 @@ describe("Form Utilities", () => {
                 expect(validator(-1)).toBe(false);
             });
 
-            it("should handle negative numbers", () => {
+            it("should handle negative numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfNumbers([
                     -1,
                     -5,
@@ -371,7 +587,15 @@ describe("Form Utilities", () => {
                 expect(validator(0)).toBe(false);
             });
 
-            it("should handle floating point numbers", () => {
+            it("should handle floating point numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfNumbers([
                     1.5,
                     2.7,
@@ -387,7 +611,15 @@ describe("Form Utilities", () => {
         });
 
         describe("oneOfStrings", () => {
-            it("should create validator that accepts allowed strings", () => {
+            it("should create validator that accepts allowed strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.oneOfStrings([
                     "red",
                     "green",
@@ -399,7 +631,15 @@ describe("Form Utilities", () => {
                 expect(validator("blue")).toBe(true);
             });
 
-            it("should create validator that rejects non-allowed strings", () => {
+            it("should create validator that rejects non-allowed strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Constructor", "type");
+
                 const validator = validationPatterns.oneOfStrings([
                     "red",
                     "green",
@@ -412,14 +652,30 @@ describe("Form Utilities", () => {
                 expect(validator("Red")).toBe(false); // Case sensitive
             });
 
-            it("should handle empty array", () => {
+            it("should handle empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfStrings([]);
 
                 expect(validator("anything")).toBe(false);
                 expect(validator("")).toBe(false);
             });
 
-            it("should handle empty strings in allowed values", () => {
+            it("should handle empty strings in allowed values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfStrings([
                     "",
                     "option1",
@@ -432,7 +688,15 @@ describe("Form Utilities", () => {
                 expect(validator("option3")).toBe(false);
             });
 
-            it("should handle special characters and unicode", () => {
+            it("should handle special characters and unicode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfStrings([
                     "@#$%",
                     "你好",
@@ -445,7 +709,15 @@ describe("Form Utilities", () => {
                 expect(validator("hello")).toBe(false);
             });
 
-            it("should be case sensitive", () => {
+            it("should be case sensitive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const validator = validationPatterns.oneOfStrings([
                     "Hello",
                     "World",
@@ -461,7 +733,15 @@ describe("Form Utilities", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with multiple handlers together", () => {
+        it("should work with multiple handlers together", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const setName = vi.fn();
             const setAge = vi.fn();
             const setActive = vi.fn();
@@ -500,7 +780,15 @@ describe("Form Utilities", () => {
             expect(setActive).toHaveBeenCalledWith(true);
         });
 
-        it("should handle complex validation workflows", () => {
+        it("should handle complex validation workflows", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formUtils", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const setValue = vi.fn();
             const rangeValidator = validationPatterns.numberInRange(1, 100);
             const allowedValidator = validationPatterns.oneOfNumbers([

@@ -9,7 +9,15 @@ import { getMonitorValidationErrors } from "../../utils/validation";
 
 describe("Validation - Missing Coverage Tests", () => {
     describe("DNS Monitor Validation", () => {
-        it("should validate DNS monitor with valid fields", () => {
+        it("should validate DNS monitor with valid fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -25,7 +33,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return errors for DNS monitor missing host", () => {
+        it("should return errors for DNS monitor missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -40,7 +56,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Host is required for DNS monitors");
         });
 
-        it("should return errors for DNS monitor with invalid host type", () => {
+        it("should return errors for DNS monitor with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -56,7 +80,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Host is required for DNS monitors");
         });
 
-        it("should return errors for DNS monitor missing record type", () => {
+        it("should return errors for DNS monitor missing record type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -73,7 +105,15 @@ describe("Validation - Missing Coverage Tests", () => {
             );
         });
 
-        it("should return errors for DNS monitor with invalid record type", () => {
+        it("should return errors for DNS monitor with invalid record type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -91,7 +131,15 @@ describe("Validation - Missing Coverage Tests", () => {
             );
         });
 
-        it("should accept all valid DNS record types", () => {
+        it("should accept all valid DNS record types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRecordTypes = [
                 "A",
                 "AAAA",
@@ -127,7 +175,15 @@ describe("Validation - Missing Coverage Tests", () => {
             }
         });
 
-        it("should handle DNS record type case insensitivity", () => {
+        it("should handle DNS record type case insensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -145,7 +201,15 @@ describe("Validation - Missing Coverage Tests", () => {
             ).toHaveLength(0);
         });
 
-        it("should return errors for DNS monitor with non-string record type", () => {
+        it("should return errors for DNS monitor with non-string record type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "dns-test",
                 type: "dns",
@@ -165,7 +229,15 @@ describe("Validation - Missing Coverage Tests", () => {
     });
 
     describe("Unknown Monitor Type Validation", () => {
-        it("should return error for unknown monitor type", () => {
+        it("should return error for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "unknown-test",
                 type: "unknown" as any,
@@ -179,7 +251,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Unknown monitor type: unknown");
         });
 
-        it("should handle custom monitor types gracefully", () => {
+        it("should handle custom monitor types gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "custom-test",
                 type: "custom-type" as any,
@@ -195,7 +275,15 @@ describe("Validation - Missing Coverage Tests", () => {
     });
 
     describe("Edge Cases in Type-Specific Validation", () => {
-        it("should handle monitor without type gracefully", () => {
+        it("should handle monitor without type gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "no-type-test",
                 status: "pending",
@@ -209,7 +297,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Monitor type is required");
         });
 
-        it("should handle null type", () => {
+        it("should handle null type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "null-type-test",
                 type: null as any,
@@ -223,7 +319,15 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Monitor type is required");
         });
 
-        it("should handle undefined type", () => {
+        it("should handle undefined type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation.missing-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "undefined-type-test",
                 type: undefined as any,

@@ -17,7 +17,15 @@ import * as errorCatalogModule from "../utils/errorCatalog";
 
 describe("Function Coverage Boost - Targeting Actual Exports", () => {
     describe("CacheKeys utilities coverage", () => {
-        it("should call all CacheKeys functions for coverage", () => {
+        it("should call all CacheKeys functions for coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Caching", "type");
+
             // Test CacheKeys config functions
             expect(cacheKeysModule.CacheKeys.config.byName("test")).toBe(
                 "config:test"
@@ -73,7 +81,15 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
     });
 
     describe("Environment utilities coverage", () => {
-        it("should call all environment detection functions for coverage", () => {
+        it("should call all environment detection functions for coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test environment detection functions
             expect(typeof environmentModule.getEnvironment()).toBe("string");
             expect(typeof environmentModule.getNodeEnv()).toBe("string");
@@ -96,7 +112,15 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
     });
 
     describe("Error catalog utilities coverage", () => {
-        it("should call all error catalog functions for coverage", () => {
+        it("should call all error catalog functions for coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test formatErrorMessage function
             const formatted = errorCatalogModule.formatErrorMessage(
                 "Test error: {code}",
@@ -127,7 +151,15 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
     });
 
     describe("Additional utility functions", () => {
-        it("should exercise comprehensive function calls", () => {
+        it("should exercise comprehensive function calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Complex cache key scenarios
             const complexKeys = [
                 cacheKeysModule.CacheKeys.config.byName("complex-config-name"),

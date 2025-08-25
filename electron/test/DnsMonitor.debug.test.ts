@@ -93,11 +93,27 @@ describe("DnsMonitor", () => {
         vi.clearAllMocks();
     });
 
-    it("should create DnsMonitor instance", () => {
+    it("should create DnsMonitor instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DnsMonitor", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
         expect(dnsMonitor).toBeInstanceOf(DnsMonitor);
     });
 
-    it("should check A record successfully", async () => {
+    it("should check A record successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DnsMonitor", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const monitor = createTestMonitor({ recordType: "A" });
         const result = await dnsMonitor.check(monitor);
 

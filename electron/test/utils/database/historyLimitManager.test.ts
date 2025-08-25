@@ -1,6 +1,14 @@
 /**
  * Tests for history it("should set limit to 0 for negative values without
- * pruning", async () => { const setHistoryLimitCallback = vi.fn(); const limit
+ * pruning", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+ const setHistoryLimitCallback = vi.fn(); const limit
  * = -10; const expectedLimit = 0;
  *
  * ```
@@ -67,7 +75,15 @@ describe("historyLimitManager", () => {
     });
 
     describe("setHistoryLimit", () => {
-        it("should set history limit with valid positive value", async () => {
+        it("should set history limit with valid positive value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 100;
 
@@ -99,7 +115,15 @@ describe("historyLimitManager", () => {
             );
         });
 
-        it("should set minimum limit of 10 for small positive values", async () => {
+        it("should set minimum limit of 10 for small positive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 5;
             const expectedLimit = 10;
@@ -129,7 +153,15 @@ describe("historyLimitManager", () => {
             );
         });
 
-        it("should set limit to 0 for negative values without pruning", async () => {
+        it("should set limit to 0 for negative values without pruning", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = -5;
             const expectedLimit = 0;
@@ -162,7 +194,15 @@ describe("historyLimitManager", () => {
             );
         });
 
-        it("should set limit to 0 for zero value without pruning", async () => {
+        it("should set limit to 0 for zero value without pruning", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 0;
             const expectedLimit = 0;
@@ -195,7 +235,15 @@ describe("historyLimitManager", () => {
             );
         });
 
-        it("should work without logger", async () => {
+        it("should work without logger", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 50;
 
@@ -221,7 +269,15 @@ describe("historyLimitManager", () => {
             expect(mockLogger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle large limit values", async () => {
+        it("should handle large limit values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 999_999;
 
@@ -247,7 +303,15 @@ describe("historyLimitManager", () => {
             ).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
-        it("should handle float values by using them as-is", async () => {
+        it("should handle float values by using them as-is", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const limit = 50.7;
 
@@ -275,7 +339,15 @@ describe("historyLimitManager", () => {
     });
 
     describe("getHistoryLimit", () => {
-        it("should return current history limit from callback", () => {
+        it("should return current history limit from callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const expectedLimit = 250;
             const getHistoryLimitCallback = vi
                 .fn()
@@ -287,7 +359,15 @@ describe("historyLimitManager", () => {
             expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
         });
 
-        it("should return zero limit", () => {
+        it("should return zero limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const expectedLimit = 0;
             const getHistoryLimitCallback = vi
                 .fn()
@@ -299,7 +379,15 @@ describe("historyLimitManager", () => {
             expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
         });
 
-        it("should return negative limit if callback returns one", () => {
+        it("should return negative limit if callback returns one", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const expectedLimit = -1;
             const getHistoryLimitCallback = vi
                 .fn()
@@ -311,7 +399,15 @@ describe("historyLimitManager", () => {
             expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
         });
 
-        it("should return large limit values", () => {
+        it("should return large limit values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const expectedLimit = 999_999;
             const getHistoryLimitCallback = vi
                 .fn()
@@ -323,7 +419,15 @@ describe("historyLimitManager", () => {
             expect(getHistoryLimitCallback).toHaveBeenCalledOnce();
         });
 
-        it("should work with callback that returns undefined", () => {
+        it("should work with callback that returns undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const getHistoryLimitCallback = vi.fn().mockReturnValue(undefined);
 
             const result = getHistoryLimit(getHistoryLimitCallback);
@@ -334,7 +438,15 @@ describe("historyLimitManager", () => {
     });
 
     describe("integration scenarios", () => {
-        it("should handle complete workflow with valid limit", async () => {
+        it("should handle complete workflow with valid limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const getHistoryLimitCallback = vi.fn();
             const limit = 150;
@@ -369,7 +481,15 @@ describe("historyLimitManager", () => {
             ).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
-        it("should handle workflow with minimum limit enforcement", async () => {
+        it("should handle workflow with minimum limit enforcement", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
             const setHistoryLimitCallback = vi.fn();
             const getHistoryLimitCallback = vi.fn();
             const limit = 3;

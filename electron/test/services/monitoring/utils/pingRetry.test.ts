@@ -80,7 +80,15 @@ describe("pingRetry utilities", () => {
                 probe: vi.fn(),
             };
         });
-        it("should successfully ping a reachable host", async () => {
+        it("should successfully ping a reachable host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
             const result = await performSinglePingCheck("example.com", 5000);
@@ -96,7 +104,15 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             });
         });
-        it("should handle unreachable host", async () => {
+        it("should handle unreachable host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(failedPingResult);
 
             const result = await performSinglePingCheck(
@@ -109,7 +125,15 @@ describe("pingRetry utilities", () => {
             expect(result.error).toBe("Ping failed - host unreachable");
             expect(typeof result.responseTime).toBe("number");
         });
-        it("should use measured time when ping library doesn't provide time", async () => {
+        it("should use measured time when ping library doesn't provide time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const resultWithoutTime = {
                 ...successfulPingResult,
                 time: undefined,
@@ -126,7 +150,15 @@ describe("pingRetry utilities", () => {
                 endTime - startTime + 10
             ); // Allow 10ms tolerance
         });
-        it("should convert timeout from milliseconds to seconds", async () => {
+        it("should convert timeout from milliseconds to seconds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
             await performSinglePingCheck("example.com", 15_000);
@@ -137,7 +169,15 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             });
         });
-        it("should use minimum timeout of 1 second", async () => {
+        it("should use minimum timeout of 1 second", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
             await performSinglePingCheck("example.com", 500); // Less than 1 second
@@ -148,7 +188,15 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             });
         });
-        it("should throw error on ping library failure", async () => {
+        it("should throw error on ping library failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const pingError = new Error("Network unreachable");
             mockPing.promise.probe.mockRejectedValue(pingError);
 
@@ -156,14 +204,30 @@ describe("pingRetry utilities", () => {
                 performSinglePingCheck("example.com", 5000)
             ).rejects.toThrow("Ping failed: Network unreachable");
         });
-        it("should handle non-Error exceptions", async () => {
+        it("should handle non-Error exceptions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockPing.promise.probe.mockRejectedValue("String error");
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
             ).rejects.toThrow("Ping failed: String error");
         });
-        it("should use cross-platform ping options only", async () => {
+        it("should use cross-platform ping options only", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(successfulPingResult);
 
             await performSinglePingCheck("example.com", 5000);
@@ -193,7 +257,15 @@ describe("pingRetry utilities", () => {
             // Mock operational hooks to just return the result
             mockWithOperationalHooks.mockImplementation(async (fn) => fn());
         });
-        it("should call withOperationalHooks with correct parameters", async () => {
+        it("should call withOperationalHooks with correct parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
             await performPingCheckWithRetry("example.com", 5000, 3);
@@ -207,7 +279,15 @@ describe("pingRetry utilities", () => {
                 }
             );
         });
-        it("should return successful result on first attempt", async () => {
+        it("should return successful result on first attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
             const result = await performPingCheckWithRetry(
@@ -218,7 +298,15 @@ describe("pingRetry utilities", () => {
 
             expect(result).toEqual(mockSingleCheckResult);
         });
-        it("should handle retry failure and call error handler", async () => {
+        it("should handle retry failure and call error handler", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("All ping attempts failed");
             const errorResult: MonitorCheckResult = {
                 status: "down",
@@ -243,7 +331,15 @@ describe("pingRetry utilities", () => {
                 maxRetries: 2,
             });
         });
-        it("should handle zero retries (single attempt only)", async () => {
+        it("should handle zero retries (single attempt only)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
             const result = await performPingCheckWithRetry(
@@ -260,7 +356,15 @@ describe("pingRetry utilities", () => {
                 })
             );
         });
-        it("should handle high retry counts", async () => {
+        it("should handle high retry counts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
             await performPingCheckWithRetry("example.com", 5000, 10);
@@ -272,7 +376,15 @@ describe("pingRetry utilities", () => {
                 })
             );
         });
-        it("should handle different host types", async () => {
+        it("should handle different host types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockWithOperationalHooks.mockResolvedValue(mockSingleCheckResult);
 
             const hostTypes = [
@@ -303,7 +415,15 @@ describe("pingRetry utilities", () => {
                 probe: vi.fn(),
             };
         });
-        it("should use only cross-platform ping options", async () => {
+        it("should use only cross-platform ping options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const successResult = {
                 alive: true,
                 time: 42,
@@ -325,7 +445,15 @@ describe("pingRetry utilities", () => {
 
             expect(options).toEqual(expectedOptions);
         });
-        it("should not use platform-specific options", async () => {
+        it("should not use platform-specific options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const successResult = {
                 alive: true,
                 time: 42,
@@ -352,21 +480,45 @@ describe("pingRetry utilities", () => {
                 probe: vi.fn(),
             };
         });
-        it("should handle ping library returning null", async () => {
+        it("should handle ping library returning null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(null);
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
             ).rejects.toThrow();
         });
-        it("should handle ping library returning undefined", async () => {
+        it("should handle ping library returning undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockPing.promise.probe.mockResolvedValue(undefined);
 
             await expect(
                 performSinglePingCheck("example.com", 5000)
             ).rejects.toThrow();
         });
-        it("should handle malformed ping result", async () => {
+        it("should handle malformed ping result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const malformedResult = {
                 // Missing required properties
                 someOtherProperty: "value",

@@ -161,12 +161,28 @@ describe("EnhancedMonitorChecker", () => {
         checker = new EnhancedMonitorChecker(mockConfig);
     });
 
-    it("should initialize successfully", () => {
+    it("should initialize successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
         expect(checker).toBeDefined();
         expect(checker).toBeInstanceOf(EnhancedMonitorChecker);
     });
 
-    it("should handle checkMonitor with manual check", async () => {
+    it("should handle checkMonitor with manual check", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const monitor = createTestMonitor({ type: "http" });
         const site = createTestSite({
             monitors: [monitor],
@@ -180,7 +196,15 @@ describe("EnhancedMonitorChecker", () => {
         expect(typeof result === "object" || result === undefined).toBe(true);
     });
 
-    it("should handle startMonitoring", async () => {
+    it("should handle startMonitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const result = await checker.startMonitoring(
             "test-site-1",
             "monitor-1"
@@ -190,14 +214,30 @@ describe("EnhancedMonitorChecker", () => {
         expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
     });
 
-    it("should handle stopMonitoring", async () => {
+    it("should handle stopMonitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const result = await checker.stopMonitoring("test-site-1", "monitor-1");
 
         expect(typeof result).toBe("boolean");
         expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
     });
 
-    it("should handle checkMonitor with non-existent monitor", async () => {
+    it("should handle checkMonitor with non-existent monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const site = createTestSite({
             monitors: [],
         });
@@ -207,7 +247,15 @@ describe("EnhancedMonitorChecker", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should handle checkMonitor with non-monitoring monitor in scheduled mode", async () => {
+    it("should handle checkMonitor with non-monitoring monitor in scheduled mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: EnhancedMonitorChecker", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const monitor = createTestMonitor({
             type: "http",
             monitoring: false, // Not monitoring

@@ -11,7 +11,15 @@ import { withErrorHandling } from "../utils/errorHandling";
 
 describe("Complete 100% Coverage - Final Tests", () => {
     describe("stringConversion.ts - Uncovered Lines", () => {
-        it("should cover default case (lines 89-90)", () => {
+        it("should cover default case (lines 89-90)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object with a custom valueOf that returns a novel type
             const weirdObject = {
                 valueOf: vi.fn(() => {
@@ -26,7 +34,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should handle edge cases that might hit the default branch", () => {
+        it("should handle edge cases that might hit the default branch", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with various edge cases
             const testCases = [
                 { [Symbol.toPrimitive]: () => "test" },
@@ -42,7 +58,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
     });
 
     describe("schemas.ts - Uncovered Lines", () => {
-        it("should trigger unknown field error (lines 399-406)", () => {
+        it("should trigger unknown field error (lines 399-406)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Try to validate a field that doesn't exist in any schema
             // Using a field name that's not in http schema or base schema
             expect(() => {
@@ -54,7 +78,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
             }).toThrow("Unknown field: unknownCustomField");
         });
 
-        it("should handle error categorization edge cases (lines 478-479, 482)", () => {
+        it("should handle error categorization edge cases (lines 478-479, 482)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // This would require creating a ZodError with specific structure
             // The actual coverage might be achieved through the comprehensive validation tests
             // but we'll add this for completeness
@@ -95,7 +127,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
     });
 
     describe("database.ts - Uncovered Lines", () => {
-        it("should handle RowValidationUtils.isValidTimestamp false case (line 208)", () => {
+        it("should handle RowValidationUtils.isValidTimestamp false case (line 208)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test the case where isValidTimestamp returns false
             const invalidTimestamp = "not-a-number";
             const result =
@@ -103,7 +143,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle property access edge cases (lines 372-373)", () => {
+        it("should handle property access edge cases (lines 372-373)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test safeGetRowProperty with edge cases that might hit the return statement
             const row = {
                 nested: {
@@ -122,7 +170,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
     });
 
     describe("errorHandling.ts - Uncovered Branch", () => {
-        it("should handle error in finally block setLoading (line 183)", async () => {
+        it("should handle error in finally block setLoading (line 183)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockStore = {
                 clearError: vi.fn(),
                 setLoading: vi.fn(),
@@ -153,7 +209,15 @@ describe("Complete 100% Coverage - Final Tests", () => {
     });
 
     describe("Comprehensive Edge Cases", () => {
-        it("should handle all remaining edge cases for 100% coverage", () => {
+        it("should handle all remaining edge cases for 100% coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-100-coverage-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This test ensures we've covered all the remaining edge cases
             // For stringConversion default case
             const result1 = safeStringify(undefined);

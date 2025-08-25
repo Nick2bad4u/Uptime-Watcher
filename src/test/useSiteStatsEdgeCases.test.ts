@@ -12,7 +12,15 @@ import { useSiteStats } from "../hooks/site/useSiteStats";
 
 describe("useSiteStats Edge Cases", () => {
     describe("Basic edge cases", () => {
-        it("should handle empty history array", () => {
+        it("should handle empty history array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSiteStats([]));
             expect(result.current.averageResponseTime).toBe(0);
             expect(result.current.checkCount).toBe(0);
@@ -21,7 +29,15 @@ describe("useSiteStats Edge Cases", () => {
     });
 
     describe("averageResponseTime calculation - line 47 coverage", () => {
-        it("should handle responseTime fallback during reduce operation", () => {
+        it("should handle responseTime fallback during reduce operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a test case that exercises the || 0 fallback on line 47
             // Use a Proxy to simulate the edge case where responseTime becomes falsy during reduce
             let proxyAccessCount = 0;
@@ -67,7 +83,15 @@ describe("useSiteStats Edge Cases", () => {
             expect(proxyAccessCount).toBeGreaterThan(0); // Proxy was accessed
         });
 
-        it("should handle Object.freeze edge case that could affect responseTime access", () => {
+        it("should handle Object.freeze edge case that could affect responseTime access", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test another potential edge case where responseTime access might be affected
             const history: StatusHistory[] = [
                 {
@@ -94,7 +118,15 @@ describe("useSiteStats Edge Cases", () => {
             expect(result.current.uptime).toBe(100);
         });
 
-        it("should handle potential numeric edge cases during reduce", () => {
+        it("should handle potential numeric edge cases during reduce", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with very specific numeric values that might trigger edge cases
             const history: StatusHistory[] = [
                 { responseTime: 1, status: "up", timestamp: 1_640_995_200_000 },
@@ -109,7 +141,15 @@ describe("useSiteStats Edge Cases", () => {
             expect(result.current.uptime).toBe(100);
         });
 
-        it("should handle empty upRecordsWithResponseTime array correctly", () => {
+        it("should handle empty upRecordsWithResponseTime array correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test when no records pass the filter (targets the ternary operator)
             const history: StatusHistory[] = [
                 {
@@ -133,7 +173,15 @@ describe("useSiteStats Edge Cases", () => {
             expect(result.current.uptime).toBe(67); // 2 up out of 3 total = 66.67 -> 67
         });
 
-        it("should handle records with various status types for uptime calculation", () => {
+        it("should handle records with various status types for uptime calculation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 100,

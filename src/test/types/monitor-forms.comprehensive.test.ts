@@ -20,7 +20,15 @@ type MonitorType = "http" | "ping" | "port";
 
 describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     describe("getDefaultMonitorFields", () => {
-        it("should return default HTTP monitor fields", () => {
+        it("should return default HTTP monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields = getDefaultMonitorFields("http");
 
             expect(fields).toMatchObject({
@@ -35,7 +43,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return default ping monitor fields", () => {
+        it("should return default ping monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields = getDefaultMonitorFields("ping");
 
             expect(fields).toMatchObject({
@@ -46,7 +62,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return default port monitor fields", () => {
+        it("should return default port monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields = getDefaultMonitorFields("port");
 
             expect(fields).toMatchObject({
@@ -59,7 +83,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should fallback to HTTP fields for unknown monitor types", () => {
+        it("should fallback to HTTP fields for unknown monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields = getDefaultMonitorFields("unknown" as MonitorType);
 
             expect(fields).toMatchObject({
@@ -70,7 +102,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle edge case monitor types", () => {
+        it("should handle edge case monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields = getDefaultMonitorFields("" as MonitorType);
 
             expect(fields).toMatchObject({
@@ -81,7 +121,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return objects that satisfy TypeScript interface constraints", () => {
+        it("should return objects that satisfy TypeScript interface constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpFields = getDefaultMonitorFields("http");
             const pingFields = getDefaultMonitorFields("ping");
             const portFields = getDefaultMonitorFields("port");
@@ -96,7 +144,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     });
 
     describe("isHttpMonitorFields", () => {
-        it("should return true for valid HTTP monitor fields", () => {
+        it("should return true for valid HTTP monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpFields: HttpMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -111,7 +167,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isHttpMonitorFields(httpFields)).toBe(true);
         });
 
-        it("should return false for ping monitor fields", () => {
+        it("should return false for ping monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingFields: PingMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -122,7 +186,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isHttpMonitorFields(pingFields)).toBe(false);
         });
 
-        it("should return false for port monitor fields", () => {
+        it("should return false for port monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portFields: PortMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -135,7 +207,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isHttpMonitorFields(portFields)).toBe(false);
         });
 
-        it("should handle fields with both url and host (edge case)", () => {
+        it("should handle fields with both url and host (edge case)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mixedFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -148,7 +228,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isHttpMonitorFields(mixedFields)).toBe(false);
         });
 
-        it("should handle minimal HTTP fields", () => {
+        it("should handle minimal HTTP fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minimalFields = {
                 url: "https://example.com",
             } as MonitorFormFields;
@@ -158,7 +246,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     });
 
     describe("isPingMonitorFields", () => {
-        it("should return true for valid ping monitor fields", () => {
+        it("should return true for valid ping monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingFields: PingMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -169,7 +265,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(pingFields)).toBe(true);
         });
 
-        it("should return false for HTTP monitor fields", () => {
+        it("should return false for HTTP monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpFields: HttpMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -184,7 +288,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(httpFields)).toBe(false);
         });
 
-        it("should return false for port monitor fields", () => {
+        it("should return false for port monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portFields: PortMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -197,7 +309,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(portFields)).toBe(false);
         });
 
-        it("should validate host is a string", () => {
+        it("should validate host is a string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const invalidPingFields = {
                 host: 123,
                 checkInterval: 300_000,
@@ -206,7 +326,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(invalidPingFields)).toBe(false);
         });
 
-        it("should return false when host is present but url is also present", () => {
+        it("should return false when host is present but url is also present", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mixedFields = {
                 host: "example.com",
                 url: "https://example.com",
@@ -215,7 +343,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(mixedFields)).toBe(false);
         });
 
-        it("should handle minimal ping fields", () => {
+        it("should handle minimal ping fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minimalFields = {
                 host: "example.com",
             } as MonitorFormFields;
@@ -225,7 +361,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     });
 
     describe("isPortMonitorFields", () => {
-        it("should return true for valid port monitor fields", () => {
+        it("should return true for valid port monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portFields: PortMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -238,7 +382,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(portFields)).toBe(true);
         });
 
-        it("should return false for HTTP monitor fields", () => {
+        it("should return false for HTTP monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpFields: HttpMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -253,7 +405,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(httpFields)).toBe(false);
         });
 
-        it("should return false for ping monitor fields", () => {
+        it("should return false for ping monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingFields: PingMonitorFields = {
                 checkInterval: 300_000,
                 retryAttempts: 3,
@@ -264,7 +424,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(pingFields)).toBe(false);
         });
 
-        it("should validate both host and port are correct types", () => {
+        it("should validate both host and port are correct types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const invalidHostFields = {
                 host: 123,
                 port: 80,
@@ -279,7 +447,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(invalidPortFields)).toBe(false);
         });
 
-        it("should return false when only host is present (missing port)", () => {
+        it("should return false when only host is present (missing port)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteFields = {
                 host: "example.com",
             } as MonitorFormFields;
@@ -287,7 +463,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(incompleteFields)).toBe(false);
         });
 
-        it("should return false when only port is present (missing host)", () => {
+        it("should return false when only port is present (missing host)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteFields = {
                 port: 80,
             } as MonitorFormFields;
@@ -295,7 +479,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(incompleteFields)).toBe(false);
         });
 
-        it("should handle minimal port fields", () => {
+        it("should handle minimal port fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minimalFields = {
                 host: "example.com",
                 port: 80,
@@ -306,7 +498,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     });
 
     describe("Type Guards Integration", () => {
-        it("should correctly identify different monitor types in an array", () => {
+        it("should correctly identify different monitor types in an array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const fields: MonitorFormFields[] = [
                 { url: "https://example.com" } as HttpMonitorFields,
                 { host: "example.com" } as PingMonitorFields,
@@ -326,7 +526,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(fields[2]!)).toBe(true);
         });
 
-        it("should handle edge cases with empty objects", () => {
+        it("should handle edge cases with empty objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyFields = {} as MonitorFormFields;
 
             expect(isHttpMonitorFields(emptyFields)).toBe(false);
@@ -336,7 +544,15 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
     });
 
     describe("Base Fields Consistency", () => {
-        it("should ensure all monitor types include base fields", () => {
+        it("should ensure all monitor types include base fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpFields = getDefaultMonitorFields("http");
             const pingFields = getDefaultMonitorFields("ping");
             const portFields = getDefaultMonitorFields("port");

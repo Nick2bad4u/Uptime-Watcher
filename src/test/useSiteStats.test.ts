@@ -11,7 +11,15 @@ import { StatusHistory } from "@shared/types";
 
 describe("useSiteStats", () => {
     describe("Basic Functionality", () => {
-        it("should return zero stats for empty history", () => {
+        it("should return zero stats for empty history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSiteStats([]));
 
             expect(result.current.uptime).toBe(0);
@@ -19,7 +27,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(0);
         });
 
-        it("should calculate stats for single record", () => {
+        it("should calculate stats for single record", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -37,7 +53,15 @@ describe("useSiteStats", () => {
     });
 
     describe("Uptime Calculation", () => {
-        it("should calculate 100% uptime for all up records", () => {
+        it("should calculate 100% uptime for all up records", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -62,7 +86,15 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(3);
         });
 
-        it("should calculate 0% uptime for all down records", () => {
+        it("should calculate 0% uptime for all down records", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 0,
@@ -82,7 +114,15 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(2);
         });
 
-        it("should calculate 50% uptime for mixed records", () => {
+        it("should calculate 50% uptime for mixed records", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -102,7 +142,15 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(2);
         });
 
-        it("should round uptime to nearest integer", () => {
+        it("should round uptime to nearest integer", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // 2 up out of 3 total = 66.666... -> 67
             const history: StatusHistory[] = [
                 {
@@ -128,7 +176,15 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(3);
         });
 
-        it("should handle 1 up out of 3 total = 33%", () => {
+        it("should handle 1 up out of 3 total = 33%", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -155,7 +211,15 @@ describe("useSiteStats", () => {
     });
 
     describe("Response Time Calculation", () => {
-        it("should calculate average response time", () => {
+        it("should calculate average response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -179,7 +243,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(200); // (200+300+100)/3 = 200
         });
 
-        it("should ignore zero response times from down status", () => {
+        it("should ignore zero response times from down status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -203,7 +275,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(250); // (200+300)/2 = 250
         });
 
-        it("should handle all zero response times", () => {
+        it("should handle all zero response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 0,
@@ -222,7 +302,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(0);
         });
 
-        it("should round average response time", () => {
+        it("should round average response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 100,
@@ -246,7 +334,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(167); // (100+200+200)/3 = 166.666... -> 167
         });
 
-        it("should handle undefined response times", () => {
+        it("should handle undefined response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -270,7 +366,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(250); // (200+300)/2 = 250
         });
 
-        it("should handle non-numeric response times", () => {
+        it("should handle non-numeric response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -296,7 +400,15 @@ describe("useSiteStats", () => {
     });
 
     describe("Check Count", () => {
-        it("should count all history records", () => {
+        it("should count all history records", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -330,7 +442,15 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(5);
         });
 
-        it("should handle single record", () => {
+        it("should handle single record", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -346,7 +466,15 @@ describe("useSiteStats", () => {
     });
 
     describe("Memoization", () => {
-        it("should not recalculate when history reference is the same", () => {
+        it("should not recalculate when history reference is the same", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -376,7 +504,15 @@ describe("useSiteStats", () => {
             expect(result.current).toBe(firstResult);
         });
 
-        it("should recalculate when history changes", () => {
+        it("should recalculate when history changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history1: StatusHistory[] = [
                 {
                     responseTime: 200,
@@ -417,7 +553,15 @@ describe("useSiteStats", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle very large numbers", () => {
+        it("should handle very large numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = Array.from(
                 { length: 1000 },
                 (_, i) => ({
@@ -434,7 +578,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(200); // Only counting up records
         });
 
-        it("should handle decimal response times", () => {
+        it("should handle decimal response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 200.5,
@@ -453,7 +605,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(250); // (200.5+299.7)/2 = 250.1 -> 250
         });
 
-        it("should handle very small response times", () => {
+        it("should handle very small response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history: StatusHistory[] = [
                 {
                     responseTime: 0.1,
@@ -472,7 +632,15 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(1); // (0.1+0.9)/2 = 0.5 -> 1
         });
 
-        it("should handle edge case that could trigger responseTime fallback (line 47)", () => {
+        it("should handle edge case that could trigger responseTime fallback (line 47)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test a scenario where the || 0 fallback might be needed
             // Even though this is defensive code, we'll document its presence
             const history: StatusHistory[] = [

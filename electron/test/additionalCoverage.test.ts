@@ -38,7 +38,15 @@ describe("Additional Coverage Tests", () => {
         vi.clearAllMocks();
     });
     describe("Constants Coverage", () => {
-        it("should import constants correctly", async () => {
+        it("should import constants correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Import Operation", "type");
+
             const constants = await import("../constants");
 
             expect(constants.DEFAULT_REQUEST_TIMEOUT).toBeDefined();
@@ -47,7 +55,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Types Coverage", () => {
-        it("should validate type exports", async () => {
+        it("should validate type exports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const types = await import("../../shared/types");
 
             // Check if types module exists and can be imported
@@ -55,7 +71,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Utilities Coverage", () => {
-        it("should validate utility exports", async () => {
+        it("should validate utility exports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const correlation = await import("../utils/correlation");
             const logger = await import("../utils/logger");
 
@@ -64,7 +88,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Environment Coverage", () => {
-        it("should handle different environment configurations", () => {
+        it("should handle different environment configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalEnv = process.env["NODE_ENV"];
 
             // Test development environment
@@ -80,7 +112,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Mock Coverage", () => {
-        it("should verify all mocks are working correctly", async () => {
+        it("should verify all mocks are working correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { logger } = await import("../utils/logger");
 
             logger.info("test");
@@ -95,14 +135,30 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("File System Coverage", () => {
-        it("should handle file system operations", () => {
+        it("should handle file system operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test basic file system functionality
             expect(fs).toBeDefined();
             expect(path).toBeDefined();
         });
     });
     describe("Runtime Coverage", () => {
-        it("should handle runtime type checking", () => {
+        it("should handle runtime type checking", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testObject = {
                 id: 1,
                 name: "test",
@@ -117,7 +173,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Edge Cases Coverage", () => {
-        it("should handle various edge cases", () => {
+        it("should handle various edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test null and undefined handling
             expect(null).toBeNull();
             expect(undefined).toBeUndefined();
@@ -136,7 +200,15 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Async Coverage", () => {
-        it("should handle async operations", async () => {
+        it("should handle async operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additionalCoverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncFunction = async () =>
                 new Promise((resolve) => {
                     setTimeout(() => resolve("success"), 1);

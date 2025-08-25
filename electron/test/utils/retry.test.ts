@@ -82,7 +82,15 @@ describe("withRetry", () => {
             process.on("rejectionHandled", handler);
         });
     });
-    it("should return result immediately on successful operation", async () => {
+    it("should return result immediately on successful operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const operation = vi.fn().mockResolvedValue("success");
 
         const result = await withRetry(operation);
@@ -91,7 +99,15 @@ describe("withRetry", () => {
         expect(operation).toHaveBeenCalledTimes(1);
         expect(dbLogger.error).not.toHaveBeenCalled();
     });
-    it("should retry operation when it fails and eventually succeed", async () => {
+    it("should retry operation when it fails and eventually succeed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const operation = vi
             .fn()
             .mockRejectedValueOnce(new Error("First failure"))
@@ -109,7 +125,15 @@ describe("withRetry", () => {
         expect(operation).toHaveBeenCalledTimes(3);
         expect(dbLogger.error).toHaveBeenCalledTimes(2);
     });
-    it("should fail after max retries are exhausted", async () => {
+    it("should fail after max retries are exhausted", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const error = new Error("Persistent failure");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -122,7 +146,15 @@ describe("withRetry", () => {
         expect(operation).toHaveBeenCalledTimes(3);
         expect(dbLogger.error).toHaveBeenCalledTimes(4); // 3 attempts + 1 final failure
     });
-    it("should use custom delay between retries", async () => {
+    it("should use custom delay between retries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const operation = vi
             .fn()
             .mockRejectedValueOnce(new Error("Failure"))
@@ -140,7 +172,15 @@ describe("withRetry", () => {
         expect(result).toBe("success");
         expect(operation).toHaveBeenCalledTimes(2);
     });
-    it("should use custom maxRetries value", async () => {
+    it("should use custom maxRetries value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const error = new Error("Always fails");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -151,7 +191,15 @@ describe("withRetry", () => {
         await expect(promise).rejects.toThrow("Always fails");
         expect(operation).toHaveBeenCalledTimes(2);
     });
-    it("should call custom onError callback when provided", async () => {
+    it("should call custom onError callback when provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const onError = vi.fn();
         const error = new Error("Custom error");
         const operation = vi
@@ -168,7 +216,15 @@ describe("withRetry", () => {
         expect(onError).toHaveBeenCalledWith(error, 1);
         expect(dbLogger.error).not.toHaveBeenCalled(); // Should not log when custom onError is provided
     });
-    it("should use custom operation name in logs", async () => {
+    it("should use custom operation name in logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const error = new Error("Test error");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -190,7 +246,15 @@ describe("withRetry", () => {
             error
         );
     });
-    it("should use default values when no options provided", async () => {
+    it("should use default values when no options provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const error = new Error("Default test");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -208,7 +272,15 @@ describe("withRetry", () => {
             error
         );
     });
-    it("should handle async operations that throw non-Error objects", async () => {
+    it("should handle async operations that throw non-Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const stringError = "String error";
         const operation = vi.fn().mockRejectedValue(stringError);
 
@@ -222,7 +294,15 @@ describe("withRetry", () => {
             stringError
         );
     });
-    it("should not delay after the last failed attempt", async () => {
+    it("should not delay after the last failed attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const error = new Error("Final error");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -234,7 +314,15 @@ describe("withRetry", () => {
         await expect(promise).rejects.toThrow("Final error");
         expect(operation).toHaveBeenCalledTimes(2);
     });
-    it("should accumulate all errors and throw the last one", async () => {
+    it("should accumulate all errors and throw the last one", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const firstError = new Error("First error");
         const secondError = new Error("Second error");
         const thirdError = new Error("Third error");
@@ -261,7 +349,15 @@ describe("withDbRetry", () => {
     afterEach(() => {
         vi.useRealTimers();
     });
-    it("should return result immediately on successful operation", async () => {
+    it("should return result immediately on successful operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const operation = vi.fn().mockResolvedValue("database result");
 
         const result = await withDbRetry(operation, "test-operation");
@@ -270,7 +366,15 @@ describe("withDbRetry", () => {
         expect(operation).toHaveBeenCalledTimes(1);
         expect(dbLogger.error).not.toHaveBeenCalled();
     });
-    it("should retry operation when it fails and eventually succeed", async () => {
+    it("should retry operation when it fails and eventually succeed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const operation = vi
             .fn()
             .mockRejectedValueOnce(new Error("DB connection failed"))
@@ -292,7 +396,15 @@ describe("withDbRetry", () => {
             expect.any(Error)
         );
     });
-    it("should fail after max retries are exhausted", async () => {
+    it("should fail after max retries are exhausted", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const error = new Error("Database is down");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -309,7 +421,15 @@ describe("withDbRetry", () => {
         );
     }, 1000);
 
-    it("should use custom maxRetries value", async () => {
+    it("should use custom maxRetries value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const error = new Error("Database locked");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -328,7 +448,15 @@ describe("withDbRetry", () => {
         );
     }, 1000);
 
-    it("should use default maxRetries (5) when not specified", async () => {
+    it("should use default maxRetries (5) when not specified", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const error = new Error("Connection timeout");
         const operation = vi.fn().mockRejectedValue(error);
 
@@ -347,7 +475,15 @@ describe("withDbRetry", () => {
         );
     }, 1000);
 
-    it("should use fixed delay of 300ms", async () => {
+    it("should use fixed delay of 300ms", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: retry", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const operation = vi
             .fn()
             .mockRejectedValueOnce(new Error("Temporary failure"))

@@ -80,7 +80,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Hook Initialization", () => {
-        it("should initialize with correct monitor data", () => {
+        it("should initialize with correct monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.latestSite).toEqual(mockSite);
@@ -93,7 +101,15 @@ describe("useSiteMonitor Hook", () => {
             ]);
         });
 
-        it("should handle site with no monitors", () => {
+        it("should handle site with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emptyMonitorsSite = {
                 ...mockSite,
                 monitors: [],
@@ -115,7 +131,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.isMonitoring).toBe(false);
         });
 
-        it("should use site from store if available", () => {
+        it("should use site from store if available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const updatedSite = {
                 ...mockSite,
                 name: "Updated Site Name",
@@ -132,7 +156,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.latestSite.name).toBe("Updated Site Name");
         });
 
-        it("should fallback to provided site if not found in store", () => {
+        it("should fallback to provided site if not found in store", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),
                 setSelectedMonitorId: vi.fn(),
@@ -146,7 +178,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Monitor State", () => {
-        it("should return correct status from selected monitor", () => {
+        it("should return correct status from selected monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.status).toBe("up");
@@ -154,14 +194,30 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.isMonitoring).toBe(true);
         });
 
-        it("should return correct history from selected monitor", () => {
+        it("should return correct history from selected monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.filteredHistory).toHaveLength(2);
             expect(result.current.filteredHistory[0]?.status).toBe("up");
         });
 
-        it("should handle monitor with no history", () => {
+        it("should handle monitor with no history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-2"),
                 setSelectedMonitorId: vi.fn(),
@@ -175,7 +231,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.isMonitoring).toBe(false);
         });
 
-        it("should handle non-existent monitor selection", () => {
+        it("should handle non-existent monitor selection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "non-existent-monitor"),
                 setSelectedMonitorId: vi.fn(),
@@ -192,7 +256,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Monitor Selection", () => {
-        it("should handle monitor selection change", () => {
+        it("should handle monitor selection change", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockSetSelectedMonitorId = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -217,7 +289,15 @@ describe("useSiteMonitor Hook", () => {
             );
         });
 
-        it("should return all monitor IDs", () => {
+        it("should return all monitor IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.monitorIds).toEqual([
@@ -226,7 +306,15 @@ describe("useSiteMonitor Hook", () => {
             ]);
         });
 
-        it("should fallback to default monitor ID when none selected", () => {
+        it("should fallback to default monitor ID when none selected", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => null),
                 setSelectedMonitorId: vi.fn(),
@@ -241,7 +329,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with undefined status", () => {
+        it("should handle monitor with undefined status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithUndefinedStatus = createMockSite({
                 identifier: "site-1",
                 name: "Test Site",
@@ -268,7 +364,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.status).toBe("pending");
         });
 
-        it("should handle monitor with monitoring undefined", () => {
+        it("should handle monitor with monitoring undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithUndefinedMonitoring = createMockSite({
                 identifier: "site-1",
                 name: "Test Site",
@@ -297,7 +401,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.isMonitoring).toBe(true);
         });
 
-        it("should handle monitor with monitoring explicitly false", () => {
+        it("should handle monitor with monitoring explicitly false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithDisabledMonitoring = createMockSite({
                 identifier: "site-1",
                 name: "Test Site",
@@ -327,7 +439,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Memoization", () => {
-        it("should maintain stable references when data doesn't change", () => {
+        it("should maintain stable references when data doesn't change", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result, rerender } = renderHook(() =>
                 useSiteMonitor(mockSite)
             );
@@ -341,7 +461,15 @@ describe("useSiteMonitor Hook", () => {
             expect(result.current.monitorIds).toBe(firstMonitorIds);
         });
 
-        it("should update references when dependencies change", () => {
+        it("should update references when dependencies change", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result, rerender } = renderHook(
                 ({ site }) => useSiteMonitor(site),
                 { initialProps: { site: mockSite } }
@@ -361,7 +489,15 @@ describe("useSiteMonitor Hook", () => {
     });
 
     describe("Return Interface", () => {
-        it("should return all required properties", () => {
+        it("should return all required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitor", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             // Check that all interface properties are present

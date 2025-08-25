@@ -333,7 +333,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
     });
 
     describe("Singleton Management", () => {
-        it("should create singleton instance with default config", () => {
+        it("should create singleton instance with default config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const container1 = ServiceContainer.getInstance();
             const container2 = ServiceContainer.getInstance();
 
@@ -341,7 +349,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container1).toBeInstanceOf(ServiceContainer);
         });
 
-        it("should create singleton instance with custom config", () => {
+        it("should create singleton instance with custom config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: ServiceContainerConfig = {
                 enableDebugLogging: true,
                 notificationConfig: {
@@ -354,7 +370,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container).toBeInstanceOf(ServiceContainer);
         });
 
-        it("should return same instance after initialization", () => {
+        it("should return same instance after initialization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const container1 = ServiceContainer.getInstance();
             const container2 = ServiceContainer.getInstance({
                 enableDebugLogging: true,
@@ -363,7 +387,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container1).toBe(container2);
         });
 
-        it("should reset for testing", () => {
+        it("should reset for testing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const container1 = ServiceContainer.getInstance();
             ServiceContainer.resetForTesting();
             const container2 = ServiceContainer.getInstance();
@@ -381,7 +413,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             });
         });
 
-        it("should create DatabaseService singleton", () => {
+        it("should create DatabaseService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = container.getDatabaseService();
             const service2 = container.getDatabaseService();
 
@@ -389,7 +429,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service1).toBeDefined();
         });
 
-        it("should create HistoryRepository singleton", () => {
+        it("should create HistoryRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const repo1 = container.getHistoryRepository();
             const repo2 = container.getHistoryRepository();
 
@@ -397,7 +445,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(repo1).toBeDefined();
         });
 
-        it("should create MonitorRepository singleton", () => {
+        it("should create MonitorRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const repo1 = container.getMonitorRepository();
             const repo2 = container.getMonitorRepository();
 
@@ -405,7 +461,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(repo1).toBeDefined();
         });
 
-        it("should create SettingsRepository singleton", () => {
+        it("should create SettingsRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const repo1 = container.getSettingsRepository();
             const repo2 = container.getSettingsRepository();
 
@@ -413,7 +477,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(repo1).toBeDefined();
         });
 
-        it("should create SiteRepository singleton", () => {
+        it("should create SiteRepository singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const repo1 = container.getSiteRepository();
             const repo2 = container.getSiteRepository();
 
@@ -431,7 +503,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             });
         });
 
-        it("should create ConfigurationManager singleton", () => {
+        it("should create ConfigurationManager singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const manager1 = container.getConfigurationManager();
             const manager2 = container.getConfigurationManager();
 
@@ -439,7 +519,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(manager1).toBeDefined();
         });
 
-        it("should create DatabaseManager singleton with dependencies", () => {
+        it("should create DatabaseManager singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const manager1 = container.getDatabaseManager();
             const manager2 = container.getDatabaseManager();
 
@@ -447,7 +535,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(manager1).toBeDefined();
         });
 
-        it("should create SiteService singleton", () => {
+        it("should create SiteService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = container.getSiteService();
             const service2 = container.getSiteService();
 
@@ -455,7 +551,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service1).toBeDefined();
         });
 
-        it("should create UptimeOrchestrator singleton with dependencies", () => {
+        it("should create UptimeOrchestrator singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
 
@@ -476,7 +580,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             });
         });
 
-        it("should create NotificationService singleton", () => {
+        it("should create NotificationService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = container.getNotificationService();
             const service2 = container.getNotificationService();
 
@@ -484,7 +596,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service1).toBeDefined();
         });
 
-        it("should create NotificationService with custom config", () => {
+        it("should create NotificationService with custom config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: ServiceContainerConfig = {
                 notificationConfig: {
                     showDownAlerts: false,
@@ -498,7 +618,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service).toBeDefined();
         });
 
-        it("should create IpcService singleton with dependencies", () => {
+        it("should create IpcService singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
 
@@ -509,7 +637,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service1).toBeDefined();
         });
 
-        it("should create AutoUpdaterService singleton", () => {
+        it("should create AutoUpdaterService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = container.getAutoUpdaterService();
             const service2 = container.getAutoUpdaterService();
 
@@ -517,7 +653,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(service1).toBeDefined();
         });
 
-        it("should create WindowService singleton", () => {
+        it("should create WindowService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const service1 = container.getWindowService();
             const service2 = container.getWindowService();
 
@@ -535,7 +679,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             });
         });
 
-        it("should create SiteManager singleton with all dependencies", () => {
+        it("should create SiteManager singleton with all dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const manager1 = container.getSiteManager();
             const manager2 = container.getSiteManager();
 
@@ -543,7 +695,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(manager1).toBeDefined();
         });
 
-        it("should create MonitorManager singleton with complex dependencies", () => {
+        it("should create MonitorManager singleton with complex dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Create SiteManager first to avoid dependency error
             container.getSiteManager();
 
@@ -554,7 +714,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(manager1).toBeDefined();
         });
 
-        it("should handle MonitorManager creation without throwing when SiteManager auto-initialized", () => {
+        it("should handle MonitorManager creation without throwing when SiteManager auto-initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // MonitorManager creation automatically calls getSiteManager() first
             // so there should be no dependency error in normal usage
             expect(() => {
@@ -588,7 +756,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             ).mockReturnValue();
         });
 
-        it("should initialize all services in correct order", async () => {
+        it("should initialize all services in correct order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             await container.initialize();
 
             // Verify initialization order and methods were called
@@ -604,7 +780,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container.getIpcService().setupHandlers).toHaveBeenCalled();
         });
 
-        it("should handle initialization with all services created", async () => {
+        it("should handle initialization with all services created", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             // Pre-create all services
             container.getAutoUpdaterService();
             container.getConfigurationManager();
@@ -638,7 +822,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container = ServiceContainer.getInstance();
         });
 
-        it("should return correct initialization status for uninitialized services", () => {
+        it("should return correct initialization status for uninitialized services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const status = container.getInitializationStatus();
 
             expect(status).toEqual({
@@ -660,7 +852,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return correct initialization status for initialized services", () => {
+        it("should return correct initialization status for initialized services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Initialize some services
             container.getDatabaseService();
             container.getConfigurationManager();
@@ -675,13 +875,29 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(status["UptimeOrchestrator"]).toBe(false);
         });
 
-        it("should return empty array for getInitializedServices when no services initialized", () => {
+        it("should return empty array for getInitializedServices when no services initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const services = container.getInitializedServices();
 
             expect(services).toEqual([]);
         });
 
-        it("should return correct initialized services", () => {
+        it("should return correct initialized services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Initialize some services
             const databaseService = container.getDatabaseService();
             const configManager = container.getConfigurationManager();
@@ -697,7 +913,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle all services initialized in getInitializedServices", () => {
+        it("should handle all services initialized in getInitializedServices", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Initialize all services
             container.getAutoUpdaterService();
             container.getConfigurationManager();
@@ -734,7 +958,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             };
         });
 
-        it("should set up event forwarding for SiteManager", () => {
+        it("should set up event forwarding for SiteManager", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             // Create SiteManager which should trigger event forwarding setup
             const siteManager = container.getSiteManager();
 
@@ -742,7 +974,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(siteManager).toBeDefined();
         });
 
-        it("should set up event forwarding for MonitorManager", () => {
+        it("should set up event forwarding for MonitorManager", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Create SiteManager first, then MonitorManager
             container.getSiteManager();
             const monitorManager = container.getMonitorManager();
@@ -751,14 +991,30 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(monitorManager).toBeDefined();
         });
 
-        it("should set up event forwarding for DatabaseManager", () => {
+        it("should set up event forwarding for DatabaseManager", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const databaseManager = container.getDatabaseManager();
 
             // Verify DatabaseManager was created successfully
             expect(databaseManager).toBeDefined();
         });
 
-        it("should handle event forwarding when main orchestrator is available", async () => {
+        it("should handle event forwarding when main orchestrator is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             // Mock getMainOrchestrator to return the mock orchestrator
             const privateContainer = container as any;
             privateContainer.uptimeOrchestrator = mockMainOrchestrator;
@@ -771,7 +1027,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(mockMainOrchestrator.emitTyped).toBeDefined();
         });
 
-        it("should handle event forwarding error gracefully", async () => {
+        it("should handle event forwarding error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock getMainOrchestrator to return orchestrator that throws error
             mockMainOrchestrator.emitTyped.mockRejectedValue(
                 new Error("Forwarding error")
@@ -785,7 +1049,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(siteManager).toBeDefined();
         });
 
-        it("should not forward events when main orchestrator is not initialized", async () => {
+        it("should not forward events when main orchestrator is not initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const siteManager = container.getSiteManager();
 
             // Verify SiteManager works without main orchestrator
@@ -819,7 +1091,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             ).mockResolvedValue(true);
         });
 
-        it("should handle setHistoryLimit operation successfully", async () => {
+        it("should handle setHistoryLimit operation successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             // Test that the container can access monitoring operations through SiteManager
             const databaseManager = container.getDatabaseManager();
 
@@ -832,7 +1112,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(databaseManager.setHistoryLimit).toHaveBeenCalledWith(1000);
         });
 
-        it("should handle setHistoryLimit operation error", async () => {
+        it("should handle setHistoryLimit operation error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const databaseManager = container.getDatabaseManager();
             vi.mocked(databaseManager.setHistoryLimit).mockRejectedValue(
                 new Error("Database error")
@@ -843,7 +1131,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle setupNewMonitors operation", async () => {
+        it("should handle setupNewMonitors operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorManager = container.getMonitorManager();
 
             const testSite: Site = {
@@ -867,7 +1163,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle startMonitoringForSite operation", async () => {
+        it("should handle startMonitoringForSite operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorManager = container.getMonitorManager();
 
             // Mock the method to return true
@@ -887,7 +1191,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle stopMonitoringForSite operation", async () => {
+        it("should handle stopMonitoringForSite operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorManager = container.getMonitorManager();
 
             // Mock the method to return true
@@ -909,7 +1221,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
     });
 
     describe("Debug Logging", () => {
-        it("should log debug messages when debug logging is enabled", () => {
+        it("should log debug messages when debug logging is enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const container = ServiceContainer.getInstance({
                 enableDebugLogging: true,
             });
@@ -922,7 +1242,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container).toBeDefined();
         });
 
-        it("should not log debug messages when debug logging is disabled", () => {
+        it("should not log debug messages when debug logging is disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const container = ServiceContainer.getInstance({
                 enableDebugLogging: false,
             });
@@ -935,7 +1263,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container).toBeDefined();
         });
 
-        it("should handle debug logging in event forwarding", () => {
+        it("should handle debug logging in event forwarding", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const container = ServiceContainer.getInstance({
                 enableDebugLogging: true,
             });
@@ -954,21 +1290,45 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container = ServiceContainer.getInstance();
         });
 
-        it("should handle empty configuration", () => {
+        it("should handle empty configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyContainer = ServiceContainer.getInstance({});
 
             expect(emptyContainer).toBeInstanceOf(ServiceContainer);
             expect(emptyContainer.getDatabaseService()).toBeDefined();
         });
 
-        it("should handle undefined configuration", () => {
+        it("should handle undefined configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const undefinedContainer = ServiceContainer.getInstance(undefined);
 
             expect(undefinedContainer).toBeInstanceOf(ServiceContainer);
             expect(undefinedContainer.getDatabaseService()).toBeDefined();
         });
 
-        it("should handle service creation with all optional configs", () => {
+        it("should handle service creation with all optional configs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const fullConfigContainer = ServiceContainer.getInstance({
                 enableDebugLogging: true,
                 notificationConfig: {
@@ -981,14 +1341,30 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(fullConfigContainer.getAutoUpdaterService()).toBeDefined();
         });
 
-        it("should handle getMainOrchestrator when orchestrator is not initialized", () => {
+        it("should handle getMainOrchestrator when orchestrator is not initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const privateContainer = container as any;
             const result = privateContainer.getMainOrchestrator();
 
             expect(result).toBeNull();
         });
 
-        it("should handle getMainOrchestrator when orchestrator is initialized", () => {
+        it("should handle getMainOrchestrator when orchestrator is initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
 
@@ -999,7 +1375,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(result).toBe(orchestrator);
         });
 
-        it("should handle multiple initialization calls", async () => {
+        it("should handle multiple initialization calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Create SiteManager first to avoid dependency issues
             container.getSiteManager();
 
@@ -1022,7 +1406,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             ).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle service creation order independence", () => {
+        it("should handle service creation order independence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create services in random order
             const windowService = container.getWindowService();
             const autoUpdater = container.getAutoUpdaterService();

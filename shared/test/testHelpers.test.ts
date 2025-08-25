@@ -17,7 +17,15 @@ import {
 
 describe("testHelpers", () => {
     describe("createValidMonitor", () => {
-        it("should create a valid monitor with default values", () => {
+        it("should create a valid monitor with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor = createValidMonitor();
 
             expect(monitor.id).toBeDefined();
@@ -37,7 +45,15 @@ describe("testHelpers", () => {
             expect(monitor.lastChecked).toBeInstanceOf(Date);
         });
 
-        it("should generate unique IDs for multiple monitors", () => {
+        it("should generate unique IDs for multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor1 = createValidMonitor();
             const monitor2 = createValidMonitor();
 
@@ -46,7 +62,15 @@ describe("testHelpers", () => {
             expect(monitor2.id).toMatch(/^test-monitor-[\da-z]{9}$/);
         });
 
-        it("should override properties correctly", () => {
+        it("should override properties correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customMonitor = createValidMonitor({
                 host: "custom.example.com",
                 status: "down",
@@ -60,7 +84,15 @@ describe("testHelpers", () => {
             expect(customMonitor.monitoring).toBe(false);
         });
 
-        it("should handle all monitor statuses", () => {
+        it("should handle all monitor statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             for (const status of [
                 "up",
                 "down",
@@ -72,7 +104,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle all monitor types", () => {
+        it("should handle all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             for (const type of [
                 "http",
                 "port",
@@ -83,7 +123,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle optional properties", () => {
+        it("should handle optional properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = createValidMonitor();
 
             // Test with a monitor where optional properties are explicitly omitted
@@ -98,7 +146,15 @@ describe("testHelpers", () => {
             expect(minimalMonitor.url).toBe("https://minimal.example.com");
         });
 
-        it("should handle complex overrides", () => {
+        it("should handle complex overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customHistory = [
                 {
                     timestamp: Date.now(),
@@ -128,7 +184,15 @@ describe("testHelpers", () => {
     });
 
     describe("createValidStatusHistory", () => {
-        it("should create a valid status history with default values", () => {
+        it("should create a valid status history with default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const statusHistory = createValidStatusHistory();
 
             expect(statusHistory.timestamp).toBeDefined();
@@ -138,14 +202,30 @@ describe("testHelpers", () => {
             expect(statusHistory.details).toBeUndefined();
         });
 
-        it("should generate different timestamps for multiple calls", () => {
+        it("should generate different timestamps for multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const history1 = createValidStatusHistory();
             const history2 = createValidStatusHistory();
 
             expect(history1.timestamp).toBeLessThanOrEqual(history2.timestamp);
         });
 
-        it("should override properties correctly", () => {
+        it("should override properties correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customHistory = createValidStatusHistory({
                 status: "down",
                 responseTime: 500,
@@ -159,14 +239,30 @@ describe("testHelpers", () => {
             expect(customHistory.details).toBe("Custom error");
         });
 
-        it("should handle all valid status values", () => {
+        it("should handle all valid status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             for (const status of ["up", "down"] as const) {
                 const statusHistory = createValidStatusHistory({ status });
                 expect(statusHistory.status).toBe(status);
             }
         });
 
-        it("should handle boundary values", () => {
+        it("should handle boundary values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const statusHistory = createValidStatusHistory({
                 responseTime: -1,
                 timestamp: 0,
@@ -178,7 +274,15 @@ describe("testHelpers", () => {
     });
 
     describe("createValidMonitors", () => {
-        it("should create the specified number of monitors", () => {
+        it("should create the specified number of monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitors = createValidMonitors(3);
 
             expect(monitors).toHaveLength(3);
@@ -188,14 +292,30 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should create an empty array when count is 0", () => {
+        it("should create an empty array when count is 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitors = createValidMonitors(0);
 
             expect(monitors).toEqual([]);
             expect(monitors).toHaveLength(0);
         });
 
-        it("should create monitors with unique IDs", () => {
+        it("should create monitors with unique IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitors = createValidMonitors(5);
             const ids = new Set(monitors.map((m) => m.id));
 
@@ -205,7 +325,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should apply base overrides to all monitors", () => {
+        it("should apply base overrides to all monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = createValidMonitors(3, {
                 type: "ping",
                 status: "down",
@@ -219,7 +347,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle different hosts for each monitor", () => {
+        it("should handle different hosts for each monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = createValidMonitors(3, { type: "port" });
 
             expect(monitors[0]!.url).toBe("https://example-0.com");
@@ -230,7 +366,15 @@ describe("testHelpers", () => {
             expect(monitors[2]!.id).toBe("test-monitor-2");
         });
 
-        it("should combine base overrides with indexed properties", () => {
+        it("should combine base overrides with indexed properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitors = createValidMonitors(2, {
                 type: "port",
                 monitoring: false,
@@ -244,7 +388,15 @@ describe("testHelpers", () => {
             expect(monitors[1]!.url).toBe("https://example-1.com");
         });
 
-        it("should handle indexed URLs properly", () => {
+        it("should handle indexed URLs properly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitors = createValidMonitors(2);
 
             expect(monitors[0]!.url).toBe("https://example-0.com");
@@ -253,7 +405,15 @@ describe("testHelpers", () => {
             expect(monitors[1]!.id).toBe("test-monitor-1");
         });
 
-        it("should handle base overrides that affect all monitors", () => {
+        it("should handle base overrides that affect all monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitors = createValidMonitors(3, {
                 host: "shared-host.com",
                 port: 8080,
@@ -269,12 +429,28 @@ describe("testHelpers", () => {
             expect(monitors[2]!.url).toBe("https://example-2.com");
         });
 
-        it("should handle negative count gracefully", () => {
+        it("should handle negative count gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitors = createValidMonitors(-1);
             expect(monitors).toEqual([]);
         });
 
-        it("should create independent objects", () => {
+        it("should create independent objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitors = createValidMonitors(2);
 
             monitors[0]!.host = "modified.com";
@@ -284,7 +460,15 @@ describe("testHelpers", () => {
             expect(monitors[1]!.host).toBe("example.com");
         });
 
-        it("should handle large numbers efficiently", () => {
+        it("should handle large numbers efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const start = performance.now();
             const monitors = createValidMonitors(1000);
             const end = performance.now();
@@ -299,7 +483,15 @@ describe("testHelpers", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should work together to create complex test scenarios", () => {
+        it("should work together to create complex test scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitors = createValidMonitors(3, { type: "http" });
 
             for (const monitor of monitors) {
@@ -321,7 +513,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle different monitor types", () => {
+        it("should handle different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitors = createValidMonitors(2, { type: "http" });
             const pingMonitors = createValidMonitors(2, { type: "ping" });
             const portMonitors = createValidMonitors(2, { type: "port" });
@@ -339,7 +539,15 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle complex scenarios with various statuses", () => {
+        it("should handle complex scenarios with various statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const allStatuses: MonitorStatus[] = [
                 "up",
                 "down",
@@ -365,7 +573,15 @@ describe("testHelpers", () => {
     });
 
     describe("Performance and Memory", () => {
-        it("should efficiently create large numbers of monitors", () => {
+        it("should efficiently create large numbers of monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const start = performance.now();
             const monitors = createValidMonitors(1000);
             const end = performance.now();
@@ -374,7 +590,15 @@ describe("testHelpers", () => {
             expect(end - start).toBeLessThan(1000); // Should complete within 1 second
         });
 
-        it("should not leak memory with large arrays", () => {
+        it("should not leak memory with large arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create and discard large arrays to test memory handling
             for (let i = 0; i < 10; i++) {
                 const monitors = createValidMonitors(100);

@@ -10,7 +10,15 @@ import * as schemasModule from "../../validation/schemas";
 
 describe("Schemas - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported validation function for complete coverage", () => {
+        it("should call every exported validation function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test validateMonitorData function coverage
             expect(typeof schemasModule.validateMonitorData).toBe("function");
 
@@ -146,7 +154,15 @@ describe("Schemas - Complete Function Coverage", () => {
             expect(true).toBe(true); // Test passes if we reach here without errors
         });
 
-        it("should exercise additional function paths and error conditions", () => {
+        it("should exercise additional function paths and error conditions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Exercise more complex validation scenarios to increase branch coverage
 
             // validateMonitorData with various error conditions
@@ -205,7 +221,15 @@ describe("Schemas - Complete Function Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should call validation functions with all supported monitor types", () => {
+        it("should call validation functions with all supported monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Systematically test each monitor type to ensure all schemas are exercised
             const monitorTypes = [
                 "http",

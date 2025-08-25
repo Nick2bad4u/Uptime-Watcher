@@ -31,10 +31,26 @@ describe("TypedEventBus", () => {
         eventBus = new TypedEventBus<TestEvents>();
     });
     describe("basic functionality", () => {
-        it("should create an instance without error", () => {
+        it("should create an instance without error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(eventBus).toBeInstanceOf(TypedEventBus);
         });
-        it("should emit and listen to events", () => {
+        it("should emit and listen to events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Event Processing", "type");
+
             const listener = vi.fn();
 
             eventBus.on("test-event", listener);
@@ -42,7 +58,15 @@ describe("TypedEventBus", () => {
 
             expect(listener).toHaveBeenCalledWith({ data: "test" });
         });
-        it("should support multiple listeners for the same event", () => {
+        it("should support multiple listeners for the same event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Event Processing", "type");
+
             const listener1 = vi.fn();
             const listener2 = vi.fn();
 
@@ -53,7 +77,15 @@ describe("TypedEventBus", () => {
             expect(listener1).toHaveBeenCalledWith({ data: "test" });
             expect(listener2).toHaveBeenCalledWith({ data: "test" });
         });
-        it("should remove listeners", () => {
+        it("should remove listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const listener = vi.fn();
 
             eventBus.on("test-event", listener);
@@ -62,7 +94,15 @@ describe("TypedEventBus", () => {
 
             expect(listener).not.toHaveBeenCalled();
         });
-        it("should support once listeners", () => {
+        it("should support once listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener = vi.fn();
 
             eventBus.once("test-event", listener);
@@ -72,7 +112,15 @@ describe("TypedEventBus", () => {
             expect(listener).toHaveBeenCalledTimes(1);
             expect(listener).toHaveBeenCalledWith({ data: "test1" });
         });
-        it("should handle different event types", () => {
+        it("should handle different event types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Event Processing", "type");
+
             const testListener = vi.fn();
             const anotherListener = vi.fn();
 
@@ -87,7 +135,15 @@ describe("TypedEventBus", () => {
         });
     });
     describe("error handling", () => {
-        it("should propagate listener errors correctly", () => {
+        it("should propagate listener errors correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorListener = vi.fn(() => {
                 throw new Error("Listener error");
             });
@@ -104,7 +160,15 @@ describe("TypedEventBus", () => {
             expect(errorListener).toHaveBeenCalled();
             // Normal listener won't be called if error listener throws first
         });
-        it("should handle multiple listeners with error in first one", () => {
+        it("should handle multiple listeners with error in first one", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorListener = vi.fn(() => {
                 throw new Error("First listener error");
             });
@@ -119,7 +183,15 @@ describe("TypedEventBus", () => {
 
             expect(errorListener).toHaveBeenCalled();
         });
-        it("should handle errors in async emitTyped", async () => {
+        it("should handle errors in async emitTyped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorListener = vi.fn(() => {
                 throw new Error("Async listener error");
             });
@@ -134,7 +206,15 @@ describe("TypedEventBus", () => {
         });
     });
     describe("event introspection", () => {
-        it("should provide listener count", () => {
+        it("should provide listener count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener1 = vi.fn();
             const listener2 = vi.fn();
 
@@ -143,7 +223,15 @@ describe("TypedEventBus", () => {
 
             expect(eventBus.listenerCount("test-event")).toBe(2);
         });
-        it("should provide event names", () => {
+        it("should provide event names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Event Processing", "type");
+
             eventBus.on("test-event", vi.fn());
             eventBus.on("another-event", vi.fn());
 
@@ -151,23 +239,55 @@ describe("TypedEventBus", () => {
             expect(eventNames).toContain("test-event");
             expect(eventNames).toContain("another-event");
         });
-        it("should provide max listeners setting", () => {
+        it("should provide max listeners setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const maxListeners = eventBus.getMaxListeners();
             expect(typeof maxListeners).toBe("number");
             expect(maxListeners).toBeGreaterThan(0);
         });
-        it("should allow setting max listeners", () => {
+        it("should allow setting max listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             eventBus.setMaxListeners(20);
             expect(eventBus.getMaxListeners()).toBe(20);
         });
     });
     describe("edge cases", () => {
-        it("should handle emitting events with no listeners", () => {
+        it("should handle emitting events with no listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Event Processing", "type");
+
             expect(() => {
                 eventBus.emit("test-event", { data: "test" });
             }).not.toThrow();
         });
-        it("should handle removing non-existent listeners", () => {
+        it("should handle removing non-existent listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener = vi.fn();
             expect(() => {
                 eventBus.off("test-event", listener);
@@ -175,7 +295,15 @@ describe("TypedEventBus", () => {
         });
     });
     describe("cleanup", () => {
-        it("should remove all listeners", () => {
+        it("should remove all listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const listener1 = vi.fn();
             const listener2 = vi.fn();
 
@@ -190,7 +318,15 @@ describe("TypedEventBus", () => {
             expect(listener1).not.toHaveBeenCalled();
             expect(listener2).not.toHaveBeenCalled();
         });
-        it("should remove listeners for specific event", () => {
+        it("should remove listeners for specific event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const listener1 = vi.fn();
             const listener2 = vi.fn();
 
@@ -207,7 +343,15 @@ describe("TypedEventBus", () => {
         });
     });
     describe("typed methods", () => {
-        it("should support typed emit and on methods", async () => {
+        it("should support typed emit and on methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener = vi.fn();
 
             eventBus.onTyped("test-event", listener);
@@ -225,7 +369,15 @@ describe("TypedEventBus", () => {
                 })
             );
         });
-        it("should support typed once method", async () => {
+        it("should support typed once method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener = vi.fn();
 
             eventBus.onceTyped("test-event", listener);
@@ -240,7 +392,15 @@ describe("TypedEventBus", () => {
                 })
             );
         });
-        it("should support typed off method", async () => {
+        it("should support typed off method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: TypedEventBus", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const listener = vi.fn();
 
             eventBus.onTyped("test-event", listener);

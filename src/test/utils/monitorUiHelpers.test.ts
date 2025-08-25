@@ -78,7 +78,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("allSupportsAdvancedAnalytics", () => {
-        it("should return true when all monitor types support advanced analytics", async () => {
+        it("should return true when all monitor types support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
                 if (type === "http" || type === "port") {
                     return createMockConfig({
@@ -97,7 +105,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when some monitor types don't support advanced analytics", async () => {
+        it("should return false when some monitor types don't support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
                 if (type === "http") {
                     return createMockConfig({
@@ -122,7 +138,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async () => {
+        it("should return true for empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await monitorUiHelpers.allSupportsAdvancedAnalytics(
                 []
             );
@@ -132,7 +156,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("allSupportsResponseTime", () => {
-        it("should return true when all monitor types support response time", async () => {
+        it("should return true when all monitor types support response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
                 if (type === "http" || type === "port") {
                     return createMockConfig({
@@ -151,7 +183,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when some monitor types don't support response time", async () => {
+        it("should return false when some monitor types don't support response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockImplementation(async (type) => {
                 if (type === "http") {
                     return createMockConfig({
@@ -176,7 +216,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async () => {
+        it("should return true for empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await monitorUiHelpers.allSupportsResponseTime([]);
 
             expect(result).toBe(true);
@@ -184,7 +232,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("supportsAdvancedAnalytics", () => {
-        it("should return true when monitor type supports advanced analytics", async () => {
+        it("should return true when monitor type supports advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -198,7 +254,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when monitor type doesn't support advanced analytics", async () => {
+        it("should return false when monitor type doesn't support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -212,7 +276,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config is undefined", async () => {
+        it("should return false when config is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
             const result =
@@ -223,7 +295,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("supportsResponseTime", () => {
-        it("should return true when monitor type supports response time", async () => {
+        it("should return true when monitor type supports response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -236,7 +316,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when monitor type doesn't support response time", async () => {
+        it("should return false when monitor type doesn't support response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -249,7 +337,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config is undefined", async () => {
+        it("should return false when config is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
             const result = await monitorUiHelpers.supportsResponseTime("http");
@@ -259,7 +355,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("shouldShowUrl", () => {
-        it("should return true when monitor type should show URL", async () => {
+        it("should return true when monitor type should show URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -272,7 +376,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when monitor type shouldn't show URL", async () => {
+        it("should return false when monitor type shouldn't show URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(
                 createMockConfig({
                     type: "http",
@@ -285,7 +397,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config is undefined", async () => {
+        it("should return false when config is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
             const result = await monitorUiHelpers.shouldShowUrl("http");
@@ -295,7 +415,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("clearConfigCache", () => {
-        it("should clear the ui helpers cache", () => {
+        it("should clear the ui helpers cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             // Set some data in cache
             AppCaches.uiHelpers.set("test-key", "test-value");
             expect(AppCaches.uiHelpers.has("test-key")).toBe(true);
@@ -309,7 +437,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("getDefaultMonitorId", () => {
-        it("should return first monitor ID from non-empty array", () => {
+        it("should return first monitor ID from non-empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = monitorUiHelpers.getDefaultMonitorId([
                 "monitor-1",
                 "monitor-2",
@@ -319,13 +455,29 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("monitor-1");
         });
 
-        it("should return empty string for empty array", () => {
+        it("should return empty string for empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = monitorUiHelpers.getDefaultMonitorId([]);
 
             expect(result).toBe("");
         });
 
-        it("should handle array with single element", () => {
+        it("should handle array with single element", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = monitorUiHelpers.getDefaultMonitorId([
                 "only-monitor",
             ]);
@@ -335,7 +487,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("Error handling and edge cases", () => {
-        it("should handle errors gracefully in basic functions", async () => {
+        it("should handle errors gracefully in basic functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(getMonitorTypeConfig).mockRejectedValue(
                 new Error("Config fetch failed")
             );
@@ -356,7 +516,15 @@ describe("Monitor UI Helpers", () => {
             );
         });
 
-        it("should handle invalid monitor types", async () => {
+        it("should handle invalid monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidType = "invalid-type" as any; // Cast to test edge case
 
             // Mock to return undefined for invalid types (this is the default, but let's be explicit)
@@ -375,7 +543,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("Caching behavior", () => {
-        it("should cache configuration results", async () => {
+        it("should cache configuration results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const mockConfig = createMockConfig({
                 type: "http",
                 uiConfig: {
@@ -396,7 +572,15 @@ describe("Monitor UI Helpers", () => {
             expect(vi.mocked(getMonitorTypeConfig)).toHaveBeenCalledTimes(1); // Still 1, not 2
         });
 
-        it("should clear cache when clearConfigCache is called", async () => {
+        it("should clear cache when clearConfigCache is called", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const mockConfig = createMockConfig({
                 type: "http",
                 uiConfig: {

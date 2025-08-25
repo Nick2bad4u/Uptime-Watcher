@@ -46,7 +46,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         vi.doUnmock("node:fs/promises");
     });
     describe("createDatabaseBackup - Success scenarios", () => {
-        it("should create database backup with default filename", async () => {
+        it("should create database backup with default filename", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
             const startTime = Date.now();
 
@@ -73,7 +81,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should create database backup with custom filename", async () => {
+        it("should create database backup with custom filename", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const customFileName = "custom-backup.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -94,7 +110,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle empty database file", async () => {
+        it("should handle empty database file", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyBuffer = Buffer.alloc(0);
             mockFs.readFile.mockResolvedValue(emptyBuffer);
 
@@ -112,7 +136,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle large database file", async () => {
+        it("should handle large database file", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const largeBuffer = Buffer.alloc(1024 * 1024 * 10); // 10MB
             largeBuffer.fill(42); // Fill with test data
             mockFs.readFile.mockResolvedValue(largeBuffer);
@@ -131,7 +163,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle special characters in path", async () => {
+        it("should handle special characters in path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const specialPath = "/test/path with spaces/database-файл.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -140,7 +180,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(result.metadata.originalPath).toBe(specialPath);
             expect(mockFs.readFile).toHaveBeenCalledWith(specialPath);
         });
-        it("should preserve buffer content integrity", async () => {
+        it("should preserve buffer content integrity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const binaryData = Buffer.from([
                 0x00,
                 0xff,
@@ -175,7 +223,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             // This scenario would be better tested through integration testing where
             // the module is actually unavailable, but for unit testing we skip this edge case
         });
-        it("should handle file read errors", async () => {
+        it("should handle file read errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const fileError = new Error("ENOENT: no such file or directory");
             fileError.name = "ENOENT";
             mockFs.readFile.mockRejectedValue(fileError);
@@ -194,7 +250,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle permission errors", async () => {
+        it("should handle permission errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const permissionError = new Error("EACCES: permission denied");
             permissionError.name = "EACCES";
             mockFs.readFile.mockRejectedValue(permissionError);
@@ -213,7 +277,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle non-Error exceptions from readFile", async () => {
+        it("should handle non-Error exceptions from readFile", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockFs.readFile.mockRejectedValue("String error");
 
             await expect(createDatabaseBackup(testDbPath)).rejects.toBe(
@@ -230,7 +302,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle file read timeout", async () => {
+        it("should handle file read timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timeoutError = new Error("Operation timed out");
             timeoutError.name = "TIMEOUT";
             mockFs.readFile.mockRejectedValue(timeoutError);
@@ -249,7 +329,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle custom filename with errors", async () => {
+        it("should handle custom filename with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const customFileName = "error-backup.sqlite";
             const error = new Error("File system error");
             mockFs.readFile.mockRejectedValue(error);
@@ -270,7 +358,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         });
     });
     describe("createDatabaseBackup - Edge cases and boundary conditions", () => {
-        it("should handle empty string paths", async () => {
+        it("should handle empty string paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup("");
@@ -278,7 +374,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(mockFs.readFile).toHaveBeenCalledWith("");
             expect(result.metadata.originalPath).toBe("");
         });
-        it("should handle very long file paths", async () => {
+        it("should handle very long file paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const longPath = `/very/long/path/${"x".repeat(1000)}/database.sqlite`;
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -287,7 +391,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(result.metadata.originalPath).toBe(longPath);
             expect(mockFs.readFile).toHaveBeenCalledWith(longPath);
         });
-        it("should handle empty custom filename", async () => {
+        it("should handle empty custom filename", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(testDbPath, "");
@@ -303,7 +415,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle very long custom filename", async () => {
+        it("should handle very long custom filename", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const longFileName = `very-long-filename-${"x".repeat(1000)}.sqlite`;
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -311,7 +431,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
             expect(result.fileName).toBe(longFileName);
         });
-        it("should handle unicode characters in filename", async () => {
+        it("should handle unicode characters in filename", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const unicodeFileName = "backup-файл-数据库-🗃️.sqlite";
             mockFs.readFile.mockResolvedValue(testBuffer);
 
@@ -322,7 +450,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
             expect(result.fileName).toBe(unicodeFileName);
         });
-        it("should ensure timestamp precision", async () => {
+        it("should ensure timestamp precision", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const before = Date.now();
@@ -341,7 +477,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         });
     });
     describe("createDatabaseBackup - Type safety and interface compliance", () => {
-        it("should return correctly typed DatabaseBackupResult", async () => {
+        it("should return correctly typed DatabaseBackupResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Backup Operation", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(testDbPath);
@@ -358,7 +502,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const expectedInterface: DatabaseBackupResult = result;
             expect(expectedInterface).toBeDefined();
         });
-        it("should validate metadata consistency", async () => {
+        it("should validate metadata consistency", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             mockFs.readFile.mockResolvedValue(testBuffer);
 
             const result = await createDatabaseBackup(
@@ -370,7 +522,15 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(result.metadata.originalPath).toBe(testDbPath);
             expect(result.fileName).toBe("test.sqlite");
         });
-        it("should handle buffer edge cases", async () => {
+        it("should handle buffer edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: databaseBackup", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with various buffer types
             const testCases = [
                 Buffer.alloc(0), // Empty

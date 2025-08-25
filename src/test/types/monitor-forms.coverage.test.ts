@@ -6,7 +6,15 @@ import { describe, expect, it } from "vitest";
 
 describe("Monitor Forms Types Coverage Tests", () => {
     describe("BaseMonitorFields Interface", () => {
-        it("should define base monitor fields correctly", () => {
+        it("should define base monitor fields correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const baseFields = {
                 checkInterval: 30_000,
                 name: "Test Monitor",
@@ -20,7 +28,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(typeof baseFields.timeout).toBe("number");
         });
 
-        it("should handle optional base fields", () => {
+        it("should handle optional base fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minimalFields = {};
             const partialFields = {
                 name: "Partial Monitor",
@@ -32,7 +48,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("HttpMonitorFields Interface", () => {
-        it("should extend BaseMonitorFields", () => {
+        it("should extend BaseMonitorFields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpFields = {
                 // Base fields
                 checkInterval: 60_000,
@@ -64,7 +88,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(typeof httpFields.url).toBe("string");
         });
 
-        it("should validate HTTP methods", () => {
+        it("should validate HTTP methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validMethods = [
                 "DELETE",
                 "GET",
@@ -83,7 +115,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should require URL field", () => {
+        it("should require URL field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpFields = {
                 url: "https://required-field.com",
                 method: "GET" as const,
@@ -94,7 +134,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(httpFields.url.length).toBeGreaterThan(0);
         });
 
-        it("should handle headers as key-value pairs", () => {
+        it("should handle headers as key-value pairs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const headers = {
                 Authorization: "Bearer token123",
                 "Content-Type": "application/json",
@@ -109,7 +157,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("MonitorFieldChangeHandlers Interface", () => {
-        it("should define all handler types", () => {
+        it("should define all handler types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handlers = {
                 boolean: (fieldName: string, value: boolean) => {
                     expect(typeof fieldName).toBe("string");
@@ -135,7 +191,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(typeof handlers.string).toBe("function");
         });
 
-        it("should handle boolean field changes", () => {
+        it("should handle boolean field changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const booleanHandler = (fieldName: string, value: boolean) => ({
                 fieldName,
                 value,
@@ -148,7 +212,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("boolean");
         });
 
-        it("should handle number field changes", () => {
+        it("should handle number field changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const numberHandler = (fieldName: string, value: number) => ({
                 fieldName,
                 value,
@@ -161,7 +233,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("number");
         });
 
-        it("should handle string field changes", () => {
+        it("should handle string field changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const stringHandler = (fieldName: string, value: string) => ({
                 fieldName,
                 value,
@@ -174,7 +254,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("string");
         });
 
-        it("should handle object field changes", () => {
+        it("should handle object field changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const objectHandler = (
                 fieldName: string,
                 value: Record<string, unknown>
@@ -189,7 +277,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Type Integration", () => {
-        it("should work with MonitorType from shared types", () => {
+        it("should work with MonitorType from shared types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorTypes = ["http", "port"];
 
             for (const type of monitorTypes) {
@@ -198,7 +294,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should support type-safe field validation", () => {
+        it("should support type-safe field validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validateField = (
                 _fieldName: string,
                 value: unknown,
@@ -219,7 +323,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Field Value Types", () => {
-        it("should handle various number field types", () => {
+        it("should handle various number field types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const numberFields = {
                 checkInterval: 30_000,
                 retryAttempts: 3,
@@ -233,7 +345,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle string field types", () => {
+        it("should handle string field types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const stringFields = {
                 name: "Test Monitor",
                 url: "https://example.com",
@@ -246,7 +366,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle boolean field types", () => {
+        it("should handle boolean field types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const booleanFields = {
                 followRedirects: true,
                 enabled: false,
@@ -259,7 +387,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("should validate required fields", () => {
+        it("should validate required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const requiredFields = ["url"];
             const _optionalFields = [
                 "name",
@@ -279,7 +415,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle field defaults", () => {
+        it("should handle field defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaultValues = {
                 checkInterval: 60_000,
                 timeout: 5000,
@@ -299,12 +443,28 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Header Handling", () => {
-        it("should handle empty headers", () => {
+        it("should handle empty headers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyHeaders = {};
             expect(Object.keys(emptyHeaders)).toHaveLength(0);
         });
 
-        it("should handle multiple headers", () => {
+        it("should handle multiple headers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const multipleHeaders = {
                 Authorization: "Bearer token",
                 "Content-Type": "application/json",
@@ -321,7 +481,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle header case sensitivity", () => {
+        it("should handle header case sensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const headers = {
                 "content-type": "application/json",
                 "Content-Type": "application/xml",
@@ -334,7 +502,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Method Validation", () => {
-        it("should validate all HTTP methods", () => {
+        it("should validate all HTTP methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const httpMethods = [
                 "DELETE",
                 "GET",
@@ -355,7 +531,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should reject invalid HTTP methods", () => {
+        it("should reject invalid HTTP methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidMethods = [
                 "PATCH",
                 "OPTIONS",
@@ -377,7 +561,15 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Field Type Safety", () => {
-        it("should enforce type safety for handlers", () => {
+        it("should enforce type safety for handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitor-forms", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const createHandler =
                 <T>(expectedType: string) =>
                 (fieldName: string, value: T) => ({

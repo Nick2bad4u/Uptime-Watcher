@@ -32,7 +32,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("getEnvironment", () => {
-        it("should return NODE_ENV value when set", async () => {
+        it("should return NODE_ENV value when set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "production" },
@@ -43,7 +51,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvironment()).toBe("production");
         });
 
-        it("should return 'unknown' when NODE_ENV is not set", async () => {
+        it("should return 'unknown' when NODE_ENV is not set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { getEnvironment } = await import("../../utils/environment");
@@ -51,7 +67,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvironment()).toBe("unknown");
         });
 
-        it("should return 'unknown' when process is undefined", async () => {
+        it("should return 'unknown' when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { getEnvironment } = await import("../../utils/environment");
@@ -59,7 +83,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvironment()).toBe("unknown");
         });
 
-        it("should handle all standard NODE_ENV values", async () => {
+        it("should handle all standard NODE_ENV values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getEnvironment } = await import("../../utils/environment");
 
             const environments = [
@@ -79,7 +111,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("getEnvVar", () => {
-        it("should return environment variable value when it exists", async () => {
+        it("should return environment variable value when it exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "test", CODECOV_TOKEN: "test-token" },
@@ -91,7 +131,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvVar("CODECOV_TOKEN")).toBe("test-token");
         });
 
-        it("should return undefined when environment variable doesn't exist", async () => {
+        it("should return undefined when environment variable doesn't exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { getEnvVar } = await import("../../utils/environment");
@@ -100,7 +148,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
         });
 
-        it("should return undefined when process is undefined", async () => {
+        it("should return undefined when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { getEnvVar } = await import("../../utils/environment");
@@ -109,7 +165,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
         });
 
-        it("should handle empty string values", async () => {
+        it("should handle empty string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "" },
@@ -122,7 +186,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("getNodeEnv", () => {
-        it("should return NODE_ENV value when set", async () => {
+        it("should return NODE_ENV value when set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "production" },
@@ -133,7 +205,15 @@ describe("Environment Detection Utilities", () => {
             expect(getNodeEnv()).toBe("production");
         });
 
-        it("should return 'development' when NODE_ENV is not set", async () => {
+        it("should return 'development' when NODE_ENV is not set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { getNodeEnv } = await import("../../utils/environment");
@@ -141,7 +221,15 @@ describe("Environment Detection Utilities", () => {
             expect(getNodeEnv()).toBe("development");
         });
 
-        it("should return 'development' when process is undefined", async () => {
+        it("should return 'development' when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { getNodeEnv } = await import("../../utils/environment");
@@ -149,7 +237,15 @@ describe("Environment Detection Utilities", () => {
             expect(getNodeEnv()).toBe("development");
         });
 
-        it("should handle all standard NODE_ENV values", async () => {
+        it("should handle all standard NODE_ENV values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getNodeEnv } = await import("../../utils/environment");
 
             const environments = [
@@ -182,7 +278,15 @@ describe("Environment Detection Utilities", () => {
             globalThis.document = originalDocument;
         });
 
-        it("should return true when window and document exist", async () => {
+        it("should return true when window and document exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.window = {} as any;
             globalThis.document = {} as any;
 
@@ -193,7 +297,15 @@ describe("Environment Detection Utilities", () => {
             expect(isBrowserEnvironment()).toBe(true);
         });
 
-        it("should return false when window is undefined", async () => {
+        it("should return false when window is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.window = undefined as any;
             globalThis.document = {} as any;
 
@@ -204,7 +316,15 @@ describe("Environment Detection Utilities", () => {
             expect(isBrowserEnvironment()).toBe(false);
         });
 
-        it("should return false when document is undefined", async () => {
+        it("should return false when document is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.window = {} as any;
             globalThis.document = undefined as any;
 
@@ -215,7 +335,15 @@ describe("Environment Detection Utilities", () => {
             expect(isBrowserEnvironment()).toBe(false);
         });
 
-        it("should return false when both window and document are undefined", async () => {
+        it("should return false when both window and document are undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.window = undefined as any;
             globalThis.document = undefined as any;
 
@@ -228,7 +356,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isDevelopment", () => {
-        it("should return true when NODE_ENV is 'development'", async () => {
+        it("should return true when NODE_ENV is 'development'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "development" },
@@ -239,7 +375,15 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(true);
         });
 
-        it("should return false when NODE_ENV is 'production'", async () => {
+        it("should return false when NODE_ENV is 'production'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "production" },
@@ -250,7 +394,15 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is 'test'", async () => {
+        it("should return false when NODE_ENV is 'test'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "test" },
@@ -261,7 +413,15 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is not set", async () => {
+        it("should return false when NODE_ENV is not set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { isDevelopment } = await import("../../utils/environment");
@@ -269,7 +429,15 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(false);
         });
 
-        it("should return false when process is undefined", async () => {
+        it("should return false when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { isDevelopment } = await import("../../utils/environment");
@@ -277,7 +445,15 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(false);
         });
 
-        it("should be case sensitive", async () => {
+        it("should be case sensitive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "Development" },
@@ -290,7 +466,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isNodeEnvironment", () => {
-        it("should return true when process and process.versions.node exist", async () => {
+        it("should return true when process and process.versions.node exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 versions: { node: "18.0.0" },
@@ -303,7 +487,15 @@ describe("Environment Detection Utilities", () => {
             expect(isNodeEnvironment()).toBe(true);
         });
 
-        it("should return false when process is undefined", async () => {
+        it("should return false when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { isNodeEnvironment } = await import(
@@ -313,7 +505,15 @@ describe("Environment Detection Utilities", () => {
             expect(isNodeEnvironment()).toBe(false);
         });
 
-        it("should return false when process.versions is undefined", async () => {
+        it("should return false when process.versions is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 versions: undefined as any,
@@ -326,7 +526,15 @@ describe("Environment Detection Utilities", () => {
             expect(isNodeEnvironment()).toBe(false);
         });
 
-        it("should return false when process.versions is not an object", async () => {
+        it("should return false when process.versions is not an object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 versions: "not-an-object" as any,
@@ -339,7 +547,15 @@ describe("Environment Detection Utilities", () => {
             expect(isNodeEnvironment()).toBe(false);
         });
 
-        it("should return false when process.versions.node is undefined", async () => {
+        it("should return false when process.versions.node is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, versions: {} as any } as any;
 
             const { isNodeEnvironment } = await import(
@@ -349,7 +565,15 @@ describe("Environment Detection Utilities", () => {
             expect(isNodeEnvironment()).toBe(false);
         });
 
-        it("should return false when process.versions.node is empty string", async () => {
+        it("should return false when process.versions.node is empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 versions: { node: "" } as any,
@@ -364,7 +588,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isProduction", () => {
-        it("should return true when NODE_ENV is 'production'", async () => {
+        it("should return true when NODE_ENV is 'production'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "production" },
@@ -375,7 +607,15 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(true);
         });
 
-        it("should return false when NODE_ENV is 'development'", async () => {
+        it("should return false when NODE_ENV is 'development'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "development" },
@@ -386,7 +626,15 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is 'test'", async () => {
+        it("should return false when NODE_ENV is 'test'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "test" },
@@ -397,7 +645,15 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is not set", async () => {
+        it("should return false when NODE_ENV is not set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { isProduction } = await import("../../utils/environment");
@@ -405,7 +661,15 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(false);
         });
 
-        it("should return false when process is undefined", async () => {
+        it("should return false when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { isProduction } = await import("../../utils/environment");
@@ -413,7 +677,15 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(false);
         });
 
-        it("should be case sensitive", async () => {
+        it("should be case sensitive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "Production" },
@@ -426,7 +698,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isTest", () => {
-        it("should return true when NODE_ENV is 'test'", async () => {
+        it("should return true when NODE_ENV is 'test'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "test" },
@@ -437,7 +717,15 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(true);
         });
 
-        it("should return false when NODE_ENV is 'development'", async () => {
+        it("should return false when NODE_ENV is 'development'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "development" },
@@ -448,7 +736,15 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is 'production'", async () => {
+        it("should return false when NODE_ENV is 'production'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "production" },
@@ -459,7 +755,15 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(false);
         });
 
-        it("should return false when NODE_ENV is not set", async () => {
+        it("should return false when NODE_ENV is not set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = { ...mockProcess, env: {} } as any;
 
             const { isTest } = await import("../../utils/environment");
@@ -467,7 +771,15 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(false);
         });
 
-        it("should return false when process is undefined", async () => {
+        it("should return false when process is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const { isTest } = await import("../../utils/environment");
@@ -475,7 +787,15 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(false);
         });
 
-        it("should be case sensitive", async () => {
+        it("should be case sensitive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "Test" },
@@ -488,7 +808,15 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("Edge cases and integration", () => {
-        it("should handle multiple environment checks consistently", async () => {
+        it("should handle multiple environment checks consistently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = {
                 ...mockProcess,
                 env: { NODE_ENV: "development" },
@@ -509,7 +837,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvironment()).toBe("development");
         });
 
-        it("should handle undefined process consistently across all functions", async () => {
+        it("should handle undefined process consistently across all functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.process = undefined as any;
 
             const {
@@ -531,7 +867,15 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
         });
 
-        it("should handle different falsy values for environment variables", async () => {
+        it("should handle different falsy values for environment variables", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getEnvVar } = await import("../../utils/environment");
 
             const falsyValues = [

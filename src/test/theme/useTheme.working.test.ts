@@ -33,7 +33,15 @@ beforeEach(() => {
 
 describe("useTheme Hooks - Working Tests", () => {
     describe("useAvailabilityColors", () => {
-        it("should return availability color functions", () => {
+        it("should return availability color functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(result.current).toHaveProperty("getAvailabilityColor");
@@ -48,7 +56,15 @@ describe("useTheme Hooks - Working Tests", () => {
             );
         });
 
-        it("should return correct colors for different percentages", () => {
+        it("should return correct colors for different percentages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Test various percentages
@@ -93,7 +109,15 @@ describe("useTheme Hooks - Working Tests", () => {
     });
 
     describe("useStatusColors", () => {
-        it("should return status colors from current theme", () => {
+        it("should return status colors from current theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useStatusColors());
 
             expect(result.current).toHaveProperty("down");
@@ -108,7 +132,15 @@ describe("useTheme Hooks - Working Tests", () => {
     });
 
     describe("useThemeClasses", () => {
-        it("should return CSS class generation functions", () => {
+        it("should return CSS class generation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current).toHaveProperty("getStatusClass");
@@ -119,7 +151,15 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getBorderClass).toBe("function");
         });
 
-        it("should generate classes correctly", () => {
+        it("should generate classes correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useThemeClasses());
 
             // Test status classes - they return color property
@@ -140,7 +180,15 @@ describe("useTheme Hooks - Working Tests", () => {
     });
 
     describe("useThemeValue", () => {
-        it("should extract value from theme using selector", () => {
+        it("should extract value from theme using selector", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.colors)
             );
@@ -149,7 +197,15 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current).toBe("object");
         });
 
-        it("should extract complex values using selector", () => {
+        it("should extract complex values using selector", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.colors?.primary)
             );
@@ -160,7 +216,15 @@ describe("useTheme Hooks - Working Tests", () => {
     });
 
     describe("useTheme", () => {
-        it("should return theme-related functions", () => {
+        it("should return theme-related functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             // Check that the hook returns an object with expected properties
@@ -174,7 +238,15 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getStatusColor).toBe("function");
         });
 
-        it("should handle color retrieval", () => {
+        it("should handle color retrieval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             // Test color retrieval functions exist and work
@@ -187,7 +259,15 @@ describe("useTheme Hooks - Working Tests", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle invalid color paths gracefully", () => {
+        it("should handle invalid color paths gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             const color = result.current.getColor(
@@ -196,7 +276,15 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof color).toBe("string"); // Should return fallback
         });
 
-        it("should handle edge case percentages in availability colors", () => {
+        it("should handle edge case percentages in availability colors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Test edge cases

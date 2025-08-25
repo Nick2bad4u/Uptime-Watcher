@@ -37,7 +37,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("setupOperationCorrelation error handling", () => {
-        it("should handle monitorRepository.update failure and cleanup", async () => {
+        it("should handle monitorRepository.update failure and cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Monitor = {
                 id: "monitor-1",
                 type: "http",
@@ -77,7 +85,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("saveHistoryEntry missing monitor ID", () => {
-        it("should handle monitor without ID gracefully", async () => {
+        it("should handle monitor without ID gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 // Missing id field - using empty string
                 id: "",
@@ -110,7 +126,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("validateMonitor missing ID", () => {
-        it("should return false for monitor without ID", () => {
+        it("should return false for monitor without ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site: Site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -143,7 +167,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("history pruning logic", () => {
-        it("should trigger history pruning when count exceeds threshold", async () => {
+        it("should trigger history pruning when count exceeds threshold", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor: Monitor = {
                 id: "monitor-1",
                 type: "http",
@@ -188,7 +220,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("error handling in saveHistoryEntry", () => {
-        it("should handle errors during history saving", async () => {
+        it("should handle errors during history saving", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Monitor = {
                 id: "monitor-1",
                 type: "http",
@@ -223,7 +263,15 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
     });
 
     describe("timeout calculation and scheduling", () => {
-        it("should calculate correct timeout with buffer", async () => {
+        it("should calculate correct timeout with buffer", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor: Monitor = {
                 id: "monitor-1",
                 type: "http",

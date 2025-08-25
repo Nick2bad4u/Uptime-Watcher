@@ -80,7 +80,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("Initial State", () => {
-        it("should initialize with default state", () => {
+        it("should initialize with default state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             expect(result.current.fieldConfigs).toEqual({});
@@ -123,7 +131,15 @@ describe("useMonitorTypesStore", () => {
             },
         ];
 
-        it("should load monitor types successfully", async () => {
+        it("should load monitor types successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes
             );
@@ -145,7 +161,15 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        it("should skip loading if already loaded and no error", async () => {
+        it("should skip loading if already loaded and no error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes
             );
@@ -170,7 +194,15 @@ describe("useMonitorTypesStore", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should reload if not loaded", async () => {
+        it("should reload if not loaded", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes
             );
@@ -188,7 +220,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.isLoaded).toBe(true);
         });
 
-        it("should reload if error exists", async () => {
+        it("should reload if error exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.monitorTypes.getMonitorTypes
                 .mockRejectedValueOnce(new Error("Previous error"))
                 .mockResolvedValueOnce(mockMonitorTypes);
@@ -217,7 +257,15 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle loading errors", async () => {
+        it("should handle loading errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorMessage = "Failed to load monitor types";
             mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(
                 new Error(errorMessage)
@@ -237,7 +285,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        it("should handle empty response with fallback", async () => {
+        it("should handle empty response with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 null
             );
@@ -255,7 +311,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("refreshMonitorTypes", () => {
-        it("should clear state and reload monitor types", async () => {
+        it("should clear state and reload monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockMonitorTypes: MonitorTypeConfig[] = [
                 {
                     type: "http",
@@ -300,7 +364,15 @@ describe("useMonitorTypesStore", () => {
             metadata: { validatedAt: Date.now() },
         };
 
-        it("should validate monitor data successfully", async () => {
+        it("should validate monitor data successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Validation", "type");
+
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockValidationResult
             );
@@ -321,7 +393,15 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledWith("http", { url: "https://example.com" });
         });
 
-        it("should handle validation with errors", async () => {
+        it("should handle validation with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorResult: ValidationResult = {
                 success: false,
                 data: null,
@@ -348,7 +428,15 @@ describe("useMonitorTypesStore", () => {
             expect(validationResult!.errors).toEqual(["URL is required"]);
         });
 
-        it("should handle partial validation result with missing properties", async () => {
+        it("should handle partial validation result with missing properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Validation", "type");
+
             const partialResult = {
                 success: true,
                 data: { url: "https://example.com" },
@@ -374,7 +462,15 @@ describe("useMonitorTypesStore", () => {
             expect(validationResult!.metadata).toEqual({});
         });
 
-        it("should handle validation errors", async () => {
+        it("should handle validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorMessage = "Validation service unavailable";
             mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
                 new Error(errorMessage)
@@ -395,7 +491,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("formatMonitorDetail", () => {
-        it("should format monitor detail successfully", async () => {
+        it("should format monitor detail successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const formattedDetail = "Response time: 150ms (Excellent)";
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
                 formattedDetail
@@ -417,7 +521,15 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledWith("http", "Response time: 150ms");
         });
 
-        it("should handle formatting errors with fallback", async () => {
+        it("should handle formatting errors with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const originalDetails = "Response time: 150ms";
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
                 new Error("Formatting failed")
@@ -439,7 +551,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBe("Formatting failed");
         });
 
-        it("should handle null response with fallback", async () => {
+        it("should handle null response with fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalDetails = "Response time: 150ms";
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
                 null
@@ -473,7 +593,15 @@ describe("useMonitorTypesStore", () => {
             url: "https://example.com",
         };
 
-        it("should format monitor title suffix successfully", async () => {
+        it("should format monitor title suffix successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const titleSuffix = "(https://example.com)";
             mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
                 titleSuffix
@@ -495,7 +623,15 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledWith("http", mockMonitor);
         });
 
-        it("should handle title suffix formatting errors", async () => {
+        it("should handle title suffix formatting errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockRejectedValue(
                 new Error("Title formatting failed")
             );
@@ -516,7 +652,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBe("Title formatting failed");
         });
 
-        it("should handle null response with empty string fallback", async () => {
+        it("should handle null response with empty string fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
                 null
             );
@@ -536,7 +680,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("getFieldConfig", () => {
-        it("should return field config for existing type", () => {
+        it("should return field config for existing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             const httpFields: MonitorFieldDefinition[] = [
@@ -553,7 +705,15 @@ describe("useMonitorTypesStore", () => {
             expect(config).toEqual(httpFields);
         });
 
-        it("should return undefined for non-existing type", () => {
+        it("should return undefined for non-existing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             const config = result.current.getFieldConfig(
@@ -562,7 +722,15 @@ describe("useMonitorTypesStore", () => {
             expect(config).toBeUndefined();
         });
 
-        it("should return undefined when fieldConfigs is empty", () => {
+        it("should return undefined when fieldConfigs is empty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             const config = result.current.getFieldConfig("http" as MonitorType);
@@ -571,7 +739,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("Base Store Actions", () => {
-        it("should clear error", () => {
+        it("should clear error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             act(() => {
@@ -587,7 +763,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should set error", () => {
+        it("should set error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             act(() => {
@@ -603,7 +787,15 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should set loading state", () => {
+        it("should set loading state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             act(() => {
@@ -621,7 +813,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should handle complete monitor types workflow", async () => {
+        it("should handle complete monitor types workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockMonitorTypes: MonitorTypeConfig[] = [
                 {
                     type: "http" as MonitorType,
@@ -696,7 +896,15 @@ describe("useMonitorTypesStore", () => {
             expect(formattedDetail!).toBe("Formatted: 150ms");
         });
 
-        it("should handle error recovery workflow", async () => {
+        it("should handle error recovery workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useMonitorTypesStore());
 
             // First, cause an error
@@ -741,7 +949,15 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle concurrent loadMonitorTypes calls", async () => {
+        it("should handle concurrent loadMonitorTypes calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypesStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockMonitorTypes: MonitorTypeConfig[] = [
                 {
                     type: "http" as MonitorType,

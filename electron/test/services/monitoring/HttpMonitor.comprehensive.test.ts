@@ -94,12 +94,28 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("Constructor", () => {
-        it("should create instance with default config", () => {
+        it("should create instance with default config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(httpMonitor).toBeDefined();
             expect(httpMonitor).toBeInstanceOf(HttpMonitor);
         });
 
-        it("should create instance with custom config", () => {
+        it("should create instance with custom config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const config: MonitorConfig = {
                 timeout: 10_000,
                 userAgent: "Custom/1.0",
@@ -112,7 +128,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should merge config with defaults", () => {
+        it("should merge config with defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config: MonitorConfig = { timeout: 8000 };
             const monitor = new HttpMonitor(config);
 
@@ -123,13 +147,29 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("getType", () => {
-        it("should return 'http'", () => {
+        it("should return 'http'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(httpMonitor.getType()).toBe("http");
         });
     });
 
     describe("getConfig", () => {
-        it("should return copy of current config", () => {
+        it("should return copy of current config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = httpMonitor.getConfig();
             expect(config).toEqual({
                 timeout: 5000,
@@ -137,7 +177,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return shallow copy", () => {
+        it("should return shallow copy", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config1 = httpMonitor.getConfig();
             const config2 = httpMonitor.getConfig();
 
@@ -147,24 +195,56 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("updateConfig", () => {
-        it("should update timeout config", () => {
+        it("should update timeout config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             httpMonitor.updateConfig({ timeout: 15_000 });
             expect(httpMonitor.getConfig().timeout).toBe(15_000);
         });
 
-        it("should update userAgent config", () => {
+        it("should update userAgent config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             httpMonitor.updateConfig({ userAgent: "NewAgent/2.0" });
             expect(httpMonitor.getConfig().userAgent).toBe("NewAgent/2.0");
         });
 
-        it("should merge partial config", () => {
+        it("should merge partial config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             httpMonitor.updateConfig({ timeout: 12_000 });
             const config = httpMonitor.getConfig();
             expect(config.timeout).toBe(12_000);
             expect(config.userAgent).toBe("UptimeWatcher/1.0");
         });
 
-        it("should recreate axios instance on config update", async () => {
+        it("should recreate axios instance on config update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const { createHttpClient } = vi.mocked(
                 await import("../../../services/monitoring/utils/httpClient")
             );
@@ -174,7 +254,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(createHttpClient).toHaveBeenCalledTimes(2); // Once for constructor, once for update
         });
 
-        it("should throw error for invalid timeout", () => {
+        it("should throw error for invalid timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => httpMonitor.updateConfig({ timeout: -1000 })).toThrow(
                 "Invalid timeout: must be a positive number"
             );
@@ -186,7 +274,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             ).toThrow("Invalid timeout: must be a positive number");
         });
 
-        it("should throw error for invalid userAgent", () => {
+        it("should throw error for invalid userAgent", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() =>
                 httpMonitor.updateConfig({ userAgent: 123 as any })
             ).toThrow("Invalid userAgent: must be a string");
@@ -194,7 +290,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("check", () => {
-        it("should throw error for non-http monitor type", async () => {
+        it("should throw error for non-http monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 type: "ping",
                 host: "example.com",
@@ -212,7 +316,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
         });
 
-        it("should return error result for invalid URL", async () => {
+        it("should return error result for invalid URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { validateMonitorUrl, createMonitorErrorResult } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
@@ -250,7 +362,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result.status).toBe("down");
         });
 
-        it("should perform health check with extracted config", async () => {
+        it("should perform health check with extracted config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
@@ -294,7 +414,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result).toEqual(mockResult);
         });
 
-        it("should handle check errors", async () => {
+        it("should handle check errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
@@ -348,7 +476,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("makeRequest (private method via performSingleHealthCheck)", () => {
-        it("should make successful HTTP request", async () => {
+        it("should make successful HTTP request", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { determineMonitorStatus } = vi.mocked(
                 await import(
                     "../../../services/monitoring/utils/httpStatusUtils"
@@ -385,7 +521,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle response without responseTime", async () => {
+        it("should handle response without responseTime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { determineMonitorStatus } = vi.mocked(
                 await import(
                     "../../../services/monitoring/utils/httpStatusUtils"
@@ -411,7 +555,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result.responseTime).toBe(0);
         });
 
-        it("should include error for down status", async () => {
+        it("should include error for down status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { determineMonitorStatus } = vi.mocked(
                 await import(
                     "../../../services/monitoring/utils/httpStatusUtils"
@@ -445,7 +597,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("Development mode logging", () => {
-        it("should log debug messages in dev mode", async () => {
+        it("should log debug messages in dev mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
@@ -495,7 +655,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
         });
 
-        it("should not log in production mode", async () => {
+        it("should not log in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
@@ -528,7 +696,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should handle complete workflow with retry logic", async () => {
+        it("should handle complete workflow with retry logic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"

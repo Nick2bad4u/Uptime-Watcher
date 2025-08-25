@@ -21,7 +21,15 @@ import {
 
 describe("safeConversions - Complete Function Coverage", () => {
   describe("safeNumberConversion", () => {
-    it("should test safeNumberConversion function", () => {
+    it("should test safeNumberConversion function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeNumberConversion(42)).toBe(42);
       expect(safeNumberConversion("42")).toBe(42);
       expect(safeNumberConversion("invalid", 10)).toBe(10);
@@ -31,7 +39,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseCheckInterval", () => {
-    it("should test safeParseCheckInterval function", () => {
+    it("should test safeParseCheckInterval function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParseCheckInterval(60000)).toBe(60000);
       expect(safeParseCheckInterval("60000")).toBe(60000);
       expect(safeParseCheckInterval(60)).toBe(300000); // below minimum
@@ -41,7 +57,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseFloat", () => {
-    it("should test safeParseFloat function", () => {
+    it("should test safeParseFloat function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParseFloat(3.14)).toBe(3.14);
       expect(safeParseFloat("3.14")).toBe(3.14);
       expect(safeParseFloat("invalid", 1.5)).toBe(1.5);
@@ -51,7 +75,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseInt", () => {
-    it("should test safeParseInt function", () => {
+    it("should test safeParseInt function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParseInt(42)).toBe(42);
       expect(safeParseInt("42")).toBe(42);
       expect(safeParseInt(3.14)).toBe(3);
@@ -62,7 +94,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParsePercentage", () => {
-    it("should test safeParsePercentage function", () => {
+    it("should test safeParsePercentage function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParsePercentage(50)).toBe(50);
       expect(safeParsePercentage("75")).toBe(75);
       expect(safeParsePercentage(150)).toBe(100); // clamped to max
@@ -73,7 +113,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParsePort", () => {
-    it("should test safeParsePort function", () => {
+    it("should test safeParsePort function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParsePort(443)).toBe(443);
       expect(safeParsePort("8080")).toBe(8080);
       expect(safeParsePort(0)).toBe(80); // invalid port
@@ -84,7 +132,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParsePositiveInt", () => {
-    it("should test safeParsePositiveInt function", () => {
+    it("should test safeParsePositiveInt function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParsePositiveInt(5)).toBe(5);
       expect(safeParsePositiveInt("10")).toBe(10);
       expect(safeParsePositiveInt(0)).toBe(1); // forced to positive
@@ -95,7 +151,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseRetryAttempts", () => {
-    it("should test safeParseRetryAttempts function", () => {
+    it("should test safeParseRetryAttempts function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParseRetryAttempts(3)).toBe(3);
       expect(safeParseRetryAttempts("5")).toBe(5);
       expect(safeParseRetryAttempts(0)).toBe(0); // valid minimum
@@ -106,7 +170,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseTimeout", () => {
-    it("should test safeParseTimeout function", () => {
+    it("should test safeParseTimeout function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       expect(safeParseTimeout(5000)).toBe(5000);
       expect(safeParseTimeout("10000")).toBe(10000);
       expect(safeParseTimeout(500)).toBe(500); // positive values pass through
@@ -118,7 +190,15 @@ describe("safeConversions - Complete Function Coverage", () => {
   });
 
   describe("safeParseTimestamp", () => {
-    it("should test safeParseTimestamp function", () => {
+    it("should test safeParseTimestamp function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: safeConversions", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
       const now = Date.now();
       expect(safeParseTimestamp(now)).toBe(now);
       expect(safeParseTimestamp(now.toString())).toBe(now);

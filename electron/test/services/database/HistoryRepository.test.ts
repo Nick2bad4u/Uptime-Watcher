@@ -86,7 +86,15 @@ describe("HistoryRepository", () => {
         vi.clearAllMocks();
     });
     describe("Constructor", () => {
-        it("should create repository with dependencies", () => {
+        it("should create repository with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(historyRepository).toBeInstanceOf(HistoryRepository);
             expect(historyRepository["databaseService"]).toBe(
                 mockDatabaseService
@@ -94,7 +102,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("addEntry", () => {
-        it("should add a history entry", async () => {
+        it("should add a history entry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const details = "Test details";
 
@@ -114,7 +130,15 @@ describe("HistoryRepository", () => {
                 details
             );
         });
-        it("should add entry without details", async () => {
+        it("should add entry without details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
 
             await historyRepository.addEntry(monitorId, mockStatusHistory);
@@ -128,7 +152,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("addEntryInternal", () => {
-        it("should add entry internally", () => {
+        it("should add entry internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const details = "Test details";
 
@@ -148,7 +180,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("bulkInsert", () => {
-        it("should bulk insert history entries", async () => {
+        it("should bulk insert history entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const historyEntries = [
                 { ...mockStatusHistory, details: "Entry 1" },
@@ -177,7 +217,15 @@ describe("HistoryRepository", () => {
                 `[HistoryRepository] Bulk inserted 2 history entries for monitor: ${monitorId}`
             );
         });
-        it("should handle empty array", async () => {
+        it("should handle empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const historyEntries: any[] = [];
 
@@ -187,7 +235,15 @@ describe("HistoryRepository", () => {
                 mockDatabaseService.executeTransaction
             ).not.toHaveBeenCalled();
         });
-        it("should finalize statement even on error", async () => {
+        it("should finalize statement even on error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitorId = "monitor-123";
             const historyEntries = [mockStatusHistory];
 
@@ -209,7 +265,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all history", async () => {
+        it("should delete all history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             await historyRepository.deleteAll();
 
             expect(
@@ -221,7 +285,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("deleteAllInternal", () => {
-        it("should delete all history internally", () => {
+        it("should delete all history internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             historyRepository.deleteAllInternal(mockDatabase);
 
             expect(historyManipulation.deleteAllHistory).toHaveBeenCalledWith(
@@ -230,7 +302,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("deleteByMonitorId", () => {
-        it("should delete history by monitor ID", async () => {
+        it("should delete history by monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const monitorId = "monitor-123";
 
             await historyRepository.deleteByMonitorId(monitorId);
@@ -244,7 +324,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("deleteByMonitorIdInternal", () => {
-        it("should delete history by monitor ID internally", () => {
+        it("should delete history by monitor ID internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const monitorId = "monitor-123";
 
             historyRepository.deleteByMonitorIdInternal(
@@ -258,7 +346,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("findByMonitorId", () => {
-        it("should find history by monitor ID", async () => {
+        it("should find history by monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const monitorId = "monitor-123";
             const expectedHistory = [mockStatusHistory];
 
@@ -277,7 +373,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getHistoryCount", () => {
-        it("should get history count", async () => {
+        it("should get history count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const monitorId = "monitor-123";
             const expectedCount = 42;
 
@@ -296,7 +400,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getHistoryCountInternal", () => {
-        it("should get history count internally", () => {
+        it("should get history count internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const monitorId = "monitor-123";
             const expectedCount = 42;
 
@@ -317,7 +429,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getLatestEntry", () => {
-        it("should get latest entry", async () => {
+        it("should get latest entry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const monitorId = "monitor-123";
 
             vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(
@@ -333,7 +453,15 @@ describe("HistoryRepository", () => {
             );
             expect(result).toEqual(mockStatusHistory);
         });
-        it("should return undefined when no entry exists", async () => {
+        it("should return undefined when no entry exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
 
             vi.mocked(historyQuery.getLatestHistoryEntry).mockReturnValue(
@@ -346,7 +474,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("pruneAllHistory", () => {
-        it("should prune all history with valid limit", async () => {
+        it("should prune all history with valid limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             const limit = 100;
             const mockMonitors = [{ id: 1 }, { id: 2 }];
             const mockExcessEntries = [{ id: 10 }, { id: 11 }];
@@ -368,21 +504,45 @@ describe("HistoryRepository", () => {
                 [10, 11]
             );
         });
-        it("should not prune with zero limit", async () => {
+        it("should not prune with zero limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             await historyRepository.pruneAllHistory(0);
 
             expect(
                 mockDatabaseService.executeTransaction
             ).not.toHaveBeenCalled();
         });
-        it("should not prune with negative limit", async () => {
+        it("should not prune with negative limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             await historyRepository.pruneAllHistory(-1);
 
             expect(
                 mockDatabaseService.executeTransaction
             ).not.toHaveBeenCalled();
         });
-        it("should handle no excess entries", async () => {
+        it("should handle no excess entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
 
@@ -394,7 +554,15 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.run).not.toHaveBeenCalled();
         });
-        it("should filter invalid IDs", async () => {
+        it("should filter invalid IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const limit = 100;
             const mockMonitors = [{ id: 1 }];
             const mockExcessEntries = [
@@ -417,7 +585,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("pruneAllHistoryInternal", () => {
-        it("should prune all history internally", () => {
+        it("should prune all history internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const limit = 100;
             const mockMonitors = [{ id: 1 }, { id: 2 }];
 
@@ -438,12 +614,28 @@ describe("HistoryRepository", () => {
                 "[HistoryRepository] Pruned history for all monitors (limit: 100) (internal)"
             );
         });
-        it("should not prune with zero limit", () => {
+        it("should not prune with zero limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             historyRepository.pruneAllHistoryInternal(mockDatabase, 0);
 
             expect(mockDatabase.all).not.toHaveBeenCalled();
         });
-        it("should filter invalid monitor IDs", () => {
+        it("should filter invalid monitor IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const limit = 100;
             const mockMonitors = [
                 { id: 1 },
@@ -468,7 +660,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("pruneHistory", () => {
-        it("should prune history for specific monitor", async () => {
+        it("should prune history for specific monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorId = "monitor-123";
             const limit = 100;
 
@@ -481,7 +681,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("pruneHistoryInternal", () => {
-        it("should prune history internally", () => {
+        it("should prune history internally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const limit = 100;
 
@@ -498,7 +706,15 @@ describe("HistoryRepository", () => {
                 "[HistoryRepository] Pruned history for monitor monitor-123 (limit: 100) (internal)"
             );
         });
-        it("should not prune with zero limit", () => {
+        it("should not prune with zero limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             const monitorId = "monitor-123";
 
             historyRepository.pruneHistoryInternal(mockDatabase, monitorId, 0);
@@ -507,7 +723,15 @@ describe("HistoryRepository", () => {
                 historyManipulation.pruneHistoryForMonitor
             ).not.toHaveBeenCalled();
         });
-        it("should not prune with negative limit", () => {
+        it("should not prune with negative limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Configuration", "type");
+
             const monitorId = "monitor-123";
 
             historyRepository.pruneHistoryInternal(mockDatabase, monitorId, -5);
@@ -518,7 +742,15 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getDb", () => {
-        it("should return database from service", () => {
+        it("should return database from service", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HistoryRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const db = historyRepository["getDb"]();
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);

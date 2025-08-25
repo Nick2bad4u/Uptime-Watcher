@@ -10,7 +10,15 @@ import {
 
 describe("Schemas - Final Final Coverage", () => {
     describe("Targeting Lines 399,482 (validation error paths)", () => {
-        it("should handle field validation error at line 399 - Unknown field error", () => {
+        it("should handle field validation error at line 399 - Unknown field error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Line 399 is the "throw new Error(`Unknown field: ${fieldName}`);" statement
             // We need to call validateMonitorField with an unknown field
             try {
@@ -35,7 +43,15 @@ describe("Schemas - Final Final Coverage", () => {
             }
         });
 
-        it("should trigger Unknown field error with different monitor types", () => {
+        it("should trigger Unknown field error with different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test with port monitor type
             try {
                 const result = validateMonitorField(
@@ -51,7 +67,15 @@ describe("Schemas - Final Final Coverage", () => {
             }
         });
 
-        it("should handle validation error categorization at line 482 - isOptionalField check", () => {
+        it("should handle validation error categorization at line 482 - isOptionalField check", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Line 482 is in the validateMonitorData function where it checks isOptionalField
             // We need to create a ZodError with specific issue types
             const result = validateMonitorData("http", {
@@ -64,7 +88,15 @@ describe("Schemas - Final Final Coverage", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should create ZodError with undefined received type for optional field detection", () => {
+        it("should create ZodError with undefined received type for optional field detection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Constructor", "type");
+
             // Try to trigger the isOptionalField logic specifically
             const result = validateMonitorData("port", {
                 host: "example.com",
@@ -79,7 +111,15 @@ describe("Schemas - Final Final Coverage", () => {
             expect(result.success).toBeDefined();
         });
 
-        it("should test field validation with base schema fallback", () => {
+        it("should test field validation with base schema fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test a field that exists in baseMonitorSchema but not in specific schema
             try {
                 const result = validateMonitorField(
@@ -94,7 +134,15 @@ describe("Schemas - Final Final Coverage", () => {
             }
         });
 
-        it("should test invalid monitor type in validateMonitorField", () => {
+        it("should test invalid monitor type in validateMonitorField", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test with invalid monitor type
             const result = validateMonitorField(
                 "invalid-type",
@@ -107,7 +155,15 @@ describe("Schemas - Final Final Coverage", () => {
             );
         });
 
-        it("should test non-ZodError in validateMonitorData catch block", () => {
+        it("should test non-ZodError in validateMonitorData catch block", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test edge case that might cause non-ZodError
             const result = validateMonitorData("http", {
                 url: "https://example.com",

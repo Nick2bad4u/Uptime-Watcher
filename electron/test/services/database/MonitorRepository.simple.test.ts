@@ -62,13 +62,29 @@ describe("MonitorRepository Coverage Tests", () => {
             executeTransaction: vi.fn(),
         };
     });
-    it("should import the repository without errors", async () => {
+    it("should import the repository without errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
         expect(MonitorRepository).toBeDefined();
     });
-    it("should create repository instance with dependencies", async () => {
+    it("should create repository instance with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -79,7 +95,15 @@ describe("MonitorRepository Coverage Tests", () => {
         expect(repository).toBeDefined();
         expect(repository).toBeInstanceOf(MonitorRepository);
     });
-    it("should handle create operations", async () => {
+    it("should handle create operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -96,7 +120,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle findByIdentifier operations", async () => {
+    it("should handle findByIdentifier operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -111,7 +143,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle findBySiteIdentifier operations", async () => {
+    it("should handle findBySiteIdentifier operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -126,7 +166,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle update operations", async () => {
+    it("should handle update operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -141,7 +189,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle delete operations", async () => {
+    it("should handle delete operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -156,7 +212,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle getAllMonitorIds operations", async () => {
+    it("should handle getAllMonitorIds operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -171,7 +235,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle bulkCreate operations", async () => {
+    it("should handle bulkCreate operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -187,7 +259,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle clearActiveOperations operations", async () => {
+    it("should handle clearActiveOperations operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -202,7 +282,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle deleteAll operations", async () => {
+    it("should handle deleteAll operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -217,7 +305,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle deleteBySiteIdentifier operations", async () => {
+    it("should handle deleteBySiteIdentifier operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -232,7 +328,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle error scenarios gracefully", async () => {
+    it("should handle error scenarios gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -249,7 +353,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should exercise SQL query building logic", async () => {
+    it("should exercise SQL query building logic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );
@@ -268,7 +380,15 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle clearActiveOperationsInternal", async () => {
+    it("should handle clearActiveOperationsInternal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { MonitorRepository } = await import(
             "../../../services/database/MonitorRepository"
         );

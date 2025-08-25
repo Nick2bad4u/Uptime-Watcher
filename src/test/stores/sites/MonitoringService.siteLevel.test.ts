@@ -30,7 +30,15 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("startSiteMonitoring", () => {
-        it("should call startMonitoringForSite with only siteId", async () => {
+        it("should call startMonitoringForSite with only siteId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
@@ -47,7 +55,15 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle errors from startMonitoringForSite", async () => {
+        it("should handle errors from startMonitoringForSite", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "example.com";
             const error = new Error("Failed to start site monitoring");
 
@@ -60,7 +76,15 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Failed to start site monitoring");
         });
 
-        it("should work with empty string site ID", async () => {
+        it("should work with empty string site ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
@@ -76,7 +100,15 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("stopSiteMonitoring", () => {
-        it("should call stopMonitoringForSite with only siteId", async () => {
+        it("should call stopMonitoringForSite with only siteId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
@@ -93,7 +125,15 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle errors from stopMonitoringForSite", async () => {
+        it("should handle errors from stopMonitoringForSite", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "example.com";
             const error = new Error("Failed to stop site monitoring");
 
@@ -106,7 +146,15 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Failed to stop site monitoring");
         });
 
-        it("should work with empty string site ID", async () => {
+        it("should work with empty string site ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
@@ -122,7 +170,15 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("Site-level vs monitor-level distinction", () => {
-        it("should distinguish between site-level and monitor-level calls", async () => {
+        it("should distinguish between site-level and monitor-level calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "example.com";
             const monitorId = "monitor-1";
 
@@ -149,7 +205,15 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("Error handling consistency", () => {
-        it("should handle network errors", async () => {
+        it("should handle network errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValue(
@@ -161,7 +225,15 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Network error");
         });
 
-        it("should handle timeout errors", async () => {
+        it("should handle timeout errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "example.com";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValue(

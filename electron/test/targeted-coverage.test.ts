@@ -34,7 +34,15 @@ describe("Targeted Coverage for Missing Branches", () => {
         vi.clearAllMocks();
     });
     describe("Development Environment Branches", () => {
-        it("should handle isDev function edge cases", async () => {
+        it("should handle isDev function edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: targeted-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { isDev } = await import("../electronUtils.js");
 
             // Test with different NODE_ENV values
@@ -60,7 +68,15 @@ describe("Targeted Coverage for Missing Branches", () => {
         });
     });
     describe("Error Handling Branches", () => {
-        it("should test error handling in module imports", async () => {
+        it("should test error handling in module imports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: targeted-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test that imports handle errors gracefully
             try {
                 const correlationModule = await import(
@@ -82,7 +98,15 @@ describe("Targeted Coverage for Missing Branches", () => {
         });
     });
     describe("Configuration Branches", () => {
-        it("should handle different configuration states", async () => {
+        it("should handle different configuration states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: targeted-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test configuration edge cases that might not be covered
             try {
                 const constantsModule = await import("../constants.js");
@@ -113,7 +137,15 @@ describe("Targeted Coverage for Missing Branches", () => {
         });
     });
     describe("Type System Branches", () => {
-        it("should handle type checking edge cases", async () => {
+        it("should handle type checking edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: targeted-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const typesModule = await import("../../shared/types.js");
 
@@ -126,7 +158,15 @@ describe("Targeted Coverage for Missing Branches", () => {
         });
     });
     describe("Service Container Branches", () => {
-        it("should handle service container edge cases", async () => {
+        it("should handle service container edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: targeted-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const { ServiceContainer } = await import(
                     "../services/ServiceContainer.js"

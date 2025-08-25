@@ -11,7 +11,15 @@ import {
 
 describe("Log Templates", () => {
     describe("SERVICE_LOGS", () => {
-        it("should contain all application service log templates", () => {
+        it("should contain all application service log templates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SERVICE_LOGS.APPLICATION_ACTIVATED).toBe(
                 "[ApplicationService] App activated"
             );
@@ -35,7 +43,15 @@ describe("Log Templates", () => {
             );
         });
 
-        it("should have consistent message format with service prefix", () => {
+        it("should have consistent message format with service prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const serviceLogValues = Object.values(SERVICE_LOGS);
 
             // Most service logs should start with a bracketed service name
@@ -49,7 +65,15 @@ describe("Log Templates", () => {
                 Math.floor(serviceLogValues.length * 0.8)
             );
         });
-        it("should have no empty or undefined values", () => {
+        it("should have no empty or undefined values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const serviceLogValues = Object.values(SERVICE_LOGS);
 
             for (const logMessage of serviceLogValues) {
@@ -59,21 +83,45 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should contain database service logs", () => {
+        it("should contain database service logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SERVICE_LOGS.DATABASE_INITIALIZED).toBeDefined();
             expect(SERVICE_LOGS.DATABASE_INITIALIZED).toContain(
                 "[DatabaseService]"
             );
         });
 
-        it("should contain site manager logs", () => {
+        it("should contain site manager logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SERVICE_LOGS.SITE_MANAGER_INITIALIZED).toBeDefined();
             expect(SERVICE_LOGS.SITE_MANAGER_INITIALIZED).toContain(
                 "[SiteManager]"
             );
         });
 
-        it("should contain monitor manager logs", () => {
+        it("should contain monitor manager logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(
                 SERVICE_LOGS.MONITOR_MANAGER_APPLYING_INTERVALS
             ).toBeDefined();
@@ -84,12 +132,28 @@ describe("Log Templates", () => {
     });
 
     describe("DEBUG_LOGS", () => {
-        it("should contain debug log templates", () => {
+        it("should contain debug log templates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DEBUG_LOGS).toBeDefined();
             expect(typeof DEBUG_LOGS).toBe("object");
         });
 
-        it("should have consistent debug message format", () => {
+        it("should have consistent debug message format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const debugLogValues = Object.values(DEBUG_LOGS);
 
             for (const logMessage of debugLogValues) {
@@ -99,19 +163,43 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should contain monitoring related debug logs", () => {
+        it("should contain monitoring related debug logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const debugKeys = Object.keys(DEBUG_LOGS);
             expect(debugKeys.length).toBeGreaterThan(0);
         });
     });
 
     describe("ERROR_LOGS", () => {
-        it("should contain error log templates", () => {
+        it("should contain error log templates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(ERROR_LOGS).toBeDefined();
             expect(typeof ERROR_LOGS).toBe("object");
         });
 
-        it("should have consistent error message format", () => {
+        it("should have consistent error message format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorLogValues = Object.values(ERROR_LOGS);
 
             for (const logMessage of errorLogValues) {
@@ -121,19 +209,43 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should contain database related error logs", () => {
+        it("should contain database related error logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorKeys = Object.keys(ERROR_LOGS);
             expect(errorKeys.length).toBeGreaterThan(0);
         });
     });
 
     describe("WARNING_LOGS", () => {
-        it("should contain warning log templates", () => {
+        it("should contain warning log templates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(WARNING_LOGS).toBeDefined();
             expect(typeof WARNING_LOGS).toBe("object");
         });
 
-        it("should have consistent warning message format", () => {
+        it("should have consistent warning message format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const warningLogValues = Object.values(WARNING_LOGS);
 
             for (const logMessage of warningLogValues) {
@@ -143,14 +255,30 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should contain monitoring related warning logs", () => {
+        it("should contain monitoring related warning logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const warningKeys = Object.keys(WARNING_LOGS);
             expect(warningKeys.length).toBeGreaterThan(0);
         });
     });
 
     describe("LOG_TEMPLATES", () => {
-        it("should implement LogTemplatesInterface correctly", () => {
+        it("should implement LogTemplatesInterface correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(LOG_TEMPLATES).toBeDefined();
             expect(LOG_TEMPLATES.services).toBe(SERVICE_LOGS);
             expect(LOG_TEMPLATES.debug).toBe(DEBUG_LOGS);
@@ -158,7 +286,15 @@ describe("Log Templates", () => {
             expect(LOG_TEMPLATES.warnings).toBe(WARNING_LOGS);
         });
 
-        it("should be readonly and immutable", () => {
+        it("should be readonly and immutable", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that LOG_TEMPLATES has the expected structure
             expect(LOG_TEMPLATES).toHaveProperty("services");
             expect(LOG_TEMPLATES).toHaveProperty("debug");
@@ -172,7 +308,15 @@ describe("Log Templates", () => {
             expect(typeof LOG_TEMPLATES.warnings).toBe("object");
         });
 
-        it("should have all required categories", () => {
+        it("should have all required categories", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const requiredCategories = [
                 "services",
                 "debug",
@@ -188,7 +332,15 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should maintain consistent structure", () => {
+        it("should maintain consistent structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(Object.keys(LOG_TEMPLATES)).toEqual([
                 "debug",
                 "errors",
@@ -199,7 +351,15 @@ describe("Log Templates", () => {
     });
 
     describe("Template Content Validation", () => {
-        it("should have meaningful and descriptive log messages", () => {
+        it("should have meaningful and descriptive log messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const allLogValues = [
                 ...Object.values(SERVICE_LOGS),
                 ...Object.values(DEBUG_LOGS),
@@ -221,7 +381,15 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should follow consistent naming conventions", () => {
+        it("should follow consistent naming conventions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const allKeys = [
                 ...Object.keys(SERVICE_LOGS),
                 ...Object.keys(DEBUG_LOGS),
@@ -239,7 +407,15 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should have unique log messages across categories", () => {
+        it("should have unique log messages across categories", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const allLogValues = [
                 ...Object.values(SERVICE_LOGS),
                 ...Object.values(DEBUG_LOGS),
@@ -253,13 +429,29 @@ describe("Log Templates", () => {
     });
 
     describe("Service Log Specific Tests", () => {
-        it("should contain IPC service logs", () => {
+        it("should contain IPC service logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const serviceKeys = Object.keys(SERVICE_LOGS);
             const ipcLogs = serviceKeys.filter((key) => key.includes("IPC"));
             expect(ipcLogs.length).toBeGreaterThan(0);
         });
 
-        it("should contain orchestrator logs", () => {
+        it("should contain orchestrator logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const serviceKeys = Object.keys(SERVICE_LOGS);
             // Look for APPLICATION or similar service logs since there might not be specific "ORCHESTRATOR" logs
             const applicationLogs = serviceKeys.filter((key) =>
@@ -268,7 +460,15 @@ describe("Log Templates", () => {
             expect(applicationLogs.length).toBeGreaterThan(0);
         });
 
-        it("should contain monitoring related logs", () => {
+        it("should contain monitoring related logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const serviceKeys = Object.keys(SERVICE_LOGS);
             const monitoringLogs = serviceKeys.filter(
                 (key) => key.includes("MONITOR") || key.includes("SITE")
@@ -278,7 +478,15 @@ describe("Log Templates", () => {
     });
 
     describe("Type Safety", () => {
-        it("should maintain type safety for LogTemplatesInterface", () => {
+        it("should maintain type safety for LogTemplatesInterface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const templates: LogTemplatesInterface = LOG_TEMPLATES;
 
             expect(templates.services).toBeDefined();
@@ -287,7 +495,15 @@ describe("Log Templates", () => {
             expect(templates.warnings).toBeDefined();
         });
 
-        it("should have readonly properties", () => {
+        it("should have readonly properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // TypeScript should enforce this, but we can verify structure
             const descriptor = Object.getOwnPropertyDescriptor(
                 LOG_TEMPLATES,
@@ -298,7 +514,15 @@ describe("Log Templates", () => {
     });
 
     describe("Integration and Usage", () => {
-        it("should be suitable for logger interpolation", () => {
+        it("should be suitable for logger interpolation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that log messages can be used with string interpolation
             const testMessage = SERVICE_LOGS.APPLICATION_ACTIVATED;
             const interpolatedMessage = `${testMessage} - Additional context`;
@@ -308,7 +532,15 @@ describe("Log Templates", () => {
             );
         });
 
-        it("should support template literal usage", () => {
+        it("should support template literal usage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const count = 5;
             const messageWithData = `${SERVICE_LOGS.APPLICATION_READY} with ${count} components`;
 
@@ -316,7 +548,15 @@ describe("Log Templates", () => {
             expect(messageWithData).toContain("5 components");
         });
 
-        it("should be compatible with structured logging", () => {
+        it("should be compatible with structured logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Verify that templates work well with structured logging patterns
             const logContext = {
                 level: "info",
@@ -333,7 +573,15 @@ describe("Log Templates", () => {
     });
 
     describe("Documentation and Maintainability", () => {
-        it("should have consistent service prefixes", () => {
+        it("should have consistent service prefixes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const serviceValues = Object.values(SERVICE_LOGS);
             const knownPrefixes = [
                 "[ApplicationService]",
@@ -387,7 +635,15 @@ describe("Log Templates", () => {
             }
         });
 
-        it("should follow semantic naming for log levels", () => {
+        it("should follow semantic naming for log levels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logTemplates", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Service logs should be informational
             const serviceValues = Object.values(SERVICE_LOGS);
             for (const message of serviceValues) {

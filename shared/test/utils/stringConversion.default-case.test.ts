@@ -7,7 +7,15 @@ import { describe, expect, it } from "vitest";
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Default Case Coverage", () => {
-    it("should cover the default case for unknown types", () => {
+    it("should cover the default case for unknown types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.default-case", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Create an object that will fool the typeof operator
         // This is a bit of a hack to reach the default case
         const mockValue = Object.create(null);
@@ -36,7 +44,15 @@ describe("String Conversion - Default Case Coverage", () => {
         expect(typeof result).toBe("string");
     });
 
-    it("should test safeStringify with unusual values", () => {
+    it("should test safeStringify with unusual values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.default-case", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Test with various edge cases that might hit default
         const testCases = [
             Symbol.for("test"), // Symbol case
@@ -58,7 +74,15 @@ describe("String Conversion - Default Case Coverage", () => {
         }
     });
 
-    it("should handle edge case type coercion attempts", () => {
+    it("should handle edge case type coercion attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.default-case", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Try to create a situation where typeof might return something unexpected
         const weirdObject = Object.create(null);
 

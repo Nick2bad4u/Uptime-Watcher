@@ -62,16 +62,40 @@ function createMockStringValidator(paramName: string): IpcParameterValidator {
 
 describe("Validator Composition Utilities", () => {
     describe("createParameterCountValidator", () => {
-        it("should validate correct parameter count", () => {
+        it("should validate correct parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const validator = createParameterCountValidator(2);
             expect(validator(["a", "b"])).toBeNull();
         });
-        it("should reject incorrect parameter count", () => {
+        it("should reject incorrect parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator = createParameterCountValidator(2);
             const result = validator(["a"]);
             expect(result).toEqual(["Expected exactly 2 parameters"]);
         });
-        it("should handle singular vs plural messaging", () => {
+        it("should handle singular vs plural messaging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const singleValidator = createParameterCountValidator(1);
             const multiValidator = createParameterCountValidator(3);
 
@@ -84,14 +108,30 @@ describe("Validator Composition Utilities", () => {
         });
     });
     describe("composeValidators", () => {
-        it("should pass when all validators pass", () => {
+        it("should pass when all validators pass", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator1: IpcParameterValidator = () => null;
             const validator2: IpcParameterValidator = () => null;
 
             const composed = composeValidators([validator1, validator2]);
             expect(composed(["test"])).toBeNull();
         });
-        it("should collect errors from all validators", () => {
+        it("should collect errors from all validators", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator1: IpcParameterValidator = () => ["Error 1"];
             const validator2: IpcParameterValidator = () => [
                 "Error 2",
@@ -107,11 +147,27 @@ describe("Validator Composition Utilities", () => {
                 "Error 3",
             ]);
         });
-        it("should handle empty validators array", () => {
+        it("should handle empty validators array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const composed = composeValidators([]);
             expect(composed(["test"])).toBeNull();
         });
-        it("should handle mix of passing and failing validators", () => {
+        it("should handle mix of passing and failing validators", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const passingValidator: IpcParameterValidator = () => null;
             const failingValidator: IpcParameterValidator = () => ["Error"];
 
@@ -125,7 +181,15 @@ describe("Validator Composition Utilities", () => {
         });
     });
     describe("Refactored createTwoStringValidator simulation", () => {
-        it("should validate two string parameters correctly", () => {
+        it("should validate two string parameters correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const firstStringValidator = createMockStringValidator("first");
             const secondStringValidator = createMockStringValidator("second");
 
@@ -148,7 +212,15 @@ describe("Validator Composition Utilities", () => {
                 "first must be a non-empty string"
             );
         });
-        it("should demonstrate complexity reduction", () => {
+        it("should demonstrate complexity reduction", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Old approach would have had many nested conditions
             // New approach uses composition of simple validators
 
@@ -172,7 +244,15 @@ describe("Validator Composition Utilities", () => {
         });
     });
     describe("Integration with existing patterns", () => {
-        it("should maintain the null-for-success, array-for-errors pattern", () => {
+        it("should maintain the null-for-success, array-for-errors pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validator = composeValidators([
                 createParameterCountValidator(1),
                 createMockStringValidator("test"),
@@ -186,7 +266,15 @@ describe("Validator Composition Utilities", () => {
             expect(Array.isArray(errors)).toBe(true);
             expect(errors?.length).toBeGreaterThan(0);
         });
-        it("should be compatible with existing IpcParameterValidator interface", () => {
+        it("should be compatible with existing IpcParameterValidator interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorComposition", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validator: IpcParameterValidator = composeValidators([
                 createParameterCountValidator(1),
             ]);

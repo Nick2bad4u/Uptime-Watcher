@@ -18,7 +18,15 @@ import {
 
 describe("Shared Database Types - Complete Coverage", () => {
     describe("isValidHistoryRow", () => {
-        it("should validate correct history row with all required fields", () => {
+        it("should validate correct history row with all required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow: HistoryRow = {
                 monitorId: "test-monitor-123",
                 status: "up",
@@ -30,7 +38,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
 
-        it("should validate minimal valid history row", () => {
+        it("should validate minimal valid history row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 monitorId: "test-monitor-minimal",
                 status: "down",
@@ -40,7 +56,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
 
-        it("should accept 'up' status", () => {
+        it("should accept 'up' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -50,7 +74,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(true);
         });
 
-        it("should accept 'down' status", () => {
+        it("should accept 'down' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "down",
@@ -60,7 +92,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(true);
         });
 
-        it("should accept numeric timestamp", () => {
+        it("should accept numeric timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -70,7 +110,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(true);
         });
 
-        it("should accept string timestamp that can be converted to number", () => {
+        it("should accept string timestamp that can be converted to number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -81,31 +129,87 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", () => {
+        it("should reject null input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", () => {
+        it("should reject undefined input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", () => {
+        it("should reject string input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", () => {
+        it("should reject number input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow(123)).toBe(false);
         });
 
-        it("should reject array input", () => {
+        it("should reject array input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow([])).toBe(false);
         });
 
-        it("should reject empty object", () => {
+        it("should reject empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidHistoryRow({})).toBe(false);
         });
 
-        it("should reject object missing monitorId", () => {
+        it("should reject object missing monitorId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const row = {
                 status: "up",
                 timestamp: 12_345,
@@ -114,7 +218,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object missing status", () => {
+        it("should reject object missing status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 timestamp: 12_345,
@@ -123,7 +235,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object missing timestamp", () => {
+        it("should reject object missing timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -132,7 +252,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined monitorId", () => {
+        it("should reject object with undefined monitorId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const row = {
                 monitorId: undefined,
                 status: "up",
@@ -142,7 +270,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined status", () => {
+        it("should reject object with undefined status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: undefined,
@@ -152,7 +288,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined timestamp", () => {
+        it("should reject object with undefined timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -162,7 +306,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with non-string monitorId", () => {
+        it("should reject object with non-string monitorId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const row = {
                 monitorId: 123,
                 status: "up",
@@ -172,7 +324,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid status", () => {
+        it("should reject object with invalid status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "invalid-status",
@@ -182,7 +342,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid timestamp (NaN)", () => {
+        it("should reject object with invalid timestamp (NaN)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -192,7 +360,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid string timestamp", () => {
+        it("should reject object with invalid string timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 monitorId: "test",
                 status: "up",
@@ -204,7 +380,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("isValidMonitorRow", () => {
-        it("should validate correct monitor row with numeric id", () => {
+        it("should validate correct monitor row with numeric id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow: MonitorRow = {
                 id: 123,
                 site_identifier: "test-site-123",
@@ -218,7 +402,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(validRow)).toBe(true);
         });
 
-        it("should validate correct monitor row with number id", () => {
+        it("should validate correct monitor row with number id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 id: 42,
                 site_identifier: "test-site-numeric",
@@ -230,7 +422,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(validRow)).toBe(true);
         });
 
-        it("should validate minimal valid monitor row", () => {
+        it("should validate minimal valid monitor row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 id: "minimal",
                 site_identifier: "site",
@@ -241,23 +441,63 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", () => {
+        it("should reject null input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidMonitorRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", () => {
+        it("should reject undefined input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidMonitorRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", () => {
+        it("should reject string input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidMonitorRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", () => {
+        it("should reject number input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidMonitorRow(456)).toBe(false);
         });
 
-        it("should reject array input", () => {
+        it("should reject array input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 isValidMonitorRow([
                     1,
@@ -267,11 +507,27 @@ describe("Shared Database Types - Complete Coverage", () => {
             ).toBe(false);
         });
 
-        it("should reject empty object", () => {
+        it("should reject empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidMonitorRow({})).toBe(false);
         });
 
-        it("should reject object missing id", () => {
+        it("should reject object missing id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 site_identifier: "test-site",
                 type: "http",
@@ -280,7 +536,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object missing site_identifier", () => {
+        it("should reject object missing site_identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 type: "http",
@@ -289,7 +553,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object missing type", () => {
+        it("should reject object missing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 site_identifier: "test-site",
@@ -298,7 +570,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined id", () => {
+        it("should reject object with undefined id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: undefined,
                 site_identifier: "test-site",
@@ -308,7 +588,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined site_identifier", () => {
+        it("should reject object with undefined site_identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 site_identifier: undefined,
@@ -318,7 +606,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined type", () => {
+        it("should reject object with undefined type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 site_identifier: "test-site",
@@ -328,7 +624,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid id type (boolean)", () => {
+        it("should reject object with invalid id type (boolean)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: true,
                 site_identifier: "test-site",
@@ -338,7 +642,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid site_identifier type", () => {
+        it("should reject object with invalid site_identifier type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 site_identifier: 123,
@@ -348,7 +660,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object with invalid type field type", () => {
+        it("should reject object with invalid type field type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 id: "test-id",
                 site_identifier: "test-site",
@@ -360,7 +680,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("isValidSettingsRow", () => {
-        it("should validate correct settings row", () => {
+        it("should validate correct settings row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow: SettingsRow = {
                 key: "theme",
                 value: "dark",
@@ -369,7 +697,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
 
-        it("should validate minimal valid settings row", () => {
+        it("should validate minimal valid settings row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 key: "enabled",
             };
@@ -377,7 +713,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
 
-        it("should validate settings row with long key", () => {
+        it("should validate settings row with long key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 key: "very-long-setting-key-name-that-should-still-work",
                 value: "some-value",
@@ -387,31 +731,87 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", () => {
+        it("should reject null input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", () => {
+        it("should reject undefined input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", () => {
+        it("should reject string input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", () => {
+        it("should reject number input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow(789)).toBe(false);
         });
 
-        it("should reject array input", () => {
+        it("should reject array input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow(["key", "value"])).toBe(false);
         });
 
-        it("should reject empty object", () => {
+        it("should reject empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSettingsRow({})).toBe(false);
         });
 
-        it("should reject object missing key", () => {
+        it("should reject object missing key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 value: "some-value",
             };
@@ -419,7 +819,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined key", () => {
+        it("should reject object with undefined key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 key: undefined,
                 value: "some-value",
@@ -428,7 +836,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with null key", () => {
+        it("should reject object with null key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 key: null,
                 value: "some-value",
@@ -437,7 +853,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with non-string key", () => {
+        it("should reject object with non-string key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 key: 123,
                 value: "some-value",
@@ -446,7 +870,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with empty string key", () => {
+        it("should reject object with empty string key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 key: "",
                 value: "some-value",
@@ -455,7 +887,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with whitespace-only key", () => {
+        it("should reject object with whitespace-only key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 key: "   ",
                 value: "some-value",
@@ -468,7 +908,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("isValidSiteRow", () => {
-        it("should validate correct site row", () => {
+        it("should validate correct site row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow: SiteRow = {
                 identifier: "test-site-123",
                 name: "Test Site",
@@ -477,7 +925,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(validRow)).toBe(true);
         });
 
-        it("should validate minimal valid site row", () => {
+        it("should validate minimal valid site row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 identifier: "minimal-site",
             };
@@ -485,7 +941,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(validRow)).toBe(true);
         });
 
-        it("should validate site row with identifier containing special characters", () => {
+        it("should validate site row with identifier containing special characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow = {
                 identifier: "site-with-dashes_and_underscores.and.dots",
                 name: "Special Site",
@@ -495,31 +959,87 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", () => {
+        it("should reject null input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", () => {
+        it("should reject undefined input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", () => {
+        it("should reject string input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", () => {
+        it("should reject number input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow(999)).toBe(false);
         });
 
-        it("should reject array input", () => {
+        it("should reject array input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow(["identifier", "name"])).toBe(false);
         });
 
-        it("should reject empty object", () => {
+        it("should reject empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidSiteRow({})).toBe(false);
         });
 
-        it("should reject object missing identifier", () => {
+        it("should reject object missing identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 name: "Some Site",
             };
@@ -527,7 +1047,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(row)).toBe(false);
         });
 
-        it("should reject object with undefined identifier", () => {
+        it("should reject object with undefined identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 identifier: undefined,
                 name: "Some Site",
@@ -536,7 +1064,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(row)).toBe(false);
         });
 
-        it("should reject object with null identifier", () => {
+        it("should reject object with null identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 identifier: null,
                 name: "Some Site",
@@ -545,7 +1081,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(row)).toBe(false);
         });
 
-        it("should reject object with non-string identifier", () => {
+        it("should reject object with non-string identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 identifier: 12_345,
                 name: "Some Site",
@@ -554,7 +1098,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(row)).toBe(false);
         });
 
-        it("should reject object with empty string identifier", () => {
+        it("should reject object with empty string identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 identifier: "",
                 name: "Some Site",
@@ -563,7 +1115,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(row)).toBe(false);
         });
 
-        it("should reject object with whitespace-only identifier", () => {
+        it("should reject object with whitespace-only identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 identifier: "   \t\n   ",
                 name: "Some Site",
@@ -574,7 +1134,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("safeGetRowProperty", () => {
-        it("should return property value when property exists and is not undefined", () => {
+        it("should return property value when property exists and is not undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 stringProp: "hello",
                 numberProp: 42,
@@ -612,7 +1180,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should return default value when property does not exist", () => {
+        it("should return default value when property does not exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = { existingProp: "value" };
 
             expect(safeGetRowProperty(row, "nonExistentProp", "default")).toBe(
@@ -626,7 +1202,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should return default value when property is undefined", () => {
+        it("should return default value when property is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 undefinedProp: undefined,
                 existingProp: "value",
@@ -637,7 +1221,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should handle empty row object", () => {
+        it("should handle empty row object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {};
 
             expect(safeGetRowProperty(row, "anyProp", "default")).toBe(
@@ -647,7 +1239,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(safeGetRowProperty(row, "boolProp", true)).toBe(true);
         });
 
-        it("should work with complex default values", () => {
+        it("should work with complex default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {};
             const complexDefault = {
                 nested: {
@@ -665,7 +1265,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             ).toEqual(complexDefault);
         });
 
-        it("should handle special property names", () => {
+        it("should handle special property names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 "prop-with-dashes": "dash-value",
                 prop_with_underscores: "underscore-value",
@@ -687,7 +1295,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should preserve type information", () => {
+        it("should preserve type information", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row = {
                 stringVal: "text",
                 numberVal: 123.45,
@@ -712,7 +1328,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("RowValidationUtils.isValidObject internal function coverage", () => {
-        it("should cover internal isValidObject validation through public functions", () => {
+        it("should cover internal isValidObject validation through public functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // These tests ensure the internal RowValidationUtils functions are exercised
 
             // Test the isValidObject check through different validation functions
@@ -727,7 +1351,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("RowValidationUtils.isValidStatus internal function coverage", () => {
-        it("should cover internal isValidStatus validation", () => {
+        it("should cover internal isValidStatus validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Test both valid status values
             const validUpRow = {
                 monitorId: "test",
@@ -761,7 +1393,15 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("RowValidationUtils.isValidTimestamp internal function coverage", () => {
-        it("should cover internal isValidTimestamp validation for numbers", () => {
+        it("should cover internal isValidTimestamp validation for numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Valid numeric timestamps
             const validNumberRow = {
                 monitorId: "test",
@@ -779,7 +1419,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(nanRow)).toBe(false);
         });
 
-        it("should cover internal isValidTimestamp validation for strings", () => {
+        it("should cover internal isValidTimestamp validation for strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Valid string timestamp that can be converted to number
             const validStringRow = {
                 monitorId: "test",
@@ -805,7 +1453,15 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(emptyStringRow)).toBe(true);
         });
 
-        it("should cover internal isValidTimestamp validation for other types", () => {
+        it("should cover internal isValidTimestamp validation for other types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Non-number, non-string timestamp should be invalid
             const booleanRow = {
                 monitorId: "test",

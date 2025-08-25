@@ -89,7 +89,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleStartMonitoring", () => {
-        it("should handle successful start monitoring (lines 420-430)", async () => {
+        it("should handle successful start monitoring (lines 420-430)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -112,7 +120,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleStopMonitoring", () => {
-        it("should handle successful stop monitoring (lines 434-450)", async () => {
+        it("should handle successful stop monitoring (lines 434-450)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -135,7 +151,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleSaveInterval - validation error path", () => {
-        it("should handle validation failure for check interval (lines 484-492)", async () => {
+        it("should handle validation failure for check interval (lines 484-492)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: false,
@@ -166,7 +190,15 @@ describe("useSiteDetails - Branch Coverage", () => {
             );
         });
 
-        it("should handle successful interval save (lines 494-508)", async () => {
+        it("should handle successful interval save (lines 494-508)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
@@ -205,7 +237,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleSaveTimeout - validation error path", () => {
-        it("should handle validation failure for timeout (lines 534-542)", async () => {
+        it("should handle validation failure for timeout (lines 534-542)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: false,
@@ -236,7 +276,15 @@ describe("useSiteDetails - Branch Coverage", () => {
             );
         });
 
-        it("should handle successful timeout save (lines 544-558)", async () => {
+        it("should handle successful timeout save (lines 544-558)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
@@ -275,7 +323,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleSaveRetryAttempts - validation error path", () => {
-        it("should handle validation failure for retry attempts (lines 584-595)", async () => {
+        it("should handle validation failure for retry attempts (lines 584-595)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock validation failure
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: false,
@@ -308,7 +364,15 @@ describe("useSiteDetails - Branch Coverage", () => {
             );
         });
 
-        it("should handle successful retry attempts save (lines 597-608)", async () => {
+        it("should handle successful retry attempts save (lines 597-608)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             // Mock validation success
             mockValidateMonitorFieldClientSide.mockResolvedValue({
                 success: true,
@@ -345,7 +409,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("handleSaveName - early return path", () => {
-        it("should handle early return when no unsaved changes (lines 624-627)", async () => {
+        it("should handle early return when no unsaved changes (lines 624-627)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -359,7 +431,15 @@ describe("useSiteDetails - Branch Coverage", () => {
             expect(mockSitesStore.modifySite).not.toHaveBeenCalled();
         });
 
-        it("should handle successful name save with trimmed name (lines 629-639)", async () => {
+        it("should handle successful name save with trimmed name (lines 629-639)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -388,7 +468,15 @@ describe("useSiteDetails - Branch Coverage", () => {
     });
 
     describe("Edge case validations", () => {
-        it("should handle missing monitor type in validation (fallback to 'http')", async () => {
+        it("should handle missing monitor type in validation (fallback to 'http')", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails.branch-coverage", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Validation", "type");
+
             // Create a monitor without type to test the fallback
             const siteWithoutType = {
                 ...mockSite,

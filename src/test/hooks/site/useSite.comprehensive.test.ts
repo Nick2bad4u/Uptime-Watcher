@@ -112,7 +112,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Hook Composition", () => {
-        it("should call all required hooks with correct parameters", () => {
+        it("should call all required hooks with correct parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             renderHook(() => useSite(mockSite));
 
             expect(mockUseSiteMonitor).toHaveBeenCalledWith(mockSite);
@@ -124,7 +132,15 @@ describe("useSite Hook", () => {
             expect(mockUseErrorStore).toHaveBeenCalled();
         });
 
-        it("should pass filteredHistory from monitor to stats", () => {
+        it("should pass filteredHistory from monitor to stats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockHistory = [
                 {
                     timestamp: Date.now(),
@@ -155,7 +171,15 @@ describe("useSite Hook", () => {
             expect(mockUseSiteStats).toHaveBeenCalledWith(mockHistory);
         });
 
-        it("should pass monitor from monitor hook to actions", () => {
+        it("should pass monitor from monitor hook to actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockUseSiteMonitor.mockReturnValueOnce({
                 monitor: mockMonitor,
                 selectedMonitorId: "monitor-1",
@@ -178,7 +202,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Return Value Composition", () => {
-        it("should return combined data from all hooks", () => {
+        it("should return combined data from all hooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockMonitorData = {
                 monitor: mockMonitor,
                 selectedMonitorId: "monitor-1",
@@ -250,7 +282,15 @@ describe("useSite Hook", () => {
             );
         });
 
-        it("should have isLoading property that does not get overwritten", () => {
+        it("should have isLoading property that does not get overwritten", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockUseErrorStore.mockReturnValueOnce({ isLoading: true });
 
             const { result } = renderHook(() => useSite(mockSite));
@@ -260,7 +300,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle site with no monitors", () => {
+        it("should handle site with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithNoMonitors: Site = {
                 ...mockSite,
                 monitors: [],
@@ -284,7 +332,15 @@ describe("useSite Hook", () => {
             expect(result.current.status).toBe("down");
         });
 
-        it("should handle site with multiple monitors", () => {
+        it("should handle site with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const multiMonitorSite: Site = {
                 ...mockSite,
                 monitors: [mockMonitor, { ...mockMonitor, id: "monitor-2" }],
@@ -296,7 +352,15 @@ describe("useSite Hook", () => {
             expect(result.current).toBeDefined();
         });
 
-        it("should handle site with disabled monitoring", () => {
+        it("should handle site with disabled monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const disabledMonitoringSite: Site = {
                 ...mockSite,
                 monitoring: false,
@@ -323,7 +387,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Hook Dependencies", () => {
-        it("should re-call hooks when site changes", () => {
+        it("should re-call hooks when site changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender } = renderHook(({ site }) => useSite(site), {
                 initialProps: { site: mockSite },
             });
@@ -340,7 +412,15 @@ describe("useSite Hook", () => {
             expect(mockUseSiteActions).toHaveBeenCalledWith(newSite, undefined);
         });
 
-        it("should maintain referential stability for functions", () => {
+        it("should maintain referential stability for functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: firstResult } = renderHook(() => useSite(mockSite));
             const { result: secondResult } = renderHook(() =>
                 useSite(mockSite)
@@ -357,7 +437,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Type Safety", () => {
-        it("should satisfy UseSiteResult interface", () => {
+        it("should satisfy UseSiteResult interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSite(mockSite));
 
             // SiteMonitorResult properties
@@ -388,7 +476,15 @@ describe("useSite Hook", () => {
             expect(result.current).toHaveProperty("isLoading");
         });
 
-        it("should have properly typed function signatures", () => {
+        it("should have properly typed function signatures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSite(mockSite));
 
             expect(typeof result.current.selectedMonitorId).toBe("string");
@@ -405,7 +501,15 @@ describe("useSite Hook", () => {
     });
 
     describe("Property Precedence", () => {
-        it("should maintain correct property precedence as documented", () => {
+        it("should maintain correct property precedence as documented", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // According to docs: Actions → Monitor → Stats → Loading state
             // isLoading should be added last and not overwritten
 

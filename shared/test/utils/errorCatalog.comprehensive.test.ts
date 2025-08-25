@@ -9,7 +9,15 @@ import {
 
 describe("errorCatalog utilities", () => {
     describe("formatErrorMessage", () => {
-        it("should format error message with basic interpolation", () => {
+        it("should format error message with basic interpolation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const template = "Site {siteId} failed with error {error}";
             const variables = { siteId: "example.com", error: "404" };
 
@@ -18,7 +26,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Site example.com failed with error 404");
         });
 
-        it("should handle missing variables gracefully", () => {
+        it("should handle missing variables gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "Monitor {monitorId} on site {siteId} failed";
             const variables = { monitorId: "mon-123" }; // missing siteId
 
@@ -27,7 +43,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Monitor mon-123 on site {siteId} failed");
         });
 
-        it("should handle template without placeholders", () => {
+        it("should handle template without placeholders", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "Generic error occurred";
             const variables = {};
 
@@ -36,7 +60,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Generic error occurred");
         });
 
-        it("should handle empty template", () => {
+        it("should handle empty template", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "";
             const variables = { key: "value" };
 
@@ -45,7 +77,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("");
         });
 
-        it("should handle empty variables object", () => {
+        it("should handle empty variables object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "Error in {module}";
             const variables = {};
 
@@ -54,7 +94,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Error in {module}");
         });
 
-        it("should handle simple error messages without placeholders", () => {
+        it("should handle simple error messages without placeholders", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const template = "Database error occurred";
             const variables = {};
 
@@ -63,7 +111,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Database error occurred");
         });
 
-        it("should handle numeric values", () => {
+        it("should handle numeric values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template =
                 "HTTP error {status} occurred after {attempts} attempts";
             const variables = { status: 500, attempts: 3 };
@@ -73,7 +129,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("HTTP error 500 occurred after 3 attempts");
         });
 
-        it("should handle string values", () => {
+        it("should handle string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "User {username} authentication failed: {reason}";
             const variables = {
                 username: "alice",
@@ -87,7 +151,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle mixed data types", () => {
+        it("should handle mixed data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "Monitor {id} for {url} failed {count} times";
             const variables = {
                 id: 123,
@@ -102,7 +174,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle repeated placeholders", () => {
+        it("should handle repeated placeholders", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = "Error {code}: {code} is not handled";
             const variables = { code: "E001" };
 
@@ -111,7 +191,15 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Error E001: E001 is not handled");
         });
 
-        it("should handle complex error scenarios", () => {
+        it("should handle complex error scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const template =
                 "Database operation failed: {operation} on table {table} with error {error} (attempt {attempt} of {maxAttempts})";
             const variables = {
@@ -129,7 +217,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle special characters in values", () => {
+        it("should handle special characters in values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template =
                 "Failed to connect to {url} with message: {message}";
             const variables = {
@@ -144,7 +240,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle placeholder-like text that is not a placeholder", () => {
+        it("should handle placeholder-like text that is not a placeholder", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template =
                 "Error occurred with {actualPlaceholder} and some {not a placeholder} text";
             const variables = { actualPlaceholder: "value" };
@@ -156,7 +260,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle zero values", () => {
+        it("should handle zero values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template =
                 "Process completed with {errors} errors and {warnings} warnings";
             const variables = { errors: 0, warnings: 0 };
@@ -168,7 +280,15 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle empty string values", () => {
+        it("should handle empty string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const template = 'Field {field} has value: "{value}"';
             const variables = { field: "description", value: "" };
 
@@ -179,7 +299,15 @@ describe("errorCatalog utilities", () => {
     });
 
     describe("isKnownErrorMessage", () => {
-        it("should return true for known error messages from the catalog", () => {
+        it("should return true for known error messages from the catalog", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test with actual error messages from the catalog
             expect(isKnownErrorMessage("Site not found")).toBe(true);
             expect(isKnownErrorMessage("Monitor not found")).toBe(true);
@@ -192,7 +320,15 @@ describe("errorCatalog utilities", () => {
             expect(isKnownErrorMessage("Operation failed")).toBe(true);
         });
 
-        it("should return false for unknown error messages", () => {
+        it("should return false for unknown error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const unknownMessages = [
                 "This is definitely not a known error message",
                 "Random string that should not be in catalog",
@@ -206,31 +342,71 @@ describe("errorCatalog utilities", () => {
             }
         });
 
-        it("should handle empty string", () => {
+        it("should handle empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = isKnownErrorMessage("");
             expect(result).toBe(false);
         });
 
-        it("should handle case sensitivity", () => {
+        it("should handle case sensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that the function is case sensitive
             expect(isKnownErrorMessage("Site not found")).toBe(true);
             expect(isKnownErrorMessage("SITE NOT FOUND")).toBe(false);
             expect(isKnownErrorMessage("site not found")).toBe(false);
         });
 
-        it("should handle whitespace sensitivity", () => {
+        it("should handle whitespace sensitivity", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isKnownErrorMessage("Site not found")).toBe(true);
             expect(isKnownErrorMessage(" Site not found ")).toBe(false);
             expect(isKnownErrorMessage("Site  not  found")).toBe(false);
         });
 
-        it("should handle partial matches", () => {
+        it("should handle partial matches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isKnownErrorMessage("Site not found")).toBe(true);
             expect(isKnownErrorMessage("Site not")).toBe(false);
             expect(isKnownErrorMessage("not found")).toBe(false);
         });
 
-        it("should work with all error categories", () => {
+        it("should work with all error categories", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test messages from different categories
             expect(isKnownErrorMessage("Failed to add site")).toBe(true); // SITE_ERRORS
             expect(
@@ -246,7 +422,15 @@ describe("errorCatalog utilities", () => {
             expect(isKnownErrorMessage("Operation failed")).toBe(true); // IPC_ERRORS
         });
 
-        it("should handle special characters in error messages", () => {
+        it("should handle special characters in error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test messages that contain special characters
             expect(isKnownErrorMessage("SSL/TLS connection failed")).toBe(true);
             expect(
@@ -254,7 +438,15 @@ describe("errorCatalog utilities", () => {
             ).toBe(true);
         });
 
-        it("should return false for non-string inputs by type safety", () => {
+        it("should return false for non-string inputs by type safety", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // The function signature requires a string, so TypeScript would catch these
             // But for runtime safety, we test the behavior
             expect(isKnownErrorMessage(123 as any)).toBe(false);
@@ -267,7 +459,15 @@ describe("errorCatalog utilities", () => {
     });
 
     describe("integration tests", () => {
-        it("should work together for error handling scenarios", () => {
+        it("should work together for error handling scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test a realistic error handling workflow
             const errorTemplate =
                 "Monitor {monitorId} failed: {errorType} - {details}";
@@ -286,7 +486,15 @@ describe("errorCatalog utilities", () => {
             expect(typeof isKnown).toBe("boolean");
         });
 
-        it("should handle error cataloging workflow", () => {
+        it("should handle error cataloging workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test common error catalog patterns
             const commonErrors = [
                 "Network request failed",
@@ -310,7 +518,15 @@ describe("errorCatalog utilities", () => {
             }
         });
 
-        it("should handle complex error scenarios", () => {
+        it("should handle complex error scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const complexTemplate =
                 "Service {service} in environment {env} failed during {operation} with error {code}: {message}. Retry attempt {retry} of {maxRetries}";
             const complexData = {

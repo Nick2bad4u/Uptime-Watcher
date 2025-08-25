@@ -119,7 +119,15 @@ describe("main.ts - Electron Main Process", () => {
         vi.resetModules();
     });
     describe("Logging Configuration", () => {
-        it("should configure debug logging when --debug flag is present", async () => {
+        it("should configure debug logging when --debug flag is present", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -133,7 +141,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
         });
-        it("should configure production logging when --log-production flag is present", async () => {
+        it("should configure production logging when --log-production flag is present", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -145,7 +161,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should configure info logging when --log-info flag is present", async () => {
+        it("should configure info logging when --log-info flag is present", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -157,7 +181,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("info");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should use default development logging when no flags are present", async () => {
+        it("should use default development logging when no flags are present", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = false;
 
@@ -166,7 +198,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("info");
             expect(mockLog.transports.console.level).toBe("debug");
         });
-        it("should use default production logging when packaged", async () => {
+        it("should use default production logging when packaged", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = ["node", "main.js"];
             (mockApp as any).isPackaged = true;
 
@@ -175,7 +215,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should handle --log-prod flag as alias for --log-production", async () => {
+        it("should handle --log-prod flag as alias for --log-production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -187,7 +235,15 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should handle --log-debug flag as alias for --debug", async () => {
+        it("should handle --log-debug flag as alias for --debug", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -201,7 +257,15 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("Main Class Initialization", () => {
-        it("should create ApplicationService instance", async () => {
+        it("should create ApplicationService instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
@@ -213,7 +277,15 @@ describe("main.ts - Electron Main Process", () => {
                 "Starting Uptime Watcher application"
             );
         });
-        it("should set up process cleanup handlers", async () => {
+        it("should set up process cleanup handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const processOnSpy = vi.spyOn(process, "on");
 
             await import("../main");
@@ -227,7 +299,15 @@ describe("main.ts - Electron Main Process", () => {
                 expect.any(Function)
             );
         });
-        it("should only cleanup once when multiple shutdown events occur", async () => {
+        it("should only cleanup once when multiple shutdown events occur", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const processOnSpy = vi.spyOn(process, "on");
 
             await import("../main");
@@ -252,7 +332,15 @@ describe("main.ts - Electron Main Process", () => {
             // Cleanup should only be called once
             expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
         });
-        it("should handle cleanup errors gracefully", async () => {
+        it("should handle cleanup errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockApplicationService.cleanup.mockRejectedValue(
                 new Error("Cleanup failed")
             );
@@ -281,7 +369,15 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("DevTools Extension Installation", () => {
-        it("should install devtools extensions in development mode", async () => {
+        it("should install devtools extensions in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockIsDev.mockReturnValue(true);
 
             await import("../main");
@@ -309,7 +405,15 @@ describe("main.ts - Electron Main Process", () => {
                 "[Main] Added Extensions: React Developer Tools, Redux DevTools"
             );
         });
-        it("should not install extensions in production mode", async () => {
+        it("should not install extensions in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockIsDev.mockReturnValue(false);
 
             await import("../main");
@@ -321,7 +425,15 @@ describe("main.ts - Electron Main Process", () => {
 
             expect(mockInstallExtension).not.toHaveBeenCalled();
         });
-        it("should handle extension installation failures gracefully", async () => {
+        it("should handle extension installation failures gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockIsDev.mockReturnValue(true);
             mockInstallExtension.mockRejectedValue(
                 new Error("Extension installation failed")
@@ -341,7 +453,15 @@ describe("main.ts - Electron Main Process", () => {
                 expect.any(Error)
             );
         });
-        it("should wait for timing before installing extensions", async () => {
+        it("should wait for timing before installing extensions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockIsDev.mockReturnValue(true);
             const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
@@ -355,7 +475,15 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("Electron Environment Detection", () => {
-        it("should only initialize when in Electron environment", async () => {
+        it("should only initialize when in Electron environment", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             // Test with Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions, electron: "25.0.0" },
@@ -369,7 +497,15 @@ describe("main.ts - Electron Main Process", () => {
 
             expect(ApplicationService).toHaveBeenCalled();
         });
-        it("should not initialize when not in Electron environment", async () => {
+        it("should not initialize when not in Electron environment", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             // Test without Electron environment
             Object.defineProperty(process, "versions", {
                 value: { ...originalVersions },
@@ -387,7 +523,15 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("Main Class Edge Cases", () => {
-        it("should handle missing cleanup method gracefully", async () => {
+        it("should handle missing cleanup method gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             (mockApplicationService as any).cleanup = undefined;
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -402,7 +546,15 @@ describe("main.ts - Electron Main Process", () => {
                 if (beforeExitHandler) beforeExitHandler();
             }).not.toThrow();
         });
-        it("should handle null applicationService gracefully", async () => {
+        it("should handle null applicationService gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
@@ -423,7 +575,15 @@ describe("main.ts - Electron Main Process", () => {
         });
     });
     describe("Log Transport Configuration", () => {
-        it("should configure file transport correctly", async () => {
+        it("should configure file transport correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             await import("../main");
 
             expect(mockLog.transports.file.fileName).toBe(
@@ -434,7 +594,15 @@ describe("main.ts - Electron Main Process", () => {
                 "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}"
             );
         });
-        it("should configure console transport correctly", async () => {
+        it("should configure console transport correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             await import("../main");
 
             expect(mockLog.transports.console.format).toBe(

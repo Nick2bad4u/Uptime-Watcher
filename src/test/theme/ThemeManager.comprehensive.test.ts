@@ -65,7 +65,15 @@ describe("ThemeManager", () => {
     });
 
     describe("Singleton Pattern", () => {
-        it("should return the same instance", () => {
+        it("should return the same instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const instance1 = ThemeManager.getInstance();
             const instance2 = ThemeManager.getInstance();
             expect(instance1).toBe(instance2);
@@ -73,25 +81,57 @@ describe("ThemeManager", () => {
     });
 
     describe("getTheme", () => {
-        it("should return light theme", () => {
+        it("should return light theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("light");
             expect(theme).toBeDefined();
             expect(theme.name).toBe("light");
         });
 
-        it("should return dark theme", () => {
+        it("should return dark theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("dark");
             expect(theme).toBeDefined();
             expect(theme.name).toBe("dark");
         });
 
-        it("should return high contrast theme", () => {
+        it("should return high contrast theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("high-contrast");
             expect(theme).toBeDefined();
             expect(theme.name).toBe("high-contrast");
         });
 
-        it("should return existing theme for any valid name", () => {
+        it("should return existing theme for any valid name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const availableThemes = themeManager.getAvailableThemes();
             for (const themeName of availableThemes) {
                 const theme = themeManager.getTheme(themeName);
@@ -107,7 +147,15 @@ describe("ThemeManager", () => {
     });
 
     describe("getAvailableThemes", () => {
-        it("should return array of theme names", () => {
+        it("should return array of theme names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const availableThemes = themeManager.getAvailableThemes();
             expect(Array.isArray(availableThemes)).toBe(true);
             expect(availableThemes.length).toBeGreaterThan(0);
@@ -117,7 +165,15 @@ describe("ThemeManager", () => {
     });
 
     describe("getSystemThemePreference", () => {
-        it("should return dark when system prefers dark", () => {
+        it("should return dark when system prefers dark", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: true,
                 media: "(prefers-color-scheme: dark)",
@@ -133,7 +189,15 @@ describe("ThemeManager", () => {
             expect(preference).toBe("dark");
         });
 
-        it("should return light when system prefers light", () => {
+        it("should return light when system prefers light", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(globalThis.matchMedia).mockReturnValue({
                 matches: false,
                 media: "(prefers-color-scheme: dark)",
@@ -149,7 +213,15 @@ describe("ThemeManager", () => {
             expect(preference).toBe("light");
         });
 
-        it("should handle missing matchMedia", () => {
+        it("should handle missing matchMedia", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalMatchMedia = globalThis.matchMedia;
             // @ts-expect-error Testing missing matchMedia
             globalThis.matchMedia = undefined;
@@ -163,20 +235,44 @@ describe("ThemeManager", () => {
     });
 
     describe("isValidThemeName", () => {
-        it("should validate correct theme names", () => {
+        it("should validate correct theme names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             expect(themeManager.isValidThemeName("light")).toBe(true);
             expect(themeManager.isValidThemeName("dark")).toBe(true);
             expect(themeManager.isValidThemeName("high-contrast")).toBe(true);
         });
 
-        it("should reject invalid theme names", () => {
+        it("should reject invalid theme names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(themeManager.isValidThemeName("invalid")).toBe(false);
             expect(themeManager.isValidThemeName("")).toBe(false);
             expect(themeManager.isValidThemeName("123")).toBe(false);
             expect(themeManager.isValidThemeName("custom-theme")).toBe(false);
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(themeManager.isValidThemeName(null as any)).toBe(false);
             expect(themeManager.isValidThemeName(undefined as any)).toBe(false);
             expect(themeManager.isValidThemeName(123 as any)).toBe(false);
@@ -185,7 +281,15 @@ describe("ThemeManager", () => {
     });
 
     describe("applyTheme", () => {
-        it("should apply theme to document", () => {
+        it("should apply theme to document", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const lightTheme = themeManager.getTheme("light");
             themeManager.applyTheme(lightTheme);
 
@@ -193,7 +297,15 @@ describe("ThemeManager", () => {
             expect(documentElement.style.setProperty).toHaveBeenCalled();
         });
 
-        it("should handle missing document gracefully", () => {
+        it("should handle missing document gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalDocument = globalThis.document;
             delete (globalThis as any).document;
 
@@ -204,7 +316,15 @@ describe("ThemeManager", () => {
             globalThis.document = originalDocument;
         });
 
-        it("should apply all theme properties", () => {
+        it("should apply all theme properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Reset mocks and ensure they're properly set up
             vi.clearAllMocks();
 
@@ -219,7 +339,15 @@ describe("ThemeManager", () => {
             // We just verify that the applyTheme method executes without errors
         });
 
-        it("should handle different theme types", () => {
+        it("should handle different theme types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const availableThemes = themeManager.getAvailableThemes();
 
             for (const themeName of availableThemes) {
@@ -230,7 +358,15 @@ describe("ThemeManager", () => {
     });
 
     describe("createCustomTheme", () => {
-        it("should create custom theme from base theme", () => {
+        it("should create custom theme from base theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             const baseTheme = themeManager.getTheme("light");
             const overrides = {
                 name: "custom-light",
@@ -246,7 +382,15 @@ describe("ThemeManager", () => {
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve other properties
         });
 
-        it("should handle partial overrides", () => {
+        it("should handle partial overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseTheme = themeManager.getTheme("dark");
             const overrides = {
                 isDark: false,
@@ -261,14 +405,30 @@ describe("ThemeManager", () => {
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve unmodified properties
         });
 
-        it("should handle empty overrides", () => {
+        it("should handle empty overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseTheme = themeManager.getTheme("light");
             const customTheme = themeManager.createCustomTheme(baseTheme, {});
 
             expect(customTheme).toEqual(baseTheme);
         });
 
-        it("should deep merge nested objects", () => {
+        it("should deep merge nested objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseTheme = themeManager.getTheme("light");
             const overrides = {
                 name: "custom-theme",
@@ -287,7 +447,15 @@ describe("ThemeManager", () => {
     });
 
     describe("generateCSSVariables", () => {
-        it("should generate CSS variables string", () => {
+        it("should generate CSS variables string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("light");
             const cssVariables = themeManager.generateCSSVariables(theme);
 
@@ -297,7 +465,15 @@ describe("ThemeManager", () => {
             expect(cssVariables).toContain("--spacing-");
         });
 
-        it("should handle all theme properties", () => {
+        it("should handle all theme properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("dark");
             const cssVariables = themeManager.generateCSSVariables(theme);
 
@@ -313,7 +489,15 @@ describe("ThemeManager", () => {
             expect(cssVariables).toMatch(/--spacing-\w+:/);
         });
 
-        it("should generate valid CSS syntax", () => {
+        it("should generate valid CSS syntax", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("high-contrast");
             const cssVariables = themeManager.generateCSSVariables(theme);
 
@@ -325,7 +509,15 @@ describe("ThemeManager", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle theme with missing properties", () => {
+        it("should handle theme with missing properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const incompleteTheme = {
                 name: "incomplete",
                 colors: {},
@@ -343,7 +535,15 @@ describe("ThemeManager", () => {
             ).not.toThrow();
         });
 
-        it("should handle null/undefined values gracefully", () => {
+        it("should handle null/undefined values gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const themeWithNulls = {
                 name: "test",
                 colors: { primary: null },
@@ -356,7 +556,15 @@ describe("ThemeManager", () => {
             expect(() => themeManager.applyTheme(themeWithNulls)).not.toThrow();
         });
 
-        it("should work without DOM environment", () => {
+        it("should work without DOM environment", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalDocument = globalThis.document;
             delete (globalThis as any).document;
 
@@ -369,7 +577,15 @@ describe("ThemeManager", () => {
     });
 
     describe("Performance", () => {
-        it("should handle multiple theme applications efficiently", () => {
+        it("should handle multiple theme applications efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("light");
 
             const start = performance.now();
@@ -382,7 +598,15 @@ describe("ThemeManager", () => {
             expect(end - start).toBeLessThan(100);
         });
 
-        it("should handle CSS variable generation efficiently", () => {
+        it("should handle CSS variable generation efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = themeManager.getTheme("dark");
 
             const start = performance.now();
