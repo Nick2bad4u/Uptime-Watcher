@@ -50,8 +50,7 @@
         "@shared/validation",
         "validator",
         "zod",
-        "@commitlint/prompt",
-        "@commitlint/prompt-cli",
+
         "@cspell/cspell-bundled-dicts",
         "@cspell/cspell-types",
         "@dword-design/eslint-plugin-import-alias",
