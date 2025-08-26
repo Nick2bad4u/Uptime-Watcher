@@ -523,7 +523,6 @@
     "@types/eslint-plugin-react-refresh": "^0.4.0",
     "@types/eslint-plugin-security": "^3.0.0",
     "@types/eslint-plugin-tailwindcss": "^3.17.0",
-    "@types/jest": "^30.0.0",
     "@types/jsdom": "^21.1.7",
     "@types/json-schema": "^7.0.15",
     "@types/lint-staged": "^14.0.0",
