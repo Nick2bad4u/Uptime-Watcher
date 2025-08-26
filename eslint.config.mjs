@@ -179,7 +179,7 @@ export default [
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
-    // @ts-ignore -- working fine - tested
+    // @ts-expect-error -- working fine - tested
     nitpick.configs.recommended,
     // Global ignores - must be first and more comprehensive
     {
@@ -225,7 +225,7 @@ export default [
             "coverage-report.json",
             "html/**",
             "report/**",
-            // "**/*.config.{js,mjs,ts}",
+            "**/package-lock.json",
         ],
     },
     // Global browser environment
@@ -273,6 +273,7 @@ export default [
                         "config/testing/tsconfig.electron.test.json",
                         "tsconfig.json",
                         "config/testing/tsconfig.test.json",
+                        "config/testing/tsconfig.configs.json",
                         "tsconfig.shared.json",
                         "config/testing/tsconfig.shared.test.json",
                         "docs/docusaurus/tsconfig.json",
@@ -288,10 +289,7 @@ export default [
 
     // YAML files
     {
-        files: [
-            "*.yaml",
-            "*.yml",
-        ],
+        files: ["**/*.{yaml,yml}"],
         ignores: [],
         languageOptions: {
             parser: yamlEslintParser,
@@ -309,10 +307,12 @@ export default [
             "yml/block-mapping-colon-indicator-newline": "error",
             "yml/block-mapping-question-indicator-newline": "error",
             "yml/block-sequence-hyphen-indicator-newline": "error",
+            "yml/file-extension": "off",
             "yml/flow-mapping-curly-newline": "error",
             "yml/flow-mapping-curly-spacing": "error",
             "yml/flow-sequence-bracket-newline": "error",
             "yml/flow-sequence-bracket-spacing": "error",
+            "yml/key-name-casing": "off",
             "yml/key-spacing": "error",
             "yml/no-empty-document": "error",
             "yml/no-empty-key": "error",
@@ -324,33 +324,51 @@ export default [
             "yml/no-trailing-zeros": "error",
             "yml/plain-scalar": "off",
             "yml/quotes": "error",
+            "yml/require-string-key": "error",
+            "yml/sort-keys": "error",
+            "yml/sort-sequence-values": "off",
         },
     },
 
     // HTML files
     {
-        files: [
-            "**/*.html",
-            "**/*.htm",
-            "*.html",
-            "*.htm",
-            "*.xhtml",
-        ],
+        files: ["**/*.{html,htm,xhtml}"],
         ignores: ["report/**"],
         languageOptions: {
             parser: htmlParser,
         },
         plugins: {
-            "@html-eslint": html,
+            html: html,
         },
         rules: {
-            ...html.configs["flat/recommended"].rules,
-            "@html-eslint/indent": "error",
-            "@html-eslint/no-extra-spacing-attrs": [
+            ...html.configs.recommended.rules,
+            "html/indent": "error",
+            "html/no-extra-spacing-attrs": [
                 "error",
                 { enforceBeforeSelfClose: true },
             ],
-            "@html-eslint/require-closing-tags": [
+            "html/require-closing-tags": [
+                "error",
+                { selfClosing: "always" },
+            ],
+        },
+    },
+
+    // Lint HTML Literals files
+    {
+        files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
+        ignores: ["report/**"],
+        plugins: {
+            html: html,
+        },
+        rules: {
+            ...html.configs.recommended.rules,
+            "html/indent": "error",
+            "html/no-extra-spacing-attrs": [
+                "error",
+                { enforceBeforeSelfClose: true },
+            ],
+            "html/require-closing-tags": [
                 "error",
                 { selfClosing: "always" },
             ],
@@ -438,7 +456,7 @@ export default [
 
     // Markdown files
     {
-        files: ["**/*.md"],
+        files: ["**/*.{md,markup,atom,rss}"],
         language: "markdown/gfm",
         plugins: {
             markdown: markdown,
@@ -564,9 +582,9 @@ export default [
         },
     },
 
-    // TSX Tailwind +Linting files
+    // TSX Tailwind + Linting files
     {
-        files: ["src/**/*.tsx"],
+        files: ["**/*.{tsx,jsx}"],
         ignores: [],
         languageOptions: {
             globals: {
@@ -648,16 +666,7 @@ export default [
 
     // Docusaurus files
     {
-        files: [
-            "docs/docusaurus/**/*.ts",
-            "docs/docusaurus/**/*.tsx",
-            "docs/docusaurus/**/*.mjs",
-            "docs/docusaurus/**/*.cjs",
-            "docs/docusaurus/**/*.js",
-            "docs/docusaurus/**/*.jsx",
-            "docs/docusaurus/**/*.mts",
-            "docs/docusaurus/**/*.cts",
-        ],
+        files: ["docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}"],
         ignores: [
             "docs/docusaurus/docs/**",
             "docs/docusaurus/build/**",
@@ -705,6 +714,7 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
@@ -726,7 +736,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -748,14 +758,14 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sql-template": sqlTemplate,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
@@ -1822,19 +1832,10 @@ export default [
 
     // TypeScript frontend files (React + Zustand)
     {
-        files: [
-            "src/**/*.ts",
-            "src/**/*.tsx",
-            "src/**/*.mts",
-            "src/**/*.cts",
-        ],
+        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
-            "**/*.spec.{ts,tsx,mts,cts}",
-            "**/*.test.{ts,tsx,mts,cts}",
-            "shared/**/*.spec.{ts,tsx,mts,cts}",
-            "shared/**/*.test.{ts,tsx,mts,cts}",
-            "shared/test/**/*.{ts,tsx,mts,cts}",
-            "src/test/**/*.{ts,tsx,mts,cts}",
+            "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "src/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -1878,6 +1879,7 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
@@ -1900,7 +1902,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -1930,7 +1932,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -1938,7 +1940,7 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             tailwind: tailwind,
@@ -3216,18 +3218,12 @@ export default [
 
     // Electron backend files
     {
-        files: [
-            "electron/**/*.ts",
-            "electron/**/*.cts",
-            "electron/**/*.mts",
-        ],
+        files: ["electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
-            "electron/**/*.spec.{ts,tsx,mts,cts}",
-            "electron/**/*.test.{ts,tsx,mts,cts}",
-            "electron/test/**/*.{ts,tsx,mts,cts}",
-            "shared/**/*.spec.{ts,tsx,mts,cts}",
-            "shared/**/*.test.{ts,tsx,mts,cts}",
-            "shared/test/**/*.{ts,tsx,mts,cts}",
+            "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "shared/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "shared/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -3273,6 +3269,7 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
@@ -3294,7 +3291,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -3316,14 +3313,14 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sql-template": sqlTemplate,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
@@ -4317,21 +4314,14 @@ export default [
         },
     },
 
-    // TypeScript frontend files (React + Zustand)
+    // TypeScript Shared (React and non-React)
     {
-        files: [
-            "shared/**/*.ts",
-            "shared/**/*.tsx",
-            "src/**/*.cts",
-            "src/**/*.mts",
-        ],
+        files: ["shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
-            "**/*.spec.{ts,tsx,mts,cts}",
-            "**/*.test.{ts,tsx,mts,cts}",
-            "shared/**/*.spec.{ts,tsx,mts,cts}",
-            "shared/**/*.test.{ts,tsx,mts,cts}",
-            "shared/test/**/*.{ts,tsx,mts,cts}",
-            "src/test/**/*.{ts,tsx,mts,cts}",
+            "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "shared/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "src/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -4375,6 +4365,7 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
+            // @ts-expect-error -- TS Error from fixupPluginRules
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-comments": pluginComments,
             "eslint-plugin-goodeffects": pluginGoodEffects,
@@ -4397,7 +4388,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -4427,7 +4418,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -4435,7 +4426,7 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            // @ts-ignore -- TS Error from fixupPluginRules
+            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             tailwind: tailwind,
@@ -5714,12 +5705,12 @@ export default [
     // Test files (Frontend)
     {
         files: [
-            "src/**/*.spec.{ts,tsx,cts,mts}",
-            "src/**/*.test.{ts,tsx,cts,mts}",
-            "src/test/**/*.{ts,tsx,cts,mts}",
-            "tests/**/*.{ts,tsx,cts,mts}",
-            "tests/**/*.spec.{ts,tsx,cts,mts}",
-            "tests/**/*.test.{ts,tsx,cts,mts}",
+            "src/**/*.{spec,test}.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "src/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "src/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "tests/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
+            "tests/**/*.{spec,test}.*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
+            "tests/**/*.{spec,test}.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -5900,9 +5891,8 @@ export default [
     // Test files (Backend)
     {
         files: [
-            "electron/**/*.spec.{ts,tsx,cts,mts}",
-            "electron/**/*.test.{ts,tsx,cts,mts}",
-            "electron/test/**/*.{ts,tsx,cts,mts}",
+            "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -6077,9 +6067,8 @@ export default [
     // Shared Test Files
     {
         files: [
-            "shared/**/*.spec.{ts,tsx,cts,mts}",
-            "shared/**/*.test.{ts,tsx,cts,mts}",
-            "shared/test/**/*.{ts,tsx,cts,mts}",
+            "shared/**/*.{spec,test}.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
+            "shared/test/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -6235,8 +6224,8 @@ export default [
     // Benchmark files
     {
         files: [
-            "benchmarks/**/*.bench.{ts,tsx,cts,mts}",
-            "benchmarks/**/*.{ts,tsx,cts,mts}",
+            "benchmarks/**/*.bench.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "benchmarks/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
         ],
         languageOptions: {
             globals: {
@@ -6418,9 +6407,10 @@ export default [
     // TypeScript Config files using Electron Test TSConfig
     {
         files: [
-            "**/*.config.{ts,mts,tsx}", // Configuration files
+            "**/*.config.{ts,tsx,mts,cts}", // Configuration files
+            "**/*.config.**.*.{ts,tsx,mts,cts}",
         ],
-        ignores: ["./.*/**"],
+        ignores: [],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -6440,7 +6430,7 @@ export default [
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: "config/testing/tsconfig.electron.test.json",
+                project: "config/testing/tsconfig.configs.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
@@ -6959,7 +6949,10 @@ export default [
 
     // JS/MJS Configuration files
     {
-        files: ["**/*.config.{js,mjs,cts,cjs}"],
+        files: [
+            "**/*.config.{js,mjs,cts,cjs}",
+            "**/*.config.**.*.{js,mjs,cts,cjs}",
+        ],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -7169,8 +7162,8 @@ export default [
     // Strict Test files (Frontend)
     {
         files: [
-            "shared/test/StrictTests/*.{ts,tsx,cts,mts}",
-            "src/test/StrictTests/*.{ts,tsx,cts,mts}",
+            "shared/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "src/test/StrictTests/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         plugins: {
             vitest: vitest,
@@ -7207,6 +7200,23 @@ export default [
         rules: {
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "off",
+        },
+    },
+
+    // YAML/YML disable empty key for github workflows (false positive)
+    {
+        files: [
+            "**/.github/workflows/**/*.{yaml,yml}",
+            "flatpak-build.yml",
+            "**/dependabot.yml",
+            "**/.spellcheck.yml",
+            "**/.pre-commit-config.yaml",
+        ],
+        rules: {
+            "yml/block-mapping-colon-indicator-newline": "off",
+            "yml/no-empty-key": "off",
+            "yml/no-empty-mapping-value": "off",
+            "yml/sort-keys": "off",
         },
     },
 

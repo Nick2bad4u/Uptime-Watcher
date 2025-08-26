@@ -2,9 +2,16 @@
 # Configuration follows modern best practices for 2025
 # See: https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
 
-# Output format for better integration with CI/CD
-output: cli,sarif
-output-file-path: console,checkov-results.sarif
+# Compact output to reduce noise
+compact: true
+
+# Custom tool name for better SARIF integration
+custom-tool-name: "Checkov-UptimeWatcher"
+
+enable-secret-scan-all-files: true
+
+# Enable evaluation of variables for better accuracy
+evaluate-variables: true
 
 # Framework selection - only scan relevant frameworks for this project
 framework:
@@ -15,14 +22,14 @@ framework:
     - yaml
     - json
 
-# Enable evaluation of variables for better accuracy
-evaluate-variables: true
+# Hard fail on high and critical issues
+hard-fail-on: HIGH,CRITICAL
 
-# Compact output to reduce noise
-compact: true
+# Output format for better integration with CI/CD
+output: cli,sarif
+output-file-path: console,checkov-results.sarif
 
-# Custom tool name for better SARIF integration
-custom-tool-name: "Checkov-UptimeWatcher"
+scan-secrets-history: false # Disabled to avoid performance impact in CI
 
 # Skip specific checks with detailed justifications
 skip-check:
@@ -44,17 +51,8 @@ skip-check:
 
 # Security enhancements
 # Enable secret scanning for all file types
-enable-secret-scan-all-files: true
-
 # Scan secrets in git history
-scan-secrets-history: false # Disabled to avoid performance impact in CI
-
 # Soft fail on low severity issues
-soft-fail-on: LOW
-
-# Hard fail on high and critical issues
-hard-fail-on: HIGH,CRITICAL
-
 # Skip paths that don't need security scanning
 skip-path:
     - node_modules/
@@ -69,3 +67,4 @@ skip-path:
     - .secretlintrc.json
     - docs/
     - shared/test/validation/schemas.test.ts
+soft-fail-on: LOW

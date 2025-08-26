@@ -1,32 +1,7 @@
-theme: jekyll-theme-hacker
-title: Uptime Watcher Documentation
-description: >-
-    Comprehensive documentation for Uptime Watcher - A cross-platform desktop
-    application for monitoring website uptime and server availability
-url: "https://nick2bad4u.github.io"
 baseurl: "/Uptime-Watcher"
-
-# Navigation
-navigation:
-    - title: "Home"
-      url: /
-    - title: "TSDoc"
-      url: /TSDoc/
-    - title: "GitHub"
-      url: https://github.com/Nick2bad4u/Uptime-Watcher
-
-# Jekyll settings
-markdown: kramdown
-highlighter: rouge
-kramdown:
-    input: GFM
-    syntax_highlighter: rouge
 
 # Collections for better organization
 collections:
-    guides:
-        output: true
-        permalink: /:collection/:name/
     api:
         output: true
         permalink: /:collection/:name/
@@ -34,6 +9,9 @@ collections:
         output: true
         permalink: /:collection/:name/
 
+    guides:
+        output: true
+        permalink: /:collection/:name/
 defaults:
     - scope:
           path: ""
@@ -46,6 +24,28 @@ defaults:
       values:
           layout: "default"
 
+description: >-
+    Comprehensive documentation for Uptime Watcher - A cross-platform desktop
+    application for monitoring website uptime and server availability
+highlighter: rouge
+kramdown:
+    input: GFM
+    syntax_highlighter: rouge
+
+# Jekyll settings
+markdown: kramdown
+# Navigation
+navigation:
+    - title: "Home"
+      url: /
+    - title: "TSDoc"
+      url: /TSDoc/
+    - title: "GitHub"
+      url: https://github.com/Nick2bad4u/Uptime-Watcher
+
+# Pagination settings (for jekyll-paginate)
+paginate: 10
+paginate_path: "/page:num/"
 plugins:
     - jekyll-sitemap
     - jekyll-seo-tag
@@ -65,9 +65,8 @@ plugins:
 
 # Plugin settings
 relative_links:
-    enabled: true
     collections: true
-
-# Pagination settings (for jekyll-paginate)
-paginate: 10
-paginate_path: "/page:num/"
+    enabled: true
+theme: jekyll-theme-hacker
+title: Uptime Watcher Documentation
+url: "https://nick2bad4u.github.io"

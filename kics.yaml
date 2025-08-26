@@ -2,44 +2,17 @@
 # Infrastructure as Code Security Scanner
 # https://docs.kics.io/latest/configuration-file/
 
-# Core Scanning Configuration
-type:
-    - Terraform
-    - Kubernetes
-    - CloudFormation
-    - Ansible
-    - OpenAPI
-    - DockerCompose
-    - Crossplane
-    - Pulumi
-    - ServerlessFW
+# Cloud provider specific settings
+cloud-provider: []
+# Disable experimental features that might cause false positives
+disable-secrets: false
 
-# Output Configuration
-report-formats:
-    - json
-    - sarif
-    - html
-    - sonarqube
-output-path: ".kics-results"
-payload-path: ".kics-payload.json"
-
-# Verbosity and Logging
-verbose: true
-log-file: true
-log-level: "INFO"
-log-path: ".kics.log"
-preview-lines: 5
-
-# UI Configuration
-minimal-ui: false
-no-color: false
-no-progress: false
-
-# Performance Configuration
-parallel: 4
-timeout: 120
+exclude-categories:
+    - "Bill Of Materials" # Skip BOM generation for development
 
 # Exclusions
+exclude-gitignore: true
+
 exclude-paths:
     # CI/CD exclusions
     - ".github/workflows/superlinter.yml"
@@ -149,28 +122,53 @@ exclude-queries:
     - "2a9b6641-52c2-4b7b-b4ed-8e5f4a7a4a7a" # Secrets in Environment Variables (for .env.example files)
 
 # Category exclusions
-exclude-categories:
-    - "Bill Of Materials" # Skip BOM generation for development
-
 # Severity filtering (only report medium and above for cleaner output)
-exclude-severities:
-    - "TRACE"
-    - "INFO"
-
 # Results exclusions (add specific result IDs as needed)
-exclude-results: []
-
-# Include experimental queries for comprehensive scanning
-include-queries: ""
-
 # Custom queries path (if using custom security rules)
 # queries-path: "./custom-queries"
 
 # Enable file filtering for better performance
-exclude-gitignore: true
+exclude-results: []
 
-# Disable experimental features that might cause false positives
-disable-secrets: false
+exclude-severities:
+    - "TRACE"
+    - "INFO"
 
-# Cloud provider specific settings
-cloud-provider: []
+# Include experimental queries for comprehensive scanning
+include-queries: ""
+log-file: true
+log-level: "INFO"
+log-path: ".kics.log"
+# UI Configuration
+minimal-ui: false
+no-color: false
+no-progress: false
+
+output-path: ".kics-results"
+# Performance Configuration
+parallel: 4
+payload-path: ".kics-payload.json"
+
+preview-lines: 5
+
+# Output Configuration
+report-formats:
+    - json
+    - sarif
+    - html
+    - sonarqube
+timeout: 120
+# Core Scanning Configuration
+type:
+    - Terraform
+    - Kubernetes
+    - CloudFormation
+    - Ansible
+    - OpenAPI
+    - DockerCompose
+    - Crossplane
+    - Pulumi
+    - ServerlessFW
+
+# Verbosity and Logging
+verbose: true

@@ -25,17 +25,27 @@
         "node_modules"
     ],
     "include": [
-        "../../electron/**/*.spec.ts",
-        "../../electron/**/*.spec.mts",
-        "../../electron/**/*.spec.cts",
-        "../../electron/**/*.test.ts",
-        "../../electron/**/*.test.mts",
-        "../../electron/**/*.test.cts",
-        "../../electron/**/*.ts",
-        "../../electron/**/*.mts",
-        "../../electron/**/*.cts",
-        "../../electron/**/*.tsx",
-        "../../electron/test/**/*"
+        "../../*.config.js",
+        "../../*.config.mjs",
+        "../../*.config.ts",
+        "../../**.config.ts",
+        "../../**/*.config.js",
+        "../../**/*.config.mjs",
+        "../../**/*.config.ts",
+        "../../eslint.config.mjs",
+        "../../postcss.config.js",
+        "../../tailwind.config.mjs",
+        "**/tailwind.config.mjs**/",
+        "**.config.js",
+        "**.config.mjs",
+        "eslint.config.mjs",
+        "postcss.config.mjs",
+        "stylelint.config.mjs",
+        "tailwind.config.mjs",
+        "vitest.config.ts",
+        "vitest.electron.config.ts",
+        "vitest.shared.config.ts",
+        "docs/docusaurus/stylelint.config.mjs"
     ],
     "references": [
         {

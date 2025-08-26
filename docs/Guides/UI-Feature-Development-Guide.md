@@ -241,10 +241,8 @@ export const MyComponent = React.memo(function MyComponent({
 ````
 
 // Main render
-return <ThemedBox>{/_ Component content _/}</ThemedBox>;
+return <ThemedBox>{/_Component content_/}</ThemedBox>;
 });
-
-`````
 
 ### Props Interface
 
@@ -253,40 +251,41 @@ return <ThemedBox>{/_ Component content _/}</ThemedBox>;
  * Props for the MyComponent component following standardized patterns.
  *
  * @remarks
- * Extends CoreComponentProperties for consistent base props across all components.
- * Uses standardized event handler signatures from EventHandlers namespace.
+ * Extends CoreComponentProperties for consistent base props across all
+ * components. Uses standardized event handler signatures from EventHandlers
+ * namespace.
  *
  * @public
  */
 export interface MyComponentProperties
-  extends ComponentProperties<{
-    /** Component-specific prop with clear description */
-    customProp: string;
-    /** Optional configuration prop */
-    enableFeature?: boolean;
-  }> {
-  /** Standard click handler following EventHandlers pattern */
-  onClick?: EventHandlers.ClickHandler;
-  /** Standard change handler with typed value */
-  onChange?: EventHandlers.ChangeHandler<string>;
+ extends ComponentProperties<{
+  /** Component-specific prop with clear description */
+  customProp: string;
+  /** Optional configuration prop */
+  enableFeature?: boolean;
+ }> {
+ /** Standard click handler following EventHandlers pattern */
+ onClick?: EventHandlers.ClickHandler;
+ /** Standard change handler with typed value */
+ onChange?: EventHandlers.ChangeHandler<string>;
 }
 
 // Alternative: For components with extensive props, use intersection types
 export interface MyComplexComponentProperties
-  extends CoreComponentProperties,
-          AccessibilityProperties {
-  /** Event handlers group */
-  onClick?: EventHandlers.ClickHandler;
-  onSubmit?: EventHandlers.SubmitHandler;
-  onKeyDown?: EventHandlers.KeyboardHandler;
+ extends CoreComponentProperties,
+  AccessibilityProperties {
+ /** Event handlers group */
+ onClick?: EventHandlers.ClickHandler;
+ onSubmit?: EventHandlers.SubmitHandler;
+ onKeyDown?: EventHandlers.KeyboardHandler;
 
-  /** Component configuration */
-  variant?: "primary" | "secondary" | "danger";
-  size?: "sm" | "md" | "lg";
+ /** Component configuration */
+ variant?: "primary" | "secondary" | "danger";
+ size?: "sm" | "md" | "lg";
 
-  /** Data props */
-  items: Array<{ id: string; label: string }>;
-  selectedItemId?: string;
+ /** Data props */
+ items: Array<{ id: string; label: string }>;
+ selectedItemId?: string;
 }
 ```
 
@@ -314,32 +313,33 @@ The application provides reusable prop type definitions in `shared/types/compone
 
 ```tsx
 import type {
-  CoreComponentProperties,
-  AccessibilityProperties,
-  ComponentProperties
+ CoreComponentProperties,
+ AccessibilityProperties,
+ ComponentProperties,
 } from "shared/types/componentProps";
 
 // Simple component extending core properties
 interface SimpleButtonProperties extends CoreComponentProperties {
-  label: string;
-  onClick?: EventHandlers.ClickHandler;
+ label: string;
+ onClick?: EventHandlers.ClickHandler;
 }
 
 // Component with accessibility features
 interface AccessibleFormProperties
-  extends CoreComponentProperties,
-          AccessibilityProperties {
-  onSubmit: EventHandlers.SubmitHandler;
+ extends CoreComponentProperties,
+  AccessibilityProperties {
+ onSubmit: EventHandlers.SubmitHandler;
 }
 
 // Complex component using utility type
-interface ComplexComponentProperties extends ComponentProperties<{
+interface ComplexComponentProperties
+ extends ComponentProperties<{
   items: Array<{ id: string; name: string }>;
   selectedId?: string;
   onSelectionChange: (id: string) => void;
-}> {
-  // Event handlers are included via ComponentProperties
-  // Core props (className, isDisabled, etc.) are included
+ }> {
+ // Event handlers are included via ComponentProperties
+ // Core props (className, isDisabled, etc.) are included
 }
 ```
 
@@ -349,31 +349,28 @@ interface ComplexComponentProperties extends ComponentProperties<{
 import type { EventHandlers } from "shared/types/componentProps";
 
 // Standard click handler
-const handleClick: EventHandlers.ClickHandler = useCallback(
-  (event) => {
-    event?.stopPropagation();
-    // Handle click logic
-  },
-  []
-);
+const handleClick: EventHandlers.ClickHandler = useCallback((event) => {
+ event?.stopPropagation();
+ // Handle click logic
+}, []);
 
 // Change handler with typed value
 const handleNameChange: EventHandlers.ChangeHandler<string> = useCallback(
-  (value, event) => {
-    setName(value);
-    onChange?.(value, event);
-  },
-  [onChange]
+ (value, event) => {
+  setName(value);
+  onChange?.(value, event);
+ },
+ [onChange]
 );
 
 // Submit handler with form data
 const handleSubmit: EventHandlers.SubmitHandler = useCallback(
-  (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    onSubmit?.(formData, event);
-  },
-  [onSubmit]
+ (event) => {
+  event.preventDefault();
+  const formData = new FormData(event.currentTarget);
+  onSubmit?.(formData, event);
+ },
+ [onSubmit]
 );
 ```
 
@@ -384,27 +381,27 @@ import type { StandardButtonProperties } from "shared/types/componentProps";
 
 // Button component using standard properties
 interface ActionButtonProperties extends StandardButtonProperties {
-  action: "save" | "cancel" | "delete";
-  confirmationRequired?: boolean;
+ action: "save" | "cancel" | "delete";
+ confirmationRequired?: boolean;
 }
 
 const ActionButton: React.FC<ActionButtonProperties> = ({
-  // Standard button props
-  variant = "primary",
-  size = "md",
-  isLoading = false,
-  isDisabled = false,
-  onClick,
+ // Standard button props
+ variant = "primary",
+ size = "md",
+ isLoading = false,
+ isDisabled = false,
+ onClick,
 
-  // Component-specific props
-  action,
-  confirmationRequired = false,
+ // Component-specific props
+ action,
+ confirmationRequired = false,
 
-  // Core props
-  className = "",
-  children,
+ // Core props
+ className = "",
+ children,
 }) => {
-  // Implementation using standardized patterns
+ // Implementation using standardized patterns
 };
 ```
 
@@ -641,60 +638,64 @@ Extract components when:
 ```tsx
 // components/common/ReusableButton/ReusableButton.tsx
 import type {
-  StandardButtonProperties,
-  EventHandlers
+ StandardButtonProperties,
+ EventHandlers,
 } from "shared/types/componentProps";
 
 export interface ReusableButtonProperties extends StandardButtonProperties {
-  /** Context-specific props */
-  label?: string;
-  icon?: string;
-  compact?: boolean;
+ /** Context-specific props */
+ label?: string;
+ icon?: string;
+ compact?: boolean;
 }
 
 export const ReusableButton = React.memo(function ReusableButton({
-  // Standard button props (from StandardButtonProperties)
-  variant = "primary",
-  size = "md",
-  isLoading = false,
-  isDisabled = false,
-  onClick,
+ // Standard button props (from StandardButtonProperties)
+ variant = "primary",
+ size = "md",
+ isLoading = false,
+ isDisabled = false,
+ onClick,
 
-  // Core props (from CoreComponentProperties)
-  className = "",
-  identifier,
+ // Core props (from CoreComponentProperties)
+ className = "",
+ identifier,
 
-  // Component-specific props
-  compact = false,
-  icon,
-  label,
+ // Component-specific props
+ compact = false,
+ icon,
+ label,
 
-  // Children from StandardButtonProperties
-  children,
+ // Children from StandardButtonProperties
+ children,
 }: ReusableButtonProperties) {
-  const handleClick = useCallback<EventHandlers.ClickHandler>(
-    (event) => {
-      event?.stopPropagation();
-      if (isDisabled || isLoading) return;
-      onClick?.(event);
-    },
-    [onClick, isDisabled, isLoading]
-  );
+ const handleClick = useCallback<EventHandlers.ClickHandler>(
+  (event) => {
+   event?.stopPropagation();
+   if (isDisabled || isLoading) return;
+   onClick?.(event);
+  },
+  [
+   onClick,
+   isDisabled,
+   isLoading,
+  ]
+ );
 
-  return (
-    <ThemedButton
-      className={`flex items-center gap-1 ${className}`}
-      disabled={isDisabled || isLoading}
-      onClick={handleClick}
-      size={size}
-      variant={variant}
-      data-testid={identifier ? `button-${identifier}` : undefined}
-    >
-      {icon && <span>{icon}</span>}
-      {!compact && label && <span>{label}</span>}
-      {children}
-    </ThemedButton>
-  );
+ return (
+  <ThemedButton
+   className={`flex items-center gap-1 ${className}`}
+   disabled={isDisabled || isLoading}
+   onClick={handleClick}
+   size={size}
+   variant={variant}
+   data-testid={identifier ? `button-${identifier}` : undefined}
+  >
+   {icon && <span>{icon}</span>}
+   {!compact && label && <span>{label}</span>}
+   {children}
+  </ThemedButton>
+ );
 });
 ```
 
@@ -707,20 +708,20 @@ import type { EventHandlers } from "shared/types/componentProps";
 
 // In parent component
 const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>(
-  (event) => {
-    // Handle start monitoring logic
-  },
-  []
+ (event) => {
+  // Handle start monitoring logic
+ },
+ []
 );
 
 <ReusableButton
-  identifier="start-monitoring-btn"
-  icon="🚀"
-  isLoading={isLoading}
-  label="Start Monitoring"
-  onClick={handleStartMonitoring}
-  variant="primary" // Using standardized variant values
-  size="md"
+ identifier="start-monitoring-btn"
+ icon="🚀"
+ isLoading={isLoading}
+ label="Start Monitoring"
+ onClick={handleStartMonitoring}
+ variant="primary" // Using standardized variant values
+ size="md"
 />;
 ```
 
@@ -754,28 +755,26 @@ test("useSiteActions provides correct handlers", () => {
 
 Follow the base tag guidelines in `docs/TSDoc/`:
 
-````tsx
+/\*\*
 
-/**
- * Brief component description.
- *
- * @remarks
- * Detailed explanation of component behavior, patterns used, and any important
- * implementation details.
- *
- * @example
- *
- * ```tsx
- * <Component prop="value" />;
- * ```
- *
- * @param props - Component props
- *
- * @returns JSX element description
- *
- * @public
- */
-`````
+- Brief component description.
+-
+- @remarks
+- Detailed explanation of component behavior, patterns used, and any important
+- implementation details.
+-
+- @example
+-
+- /```tsx
+- <Component prop="value" />;
+- /```
+-
+- @param props - Component props
+-
+- @returns JSX element description
+-
+- @public
+  \*/
 
 ### Code Comments
 
