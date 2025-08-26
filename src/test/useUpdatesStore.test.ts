@@ -59,10 +59,7 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update status management", () => {
-        it("should initialize with idle status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize with idle status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -76,10 +73,7 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateInfo).toBeUndefined();
         });
 
-        it("should set update status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set update status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -125,10 +119,7 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update progress management", () => {
-        it("should set update progress", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set update progress", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -173,10 +164,7 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update error management", () => {
-        it("should set update error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set update error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -191,10 +179,7 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateError).toBe("Update failed");
         });
 
-        it("should clear update error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear update error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -265,10 +250,7 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update info management", () => {
-        it("should set update info", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set update info", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -290,10 +272,7 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateInfo).toEqual(updateInfo);
         });
 
-        it("should clear update info", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear update info", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
@@ -507,10 +486,7 @@ describe("useUpdatesStore", () => {
     });
 
     describe("store action logging", () => {
-        it("should log all store actions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log all store actions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");

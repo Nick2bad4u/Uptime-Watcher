@@ -119,13 +119,16 @@ describe("Debug SiteManager Mock", () => {
     });
 
     it("should create SiteManager with getSitesCache method", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.debug-sitemanager", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: ServiceContainer.debug-sitemanager",
+            "component"
+        );
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         console.log("Starting test...");
 

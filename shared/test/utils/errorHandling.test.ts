@@ -25,10 +25,7 @@ describe("Error Handling Utils", () => {
             vi.clearAllMocks();
         });
 
-        it("should handle successful operation", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle successful operation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
             await annotate("Category: Utility", "category");
@@ -162,10 +159,7 @@ describe("Error Handling Utils", () => {
             vi.clearAllMocks();
         });
 
-        it("should handle successful operation", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle successful operation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
             await annotate("Category: Utility", "category");

@@ -4,11 +4,14 @@
  * Automatically appends new unknown words found by cspell to custom-words.txt.
  * Provides intelligent filtering, validation, and configuration options.
  *
- * @fileoverview Enhanced CSpell dictionary management tool with advanced features
- * @author GitHub Copilot Assistant
  * @version 2.0.0
  *
+ * @file Enhanced CSpell dictionary management tool with advanced features
+ *
+ * @author GitHub Copilot Assistant
+ *
  * @example
+ *
  * ```bash
  * # Basic usage
  * node scripts/add-cspell-words.mjs
@@ -36,7 +39,9 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Configuration object for the script with validation and defaults
+ *
  * @typedef {Object} Config
+ *
  * @property {string} customWordsFile - Path to custom words file
  * @property {string[]} filePatterns - File patterns to check
  * @property {boolean} dryRun - Whether to perform a dry run
@@ -51,6 +56,7 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Default configuration
+ *
  * @type {Config}
  */
 const DEFAULT_CONFIG = {
@@ -74,6 +80,7 @@ const DEFAULT_CONFIG = {
 
 /**
  * Parse command line arguments and return configuration
+ *
  * @returns {Config} Parsed configuration
  */
 function parseArguments() {
@@ -81,7 +88,7 @@ function parseArguments() {
     const config = { ...DEFAULT_CONFIG };
 
     // Handle help flag
-    if (args.includes('--help') || args.includes('-h')) {
+    if (args.includes("--help") || args.includes("-h")) {
         showHelp();
         process.exit(0);
     }
@@ -92,45 +99,48 @@ function parseArguments() {
         const nextArg = args[i + 1];
 
         switch (arg) {
-            case '--dry-run':
-            case '-d':
+            case "--dry-run":
+            case "-d":
                 config.dryRun = true;
                 break;
-            case '--verbose':
-            case '-v':
+            case "--verbose":
+            case "-v":
                 config.verbose = true;
                 break;
-            case '--interactive':
-            case '-i':
+            case "--interactive":
+            case "-i":
                 config.interactive = true;
                 break;
-            case '--no-backup':
+            case "--no-backup":
                 config.createBackup = false;
                 break;
-            case '--no-sort':
+            case "--no-sort":
                 config.sortWords = false;
                 break;
-            case '--min-length':
+            case "--min-length":
                 if (nextArg && !isNaN(parseInt(nextArg))) {
                     config.minWordLength = parseInt(nextArg);
                     i++;
                 }
                 break;
-            case '--max-length':
+            case "--max-length":
                 if (nextArg && !isNaN(parseInt(nextArg))) {
                     config.maxWordLength = parseInt(nextArg);
                     i++;
                 }
                 break;
-            case '--patterns':
+            case "--patterns":
                 if (nextArg) {
-                    config.filePatterns = nextArg.split(',');
+                    config.filePatterns = nextArg.split(",");
                     i++;
                 }
                 break;
             default:
                 // First positional argument is custom words file path
-                if (!arg.startsWith('-') && !config.customWordsFile.includes(arg)) {
+                if (
+                    !arg.startsWith("-") &&
+                    !config.customWordsFile.includes(arg)
+                ) {
                     config.customWordsFile = path.resolve(arg);
                 }
         }
@@ -140,7 +150,7 @@ function parseArguments() {
     if (process.env.CUSTOM_WORDS_FILE) {
         config.customWordsFile = path.resolve(process.env.CUSTOM_WORDS_FILE);
     }
-    if (process.env.CSPELL_VERBOSE === 'true') {
+    if (process.env.CSPELL_VERBOSE === "true") {
         config.verbose = true;
     }
 
@@ -217,19 +227,24 @@ class Logger {
 
 /**
  * Validate a word against exclusion patterns and length constraints
+ *
  * @param {string} word - Word to validate
  * @param {Config} config - Configuration object
+ *
  * @returns {boolean} Whether the word is valid
  */
 function isValidWord(word, config) {
     // Check length constraints
-    if (word.length < config.minWordLength || word.length > config.maxWordLength) {
+    if (
+        word.length < config.minWordLength ||
+        word.length > config.maxWordLength
+    ) {
         return false;
     }
 
     // Check against exclusion patterns
     for (const pattern of config.excludePatterns) {
-        if (new RegExp(pattern, 'i').test(word)) {
+        if (new RegExp(pattern, "i").test(word)) {
             return false;
         }
     }
@@ -239,12 +254,14 @@ function isValidWord(word, config) {
 
 /**
  * Create a backup of the custom words file
+ *
  * @param {string} filePath - Path to the file to backup
  * @param {Logger} logger - Logger instance
+ *
  * @returns {Promise<string>} Path to the backup file
  */
 async function createBackup(filePath, logger) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const backupPath = `${filePath}.backup.${timestamp}`;
 
     try {
@@ -259,9 +276,12 @@ async function createBackup(filePath, logger) {
 
 /**
  * Read and parse current custom words from file
+ *
  * @param {string} filePath - Path to custom words file
  * @param {Logger} logger - Logger instance
- * @returns {Promise<{content: string, words: Set<string>}>} Current content and words
+ *
+ * @returns {Promise<{ content: string; words: Set<string> }>} Current content
+ *   and words
  */
 async function readCurrentWords(filePath, logger) {
     let currentWordsContent = "";
@@ -269,9 +289,13 @@ async function readCurrentWords(filePath, logger) {
     try {
         if (fsSync.existsSync(filePath)) {
             currentWordsContent = await fs.readFile(filePath, "utf8");
-            logger.debug(`Read ${currentWordsContent.split('\n').length} lines from ${filePath}`);
+            logger.debug(
+                `Read ${currentWordsContent.split("\n").length} lines from ${filePath}`
+            );
         } else {
-            logger.info(`Custom words file not found, will create: ${filePath}`);
+            logger.info(
+                `Custom words file not found, will create: ${filePath}`
+            );
         }
     } catch (error) {
         logger.error(`Failed to read custom words file: ${error.message}`);
@@ -290,15 +314,17 @@ async function readCurrentWords(filePath, logger) {
 
 /**
  * Run cspell and get unknown words
+ *
  * @param {Config} config - Configuration object
  * @param {Logger} logger - Logger instance
+ *
  * @returns {Promise<string>} CSpell output
  */
 async function runCSpell(config, logger) {
     const cspellCommand = [
         "npx",
         "cspell",
-        `"${config.filePatterns.join(',')}"`,
+        `"${config.filePatterns.join(",")}"`,
         "--gitignore",
         "--config .cspell.json",
         "--words-only",
@@ -312,18 +338,23 @@ async function runCSpell(config, logger) {
         return execSync(cspellCommand, {
             stdio: "pipe",
             encoding: "utf8",
-            maxBuffer: 1024 * 1024 * 10 // 10MB buffer
+            maxBuffer: 1024 * 1024 * 10, // 10MB buffer
         });
     } catch (err) {
         // cspell returns a non-zero exit code when spelling issues are found,
         // but the output (err.stdout) still contains the list of unknown words we want to process.
-        if (err && typeof err === 'object' && 'stdout' in err && err.stdout) {
-            if ('stderr' in err && err.stderr) {
+        if (err && typeof err === "object" && "stdout" in err && err.stdout) {
+            if ("stderr" in err && err.stderr) {
                 logger.debug("CSpell stderr:", err.stderr.toString());
             }
             return err.stdout.toString();
         } else {
-            if (err && typeof err === 'object' && 'stderr' in err && err.stderr) {
+            if (
+                err &&
+                typeof err === "object" &&
+                "stderr" in err &&
+                err.stderr
+            ) {
                 logger.error("CSpell stderr:", err.stderr.toString());
             }
             throw new Error(`CSpell execution failed: ${err.message || err}`);
@@ -333,21 +364,23 @@ async function runCSpell(config, logger) {
 
 /**
  * Process and filter found words
+ *
  * @param {string} cspellOutput - Raw output from cspell
  * @param {Set<string>} currentWords - Currently known words
  * @param {Config} config - Configuration object
  * @param {Logger} logger - Logger instance
+ *
  * @returns {Set<string>} Filtered new words
  */
 function processFoundWords(cspellOutput, currentWords, config, logger) {
     const rawWords = cspellOutput
         .split(/\r?\n/)
-        .map(w => w.trim())
-        .filter(w => w);
+        .map((w) => w.trim())
+        .filter((w) => w);
 
     logger.debug(`Found ${rawWords.length} raw words from cspell`);
 
-    const validWords = rawWords.filter(word => {
+    const validWords = rawWords.filter((word) => {
         if (currentWords.has(word)) {
             return false;
         }
@@ -361,8 +394,10 @@ function processFoundWords(cspellOutput, currentWords, config, logger) {
 
 /**
  * Prompt user for confirmation in interactive mode
+ *
  * @param {Set<string>} words - Words to be added
  * @param {Logger} logger - Logger instance
+ *
  * @returns {Promise<boolean>} Whether to proceed
  */
 async function promptForConfirmation(words, logger) {
@@ -374,24 +409,32 @@ async function promptForConfirmation(words, logger) {
             logger.info(`... and ${words.size - 20} more words`);
         }
 
-        process.stdout.write('Add these words to custom dictionary? (y/N): ');
-        process.stdin.once('data', (data) => {
+        process.stdout.write("Add these words to custom dictionary? (y/N): ");
+        process.stdin.once("data", (data) => {
             const answer = data.toString().trim().toLowerCase();
-            resolve(answer === 'y' || answer === 'yes');
+            resolve(answer === "y" || answer === "yes");
         });
     });
 }
 
 /**
  * Write updated words to file
+ *
  * @param {string} filePath - Path to custom words file
  * @param {string} currentContent - Current file content
  * @param {Set<string>} newWords - New words to add
  * @param {Config} config - Configuration object
  * @param {Logger} logger - Logger instance
+ *
  * @returns {Promise<void>}
  */
-async function writeUpdatedWords(filePath, currentContent, newWords, config, logger) {
+async function writeUpdatedWords(
+    filePath,
+    currentContent,
+    newWords,
+    config,
+    logger
+) {
     if (config.createBackup && fsSync.existsSync(filePath)) {
         await createBackup(filePath, logger);
     }
@@ -402,10 +445,9 @@ async function writeUpdatedWords(filePath, currentContent, newWords, config, log
     const newWordsBlock = newWordsArray.join("\n");
 
     // Write back, ensuring only a single trailing newline in the file
-    const updatedContent = [fileContent, newWordsBlock]
-        .filter(Boolean)
-        .join("\n")
-        .trimEnd() + "\n";
+    const updatedContent =
+        [fileContent, newWordsBlock].filter(Boolean).join("\n").trimEnd() +
+        "\n";
 
     if (config.dryRun) {
         logger.info("DRY RUN: Would add the following words:");
@@ -423,7 +465,9 @@ async function writeUpdatedWords(filePath, currentContent, newWords, config, log
 
 /**
  * Generate hash of current configuration for caching
+ *
  * @param {Config} config - Configuration object
+ *
  * @returns {string} Configuration hash
  */
 function generateConfigHash(config) {
@@ -433,11 +477,12 @@ function generateConfigHash(config) {
         maxWordLength: config.maxWordLength,
         excludePatterns: config.excludePatterns,
     });
-    return createHash('md5').update(hashData).digest('hex');
+    return createHash("md5").update(hashData).digest("hex");
 }
 
 /**
  * Main execution function
+ *
  * @returns {Promise<void>}
  */
 async function main() {
@@ -449,10 +494,8 @@ async function main() {
         logger.debug("Configuration:", config);
 
         // Read current words
-        const { content: currentContent, words: currentWords } = await readCurrentWords(
-            config.customWordsFile,
-            logger
-        );
+        const { content: currentContent, words: currentWords } =
+            await readCurrentWords(config.customWordsFile, logger);
 
         logger.info(`Current dictionary contains ${currentWords.size} words`);
 
@@ -461,7 +504,12 @@ async function main() {
         const cspellOutput = await runCSpell(config, logger);
 
         // Process found words
-        const newWords = processFoundWords(cspellOutput, currentWords, config, logger);
+        const newWords = processFoundWords(
+            cspellOutput,
+            currentWords,
+            config,
+            logger
+        );
 
         if (newWords.size === 0) {
             logger.success("No new words to add to dictionary");
@@ -488,8 +536,9 @@ async function main() {
 
         // Summary
         logger.info(`Operation completed successfully`);
-        logger.info(`Dictionary now contains ${currentWords.size + newWords.size} words`);
-
+        logger.info(
+            `Dictionary now contains ${currentWords.size + newWords.size} words`
+        );
     } catch (error) {
         logger.error(`Script failed: ${error.message}`);
         if (config.verbose) {

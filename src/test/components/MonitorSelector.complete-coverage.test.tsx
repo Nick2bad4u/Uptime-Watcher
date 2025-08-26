@@ -73,12 +73,18 @@ describe("MonitorSelector - Complete Coverage", () => {
     describe("Basic Rendering", () => {
         it("should render with default className", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -90,12 +96,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should render with custom className", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -107,12 +119,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should render all monitor options", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -128,12 +146,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should show selected monitor value", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -147,12 +171,18 @@ describe("MonitorSelector - Complete Coverage", () => {
     describe("Monitor Option Formatting", () => {
         it("should format HTTP monitor with URL", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -162,14 +192,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should format port monitor with port number", ({ task, annotate }) => {
+        it("should format port monitor with port number", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -179,14 +218,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should format ping monitor without additional details", ({ task, annotate }) => {
+        it("should format ping monitor without additional details", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -196,14 +244,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should format monitor with only type when no url or port", ({ task, annotate }) => {
+        it("should format monitor with only type when no url or port", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -219,12 +276,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should handle mixed case monitor types", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -242,14 +305,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should prioritize port over url when both present", ({ task, annotate }) => {
+        it("should prioritize port over url when both present", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -268,14 +340,23 @@ describe("MonitorSelector - Complete Coverage", () => {
     });
 
     describe("Event Handling", () => {
-        it("should call onChange when selection changes", async ({ task, annotate }) => {
+        it("should call onChange when selection changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -290,12 +371,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should stop propagation on click events", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -312,14 +399,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(stopPropagation).toHaveBeenCalled();
         });
 
-        it("should stop propagation on mouseDown events", ({ task, annotate }) => {
+        it("should stop propagation on mouseDown events", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -338,12 +434,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should handle click without event object", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -357,14 +459,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(select).toBeInTheDocument();
         });
 
-        it("should handle mouseDown without event object", ({ task, annotate }) => {
+        it("should handle mouseDown without event object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -380,14 +491,23 @@ describe("MonitorSelector - Complete Coverage", () => {
     });
 
     describe("Performance Optimizations", () => {
-        it("should be a memoized component (React.memo)", ({ task, annotate }) => {
+        it("should be a memoized component (React.memo)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -396,14 +516,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(MonitorSelector).toBeDefined();
         });
 
-        it("should maintain stable event handlers across renders", ({ task, annotate }) => {
+        it("should maintain stable event handlers across renders", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -426,12 +555,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should re-render when props change", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -462,12 +597,18 @@ describe("MonitorSelector - Complete Coverage", () => {
     describe("Edge Cases", () => {
         it("should handle empty monitors array", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -482,12 +623,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should handle single monitor", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -499,14 +646,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(options[0]).toHaveTextContent("PING");
         });
 
-        it("should handle monitors with special characters in URL", ({ task, annotate }) => {
+        it("should handle monitors with special characters in URL", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -524,14 +680,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should handle monitors with very high port numbers", ({ task, annotate }) => {
+        it("should handle monitors with very high port numbers", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -545,14 +710,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should handle monitors with port 0 (falsy value edge case)", ({ task, annotate }) => {
+        it("should handle monitors with port 0 (falsy value edge case)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -568,14 +742,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(option).toBeInTheDocument();
         });
 
-        it("should handle invalid selected monitor ID gracefully", ({ task, annotate }) => {
+        it("should handle invalid selected monitor ID gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -594,14 +777,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(options).toHaveLength(3);
         });
 
-        it("should handle undefined selected monitor ID", ({ task, annotate }) => {
+        it("should handle undefined selected monitor ID", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -613,14 +805,23 @@ describe("MonitorSelector - Complete Coverage", () => {
     });
 
     describe("Monitor Type Coverage", () => {
-        it("should handle all supported monitor types", ({ task, annotate }) => {
+        it("should handle all supported monitor types", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -641,14 +842,23 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(screen.getByText("PING: example.com")).toBeInTheDocument();
         });
 
-        it("should format monitor options consistently", ({ task, annotate }) => {
+        it("should format monitor options consistently", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -674,12 +884,18 @@ describe("MonitorSelector - Complete Coverage", () => {
     describe("Accessibility", () => {
         it("should be keyboard navigable", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -698,12 +914,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
         it("should have proper roles and attributes", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.complete-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 

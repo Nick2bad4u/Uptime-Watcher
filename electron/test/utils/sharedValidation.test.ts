@@ -99,10 +99,7 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(validateMonitorType("port")).toBe(true);
         });
 
-        it("should reject invalid types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: sharedValidation", "component");
             await annotate("Category: Utility", "category");
@@ -116,10 +113,7 @@ describe("Shared Validation - Backend Coverage", () => {
     });
 
     describe("validateSite", () => {
-        it("should validate complete site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate complete site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: sharedValidation", "component");
             await annotate("Category: Utility", "category");

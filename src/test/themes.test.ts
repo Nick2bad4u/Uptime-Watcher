@@ -26,10 +26,7 @@ describe("Theme Definitions", () => {
             expect(lightTheme.colors.status).toBeDefined();
         });
 
-        it("should have status colors defined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have status colors defined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themes", "component");
             await annotate("Category: Core", "category");
@@ -55,10 +52,7 @@ describe("Theme Definitions", () => {
             expect(lightTheme.colors.background.tertiary).toBeDefined();
         });
 
-        it("should have text colors defined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have text colors defined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themes", "component");
             await annotate("Category: Core", "category");
@@ -88,10 +82,7 @@ describe("Theme Definitions", () => {
             expect(darkTheme.colors.status).toBeDefined();
         });
 
-        it("should have status colors defined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have status colors defined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themes", "component");
             await annotate("Category: Core", "category");
@@ -117,10 +108,7 @@ describe("Theme Definitions", () => {
             expect(darkTheme.colors.background.tertiary).toBeDefined();
         });
 
-        it("should have text colors defined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have text colors defined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themes", "component");
             await annotate("Category: Core", "category");

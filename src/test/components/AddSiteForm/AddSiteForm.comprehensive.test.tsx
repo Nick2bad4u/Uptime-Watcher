@@ -420,7 +420,10 @@ describe("AddSiteForm Component", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle component errors gracefully", ({ task, annotate }) => {
+        it("should handle component errors gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm", "component");
             annotate("Category: Component", "category");

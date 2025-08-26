@@ -21,14 +21,11 @@ beforeEach(() => {
 });
 
 describe("useThemeStyles", () => {
-    it("should return theme styles object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should return theme styles object", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -37,13 +34,13 @@ describe("useThemeStyles", () => {
     });
 
     it("should provide all required style properties", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -56,14 +53,11 @@ describe("useThemeStyles", () => {
         expect(result.current.metaStyle).toBeDefined();
     });
 
-    it("should return CSS properties objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should return CSS properties objects", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -76,14 +70,11 @@ describe("useThemeStyles", () => {
         expect(typeof result.current.metaStyle).toBe("object");
     });
 
-    it("should handle collapsed state", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle collapsed state", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result: collapsedResult } = renderHook(() =>
             useThemeStyles(true)
@@ -98,14 +89,11 @@ describe("useThemeStyles", () => {
         expect(expandedResult.current.contentStyle.padding).toBe("1.5rem");
     });
 
-    it("should handle light mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle light mode", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
             addEventListener: vi.fn(),
@@ -126,14 +114,11 @@ describe("useThemeStyles", () => {
         expect(result.current.headerStyle.color).toBe("#111827");
     });
 
-    it("should handle dark mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle dark mode", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
             addEventListener: vi.fn(),
@@ -154,14 +139,11 @@ describe("useThemeStyles", () => {
         expect(result.current.headerStyle.color).toBe("#f3f4f6");
     });
 
-    it("should provide collapse button styles", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide collapse button styles", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -174,13 +156,13 @@ describe("useThemeStyles", () => {
     });
 
     it("should provide header styles with gradients", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -191,14 +173,11 @@ describe("useThemeStyles", () => {
         expect(result.current.headerStyle.boxShadow).toBeDefined();
     });
 
-    it("should provide overlay styles", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide overlay styles", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -206,14 +185,11 @@ describe("useThemeStyles", () => {
         expect(typeof result.current.overlayStyle).toBe("object");
     });
 
-    it("should provide title styles", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide title styles", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -221,14 +197,11 @@ describe("useThemeStyles", () => {
         expect(typeof result.current.titleStyle).toBe("object");
     });
 
-    it("should provide URL styles", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide URL styles", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -236,14 +209,11 @@ describe("useThemeStyles", () => {
         expect(typeof result.current.urlStyle).toBe("object");
     });
 
-    it("should provide meta styles", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide meta styles", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -251,14 +221,11 @@ describe("useThemeStyles", () => {
         expect(typeof result.current.metaStyle).toBe("object");
     });
 
-    it("should memoize styles correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should memoize styles correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { rerender, result } = renderHook(() => useThemeStyles(false));
 
@@ -271,13 +238,13 @@ describe("useThemeStyles", () => {
     });
 
     it("should update styles when collapsed state changes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
         const { result } = renderHook(
             ({ isCollapsed }) => useThemeStyles(isCollapsed),
@@ -292,13 +259,13 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle missing matchMedia gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const originalMatchMedia = globalThis.matchMedia;
         // Remove matchMedia to test defensive programming
@@ -312,14 +279,11 @@ describe("useThemeStyles", () => {
         globalThis.matchMedia = originalMatchMedia;
     });
 
-    it("should provide transition effects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide transition effects", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -329,14 +293,11 @@ describe("useThemeStyles", () => {
         expect(result.current.contentStyle.transition).toContain("padding");
     });
 
-    it("should have consistent color schemes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should have consistent color schemes", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test light mode
         vi.mocked(globalThis.matchMedia).mockImplementation(() => ({
@@ -375,14 +336,11 @@ describe("useThemeStyles", () => {
         );
     });
 
-    it("should provide default collapsed state", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should provide default collapsed state", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -391,13 +349,13 @@ describe("useThemeStyles", () => {
     });
 
     it("should handle boolean collapsed parameter correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useThemeStyles", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useThemeStyles", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result: undefinedResult } = renderHook(() => useThemeStyles());
         const { result: falseResult } = renderHook(() => useThemeStyles(false));

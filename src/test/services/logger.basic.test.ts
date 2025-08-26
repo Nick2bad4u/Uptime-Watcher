@@ -313,10 +313,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     describe("App Logging Methods", () => {
-        it("should log app started event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log app started event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -329,10 +326,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log app stopped event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log app stopped event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -345,10 +339,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log app error event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log app error event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -368,10 +359,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log app performance event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log app performance event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -386,10 +374,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     describe("Site Logging Methods", () => {
-        it("should log site added event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site added event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -402,10 +387,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log site removed event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site removed event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -450,10 +432,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log site error with string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site error with string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -489,10 +468,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log site status change", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site status change", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -507,10 +483,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     describe("System Logging Methods", () => {
-        it("should log notification event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log notification event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -526,10 +499,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log tray action", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log tray action", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -612,10 +582,7 @@ describe("Logger Service - Basic Coverage", () => {
             );
         });
 
-        it("should log settings change", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log settings change", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -649,10 +616,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     describe("Raw Logger Access", () => {
-        it("should provide raw logger access", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide raw logger access", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");
@@ -678,10 +642,7 @@ describe("Logger Service - Basic Coverage", () => {
     });
 
     describe("Logger Module Structure", () => {
-        it("should have all required methods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have all required methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger.basic", "component");
             await annotate("Category: Service", "category");

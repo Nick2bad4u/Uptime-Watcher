@@ -212,7 +212,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Initial Render", () => {
-        it("renders the form with all required fields", ({ task, annotate }) => {
+        it("renders the form with all required fields", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -261,7 +264,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("shows monitor type dropdown with correct options", ({ task, annotate }) => {
+        it("shows monitor type dropdown with correct options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -282,7 +288,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Interactions", () => {
-        it("calls setName when site name input changes", async ({ task, annotate }) => {
+        it("calls setName when site name input changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -306,7 +315,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setName).toHaveBeenLastCalledWith("e"); // Last character typed
         });
 
-        it("calls setUrl when URL input changes", async ({ task, annotate }) => {
+        it("calls setUrl when URL input changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -328,7 +340,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setUrl).toHaveBeenLastCalledWith("m"); // Last character typed
         });
 
-        it("calls setMonitorType when monitor type changes", async ({ task, annotate }) => {
+        it("calls setMonitorType when monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -352,7 +367,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Monitor Type Specific Fields", () => {
-        it("renders dynamic fields for HTTP monitor type", ({ task, annotate }) => {
+        it("renders dynamic fields for HTTP monitor type", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -377,7 +395,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("renders dynamic fields for ping monitor type", ({ task, annotate }) => {
+        it("renders dynamic fields for ping monitor type", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -399,7 +420,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("renders dynamic fields for port monitor type", ({ task, annotate }) => {
+        it("renders dynamic fields for port monitor type", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -426,7 +450,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("shows add button as enabled when form is valid", ({ task, annotate }) => {
+        it("shows add button as enabled when form is valid", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -467,7 +494,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             );
         });
 
-        it("does not display error alert when form has no error", ({ task, annotate }) => {
+        it("does not display error alert when form has no error", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -586,7 +616,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("handles special characters in input fields", async ({ task, annotate }) => {
+        it("handles special characters in input fields", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");
@@ -752,7 +785,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("handles missing setter functions gracefully", ({ task, annotate }) => {
+        it("handles missing setter functions gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive", "component");
             annotate("Category: Component", "category");

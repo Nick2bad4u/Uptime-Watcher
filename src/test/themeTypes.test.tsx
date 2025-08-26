@@ -143,7 +143,10 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeTypography Interface", () => {
-        it("should create valid ThemeTypography object", ({ task, annotate }) => {
+        it("should create valid ThemeTypography object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: themeTypes", "component");
             annotate("Category: Core", "category");
@@ -235,7 +238,10 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeBorderRadius Interface", () => {
-        it("should create valid ThemeBorderRadius object", ({ task, annotate }) => {
+        it("should create valid ThemeBorderRadius object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: themeTypes", "component");
             annotate("Category: Core", "category");

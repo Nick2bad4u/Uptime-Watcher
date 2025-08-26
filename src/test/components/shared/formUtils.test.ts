@@ -82,10 +82,7 @@ describe("Form Utilities", () => {
             expect(setValue).not.toHaveBeenCalled();
         });
 
-        it("should handle numeric input values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle numeric input values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formUtils", "component");
             await annotate("Category: Component", "category");
@@ -103,10 +100,7 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith("123");
         });
 
-        it("should handle empty string values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formUtils", "component");
             await annotate("Category: Component", "category");
@@ -225,10 +219,7 @@ describe("Form Utilities", () => {
             expect(setValue).toHaveBeenCalledWith(true);
         });
 
-        it("should handle empty select values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty select values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formUtils", "component");
             await annotate("Category: Component", "category");
@@ -372,13 +363,13 @@ describe("Form Utilities", () => {
     describe("validationPatterns", () => {
         describe("nonEmptyString", () => {
             it("should return true for non-empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(validationPatterns.nonEmptyString("hello")).toBe(true);
                 expect(validationPatterns.nonEmptyString("a")).toBe(true);
@@ -388,13 +379,13 @@ describe("Form Utilities", () => {
             });
 
             it("should return false for empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(validationPatterns.nonEmptyString("")).toBe(false);
                 expect(validationPatterns.nonEmptyString("   ")).toBe(false);
@@ -402,13 +393,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle special characters and unicode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(validationPatterns.nonEmptyString("🎉")).toBe(true);
                 expect(validationPatterns.nonEmptyString("@#$%")).toBe(true);
@@ -418,13 +409,13 @@ describe("Form Utilities", () => {
 
         describe("numberInRange", () => {
             it("should create validator that accepts numbers in range", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.numberInRange(1, 10);
 
@@ -434,13 +425,13 @@ describe("Form Utilities", () => {
             });
 
             it("should create validator that rejects numbers outside range", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.numberInRange(1, 10);
 
@@ -450,14 +441,11 @@ describe("Form Utilities", () => {
                 expect(validator(100)).toBe(false);
             });
 
-            it("should handle negative ranges", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle negative ranges", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.numberInRange(-10, -1);
 
@@ -469,13 +457,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle floating point numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.numberInRange(0.1, 0.9);
 
@@ -487,13 +475,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle single-point range", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.numberInRange(5, 5);
 
@@ -505,13 +493,13 @@ describe("Form Utilities", () => {
 
         describe("oneOfNumbers", () => {
             it("should create validator that accepts allowed numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.oneOfNumbers([
                     1,
@@ -527,13 +515,13 @@ describe("Form Utilities", () => {
             });
 
             it("should create validator that rejects non-allowed numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.oneOfNumbers([
                     1,
@@ -549,14 +537,11 @@ describe("Form Utilities", () => {
                 expect(validator(0)).toBe(false);
             });
 
-            it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty array", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfNumbers([]);
 
@@ -565,14 +550,11 @@ describe("Form Utilities", () => {
                 expect(validator(-1)).toBe(false);
             });
 
-            it("should handle negative numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle negative numbers", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfNumbers([
                     -1,
@@ -588,13 +570,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle floating point numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfNumbers([
                     1.5,
@@ -612,13 +594,13 @@ describe("Form Utilities", () => {
 
         describe("oneOfStrings", () => {
             it("should create validator that accepts allowed strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.oneOfStrings([
                     "red",
@@ -632,13 +614,13 @@ describe("Form Utilities", () => {
             });
 
             it("should create validator that rejects non-allowed strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Constructor", "type");
 
                 const validator = validationPatterns.oneOfStrings([
                     "red",
@@ -652,14 +634,11 @@ describe("Form Utilities", () => {
                 expect(validator("Red")).toBe(false); // Case sensitive
             });
 
-            it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty array", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfStrings([]);
 
@@ -668,13 +647,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle empty strings in allowed values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfStrings([
                     "",
@@ -689,13 +668,13 @@ describe("Form Utilities", () => {
             });
 
             it("should handle special characters and unicode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfStrings([
                     "@#$%",
@@ -709,14 +688,11 @@ describe("Form Utilities", () => {
                 expect(validator("hello")).toBe(false);
             });
 
-            it("should be case sensitive", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formUtils", "component");
-            await annotate("Category: Component", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should be case sensitive", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: formUtils", "component");
+                await annotate("Category: Component", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const validator = validationPatterns.oneOfStrings([
                     "Hello",

@@ -15,7 +15,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -41,7 +44,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
@@ -69,7 +75,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -93,7 +102,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
@@ -122,7 +134,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -145,12 +160,12 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Store Helper Functions", () => {
-        it("should test store action helpers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test store action helpers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -184,7 +199,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -217,12 +235,12 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Utility Helper Functions", () => {
-        it("should test date and time helpers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test date and time helpers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -247,7 +265,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -272,7 +293,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -320,7 +344,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -342,12 +369,12 @@ describe("Final 90% Function Coverage Push", () => {
             expect(safeExecute(returnValue, "fallback")).toBe("success");
         });
 
-        it("should test async error handling", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test async error handling", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -383,7 +410,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -424,7 +454,10 @@ describe("Final 90% Function Coverage Push", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -456,12 +489,12 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Performance Helper Functions", () => {
-        it("should test performance utilities", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test performance utilities", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -510,12 +543,12 @@ describe("Final 90% Function Coverage Push", () => {
             expect(typeof throttledFn).toBe("function");
         });
 
-        it("should test memoization utilities", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test memoization utilities", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate(
+                "Component: final-90-percent-function-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 

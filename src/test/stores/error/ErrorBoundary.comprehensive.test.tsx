@@ -44,7 +44,10 @@ vi.mock("../../../services/logger", () => ({
 
 describe("ErrorBoundary", () => {
     describe("Normal Operation", () => {
-        it("should render children when there are no errors", ({ task, annotate }) => {
+        it("should render children when there are no errors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -67,7 +70,10 @@ describe("ErrorBoundary", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should render multiple children correctly", ({ task, annotate }) => {
+        it("should render multiple children correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -91,7 +97,10 @@ describe("ErrorBoundary", () => {
     });
 
     describe("Error Handling", () => {
-        it("should catch errors and display default fallback", ({ task, annotate }) => {
+        it("should catch errors and display default fallback", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -116,7 +125,10 @@ describe("ErrorBoundary", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display custom fallback when provided", ({ task, annotate }) => {
+        it("should display custom fallback when provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -139,7 +151,10 @@ describe("ErrorBoundary", () => {
             ).toBeInTheDocument();
         });
 
-        it("should call onError callback when error occurs", ({ task, annotate }) => {
+        it("should call onError callback when error occurs", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -166,7 +181,10 @@ describe("ErrorBoundary", () => {
             );
         });
 
-        it("should not call onError when no callback is provided", ({ task, annotate }) => {
+        it("should not call onError when no callback is provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -340,7 +358,10 @@ describe("ErrorBoundary", () => {
     });
 
     describe("getDerivedStateFromError", () => {
-        it("should return correct state when error occurs", ({ task, annotate }) => {
+        it("should return correct state when error occurs", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorBoundary", "component");
             annotate("Category: Store", "category");
@@ -369,15 +390,15 @@ describe("withErrorBoundary HOC", () => {
     );
 
     it("should wrap component with error boundary", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Error Handling", "type");
 
         const WrappedComponent = withErrorBoundary(TestComponent);
 
@@ -388,15 +409,15 @@ describe("withErrorBoundary HOC", () => {
     });
 
     it("should use custom fallback when provided", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
         const ThrowingTestComponent = ({
             shouldThrow,
@@ -422,16 +443,19 @@ describe("withErrorBoundary HOC", () => {
         ).toBeInTheDocument();
     });
 
-    it("should set correct display name for wrapped component", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+    it("should set correct display name for wrapped component", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
         const TestComponentWithName = ({ message }: { message: string }) => (
             <div data-testid="wrapped-component">{message}</div>
@@ -446,15 +470,15 @@ describe("withErrorBoundary HOC", () => {
     });
 
     it("should handle component without displayName", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
         const AnonymousComponent = () => <div>Anonymous</div>;
         const WrappedComponent = withErrorBoundary(AnonymousComponent);
@@ -464,16 +488,19 @@ describe("withErrorBoundary HOC", () => {
         );
     });
 
-    it("should use default fallback when none provided", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+    it("should use default fallback when none provided", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ErrorBoundary", "component");
-            annotate("Category: Store", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ErrorBoundary", "component");
+        annotate("Category: Store", "category");
+        annotate("Type: Business Logic", "type");
 
         const ThrowingTestComponent = () => {
             throw new Error("Default fallback test");

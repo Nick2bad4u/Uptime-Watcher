@@ -14,10 +14,7 @@ import {
 
 describe("Time Utilities", () => {
     describe("formatDuration", () => {
-        it("should format seconds only", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format seconds only", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -28,10 +25,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(59_000)).toBe("59s");
         });
 
-        it("should format minutes and seconds", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format minutes and seconds", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -43,10 +37,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(3_540_000)).toBe("59m 0s");
         });
 
-        it("should format hours and minutes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format hours and minutes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -73,10 +64,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(999)).toBe("0s");
         });
 
-        it("should handle very large values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -120,10 +108,7 @@ describe("Time Utilities", () => {
             expect(result.length).toBeGreaterThan(5);
         });
 
-        it("should handle different timestamps", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle different timestamps", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -142,10 +127,7 @@ describe("Time Utilities", () => {
             }
         });
 
-        it("should handle zero timestamp", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -217,10 +199,7 @@ describe("Time Utilities", () => {
             expect(formatIntervalDuration(119_500)).toBe("2m"); // 1.99 minutes rounds up
         });
 
-        it("should handle very large values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -277,10 +256,7 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp2)).toBe("59 seconds ago");
         });
 
-        it("should format minutes ago", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format minutes ago", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -296,10 +272,7 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("30 minutes ago");
         });
 
-        it("should format hours ago", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format hours ago", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -315,10 +288,7 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("6 hours ago");
         });
 
-        it("should format days ago", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format days ago", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -334,10 +304,7 @@ describe("Time Utilities", () => {
             expect(formatRelativeTimestamp(timestamp3)).toBe("7 days ago");
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -433,10 +400,7 @@ describe("Time Utilities", () => {
             expect(formatResponseDuration(7_200_000)).toBe("2h");
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -462,10 +426,7 @@ describe("Time Utilities", () => {
             expect(formatResponseTime(null as any)).toBe("N/A");
         });
 
-        it("should format zero as milliseconds", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format zero as milliseconds", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -519,10 +480,7 @@ describe("Time Utilities", () => {
             expect(formatResponseTime(1234.999)).toBe("1.23s"); // Rounds down
         });
 
-        it("should handle very large values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -582,10 +540,7 @@ describe("Time Utilities", () => {
             expect(getIntervalLabel({ value: 3_600_000 })).toBe("1h");
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -651,10 +606,7 @@ describe("Time Utilities", () => {
             );
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -731,10 +683,7 @@ describe("Time Utilities", () => {
             }
         });
 
-        it("should provide meaningful labels", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide meaningful labels", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");

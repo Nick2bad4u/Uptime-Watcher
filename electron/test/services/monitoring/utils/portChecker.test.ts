@@ -567,10 +567,7 @@ describe("performSinglePortCheck", () => {
             expect(result.responseTime).toBe(1_000_000); // Should round to nearest integer
         });
 
-        it("should handle zero response time", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero response time", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: portChecker", "component");
             await annotate("Category: Service", "category");

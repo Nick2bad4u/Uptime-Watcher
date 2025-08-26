@@ -228,7 +228,10 @@ describe("OverviewTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render overview tab with all statistics", ({ task, annotate }) => {
+        it("should render overview tab with all statistics", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");
@@ -253,7 +256,10 @@ describe("OverviewTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display uptime percentage correctly", ({ task, annotate }) => {
+        it("should display uptime percentage correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");
@@ -344,7 +350,10 @@ describe("OverviewTab", () => {
             expect(mockOnCheckNow).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle remove monitor button click", async ({ task, annotate }) => {
+        it("should handle remove monitor button click", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");
@@ -405,7 +414,10 @@ describe("OverviewTab", () => {
             expect(mockHandleTimeoutChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save interval button when interval changed", ({ task, annotate }) => {
+        it("should enable save interval button when interval changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");
@@ -425,7 +437,10 @@ describe("OverviewTab", () => {
             expect(mockHandleSaveInterval).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save timeout button when timeout changed", ({ task, annotate }) => {
+        it("should enable save timeout button when timeout changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");
@@ -447,7 +462,10 @@ describe("OverviewTab", () => {
     });
 
     describe("Loading States", () => {
-        it("should show loading state when isLoading is true", ({ task, annotate }) => {
+        it("should show loading state when isLoading is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");
             annotate("Category: Component", "category");

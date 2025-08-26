@@ -22,7 +22,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate(
+                "Component: corrected-function-coverage-boost",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Caching", "type");
 
@@ -86,7 +89,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate(
+                "Component: corrected-function-coverage-boost",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -117,7 +123,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate(
+                "Component: corrected-function-coverage-boost",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -156,7 +165,10 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: corrected-function-coverage-boost", "component");
+            await annotate(
+                "Component: corrected-function-coverage-boost",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

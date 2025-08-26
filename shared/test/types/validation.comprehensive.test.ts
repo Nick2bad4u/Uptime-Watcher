@@ -56,10 +56,7 @@ describe("Validation Types and Utilities", () => {
             });
         });
 
-        it("should handle empty errors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty errors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -207,10 +204,7 @@ describe("Validation Types and Utilities", () => {
             });
         });
 
-        it("should handle null data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -222,10 +216,7 @@ describe("Validation Types and Utilities", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle complex data objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex data objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -250,10 +241,7 @@ describe("Validation Types and Utilities", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle empty warnings array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty warnings array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -303,10 +291,7 @@ describe("Validation Types and Utilities", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -315,10 +300,7 @@ describe("Validation Types and Utilities", () => {
             expect(isValidationResult(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -407,10 +389,7 @@ describe("Validation Types and Utilities", () => {
             expect(isValidationResult(resultWithExtras)).toBe(true);
         });
 
-        it("should handle arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -422,10 +401,7 @@ describe("Validation Types and Utilities", () => {
             );
         });
 
-        it("should handle nested objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle nested objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");

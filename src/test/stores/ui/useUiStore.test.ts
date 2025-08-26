@@ -111,10 +111,7 @@ describe("useUIStore", () => {
     });
 
     describe("Site Details Tab Management", () => {
-        it("should set active site details tab", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set active site details tab", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -129,10 +126,7 @@ describe("useUIStore", () => {
             expect(result.current.activeSiteDetailsTab).toBe("analytics");
         });
 
-        it("should handle different tab names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle different tab names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -155,10 +149,7 @@ describe("useUIStore", () => {
             }
         });
 
-        it("should handle empty string tab", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string tab", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -310,10 +301,7 @@ describe("useUIStore", () => {
     });
 
     describe("Advanced Metrics Visibility", () => {
-        it("should show advanced metrics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should show advanced metrics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -328,10 +316,7 @@ describe("useUIStore", () => {
             expect(result.current.showAdvancedMetrics).toBe(true);
         });
 
-        it("should hide advanced metrics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should hide advanced metrics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -378,10 +363,7 @@ describe("useUIStore", () => {
     });
 
     describe("Settings Modal Management", () => {
-        it("should show settings modal", async ({
-            task,
-            annotate,
-        }) => {
+        it("should show settings modal", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -396,10 +378,7 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(true);
         });
 
-        it("should hide settings modal", async ({
-            task,
-            annotate,
-        }) => {
+        it("should hide settings modal", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -446,10 +425,7 @@ describe("useUIStore", () => {
     });
 
     describe("Site Details Modal Management", () => {
-        it("should show site details modal", async ({
-            task,
-            annotate,
-        }) => {
+        it("should show site details modal", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -464,10 +440,7 @@ describe("useUIStore", () => {
             expect(result.current.showSiteDetails).toBe(true);
         });
 
-        it("should hide site details modal", async ({
-            task,
-            annotate,
-        }) => {
+        it("should hide site details modal", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -510,10 +483,7 @@ describe("useUIStore", () => {
     });
 
     describe("Chart Time Range Management", () => {
-        it("should set chart time range to 1h", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set chart time range to 1h", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -528,10 +498,7 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("1h");
         });
 
-        it("should set chart time range to 24h", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set chart time range to 24h", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -546,10 +513,7 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
         });
 
-        it("should set chart time range to 7d", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set chart time range to 7d", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -564,10 +528,7 @@ describe("useUIStore", () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
 
-        it("should set chart time range to 30d", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set chart time range to 30d", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");
@@ -676,10 +637,7 @@ describe("useUIStore", () => {
             expect(result.current.showSettings).toBe(true);
         });
 
-        it("should handle rapid state changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle rapid state changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUiStore", "component");
             await annotate("Category: Store", "category");

@@ -69,7 +69,10 @@ describe("Component Coverage Boost", () => {
             ).toBe(true);
         });
 
-        it("should handle site list rendering scenarios", ({ task, annotate }) => {
+        it("should handle site list rendering scenarios", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -107,7 +110,10 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("SiteDetails Component Coverage", () => {
-        it("should handle SiteDetails navigation logic", ({ task, annotate }) => {
+        it("should handle SiteDetails navigation logic", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -231,7 +237,10 @@ describe("Component Coverage Boost", () => {
             );
         });
 
-        it("should handle SiteDetailsNavigation logic", ({ task, annotate }) => {
+        it("should handle SiteDetailsNavigation logic", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -313,7 +322,10 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("SiteCardHistory Component Coverage", () => {
-        it("should handle SiteCardHistory memo comparison logic", ({ task, annotate }) => {
+        it("should handle SiteCardHistory memo comparison logic", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -505,7 +517,10 @@ describe("Component Coverage Boost", () => {
             expect(areHistoryPropsEqual(props13, props14)).toBe(false);
         });
 
-        it("should handle SiteCardHistory title generation logic", ({ task, annotate }) => {
+        it("should handle SiteCardHistory title generation logic", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -611,7 +626,10 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("ActionButtonGroup Component Coverage", () => {
-        it("should handle ActionButtonGroup event handlers", ({ task, annotate }) => {
+        it("should handle ActionButtonGroup event handlers", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -738,7 +756,10 @@ describe("Component Coverage Boost", () => {
             expect(baseProps.onStopMonitoring).toHaveBeenCalled();
         });
 
-        it("should handle all monitors running scenarios", ({ task, annotate }) => {
+        it("should handle all monitors running scenarios", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -819,7 +840,10 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("AddSiteForm Component Coverage", () => {
-        it("should handle AddSiteForm validation logic", ({ task, annotate }) => {
+        it("should handle AddSiteForm validation logic", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");
@@ -1368,7 +1392,10 @@ describe("Component Coverage Boost", () => {
     });
 
     describe("Site Analytics Coverage", () => {
-        it("should handle useSiteAnalytics edge cases", ({ task, annotate }) => {
+        it("should handle useSiteAnalytics edge cases", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: component-coverage-boost", "component");
             annotate("Category: Core", "category");

@@ -98,10 +98,7 @@ describe("MonitorRepository", () => {
         });
     });
     describe("findByIdentifier", () => {
-        it("should find a monitor by id", async ({
-            task,
-            annotate,
-        }) => {
+        it("should find a monitor by id", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -139,10 +136,7 @@ describe("MonitorRepository", () => {
         });
     });
     describe("getAllMonitorIds", () => {
-        it("should return all monitor ids", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all monitor ids", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");

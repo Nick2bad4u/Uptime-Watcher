@@ -157,7 +157,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
@@ -177,7 +180,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -210,7 +216,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -245,7 +254,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -262,7 +274,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -289,7 +304,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
@@ -322,7 +340,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
@@ -351,7 +372,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -408,12 +432,12 @@ describe("SiteWriterService Coverage Tests", () => {
             ]);
         });
 
-        it("should update site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -500,7 +524,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -528,12 +555,12 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should remove obsolete monitors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove obsolete monitors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
@@ -556,7 +583,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -574,7 +604,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -588,7 +621,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -623,7 +659,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -670,7 +709,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -711,7 +753,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -739,7 +784,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -782,7 +830,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -807,7 +858,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -832,7 +886,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -863,7 +920,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -889,12 +949,12 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toEqual([]); // Should not detect as new
         });
 
-        it("should handle empty arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -902,12 +962,12 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toEqual([]);
         });
 
-        it("should handle mixed scenarios", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle mixed scenarios", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1026,7 +1086,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -1060,7 +1123,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -1099,7 +1165,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1128,7 +1197,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -1156,7 +1228,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1191,7 +1266,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1225,7 +1303,10 @@ describe("SiteWriterService Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 

@@ -35,14 +35,23 @@ describe("DynamicField - Additional Coverage", () => {
         render(<ThemeProvider>{component}</ThemeProvider>);
 
     describe("Unsupported field types (Line 134)", () => {
-        it("should display error message for unsupported field type", ({ task, annotate }) => {
+        it("should display error message for unsupported field type", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -76,14 +85,23 @@ describe("DynamicField - Additional Coverage", () => {
     });
 
     describe("Invalid numeric input handling (Line 188)", () => {
-        it("should handle numeric input with direct simulation", ({ task, annotate }) => {
+        it("should handle numeric input with direct simulation", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -125,14 +143,23 @@ describe("DynamicField - Additional Coverage", () => {
     });
 
     describe("Valid input handling", () => {
-        it("should handle empty numeric input correctly", async ({ task, annotate }) => {
+        it("should handle empty numeric input correctly", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -168,12 +195,18 @@ describe("DynamicField - Additional Coverage", () => {
 
         it("should handle valid numeric input", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -208,14 +241,23 @@ describe("DynamicField - Additional Coverage", () => {
             expect(mockOnChange).toHaveBeenCalledWith(3); // From typing "3"
         });
 
-        it("should handle text field input correctly", async ({ task, annotate }) => {
+        it("should handle text field input correctly", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -251,12 +293,18 @@ describe("DynamicField - Additional Coverage", () => {
 
         it("should handle disabled field", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicField.additional-coverage", "component");
+            annotate(
+                "Component: DynamicField.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 

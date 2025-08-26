@@ -156,10 +156,7 @@ describe("StatusUpdateHandler", () => {
     });
 
     describe("Subscription Management", () => {
-        it("should start as not subscribed", async ({
-            task,
-            annotate,
-        }) => {
+        it("should start as not subscribed", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: statusUpdateHandler", "component");
             await annotate("Category: Utility", "category");
@@ -897,10 +894,7 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should handle empty sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: statusUpdateHandler", "component");
             await annotate("Category: Utility", "category");

@@ -38,15 +38,15 @@ describe("SiteCardHeader", () => {
     };
 
     it("should render without crashing", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         expect(() => {
             // Just test that it doesn't throw
@@ -57,15 +57,15 @@ describe("SiteCardHeader", () => {
     });
 
     it("should handle basic props", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         const props = { ...defaultProps };
         expect(props.site.site.name).toBe("Test Site");
@@ -74,15 +74,15 @@ describe("SiteCardHeader", () => {
     });
 
     it("should handle different site states", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHeader", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardHeader", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         const states = [
             { isLoading: true, isMonitoring: false },

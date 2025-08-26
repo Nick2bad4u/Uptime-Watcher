@@ -119,10 +119,7 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle null payload", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null payload", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
@@ -138,10 +135,7 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle empty string payload", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string payload", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
@@ -157,10 +151,7 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle number payload", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle number payload", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
@@ -176,10 +167,7 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle boolean payload", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle boolean payload", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");

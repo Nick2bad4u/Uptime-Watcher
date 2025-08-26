@@ -993,7 +993,7 @@ describe("React Hook Performance", () => {
         }
 
         // Clear any remaining intervals
-        activeIntervals.forEach(interval => clearInterval(interval));
+        activeIntervals.forEach((interval) => clearInterval(interval));
 
         hookSystem.reset();
     });

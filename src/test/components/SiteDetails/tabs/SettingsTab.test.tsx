@@ -286,7 +286,10 @@ describe("SettingsTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render settings tab with all sections", ({ task, annotate }) => {
+        it("should render settings tab with all sections", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -308,7 +311,10 @@ describe("SettingsTab", () => {
             expect(screen.getByText("Danger Zone")).toBeInTheDocument();
         });
 
-        it("should display site name input with current value", ({ task, annotate }) => {
+        it("should display site name input with current value", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -326,7 +332,10 @@ describe("SettingsTab", () => {
             expect(siteNameInput).not.toBeDisabled();
         });
 
-        it("should display disabled site identifier input", ({ task, annotate }) => {
+        it("should display disabled site identifier input", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -346,7 +355,10 @@ describe("SettingsTab", () => {
             expect(identifierInput).toBeDisabled();
         });
 
-        it("should show check interval dropdown with options", ({ task, annotate }) => {
+        it("should show check interval dropdown with options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -367,7 +379,10 @@ describe("SettingsTab", () => {
             expect(options.length).toBeGreaterThan(1);
         });
 
-        it("should display timeout input with current value", ({ task, annotate }) => {
+        it("should display timeout input with current value", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -385,7 +400,10 @@ describe("SettingsTab", () => {
             expect(timeoutInput).toHaveAttribute("type", "number");
         });
 
-        it("should display retry attempts input with current value", ({ task, annotate }) => {
+        it("should display retry attempts input with current value", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -428,7 +446,10 @@ describe("SettingsTab", () => {
             );
         });
 
-        it("should show save button for site name when there are unsaved changes", ({ task, annotate }) => {
+        it("should show save button for site name when there are unsaved changes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -445,7 +466,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[0]).not.toBeDisabled();
         });
 
-        it("should disable save button when no changes", ({ task, annotate }) => {
+        it("should disable save button when no changes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -465,7 +489,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[0]).toBeDisabled();
         });
 
-        it("should call handleSaveName when save button is clicked", async ({ task, annotate }) => {
+        it("should call handleSaveName when save button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -524,7 +551,10 @@ describe("SettingsTab", () => {
             expect(baseProps.handleIntervalChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save interval button when interval changed", ({ task, annotate }) => {
+        it("should enable save interval button when interval changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -541,7 +571,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[1]).not.toBeDisabled();
         });
 
-        it("should call handleSaveInterval when save button clicked", ({ task, annotate }) => {
+        it("should call handleSaveInterval when save button clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -580,7 +613,10 @@ describe("SettingsTab", () => {
             expect(baseProps.handleTimeoutChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save timeout button when timeout changed", ({ task, annotate }) => {
+        it("should enable save timeout button when timeout changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -597,7 +633,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[2]).not.toBeDisabled();
         });
 
-        it("should call handleSaveTimeout when save button clicked", async ({ task, annotate }) => {
+        it("should call handleSaveTimeout when save button clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -640,7 +679,10 @@ describe("SettingsTab", () => {
             );
         });
 
-        it("should enable save retry button when retry attempts changed", ({ task, annotate }) => {
+        it("should enable save retry button when retry attempts changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -657,7 +699,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[3]).not.toBeDisabled();
         });
 
-        it("should call handleSaveRetryAttempts when save button clicked", async ({ task, annotate }) => {
+        it("should call handleSaveRetryAttempts when save button clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -681,7 +726,10 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should show maximum duration calculation when retry attempts > 0", ({ task, annotate }) => {
+        it("should show maximum duration calculation when retry attempts > 0", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -706,7 +754,10 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should not show maximum duration when retry attempts is 0", ({ task, annotate }) => {
+        it("should not show maximum duration when retry attempts is 0", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -802,7 +853,10 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should call handleRemoveSite when remove button clicked", async ({ task, annotate }) => {
+        it("should call handleRemoveSite when remove button clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -826,7 +880,10 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should disable remove button when loading", ({ task, annotate }) => {
+        it("should disable remove button when loading", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -873,7 +930,10 @@ describe("SettingsTab", () => {
             expect(saveButtons[0]).toBeDisabled();
         });
 
-        it("should show loading state on remove button", ({ task, annotate }) => {
+        it("should show loading state on remove button", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -920,7 +980,10 @@ describe("SettingsTab", () => {
             expect(screen.getByText("0")).toBeInTheDocument();
         });
 
-        it("should handle monitor with undefined lastChecked", ({ task, annotate }) => {
+        it("should handle monitor with undefined lastChecked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");
@@ -1003,7 +1066,10 @@ describe("SettingsTab", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper form labels and structure", ({ task, annotate }) => {
+        it("should have proper form labels and structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SettingsTab", "component");
             annotate("Category: Component", "category");

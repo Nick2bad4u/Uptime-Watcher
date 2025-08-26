@@ -401,10 +401,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Additional edge cases", () => {
-        it("should handle bulk-sync with sites", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle bulk-sync with sites", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync.line-coverage", "component");
             await annotate("Category: Store", "category");

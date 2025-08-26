@@ -100,7 +100,10 @@ describe("Types Module", () => {
             expect(monitor.retryAttempts).toBe(3);
         });
 
-        it("should create valid HTTP Monitor with minimal fields", ({ task, annotate }) => {
+        it("should create valid HTTP Monitor with minimal fields", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -224,7 +227,10 @@ describe("Types Module", () => {
             expect(site.monitoring).toBe(true);
         });
 
-        it("should create Site with multiple monitors", ({ task, annotate }) => {
+        it("should create Site with multiple monitors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -399,7 +405,10 @@ describe("Types Module", () => {
             expect(statusUpdate.previousStatus).toBe("down");
         });
 
-        it("should create StatusUpdate without previous status", ({ task, annotate }) => {
+        it("should create StatusUpdate without previous status", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -429,7 +438,10 @@ describe("Types Module", () => {
             expect(statusUpdate.previousStatus).toBeUndefined();
         });
 
-        it("should support all previous status values", ({ task, annotate }) => {
+        it("should support all previous status values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -468,7 +480,10 @@ describe("Types Module", () => {
     });
 
     describe("Window Electron API", () => {
-        it("should have electronAPI structure defined", ({ task, annotate }) => {
+        it("should have electronAPI structure defined", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -583,7 +598,10 @@ describe("Types Module", () => {
     });
 
     describe("Type Compatibility", () => {
-        it("should allow Monitor in Site monitors array", ({ task, annotate }) => {
+        it("should allow Monitor in Site monitors array", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -616,7 +634,10 @@ describe("Types Module", () => {
             expect(site.monitors[0]).toBe(monitor);
         });
 
-        it("should allow StatusHistory in Monitor history array", ({ task, annotate }) => {
+        it("should allow StatusHistory in Monitor history array", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -736,7 +757,10 @@ describe("Types Module", () => {
             expect(minimalSite.monitoring).toBe(false);
         });
 
-        it("should handle optional StatusUpdate fields", ({ task, annotate }) => {
+        it("should handle optional StatusUpdate fields", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");

@@ -99,10 +99,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
     });
 
     describe("Form Field Updates", () => {
-        it("should update URL field correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update URL field correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -117,10 +114,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.url).toBe("https://example.com");
         });
 
-        it("should update host field correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update host field correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -135,10 +129,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.host).toBe("example.com");
         });
 
-        it("should update port field correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update port field correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -153,10 +144,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.port).toBe("8080");
         });
 
-        it("should update name field correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update name field correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -207,10 +195,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.checkInterval).toBe(60_000);
         });
 
-        it("should update siteId correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update siteId correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -245,10 +230,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should update form error correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update form error correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -263,10 +245,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.formError).toBe("Test error message");
         });
 
-        it("should clear form error correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear form error correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -289,10 +268,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
     });
 
     describe("Add Mode Management", () => {
-        it("should update add mode correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update add mode correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -477,13 +453,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
     describe("Form Validation", () => {
         describe("New Site Mode Validation", () => {
             it("should be invalid when name is empty in new mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -497,13 +473,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be invalid when name is only whitespace in new mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -517,13 +493,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be valid with proper name and required fields in new mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -539,13 +515,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
         describe("Existing Site Mode Validation", () => {
             it("should be invalid when no existing site is selected", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -559,13 +535,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be valid with selected existing site and required fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -581,13 +557,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
         describe("Monitor Type Field Validation", () => {
             it("should be invalid when required HTTP URL field is empty", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -602,13 +578,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be invalid when required HTTP URL field is whitespace", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -623,13 +599,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be invalid when required port monitor host field is empty", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -645,13 +621,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be invalid when required port monitor port field is empty", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -667,13 +643,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be valid when all required port monitor fields are filled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -689,13 +665,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be invalid when required ping monitor host field is empty", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -710,13 +686,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should be valid when all required ping monitor fields are filled", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const { result } = renderHook(() => useAddSiteForm());
 
@@ -733,13 +709,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
         describe("Dynamic Field Validation", () => {
             it("should validate fields dynamically based on monitor type configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Validation", "type");
 
                 // Mock a custom monitor type with different required fields
                 mockGetFields.mockImplementation((type: MonitorType) => {
@@ -766,13 +742,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             it("should handle monitor types with no required fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useAddSiteForm", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useAddSiteForm", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 mockGetFields.mockImplementation(() => [
                     { name: "optional", required: false },

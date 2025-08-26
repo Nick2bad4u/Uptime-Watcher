@@ -6,7 +6,10 @@ import {
 
 describe("Database Types - Missing Coverage", () => {
     describe("RowValidationUtils.isValidTimestamp coverage", () => {
-        test("should handle invalid string timestamps through isValidHistoryRow (line 208)", ({ task, annotate }) => {
+        test("should handle invalid string timestamps through isValidHistoryRow (line 208)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
             annotate("Category: Shared", "category");
@@ -33,7 +36,10 @@ describe("Database Types - Missing Coverage", () => {
             );
         });
 
-        test("should handle invalid string timestamps through isValidMonitorRow", ({ task, annotate }) => {
+        test("should handle invalid string timestamps through isValidMonitorRow", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
             annotate("Category: Shared", "category");
@@ -67,7 +73,10 @@ describe("Database Types - Missing Coverage", () => {
             );
         });
 
-        test("should handle invalid string timestamps through isValidSiteRow", ({ task, annotate }) => {
+        test("should handle invalid string timestamps through isValidSiteRow", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
             annotate("Category: Shared", "category");
@@ -92,7 +101,10 @@ describe("Database Types - Missing Coverage", () => {
             expect(isValidSiteRow(siteRowWithInvalidTimestamp)).toBe(false);
         });
 
-        test("should handle edge case string timestamps that become NaN", ({ task, annotate }) => {
+        test("should handle edge case string timestamps that become NaN", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
             annotate("Category: Shared", "category");

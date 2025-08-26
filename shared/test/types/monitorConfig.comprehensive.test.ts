@@ -533,10 +533,7 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("MonitorConfig Union Type", () => {
-        it("should accept all monitor types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept all monitor types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");
@@ -750,10 +747,7 @@ describe("Monitor Configuration Types", () => {
             expect(isPortMonitorConfig(pingConfig)).toBe(false);
         });
 
-        it("should provide type narrowing", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide type narrowing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");
@@ -780,10 +774,7 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("DEFAULT_MONITOR_CONFIG", () => {
-        it("should provide HTTP defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide HTTP defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");
@@ -801,10 +792,7 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.timeout).toBe(30_000);
         });
 
-        it("should provide ping defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide ping defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");
@@ -822,10 +810,7 @@ describe("Monitor Configuration Types", () => {
             expect(defaults.timeout).toBe(30_000);
         });
 
-        it("should provide port defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide port defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");
@@ -897,10 +882,7 @@ describe("Monitor Configuration Types", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce strict typing", async ({
-            task,
-            annotate,
-        }) => {
+        it("should enforce strict typing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig", "component");
             await annotate("Category: Shared", "category");

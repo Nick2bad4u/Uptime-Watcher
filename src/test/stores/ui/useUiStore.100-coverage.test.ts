@@ -24,7 +24,10 @@ describe("useUIStore - 100% Coverage Tests", () => {
     });
 
     describe("Targeting Lines 130-131 (setSelectedSite with undefined)", () => {
-        test("should handle setSelectedSite with undefined site", async ({ task, annotate }) => {
+        test("should handle setSelectedSite with undefined site", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useUiStore.100-coverage", "component");
             annotate("Category: Store", "category");
@@ -64,7 +67,10 @@ describe("useUIStore - 100% Coverage Tests", () => {
             expect(result.current.selectedSiteId).toBeUndefined();
         });
 
-        test("should handle setSelectedSite with valid site", async ({ task, annotate }) => {
+        test("should handle setSelectedSite with valid site", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useUiStore.100-coverage", "component");
             annotate("Category: Store", "category");
@@ -97,7 +103,10 @@ describe("useUIStore - 100% Coverage Tests", () => {
             expect(result.current.selectedSiteId).toBe("test-site-2");
         });
 
-        test("should handle all UI store actions for coverage", async ({ task, annotate }) => {
+        test("should handle all UI store actions for coverage", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useUiStore.100-coverage", "component");
             annotate("Category: Store", "category");

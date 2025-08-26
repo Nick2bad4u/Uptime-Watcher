@@ -27,7 +27,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -52,7 +55,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -97,7 +103,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -137,7 +146,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
@@ -209,7 +221,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -242,7 +257,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -300,12 +318,12 @@ describe("Utility Files - Missing Branch Coverage", () => {
     });
 
     describe("Async Utility Edge Cases", () => {
-        it("should handle promise edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle promise edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -330,12 +348,12 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(results.some((r) => r.status === "rejected")).toBe(true);
         });
 
-        it("should handle timeout scenarios", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout scenarios", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -358,7 +376,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -404,7 +425,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -456,7 +480,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -496,7 +523,10 @@ describe("Utility Files - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -530,12 +560,12 @@ describe("Utility Files - Missing Branch Coverage", () => {
             expect(Object.keys(largeObject).length).toBe(10_000);
         });
 
-        it("should handle rapid operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle rapid operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utilities.missing-branches", "component");
+            await annotate(
+                "Component: utilities.missing-branches",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 

@@ -56,10 +56,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
 
-        it("should accept 'up' status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept 'up' status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -74,10 +71,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(true);
         });
 
-        it("should accept 'down' status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept 'down' status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -92,10 +86,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(row)).toBe(true);
         });
 
-        it("should accept numeric timestamp", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept numeric timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -129,10 +120,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -141,10 +129,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject undefined input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -153,10 +138,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject string input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -165,10 +147,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject number input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -177,10 +156,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow(123)).toBe(false);
         });
 
-        it("should reject array input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject array input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -189,10 +165,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidHistoryRow([])).toBe(false);
         });
 
-        it("should reject empty object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject empty object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -441,10 +414,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -453,10 +423,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject undefined input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -465,10 +432,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject string input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -477,10 +441,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject number input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -489,10 +450,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(456)).toBe(false);
         });
 
-        it("should reject array input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject array input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -507,10 +465,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             ).toBe(false);
         });
 
-        it("should reject empty object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject empty object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -519,10 +474,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow({})).toBe(false);
         });
 
-        it("should reject object missing id", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject object missing id", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -553,10 +505,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidMonitorRow(row)).toBe(false);
         });
 
-        it("should reject object missing type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject object missing type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -731,10 +680,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -743,10 +689,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject undefined input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -755,10 +698,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject string input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -767,10 +707,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject number input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -779,10 +716,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(789)).toBe(false);
         });
 
-        it("should reject array input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject array input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -791,10 +725,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(["key", "value"])).toBe(false);
         });
 
-        it("should reject empty object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject empty object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -803,10 +734,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow({})).toBe(false);
         });
 
-        it("should reject object missing key", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject object missing key", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -836,10 +764,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSettingsRow(row)).toBe(false);
         });
 
-        it("should reject object with null key", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject object with null key", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -908,10 +833,7 @@ describe("Shared Database Types - Complete Coverage", () => {
     });
 
     describe("isValidSiteRow", () => {
-        it("should validate correct site row", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate correct site row", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -959,10 +881,7 @@ describe("Shared Database Types - Complete Coverage", () => {
         });
 
         // Test all rejection cases
-        it("should reject null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -971,10 +890,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(null)).toBe(false);
         });
 
-        it("should reject undefined input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject undefined input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -983,10 +899,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(undefined)).toBe(false);
         });
 
-        it("should reject string input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject string input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -995,10 +908,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow("not-an-object")).toBe(false);
         });
 
-        it("should reject number input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject number input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -1007,10 +917,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(999)).toBe(false);
         });
 
-        it("should reject array input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject array input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -1019,10 +926,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             expect(isValidSiteRow(["identifier", "name"])).toBe(false);
         });
 
-        it("should reject empty object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject empty object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -1221,10 +1125,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should handle empty row object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty row object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -1295,10 +1196,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             );
         });
 
-        it("should preserve type information", async ({
-            task,
-            annotate,
-        }) => {
+        it("should preserve type information", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-types-coverage", "component");
             await annotate("Category: Core", "category");

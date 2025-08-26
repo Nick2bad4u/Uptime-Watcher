@@ -137,10 +137,7 @@ describe("PingMonitor", () => {
     });
 
     describe("updateConfig", () => {
-        it("should update configuration values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update configuration values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PingMonitor", "component");
             await annotate("Category: Service", "category");
@@ -259,10 +256,7 @@ describe("PingMonitor", () => {
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
         });
 
-        it("should handle ping failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle ping failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PingMonitor", "component");
             await annotate("Category: Service", "category");
@@ -301,10 +295,7 @@ describe("PingMonitor", () => {
             );
         });
 
-        it("should handle different host types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle different host types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PingMonitor", "component");
             await annotate("Category: Service", "category");
@@ -330,10 +321,7 @@ describe("PingMonitor", () => {
             }
         });
 
-        it("should propagate ping retry errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should propagate ping retry errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PingMonitor", "component");
             await annotate("Category: Service", "category");

@@ -110,10 +110,7 @@ describe("monitorOperations", () => {
             expect(mockCrypto.randomUUID).not.toHaveBeenCalled();
         });
 
-        it("should handle partial overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -166,10 +163,7 @@ describe("monitorOperations", () => {
             expect(validateMonitor(validMonitor)).toBe(true);
         });
 
-        it("should return false for missing id", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for missing id", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -503,10 +497,7 @@ describe("monitorOperations", () => {
             expect(result.status).toBe("pending");
         });
 
-        it("should preserve existing id", async ({
-            task,
-            annotate,
-        }) => {
+        it("should preserve existing id", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -518,10 +509,7 @@ describe("monitorOperations", () => {
             expect(mockCrypto.randomUUID).not.toHaveBeenCalled();
         });
 
-        it("should preserve existing type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should preserve existing type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -531,10 +519,7 @@ describe("monitorOperations", () => {
             expect(result.type).toBe("http");
         });
 
-        it("should preserve existing history", async ({
-            task,
-            annotate,
-        }) => {
+        it("should preserve existing history", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -683,10 +668,7 @@ describe("monitorOperations", () => {
             name: "Test Site",
         };
 
-        it("should find existing monitor by id", async ({
-            task,
-            annotate,
-        }) => {
+        it("should find existing monitor by id", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -709,10 +691,7 @@ describe("monitorOperations", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -771,10 +750,7 @@ describe("monitorOperations", () => {
             name: "Test Site",
         };
 
-        it("should update existing monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update existing monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -812,10 +788,7 @@ describe("monitorOperations", () => {
             }).toThrow("Monitor not found");
         });
 
-        it("should not mutate original site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not mutate original site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -831,10 +804,7 @@ describe("monitorOperations", () => {
             expect(result.monitors).not.toBe(mockSite.monitors);
         });
 
-        it("should handle partial updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -851,10 +821,7 @@ describe("monitorOperations", () => {
             });
         });
 
-        it("should handle empty updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -890,10 +857,7 @@ describe("monitorOperations", () => {
             name: "Test Site",
         };
 
-        it("should add monitor to site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add monitor to site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -918,10 +882,7 @@ describe("monitorOperations", () => {
             expect(result.monitors[1]).toEqual(newMonitor);
         });
 
-        it("should not mutate original site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not mutate original site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -947,10 +908,7 @@ describe("monitorOperations", () => {
             expect(result.monitors).not.toBe(mockSite.monitors);
         });
 
-        it("should add to empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add to empty monitors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -1010,10 +968,7 @@ describe("monitorOperations", () => {
             name: "Test Site",
         };
 
-        it("should remove existing monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove existing monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -1040,10 +995,7 @@ describe("monitorOperations", () => {
             expect(result.monitors).toEqual(mockSite.monitors);
         });
 
-        it("should not mutate original site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not mutate original site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -1058,10 +1010,7 @@ describe("monitorOperations", () => {
             expect(result.monitors).not.toBe(mockSite.monitors);
         });
 
-        it("should remove last monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove last monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -1080,10 +1029,7 @@ describe("monitorOperations", () => {
             expect(result.monitors).toHaveLength(0);
         });
 
-        it("should handle empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
             await annotate("Category: Core", "category");
@@ -1200,13 +1146,13 @@ describe("monitorOperations", () => {
 
         describe("toggleMonitoring", () => {
             it("should toggle monitoring from true to false", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = monitorOperations.toggleMonitoring(mockMonitor);
 
@@ -1217,13 +1163,13 @@ describe("monitorOperations", () => {
             });
 
             it("should toggle monitoring from false to true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const monitorWithMonitoringOff = {
                     ...mockMonitor,
@@ -1241,13 +1187,13 @@ describe("monitorOperations", () => {
             });
 
             it("should not mutate original monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const originalMonitor = { ...mockMonitor };
 
@@ -1259,14 +1205,11 @@ describe("monitorOperations", () => {
         });
 
         describe("updateCheckInterval", () => {
-            it("should update check interval", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+            it("should update check interval", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Data Update", "type");
 
                 const newInterval = 60_000;
 
@@ -1282,13 +1225,13 @@ describe("monitorOperations", () => {
             });
 
             it("should not mutate original monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const originalMonitor = { ...mockMonitor };
 
@@ -1301,14 +1244,11 @@ describe("monitorOperations", () => {
                 expect(result).not.toBe(mockMonitor);
             });
 
-            it("should handle zero interval", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle zero interval", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = monitorOperations.updateCheckInterval(
                     mockMonitor,
@@ -1320,14 +1260,11 @@ describe("monitorOperations", () => {
         });
 
         describe("updateRetryAttempts", () => {
-            it("should update retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+            it("should update retry attempts", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Data Update", "type");
 
                 const newRetryAttempts = 5;
 
@@ -1343,13 +1280,13 @@ describe("monitorOperations", () => {
             });
 
             it("should not mutate original monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const originalMonitor = { ...mockMonitor };
 
@@ -1365,13 +1302,13 @@ describe("monitorOperations", () => {
 
         describe("updateStatus", () => {
             it("should update status to pending", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Data Update", "type");
 
                 const result = monitorOperations.updateStatus(
                     mockMonitor,
@@ -1384,14 +1321,11 @@ describe("monitorOperations", () => {
                 });
             });
 
-            it("should update status to down", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+            it("should update status to down", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Data Update", "type");
 
                 const result = monitorOperations.updateStatus(
                     mockMonitor,
@@ -1405,13 +1339,13 @@ describe("monitorOperations", () => {
             });
 
             it("should not mutate original monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const originalMonitor = { ...mockMonitor };
 
@@ -1426,14 +1360,11 @@ describe("monitorOperations", () => {
         });
 
         describe("updateTimeout", () => {
-            it("should update timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+            it("should update timeout", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Data Update", "type");
 
                 const newTimeout = 10_000;
 
@@ -1449,13 +1380,13 @@ describe("monitorOperations", () => {
             });
 
             it("should not mutate original monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const originalMonitor = { ...mockMonitor };
 
@@ -1468,14 +1399,11 @@ describe("monitorOperations", () => {
                 expect(result).not.toBe(mockMonitor);
             });
 
-            it("should handle zero timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorOperations", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle zero timeout", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorOperations", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = monitorOperations.updateTimeout(mockMonitor, 0);
 

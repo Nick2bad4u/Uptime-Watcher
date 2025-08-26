@@ -29,10 +29,7 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
-        it("should retry on failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should retry on failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Utility", "category");
@@ -52,10 +49,7 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should fail after max retries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should fail after max retries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Utility", "category");
@@ -76,10 +70,7 @@ describe("Operational Hooks", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should call callbacks correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call callbacks correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Utility", "category");

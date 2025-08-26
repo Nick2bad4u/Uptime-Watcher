@@ -18,13 +18,13 @@ describe("Logger Utilities", () => {
     describe("Logger Interface Tests", () => {
         describe("Main Logger (logger)", () => {
             it("should have all required logging methods", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(logger).toBeDefined();
                 expect(typeof logger.debug).toBe("function");
@@ -34,13 +34,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should be callable with various argument types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // These tests verify the logger can be called without throwing errors
                 expect(() => logger.debug("Debug message")).not.toThrow();
@@ -56,13 +56,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle Error objects in error method", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error("Test error");
                 error.stack = "Error stack trace";
@@ -73,13 +73,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle non-Error objects in error method", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const errorObject = { code: 500, message: "Server error" };
 
@@ -88,14 +88,11 @@ describe("Logger Utilities", () => {
                 ).not.toThrow();
             });
 
-            it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle edge cases", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() => logger.info("")).not.toThrow();
                 expect(() => logger.debug("Just message")).not.toThrow();
@@ -108,13 +105,13 @@ describe("Logger Utilities", () => {
 
         describe("Database Logger (dbLogger)", () => {
             it("should have all required logging methods", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(dbLogger).toBeDefined();
                 expect(typeof dbLogger.debug).toBe("function");
@@ -124,13 +121,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should be callable with database-specific scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() =>
                     dbLogger.debug("Executing query", {
@@ -158,13 +155,13 @@ describe("Logger Utilities", () => {
 
         describe("Monitor Logger (monitorLogger)", () => {
             it("should have all required logging methods", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(monitorLogger).toBeDefined();
                 expect(typeof monitorLogger.debug).toBe("function");
@@ -174,13 +171,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should be callable with monitoring-specific scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(() =>
                     monitorLogger.debug("Response time recorded", {
@@ -209,13 +206,13 @@ describe("Logger Utilities", () => {
 
         describe("Logger Distinctness", () => {
             it("should have distinct logger instances", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(logger).not.toBe(dbLogger);
                 expect(logger).not.toBe(monitorLogger);
@@ -223,13 +220,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should all be function objects with same interface", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const loggers = [
                     logger,
@@ -248,13 +245,13 @@ describe("Logger Utilities", () => {
 
         describe("Performance and Edge Cases", () => {
             it("should handle rapid logging without issues", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() => {
                     for (let i = 0; i < 100; i++) {
@@ -264,13 +261,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle concurrent logging from multiple loggers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() => {
                     for (let i = 0; i < 10; i++) {
@@ -282,13 +279,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle logging with circular references", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const circular: any = { name: "test" };
                 circular.self = circular;
@@ -299,13 +296,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle very large objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const largeObject = {
                     data: Array.from({ length: 1000 })
@@ -321,13 +318,13 @@ describe("Logger Utilities", () => {
 
         describe("Real-world Usage Scenarios", () => {
             it("should handle application startup logging", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() => {
                     logger.info("Application initializing");
@@ -339,13 +336,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle database operation logging", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(() => {
                     dbLogger.info("Database connection established");
@@ -361,13 +358,13 @@ describe("Logger Utilities", () => {
             });
 
             it("should handle monitoring workflow logging", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: logger", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(() => {
                     monitorLogger.info("Starting monitor check", {

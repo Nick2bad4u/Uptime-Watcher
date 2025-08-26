@@ -388,10 +388,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        it("should handle empty monitor object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorValidator", "component");
             await annotate("Category: Manager", "category");

@@ -194,10 +194,7 @@ describe("useMonitorTypesStore", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should reload if not loaded", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reload if not loaded", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -220,10 +217,7 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.isLoaded).toBe(true);
         });
 
-        it("should reload if error exists", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reload if error exists", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -257,10 +251,7 @@ describe("useMonitorTypesStore", () => {
             ).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle loading errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle loading errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -462,10 +453,7 @@ describe("useMonitorTypesStore", () => {
             expect(validationResult!.metadata).toEqual({});
         });
 
-        it("should handle validation errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle validation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -739,10 +727,7 @@ describe("useMonitorTypesStore", () => {
     });
 
     describe("Base Store Actions", () => {
-        it("should clear error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -763,10 +748,7 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should set error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");
@@ -787,10 +769,7 @@ describe("useMonitorTypesStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should set loading state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set loading state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypesStore", "component");
             await annotate("Category: Store", "category");

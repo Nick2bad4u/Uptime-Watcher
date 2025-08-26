@@ -118,13 +118,13 @@ describe("ServiceContainer - Debug Mock Test", () => {
     });
 
     it("should create ServiceContainer and test SiteManager creation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.debug-mock", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: ServiceContainer.debug-mock", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         console.log("Creating ServiceContainer instance...");
         serviceContainer = ServiceContainer.getInstance();

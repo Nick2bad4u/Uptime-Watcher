@@ -74,10 +74,7 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to start monitoring");
         });
 
-        it("should handle empty siteId", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty siteId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -97,10 +94,7 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith("", monitorId);
         });
 
-        it("should handle empty monitorId", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitorId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -213,10 +207,7 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to stop monitoring");
         });
 
-        it("should handle empty siteId", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty siteId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -236,10 +227,7 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith("", monitorId);
         });
 
-        it("should handle empty monitorId", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitorId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -376,10 +364,7 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle long IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle long IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -422,10 +407,7 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle UUID-like IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle UUID-like IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -447,10 +429,7 @@ describe("MonitoringService", () => {
     });
 
     describe("Error handling", () => {
-        it("should propagate network errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should propagate network errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -485,10 +464,7 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Invalid site ID");
         });
 
-        it("should handle timeout errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");

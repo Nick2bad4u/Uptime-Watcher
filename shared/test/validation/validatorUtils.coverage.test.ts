@@ -28,10 +28,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost(() => {})).toBe(false);
         });
 
-        it("should validate valid hosts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate valid hosts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -50,10 +47,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidHost("localhost")).toBe(true);
         });
 
-        it("should reject invalid string hosts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid string hosts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -90,10 +84,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(new Date())).toBe(false);
         });
 
-        it("should validate number ports", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate number ports", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -111,10 +102,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(70_000)).toBe(false);
         });
 
-        it("should validate string ports", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate string ports", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");

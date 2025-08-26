@@ -65,10 +65,7 @@ describe("Port Error Handling", () => {
             expect(PORT_NOT_REACHABLE).toBe("Port not reachable");
         });
 
-        it("should be a string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be a string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: portErrorHandling", "component");
             await annotate("Category: Service", "category");
@@ -289,10 +286,7 @@ describe("Port Error Handling", () => {
             expect(Object.hasOwn(error, "responseTime")).toBe(true);
         });
 
-        it("should handle empty string message", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string message", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: portErrorHandling", "component");
             await annotate("Category: Service", "category");
@@ -325,13 +319,13 @@ describe("Port Error Handling", () => {
     describe("handlePortCheckError function", () => {
         describe("PortCheckError input", () => {
             it("should handle PortCheckError with preserved response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const responseTime = 1200;
                 const error = new PortCheckError(
@@ -350,13 +344,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle PortCheckError with custom message", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const customMessage = "Connection timed out";
                 const responseTime = 5000;
@@ -375,13 +369,13 @@ describe("Port Error Handling", () => {
 
         describe("Standard Error input", () => {
             it("should handle standard Error with -1 response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error("Network unreachable");
 
@@ -396,13 +390,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle Error with PORT_NOT_REACHABLE message", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error(PORT_NOT_REACHABLE);
 
@@ -418,14 +412,11 @@ describe("Port Error Handling", () => {
         });
 
         describe("Non-Error input", () => {
-            it("should handle string error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle string error", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = handlePortCheckError(
                     "String error",
@@ -441,14 +432,11 @@ describe("Port Error Handling", () => {
                 });
             });
 
-            it("should handle number error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle number error", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = handlePortCheckError(404, "api.test", 443);
 
@@ -460,14 +448,11 @@ describe("Port Error Handling", () => {
                 });
             });
 
-            it("should handle null error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle null error", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = handlePortCheckError(null, "null.test", 80);
 
@@ -479,14 +464,11 @@ describe("Port Error Handling", () => {
                 });
             });
 
-            it("should handle undefined error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle undefined error", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = handlePortCheckError(
                     undefined,
@@ -502,14 +484,11 @@ describe("Port Error Handling", () => {
                 });
             });
 
-            it("should handle object error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle object error", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const objectError = {
                     code: "ECONNREFUSED",
@@ -532,13 +511,13 @@ describe("Port Error Handling", () => {
 
         describe("Different port and host combinations", () => {
             it("should handle different port numbers correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const error = new Error("Test error");
                 const testCases = [
@@ -562,13 +541,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle different host formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const error = new Error("Test error");
                 const hosts = [
@@ -592,13 +571,13 @@ describe("Port Error Handling", () => {
 
         describe("Development mode logging", () => {
             it("should log debug message when isDev returns true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection failed");
@@ -611,13 +590,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should not log debug message when isDev returns false", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 vi.mocked(isDev).mockReturnValue(false);
                 const error = new Error("Connection failed");
@@ -628,13 +607,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should log debug message with PortCheckError", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new PortCheckError(PORT_NOT_REACHABLE, 1000);
@@ -647,13 +626,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should log debug message with non-Error input", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(isDev).mockReturnValue(true);
 
@@ -665,13 +644,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle isDev throwing an error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(isDev).mockImplementation(() => {
                     throw new Error("isDev failed");
@@ -688,13 +667,13 @@ describe("Port Error Handling", () => {
 
         describe("Message normalization", () => {
             it("should preserve PORT_NOT_REACHABLE message when it matches exactly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const error = new Error(PORT_NOT_REACHABLE);
 
@@ -704,13 +683,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should preserve custom error messages that are not PORT_NOT_REACHABLE", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const customMessage = "Custom connection error";
                 const error = new Error(customMessage);
@@ -721,13 +700,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle empty error message", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 // eslint-disable-next-line unicorn/error-message -- testing empty error message
                 const error = new Error("");
@@ -739,13 +718,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle very long error messages", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const longMessage = `Error: ${"x".repeat(1000)}`;
                 const error = new Error(longMessage);
@@ -758,13 +737,13 @@ describe("Port Error Handling", () => {
 
         describe("Response time preservation", () => {
             it("should preserve response time from PortCheckError", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const responseTime = 2500;
                 const error = new PortCheckError("Test", responseTime);
@@ -775,13 +754,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should use -1 for non-PortCheckError", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error("Standard error");
 
@@ -795,13 +774,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle PortCheckError with zero response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new PortCheckError("Zero time", 0);
 
@@ -811,13 +790,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should handle PortCheckError with negative response time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new PortCheckError("Negative time", -100);
 
@@ -833,13 +812,13 @@ describe("Port Error Handling", () => {
 
         describe("Edge cases and integration", () => {
             it("should handle all combinations consistently", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const testMatrix = [
                     {
@@ -871,13 +850,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should produce consistent results for the same input", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const error = new PortCheckError("Consistent test", 1500);
 
@@ -896,13 +875,13 @@ describe("Port Error Handling", () => {
             });
 
             it("should work with all interface properties properly typed", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: portErrorHandling", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const error = new PortCheckError(PORT_NOT_REACHABLE, 2000);
                 const result = handlePortCheckError(error, "typed.test", 443);

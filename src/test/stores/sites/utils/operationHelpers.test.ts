@@ -125,10 +125,7 @@ describe("OperationHelpers", () => {
     });
 
     describe("getSiteById", () => {
-        it("should return site when found", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return site when found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -155,10 +152,7 @@ describe("OperationHelpers", () => {
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle empty sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -357,10 +351,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle sync errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle sync errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationHelpers", "component");
             await annotate("Category: Utility", "category");

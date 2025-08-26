@@ -119,10 +119,7 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(1000)).toBe("down");
         });
 
-        it("should handle non-integer inputs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-integer inputs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorLifecycle", "component");
             await annotate("Category: Utility", "category");

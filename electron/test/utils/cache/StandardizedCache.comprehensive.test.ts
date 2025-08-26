@@ -56,10 +56,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(stats.size).toBe(0);
         });
 
-        it("should respect custom defaultTTL", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect custom defaultTTL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -122,10 +119,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("key1")).toBe("value1");
         });
 
-        it("should respect custom maxSize", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect custom maxSize", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -148,10 +142,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.has("key3")).toBe(true);
         });
 
-        it("should handle enableStats = false", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle enableStats = false", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -173,10 +164,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(stats.hitRatio).toBe(0);
         });
 
-        it("should work with event emitter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with event emitter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -200,10 +188,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             });
         });
 
-        it("should work without event emitter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work without event emitter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -564,10 +549,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(stats.misses).toBe(1);
         });
 
-        it("should track entry hit counts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should track entry hit counts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -658,10 +640,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             });
         });
 
-        it("should emit cleared event on clear", async ({
-            task,
-            annotate,
-        }) => {
+        it("should emit cleared event on clear", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -811,10 +790,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cleanup2();
         });
 
-        it("should call callbacks on delete", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call callbacks on delete", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -960,10 +936,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(callback).not.toHaveBeenCalled();
         });
 
-        it("should call callbacks on cleanup", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call callbacks on cleanup", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1010,10 +983,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("key3")).toBe("value3");
         });
 
-        it("should handle empty bulk update", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty bulk update", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1054,10 +1024,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             });
         });
 
-        it("should clean up all expired items", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clean up all expired items", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1115,10 +1082,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             });
         });
 
-        it("should return all valid entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all valid entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1154,10 +1118,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(entries[0]).toEqual(["key2", "value2"]);
         });
 
-        it("should return all valid keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all valid keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1172,10 +1133,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(keys).toHaveLength(2);
         });
 
-        it("should return all valid values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all valid values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1255,10 +1213,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             }).not.toThrow();
         });
 
-        it("should handle complex data types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex data types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1282,10 +1237,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("complex")).toEqual(complexData);
         });
 
-        it("should handle maxSize of 0", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle maxSize of 0", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -1300,10 +1252,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             }).not.toThrow();
         });
 
-        it("should handle maxSize of 1", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle maxSize of 1", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");

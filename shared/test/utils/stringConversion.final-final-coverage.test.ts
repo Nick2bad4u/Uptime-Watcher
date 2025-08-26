@@ -12,7 +12,10 @@ describe("String Conversion - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate(
+                "Component: stringConversion.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -26,7 +29,10 @@ describe("String Conversion - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate(
+                "Component: stringConversion.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -51,7 +57,10 @@ describe("String Conversion - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate(
+                "Component: stringConversion.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -71,7 +80,10 @@ describe("String Conversion - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.final-final-coverage", "component");
+            await annotate(
+                "Component: stringConversion.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 

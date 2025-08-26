@@ -61,15 +61,15 @@ describe("Main Entry Point", () => {
     });
 
     it("should have React available", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const React = await import("react");
         expect(React).toBeDefined();
@@ -77,15 +77,15 @@ describe("Main Entry Point", () => {
     });
 
     it("should have ReactDOM available", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const ReactDOM = await import("react-dom/client");
         expect(ReactDOM).toBeDefined();
@@ -93,30 +93,33 @@ describe("Main Entry Point", () => {
     });
 
     it("should have App component available", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const AppModule = await import("../App");
         expect(AppModule.default).toBeDefined();
     });
 
-    it("should initialize app when root element exists", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Initialization", "type");
+    it("should initialize app when root element exists", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Initialization", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Initialization", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Initialization", "type");
 
         (document.getElementById as any).mockReturnValue(mockElement);
 
@@ -128,16 +131,19 @@ describe("Main Entry Point", () => {
         expect(mockRender).toHaveBeenCalled();
     });
 
-    it("should handle error when root element not found", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle error when root element not found", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Error Handling", "type");
 
         const consoleErrorSpy = vi
             .spyOn(console, "error")
@@ -155,16 +161,19 @@ describe("Main Entry Point", () => {
         consoleErrorSpy.mockRestore();
     });
 
-    it("should use getElementById for root element lookup", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Retrieval", "type");
+    it("should use getElementById for root element lookup", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Data Retrieval", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Retrieval", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Data Retrieval", "type");
 
         (document.getElementById as any).mockReturnValue(mockElement);
 
@@ -174,16 +183,19 @@ describe("Main Entry Point", () => {
         expect(document.getElementById).toHaveBeenCalledTimes(1);
     });
 
-    it("should render App component within React.StrictMode", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should render App component within React.StrictMode", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: main", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         (document.getElementById as any).mockReturnValue(mockElement);
 

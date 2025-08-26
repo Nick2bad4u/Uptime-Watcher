@@ -55,10 +55,7 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should handle empty errors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty errors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation-functions", "component");
             await annotate("Category: Shared", "category");
@@ -195,10 +192,7 @@ describe("shared/types/validation function coverage", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation-functions", "component");
             await annotate("Category: Shared", "category");
@@ -207,10 +201,7 @@ describe("shared/types/validation function coverage", () => {
             expect(isValidationResult(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation-functions", "component");
             await annotate("Category: Shared", "category");

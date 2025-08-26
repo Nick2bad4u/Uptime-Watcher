@@ -99,10 +99,7 @@ describe("SiteService", () => {
             expect(sites).toEqual(mockSites);
         });
 
-        it("should handle empty sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -132,10 +129,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle network errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle network errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -151,10 +145,7 @@ describe("SiteService", () => {
     });
 
     describe("addSite", () => {
-        it("should add a new site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add a new site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -208,10 +199,7 @@ describe("SiteService", () => {
             expect(result).toEqual(createdSite);
         });
 
-        it("should handle creation errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle creation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -232,10 +220,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle validation errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle validation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -308,10 +293,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle update errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle update errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -354,10 +336,7 @@ describe("SiteService", () => {
             ).rejects.toThrow("Site not found");
         });
 
-        it("should handle partial updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -380,10 +359,7 @@ describe("SiteService", () => {
     });
 
     describe("removeSite", () => {
-        it("should remove a site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove a site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -399,10 +375,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle removal errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle removal errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -477,10 +450,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle check errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle check errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -543,10 +513,7 @@ describe("SiteService", () => {
             expect(result).toEqual(backupData);
         });
 
-        it("should handle download errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle download errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -626,10 +593,7 @@ describe("SiteService", () => {
     });
 
     describe("Parameter validation", () => {
-        it("should accept valid site objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept valid site objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -795,10 +759,7 @@ describe("SiteService", () => {
     });
 
     describe("Error handling", () => {
-        it("should propagate network errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should propagate network errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -831,10 +792,7 @@ describe("SiteService", () => {
             ).rejects.toThrow("Invalid site data");
         });
 
-        it("should handle timeout errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");

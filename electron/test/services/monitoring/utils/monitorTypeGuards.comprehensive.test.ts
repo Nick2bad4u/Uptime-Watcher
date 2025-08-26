@@ -1216,10 +1216,7 @@ describe("Monitor Type Guards", () => {
             }
         });
 
-        it("should handle undefined url", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined url", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
@@ -1234,10 +1231,7 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith(undefined);
         });
 
-        it("should handle null url", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null url", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
@@ -1252,10 +1246,7 @@ describe("Monitor Type Guards", () => {
             expect(isValidUrl).toHaveBeenCalledWith(null);
         });
 
-        it("should handle non-string url", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-string url", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");

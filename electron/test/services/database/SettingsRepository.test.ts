@@ -101,10 +101,7 @@ describe("SettingsRepository", () => {
 
             expect(result).toBeUndefined();
         });
-        it("should handle database errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle database errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -160,10 +157,7 @@ describe("SettingsRepository", () => {
 
             expect(result).toEqual({});
         });
-        it("should handle database errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle database errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -216,10 +210,7 @@ describe("SettingsRepository", () => {
                 expect.any(Function)
             );
         });
-        it("should handle database errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle database errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -232,10 +223,7 @@ describe("SettingsRepository", () => {
                 repository.set("test-key", "test-value")
             ).rejects.toThrow("Database error");
         });
-        it("should handle empty string value", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string value", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -269,13 +257,13 @@ describe("SettingsRepository", () => {
     describe("internal methods", () => {
         describe("setInternal", () => {
             it("should set setting using database run method", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 repository.setInternal(mockDatabase, "test-key", "test-value");
 
@@ -284,14 +272,11 @@ describe("SettingsRepository", () => {
                     ["test-key", "test-value"]
                 );
             });
-            it("should handle empty values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty values", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 repository.setInternal(mockDatabase, "test-key", "");
 
@@ -302,14 +287,11 @@ describe("SettingsRepository", () => {
             });
         });
         describe("deleteInternal", () => {
-            it("should delete setting by key", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Deletion", "type");
+            it("should delete setting by key", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Data Deletion", "type");
 
                 repository.deleteInternal(mockDatabase, "test-key");
 
@@ -320,14 +302,11 @@ describe("SettingsRepository", () => {
             });
         });
         describe("deleteAllInternal", () => {
-            it("should delete all settings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Deletion", "type");
+            it("should delete all settings", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Data Deletion", "type");
 
                 repository.deleteAllInternal(mockDatabase);
 
@@ -338,13 +317,13 @@ describe("SettingsRepository", () => {
         });
         describe("bulkInsertInternal", () => {
             it("should bulk insert multiple settings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockStatement = {
                     run: vi.fn(),
@@ -371,13 +350,13 @@ describe("SettingsRepository", () => {
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });
             it("should handle empty settings array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockStatement = {
                     run: vi.fn(),
@@ -392,13 +371,13 @@ describe("SettingsRepository", () => {
                 expect(mockStatement.finalize).not.toHaveBeenCalled();
             });
             it("should finalize statement even if error occurs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: SettingsRepository", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const settings = { setting1: "value1" };
                 const mockStatement = {
@@ -417,10 +396,7 @@ describe("SettingsRepository", () => {
         });
     });
     describe("edge cases and error handling", () => {
-        it("should handle very long key names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very long key names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -434,10 +410,7 @@ describe("SettingsRepository", () => {
             expect(result).toBeUndefined();
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
         });
-        it("should handle very long values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very long values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");
@@ -465,10 +438,7 @@ describe("SettingsRepository", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle null key gracefully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null key gracefully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
             await annotate("Category: Service", "category");

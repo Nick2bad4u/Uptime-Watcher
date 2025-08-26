@@ -14,7 +14,10 @@ import type {
 
 describe("Monitor Forms - 100% Coverage Tests", () => {
     describe("Targeting Line 166 (satisfies DnsMonitorFields)", () => {
-        test("should return valid DNS monitor fields structure", ({ task, annotate }) => {
+        test("should return valid DNS monitor fields structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");
@@ -46,7 +49,10 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(dnsFields.timeout).toBe(10_000);
         });
 
-        test("should return valid HTTP monitor fields structure", ({ task, annotate }) => {
+        test("should return valid HTTP monitor fields structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");
@@ -81,7 +87,10 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(httpFields.method).toBe("GET");
         });
 
-        test("should return valid port monitor fields structure", ({ task, annotate }) => {
+        test("should return valid port monitor fields structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");
@@ -113,7 +122,10 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(portFields.timeout).toBe(10_000);
         });
 
-        test("should return valid ping monitor fields structure", ({ task, annotate }) => {
+        test("should return valid ping monitor fields structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");
@@ -141,7 +153,10 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             expect(pingFields.timeout).toBe(10_000);
         });
 
-        test("should handle all monitor types consistently", ({ task, annotate }) => {
+        test("should handle all monitor types consistently", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");
@@ -174,7 +189,10 @@ describe("Monitor Forms - 100% Coverage Tests", () => {
             }
         });
 
-        test("should handle unknown monitor type with HTTP fallback", ({ task, annotate }) => {
+        test("should handle unknown monitor type with HTTP fallback", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: monitor-forms.100-coverage", "component");
             annotate("Category: Core", "category");

@@ -641,10 +641,7 @@ describe("SiteService", () => {
             ).rejects.toThrow("Invalid site identifier: null");
         });
 
-        it("should log debug messages", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log debug messages", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Service", "category");
@@ -742,10 +739,7 @@ describe("SiteService", () => {
             });
         });
 
-        it("should handle empty sites list", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites list", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Service", "category");
@@ -815,10 +809,7 @@ describe("SiteService", () => {
             expect(result[0]!.monitoring).toBe(false);
         });
 
-        it("should log debug and info messages", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log debug and info messages", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Service", "category");
@@ -834,10 +825,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should process sites in parallel", async ({
-            task,
-            annotate,
-        }) => {
+        it("should process sites in parallel", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Service", "category");

@@ -107,7 +107,10 @@ describe("HistoryTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render history tab with basic elements", ({ task, annotate }) => {
+        it("should render history tab with basic elements", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -192,7 +195,10 @@ describe("HistoryTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with undefined history", ({ task, annotate }) => {
+        it("should handle monitor with undefined history", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -218,7 +224,10 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle history records with missing fields", ({ task, annotate }) => {
+        it("should handle history records with missing fields", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");

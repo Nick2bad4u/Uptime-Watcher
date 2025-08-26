@@ -14,7 +14,9 @@ const vitestConfig = defineConfig({
     resolve: {
         alias: {
             "@shared": normalizePath(path.resolve(__dirname, "../../shared")),
-            "@electron": normalizePath(path.resolve(__dirname, "../../electron")),
+            "@electron": normalizePath(
+                path.resolve(__dirname, "../../electron")
+            ),
             "@app": normalizePath(path.resolve(__dirname, "../../src")),
         },
     },

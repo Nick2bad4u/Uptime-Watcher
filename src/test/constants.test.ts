@@ -107,10 +107,7 @@ describe("Application Constants", () => {
             expect(values).toContain("port");
         });
 
-        it("should have descriptive labels", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have descriptive labels", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -162,10 +159,7 @@ describe("Application Constants", () => {
             expect(FONT_FAMILY_SANS.length).toBeGreaterThan(0);
         });
 
-        it("should contain valid font names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain valid font names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -182,10 +176,7 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should include fallback fonts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should include fallback fonts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -195,10 +186,7 @@ describe("Application Constants", () => {
             expect(FONT_FAMILY_SANS).toContain("sans-serif");
         });
 
-        it("should have popular fonts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have popular fonts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -270,10 +258,7 @@ describe("Application Constants", () => {
             expect(Math.max(...values)).toBeLessThanOrEqual(2_592_000_000); // At most 30 days
         });
 
-        it("should have sorted intervals", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have sorted intervals", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -400,10 +385,7 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should include unlimited option", async ({
-            task,
-            annotate,
-        }) => {
+        it("should include unlimited option", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -418,10 +400,7 @@ describe("Application Constants", () => {
     });
 
     describe("Timeout Constraints", () => {
-        it("should export TIMEOUT_CONSTRAINTS", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export TIMEOUT_CONSTRAINTS", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -488,10 +467,7 @@ describe("Application Constants", () => {
     });
 
     describe("Retry Constraints", () => {
-        it("should export RETRY_CONSTRAINTS", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export RETRY_CONSTRAINTS", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -539,10 +515,7 @@ describe("Application Constants", () => {
     });
 
     describe("UI Delays", () => {
-        it("should export UI_DELAYS", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export UI_DELAYS", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -575,10 +548,7 @@ describe("Application Constants", () => {
     });
 
     describe("Chart Configuration", () => {
-        it("should export CHART_TIME_PERIODS", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export CHART_TIME_PERIODS", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -615,10 +585,7 @@ describe("Application Constants", () => {
             }
         });
 
-        it("should export CHART_TIME_RANGES", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export CHART_TIME_RANGES", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -654,10 +621,7 @@ describe("Application Constants", () => {
     });
 
     describe("Accessibility", () => {
-        it("should export ARIA_LABEL", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export ARIA_LABEL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");

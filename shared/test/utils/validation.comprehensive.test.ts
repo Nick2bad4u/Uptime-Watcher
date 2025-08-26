@@ -15,13 +15,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
     describe("getMonitorValidationErrors", () => {
         describe("Basic field validation", () => {
             it("should return no errors for valid HTTP monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -38,13 +38,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return no errors for valid port monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -62,13 +62,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for missing id", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     type: "http",
@@ -81,13 +81,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for missing type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -100,13 +100,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for invalid type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -119,13 +119,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for missing status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -138,13 +138,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for invalid status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -160,13 +160,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Numeric field validation", () => {
             it("should return error for invalid check interval", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -183,13 +183,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-numeric check interval", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -206,13 +206,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for invalid timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -227,13 +227,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for zero timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -248,13 +248,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-numeric timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -269,13 +269,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for negative retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -292,13 +292,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for too high retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -315,13 +315,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-numeric retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -340,13 +340,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("HTTP monitor validation", () => {
             it("should return error for missing URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -359,13 +359,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-string URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -379,13 +379,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for empty URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -401,13 +401,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Port monitor validation", () => {
             it("should return error for missing host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -421,13 +421,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-string host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -442,13 +442,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for empty host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -463,13 +463,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for missing port", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -485,13 +485,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for invalid port number - too low", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -508,13 +508,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for invalid port number - too high", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -531,13 +531,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-numeric port", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -556,13 +556,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Ping monitor validation", () => {
             it("should return error for missing host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -575,13 +575,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-string host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor = {
                     id: "test-id",
@@ -595,13 +595,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return error for empty host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -615,13 +615,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should not require port for ping monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -638,13 +638,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should validate ping monitor with valid host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -663,13 +663,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Multiple errors", () => {
             it("should return multiple errors when multiple fields are invalid", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const monitor: Partial<Monitor> = {
                     type: "http",
@@ -695,13 +695,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
 
         describe("Edge cases", () => {
             it("should handle undefined fields gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const monitor: Partial<Monitor> = {
                     id: "test-id",
@@ -716,13 +716,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should handle empty monitor object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const monitor: Partial<Monitor> = {};
 
@@ -811,10 +811,7 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             expect(validateMonitorType("")).toBe(false);
         });
 
-        it("should be case sensitive", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be case sensitive", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Utility", "category");
@@ -828,13 +825,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
     describe("validateSite", () => {
         describe("Valid sites", () => {
             it("should return true for valid site with HTTP monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site: Site = {
                     identifier: "test-site",
@@ -860,13 +857,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return true for valid site with port monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site: Site = {
                     identifier: "test-site",
@@ -893,13 +890,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return true for valid site with multiple monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site: Site = {
                     identifier: "test-site",
@@ -938,13 +935,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return true for valid site with empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site: Site = {
                     identifier: "test-site",
@@ -958,14 +955,11 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
         });
 
         describe("Invalid sites", () => {
-            it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should return false for null", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(validateSite(null as unknown as Partial<Site>)).toBe(
                     false
@@ -973,13 +967,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(
                     validateSite(undefined as unknown as Partial<Site>)
@@ -987,13 +981,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(validateSite("string" as unknown as Partial<Site>)).toBe(
                     false
@@ -1007,13 +1001,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for missing identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site = {
                     name: "Test Site",
@@ -1025,13 +1019,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-string identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site = {
                     identifier: 123,
@@ -1044,13 +1038,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for empty identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site: Partial<Site> = {
                     identifier: "",
@@ -1063,13 +1057,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for missing name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1081,13 +1075,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-string name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1100,13 +1094,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for empty name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const site: Partial<Site> = {
                     identifier: "test-site",
@@ -1119,13 +1113,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for missing monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1137,13 +1131,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-boolean monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1156,13 +1150,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for missing monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1174,13 +1168,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-array monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1193,13 +1187,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for invalid monitor in array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1218,13 +1212,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for non-object monitor in array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",
@@ -1237,13 +1231,13 @@ describe("Shared Validation Utilities - Comprehensive Coverage", () => {
             });
 
             it("should return false for null monitor in array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const site = {
                     identifier: "test-site",

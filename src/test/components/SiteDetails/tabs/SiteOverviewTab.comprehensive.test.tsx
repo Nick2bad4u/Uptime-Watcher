@@ -84,7 +84,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render the site overview tab with all main sections", ({ task, annotate }) => {
+        it("should render the site overview tab with all main sections", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -130,7 +133,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("1/2")).toBeInTheDocument(); // active/total format
         });
 
-        it("should display metrics with correct formatting", ({ task, annotate }) => {
+        it("should display metrics with correct formatting", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -157,7 +163,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Monitor Status Calculations", () => {
-        it("should calculate and display correct monitor statistics", ({ task, annotate }) => {
+        it("should calculate and display correct monitor statistics", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -182,7 +191,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("example.com")).toBeInTheDocument(); // ping monitor display
         });
 
-        it("should show correct monitor status badges", ({ task, annotate }) => {
+        it("should show correct monitor status badges", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -222,7 +234,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("0/0")).toBeInTheDocument();
         });
 
-        it("should handle sites with all monitors running", ({ task, annotate }) => {
+        it("should handle sites with all monitors running", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -248,7 +263,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("Stop All Monitoring")).toBeInTheDocument();
         });
 
-        it("should handle sites with all monitors stopped", ({ task, annotate }) => {
+        it("should handle sites with all monitors stopped", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -278,7 +296,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Theme Integration and Color Calculations", () => {
-        it("should apply theme colors based on uptime percentage", ({ task, annotate }) => {
+        it("should apply theme colors based on uptime percentage", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -296,7 +317,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("99.90%")).toBeInTheDocument();
         });
 
-        it("should apply response time colors correctly", ({ task, annotate }) => {
+        it("should apply response time colors correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -325,7 +349,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("1.50s")).toBeInTheDocument();
         });
 
-        it("should handle different site display statuses", ({ task, annotate }) => {
+        it("should handle different site display statuses", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -359,7 +386,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("User Interactions", () => {
-        it("should handle start monitoring action", async ({ task, annotate }) => {
+        it("should handle start monitoring action", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -395,7 +425,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             });
         });
 
-        it("should handle stop monitoring action", async ({ task, annotate }) => {
+        it("should handle stop monitoring action", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -482,7 +515,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Monitor Details Formatting", () => {
-        it("should format different monitor types correctly", ({ task, annotate }) => {
+        it("should format different monitor types correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -568,7 +604,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText(/Every 1m/)).toBeInTheDocument();
         });
 
-        it("should handle monitors without URL or host", ({ task, annotate }) => {
+        it("should handle monitors without URL or host", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -733,7 +772,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(document.activeElement).toBe(removeButton);
         });
 
-        it("should maintain component state during re-renders", ({ task, annotate }) => {
+        it("should maintain component state during re-renders", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -756,7 +798,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Complex Scenarios", () => {
-        it("should handle mixed monitor states correctly", ({ task, annotate }) => {
+        it("should handle mixed monitor states correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -808,7 +853,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             ).toBeInTheDocument(); // Because not all are running
         });
 
-        it("should handle error responses in async operations", async ({ task, annotate }) => {
+        it("should handle error responses in async operations", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -842,7 +890,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
         });
 
         // Additional tests to cover uncovered branches (lines 110, 122, 134)
-        it("should handle response time color variations for branch coverage", ({ task, annotate }) => {
+        it("should handle response time color variations for branch coverage", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -931,7 +982,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByTestId("site-overview-tab")).toBeInTheDocument();
         });
 
-        it("should test getUptimeVariant danger branch mapping - line 116", ({ task, annotate }) => {
+        it("should test getUptimeVariant danger branch mapping - line 116", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");
@@ -989,7 +1043,10 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByTestId("site-overview-tab")).toBeInTheDocument();
         });
 
-        it("should handle allMonitorsRunning edge cases - line 103-105", ({ task, annotate }) => {
+        it("should handle allMonitorsRunning edge cases - line 103-105", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteOverviewTab", "component");
             annotate("Category: Component", "category");

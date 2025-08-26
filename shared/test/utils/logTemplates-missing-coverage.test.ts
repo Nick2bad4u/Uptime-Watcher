@@ -14,7 +14,10 @@ describe("LogTemplates - Missing Coverage", () => {
             vi.clearAllMocks();
         });
 
-        test("should handle debug logging without variables (line 472)", ({ task, annotate }) => {
+        test("should handle debug logging without variables (line 472)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -36,7 +39,10 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle info logging without variables (line 481)", ({ task, annotate }) => {
+        test("should handle info logging without variables (line 481)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -58,7 +64,10 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle warn logging without variables (line 499)", ({ task, annotate }) => {
+        test("should handle warn logging without variables (line 499)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -80,7 +89,10 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle error logging without variables", ({ task, annotate }) => {
+        test("should handle error logging without variables", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -102,7 +114,10 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle all logging methods with and without variables for complete branch coverage", ({ task, annotate }) => {
+        test("should handle all logging methods with and without variables for complete branch coverage", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -133,7 +148,10 @@ describe("LogTemplates - Missing Coverage", () => {
             expect(mockLogger.error).toHaveBeenCalledTimes(2);
         });
 
-        test("should verify ternary operator branches explicitly", ({ task, annotate }) => {
+        test("should verify ternary operator branches explicitly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: logTemplates-missing-coverage", "component");
             annotate("Category: Utility", "category");

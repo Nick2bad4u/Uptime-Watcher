@@ -397,10 +397,7 @@ describe("generateUuid", () => {
             expect(result.includes(largeTimestamp.toString())).toBe(true);
         });
 
-        it("should handle timestamp of 0", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timestamp of 0", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -477,10 +474,7 @@ describe("generateUuid", () => {
     });
 
     describe("Return Value Properties", () => {
-        it("should always return a string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should always return a string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -697,10 +691,7 @@ describe("generateUuid", () => {
             }
         });
 
-        it("should work with mocked Date.now", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with mocked Date.now", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");

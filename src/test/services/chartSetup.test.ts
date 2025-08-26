@@ -10,10 +10,7 @@ import "../../services/chartSetup";
 
 describe("Chart Setup", () => {
     describe("Chart.js Registration", () => {
-        it("should export ChartJS", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export ChartJS", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartSetup", "component");
             await annotate("Category: Service", "category");
@@ -23,10 +20,7 @@ describe("Chart Setup", () => {
             expect(Chart).toBe(Chart);
         });
 
-        it("should have registered components", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have registered components", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartSetup", "component");
             await annotate("Category: Service", "category");

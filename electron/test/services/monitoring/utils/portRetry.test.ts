@@ -543,10 +543,7 @@ describe("performPortCheckWithRetry", () => {
             }
         });
 
-        it("should handle large retry counts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large retry counts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: portRetry", "component");
             await annotate("Category: Service", "category");

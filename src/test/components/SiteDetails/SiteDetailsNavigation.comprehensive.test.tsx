@@ -330,7 +330,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Tab Click Handlers", () => {
-        it("should call setActiveSiteDetailsTab when site overview clicked", ({ task, annotate }) => {
+        it("should call setActiveSiteDetailsTab when site overview clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -353,7 +356,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             );
         });
 
-        it("should call setActiveSiteDetailsTab when monitor overview clicked", ({ task, annotate }) => {
+        it("should call setActiveSiteDetailsTab when monitor overview clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -376,7 +382,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             );
         });
 
-        it("should call setActiveSiteDetailsTab when settings clicked", ({ task, annotate }) => {
+        it("should call setActiveSiteDetailsTab when settings clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -397,7 +406,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("settings");
         });
 
-        it("should call setActiveSiteDetailsTab when history clicked", ({ task, annotate }) => {
+        it("should call setActiveSiteDetailsTab when history clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -418,7 +430,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("history");
         });
 
-        it("should call setActiveSiteDetailsTab when analytics tab clicked", ({ task, annotate }) => {
+        it("should call setActiveSiteDetailsTab when analytics tab clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -443,7 +458,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Active Tab Highlighting", () => {
-        it("should highlight site overview tab when active", ({ task, annotate }) => {
+        it("should highlight site overview tab when active", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -463,7 +481,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(siteOverviewButton).toHaveClass("themed-button--primary");
         });
 
-        it("should highlight settings tab when active", ({ task, annotate }) => {
+        it("should highlight settings tab when active", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -501,7 +522,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(historyButton).toHaveClass("themed-button--primary");
         });
 
-        it("should highlight monitor analytics tab when active", ({ task, annotate }) => {
+        it("should highlight monitor analytics tab when active", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -560,7 +584,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show start button when not monitoring", ({ task, annotate }) => {
+        it("should show start button when not monitoring", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");
@@ -728,7 +755,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Site-Level Monitoring", () => {
-        it("should calculate all monitors running correctly", ({ task, annotate }) => {
+        it("should calculate all monitors running correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetailsNavigation", "component");
             annotate("Category: Component", "category");

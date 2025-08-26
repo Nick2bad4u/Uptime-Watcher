@@ -88,14 +88,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("Check Now Button", () => {
-        it("should render check now button with correct aria-label", ({ task, annotate }) => {
+        it("should render check now button with correct aria-label", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -108,14 +117,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(checkButton).toHaveTextContent("🔄");
         });
 
-        it("should call onCheckNow when clicked", async ({ task, annotate }) => {
+        it("should call onCheckNow when clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -130,14 +148,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onCheckNow).toHaveBeenCalledTimes(1);
         });
 
-        it("should stop event propagation when clicked", async ({ task, annotate }) => {
+        it("should stop event propagation when clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -160,14 +187,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onCheckNow).toHaveBeenCalled();
         });
 
-        it("should be disabled when isLoading is true", ({ task, annotate }) => {
+        it("should be disabled when isLoading is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -179,14 +215,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(checkButton).toBeDisabled();
         });
 
-        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+        it("should be disabled when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -198,14 +243,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(checkButton).toBeDisabled();
         });
 
-        it("should be disabled when both isLoading and disabled are true", ({ task, annotate }) => {
+        it("should be disabled when both isLoading and disabled are true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -219,14 +273,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("Start/Stop Monitoring Buttons", () => {
-        it("should show start monitoring button when not monitoring", ({ task, annotate }) => {
+        it("should show start monitoring button when not monitoring", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -244,14 +307,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(stopButton).not.toBeInTheDocument();
         });
 
-        it("should show stop monitoring button when monitoring", ({ task, annotate }) => {
+        it("should show stop monitoring button when monitoring", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -269,14 +341,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(startButton).not.toBeInTheDocument();
         });
 
-        it("should call onStartMonitoring when start button is clicked", async ({ task, annotate }) => {
+        it("should call onStartMonitoring when start button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -291,14 +372,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStartMonitoring).toHaveBeenCalledTimes(1);
         });
 
-        it("should call onStopMonitoring when stop button is clicked", async ({ task, annotate }) => {
+        it("should call onStopMonitoring when stop button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -313,14 +403,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStopMonitoring).toHaveBeenCalledTimes(1);
         });
 
-        it("should stop event propagation on start monitoring click", ({ task, annotate }) => {
+        it("should stop event propagation on start monitoring click", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -343,14 +442,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStartMonitoring).toHaveBeenCalled();
         });
 
-        it("should stop event propagation on stop monitoring click", ({ task, annotate }) => {
+        it("should stop event propagation on stop monitoring click", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -375,12 +483,18 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
         it("should disable start button when loading", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -394,12 +508,18 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
         it("should disable stop button when loading", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -411,14 +531,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(stopButton).toBeDisabled();
         });
 
-        it("should disable start button when disabled prop is true", ({ task, annotate }) => {
+        it("should disable start button when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -430,14 +559,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(startButton).toBeDisabled();
         });
 
-        it("should disable stop button when disabled prop is true", ({ task, annotate }) => {
+        it("should disable stop button when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -451,14 +589,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("SiteMonitoringButton Integration", () => {
-        it("should render SiteMonitoringButton with correct props", ({ task, annotate }) => {
+        it("should render SiteMonitoringButton with correct props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -477,14 +624,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             );
         });
 
-        it("should pass onStartSiteMonitoring to SiteMonitoringButton", async ({ task, annotate }) => {
+        it("should pass onStartSiteMonitoring to SiteMonitoringButton", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -500,14 +656,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStartSiteMonitoring).toHaveBeenCalledTimes(1);
         });
 
-        it("should pass onStopSiteMonitoring to SiteMonitoringButton", async ({ task, annotate }) => {
+        it("should pass onStopSiteMonitoring to SiteMonitoringButton", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -523,14 +688,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStopSiteMonitoring).toHaveBeenCalledTimes(1);
         });
 
-        it("should pass loading state to SiteMonitoringButton", ({ task, annotate }) => {
+        it("should pass loading state to SiteMonitoringButton", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -542,14 +716,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(siteAction).toBeDisabled();
         });
 
-        it("should pass disabled state to SiteMonitoringButton", ({ task, annotate }) => {
+        it("should pass disabled state to SiteMonitoringButton", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -563,14 +746,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("Event Handling Edge Cases", () => {
-        it("should handle click events without event object", ({ task, annotate }) => {
+        it("should handle click events without event object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -588,14 +780,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             // Should not throw error when event is undefined
         });
 
-        it("should handle start monitoring click without event object", ({ task, annotate }) => {
+        it("should handle start monitoring click without event object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -610,14 +811,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(onStartMonitoring).toHaveBeenCalled();
         });
 
-        it("should handle stop monitoring click without event object", ({ task, annotate }) => {
+        it("should handle stop monitoring click without event object", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -636,12 +846,18 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     describe("Component Structure", () => {
         it("should render all required buttons", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -660,14 +876,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(siteButton).toBeInTheDocument();
         });
 
-        it("should have correct button structure for all states", ({ task, annotate }) => {
+        it("should have correct button structure for all states", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -688,14 +913,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria-labels for all buttons", ({ task, annotate }) => {
+        it("should have proper aria-labels for all buttons", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -709,14 +943,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should have proper aria-labels when monitoring", ({ task, annotate }) => {
+        it("should have proper aria-labels when monitoring", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -734,12 +977,18 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     describe("React.memo Optimization", () => {
         it("should be properly exported", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Export Operation", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Export Operation", "type");
 
@@ -749,14 +998,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("State Combinations", () => {
-        it("should handle all disabled and loading combinations", ({ task, annotate }) => {
+        it("should handle all disabled and loading combinations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -780,14 +1038,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             expect(siteButton).toBeDisabled();
         });
 
-        it("should handle monitoring state with all props", ({ task, annotate }) => {
+        it("should handle monitoring state with all props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -808,14 +1075,23 @@ describe("ActionButtonGroup - Complete Coverage", () => {
     });
 
     describe("Callback Dependencies", () => {
-        it("should maintain callback identity with same dependencies", ({ task, annotate }) => {
+        it("should maintain callback identity with same dependencies", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ActionButtonGroup.complete-coverage", "component");
+            annotate(
+                "Component: ActionButtonGroup.complete-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 

@@ -65,10 +65,7 @@ describe("ThemeManager", () => {
     });
 
     describe("Singleton Pattern", () => {
-        it("should return the same instance", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return the same instance", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -81,10 +78,7 @@ describe("ThemeManager", () => {
     });
 
     describe("getTheme", () => {
-        it("should return light theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return light theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -95,10 +89,7 @@ describe("ThemeManager", () => {
             expect(theme.name).toBe("light");
         });
 
-        it("should return dark theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return dark theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -109,10 +100,7 @@ describe("ThemeManager", () => {
             expect(theme.name).toBe("dark");
         });
 
-        it("should return high contrast theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return high contrast theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -147,10 +135,7 @@ describe("ThemeManager", () => {
     });
 
     describe("getAvailableThemes", () => {
-        it("should return array of theme names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return array of theme names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -213,10 +198,7 @@ describe("ThemeManager", () => {
             expect(preference).toBe("light");
         });
 
-        it("should handle missing matchMedia", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle missing matchMedia", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -249,10 +231,7 @@ describe("ThemeManager", () => {
             expect(themeManager.isValidThemeName("high-contrast")).toBe(true);
         });
 
-        it("should reject invalid theme names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid theme names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -264,10 +243,7 @@ describe("ThemeManager", () => {
             expect(themeManager.isValidThemeName("custom-theme")).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -281,10 +257,7 @@ describe("ThemeManager", () => {
     });
 
     describe("applyTheme", () => {
-        it("should apply theme to document", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme to document", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -316,10 +289,7 @@ describe("ThemeManager", () => {
             globalThis.document = originalDocument;
         });
 
-        it("should apply all theme properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply all theme properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -382,10 +352,7 @@ describe("ThemeManager", () => {
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve other properties
         });
 
-        it("should handle partial overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -405,10 +372,7 @@ describe("ThemeManager", () => {
             expect(customTheme.colors).toEqual(baseTheme.colors); // Should preserve unmodified properties
         });
 
-        it("should handle empty overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -420,10 +384,7 @@ describe("ThemeManager", () => {
             expect(customTheme).toEqual(baseTheme);
         });
 
-        it("should deep merge nested objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should deep merge nested objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -465,10 +426,7 @@ describe("ThemeManager", () => {
             expect(cssVariables).toContain("--spacing-");
         });
 
-        it("should handle all theme properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all theme properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -489,10 +447,7 @@ describe("ThemeManager", () => {
             expect(cssVariables).toMatch(/--spacing-\w+:/);
         });
 
-        it("should generate valid CSS syntax", async ({
-            task,
-            annotate,
-        }) => {
+        it("should generate valid CSS syntax", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");

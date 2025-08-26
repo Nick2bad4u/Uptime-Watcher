@@ -181,7 +181,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Error Display Branches", () => {
-        it("should render error alert when lastError is present", ({ task, annotate }) => {
+        it("should render error alert when lastError is present", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -202,7 +205,10 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(screen.getByText("Test error message")).toBeInTheDocument();
         });
 
-        it("should not render error alert when lastError is null", ({ task, annotate }) => {
+        it("should not render error alert when lastError is null", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -225,7 +231,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Sync Success Display Branches", () => {
-        it("should render sync success message when syncSuccess is true and no error", async ({ task, annotate }) => {
+        it("should render sync success message when syncSuccess is true and no error", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -254,7 +263,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should not render sync success when error is present", ({ task, annotate }) => {
+        it("should not render sync success when error is present", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -303,7 +315,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should reject invalid settings keys and warn", ({ task, annotate }) => {
+        it("should reject invalid settings keys and warn", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -327,7 +342,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Loading State Branches", () => {
-        it("should disable inputs when loading is true", ({ task, annotate }) => {
+        it("should disable inputs when loading is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -356,7 +374,10 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(screen.getByText("🔄 Sync Data")).toBeDisabled();
         });
 
-        it("should enable inputs when loading is false", ({ task, annotate }) => {
+        it("should enable inputs when loading is false", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -387,7 +408,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Async Error Handling Branches", () => {
-        it("should handle sync errors and set error state", async ({ task, annotate }) => {
+        it("should handle sync errors and set error state", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -416,7 +440,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle backup download errors", async ({ task, annotate }) => {
+        it("should handle backup download errors", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -445,7 +472,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle history limit update errors", async ({ task, annotate }) => {
+        it("should handle history limit update errors", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -506,7 +536,10 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(mockErrorStore.clearError).toHaveBeenCalled();
         });
 
-        it("should not reset settings when user cancels", ({ task, annotate }) => {
+        it("should not reset settings when user cancels", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -533,7 +566,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Theme Selection Branches", () => {
-        it("should handle theme change with multiple available themes", ({ task, annotate }) => {
+        it("should handle theme change with multiple available themes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -554,7 +590,10 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(mockTheme.setTheme).toHaveBeenCalledWith("dark");
         });
 
-        it("should render all available themes in select options", ({ task, annotate }) => {
+        it("should render all available themes in select options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -578,7 +617,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Error Object Property Access Branches", () => {
-        it("should handle error objects with message property", async ({ task, annotate }) => {
+        it("should handle error objects with message property", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -609,7 +651,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle error objects without message property", async ({ task, annotate }) => {
+        it("should handle error objects without message property", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -640,7 +685,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle primitive error values", async ({ task, annotate }) => {
+        it("should handle primitive error values", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -710,7 +758,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle history limit select change", ({ task, annotate }) => {
+        it("should handle history limit select change", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -757,7 +808,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("Successful Operation Branches", () => {
-        it("should handle successful sync operation", async ({ task, annotate }) => {
+        it("should handle successful sync operation", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -786,7 +840,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle successful backup download", async ({ task, annotate }) => {
+        it("should handle successful backup download", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");

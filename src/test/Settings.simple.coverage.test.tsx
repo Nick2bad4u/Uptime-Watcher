@@ -19,16 +19,19 @@ describe("Settings Component - Coverage Tests", () => {
         vi.clearAllMocks();
     });
 
-    it("should warn when invalid settings key is used (lines 87-89)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should warn when invalid settings key is used (lines 87-89)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test the specific logic that was missing coverage
         const allowedKeys = [
@@ -53,16 +56,19 @@ describe("Settings Component - Coverage Tests", () => {
         );
     });
 
-    it("should not warn when valid settings key is used", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should not warn when valid settings key is used", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const allowedKeys = [
             "notifications",
@@ -84,15 +90,15 @@ describe("Settings Component - Coverage Tests", () => {
     });
 
     it("should test all allowed settings keys", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.simple", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.simple", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const allowedKeys = [
             "notifications",

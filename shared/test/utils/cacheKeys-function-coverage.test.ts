@@ -16,7 +16,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
@@ -29,7 +32,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
@@ -44,7 +50,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -56,7 +65,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -70,7 +82,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -82,7 +97,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -94,7 +112,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -108,7 +129,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
@@ -124,7 +148,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
@@ -141,7 +168,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -157,7 +187,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -171,7 +204,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -193,7 +229,10 @@ describe("Cache Keys Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 

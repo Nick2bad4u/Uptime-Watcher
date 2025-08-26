@@ -44,7 +44,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -66,7 +69,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Event Processing", "type");
 
@@ -90,7 +96,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Event Processing", "type");
 
@@ -115,7 +124,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -142,7 +154,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -166,7 +181,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -189,12 +207,12 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Backoff Strategies", () => {
-        it("should handle exponential backoff", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle exponential backoff", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -216,12 +234,12 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should handle linear backoff", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle linear backoff", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -245,12 +263,12 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Callback Handling", () => {
-        it("should call onSuccess callback", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call onSuccess callback", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -269,12 +287,12 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(onSuccess).toHaveBeenCalledWith("success");
         });
-        it("should call onRetry callback", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call onRetry callback", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -302,7 +320,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -329,7 +350,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -348,7 +372,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -367,7 +394,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -395,7 +425,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -416,7 +449,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Event Processing", "type");
 
@@ -436,7 +472,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -458,7 +497,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -480,7 +522,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -503,7 +548,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -523,7 +571,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -557,7 +608,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -580,7 +634,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -611,7 +668,10 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate(
+                "Component: operationalHooks.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Event Processing", "type");
 

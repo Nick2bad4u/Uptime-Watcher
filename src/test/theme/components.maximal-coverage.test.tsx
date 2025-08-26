@@ -1703,7 +1703,10 @@ describe("Theme Components - Complete Coverage", () => {
             expect(screen.getByText("Success")).toBeInTheDocument();
         });
 
-        it("should handle components with custom className", ({ task, annotate }) => {
+        it("should handle components with custom className", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components.maximal-coverage", "component");
             annotate("Category: Core", "category");

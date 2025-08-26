@@ -16,7 +16,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -28,24 +31,24 @@ describe("Chart Config Function Coverage", () => {
             expect(hasPlugins(validConfig)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(hasPlugins(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -57,7 +60,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -70,7 +76,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -83,7 +92,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -99,7 +111,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -112,24 +127,24 @@ describe("Chart Config Function Coverage", () => {
             expect(hasScales(validConfig)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(hasScales(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -141,7 +156,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -154,7 +172,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -167,7 +188,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -183,7 +207,10 @@ describe("Chart Config Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig-function-coverage", "component");
+            await annotate(
+                "Component: chartConfig-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

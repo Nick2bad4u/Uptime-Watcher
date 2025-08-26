@@ -282,10 +282,7 @@ describe("useSiteSync", () => {
             expect(typeof result).toBe("function");
         });
 
-        it("should handle bulk-sync events", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle bulk-sync events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");
             await annotate("Category: Store", "category");
@@ -345,10 +342,7 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
-        it("should handle delete events", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle delete events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");
             await annotate("Category: Store", "category");
@@ -450,10 +444,7 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle sync errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle sync errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");
             await annotate("Category: Store", "category");

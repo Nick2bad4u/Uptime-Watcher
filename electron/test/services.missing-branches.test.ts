@@ -354,10 +354,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle timeout scenarios", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout scenarios", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: services.missing-branches", "component");
             await annotate("Category: Core", "category");
@@ -437,10 +434,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle state validation", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle state validation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: services.missing-branches", "component");
             await annotate("Category: Core", "category");

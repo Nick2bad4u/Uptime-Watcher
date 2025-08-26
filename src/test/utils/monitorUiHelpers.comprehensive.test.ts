@@ -138,10 +138,7 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -174,10 +171,7 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false); // Default fallback
         });
 
-        it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -193,10 +187,7 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("clearConfigCache", () => {
-        it("should call cache clear method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call cache clear method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -861,10 +852,7 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("200");
         });
 
-        it("should handle cache operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle cache operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -903,10 +891,7 @@ describe("Monitor UI Helpers", () => {
             expect(result2).toBe("HTTP Response Time");
         });
 
-        it("should sanitize cache keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should sanitize cache keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");

@@ -34,7 +34,10 @@ describe("ThemedTooltip", () => {
             expect(screen.getByText("Hover me")).toBeInTheDocument();
         });
 
-        it("should render with tooltip content as title attribute", ({ task, annotate }) => {
+        it("should render with tooltip content as title attribute", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -150,7 +153,10 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", longContent);
         });
 
-        it("should handle tooltip content with special characters", ({ task, annotate }) => {
+        it("should handle tooltip content with special characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -170,7 +176,10 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", specialContent);
         });
 
-        it("should handle tooltip content with newlines", ({ task, annotate }) => {
+        it("should handle tooltip content with newlines", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -190,7 +199,10 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", multilineContent);
         });
 
-        it("should handle tooltip content with HTML entities", ({ task, annotate }) => {
+        it("should handle tooltip content with HTML entities", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -359,7 +371,10 @@ describe("ThemedTooltip", () => {
     });
 
     describe("CSS Classes", () => {
-        it("should combine base class with custom className", ({ task, annotate }) => {
+        it("should combine base class with custom className", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -453,7 +468,10 @@ describe("ThemedTooltip", () => {
     });
 
     describe("User Interactions", () => {
-        it("should allow interaction with children", async ({ task, annotate }) => {
+        it("should allow interaction with children", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -569,7 +587,10 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Accessibility", () => {
-        it("should provide tooltip content via title attribute", ({ task, annotate }) => {
+        it("should provide tooltip content via title attribute", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -589,7 +610,10 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should preserve child element accessibility", ({ task, annotate }) => {
+        it("should preserve child element accessibility", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -610,7 +634,10 @@ describe("ThemedTooltip", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should not interfere with child element roles", ({ task, annotate }) => {
+        it("should not interfere with child element roles", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -631,7 +658,10 @@ describe("ThemedTooltip", () => {
             expect(alert).toHaveTextContent("Alert message");
         });
 
-        it("should support screen reader friendly content", ({ task, annotate }) => {
+        it("should support screen reader friendly content", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");
@@ -884,7 +914,10 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should maintain tooltip relationship across re-renders", ({ task, annotate }) => {
+        it("should maintain tooltip relationship across re-renders", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedTooltip", "component");
             annotate("Category: Component", "category");

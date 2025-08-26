@@ -387,10 +387,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(container1).toBe(container2);
         });
 
-        it("should reset for testing", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reset for testing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ServiceContainer", "component");
             await annotate("Category: Service", "category");
@@ -1290,10 +1287,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container = ServiceContainer.getInstance();
         });
 
-        it("should handle empty configuration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ServiceContainer", "component");
             await annotate("Category: Service", "category");

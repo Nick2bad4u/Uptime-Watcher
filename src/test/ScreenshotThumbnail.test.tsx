@@ -162,7 +162,10 @@ describe("ScreenshotThumbnail", () => {
             expect(caption).toBeInTheDocument();
         });
 
-        it("should generate correct Microlink API URL", ({ task, annotate }) => {
+        it("should generate correct Microlink API URL", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -182,7 +185,10 @@ describe("ScreenshotThumbnail", () => {
             expect(image).toHaveAttribute("src", expectedUrl);
         });
 
-        it("should handle special characters in URL encoding", ({ task, annotate }) => {
+        it("should handle special characters in URL encoding", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -208,7 +214,10 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Click Handling", () => {
-        it("should call electronAPI.openExternal when available", async ({ task, annotate }) => {
+        it("should call electronAPI.openExternal when available", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -274,7 +283,10 @@ describe("ScreenshotThumbnail", () => {
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
-        it("should handle electronAPI without openExternal method", ({ task, annotate }) => {
+        it("should handle electronAPI without openExternal method", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -460,7 +472,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should apply correct theme class to overlay", async ({ task, annotate }) => {
+        it("should apply correct theme class to overlay", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -485,7 +500,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle rapid hover/unhover cycles without leaving stray portals", async ({ task, annotate }) => {
+        it("should handle rapid hover/unhover cycles without leaving stray portals", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -516,7 +534,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle rapid focus/blur cycles without leaving stray portals", async ({ task, annotate }) => {
+        it("should handle rapid focus/blur cycles without leaving stray portals", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -546,7 +567,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle mixed hover and focus events without creating multiple portals", async ({ task, annotate }) => {
+        it("should handle mixed hover and focus events without creating multiple portals", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -577,7 +601,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should maintain only one portal when multiple hover events occur", async ({ task, annotate }) => {
+        it("should maintain only one portal when multiple hover events occur", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -616,7 +643,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle immediate hover/unhover without race conditions", async ({ task, annotate }) => {
+        it("should handle immediate hover/unhover without race conditions", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -645,7 +675,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should clean up portal when component unmounts during hover", async ({ task, annotate }) => {
+        it("should clean up portal when component unmounts during hover", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -684,7 +717,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should handle window resize during hover without breaking portal", async ({ task, annotate }) => {
+        it("should handle window resize during hover without breaking portal", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -742,7 +778,10 @@ describe("ScreenshotThumbnail", () => {
         const createDelay = (ms: number) =>
             new Promise((resolve) => setTimeout(resolve, ms));
 
-        it("should debounce mouse leave to prevent flickering", async ({ task, annotate }) => {
+        it("should debounce mouse leave to prevent flickering", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -793,7 +832,10 @@ describe("ScreenshotThumbnail", () => {
             });
         });
 
-        it("should clean up portal when URL prop changes during hover", async ({ task, annotate }) => {
+        it("should clean up portal when URL prop changes during hover", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -964,7 +1006,10 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Type Guard Functionality", () => {
-        it("should use electronAPI when openExternal is available", ({ task, annotate }) => {
+        it("should use electronAPI when openExternal is available", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1000,7 +1045,10 @@ describe("ScreenshotThumbnail", () => {
             ).toHaveBeenCalledWith("https://example.com");
         });
 
-        it("should fallback to window.open when openExternal is not available", ({ task, annotate }) => {
+        it("should fallback to window.open when openExternal is not available", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1043,7 +1091,10 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Cleanup Edge Cases", () => {
-        it("should clean up timeout on component unmount", ({ task, annotate }) => {
+        it("should clean up timeout on component unmount", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1087,7 +1138,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on mouse leave after mouse enter", ({ task, annotate }) => {
+        it("should clear timeout on mouse leave after mouse enter", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1127,7 +1181,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on focus after timeout creation", ({ task, annotate }) => {
+        it("should clear timeout on focus after timeout creation", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1166,7 +1223,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should clear timeout on blur after timeout creation", ({ task, annotate }) => {
+        it("should clear timeout on blur after timeout creation", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1205,7 +1265,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should specifically cover timeout clearance in handleMouseLeave (line 132-133)", ({ task, annotate }) => {
+        it("should specifically cover timeout clearance in handleMouseLeave (line 132-133)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1247,7 +1310,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test useEffect cleanup behavior (lines 59-60, 65-66)", ({ task, annotate }) => {
+        it("should test useEffect cleanup behavior (lines 59-60, 65-66)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1288,7 +1354,10 @@ describe("ScreenshotThumbnail", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should test handleMouseEnter timeout clearing when timeout exists", ({ task, annotate }) => {
+        it("should test handleMouseEnter timeout clearing when timeout exists", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1329,7 +1398,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test handleFocus timeout clearing when timeout exists", ({ task, annotate }) => {
+        it("should test handleFocus timeout clearing when timeout exists", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1369,7 +1441,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test handleBlur timeout clearing when timeout exists", ({ task, annotate }) => {
+        it("should test handleBlur timeout clearing when timeout exists", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1409,7 +1484,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test timeout cleanup in handleMouseLeave with rapid events", ({ task, annotate }) => {
+        it("should test timeout cleanup in handleMouseLeave with rapid events", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1451,7 +1529,10 @@ describe("ScreenshotThumbnail", () => {
             vi.useRealTimers();
         });
 
-        it("should test overlay positioning with various edge cases", ({ task, annotate }) => {
+        it("should test overlay positioning with various edge cases", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1547,7 +1628,10 @@ describe("ScreenshotThumbnail", () => {
             );
         });
 
-        it("should handle all event combinations that can clear timeouts", ({ task, annotate }) => {
+        it("should handle all event combinations that can clear timeouts", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");
@@ -1603,7 +1687,10 @@ describe("ScreenshotThumbnail", () => {
     });
 
     describe("Closure Issues", () => {
-        it("should demonstrate useEffect closure issue with cleanup (lines 59-60, 65-66)", ({ task, annotate }) => {
+        it("should demonstrate useEffect closure issue with cleanup (lines 59-60, 65-66)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ScreenshotThumbnail", "component");
             annotate("Category: Core", "category");

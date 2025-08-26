@@ -110,10 +110,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle empty database file", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty database file", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -136,10 +133,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle large database file", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large database file", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -223,10 +217,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             // This scenario would be better tested through integration testing where
             // the module is actually unavailable, but for unit testing we skip this edge case
         });
-        it("should handle file read errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle file read errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -250,10 +241,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle permission errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle permission errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -302,10 +290,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 })
             );
         });
-        it("should handle file read timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle file read timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -358,10 +343,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         });
     });
     describe("createDatabaseBackup - Edge cases and boundary conditions", () => {
-        it("should handle empty string paths", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string paths", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -374,10 +356,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(mockFs.readFile).toHaveBeenCalledWith("");
             expect(result.metadata.originalPath).toBe("");
         });
-        it("should handle very long file paths", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very long file paths", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -450,10 +429,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
             expect(result.fileName).toBe(unicodeFileName);
         });
-        it("should ensure timestamp precision", async ({
-            task,
-            annotate,
-        }) => {
+        it("should ensure timestamp precision", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");
@@ -522,10 +498,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             expect(result.metadata.originalPath).toBe(testDbPath);
             expect(result.fileName).toBe("test.sqlite");
         });
-        it("should handle buffer edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle buffer edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: databaseBackup", "component");
             await annotate("Category: Service", "category");

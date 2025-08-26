@@ -1132,7 +1132,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct database access
    const result = db.prepare("SELECT * FROM sites").all();
-
+   
    // ✅ CORRECT - Repository pattern
    const sites = await siteRepository.getAllSites();
    ```
@@ -1142,7 +1142,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Untyped IPC
    ipcRenderer.invoke("some-operation", data);
-
+   
    // ✅ CORRECT - Typed IPC
    window.electronAPI.sites.addSite(siteData);
    ```
@@ -1152,7 +1152,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct mutation
    store.sites.push(newSite);
-
+   
    // ✅ CORRECT - Store actions
    store.addSite(newSite);
    ```
@@ -1166,7 +1166,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    } catch (error) {
     console.log(error);
    }
-
+   
    // ✅ CORRECT - Proper error handling
    await withErrorHandling(() => operation(), {
     logger,

@@ -123,9 +123,14 @@ describe("Enhanced Database Operations Benchmarks", () => {
                 for (let i = 0; i < 10; i++) {
                     const monitors: Monitor[] = [];
                     for (let j = 0; j < 5; j++) {
-                        monitors.push(generateMonitor(sites[i].identifier, i * 5 + j));
+                        monitors.push(
+                            generateMonitor(sites[i].identifier, i * 5 + j)
+                        );
                     }
-                    await monitorRepository.bulkCreate(sites[i].identifier, monitors);
+                    await monitorRepository.bulkCreate(
+                        sites[i].identifier,
+                        monitors
+                    );
                 }
             },
             { iterations: 5 }
@@ -166,7 +171,10 @@ describe("Enhanced Database Operations Benchmarks", () => {
                     for (let j = 0; j < 10; j++) {
                         monitors.push(generateMonitor(site.identifier, j));
                     }
-                    await monitorRepository.bulkCreate(site.identifier, monitors);
+                    await monitorRepository.bulkCreate(
+                        site.identifier,
+                        monitors
+                    );
                 }
             },
             { iterations: 2 }
@@ -210,7 +218,10 @@ describe("Enhanced Database Operations Benchmarks", () => {
                     for (let j = 0; j < 5; j++) {
                         monitors.push(generateMonitor(site.identifier, j));
                     }
-                    await monitorRepository.bulkCreate(site.identifier, monitors);
+                    await monitorRepository.bulkCreate(
+                        site.identifier,
+                        monitors
+                    );
                 }
             },
             { iterations: 1 }
@@ -262,7 +273,11 @@ describe("Enhanced Database Operations Benchmarks", () => {
 
                     // Create monitors within transaction
                     for (const monitor of monitors) {
-                        monitorRepository.createInternal(db, site.identifier, monitor);
+                        monitorRepository.createInternal(
+                            db,
+                            site.identifier,
+                            monitor
+                        );
                     }
                 });
             },
@@ -298,7 +313,9 @@ describe("Enhanced Database Operations Benchmarks", () => {
 
                 // Get monitors for first 50 sites (limit for benchmark)
                 for (const site of sites.slice(0, 50)) {
-                    await monitorRepository.findBySiteIdentifier(site.identifier);
+                    await monitorRepository.findBySiteIdentifier(
+                        site.identifier
+                    );
                 }
             },
             { iterations: 3 }

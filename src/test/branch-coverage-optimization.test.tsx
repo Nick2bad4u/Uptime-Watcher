@@ -49,7 +49,10 @@ vi.mock("../components/common/HistoryChart", () => ({
 
 describe("Branch Coverage Optimization Tests", () => {
     describe("StatusBadge Component", () => {
-        it("should handle all size mappings in getIndicatorSize switch statement", ({ task, annotate }) => {
+        it("should handle all size mappings in getIndicatorSize switch statement", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -146,7 +149,10 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getByText("Custom: Status (UP)")).toBeInTheDocument();
         });
 
-        it("should handle default formatter when no custom formatter provided", ({ task, annotate }) => {
+        it("should handle default formatter when no custom formatter provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -186,7 +192,10 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getByText("Status: up")).toBeInTheDocument();
         });
 
-        it("should handle showIcon=true branch (default)", ({ task, annotate }) => {
+        it("should handle showIcon=true branch (default)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -240,7 +249,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor with type not found in options", ({ task, annotate }) => {
+        it("should handle monitor with type not found in options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -311,7 +323,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle port monitor with host and port", ({ task, annotate }) => {
+        it("should handle port monitor with host and port", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -348,7 +363,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle ping monitor without URL or port", ({ task, annotate }) => {
+        it("should handle ping monitor without URL or port", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -496,7 +514,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle both monitor and no monitor cases", ({ task, annotate }) => {
+        it("should handle both monitor and no monitor cases", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -539,7 +560,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor property differences", ({ task, annotate }) => {
+        it("should handle monitor property differences", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -694,7 +718,10 @@ describe("Branch Coverage Optimization Tests", () => {
     });
 
     describe("Edge Cases and Complex Scenarios", () => {
-        it("should handle monitor with all optional properties undefined", ({ task, annotate }) => {
+        it("should handle monitor with all optional properties undefined", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -724,7 +751,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor with partial properties", ({ task, annotate }) => {
+        it("should handle monitor with partial properties", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");
@@ -755,7 +785,10 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should verify maxItems is passed correctly", ({ task, annotate }) => {
+        it("should verify maxItems is passed correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: branch-coverage-optimization", "component");
             annotate("Category: Core", "category");

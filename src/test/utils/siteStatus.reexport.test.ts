@@ -85,10 +85,7 @@ describe("Shared SiteStatus Utilities", () => {
     });
 
     describe("Re-exported types", () => {
-        it("should re-export SiteStatus type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should re-export SiteStatus type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
             await annotate("Category: Utility", "category");
@@ -253,10 +250,7 @@ describe("Shared SiteStatus Utilities", () => {
     });
 
     describe("Edge cases", () => {
-        it("should handle empty monitor arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
             await annotate("Category: Utility", "category");

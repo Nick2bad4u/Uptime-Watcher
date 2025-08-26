@@ -102,14 +102,23 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
     };
 
     describe("URL Click Handler Coverage (Line 72)", () => {
-        it("should call openExternal with proper parameters when URL link is clicked", async ({ task, annotate }) => {
+        it("should call openExternal with proper parameters when URL link is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -141,14 +150,23 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
         });
 
-        it("should call openExternal with empty URL when monitor has no URL", async ({ task, annotate }) => {
+        it("should call openExternal with empty URL when monitor has no URL", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -191,14 +209,23 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             // This is the correct behavior - no link means no accidental external opens
         });
 
-        it("should call openExternal when clicking link with different site names", async ({ task, annotate }) => {
+        it("should call openExternal when clicking link with different site names", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteDetailsHeader.additional-coverage", "component");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 

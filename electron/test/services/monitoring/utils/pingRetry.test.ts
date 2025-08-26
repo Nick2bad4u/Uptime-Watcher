@@ -104,10 +104,7 @@ describe("pingRetry utilities", () => {
                 min_reply: 1,
             });
         });
-        it("should handle unreachable host", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle unreachable host", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Service", "category");
@@ -204,10 +201,7 @@ describe("pingRetry utilities", () => {
                 performSinglePingCheck("example.com", 5000)
             ).rejects.toThrow("Ping failed: Network unreachable");
         });
-        it("should handle non-Error exceptions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error exceptions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Service", "category");
@@ -356,10 +350,7 @@ describe("pingRetry utilities", () => {
                 })
             );
         });
-        it("should handle high retry counts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle high retry counts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Service", "category");
@@ -376,10 +367,7 @@ describe("pingRetry utilities", () => {
                 })
             );
         });
-        it("should handle different host types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle different host types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Service", "category");

@@ -561,10 +561,7 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Return Value", () => {
-        it("should always return a boolean", async ({
-            task,
-            annotate,
-        }) => {
+        it("should always return a boolean", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDelayedButtonLoading", "component");
             await annotate("Category: Hook", "category");

@@ -35,26 +35,26 @@ describe("Cache Utilities", () => {
     describe("TypedCache", () => {
         describe("Constructor and basic properties", () => {
             it("should create cache with default options", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Constructor", "type");
 
                 const cache = new TypedCache();
                 expect(cache.size).toBe(0);
             });
 
             it("should create cache with custom maxSize", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Constructor", "type");
 
                 const cache = new TypedCache({ maxSize: 50 });
                 expect(cache.size).toBe(0);
@@ -66,13 +66,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should create cache with custom TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Constructor", "type");
 
                 const cache = new TypedCache({ ttl: 5000 });
                 cache.set("key", "value");
@@ -93,13 +93,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should create cache with both maxSize and TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Constructor", "type");
 
                 const cache = new TypedCache({ maxSize: 5, ttl: 2000 });
                 cache.set("key", "value");
@@ -115,14 +115,11 @@ describe("Cache Utilities", () => {
                 cache = new TypedCache<string, string>();
             });
 
-            it("should set and get values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Retrieval", "type");
+            it("should set and get values", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Data Retrieval", "type");
 
                 cache.set("key1", "value1");
                 expect(cache.get("key1")).toBe("value1");
@@ -130,39 +127,36 @@ describe("Cache Utilities", () => {
             });
 
             it("should return undefined for non-existent keys", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(cache.get("nonexistent")).toBeUndefined();
             });
 
             it("should check key existence with has()", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 cache.set("key1", "value1");
                 expect(cache.has("key1")).toBe(true);
                 expect(cache.has("nonexistent")).toBe(false);
             });
 
-            it("should delete keys", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Deletion", "type");
+            it("should delete keys", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Data Deletion", "type");
 
                 cache.set("key1", "value1");
                 expect(cache.delete("key1")).toBe(true);
@@ -171,25 +165,22 @@ describe("Cache Utilities", () => {
             });
 
             it("should return false when deleting non-existent keys", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(cache.delete("nonexistent")).toBe(false);
             });
 
-            it("should clear all entries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should clear all entries", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 cache.set("key1", "value1");
                 cache.set("key2", "value2");
@@ -204,13 +195,13 @@ describe("Cache Utilities", () => {
 
         describe("TTL functionality", () => {
             it("should expire entries after default TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
 
@@ -233,13 +224,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle per-entry TTL override", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 5000 }); // Default TTL
 
@@ -259,13 +250,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle cache without TTL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>(); // No TTL
                 cache.set("key1", "value1");
@@ -276,13 +267,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should update lastAccessed on get", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Update", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Data Update", "type");
 
                 const cache = new TypedCache<string, string>();
                 cache.set("key1", "value1");
@@ -299,13 +290,13 @@ describe("Cache Utilities", () => {
 
         describe("LRU eviction", () => {
             it("should evict least recently used entries when maxSize reached", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ maxSize: 3 });
 
@@ -334,13 +325,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle LRU eviction with no existing entries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ maxSize: 0 }); // Zero max size
                 cache.set("key1", "value1");
@@ -348,13 +339,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle LRU eviction when cache is exactly at maxSize", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ maxSize: 2 });
 
@@ -374,13 +365,13 @@ describe("Cache Utilities", () => {
 
         describe("Cleanup functionality", () => {
             it("should remove expired entries during cleanup", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Deletion", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Data Deletion", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
 
@@ -404,13 +395,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should keep non-expired entries during cleanup", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 5000 });
 
@@ -433,13 +424,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle cleanup with no TTL set", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>(); // No TTL
                 cache.set("key1", "value1");
@@ -455,13 +446,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle cleanup with mixed TTL entries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 5000 });
 
@@ -485,13 +476,13 @@ describe("Cache Utilities", () => {
 
         describe("Type safety", () => {
             it("should handle different key types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const numberKeyCache = new TypedCache<number, string>();
                 numberKeyCache.set(1, "value1");
@@ -504,13 +495,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle different value types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const objectCache = new TypedCache<
                     string,
@@ -527,13 +518,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle null and undefined values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<
                     string,
@@ -555,13 +546,13 @@ describe("Cache Utilities", () => {
 
         describe("Edge cases", () => {
             it("should handle setting the same key multiple times", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>();
                 cache.set("key1", "value1");
@@ -573,13 +564,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle very large cache operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ maxSize: 1000 });
 
@@ -599,13 +590,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle cleanup with empty cache", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
                 expect(() => cache.cleanup()).not.toThrow();
@@ -613,13 +604,13 @@ describe("Cache Utilities", () => {
             });
 
             it("should handle edge case where all entries have same lastAccessed time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cache", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const cache = new TypedCache<string, string>({ maxSize: 2 });
 
@@ -679,10 +670,7 @@ describe("Cache Utilities", () => {
             AppCaches.uiHelpers.set("theme", "light");
         });
 
-        it("should cleanup all caches", async ({
-            task,
-            annotate,
-        }) => {
+        it("should cleanup all caches", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cache", "component");
             await annotate("Category: Utility", "category");
@@ -704,10 +692,7 @@ describe("Cache Utilities", () => {
             expect(AppCaches.general.get("item1")).toBe("value1");
         });
 
-        it("should clear all caches", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear all caches", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cache", "component");
             await annotate("Category: Utility", "category");
@@ -802,10 +787,7 @@ describe("Cache Utilities", () => {
             ).toBe(true);
         });
 
-        it("should handle fetcher errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fetcher errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cache", "component");
             await annotate("Category: Utility", "category");

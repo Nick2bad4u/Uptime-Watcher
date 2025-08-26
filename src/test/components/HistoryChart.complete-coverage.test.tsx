@@ -119,7 +119,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(chartContainer).toHaveClass("custom-chart-class");
         });
 
-        it("should render with default className when not provided", ({ task, annotate }) => {
+        it("should render with default className when not provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -142,7 +145,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(chartContainer).toBeInTheDocument();
         });
 
-        it("should apply proper CSS classes for layout", ({ task, annotate }) => {
+        it("should apply proper CSS classes for layout", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -176,7 +182,10 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Data Handling", () => {
-        it("should display history items in chronological order (oldest first)", ({ task, annotate }) => {
+        it("should display history items in chronological order (oldest first)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -206,7 +215,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
 
-        it("should handle maximum items limit (default 120)", ({ task, annotate }) => {
+        it("should handle maximum items limit (default 120)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -260,7 +272,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(30); // Should be limited to custom maxItems
         });
 
-        it("should handle maxItems greater than history length", ({ task, annotate }) => {
+        it("should handle maxItems greater than history length", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -288,7 +303,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars).toHaveLength(2); // Should show all available items
         });
 
-        it("should pass correct props to MiniChartBar components", ({ task, annotate }) => {
+        it("should pass correct props to MiniChartBar components", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -325,7 +343,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[1]).toHaveAttribute("data-timestamp", "1234567891");
         });
 
-        it("should generate unique keys for each MiniChartBar", ({ task, annotate }) => {
+        it("should generate unique keys for each MiniChartBar", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -358,7 +379,10 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should return null for empty history array", ({ task, annotate }) => {
+        it("should return null for empty history array", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -459,7 +483,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[0]).toHaveAttribute("data-timestamp", "2000");
         });
 
-        it("should handle very large responseTime values", ({ task, annotate }) => {
+        it("should handle very large responseTime values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -584,7 +611,10 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Title Rendering", () => {
-        it("should render title with correct themed text props", ({ task, annotate }) => {
+        it("should render title with correct themed text props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -630,7 +660,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(titleElement).toHaveTextContent("");
         });
 
-        it("should handle title with special characters", ({ task, annotate }) => {
+        it("should handle title with special characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -719,7 +752,10 @@ describe("HistoryChart - Complete Coverage", () => {
     });
 
     describe("Array Methods", () => {
-        it("should handle toReversed() method correctly", ({ task, annotate }) => {
+        it("should handle toReversed() method correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -750,7 +786,10 @@ describe("HistoryChart - Complete Coverage", () => {
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
 
-        it("should handle slice() with maxItems correctly", ({ task, annotate }) => {
+        it("should handle slice() with maxItems correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryChart.complete-coverage", "component");
             annotate("Category: Component", "category");

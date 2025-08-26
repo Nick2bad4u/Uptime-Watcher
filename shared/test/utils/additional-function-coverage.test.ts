@@ -13,7 +13,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -43,7 +46,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -68,7 +74,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -83,7 +92,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -98,7 +110,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -117,7 +132,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -133,7 +151,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -146,12 +167,12 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("typeGuards module", () => {
-        it("should call isArray function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isArray function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -166,12 +187,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isFunction function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isFunction function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -182,12 +203,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isError function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isError function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -198,12 +219,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isDate function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isDate function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -214,12 +235,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call hasProperty function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call hasProperty function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -236,7 +257,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -249,12 +273,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isBoolean function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isBoolean function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -270,7 +294,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
@@ -286,7 +313,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -304,7 +334,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -317,12 +350,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isString function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isString function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -333,12 +366,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isValidPort function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isValidPort function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -356,7 +389,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -374,7 +410,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -392,7 +431,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -403,12 +445,12 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call validateSite function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call validateSite function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -432,7 +474,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -464,7 +509,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -485,7 +533,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -506,7 +557,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -527,7 +581,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -543,7 +600,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -572,7 +632,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -588,7 +651,10 @@ describe("Utils Additional Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-function-coverage", "component");
+            await annotate(
+                "Component: additional-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 

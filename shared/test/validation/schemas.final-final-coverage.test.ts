@@ -15,7 +15,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -48,7 +51,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -72,7 +78,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -93,7 +102,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Constructor", "type");
 
@@ -116,7 +128,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -139,7 +154,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -160,7 +178,10 @@ describe("Schemas - Final Final Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.final-final-coverage", "component");
+            await annotate(
+                "Component: schemas.final-final-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 

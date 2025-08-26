@@ -23,7 +23,10 @@ const mockLogger = vi.mocked(logger);
 
 describe("useMount - 100% Coverage Tests", () => {
     describe("Targeting Lines 97,113", () => {
-        test("should handle strict mode duplicate mount (line 97)", ({ task, annotate }) => {
+        test("should handle strict mode duplicate mount (line 97)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useMount.100-coverage", "component");
             annotate("Category: Hook", "category");
@@ -52,7 +55,10 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(mountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle async mount callback errors (line 113)", async ({ task, annotate }) => {
+        test("should handle async mount callback errors (line 113)", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useMount.100-coverage", "component");
             annotate("Category: Hook", "category");
@@ -86,7 +92,10 @@ describe("useMount - 100% Coverage Tests", () => {
             unmount();
         });
 
-        test("should handle promise-returning mount callback", async ({ task, annotate }) => {
+        test("should handle promise-returning mount callback", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useMount.100-coverage", "component");
             annotate("Category: Hook", "category");
@@ -108,7 +117,10 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(promiseMountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle unmount callback execution", ({ task, annotate }) => {
+        test("should handle unmount callback execution", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useMount.100-coverage", "component");
             annotate("Category: Hook", "category");
@@ -134,7 +146,10 @@ describe("useMount - 100% Coverage Tests", () => {
             expect(unmountCallback).toHaveBeenCalledTimes(1);
         });
 
-        test("should handle synchronous mount callback", ({ task, annotate }) => {
+        test("should handle synchronous mount callback", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: useMount.100-coverage", "component");
             annotate("Category: Hook", "category");

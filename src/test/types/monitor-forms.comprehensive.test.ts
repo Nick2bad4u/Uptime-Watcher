@@ -230,10 +230,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isHttpMonitorFields(mixedFields)).toBe(false);
         });
 
-        it("should handle minimal HTTP fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle minimal HTTP fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -311,10 +308,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(portFields)).toBe(false);
         });
 
-        it("should validate host is a string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate host is a string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -345,10 +339,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPingMonitorFields(mixedFields)).toBe(false);
         });
 
-        it("should handle minimal ping fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle minimal ping fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -481,10 +472,7 @@ describe("Monitor Forms Utilities - Comprehensive Coverage", () => {
             expect(isPortMonitorFields(incompleteFields)).toBe(false);
         });
 
-        it("should handle minimal port fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle minimal port fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");

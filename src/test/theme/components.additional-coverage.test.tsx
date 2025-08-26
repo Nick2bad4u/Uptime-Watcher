@@ -197,7 +197,10 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).not.toBeInTheDocument();
         });
 
-        it("should render with text when showText is true", ({ task, annotate }) => {
+        it("should render with text when showText is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components.additional-coverage", "component");
             annotate("Category: Core", "category");
@@ -217,7 +220,10 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).toHaveTextContent("Up");
         });
 
-        it("should render with different status values", ({ task, annotate }) => {
+        it("should render with different status values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components.additional-coverage", "component");
             annotate("Category: Core", "category");
@@ -274,7 +280,10 @@ describe("Theme Components - Missing Coverage", () => {
             expect(text).toHaveTextContent("Pending");
         });
 
-        it("should render with different size variants", ({ task, annotate }) => {
+        it("should render with different size variants", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components.additional-coverage", "component");
             annotate("Category: Core", "category");
@@ -449,7 +458,10 @@ describe("Theme Components - Missing Coverage", () => {
     });
 
     describe("Complex Input Combinations and Props", () => {
-        it("should handle various boolean prop combinations", ({ task, annotate }) => {
+        it("should handle various boolean prop combinations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components.additional-coverage", "component");
             annotate("Category: Core", "category");

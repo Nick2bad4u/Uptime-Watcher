@@ -13,7 +13,10 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate(
+                "Component: stringConversion.targeted-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -36,7 +39,10 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate(
+                "Component: stringConversion.targeted-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -56,7 +62,10 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate(
+                "Component: stringConversion.targeted-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -77,7 +86,10 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate(
+                "Component: stringConversion.targeted-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

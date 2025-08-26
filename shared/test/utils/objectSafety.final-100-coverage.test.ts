@@ -13,7 +13,10 @@ describe("Object Safety - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate(
+                "Component: objectSafety.final-100-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -40,7 +43,10 @@ describe("Object Safety - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate(
+                "Component: objectSafety.final-100-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -73,7 +79,10 @@ describe("Object Safety - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate(
+                "Component: objectSafety.final-100-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -97,7 +106,10 @@ describe("Object Safety - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate(
+                "Component: objectSafety.final-100-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -127,7 +139,10 @@ describe("Object Safety - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate(
+                "Component: objectSafety.final-100-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

@@ -92,10 +92,7 @@ describe("useSettingsStore", () => {
             });
         });
 
-        it("should update settings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update settings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -116,10 +113,7 @@ describe("useSettingsStore", () => {
             expect(state.settings.autoStart).toBe(false); // unchanged
         });
 
-        it("should reset settings to defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reset settings to defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -344,10 +338,7 @@ describe("useSettingsStore", () => {
     });
 
     describe("Persistence", () => {
-        it("should persist settings changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should persist settings changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -370,10 +361,7 @@ describe("useSettingsStore", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle partial updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -401,10 +389,7 @@ describe("useSettingsStore", () => {
             expect(state.settings.theme).toBe(originalSettings.theme);
         });
 
-        it("should handle empty updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -451,10 +436,7 @@ describe("useSettingsStore", () => {
             expect(state.settings.historyLimit).toBe(-10);
         });
 
-        it("should handle zero historyLimit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero historyLimit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -506,10 +488,7 @@ describe("useSettingsStore", () => {
             expect(state.settings.theme).toBe("dark");
         });
 
-        it("should allow chaining updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow chaining updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");
@@ -531,10 +510,7 @@ describe("useSettingsStore", () => {
     });
 
     describe("Type Safety", () => {
-        it("should accept valid theme values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept valid theme values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Core", "category");

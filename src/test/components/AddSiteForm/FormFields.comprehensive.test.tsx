@@ -88,7 +88,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Test Field")).toBeInTheDocument();
         });
 
-        it("should show required indicator when required", ({ task, annotate }) => {
+        it("should show required indicator when required", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -177,7 +180,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Test Field")).toBeInTheDocument();
         });
 
-        it("should prioritize error over help text when both are present", ({ task, annotate }) => {
+        it("should prioritize error over help text when both are present", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -199,7 +205,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.queryByText("Help text")).not.toBeInTheDocument();
         });
 
-        it("should not show required indicator when required is false", ({ task, annotate }) => {
+        it("should not show required indicator when required is false", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -214,7 +223,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.queryByText("*")).not.toBeInTheDocument();
         });
 
-        it("should handle required prop explicitly set to false", ({ task, annotate }) => {
+        it("should handle required prop explicitly set to false", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -304,7 +316,10 @@ describe("FormFields Components - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+        it("should be disabled when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -406,7 +421,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("This is helpful")).toBeInTheDocument();
         });
 
-        it("should handle TextField with explicit undefined props", ({ task, annotate }) => {
+        it("should handle TextField with explicit undefined props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -425,7 +443,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByTestId("themed-input")).toBeInTheDocument();
         });
 
-        it("should handle min and max attributes for number inputs", ({ task, annotate }) => {
+        it("should handle min and max attributes for number inputs", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -535,7 +556,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(select).toHaveValue("port");
         });
 
-        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+        it("should be disabled when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -607,7 +631,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
-        it("should handle SelectField with explicit undefined props", ({ task, annotate }) => {
+        it("should handle SelectField with explicit undefined props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -626,7 +653,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByTestId("themed-select")).toBeInTheDocument();
         });
 
-        it("should show placeholder option when provided", ({ task, annotate }) => {
+        it("should show placeholder option when provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -734,7 +764,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByDisplayValue("existing")).toBeChecked();
         });
 
-        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+        it("should be disabled when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -770,7 +803,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.queryByDisplayValue("new")).not.toBeInTheDocument();
         });
 
-        it("should use correct name attribute for grouping", ({ task, annotate }) => {
+        it("should use correct name attribute for grouping", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -833,7 +869,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
-        it("should handle radiogroup without error or helpText", ({ task, annotate }) => {
+        it("should handle radiogroup without error or helpText", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");
@@ -848,7 +887,10 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
         });
 
-        it("should handle radiogroup with explicit undefined error", ({ task, annotate }) => {
+        it("should handle radiogroup with explicit undefined error", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");
             annotate("Category: Component", "category");

@@ -6,7 +6,7 @@
 
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import App from "../App";
@@ -185,7 +185,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render the main app structure", async ({ task, annotate }) => {
+        it("should render the main app structure", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -204,7 +207,10 @@ describe("App Component - Comprehensive Coverage", () => {
             // AddSiteModal is conditionally rendered and not visible by default
         });
 
-        it("should apply dark theme class when isDark is true", async ({ task, annotate }) => {
+        it("should apply dark theme class when isDark is true", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -223,7 +229,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(appContainer).toHaveClass("dark");
         });
 
-        it("should not apply dark theme class when isDark is false", async ({ task, annotate }) => {
+        it("should not apply dark theme class when isDark is false", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -265,7 +274,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Loading States", () => {
-        it("should show loading overlay when isLoading is true", async ({ task, annotate }) => {
+        it("should show loading overlay when isLoading is true", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -296,7 +308,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("Loading...")).toBeInTheDocument();
         });
 
-        it("should hide loading overlay when isLoading becomes false", async ({ task, annotate }) => {
+        it("should hide loading overlay when isLoading becomes false", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -340,7 +355,10 @@ describe("App Component - Comprehensive Coverage", () => {
             });
         });
 
-        it("should not show loading overlay for quick operations", async ({ task, annotate }) => {
+        it("should not show loading overlay for quick operations", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -373,7 +391,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Error Handling", () => {
-        it("should display error notification when lastError is present", async ({ task, annotate }) => {
+        it("should display error notification when lastError is present", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -396,7 +417,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByLabelText("Dismiss error")).toBeInTheDocument();
         });
 
-        it("should clear error when close button is clicked", async ({ task, annotate }) => {
+        it("should clear error when close button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -422,7 +446,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(clearError).toHaveBeenCalledTimes(1);
         });
 
-        it("should not display error notification when lastError is null", async ({ task, annotate }) => {
+        it("should not display error notification when lastError is null", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -445,7 +472,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Update Notifications", () => {
-        it("should display available update notification", async ({ task, annotate }) => {
+        it("should display available update notification", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -469,7 +499,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("⬇️")).toBeInTheDocument();
         });
 
-        it("should display downloading update notification", async ({ task, annotate }) => {
+        it("should display downloading update notification", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -493,7 +526,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("⏬")).toBeInTheDocument();
         });
 
-        it("should display downloaded update notification with restart button", async ({ task, annotate }) => {
+        it("should display downloaded update notification with restart button", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -518,7 +554,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("Restart Now")).toBeInTheDocument();
         });
 
-        it("should display error update notification", async ({ task, annotate }) => {
+        it("should display error update notification", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -543,7 +582,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("Dismiss")).toBeInTheDocument();
         });
 
-        it("should display fallback error message when updateError is null", async ({ task, annotate }) => {
+        it("should display fallback error message when updateError is null", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -565,7 +607,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByText("Update failed.")).toBeInTheDocument();
         });
 
-        it("should apply update when restart button is clicked", async ({ task, annotate }) => {
+        it("should apply update when restart button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -591,7 +636,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(applyUpdate).toHaveBeenCalledTimes(1);
         });
 
-        it("should dismiss update notification when dismiss button is clicked", async ({ task, annotate }) => {
+        it("should dismiss update notification when dismiss button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -623,7 +671,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Modal Management", () => {
-        it("should show settings modal when showSettings is true", async ({ task, annotate }) => {
+        it("should show settings modal when showSettings is true", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -644,7 +695,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(screen.getByTestId("settings-modal")).toBeInTheDocument();
         });
 
-        it("should hide settings modal when showSettings is false", async ({ task, annotate }) => {
+        it("should hide settings modal when showSettings is false", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -667,7 +721,10 @@ describe("App Component - Comprehensive Coverage", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should close settings modal when close handler is called", async ({ task, annotate }) => {
+        it("should close settings modal when close handler is called", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -693,7 +750,10 @@ describe("App Component - Comprehensive Coverage", () => {
             expect(setShowSettings).toHaveBeenCalledWith(false);
         });
 
-        it("should show site details modal when showSiteDetails is true and site is selected", async ({ task, annotate }) => {
+        it("should show site details modal when showSiteDetails is true and site is selected", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -727,7 +787,10 @@ describe("App Component - Comprehensive Coverage", () => {
             ).toHaveTextContent("test-site-1");
         });
 
-        it("should not show site details modal when showSiteDetails is true but no site is selected", async ({ task, annotate }) => {
+        it("should not show site details modal when showSiteDetails is true but no site is selected", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -758,7 +821,10 @@ describe("App Component - Comprehensive Coverage", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should close site details modal when close handler is called", async ({ task, annotate }) => {
+        it("should close site details modal when close handler is called", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -854,7 +920,10 @@ describe("App Component - Comprehensive Coverage", () => {
             });
         });
 
-        it("should subscribe to status updates on mount", async ({ task, annotate }) => {
+        it("should subscribe to status updates on mount", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -881,7 +950,10 @@ describe("App Component - Comprehensive Coverage", () => {
             });
         });
 
-        it("should cleanup subscriptions on unmount", async ({ task, annotate }) => {
+        it("should cleanup subscriptions on unmount", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -922,7 +994,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Status Update Handling", () => {
-        it("should handle status updates in development mode", async ({ task, annotate }) => {
+        it("should handle status updates in development mode", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -975,7 +1050,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Backend Focus Sync", () => {
-        it("should call useBackendFocusSync with disabled state", async ({ task, annotate }) => {
+        it("should call useBackendFocusSync with disabled state", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -999,7 +1077,10 @@ describe("App Component - Comprehensive Coverage", () => {
     });
 
     describe("Production vs Development Behavior", () => {
-        it("should log app started in production mode", async ({ task, annotate }) => {
+        it("should log app started in production mode", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1024,7 +1105,10 @@ describe("App Component - Comprehensive Coverage", () => {
             });
         });
 
-        it("should not log app started in non-production mode", async ({ task, annotate }) => {
+        it("should not log app started in non-production mode", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");

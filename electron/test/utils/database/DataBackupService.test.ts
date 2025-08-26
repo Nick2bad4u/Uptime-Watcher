@@ -167,10 +167,7 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should use correct database path", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use correct database path", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DataBackupService", "component");
             await annotate("Category: Utility", "category");
@@ -389,10 +386,7 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle empty buffer results", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty buffer results", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DataBackupService", "component");
             await annotate("Category: Utility", "category");
@@ -420,10 +414,7 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle large buffer results", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large buffer results", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DataBackupService", "component");
             await annotate("Category: Utility", "category");

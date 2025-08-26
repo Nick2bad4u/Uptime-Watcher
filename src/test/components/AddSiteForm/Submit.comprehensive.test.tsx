@@ -91,7 +91,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("handleSubmit - New Site Creation", () => {
-        it("should handle successful new site submission with HTTP monitor", async ({ task, annotate }) => {
+        it("should handle successful new site submission with HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Submit", "component");
             annotate("Category: Component", "category");
@@ -164,7 +167,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("handleSubmit - Existing Site", () => {
-        it("should handle adding monitor to existing site", async ({ task, annotate }) => {
+        it("should handle adding monitor to existing site", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Submit", "component");
             annotate("Category: Component", "category");

@@ -91,10 +91,7 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current.themeName).toBe("system");
         });
 
-        it("should handle theme toggling", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle theme toggling", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");
@@ -114,10 +111,7 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current.themeName).not.toBe(initialTheme);
         });
 
-        it("should handle color retrieval", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle color retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");
@@ -319,10 +313,7 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useStatusColors hook", () => {
-        it("should return status color object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return status color object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");
@@ -386,10 +377,7 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof statusClass).toBe("object");
         });
 
-        it("should handle color path retrieval", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle color path retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");
@@ -436,10 +424,7 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current).toHaveProperty("text");
         });
 
-        it("should handle complex selectors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex selectors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");
@@ -556,10 +541,7 @@ describe("useTheme - Complete Coverage", () => {
             ).not.toThrow();
         });
 
-        it("should handle invalid color paths", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle invalid color paths", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme.unmocked", "component");
             await annotate("Category: Core", "category");

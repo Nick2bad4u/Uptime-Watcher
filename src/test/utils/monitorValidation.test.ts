@@ -148,10 +148,7 @@ describe("Monitor Validation Utilities", () => {
             });
         });
 
-        it("should handle empty fields object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty fields object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorValidation", "component");
             await annotate("Category: Utility", "category");
@@ -814,13 +811,13 @@ describe("Monitor Validation Utilities", () => {
 
         describe("HTTP monitor form validation", () => {
             it("should validate HTTP monitor with valid URL", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("http", {
                     url: "https://example.com",
@@ -836,13 +833,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should require URL for HTTP monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await validateMonitorFormData("http", {});
 
@@ -854,13 +851,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should validate URL type for HTTP monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("http", {
                     url: 123 as any,
@@ -874,13 +871,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should include URL validation errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(sharedValidateMonitorField).mockReturnValue({
                     errors: ["URL format is invalid"],
@@ -903,13 +900,13 @@ describe("Monitor Validation Utilities", () => {
 
         describe("Port monitor form validation", () => {
             it("should validate port monitor with valid host and port", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("port", {
                     host: "localhost",
@@ -931,13 +928,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should require host for port monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await validateMonitorFormData("port", {
                     port: 3000,
@@ -951,13 +948,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should validate host type for port monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("port", {
                     host: 123 as any,
@@ -972,13 +969,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should require port for port monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await validateMonitorFormData("port", {
                     host: "localhost",
@@ -992,13 +989,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should validate port type for port monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("port", {
                     host: "localhost",
@@ -1013,13 +1010,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should include host and port validation errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(sharedValidateMonitorField)
                     .mockReturnValueOnce({
@@ -1048,13 +1045,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should handle mixed validation results", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 vi.mocked(sharedValidateMonitorField)
                     .mockReturnValueOnce({
@@ -1085,13 +1082,13 @@ describe("Monitor Validation Utilities", () => {
 
         describe("Ping monitor form validation", () => {
             it("should validate ping monitor with valid host", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("ping", {
                     host: "example.com",
@@ -1107,13 +1104,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should require host for ping monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await validateMonitorFormData("ping", {});
 
@@ -1125,13 +1122,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should validate host type for ping monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const result = await validateMonitorFormData("ping", {
                     host: 123 as any,
@@ -1145,13 +1142,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should include host validation errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(sharedValidateMonitorField).mockReturnValue({
                     errors: [
@@ -1176,13 +1173,13 @@ describe("Monitor Validation Utilities", () => {
             });
 
             it("should validate different host formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: monitorValidation", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 // Test with IP address
                 await validateMonitorFormData("ping", { host: "192.168.1.1" });
@@ -1256,10 +1253,7 @@ describe("Monitor Validation Utilities", () => {
             );
         });
 
-        it("should handle empty form data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty form data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorValidation", "component");
             await annotate("Category: Utility", "category");

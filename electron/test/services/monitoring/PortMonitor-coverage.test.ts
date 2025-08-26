@@ -212,10 +212,7 @@ describe("PortMonitor Coverage Tests", () => {
             expect(config.timeout).toBe(10_000);
         });
 
-        it("should merge partial configuration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should merge partial configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PortMonitor-coverage", "component");
             await annotate("Category: Service", "category");
@@ -282,10 +279,7 @@ describe("PortMonitor Coverage Tests", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle empty config update", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty config update", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: PortMonitor-coverage", "component");
             await annotate("Category: Service", "category");

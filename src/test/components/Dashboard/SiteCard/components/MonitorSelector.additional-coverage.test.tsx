@@ -36,14 +36,23 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
         );
 
     describe("Coverage for Lines 90-93 (default case in switch statement)", () => {
-        it("should use port for unknown monitor type with port property (line 90-91)", ({ task, annotate }) => {
+        it("should use port for unknown monitor type with port property (line 90-91)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -70,14 +79,23 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should use url for unknown monitor type with url property (line 92-93)", ({ task, annotate }) => {
+        it("should use url for unknown monitor type with url property (line 92-93)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -110,14 +128,23 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should return empty string for unknown monitor type with no port or url (line 94)", ({ task, annotate }) => {
+        it("should return empty string for unknown monitor type with no port or url (line 94)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -144,14 +171,23 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should prioritize port over url for unknown monitor type with both properties", ({ task, annotate }) => {
+        it("should prioritize port over url for unknown monitor type with both properties", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -177,14 +213,23 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle multiple unknown monitor types in the same selector", ({ task, annotate }) => {
+        it("should handle multiple unknown monitor types in the same selector", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate(
+                "Component: MonitorSelector.additional-coverage",
+                "component"
+            );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 

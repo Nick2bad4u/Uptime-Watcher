@@ -111,10 +111,7 @@ describe("Shared Utils Coverage", () => {
             );
         });
 
-        it("should handle cache operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle cache operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: coverage-legacy", "component");
             await annotate("Category: Utility", "category");

@@ -11,13 +11,13 @@ import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler"
 
 describe("MonitorScheduler Debug", () => {
     it("should have performImmediateCheck method", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: MonitorScheduler", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const scheduler = new MonitorScheduler();
 
@@ -46,14 +46,11 @@ describe("MonitorScheduler Debug", () => {
         expect(typeof scheduler.restartMonitor).toBe("function");
     });
 
-    it("should instantiate properly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorScheduler", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should instantiate properly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: MonitorScheduler", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const scheduler = new MonitorScheduler();
         expect(scheduler).toBeInstanceOf(MonitorScheduler);

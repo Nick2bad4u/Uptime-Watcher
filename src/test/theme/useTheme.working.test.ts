@@ -151,10 +151,7 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getBorderClass).toBe("function");
         });
 
-        it("should generate classes correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should generate classes correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");
@@ -238,10 +235,7 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getStatusColor).toBe("function");
         });
 
-        it("should handle color retrieval", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle color retrieval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");

@@ -17,15 +17,15 @@ vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
 
 describe("SiteCardMetrics", () => {
     it("renders all metrics with correct values", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         render(
             <SiteCardMetrics
@@ -67,15 +67,15 @@ describe("SiteCardMetrics", () => {
     });
 
     it("renders correct number of metric cards", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         render(
             <SiteCardMetrics
@@ -89,15 +89,15 @@ describe("SiteCardMetrics", () => {
     });
 
     it("renders uptime with percent sign", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardMetrics", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCardMetrics", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         render(
             <SiteCardMetrics

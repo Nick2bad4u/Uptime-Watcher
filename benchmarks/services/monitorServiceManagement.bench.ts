@@ -7,8 +7,8 @@
  * health monitoring, and bulk operations that handle the core monitoring
  * functionality across multiple monitor types and sites.
  *
- * Tests the performance of monitor registration, execution, coordination,
- * and resource management under various load conditions.
+ * Tests the performance of monitor registration, execution, coordination, and
+ * resource management under various load conditions.
  *
  * @author Uptime-Watcher Development Team
  */
@@ -95,7 +95,7 @@ class MockMonitorServiceManager {
         averageResponseTime: 0,
         successRate: 0,
         resourceUtilization: { cpu: 0, memory: 0, networkConnections: 0 },
-        queueMetrics: { queueSize: 0, averageWaitTime: 0, processingRate: 0 }
+        queueMetrics: { queueSize: 0, averageWaitTime: 0, processingRate: 0 },
     };
     private checkHistory: MonitorCheckResult[] = [];
     private concurrencyLimit = 50;
@@ -117,7 +117,7 @@ class MockMonitorServiceManager {
             intervalMs: monitor.interval,
             priority: this.determinePriority(monitor),
             consecutiveFailures: 0,
-            adaptiveInterval: monitor.interval
+            adaptiveInterval: monitor.interval,
         };
 
         this.schedules.set(monitor.id, schedule);
@@ -130,7 +130,7 @@ class MockMonitorServiceManager {
     async bulkRegisterMonitors(monitors: Monitor[]): Promise<void> {
         this.operationCount++;
 
-        const registrationPromises = monitors.map(monitor =>
+        const registrationPromises = monitors.map((monitor) =>
             this.registerMonitor(monitor)
         );
 
@@ -179,7 +179,7 @@ class MockMonitorServiceManager {
                 timestamp: Date.now(),
                 error: error instanceof Error ? error.message : String(error),
                 retryCount: 0,
-                success: false
+                success: false,
             };
 
             this.checkHistory.push(result);
@@ -204,7 +204,9 @@ class MockMonitorServiceManager {
         // Process in batches to control concurrency
         for (let i = 0; i < monitorIds.length; i += maxConcurrency) {
             const batch = monitorIds.slice(i, i + maxConcurrency);
-            const batchPromises = batch.map(id => this.performMonitorCheck(id));
+            const batchPromises = batch.map((id) =>
+                this.performMonitorCheck(id)
+            );
             const batchResults = await Promise.allSettled(batchPromises);
 
             for (const result of batchResults) {
@@ -219,7 +221,7 @@ class MockMonitorServiceManager {
                         timestamp: Date.now(),
                         error: result.reason,
                         retryCount: 0,
-                        success: false
+                        success: false,
                     });
                 }
             }
@@ -238,8 +240,13 @@ class MockMonitorServiceManager {
         const dueMonitors: string[] = [];
 
         // Find monitors due for checking
-        for (const [monitorId, schedule] of Array.from(this.schedules.entries())) {
-            if (schedule.nextCheck <= now && this.monitors.get(monitorId)?.enabled) {
+        for (const [monitorId, schedule] of Array.from(
+            this.schedules.entries()
+        )) {
+            if (
+                schedule.nextCheck <= now &&
+                this.monitors.get(monitorId)?.enabled
+            ) {
                 dueMonitors.push(monitorId);
             }
         }
@@ -258,7 +265,10 @@ class MockMonitorServiceManager {
             if (!scheduleA || !scheduleB) return 0;
 
             const priorityOrder = { critical: 0, high: 1, normal: 2, low: 3 };
-            return priorityOrder[scheduleA.priority] - priorityOrder[scheduleB.priority];
+            return (
+                priorityOrder[scheduleA.priority] -
+                priorityOrder[scheduleB.priority]
+            );
         });
 
         // Execute checks
@@ -275,21 +285,29 @@ class MockMonitorServiceManager {
         this.operationCount++;
 
         const now = Date.now();
-        const activeMonitors = Array.from(this.monitors.values()).filter(m => m.enabled);
+        const activeMonitors = Array.from(this.monitors.values()).filter(
+            (m) => m.enabled
+        );
         const recentChecks = this.checkHistory.filter(
-            check => now - check.timestamp < 300_000 // Last 5 minutes
+            (check) => now - check.timestamp < 300_000 // Last 5 minutes
         );
 
         // Calculate success rate
-        const successCount = recentChecks.filter(check => check.success).length;
-        const successRate = recentChecks.length > 0 ? successCount / recentChecks.length : 1;
+        const successCount = recentChecks.filter(
+            (check) => check.success
+        ).length;
+        const successRate =
+            recentChecks.length > 0 ? successCount / recentChecks.length : 1;
 
         // Calculate average response time
         const totalResponseTime = recentChecks.reduce(
-            (sum, check) => sum + check.responseTime, 0
+            (sum, check) => sum + check.responseTime,
+            0
         );
-        const averageResponseTime = recentChecks.length > 0 ?
-            totalResponseTime / recentChecks.length : 0;
+        const averageResponseTime =
+            recentChecks.length > 0
+                ? totalResponseTime / recentChecks.length
+                : 0;
 
         // Determine service status
         let status: "healthy" | "degraded" | "unhealthy";
@@ -307,17 +325,25 @@ class MockMonitorServiceManager {
 
         if (successRate < 0.95) {
             issues.push(`Low success rate: ${(successRate * 100).toFixed(1)}%`);
-            recommendations.push("Review monitor configurations and network connectivity");
+            recommendations.push(
+                "Review monitor configurations and network connectivity"
+            );
         }
 
         if (averageResponseTime > 2000) {
-            issues.push(`High response time: ${averageResponseTime.toFixed(0)}ms`);
-            recommendations.push("Consider optimizing monitor timeouts or intervals");
+            issues.push(
+                `High response time: ${averageResponseTime.toFixed(0)}ms`
+            );
+            recommendations.push(
+                "Consider optimizing monitor timeouts or intervals"
+            );
         }
 
         if (this.checkQueue.length > 100) {
             issues.push(`Large check queue: ${this.checkQueue.length} items`);
-            recommendations.push("Consider increasing concurrency limit or monitor intervals");
+            recommendations.push(
+                "Consider increasing concurrency limit or monitor intervals"
+            );
         }
 
         // Update metrics
@@ -330,13 +356,13 @@ class MockMonitorServiceManager {
             resourceUtilization: {
                 cpu: Math.random() * 100, // Simulated
                 memory: Math.random() * 100,
-                networkConnections: this.activeChecks.size
+                networkConnections: this.activeChecks.size,
             },
             queueMetrics: {
                 queueSize: this.checkQueue.length,
                 averageWaitTime: this.calculateAverageWaitTime(),
-                processingRate: this.calculateProcessingRate()
-            }
+                processingRate: this.calculateProcessingRate(),
+            },
         };
 
         return {
@@ -345,7 +371,7 @@ class MockMonitorServiceManager {
             lastCheck: now,
             metrics: this.metrics,
             issues,
-            recommendations
+            recommendations,
         };
     }
 
@@ -355,21 +381,26 @@ class MockMonitorServiceManager {
     async optimizeMonitorSchedules(): Promise<void> {
         this.operationCount++;
 
-        for (const [monitorId, schedule] of Array.from(this.schedules.entries())) {
+        for (const [monitorId, schedule] of Array.from(
+            this.schedules.entries()
+        )) {
             const monitor = this.monitors.get(monitorId);
             if (!monitor) continue;
 
             const recentChecks = this.checkHistory
-                .filter(check => check.monitorId === monitorId)
+                .filter((check) => check.monitorId === monitorId)
                 .slice(-10); // Last 10 checks
 
             if (recentChecks.length < 3) continue;
 
             // Calculate stability score
-            const consecutiveSuccesses = this.calculateConsecutiveSuccesses(recentChecks);
-            const averageResponseTime = recentChecks.reduce(
-                (sum, check) => sum + check.responseTime, 0
-            ) / recentChecks.length;
+            const consecutiveSuccesses =
+                this.calculateConsecutiveSuccesses(recentChecks);
+            const averageResponseTime =
+                recentChecks.reduce(
+                    (sum, check) => sum + check.responseTime,
+                    0
+                ) / recentChecks.length;
 
             // Adaptive interval adjustment
             let newInterval = schedule.intervalMs;
@@ -398,7 +429,7 @@ class MockMonitorServiceManager {
     ): Promise<void> {
         this.operationCount++;
 
-        const updatePromises = updates.map(async update => {
+        const updatePromises = updates.map(async (update) => {
             const monitor = this.monitors.get(update.monitorId);
             if (monitor) {
                 Object.assign(monitor, update.changes);
@@ -408,7 +439,8 @@ class MockMonitorServiceManager {
                     const schedule = this.schedules.get(update.monitorId);
                     if (schedule) {
                         schedule.intervalMs = update.changes.interval;
-                        schedule.nextCheck = Date.now() + update.changes.interval;
+                        schedule.nextCheck =
+                            Date.now() + update.changes.interval;
                     }
                 }
             }
@@ -435,7 +467,12 @@ class MockMonitorServiceManager {
         this.operationCount++;
 
         // Generate test monitors with valid monitor types
-        const validMonitorTypes = ["http", "dns", "port", "ping"] as const;
+        const validMonitorTypes = [
+            "http",
+            "dns",
+            "port",
+            "ping",
+        ] as const;
         const testMonitors = Array.from({ length: monitorCount }, (_, i) => ({
             id: `stress-test-${i}`,
             siteId: `site-${Math.floor(i / 10)}`,
@@ -447,7 +484,7 @@ class MockMonitorServiceManager {
             retryAttempts: 1,
             enabled: true,
             status: "pending" as const,
-            metadata: { test: true }
+            metadata: { test: true },
         }));
 
         // Register monitors
@@ -465,20 +502,30 @@ class MockMonitorServiceManager {
             const currentConcurrency = this.activeChecks.size;
             peakConcurrency = Math.max(peakConcurrency, currentConcurrency);
 
-            totalChecks += Math.min(this.checkQueue.length, this.concurrencyLimit);
+            totalChecks += Math.min(
+                this.checkQueue.length,
+                this.concurrencyLimit
+            );
 
             // Brief pause to prevent overwhelming
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
         // Calculate results
         const testChecks = this.checkHistory.filter(
-            check => check.timestamp >= startTime
+            (check) => check.timestamp >= startTime
         );
 
-        const successfulChecks = testChecks.filter(check => check.success).length;
-        const averageResponseTime = testChecks.length > 0 ?
-            testChecks.reduce((sum, check) => sum + check.responseTime, 0) / testChecks.length : 0;
+        const successfulChecks = testChecks.filter(
+            (check) => check.success
+        ).length;
+        const averageResponseTime =
+            testChecks.length > 0
+                ? testChecks.reduce(
+                      (sum, check) => sum + check.responseTime,
+                      0
+                  ) / testChecks.length
+                : 0;
 
         // Cleanup test monitors
         for (const monitor of testMonitors) {
@@ -493,24 +540,26 @@ class MockMonitorServiceManager {
             peakConcurrency,
             resourceUsage: {
                 cpu: Math.random() * 100,
-                memory: Math.random() * 100
-            }
+                memory: Math.random() * 100,
+            },
         };
     }
 
     // Helper methods
-    private async simulateMonitorCheck(monitor: Monitor): Promise<MonitorCheckResult> {
+    private async simulateMonitorCheck(
+        monitor: Monitor
+    ): Promise<MonitorCheckResult> {
         // Simulate check duration based on monitor type
         const baseDuration = {
             http: 200,
             https: 250,
             dns: 100,
             tcp: 150,
-            ping: 50
+            ping: 50,
         }[monitor.type];
 
         const checkDuration = baseDuration + Math.random() * 100;
-        await new Promise(resolve => setTimeout(resolve, checkDuration));
+        await new Promise((resolve) => setTimeout(resolve, checkDuration));
 
         // Simulate success/failure (95% success rate)
         const success = Math.random() > 0.05;
@@ -523,11 +572,14 @@ class MockMonitorServiceManager {
             error: success ? undefined : "Simulated failure",
             details: success ? "Check completed successfully" : undefined,
             retryCount: 0,
-            success
+            success,
         };
     }
 
-    private updateMonitorSchedule(monitorId: string, result: MonitorCheckResult): void {
+    private updateMonitorSchedule(
+        monitorId: string,
+        result: MonitorCheckResult
+    ): void {
         const schedule = this.schedules.get(monitorId);
         if (!schedule) return;
 
@@ -544,7 +596,9 @@ class MockMonitorServiceManager {
         schedule.nextCheck = result.timestamp + interval;
     }
 
-    private determinePriority(monitor: Monitor): "critical" | "high" | "normal" | "low" {
+    private determinePriority(
+        monitor: Monitor
+    ): "critical" | "high" | "normal" | "low" {
         // Simple priority determination based on interval
         if (monitor.interval <= 30_000) return "critical";
         if (monitor.interval <= 60_000) return "high";
@@ -553,7 +607,9 @@ class MockMonitorServiceManager {
     }
 
     private updateMetrics(): void {
-        const activeMonitors = Array.from(this.monitors.values()).filter(m => m.enabled);
+        const activeMonitors = Array.from(this.monitors.values()).filter(
+            (m) => m.enabled
+        );
         this.metrics.totalMonitors = this.monitors.size;
         this.metrics.activeMonitors = activeMonitors.length;
     }
@@ -562,13 +618,17 @@ class MockMonitorServiceManager {
         // Update average response time (simplified)
         const recentChecks = this.checkHistory.slice(-100);
         if (recentChecks.length > 0) {
-            this.metrics.averageResponseTime = recentChecks.reduce(
-                (sum, check) => sum + check.responseTime, 0
-            ) / recentChecks.length;
+            this.metrics.averageResponseTime =
+                recentChecks.reduce(
+                    (sum, check) => sum + check.responseTime,
+                    0
+                ) / recentChecks.length;
         }
     }
 
-    private calculateConsecutiveSuccesses(checks: MonitorCheckResult[]): number {
+    private calculateConsecutiveSuccesses(
+        checks: MonitorCheckResult[]
+    ): number {
         let count = 0;
         for (let i = checks.length - 1; i >= 0; i--) {
             if (checks[i].success) {
@@ -588,7 +648,7 @@ class MockMonitorServiceManager {
     private calculateProcessingRate(): number {
         // Items processed per second
         const recentChecks = this.checkHistory.filter(
-            check => Date.now() - check.timestamp < 60_000 // Last minute
+            (check) => Date.now() - check.timestamp < 60_000 // Last minute
         );
         return recentChecks.length / 60; // Per second
     }
@@ -613,12 +673,18 @@ class MockMonitorServiceManager {
         this.operationCount = 0;
         this.metrics = {
             totalMonitors: this.monitors.size,
-            activeMonitors: Array.from(this.monitors.values()).filter(m => m.enabled).length,
+            activeMonitors: Array.from(this.monitors.values()).filter(
+                (m) => m.enabled
+            ).length,
             checksPerMinute: 0,
             averageResponseTime: 0,
             successRate: 0,
             resourceUtilization: { cpu: 0, memory: 0, networkConnections: 0 },
-            queueMetrics: { queueSize: 0, averageWaitTime: 0, processingRate: 0 }
+            queueMetrics: {
+                queueSize: 0,
+                averageWaitTime: 0,
+                processingRate: 0,
+            },
         };
     }
 }
@@ -626,7 +692,12 @@ class MockMonitorServiceManager {
 // Helper functions for generating test data
 function generateMonitors(count: number, siteCount: number = 10): Monitor[] {
     const monitors: Monitor[] = [];
-    const types = ["http", "dns", "port", "ping"] as const;
+    const types = [
+        "http",
+        "dns",
+        "port",
+        "ping",
+    ] as const;
 
     for (let i = 0; i < count; i++) {
         const siteId = `site-${(i % siteCount) + 1}`;
@@ -640,15 +711,29 @@ function generateMonitors(count: number, siteCount: number = 10): Monitor[] {
             url: type === "http" ? `https://example${i}.com` : undefined,
             host: type === "http" ? undefined : `host${i}.example.com`,
             port: type === "port" ? 80 + (i % 100) : undefined,
-            interval: [30_000, 60_000, 120_000, 300_000][Math.floor(Math.random() * 4)],
-            timeout: [3000, 5000, 10_000][Math.floor(Math.random() * 3)],
+            interval: [
+                30_000,
+                60_000,
+                120_000,
+                300_000,
+            ][Math.floor(Math.random() * 4)],
+            timeout: [
+                3000,
+                5000,
+                10_000,
+            ][Math.floor(Math.random() * 3)],
             retryAttempts: Math.floor(Math.random() * 3) + 1,
             enabled: Math.random() > 0.1, // 90% enabled
             status: "pending",
             metadata: {
-                priority: ["critical", "high", "normal", "low"][Math.floor(Math.random() * 4)],
-                tags: [`tag-${i % 5}`, type]
-            }
+                priority: [
+                    "critical",
+                    "high",
+                    "normal",
+                    "low",
+                ][Math.floor(Math.random() * 4)],
+                tags: [`tag-${i % 5}`, type],
+            },
         });
     }
 
@@ -664,331 +749,433 @@ describe("Monitor Service Management Benchmarks", () => {
     });
 
     describe("Monitor Registration and Management", () => {
-        bench("Register single monitor", async () => {
-            const monitor = generateMonitors(1)[0];
-            await monitorService.registerMonitor(monitor);
-        }, { iterations: 500 });
+        bench(
+            "Register single monitor",
+            async () => {
+                const monitor = generateMonitors(1)[0];
+                await monitorService.registerMonitor(monitor);
+            },
+            { iterations: 500 }
+        );
 
-        bench("Bulk register monitors - 50 monitors", async () => {
-            const monitors = generateMonitors(50);
-            await monitorService.bulkRegisterMonitors(monitors);
-        }, { iterations: 50 });
+        bench(
+            "Bulk register monitors - 50 monitors",
+            async () => {
+                const monitors = generateMonitors(50);
+                await monitorService.bulkRegisterMonitors(monitors);
+            },
+            { iterations: 50 }
+        );
 
-        bench("Bulk register monitors - 200 monitors", async () => {
-            const monitors = generateMonitors(200);
-            await monitorService.bulkRegisterMonitors(monitors);
-        }, { iterations: 10 });
+        bench(
+            "Bulk register monitors - 200 monitors",
+            async () => {
+                const monitors = generateMonitors(200);
+                await monitorService.bulkRegisterMonitors(monitors);
+            },
+            { iterations: 10 }
+        );
 
-        bench("Bulk register monitors - 1000 monitors", async () => {
-            const monitors = generateMonitors(1000);
-            await monitorService.bulkRegisterMonitors(monitors);
-        }, { iterations: 2 });
+        bench(
+            "Bulk register monitors - 1000 monitors",
+            async () => {
+                const monitors = generateMonitors(1000);
+                await monitorService.bulkRegisterMonitors(monitors);
+            },
+            { iterations: 2 }
+        );
     });
 
     describe("Monitor Check Operations", () => {
-        bench("Single monitor check", async () => {
-            const monitor = generateMonitors(1)[0];
-            await monitorService.registerMonitor(monitor);
-            await monitorService.performMonitorCheck(monitor.id);
-        }, { iterations: 200 });
+        bench(
+            "Single monitor check",
+            async () => {
+                const monitor = generateMonitors(1)[0];
+                await monitorService.registerMonitor(monitor);
+                await monitorService.performMonitorCheck(monitor.id);
+            },
+            { iterations: 200 }
+        );
 
-        bench("Concurrent checks - 10 monitors", async () => {
-            const monitors = generateMonitors(10);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Concurrent checks - 10 monitors",
+            async () => {
+                const monitors = generateMonitors(10);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            const monitorIds = monitors.map(m => m.id);
-            await monitorService.performConcurrentChecks(monitorIds, 5);
-        }, { iterations: 100 });
+                const monitorIds = monitors.map((m) => m.id);
+                await monitorService.performConcurrentChecks(monitorIds, 5);
+            },
+            { iterations: 100 }
+        );
 
-        bench("Concurrent checks - 50 monitors", async () => {
-            const monitors = generateMonitors(50);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Concurrent checks - 50 monitors",
+            async () => {
+                const monitors = generateMonitors(50);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            const monitorIds = monitors.map(m => m.id);
-            await monitorService.performConcurrentChecks(monitorIds, 10);
-        }, { iterations: 20 });
+                const monitorIds = monitors.map((m) => m.id);
+                await monitorService.performConcurrentChecks(monitorIds, 10);
+            },
+            { iterations: 20 }
+        );
 
-        bench("Concurrent checks - 200 monitors", async () => {
-            const monitors = generateMonitors(200);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Concurrent checks - 200 monitors",
+            async () => {
+                const monitors = generateMonitors(200);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            const monitorIds = monitors.map(m => m.id);
-            await monitorService.performConcurrentChecks(monitorIds, 25);
-        }, { iterations: 5 });
+                const monitorIds = monitors.map((m) => m.id);
+                await monitorService.performConcurrentChecks(monitorIds, 25);
+            },
+            { iterations: 5 }
+        );
     });
 
     describe("Queue Processing", () => {
-        bench("Process check queue - small load", async () => {
-            const monitors = generateMonitors(20);
-            await monitorService.bulkRegisterMonitors(monitors);
-            await monitorService.processCheckQueue();
-        }, { iterations: 100 });
-
-        bench("Process check queue - medium load", async () => {
-            const monitors = generateMonitors(100);
-            await monitorService.bulkRegisterMonitors(monitors);
-            await monitorService.processCheckQueue();
-        }, { iterations: 20 });
-
-        bench("Process check queue - high load", async () => {
-            const monitors = generateMonitors(500);
-            await monitorService.bulkRegisterMonitors(monitors);
-            await monitorService.processCheckQueue();
-        }, { iterations: 5 });
-
-        bench("Continuous queue processing", async () => {
-            const monitors = generateMonitors(100);
-            await monitorService.bulkRegisterMonitors(monitors);
-
-            // Process queue multiple times to simulate continuous operation
-            for (let i = 0; i < 5; i++) {
+        bench(
+            "Process check queue - small load",
+            async () => {
+                const monitors = generateMonitors(20);
+                await monitorService.bulkRegisterMonitors(monitors);
                 await monitorService.processCheckQueue();
-                await new Promise(resolve => setTimeout(resolve, 50));
-            }
-        }, { iterations: 20 });
+            },
+            { iterations: 100 }
+        );
+
+        bench(
+            "Process check queue - medium load",
+            async () => {
+                const monitors = generateMonitors(100);
+                await monitorService.bulkRegisterMonitors(monitors);
+                await monitorService.processCheckQueue();
+            },
+            { iterations: 20 }
+        );
+
+        bench(
+            "Process check queue - high load",
+            async () => {
+                const monitors = generateMonitors(500);
+                await monitorService.bulkRegisterMonitors(monitors);
+                await monitorService.processCheckQueue();
+            },
+            { iterations: 5 }
+        );
+
+        bench(
+            "Continuous queue processing",
+            async () => {
+                const monitors = generateMonitors(100);
+                await monitorService.bulkRegisterMonitors(monitors);
+
+                // Process queue multiple times to simulate continuous operation
+                for (let i = 0; i < 5; i++) {
+                    await monitorService.processCheckQueue();
+                    await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+            },
+            { iterations: 20 }
+        );
     });
 
     describe("Health Monitoring and Optimization", () => {
-        bench("Health check - basic system", async () => {
-            const monitors = generateMonitors(50);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Health check - basic system",
+            async () => {
+                const monitors = generateMonitors(50);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            // Perform some checks to generate history
-            await monitorService.processCheckQueue();
-
-            await monitorService.performHealthCheck();
-        }, { iterations: 50 });
-
-        bench("Health check - complex system", async () => {
-            const monitors = generateMonitors(300);
-            await monitorService.bulkRegisterMonitors(monitors);
-
-            // Generate check history
-            for (let i = 0; i < 3; i++) {
+                // Perform some checks to generate history
                 await monitorService.processCheckQueue();
-            }
 
-            await monitorService.performHealthCheck();
-        }, { iterations: 10 });
+                await monitorService.performHealthCheck();
+            },
+            { iterations: 50 }
+        );
 
-        bench("Schedule optimization", async () => {
-            const monitors = generateMonitors(100);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Health check - complex system",
+            async () => {
+                const monitors = generateMonitors(300);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            // Generate some check history for optimization
-            await monitorService.processCheckQueue();
-
-            await monitorService.optimizeMonitorSchedules();
-        }, { iterations: 30 });
-
-        bench("Bulk monitor updates", async () => {
-            const monitors = generateMonitors(200);
-            await monitorService.bulkRegisterMonitors(monitors);
-
-            // Create bulk updates
-            const updates = monitors.slice(0, 50).map(monitor => ({
-                monitorId: monitor.id,
-                changes: {
-                    interval: monitor.interval * 1.5,
-                    timeout: monitor.timeout + 1000,
-                    enabled: !monitor.enabled
+                // Generate check history
+                for (let i = 0; i < 3; i++) {
+                    await monitorService.processCheckQueue();
                 }
-            }));
 
-            await monitorService.bulkUpdateMonitors(updates);
-        }, { iterations: 20 });
+                await monitorService.performHealthCheck();
+            },
+            { iterations: 10 }
+        );
+
+        bench(
+            "Schedule optimization",
+            async () => {
+                const monitors = generateMonitors(100);
+                await monitorService.bulkRegisterMonitors(monitors);
+
+                // Generate some check history for optimization
+                await monitorService.processCheckQueue();
+
+                await monitorService.optimizeMonitorSchedules();
+            },
+            { iterations: 30 }
+        );
+
+        bench(
+            "Bulk monitor updates",
+            async () => {
+                const monitors = generateMonitors(200);
+                await monitorService.bulkRegisterMonitors(monitors);
+
+                // Create bulk updates
+                const updates = monitors.slice(0, 50).map((monitor) => ({
+                    monitorId: monitor.id,
+                    changes: {
+                        interval: monitor.interval * 1.5,
+                        timeout: monitor.timeout + 1000,
+                        enabled: !monitor.enabled,
+                    },
+                }));
+
+                await monitorService.bulkUpdateMonitors(updates);
+            },
+            { iterations: 20 }
+        );
     });
 
     describe("Stress Testing and Performance Limits", () => {
-        bench("Stress test - small scale", async () => {
-            await monitorService.performStressTest(
-                50,    // 50 monitors
-                30_000, // 30 second interval
-                5000   // 5 second duration
-            );
-        }, { iterations: 10 });
+        bench(
+            "Stress test - small scale",
+            async () => {
+                await monitorService.performStressTest(
+                    50, // 50 monitors
+                    30_000, // 30 second interval
+                    5000 // 5 second duration
+                );
+            },
+            { iterations: 10 }
+        );
 
-        bench("Stress test - medium scale", async () => {
-            await monitorService.performStressTest(
-                200,   // 200 monitors
-                60_000, // 1 minute interval
-                10_000  // 10 second duration
-            );
-        }, { iterations: 3 });
+        bench(
+            "Stress test - medium scale",
+            async () => {
+                await monitorService.performStressTest(
+                    200, // 200 monitors
+                    60_000, // 1 minute interval
+                    10_000 // 10 second duration
+                );
+            },
+            { iterations: 3 }
+        );
 
-        bench("Stress test - large scale", async () => {
-            await monitorService.performStressTest(
-                500,   // 500 monitors
-                120_000, // 2 minute interval
-                15_000   // 15 second duration
-            );
-        }, { iterations: 1 });
+        bench(
+            "Stress test - large scale",
+            async () => {
+                await monitorService.performStressTest(
+                    500, // 500 monitors
+                    120_000, // 2 minute interval
+                    15_000 // 15 second duration
+                );
+            },
+            { iterations: 1 }
+        );
 
-        bench("High-frequency monitoring", async () => {
-            const monitors = generateMonitors(100);
+        bench(
+            "High-frequency monitoring",
+            async () => {
+                const monitors = generateMonitors(100);
 
-            // Set very short intervals for high-frequency testing
-            monitors.forEach(monitor => {
-                monitor.interval = 5000; // 5 seconds
-                monitor.timeout = 2000;   // 2 seconds
-            });
+                // Set very short intervals for high-frequency testing
+                monitors.forEach((monitor) => {
+                    monitor.interval = 5000; // 5 seconds
+                    monitor.timeout = 2000; // 2 seconds
+                });
 
-            await monitorService.bulkRegisterMonitors(monitors);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            // Process multiple queue cycles
-            for (let i = 0; i < 10; i++) {
-                await monitorService.processCheckQueue();
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-        }, { iterations: 5 });
+                // Process multiple queue cycles
+                for (let i = 0; i < 10; i++) {
+                    await monitorService.processCheckQueue();
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                }
+            },
+            { iterations: 5 }
+        );
     });
 
     describe("Mixed Workload Scenarios", () => {
-        bench("Mixed monitor types and intervals", async () => {
-            const monitors = generateMonitors(150, 20);
+        bench(
+            "Mixed monitor types and intervals",
+            async () => {
+                const monitors = generateMonitors(150, 20);
 
-            // Vary intervals and types for realistic mixed workload
-            monitors.forEach((monitor, index) => {
-                switch (0) {
-                case index % 5: {
-                    monitor.type = "dns";
-                    monitor.interval = 30_000; // 30 seconds
+                // Vary intervals and types for realistic mixed workload
+                monitors.forEach((monitor, index) => {
+                    switch (0) {
+                        case index % 5: {
+                            monitor.type = "dns";
+                            monitor.interval = 30_000; // 30 seconds
 
-                break;
-                }
-                case index % 4: {
-                    monitor.type = "ping";
-                    monitor.interval = 60_000; // 1 minute
+                            break;
+                        }
+                        case index % 4: {
+                            monitor.type = "ping";
+                            monitor.interval = 60_000; // 1 minute
 
-                break;
-                }
-                case index % 3: {
-                    monitor.type = "port";
-                    monitor.interval = 120_000; // 2 minutes
+                            break;
+                        }
+                        case index % 3: {
+                            monitor.type = "port";
+                            monitor.interval = 120_000; // 2 minutes
 
-                break;
-                }
-                default: {
-                    monitor.type = Math.random() > 0.5 ? "http" : "dns";
-                    monitor.interval = 300_000; // 5 minutes
-                }
-                }
-            });
+                            break;
+                        }
+                        default: {
+                            monitor.type = Math.random() > 0.5 ? "http" : "dns";
+                            monitor.interval = 300_000; // 5 minutes
+                        }
+                    }
+                });
 
-            await monitorService.bulkRegisterMonitors(monitors);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            // Process queue and perform health check
-            await monitorService.processCheckQueue();
-            await monitorService.performHealthCheck();
-            await monitorService.optimizeMonitorSchedules();
-        }, { iterations: 10 });
-
-        bench("Production-like workload simulation", async () => {
-            // Simulate a production environment with mixed priorities
-            const criticalMonitors = generateMonitors(50, 10).map(m => ({
-                ...m,
-                interval: 30_000,  // 30 seconds
-                metadata: { ...m.metadata, priority: "critical" }
-            }));
-
-            const normalMonitors = generateMonitors(200, 50).map(m => ({
-                ...m,
-                interval: 300_000, // 5 minutes
-                metadata: { ...m.metadata, priority: "normal" }
-            }));
-
-            const lowPriorityMonitors = generateMonitors(100, 25).map(m => ({
-                ...m,
-                interval: 600_000, // 10 minutes
-                metadata: { ...m.metadata, priority: "low" }
-            }));
-
-            const allMonitors = [
-                ...criticalMonitors,
-                ...normalMonitors,
-                ...lowPriorityMonitors
-            ];
-
-            await monitorService.bulkRegisterMonitors(allMonitors);
-
-            // Simulate continuous operation
-            for (let cycle = 0; cycle < 5; cycle++) {
+                // Process queue and perform health check
                 await monitorService.processCheckQueue();
+                await monitorService.performHealthCheck();
+                await monitorService.optimizeMonitorSchedules();
+            },
+            { iterations: 10 }
+        );
 
-                if (cycle % 2 === 0) {
-                    await monitorService.performHealthCheck();
+        bench(
+            "Production-like workload simulation",
+            async () => {
+                // Simulate a production environment with mixed priorities
+                const criticalMonitors = generateMonitors(50, 10).map((m) => ({
+                    ...m,
+                    interval: 30_000, // 30 seconds
+                    metadata: { ...m.metadata, priority: "critical" },
+                }));
+
+                const normalMonitors = generateMonitors(200, 50).map((m) => ({
+                    ...m,
+                    interval: 300_000, // 5 minutes
+                    metadata: { ...m.metadata, priority: "normal" },
+                }));
+
+                const lowPriorityMonitors = generateMonitors(100, 25).map(
+                    (m) => ({
+                        ...m,
+                        interval: 600_000, // 10 minutes
+                        metadata: { ...m.metadata, priority: "low" },
+                    })
+                );
+
+                const allMonitors = [
+                    ...criticalMonitors,
+                    ...normalMonitors,
+                    ...lowPriorityMonitors,
+                ];
+
+                await monitorService.bulkRegisterMonitors(allMonitors);
+
+                // Simulate continuous operation
+                for (let cycle = 0; cycle < 5; cycle++) {
+                    await monitorService.processCheckQueue();
+
+                    if (cycle % 2 === 0) {
+                        await monitorService.performHealthCheck();
+                    }
+
+                    if (cycle === 3) {
+                        await monitorService.optimizeMonitorSchedules();
+                    }
+
+                    // Brief pause between cycles
+                    await new Promise((resolve) => setTimeout(resolve, 200));
                 }
+            },
+            { iterations: 3 }
+        );
 
-                if (cycle === 3) {
-                    await monitorService.optimizeMonitorSchedules();
-                }
+        bench(
+            "Resource utilization under load",
+            async () => {
+                const monitors = generateMonitors(300, 30);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-                // Brief pause between cycles
-                await new Promise(resolve => setTimeout(resolve, 200));
-            }
-        }, { iterations: 3 });
+                // Simulate high-load conditions
+                const operations = [
+                    () => monitorService.processCheckQueue(),
+                    () => monitorService.performHealthCheck(),
+                    () => monitorService.optimizeMonitorSchedules(),
+                    () => {
+                        const updates = monitors.slice(0, 10).map((m) => ({
+                            monitorId: m.id,
+                            changes: { interval: m.interval * 1.1 },
+                        }));
+                        return monitorService.bulkUpdateMonitors(updates);
+                    },
+                ];
 
-        bench("Resource utilization under load", async () => {
-            const monitors = generateMonitors(300, 30);
-            await monitorService.bulkRegisterMonitors(monitors);
+                // Execute operations concurrently
+                const operationPromises = Array.from({ length: 20 }, (_, i) => {
+                    const operation = operations[i % operations.length];
+                    return operation();
+                });
 
-            // Simulate high-load conditions
-            const operations = [
-                () => monitorService.processCheckQueue(),
-                () => monitorService.performHealthCheck(),
-                () => monitorService.optimizeMonitorSchedules(),
-                () => {
-                    const updates = monitors.slice(0, 10).map(m => ({
-                        monitorId: m.id,
-                        changes: { interval: m.interval * 1.1 }
-                    }));
-                    return monitorService.bulkUpdateMonitors(updates);
-                }
-            ];
-
-            // Execute operations concurrently
-            const operationPromises = Array.from({ length: 20 }, (_, i) => {
-                const operation = operations[i % operations.length];
-                return operation();
-            });
-
-            await Promise.all(operationPromises);
-        }, { iterations: 5 });
+                await Promise.all(operationPromises);
+            },
+            { iterations: 5 }
+        );
     });
 
     describe("Error Handling and Recovery", () => {
-        bench("Handle monitor check failures", async () => {
-            const monitors = generateMonitors(100);
+        bench(
+            "Handle monitor check failures",
+            async () => {
+                const monitors = generateMonitors(100);
 
-            // Simulate some monitors that will fail
-            monitors.forEach((monitor, index) => {
-                if (index % 10 === 0) {
-                    monitor.url = "https://nonexistent-domain-12345.com";
-                    monitor.timeout = 1000; // Short timeout to force failures
-                }
-            });
+                // Simulate some monitors that will fail
+                monitors.forEach((monitor, index) => {
+                    if (index % 10 === 0) {
+                        monitor.url = "https://nonexistent-domain-12345.com";
+                        monitor.timeout = 1000; // Short timeout to force failures
+                    }
+                });
 
-            await monitorService.bulkRegisterMonitors(monitors);
-            await monitorService.processCheckQueue();
+                await monitorService.bulkRegisterMonitors(monitors);
+                await monitorService.processCheckQueue();
 
-            // Check health after failures
-            await monitorService.performHealthCheck();
-        }, { iterations: 20 });
+                // Check health after failures
+                await monitorService.performHealthCheck();
+            },
+            { iterations: 20 }
+        );
 
-        bench("Recovery and optimization after failures", async () => {
-            const monitors = generateMonitors(150);
-            await monitorService.bulkRegisterMonitors(monitors);
+        bench(
+            "Recovery and optimization after failures",
+            async () => {
+                const monitors = generateMonitors(150);
+                await monitorService.bulkRegisterMonitors(monitors);
 
-            // Initial check to establish baseline
-            await monitorService.processCheckQueue();
+                // Initial check to establish baseline
+                await monitorService.processCheckQueue();
 
-            // Simulate system recovery cycle
-            await monitorService.performHealthCheck();
-            await monitorService.optimizeMonitorSchedules();
+                // Simulate system recovery cycle
+                await monitorService.performHealthCheck();
+                await monitorService.optimizeMonitorSchedules();
 
-            // Additional check cycle after optimization
-            await monitorService.processCheckQueue();
-            await monitorService.performHealthCheck();
-        }, { iterations: 10 });
+                // Additional check cycle after optimization
+                await monitorService.processCheckQueue();
+                await monitorService.performHealthCheck();
+            },
+            { iterations: 10 }
+        );
     });
 });

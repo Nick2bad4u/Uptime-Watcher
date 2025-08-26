@@ -95,7 +95,10 @@ describe("useSiteSync - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate(
+                "Component: useSiteSync.final-coverage",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -127,7 +130,10 @@ describe("useSiteSync - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate(
+                "Component: useSiteSync.final-coverage",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -181,7 +187,10 @@ describe("useSiteSync - Final 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate(
+                "Component: useSiteSync.final-coverage",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 

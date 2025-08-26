@@ -59,10 +59,7 @@ describe("Shared Validation Utils", () => {
             expect(isValidUrl("https://sub.domain.com/path")).toBe(true);
         });
 
-        it("should reject invalid URL formats", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid URL formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");
@@ -74,10 +71,7 @@ describe("Shared Validation Utils", () => {
             expect(isValidUrl(null)).toBe(false);
         });
 
-        it("should respect validation options", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect validation options", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");
@@ -108,10 +102,7 @@ describe("Shared Validation Utils", () => {
             expect(isValidFQDN("test-site.example.org")).toBe(true);
         });
 
-        it("should reject invalid FQDN formats", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid FQDN formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");
@@ -175,10 +166,7 @@ describe("Shared Validation Utils", () => {
     });
 
     describe("safeInteger", () => {
-        it("should parse valid integers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should parse valid integers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");
@@ -205,10 +193,7 @@ describe("Shared Validation Utils", () => {
             expect(safeInteger("12.34", 50)).toBe(50); // No decimals allowed
         });
 
-        it("should respect min/max bounds", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect min/max bounds", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");
@@ -219,10 +204,7 @@ describe("Shared Validation Utils", () => {
             expect(safeInteger("250", 0, 100, 200)).toBe(200); // Above max
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validationUtils", "component");
             await annotate("Category: Validation", "category");

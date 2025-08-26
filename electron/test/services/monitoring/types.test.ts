@@ -53,10 +53,7 @@ describe("Monitoring Types", () => {
             expect(result.error).toBe("Connection timeout");
         });
 
-        it("should allow minimal check result", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow minimal check result", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");
@@ -93,10 +90,7 @@ describe("Monitoring Types", () => {
             expect(config.userAgent).toBe("UptimeWatcher/1.0");
         });
 
-        it("should validate empty config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate empty config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");

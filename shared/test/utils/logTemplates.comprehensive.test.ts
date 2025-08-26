@@ -98,10 +98,7 @@ describe("Log Templates", () => {
             );
         });
 
-        it("should contain site manager logs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain site manager logs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -132,10 +129,7 @@ describe("Log Templates", () => {
     });
 
     describe("DEBUG_LOGS", () => {
-        it("should contain debug log templates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain debug log templates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -178,10 +172,7 @@ describe("Log Templates", () => {
     });
 
     describe("ERROR_LOGS", () => {
-        it("should contain error log templates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain error log templates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -286,10 +277,7 @@ describe("Log Templates", () => {
             expect(LOG_TEMPLATES.warnings).toBe(WARNING_LOGS);
         });
 
-        it("should be readonly and immutable", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be readonly and immutable", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -429,10 +417,7 @@ describe("Log Templates", () => {
     });
 
     describe("Service Log Specific Tests", () => {
-        it("should contain IPC service logs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain IPC service logs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -443,10 +428,7 @@ describe("Log Templates", () => {
             expect(ipcLogs.length).toBeGreaterThan(0);
         });
 
-        it("should contain orchestrator logs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain orchestrator logs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");
@@ -495,10 +477,7 @@ describe("Log Templates", () => {
             expect(templates.warnings).toBeDefined();
         });
 
-        it("should have readonly properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have readonly properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates", "component");
             await annotate("Category: Utility", "category");

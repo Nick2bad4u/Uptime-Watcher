@@ -16,16 +16,19 @@ import BaseFormField from "../../../components/AddSiteForm/BaseFormField";
 import type { AriaProperties } from "../../../components/AddSiteForm/BaseFormField";
 
 describe("BaseFormField - Additional Coverage", () => {
-    it("should handle undefined error and undefined helpText (lines 97-98 false branches)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle undefined error and undefined helpText (lines 97-98 false branches)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Testing the scenario where both error and helpText are undefined
         // This tests the false branches of both conditional spread operators
@@ -57,16 +60,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).not.toHaveAttribute("aria-describedby");
     });
 
-    it("should handle defined error with undefined helpText (line 97 true, line 98 false)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle defined error with undefined helpText (line 97 true, line 98 false)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Testing error !== undefined (true) && helpText === undefined (false)
         const childrenSpy = (ariaProps: AriaProperties) => (
@@ -97,16 +103,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).toHaveAttribute("aria-describedby", "test-field-error");
     });
 
-    it("should handle undefined error with defined helpText (line 97 false, line 98 true)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle undefined error with defined helpText (line 97 false, line 98 true)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Testing error === undefined (false) && helpText !== undefined (true)
         const childrenSpy = (ariaProps: AriaProperties) => (
@@ -137,16 +146,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).toHaveAttribute("aria-describedby", "test-field-help");
     });
 
-    it("should handle defined error with defined helpText (both lines 97-98 true)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle defined error with defined helpText (both lines 97-98 true)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Testing error !== undefined (true) && helpText !== undefined (true)
         // Error should take precedence for aria-describedby
@@ -178,16 +190,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).toHaveAttribute("aria-describedby", "test-field-error");
     });
 
-    it("should handle empty string error (line 97 true branch with falsy error)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle empty string error (line 97 true branch with falsy error)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Testing when error is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
         const childrenSpy = (ariaProps: AriaProperties) => (
@@ -218,16 +233,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).toHaveAttribute("aria-describedby", "test-field-help");
     });
 
-    it("should handle empty string helpText (line 98 true branch with falsy helpText)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle empty string helpText (line 98 true branch with falsy helpText)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Testing when helpText is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
         const childrenSpy = (ariaProps: AriaProperties) => (
@@ -258,16 +276,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(input).not.toHaveAttribute("aria-describedby");
     });
 
-    it("should properly spread conditional props to FormField", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should properly spread conditional props to FormField", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Testing that the conditional spread operators work correctly for FormField props
         const childrenSpy = (ariaProps: AriaProperties) => (
@@ -302,16 +323,19 @@ describe("BaseFormField - Additional Coverage", () => {
         expect(ariaProps["aria-describedby"]).toBe("test-field-error");
     });
 
-    it("should handle complex label text with special characters", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle complex label text with special characters", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: BaseFormField.additional-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: BaseFormField.additional-coverage", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Testing edge case with complex label text
         const childrenSpy = (ariaProps: AriaProperties) => (

@@ -70,7 +70,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -106,7 +109,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -134,7 +140,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -168,7 +177,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -198,7 +210,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -220,7 +235,10 @@ describe("Additional Uncovered Lines Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: additional-uncovered-lines", "component");
+            await annotate(
+                "Component: additional-uncovered-lines",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 

@@ -157,10 +157,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(sitesStore.fullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should integrate with useTheme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should integrate with useTheme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -223,10 +220,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(setShowButtonLoading).toHaveBeenCalledWith(false);
         });
 
-        it("should handle timeout cleanup", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout cleanup", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -247,10 +241,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Sync Success State", () => {
-        it("should handle sync success state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle sync success state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -420,10 +411,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Theme Handling", () => {
-        it("should handle theme names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle theme names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -447,10 +435,7 @@ describe("Settings Component Coverage Tests", () => {
             }
         });
 
-        it("should handle theme selection", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle theme selection", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -471,10 +456,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle error utilities", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle error utilities", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -496,10 +478,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(ensureError(actualError)).toBe(actualError);
         });
 
-        it("should handle error clearing", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle error clearing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -536,10 +515,7 @@ describe("Settings Component Coverage Tests", () => {
             return expect(handleBackup()).resolves.toBeUndefined();
         });
 
-        it("should handle full sync operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle full sync operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -555,10 +531,7 @@ describe("Settings Component Coverage Tests", () => {
             return expect(handleSync()).resolves.toBeUndefined();
         });
 
-        it("should handle settings reset", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle settings reset", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -572,10 +545,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("UI Constants", () => {
-        it("should use correct UI delays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use correct UI delays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -640,10 +610,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("App Settings Interface", () => {
-        it("should handle AppSettings type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle AppSettings type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -668,10 +635,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Logger Integration", () => {
-        it("should handle logger calls", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle logger calls", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -695,10 +659,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Component Features", () => {
-        it("should list all component features", async ({
-            task,
-            annotate,
-        }) => {
+        it("should list all component features", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -727,10 +688,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Themed Components", () => {
-        it("should use themed components", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use themed components", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -756,10 +714,7 @@ describe("Settings Component Coverage Tests", () => {
     });
 
     describe("Event Handling", () => {
-        it("should handle close event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle close event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");
@@ -773,10 +728,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(onClose).toHaveBeenCalled();
         });
 
-        it("should handle setting changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle setting changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Settings", "component");
             await annotate("Category: Component", "category");

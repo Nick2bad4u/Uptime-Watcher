@@ -48,14 +48,11 @@ describe("Debug Store Test", () => {
         vi.clearAllMocks();
     });
 
-    it("should debug the basic store behavior", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: debug-store", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should debug the basic store behavior", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: debug-store", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         console.log("Starting debug test");
         console.log("window.electronAPI:", globalThis.window?.electronAPI);

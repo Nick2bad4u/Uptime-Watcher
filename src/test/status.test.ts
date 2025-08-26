@@ -23,10 +23,7 @@ describe("Status Utils", () => {
             expect(getStatusIcon("unknown")).toBe("❓");
         });
 
-        it("handles case insensitive input", async ({
-            task,
-            annotate,
-        }) => {
+        it("handles case insensitive input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");
@@ -52,10 +49,7 @@ describe("Status Utils", () => {
             expect(getStatusIcon("random")).toBe("⚪");
         });
 
-        it("handles mixed case input", async ({
-            task,
-            annotate,
-        }) => {
+        it("handles mixed case input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");
@@ -83,10 +77,7 @@ describe("Status Utils", () => {
             expect(formatStatusWithIcon("unknown")).toBe("❓ Unknown");
         });
 
-        it("handles different input cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("handles different input cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");
@@ -97,10 +88,7 @@ describe("Status Utils", () => {
             expect(formatStatusWithIcon("PENDING")).toBe("⏳ Pending");
         });
 
-        it("formats unknown statuses correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("formats unknown statuses correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");
@@ -126,10 +114,7 @@ describe("Status Utils", () => {
             expect(formatStatusWithIcon("rAnDoM")).toBe("⚪ Random");
         });
 
-        it("handles single character input", async ({
-            task,
-            annotate,
-        }) => {
+        it("handles single character input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");
@@ -139,10 +124,7 @@ describe("Status Utils", () => {
             expect(formatStatusWithIcon("d")).toBe("⚪ D");
         });
 
-        it("preserves longer status strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("preserves longer status strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
             await annotate("Category: Core", "category");

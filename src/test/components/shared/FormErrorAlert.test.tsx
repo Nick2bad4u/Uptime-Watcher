@@ -66,7 +66,10 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Rendering", () => {
-        it("should render error message when error is provided", ({ task, annotate }) => {
+        it("should render error message when error is provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -92,7 +95,10 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should render close button with correct symbol", ({ task, annotate }) => {
+        it("should render close button with correct symbol", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -111,7 +117,10 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should render ThemedBox with correct variant", ({ task, annotate }) => {
+        it("should render ThemedBox with correct variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -169,7 +178,10 @@ describe("FormErrorAlert", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should not render when error is empty string", ({ task, annotate }) => {
+        it("should not render when error is empty string", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -191,7 +203,10 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Theme Support", () => {
-        it("should apply light theme classes by default", ({ task, annotate }) => {
+        it("should apply light theme classes by default", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -213,7 +228,10 @@ describe("FormErrorAlert", () => {
             expect(closeButton).not.toHaveClass("dark");
         });
 
-        it("should apply dark theme classes when isDark is true", ({ task, annotate }) => {
+        it("should apply dark theme classes when isDark is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -233,7 +251,10 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toHaveClass("error-alert__close", "dark");
         });
 
-        it("should apply light theme classes when isDark is false", ({ task, annotate }) => {
+        it("should apply light theme classes when isDark is false", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -278,7 +299,10 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should apply custom className with dark theme", ({ task, annotate }) => {
+        it("should apply custom className with dark theme", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -381,7 +405,10 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with special characters", ({ task, annotate }) => {
+        it("should handle error messages with special characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -401,7 +428,10 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with HTML entities", ({ task, annotate }) => {
+        it("should handle error messages with HTML entities", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -420,7 +450,10 @@ describe("FormErrorAlert", () => {
             );
         });
 
-        it("should handle error messages with unicode characters", ({ task, annotate }) => {
+        it("should handle error messages with unicode characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -463,7 +496,10 @@ describe("FormErrorAlert", () => {
     });
 
     describe("User Interactions", () => {
-        it("should call onClearError when close button is clicked", async ({ task, annotate }) => {
+        it("should call onClearError when close button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -491,7 +527,10 @@ describe("FormErrorAlert", () => {
             // The mock receives event argument, so don't check exact args
         });
 
-        it("should call onClearError multiple times on multiple clicks", async ({ task, annotate }) => {
+        it("should call onClearError multiple times on multiple clicks", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -548,7 +587,10 @@ describe("FormErrorAlert", () => {
             expect(mockOnClearError).toHaveBeenCalledTimes(1);
         });
 
-        it("should support space key activation", async ({ task, annotate }) => {
+        it("should support space key activation", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -612,7 +654,10 @@ describe("FormErrorAlert", () => {
             expect(screen.queryByTestId("themed-box")).not.toBeInTheDocument();
         });
 
-        it("should handle theme changes during error display", ({ task, annotate }) => {
+        it("should handle theme changes during error display", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -720,7 +765,10 @@ describe("FormErrorAlert", () => {
             expect(closeButton).toBeInTheDocument();
         });
 
-        it("should allow close button to be focusable", ({ task, annotate }) => {
+        it("should allow close button to be focusable", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");
@@ -778,7 +826,10 @@ describe("FormErrorAlert", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with all props combinations", async ({ task, annotate }) => {
+        it("should work with all props combinations", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormErrorAlert", "component");
             annotate("Category: Component", "category");

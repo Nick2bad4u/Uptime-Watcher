@@ -9,10 +9,7 @@ describe("StandardizedCache", () => {
     });
 
     describe("basic operations", () => {
-        it("should start empty", async ({
-            task,
-            annotate,
-        }) => {
+        it("should start empty", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -21,10 +18,7 @@ describe("StandardizedCache", () => {
             expect(cache.size).toBe(0);
         });
 
-        it("should set and get values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set and get values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -47,10 +41,7 @@ describe("StandardizedCache", () => {
             expect(cache.get("nonexistent")).toBeUndefined();
         });
 
-        it("should check if keys exist", async ({
-            task,
-            annotate,
-        }) => {
+        it("should check if keys exist", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -61,10 +52,7 @@ describe("StandardizedCache", () => {
             expect(cache.has("nonexistent")).toBe(false);
         });
 
-        it("should delete keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delete keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -76,10 +64,7 @@ describe("StandardizedCache", () => {
             expect(cache.delete("nonexistent")).toBe(false);
         });
 
-        it("should clear all entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear all entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -117,10 +102,7 @@ describe("StandardizedCache", () => {
             expect(limitedCache.has("key1")).toBe(false); // Oldest should be evicted
         });
 
-        it("should handle TTL expiration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle TTL expiration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -140,10 +122,7 @@ describe("StandardizedCache", () => {
     });
 
     describe("statistics", () => {
-        it("should track cache statistics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should track cache statistics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -159,10 +138,7 @@ describe("StandardizedCache", () => {
             expect(stats.hitRatio).toBe(0.5);
         });
 
-        it("should reset statistics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reset statistics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -180,10 +156,7 @@ describe("StandardizedCache", () => {
     });
 
     describe("invalidation", () => {
-        it("should invalidate specific entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should invalidate specific entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -198,10 +171,7 @@ describe("StandardizedCache", () => {
             expect(cache.has("key2")).toBe(true);
         });
 
-        it("should invalidate all entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should invalidate all entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -216,10 +186,7 @@ describe("StandardizedCache", () => {
     });
 
     describe("bulk operations", () => {
-        it("should support bulk updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support bulk updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");

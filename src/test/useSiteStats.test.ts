@@ -302,10 +302,7 @@ describe("useSiteStats", () => {
             expect(result.current.averageResponseTime).toBe(0);
         });
 
-        it("should round average response time", async ({
-            task,
-            annotate,
-        }) => {
+        it("should round average response time", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteStats", "component");
             await annotate("Category: Core", "category");
@@ -400,10 +397,7 @@ describe("useSiteStats", () => {
     });
 
     describe("Check Count", () => {
-        it("should count all history records", async ({
-            task,
-            annotate,
-        }) => {
+        it("should count all history records", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteStats", "component");
             await annotate("Category: Core", "category");
@@ -442,10 +436,7 @@ describe("useSiteStats", () => {
             expect(result.current.checkCount).toBe(5);
         });
 
-        it("should handle single record", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle single record", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteStats", "component");
             await annotate("Category: Core", "category");
@@ -553,10 +544,7 @@ describe("useSiteStats", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle very large numbers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large numbers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteStats", "component");
             await annotate("Category: Core", "category");

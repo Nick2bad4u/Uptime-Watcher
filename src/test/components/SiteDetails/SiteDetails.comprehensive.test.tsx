@@ -365,7 +365,10 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should render default overview tab content", ({ task, annotate }) => {
+        it("should render default overview tab content", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -385,7 +388,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Tab Navigation", () => {
-        it("should switch to history tab when selected", ({ task, annotate }) => {
+        it("should switch to history tab when selected", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -411,7 +417,10 @@ describe("SiteDetails", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should switch to analytics tab when selected", ({ task, annotate }) => {
+        it("should switch to analytics tab when selected", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -437,7 +446,10 @@ describe("SiteDetails", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should switch to settings tab when selected", ({ task, annotate }) => {
+        it("should switch to settings tab when selected", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -487,7 +499,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Header Actions", () => {
-        it("should render header with site information", ({ task, annotate }) => {
+        it("should render header with site information", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -523,7 +538,10 @@ describe("SiteDetails", () => {
             expect(screen.getByText("Monitor: monitor-1")).toBeInTheDocument();
         });
 
-        it("should handle different site data in header", ({ task, annotate }) => {
+        it("should handle different site data in header", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -558,7 +576,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Loading States", () => {
-        it("should render loading state when isLoading is true", ({ task, annotate }) => {
+        it("should render loading state when isLoading is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -583,7 +604,10 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render content when loading is complete", ({ task, annotate }) => {
+        it("should render content when loading is complete", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -609,7 +633,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Error Handling", () => {
-        it("should render normal content even when error exists in hook", ({ task, annotate }) => {
+        it("should render normal content even when error exists in hook", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -639,7 +666,10 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle missing error boundary gracefully", ({ task, annotate }) => {
+        it("should handle missing error boundary gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -667,7 +697,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Site Data Handling", () => {
-        it("should handle missing site data gracefully", ({ task, annotate }) => {
+        it("should handle missing site data gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -758,7 +791,10 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should handle special characters in site data", ({ task, annotate }) => {
+        it("should handle special characters in site data", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -782,7 +818,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Component Lifecycle", () => {
-        it("should call refresh when component mounts", ({ task, annotate }) => {
+        it("should call refresh when component mounts", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -799,7 +838,10 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should handle component updates correctly", async ({ task, annotate }) => {
+        it("should handle component updates correctly", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");
@@ -838,7 +880,10 @@ describe("SiteDetails", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper accessibility structure", ({ task, annotate }) => {
+        it("should have proper accessibility structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteDetails", "component");
             annotate("Category: Component", "category");

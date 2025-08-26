@@ -217,7 +217,10 @@ describe("HistoryTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render history tab with all main sections", ({ task, annotate }) => {
+        it("should render history tab with all main sections", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -237,7 +240,10 @@ describe("HistoryTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display filter buttons for all, up, and down", ({ task, annotate }) => {
+        it("should display filter buttons for all, up, and down", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -254,7 +260,10 @@ describe("HistoryTab", () => {
             expect(buttons).toHaveLength(3); // All, Up, Down filter buttons
         });
 
-        it("should display history records when available", ({ task, annotate }) => {
+        it("should display history records when available", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -274,7 +283,10 @@ describe("HistoryTab", () => {
             ).toHaveLength(3);
         });
 
-        it("should display empty state when no history available", ({ task, annotate }) => {
+        it("should display empty state when no history available", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -380,7 +392,10 @@ describe("HistoryTab", () => {
             ).toHaveLength(10);
         });
 
-        it("should show all available records when history is less than limit", ({ task, annotate }) => {
+        it("should show all available records when history is less than limit", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -407,7 +422,10 @@ describe("HistoryTab", () => {
             ).toHaveLength(5);
         });
 
-        it("should handle display limit dropdown changes", async ({ task, annotate }) => {
+        it("should handle display limit dropdown changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -435,7 +453,10 @@ describe("HistoryTab", () => {
     });
 
     describe("Data Formatting", () => {
-        it("should call formatting functions with correct parameters", ({ task, annotate }) => {
+        it("should call formatting functions with correct parameters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -497,7 +518,10 @@ describe("HistoryTab", () => {
             expect(mockFormatResponseTime).toHaveBeenCalledWith(250);
         });
 
-        it("should display formatted status with icons", ({ task, annotate }) => {
+        it("should display formatted status with icons", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -648,7 +672,10 @@ describe("HistoryTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with undefined history", ({ task, annotate }) => {
+        it("should handle monitor with undefined history", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -686,7 +713,10 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle missing settings gracefully", ({ task, annotate }) => {
+        it("should handle missing settings gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -713,7 +743,10 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle history records with missing fields", ({ task, annotate }) => {
+        it("should handle history records with missing fields", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -740,7 +773,10 @@ describe("HistoryTab", () => {
     });
 
     describe("User Interactions", () => {
-        it("should update filter state when filter buttons are clicked", async ({ task, annotate }) => {
+        it("should update filter state when filter buttons are clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");
@@ -816,7 +852,10 @@ describe("HistoryTab", () => {
             }
         });
 
-        it("should provide accessible select dropdown", ({ task, annotate }) => {
+        it("should provide accessible select dropdown", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: HistoryTab", "component");
             annotate("Category: Component", "category");

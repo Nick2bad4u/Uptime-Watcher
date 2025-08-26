@@ -35,13 +35,13 @@ function createTestSite(
 
 describe("calculateSiteMonitoringStatus", () => {
     it("should return 'stopped' for sites with no monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([]);
         const result = calculateSiteMonitoringStatus(site);
@@ -49,13 +49,13 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 
     it("should return 'stopped' when all monitors are not monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: false, status: "up" },
@@ -67,13 +67,13 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 
     it("should return 'running' when all monitors are monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -85,13 +85,13 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 
     it("should return 'partial' when some monitors are monitoring and some are not", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -103,13 +103,13 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 
     it("should return 'running' for single monitoring monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([{ monitoring: true, status: "up" }]);
         const result = calculateSiteMonitoringStatus(site);
@@ -117,13 +117,13 @@ describe("calculateSiteMonitoringStatus", () => {
     });
 
     it("should return 'stopped' for single non-monitoring monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([{ monitoring: false, status: "up" }]);
         const result = calculateSiteMonitoringStatus(site);
@@ -133,13 +133,13 @@ describe("calculateSiteMonitoringStatus", () => {
 
 describe("calculateSiteStatus", () => {
     it("should return 'unknown' for sites with no monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([]);
         const result = calculateSiteStatus(site);
@@ -147,13 +147,13 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return the status when all monitors have the same status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
             "up",
@@ -174,13 +174,13 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return 'mixed' when monitors have different statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -191,13 +191,13 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return 'mixed' for multiple different statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -210,13 +210,13 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should return single status for single monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
             "up",
@@ -233,13 +233,13 @@ describe("calculateSiteStatus", () => {
     });
 
     it("should handle mixed status with valid monitor statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -252,13 +252,13 @@ describe("calculateSiteStatus", () => {
 
 describe("getSiteDisplayStatus", () => {
     it("should return 'unknown' for sites with no monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([]);
         const result = getSiteDisplayStatus(site);
@@ -266,13 +266,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should return 'paused' when no monitors are monitoring (stopped)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: false, status: "up" },
@@ -283,13 +283,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should return 'mixed' when monitoring is partial", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -300,13 +300,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should return operational status when all monitors are running", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const testCases: MonitorStatus[] = [
             "up",
@@ -325,13 +325,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should return 'mixed' operational status when all monitors are running but have different statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -342,13 +342,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should prioritize 'paused' over operational status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const site = createTestSite([{ monitoring: false, status: "up" }]);
         const result = getSiteDisplayStatus(site);
@@ -356,13 +356,13 @@ describe("getSiteDisplayStatus", () => {
     });
 
     it("should prioritize 'mixed' over operational status for partial monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -375,27 +375,24 @@ describe("getSiteDisplayStatus", () => {
 
 describe("getSiteStatusDescription", () => {
     it("should describe unknown status for no monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([]);
         const result = getSiteStatusDescription(site);
         expect(result).toBe("No monitors configured");
     });
 
-    it("should describe down status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should describe down status correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "down" },
@@ -406,13 +403,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe single monitor down status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([{ monitoring: true, status: "down" }]);
         const result = getSiteStatusDescription(site);
@@ -420,13 +417,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe mixed status with monitoring count", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -438,13 +435,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe paused status with monitoring count", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: false, status: "up" },
@@ -455,13 +452,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe pending status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "pending" },
@@ -472,14 +469,11 @@ describe("getSiteStatusDescription", () => {
         expect(result).toBe("All 3 monitors are pending");
     });
 
-    it("should describe up status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should describe up status correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },
@@ -490,13 +484,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should handle unexpected status values using fallback", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // This tests the getSiteDisplayStatus function's ability to handle edge cases
         // The function will calculate status based on monitor states
@@ -506,13 +500,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe single monitor up status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([{ monitoring: true, status: "up" }]);
         const result = getSiteStatusDescription(site);
@@ -520,13 +514,13 @@ describe("getSiteStatusDescription", () => {
     });
 
     it("should describe single monitor pending status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([{ monitoring: true, status: "pending" }]);
         const result = getSiteStatusDescription(site);
@@ -536,91 +530,91 @@ describe("getSiteStatusDescription", () => {
 
 describe("getSiteStatusVariant", () => {
     it("should return 'error' for 'down' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Error Handling", "type");
 
         const result = getSiteStatusVariant("down");
         expect(result).toBe("error");
     });
 
     it("should return 'warning' for 'mixed' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const result = getSiteStatusVariant("mixed");
         expect(result).toBe("warning");
     });
 
     it("should return 'warning' for 'paused' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const result = getSiteStatusVariant("paused");
         expect(result).toBe("warning");
     });
 
     it("should return 'info' for 'pending' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const result = getSiteStatusVariant("pending");
         expect(result).toBe("info");
     });
 
     it("should return 'error' for 'unknown' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Error Handling", "type");
 
         const result = getSiteStatusVariant("unknown");
         expect(result).toBe("error");
     });
 
     it("should return 'success' for 'up' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         const result = getSiteStatusVariant("up");
         expect(result).toBe("success");
     });
 
     it("should return 'error' for unexpected status values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Error Handling", "type");
 
         // Test the default case - create an invalid status
         const result = getSiteStatusVariant("invalid-status" as SiteStatus);
@@ -630,13 +624,13 @@ describe("getSiteStatusVariant", () => {
 
 describe("Edge Cases and Complex Scenarios", () => {
     it("should handle sites with large numbers of monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const monitors = Array.from({ length: 100 }, (_, i) => {
             let status: MonitorStatus;
@@ -665,13 +659,13 @@ describe("Edge Cases and Complex Scenarios", () => {
     });
 
     it("should handle all monitors with same non-'up' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const statuses: MonitorStatus[] = [
             "down",
@@ -691,13 +685,13 @@ describe("Edge Cases and Complex Scenarios", () => {
     });
 
     it("should handle monitoring status priority over operational status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         // All monitors up but none monitoring
         const site = createTestSite([
@@ -713,13 +707,13 @@ describe("Edge Cases and Complex Scenarios", () => {
     });
 
     it("should handle complex mixed monitoring and status scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Monitoring", "type");
 
         const site = createTestSite([
             { monitoring: true, status: "up" },

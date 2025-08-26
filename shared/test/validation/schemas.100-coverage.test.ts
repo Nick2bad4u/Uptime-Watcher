@@ -11,7 +11,10 @@ import {
 
 describe("Schemas - 100% Coverage Tests", () => {
     describe("Targeting Lines 399,482", () => {
-        test("should handle field validation error at line 399", ({ task, annotate }) => {
+        test("should handle field validation error at line 399", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas.100-coverage", "component");
             annotate("Category: Validation", "category");
@@ -30,7 +33,10 @@ describe("Schemas - 100% Coverage Tests", () => {
             }).toThrow("Unknown field: unknownField");
         });
 
-        test("should handle validation error categorization at line 482", ({ task, annotate }) => {
+        test("should handle validation error categorization at line 482", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas.100-coverage", "component");
             annotate("Category: Validation", "category");
@@ -55,7 +61,10 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        test("should trigger optional field warning classification", ({ task, annotate }) => {
+        test("should trigger optional field warning classification", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas.100-coverage", "component");
             annotate("Category: Validation", "category");
@@ -84,7 +93,10 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect("success" in result).toBe(true);
         });
 
-        test("should handle complex validation scenarios", ({ task, annotate }) => {
+        test("should handle complex validation scenarios", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas.100-coverage", "component");
             annotate("Category: Validation", "category");

@@ -55,7 +55,10 @@ describe("SaveButton", () => {
     });
 
     describe("Rendering", () => {
-        it("should render save button with default props", ({ task, annotate }) => {
+        it("should render save button with default props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -173,7 +176,10 @@ describe("SaveButton", () => {
     });
 
     describe("Disabled State", () => {
-        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+        it("should be disabled when disabled prop is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -191,7 +197,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should be disabled when isLoading is true", ({ task, annotate }) => {
+        it("should be disabled when isLoading is true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -209,7 +218,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("data-variant", "primary"); // isLoading doesn't change variant
         });
 
-        it("should be disabled when both disabled and isLoading are true", ({ task, annotate }) => {
+        it("should be disabled when both disabled and isLoading are true", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -233,7 +245,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should not be disabled when both disabled and isLoading are false", ({ task, annotate }) => {
+        it("should not be disabled when both disabled and isLoading are false", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -277,7 +292,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("data-variant", "primary");
         });
 
-        it("should show secondary variant when disabled but not loading", ({ task, annotate }) => {
+        it("should show secondary variant when disabled but not loading", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -301,7 +319,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("data-variant", "secondary");
         });
 
-        it("should show secondary variant when both disabled and loading", ({ task, annotate }) => {
+        it("should show secondary variant when both disabled and loading", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -349,7 +370,10 @@ describe("SaveButton", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should not call onClick when disabled", async ({ task, annotate }) => {
+        it("should not call onClick when disabled", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -377,7 +401,10 @@ describe("SaveButton", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should not call onClick when loading", async ({ task, annotate }) => {
+        it("should not call onClick when loading", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -405,7 +432,10 @@ describe("SaveButton", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should call onClick multiple times on multiple clicks", async ({ task, annotate }) => {
+        it("should call onClick multiple times on multiple clicks", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -452,7 +482,10 @@ describe("SaveButton", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should support space key activation", async ({ task, annotate }) => {
+        it("should support space key activation", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -477,7 +510,10 @@ describe("SaveButton", () => {
     });
 
     describe("Props Spreading", () => {
-        it("should spread additional props to ThemedButton", ({ task, annotate }) => {
+        it("should spread additional props to ThemedButton", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -569,7 +605,10 @@ describe("SaveButton", () => {
             );
         });
 
-        it("should use secondary variant when disabled", ({ task, annotate }) => {
+        it("should use secondary variant when disabled", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -588,7 +627,10 @@ describe("SaveButton", () => {
             );
         });
 
-        it("should prioritize disabled prop over loading for variant", ({ task, annotate }) => {
+        it("should prioritize disabled prop over loading for variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -613,7 +655,10 @@ describe("SaveButton", () => {
             );
         });
 
-        it("should use primary variant when only loading", ({ task, annotate }) => {
+        it("should use primary variant when only loading", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -699,7 +744,10 @@ describe("SaveButton", () => {
             expect(button).toHaveFocus();
         });
 
-        it("should maintain accessibility when disabled", ({ task, annotate }) => {
+        it("should maintain accessibility when disabled", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -768,7 +816,10 @@ describe("SaveButton", () => {
             expect(screen.getByTestId("themed-button")).not.toBeDisabled();
         });
 
-        it("should handle onClick function changes", async ({ task, annotate }) => {
+        it("should handle onClick function changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -839,7 +890,10 @@ describe("SaveButton", () => {
             expect(button).toHaveAttribute("class", "");
         });
 
-        it("should handle undefined aria-label gracefully", ({ task, annotate }) => {
+        it("should handle undefined aria-label gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");
@@ -860,7 +914,10 @@ describe("SaveButton", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with all props combinations", async ({ task, annotate }) => {
+        it("should work with all props combinations", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SaveButton", "component");
             annotate("Category: Component", "category");

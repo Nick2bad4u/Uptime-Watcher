@@ -27,13 +27,13 @@ describe("Error Handling Utilities", () => {
     describe("ensureError", () => {
         describe("Error instance handling", () => {
             it("should return the same Error object when input is already an Error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const originalError = new Error("Test error message");
                 const result = ensureError(originalError);
@@ -44,13 +44,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle Error subclasses correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const customTypeError = new TypeError("Type error message");
                 const result = ensureError(customTypeError);
@@ -62,13 +62,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle custom Error classes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 class CustomError extends Error {
                     constructor(message: string) {
@@ -90,13 +90,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Non-error value conversion", () => {
             it("should convert string to Error object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const errorString = "Something went wrong";
                 const result = ensureError(errorString);
@@ -107,13 +107,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should convert number to Error object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const errorNumber = 404;
                 const result = ensureError(errorNumber);
@@ -123,13 +123,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should convert object to Error object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const errorObject = {
                     status: 500,
@@ -142,13 +142,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should convert array to Error object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const errorArray = ["error1", "error2"];
                 const result = ensureError(errorArray);
@@ -157,14 +157,11 @@ describe("Error Handling Utilities", () => {
                 expect(result.message).toBe("error1,error2");
             });
 
-            it("should handle null value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle null value", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = ensureError(null);
 
@@ -172,14 +169,11 @@ describe("Error Handling Utilities", () => {
                 expect(result.message).toBe("null");
             });
 
-            it("should handle undefined value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle undefined value", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = ensureError(undefined);
 
@@ -187,14 +181,11 @@ describe("Error Handling Utilities", () => {
                 expect(result.message).toBe("undefined");
             });
 
-            it("should handle boolean values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle boolean values", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const resultTrue = ensureError(true);
                 const resultFalse = ensureError(false);
@@ -206,14 +197,11 @@ describe("Error Handling Utilities", () => {
                 expect(resultFalse.message).toBe("false");
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = ensureError("");
 
@@ -221,14 +209,11 @@ describe("Error Handling Utilities", () => {
                 expect(result.message).toBe("");
             });
 
-            it("should handle symbols", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle symbols", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const symbolValue = Symbol("test");
                 const result = ensureError(symbolValue);
@@ -242,13 +227,13 @@ describe("Error Handling Utilities", () => {
     describe("withUtilityErrorHandling", () => {
         describe("Successful operations", () => {
             it("should return the operation result when operation succeeds", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue("success result");
 
@@ -262,13 +247,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should return complex object results", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const complexResult = {
                     data: [
@@ -290,13 +275,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle operations returning null", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue(null);
 
@@ -309,13 +294,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle operations returning undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue(undefined);
 
@@ -330,13 +315,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Error handling with shouldThrow=true", () => {
             it("should throw the wrapped error when shouldThrow is true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const originalError = new Error("Original error");
                 const operation = vi.fn().mockRejectedValue(originalError);
@@ -354,13 +339,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should log error before throwing when shouldThrow is true", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const logger = await import("../../services/logger");
                 const originalError = new Error("Test error");
@@ -382,13 +367,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should wrap non-Error objects before throwing", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const operation = vi.fn().mockRejectedValue("string error");
 
@@ -405,13 +390,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Error handling with shouldThrow=false and fallback values", () => {
             it("should return fallback value when operation fails and shouldThrow is false", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const originalError = new Error("Operation failed");
                 const operation = vi.fn().mockRejectedValue(originalError);
@@ -429,13 +414,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should log error before returning fallback value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const logger = await import("../../services/logger");
                 const originalError = new Error("Test error");
@@ -456,13 +441,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle null as a valid fallback value", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -479,13 +464,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle primitive fallback values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -522,13 +507,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Error handling without fallback values", () => {
             it("should throw error when shouldThrow=false but no fallback value provided", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const originalError = new Error("Operation failed");
                 const operation = vi.fn().mockRejectedValue(originalError);
@@ -546,13 +531,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should throw error when fallback is explicitly undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const operation = vi
                     .fn()
@@ -571,13 +556,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should log original error before throwing fallback error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const logger = await import("../../services/logger");
                 const originalError = new Error("Original error");
@@ -603,13 +588,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Default parameter behavior", () => {
             it("should default shouldThrow to false", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockRejectedValue(new Error("Test"));
 
@@ -623,13 +608,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle operations without optional parameters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockRejectedValue(new Error("Test"));
 
@@ -643,13 +628,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Real-world scenarios", () => {
             it("should handle async operations that take time", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockImplementation(async () => {
                     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -669,13 +654,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle network-like errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const networkError = new Error("Network timeout");
                 (networkError as any).code = "ECONNRESET";
@@ -694,13 +679,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle JSON parsing errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const parseError = new SyntaxError("Unexpected token in JSON");
                 const operation = vi.fn().mockRejectedValue(parseError);
@@ -718,13 +703,13 @@ describe("Error Handling Utilities", () => {
 
         describe("Edge cases", () => {
             it("should handle operations that throw non-Error objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const operation = vi.fn().mockImplementation(async () => {
                     throw "String error";
@@ -740,13 +725,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle operations that throw objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockImplementation(async () => {
                     throw { message: "Object error", code: 500 };
@@ -762,13 +747,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle very long operation names", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const longName = "a".repeat(1000);
                 const operation = vi.fn().mockRejectedValue(new Error("Test"));
@@ -786,13 +771,13 @@ describe("Error Handling Utilities", () => {
             });
 
             it("should handle empty operation name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorHandling", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockRejectedValue(new Error("Test"));
 

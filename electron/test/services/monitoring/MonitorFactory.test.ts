@@ -23,10 +23,7 @@ describe("MonitorFactory - Fixed", () => {
     });
 
     describe("getMonitor", () => {
-        it("should get a ping monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get a ping monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
@@ -37,10 +34,7 @@ describe("MonitorFactory - Fixed", () => {
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should get an http monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get an http monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
@@ -51,10 +45,7 @@ describe("MonitorFactory - Fixed", () => {
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should get a port monitor", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get a port monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
@@ -65,10 +56,7 @@ describe("MonitorFactory - Fixed", () => {
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should handle invalid monitor type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle invalid monitor type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
@@ -111,10 +99,7 @@ describe("MonitorFactory - Fixed", () => {
     });
 
     describe("clearCache", () => {
-        it("should clear monitor cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear monitor cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");

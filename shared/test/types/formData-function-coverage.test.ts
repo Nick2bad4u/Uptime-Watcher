@@ -17,7 +17,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -33,36 +36,36 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isHttpFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isHttpFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isHttpFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for wrong type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for wrong type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -83,7 +86,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -97,48 +103,48 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPingFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPingFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPingFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for non-object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPingFormData("string" as any)).toBe(false);
         });
 
-        it("should return false for wrong type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for wrong type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -157,7 +163,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -175,7 +184,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -194,7 +206,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -213,7 +228,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -232,7 +250,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -253,7 +274,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -268,48 +292,48 @@ describe("FormData Types - Complete Function Coverage", () => {
             expect(isPortFormData(validData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPortFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPortFormData(undefined as any)).toBe(false);
         });
 
-        it("should return false for non-object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isPortFormData("string" as any)).toBe(false);
         });
 
-        it("should return false for wrong type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for wrong type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -329,7 +353,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -348,7 +375,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -368,7 +398,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -387,7 +420,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -407,7 +443,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -427,7 +466,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -447,7 +489,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -469,7 +514,10 @@ describe("FormData Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData-function-coverage", "component");
+            await annotate(
+                "Component: formData-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

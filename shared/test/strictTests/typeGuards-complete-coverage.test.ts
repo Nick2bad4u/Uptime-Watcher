@@ -32,7 +32,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -41,24 +44,24 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isObject({ nested: { prop: "value" } })).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isObject(null)).toBe(false);
         });
 
-        it("should return false for arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -72,12 +75,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             ).toBe(false);
         });
 
-        it("should return false for primitives", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for primitives", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -95,7 +98,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -107,7 +113,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -119,7 +128,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -133,7 +145,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -145,12 +160,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isNumber(-Infinity)).toBe(true);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -162,7 +177,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -183,7 +201,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -197,7 +218,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -211,7 +235,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -224,7 +251,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -235,12 +265,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(hasProperties([], ["prop"])).toBe(false);
         });
 
-        it("should handle symbol properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -249,12 +279,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(hasProperties(obj, [sym])).toBe(true);
         });
 
-        it("should handle numeric properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle numeric properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -270,7 +300,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -284,7 +317,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -297,7 +333,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -308,12 +347,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(hasProperty([], "prop")).toBe(false);
         });
 
-        it("should handle symbol properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -327,7 +366,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -345,7 +387,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -367,12 +412,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isArray([true, false])).toBe(true);
         });
 
-        it("should return false for non-arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -388,7 +433,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
@@ -444,7 +492,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -455,12 +506,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isBoolean", () => {
-        it("should return true for booleans", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for booleans", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -473,7 +524,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -489,12 +543,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isDate", () => {
-        it("should return true for valid dates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for valid dates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -508,7 +562,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -521,7 +578,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -539,7 +599,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -555,7 +618,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -573,7 +639,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Initialization", "type");
 
@@ -590,7 +659,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Initialization", "type");
 
@@ -598,12 +670,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isFiniteNumber(-Infinity)).toBe(false);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -615,7 +687,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -626,12 +701,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isFunction", () => {
-        it("should return true for functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -648,7 +723,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -667,7 +745,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -682,7 +763,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -692,12 +776,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isNonNegativeNumber(-Infinity)).toBe(false);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -709,7 +793,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -720,12 +807,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isNonNullObject", () => {
-        it("should return true for objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -735,36 +822,36 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isNonNullObject(new Error())).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isNonNullObject(null)).toBe(false);
         });
 
-        it("should return false for arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isNonNullObject([])).toBe(false);
         });
 
-        it("should return false for primitives", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for primitives", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -781,7 +868,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -791,12 +881,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isPositiveNumber(Infinity)).toBe(true);
         });
 
-        it("should return false for zero", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for zero", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -808,7 +898,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -817,12 +910,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isPositiveNumber(-Infinity)).toBe(false);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -834,7 +927,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -845,12 +941,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
     });
 
     describe("isString", () => {
-        it("should return true for strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -866,7 +962,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -885,7 +984,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -902,7 +1004,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -917,7 +1022,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -930,7 +1038,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -950,7 +1061,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -965,7 +1079,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -978,7 +1095,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -991,7 +1111,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1005,7 +1128,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1022,7 +1148,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
@@ -1058,7 +1187,10 @@ describe("TypeGuards - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards-complete-coverage", "component");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

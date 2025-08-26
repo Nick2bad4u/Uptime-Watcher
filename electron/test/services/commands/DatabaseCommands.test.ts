@@ -136,10 +136,7 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should construct with dependencies", async ({
-            task,
-            annotate,
-        }) => {
+        it("should construct with dependencies", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -248,10 +245,7 @@ describe("DatabaseCommands", () => {
             expect(mockEventBus.emitTyped).toBeDefined();
         });
 
-        it("should handle execution failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle execution failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -264,10 +258,7 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle rollback failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle rollback failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -280,10 +271,7 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle validation failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle validation failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -491,10 +479,7 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should clear command history", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear command history", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -619,10 +604,7 @@ describe("DatabaseCommands", () => {
             await expect(command.rollback()).resolves.toBeUndefined();
         });
 
-        it("should provide correct description", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide correct description", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -720,10 +702,7 @@ describe("DatabaseCommands", () => {
             await expect(command.rollback()).resolves.toBeUndefined();
         });
 
-        it("should provide correct description", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide correct description", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -933,10 +912,7 @@ describe("DatabaseCommands", () => {
             });
         });
 
-        it("should validate multiple errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate multiple errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -969,10 +945,7 @@ describe("DatabaseCommands", () => {
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should provide correct description", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide correct description", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");
@@ -1135,10 +1108,7 @@ describe("DatabaseCommands", () => {
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should provide correct description", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide correct description", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
             await annotate("Category: Service", "category");

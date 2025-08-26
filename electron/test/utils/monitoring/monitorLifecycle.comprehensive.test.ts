@@ -225,10 +225,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle empty sites cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorLifecycle", "component");
             await annotate("Category: Utility", "category");
@@ -480,10 +477,7 @@ describe("Monitor Lifecycle Management - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle empty sites cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorLifecycle", "component");
             await annotate("Category: Utility", "category");

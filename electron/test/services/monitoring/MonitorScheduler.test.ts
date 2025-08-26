@@ -406,10 +406,7 @@ describe("MonitorScheduler", () => {
     });
 
     describe("stopAll", () => {
-        it("should stop all running monitors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stop all running monitors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorScheduler", "component");
             await annotate("Category: Service", "category");
@@ -564,10 +561,7 @@ describe("MonitorScheduler", () => {
             expect(scheduler.isMonitoring("site-1", "monitor-3")).toBe(false);
         });
 
-        it("should skip monitors without IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should skip monitors without IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorScheduler", "component");
             await annotate("Category: Service", "category");

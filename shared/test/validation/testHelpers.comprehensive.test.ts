@@ -40,10 +40,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.lastChecked).toBeInstanceOf(Date);
         });
 
-        it("should apply overrides correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply overrides correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -68,10 +65,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle partial overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -98,10 +92,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.history).toEqual([]);
         });
 
-        it("should handle all monitor types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all monitor types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -116,10 +107,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(pingMonitor.type).toBe("ping");
         });
 
-        it("should handle all status types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all status types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -138,10 +126,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(pausedMonitor.status).toBe("paused");
         });
 
-        it("should handle history override", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle history override", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -153,10 +138,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.history).toBe(history);
         });
 
-        it("should handle lastChecked override", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle lastChecked override", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -307,10 +289,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("port");
         });
 
-        it("should handle various port numbers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle various port numbers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -403,10 +382,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("ping");
         });
 
-        it("should handle various host formats", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle various host formats", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -494,10 +470,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.monitors).toBe(customMonitors);
         });
 
-        it("should handle empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -508,10 +481,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.monitors).toEqual([]);
         });
 
-        it("should handle custom timestamps", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle custom timestamps", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -527,10 +497,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(site.updatedAt).toBe(customDate);
         });
 
-        it("should handle all status types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all status types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -615,10 +582,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(history.details).toBe("Connection timeout");
         });
 
-        it("should handle both status types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle both status types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -651,10 +615,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(zeroHistory.responseTime).toBe(0);
         });
 
-        it("should handle undefined details", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined details", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -665,10 +626,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(history.details).toBeUndefined();
         });
 
-        it("should handle empty details", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty details", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");

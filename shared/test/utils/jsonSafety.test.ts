@@ -83,10 +83,7 @@ describe("jsonSafety utilities", () => {
             );
         });
 
-        it("should handle null JSON", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null JSON", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -102,10 +99,7 @@ describe("jsonSafety utilities", () => {
             );
         });
 
-        it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -233,10 +227,7 @@ describe("jsonSafety utilities", () => {
             );
         });
 
-        it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -386,10 +377,7 @@ describe("jsonSafety utilities", () => {
             expect(result).toEqual(fallbackConfig);
         });
 
-        it("should handle null parsed data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null parsed data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -505,10 +493,7 @@ describe("jsonSafety utilities", () => {
             expect(nullResult.data).toBe("null");
         });
 
-        it("should handle circular references", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle circular references", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -524,10 +509,7 @@ describe("jsonSafety utilities", () => {
             expect(result.error).toContain("JSON stringification failed:");
         });
 
-        it("should handle undefined values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -540,10 +522,7 @@ describe("jsonSafety utilities", () => {
             expect(result.error).toBe("Value cannot be serialized to JSON");
         });
 
-        it("should handle functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -556,10 +535,7 @@ describe("jsonSafety utilities", () => {
             expect(result.error).toBe("Value cannot be serialized to JSON");
         });
 
-        it("should handle symbols", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbols", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -747,10 +723,7 @@ describe("jsonSafety utilities", () => {
             expect(successResult.error).toBeUndefined();
         });
 
-        it("should properly type error results", async ({
-            task,
-            annotate,
-        }) => {
+        it("should properly type error results", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");

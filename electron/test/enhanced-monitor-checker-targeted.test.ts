@@ -42,7 +42,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -90,7 +93,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -131,7 +137,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -172,7 +181,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -225,7 +237,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -268,7 +283,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: enhanced-monitor-checker-targeted", "component");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 

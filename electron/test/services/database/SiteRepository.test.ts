@@ -49,10 +49,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("findAll", () => {
-        it("should find all sites", async ({
-            task,
-            annotate,
-        }) => {
+        it("should find all sites", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -91,10 +88,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("findByIdentifier", () => {
-        it("should find a site by identifier", async ({
-            task,
-            annotate,
-        }) => {
+        it("should find a site by identifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -133,10 +127,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("upsert", () => {
-        it("should upsert a site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should upsert a site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -159,10 +150,7 @@ describe("SiteRepository", () => {
                 expect.any(Array)
             );
         });
-        it("should handle upsert errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle upsert errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -184,10 +172,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("delete", () => {
-        it("should delete a site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delete a site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -238,10 +223,7 @@ describe("SiteRepository", () => {
 
             expect(result).toBe(false);
         });
-        it("should handle deletion errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -256,10 +238,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all sites", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delete all sites", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -341,10 +320,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("bulkInsert", () => {
-        it("should insert multiple sites", async ({
-            task,
-            annotate,
-        }) => {
+        it("should insert multiple sites", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -372,10 +348,7 @@ describe("SiteRepository", () => {
                 expect.stringContaining("INSERT")
             );
         });
-        it("should handle bulk insert errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle bulk insert errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");
@@ -394,10 +367,7 @@ describe("SiteRepository", () => {
         });
     });
     describe("exportAll", () => {
-        it("should export all sites", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export all sites", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepository", "component");
             await annotate("Category: Service", "category");

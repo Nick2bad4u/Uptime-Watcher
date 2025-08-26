@@ -53,7 +53,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(mockOnChange).toHaveBeenCalledWith("option2");
         });
 
-        it("should handle selection of different radio options", ({ task, annotate }) => {
+        it("should handle selection of different radio options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -90,7 +93,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(mockOnChange).toHaveBeenCalledWith("existing");
         });
 
-        it("should render all radio options correctly", ({ task, annotate }) => {
+        it("should render all radio options correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -205,7 +211,10 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("ThemedBox Component", () => {
-        it("should handle different variant combinations", ({ task, annotate }) => {
+        it("should handle different variant combinations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -244,7 +253,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Secondary Box")).toBeInTheDocument();
         });
 
-        it("should handle custom className and style props", ({ task, annotate }) => {
+        it("should handle custom className and style props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -293,7 +305,10 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("ThemedProgress Component", () => {
-        it("should handle different progress value ranges", ({ task, annotate }) => {
+        it("should handle different progress value ranges", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -466,7 +481,10 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("IconUtils Utility Functions", () => {
-        it("should handle getIconColorClass function with all color types", ({ task, annotate }) => {
+        it("should handle getIconColorClass function with all color types", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -550,7 +568,10 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("Error Boundary and Edge Cases", () => {
-        it("should handle components with missing props gracefully", ({ task, annotate }) => {
+        it("should handle components with missing props gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -579,7 +600,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.queryByRole("radio")).not.toBeInTheDocument();
         });
 
-        it("should handle ThemedBox with all prop combinations", ({ task, annotate }) => {
+        it("should handle ThemedBox with all prop combinations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -606,7 +630,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Full Box Content")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress edge cases with high values", ({ task, annotate }) => {
+        it("should handle ThemedProgress edge cases with high values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -627,7 +654,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress edge cases with negative values", ({ task, annotate }) => {
+        it("should handle ThemedProgress edge cases with negative values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -648,7 +678,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress percentage calculation with zero max", ({ task, annotate }) => {
+        it("should handle ThemedProgress percentage calculation with zero max", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");
@@ -669,7 +702,10 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress percentage calculation with negative max", ({ task, annotate }) => {
+        it("should handle ThemedProgress percentage calculation with negative max", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
             annotate("Category: Core", "category");

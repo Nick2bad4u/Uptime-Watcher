@@ -157,10 +157,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should work with symbol keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with symbol keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -171,10 +168,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle nested objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle nested objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -350,10 +344,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle empty objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -434,10 +425,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toEqual({});
         });
 
-        it("should handle symbol keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -538,10 +526,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result).not.toBe(smallObj); // Should be a copy
         });
 
-        it("should handle symbol keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -567,10 +552,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(result.array).toBe(testObj.array); // Same reference
         });
 
-        it("should only pick existing keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should only pick existing keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -614,10 +596,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             ]);
         });
 
-        it("should handle empty objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -653,10 +632,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(entries.find(([key]) => key === "bool")?.[1]).toBe(false);
         });
 
-        it("should not include symbol keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not include symbol keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -670,10 +646,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("typedObjectKeys", () => {
-        it("should return properly typed keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return properly typed keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -690,10 +663,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(keys).toContain("array");
         });
 
-        it("should handle empty objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -731,10 +701,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should not include symbol keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not include symbol keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -768,10 +735,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(values).toContain(testObj.array);
         });
 
-        it("should handle empty objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");
@@ -809,10 +773,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should preserve object references", async ({
-            task,
-            annotate,
-        }) => {
+        it("should preserve object references", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: objectSafety", "component");
             await annotate("Category: Utility", "category");

@@ -158,10 +158,7 @@ describe("useSettingsStore", () => {
     });
 
     describe("Settings Operations", () => {
-        it("should update settings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update settings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -181,10 +178,7 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(500); // unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
-        it("should update individual settings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update individual settings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -200,10 +194,7 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.notifications).toBe(true); // unchanged
         });
 
-        it("should handle reset to defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle reset to defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -293,10 +284,7 @@ describe("useSettingsStore", () => {
             expect(result.current.updateSettings).toBeDefined();
         });
 
-        it("should use error handling wrapper", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use error handling wrapper", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -674,10 +662,7 @@ describe("useSettingsStore", () => {
             expect(result2.current.settings.theme).toBe("dark");
         });
 
-        it("should handle store rehydration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle store rehydration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -693,10 +678,7 @@ describe("useSettingsStore", () => {
     });
 
     describe("Action Logging", () => {
-        it("should log all store actions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log all store actions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");
@@ -731,10 +713,7 @@ describe("useSettingsStore", () => {
             );
         });
 
-        it("should log initialization actions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log initialization actions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
             await annotate("Category: Store", "category");

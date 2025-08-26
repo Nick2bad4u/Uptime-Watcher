@@ -80,15 +80,15 @@ describe("AddSiteForm Component", () => {
     });
 
     it("should render the form with basic elements", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<AddSiteForm />);
 
@@ -98,15 +98,15 @@ describe("AddSiteForm Component", () => {
     });
 
     it("should display different mode options", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<AddSiteForm />);
 
@@ -116,15 +116,15 @@ describe("AddSiteForm Component", () => {
     });
 
     it("should show monitor type selection", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
         render(<AddSiteForm />);
 

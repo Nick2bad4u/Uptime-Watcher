@@ -53,16 +53,19 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         vi.useRealTimers();
     });
 
-    it("should handle cleanup with current timeout and portal removal (lines 60-61, 67-68)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle cleanup with current timeout and portal removal (lines 60-61, 67-68)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const props = {
             siteName: "Test Site",
@@ -100,16 +103,19 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         expect(true).toBe(true); // If we get here without errors, cleanup worked
     });
 
-    it("should handle hover timeout creation and cleanup", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle hover timeout creation and cleanup", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const props = {
             siteName: "Test Site",
@@ -135,15 +141,15 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
     });
 
     it("should handle portal cleanup on unmount", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const props = {
             siteName: "Test Site",
@@ -172,16 +178,19 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         expect(true).toBe(true); // If we get here, cleanup worked correctly
     });
 
-    it("should handle click event and log user action", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Event Processing", "type");
+    it("should handle click event and log user action", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Event Processing", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Event Processing", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Event Processing", "type");
 
         const props = {
             siteName: "Test Site",
@@ -209,15 +218,15 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
     });
 
     it("should handle rapid hover/unhover cycles", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ScreenshotThumbnail", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         const props = {
             siteName: "Test Site",

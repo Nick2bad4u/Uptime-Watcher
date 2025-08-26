@@ -45,7 +45,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -112,7 +115,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -145,7 +151,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -170,7 +179,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Initialization", "type");
 
@@ -188,7 +200,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -224,7 +239,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
@@ -259,7 +277,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -282,7 +303,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -313,7 +337,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
@@ -346,7 +373,10 @@ describe("useSitesStore - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate(
+                "Component: useSitesStore-complete-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 

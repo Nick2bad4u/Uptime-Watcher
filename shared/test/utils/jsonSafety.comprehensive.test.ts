@@ -79,10 +79,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle null JSON values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null JSON values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -95,10 +92,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(null);
         });
 
-        it("should handle boolean JSON values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle boolean JSON values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -112,10 +106,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(true);
         });
 
-        it("should handle number JSON values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle number JSON values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -129,10 +120,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe(42);
         });
 
-        it("should handle array JSON values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle array JSON values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -249,10 +237,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.error).toContain("Array element at index 1");
         });
 
-        it("should handle empty arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -291,10 +276,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
     });
 
     describe("safeJsonStringifyWithFallback", () => {
-        it("should stringify simple objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stringify simple objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -345,10 +327,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -364,10 +343,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe('[1,2,3,"test"]');
         });
 
-        it("should handle null values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -393,10 +369,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("undefined_fallback");
         });
 
-        it("should handle primitive values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle primitive values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -478,10 +451,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("error_fallback");
         });
 
-        it("should handle BigInt with fallback", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle BigInt with fallback", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -512,10 +482,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("{}"); // Functions are not serialized
         });
 
-        it("should respect space parameter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect space parameter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -619,10 +586,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result).toBe(fallback);
         });
 
-        it("should handle primitive types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle primitive types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -692,10 +656,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe('[1,2,3,"test"]');
         });
 
-        it("should handle null values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -706,10 +667,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe("null");
         });
 
-        it("should handle primitive values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle primitive values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -721,10 +679,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(safeJsonStringify(false).data).toBe("false");
         });
 
-        it("should handle undefined values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -737,10 +692,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle circular references", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle circular references", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -773,10 +725,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).not.toContain("func");
         });
 
-        it("should handle BigInt values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle BigInt values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -837,10 +786,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(emptyArr.data).toBe("[]");
         });
 
-        it("should handle nested objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle nested objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");
@@ -858,10 +804,7 @@ describe("JSON Safety Utilities - Comprehensive Coverage", () => {
             expect(result.data).toBe('{"level1":{"level2":{"value":"deep"}}}');
         });
 
-        it("should handle Date objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Date objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: jsonSafety", "component");
             await annotate("Category: Utility", "category");

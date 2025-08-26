@@ -2,7 +2,10 @@ import { getSiteStatusDescription } from "../../utils/siteStatus";
 
 describe("SiteStatus - Missing Coverage", () => {
     describe("getSiteStatusDescription default case", () => {
-        test("should handle unknown status values (lines 199-200)", ({ task, annotate }) => {
+        test("should handle unknown status values (lines 199-200)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -42,7 +45,10 @@ describe("SiteStatus - Missing Coverage", () => {
             expect(description).toBe("Unknown status");
         });
 
-        test("should handle various invalid status values", ({ task, annotate }) => {
+        test("should handle various invalid status values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -95,7 +101,10 @@ describe("SiteStatus - Missing Coverage", () => {
             });
         });
 
-        test("should hit default case with mixed invalid statuses", ({ task, annotate }) => {
+        test("should hit default case with mixed invalid statuses", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -150,7 +159,10 @@ describe("SiteStatus - Missing Coverage", () => {
             expect(description).toBe("Mixed status (2/2 monitoring active)");
         });
 
-        test("should verify the switch statement default behavior", ({ task, annotate }) => {
+        test("should verify the switch statement default behavior", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");

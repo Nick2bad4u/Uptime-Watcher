@@ -155,10 +155,7 @@ describe("monitorTypeHelper", () => {
     });
 
     describe("clearMonitorTypeCache", () => {
-        it("should call cache clear method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call cache clear method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
             await annotate("Category: Utility", "category");

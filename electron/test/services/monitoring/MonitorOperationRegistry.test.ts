@@ -156,10 +156,7 @@ describe("MonitorOperationRegistry", () => {
             expect(mockRandomUUID).toHaveBeenCalledTimes(5); // Should try 5 times
         });
 
-        it("should handle empty monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorOperationRegistry", "component");
             await annotate("Category: Service", "category");
@@ -173,10 +170,7 @@ describe("MonitorOperationRegistry", () => {
             expect(operation?.monitorId).toBe("");
         });
 
-        it("should set accurate timestamps", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set accurate timestamps", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorOperationRegistry", "component");
             await annotate("Category: Service", "category");
@@ -357,10 +351,7 @@ describe("MonitorOperationRegistry", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle empty monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorOperationRegistry", "component");
             await annotate("Category: Service", "category");
@@ -454,10 +445,7 @@ describe("MonitorOperationRegistry", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should handle empty operation ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty operation ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorOperationRegistry", "component");
             await annotate("Category: Service", "category");
@@ -703,10 +691,7 @@ describe("MonitorOperationRegistry", () => {
     });
 
     describe("Singleton operationRegistry", () => {
-        it("should export a singleton instance", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export a singleton instance", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorOperationRegistry", "component");
             await annotate("Category: Service", "category");

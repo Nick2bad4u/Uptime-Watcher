@@ -76,10 +76,7 @@ describe("validatorUtils", () => {
             expect(isNonEmptyString({})).toBe(false);
         });
 
-        it("should trim whitespace correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should trim whitespace correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -92,10 +89,7 @@ describe("validatorUtils", () => {
     });
 
     describe("isValidFQDN", () => {
-        it("should return true for valid FQDNs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for valid FQDNs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -141,10 +135,7 @@ describe("validatorUtils", () => {
             expect(isValidFQDN({})).toBe(false);
         });
 
-        it("should respect options parameter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect options parameter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -368,10 +359,7 @@ describe("validatorUtils", () => {
             expect(isValidInteger({})).toBe(false);
         });
 
-        it("should respect options parameter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect options parameter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -383,10 +371,7 @@ describe("validatorUtils", () => {
             expect(isValidInteger("150", { min: 0, max: 100 })).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -447,10 +432,7 @@ describe("validatorUtils", () => {
             expect(isValidNumeric({})).toBe(false);
         });
 
-        it("should respect options parameter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect options parameter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -462,10 +444,7 @@ describe("validatorUtils", () => {
             expect(isValidNumeric("150.5", { min: 0, max: 100 })).toBe(false);
         });
 
-        it("should handle scientific notation", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle scientific notation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -494,10 +473,7 @@ describe("validatorUtils", () => {
             expect(isValidHost("2001:db8::1")).toBe(true); // IPv6
         });
 
-        it("should return true for valid FQDNs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for valid FQDNs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -509,10 +485,7 @@ describe("validatorUtils", () => {
             expect(isValidHost("my-site.net")).toBe(true);
         });
 
-        it("should return true for localhost", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for localhost", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -554,10 +527,7 @@ describe("validatorUtils", () => {
             expect(isValidHost({})).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -601,10 +571,7 @@ describe("validatorUtils", () => {
             expect(isValidPort("8080")).toBe(true);
         });
 
-        it("should return false for port 0", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for port 0", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -660,10 +627,7 @@ describe("validatorUtils", () => {
             expect(isValidPort({})).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -675,10 +639,7 @@ describe("validatorUtils", () => {
     });
 
     describe("isValidUrl", () => {
-        it("should return true for valid URLs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for valid URLs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -750,10 +711,7 @@ describe("validatorUtils", () => {
             expect(isValidUrl({})).toBe(false);
         });
 
-        it("should respect options parameter", async ({
-            task,
-            annotate,
-        }) => {
+        it("should respect options parameter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -775,10 +733,7 @@ describe("validatorUtils", () => {
             expect(isValidUrl("ftp://example.com")).toBe(true);
         });
 
-        it("should handle complex URLs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex URLs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -826,10 +781,7 @@ describe("validatorUtils", () => {
             expect(safeInteger({}, 60)).toBe(60);
         });
 
-        it("should clamp to minimum value", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clamp to minimum value", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -840,10 +792,7 @@ describe("validatorUtils", () => {
             expect(safeInteger("15", 0, 10)).toBe(15); // Above min
         });
 
-        it("should clamp to maximum value", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clamp to maximum value", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -885,10 +834,7 @@ describe("validatorUtils", () => {
             expect(safeInteger({}, 0)).toBe(0); // Object "[object Object]" is not a valid integer
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");
@@ -899,10 +845,7 @@ describe("validatorUtils", () => {
             expect(safeInteger("0x10", 0)).toBe(0); // Hex format invalid
         });
 
-        it("should work without bounds", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work without bounds", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
             await annotate("Category: Validation", "category");

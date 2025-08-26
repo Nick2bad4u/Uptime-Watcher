@@ -103,10 +103,7 @@ describe("main.ts - Missing Branch Coverage", () => {
         vi.restoreAllMocks();
     });
     describe("Command Line Argument Processing", () => {
-        it("should handle --debug flag", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle --debug flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");
             await annotate("Category: Core", "category");
@@ -130,10 +127,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
         });
-        it("should handle --log-debug flag", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle --log-debug flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");
             await annotate("Category: Core", "category");
@@ -184,10 +178,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should handle --log-info flag", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle --log-info flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");
             await annotate("Category: Core", "category");
@@ -314,10 +305,7 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
     });
     describe("Application Lifecycle", () => {
-        it("should initialize logger", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize logger", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");
             await annotate("Category: Core", "category");
@@ -336,10 +324,7 @@ describe("main.ts - Missing Branch Coverage", () => {
 
             expect(mockLog.initialize).toHaveBeenCalled();
         });
-        it("should handle app ready event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle app ready event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");
             await annotate("Category: Core", "category");

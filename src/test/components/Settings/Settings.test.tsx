@@ -176,15 +176,15 @@ describe("Settings Component", () => {
     });
 
     it("should render settings modal", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -192,16 +192,19 @@ describe("Settings Component", () => {
         expect(screen.getByText("History Limit")).toBeInTheDocument();
     });
 
-    it("should call onClose when close button is clicked", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should call onClose when close button is clicked", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -212,15 +215,15 @@ describe("Settings Component", () => {
     });
 
     it("should show error when lastError exists", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         const errorStore = { ...mockErrorStore, lastError: "Test error" };
         mockUseErrorStore.mockReturnValue(errorStore);
@@ -232,15 +235,15 @@ describe("Settings Component", () => {
     });
 
     it("should not show error when no lastError", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -248,15 +251,15 @@ describe("Settings Component", () => {
     });
 
     it("should handle history limit changes", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Configuration", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Configuration", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Configuration", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Configuration", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -271,15 +274,15 @@ describe("Settings Component", () => {
     });
 
     it("should handle reset settings", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Mock window.confirm to return true
         const confirmSpy = vi
@@ -297,15 +300,15 @@ describe("Settings Component", () => {
     });
 
     it("should not reset settings when cancelled", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Mock window.confirm to return false
         const confirmSpy = vi
@@ -323,15 +326,15 @@ describe("Settings Component", () => {
     });
 
     it("should handle sync settings", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -342,15 +345,15 @@ describe("Settings Component", () => {
     });
 
     it("should handle SQLite backup download", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Backup Operation", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Backup Operation", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Backup Operation", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Backup Operation", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -361,15 +364,15 @@ describe("Settings Component", () => {
     });
 
     it("should handle theme changes", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -380,15 +383,15 @@ describe("Settings Component", () => {
     });
 
     it("should display current settings values", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -398,16 +401,19 @@ describe("Settings Component", () => {
         expect(historyInput).toHaveValue("1000");
     });
 
-    it("should handle numeric conversion for history limit", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Configuration", "type");
+    it("should handle numeric conversion for history limit", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Configuration", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Configuration", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Configuration", "type");
 
         const settingsWithStringLimit = {
             ...mockSettingsStore,
@@ -426,16 +432,19 @@ describe("Settings Component", () => {
         expect(historyInput).toHaveValue("500");
     });
 
-    it("should apply dark theme styles when isDark is true", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should apply dark theme styles when isDark is true", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         const darkTheme = { ...mockTheme, isDark: true };
         mockUseTheme.mockReturnValue(darkTheme as any);
@@ -448,16 +457,19 @@ describe("Settings Component", () => {
         expect(container).toBeInTheDocument();
     });
 
-    it("should handle component unmounting during async operations", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle component unmounting during async operations", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         const { unmount } = render(<Settings onClose={mockOnClose} />);
 

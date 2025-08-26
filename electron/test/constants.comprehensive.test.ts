@@ -264,10 +264,7 @@ describe("Backend Constants", () => {
             expect(CACHE_TTL.CONFIGURATION_VALUES).toBeGreaterThan(0);
         });
 
-        it("should have correct MONITORS TTL", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct MONITORS TTL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -278,10 +275,7 @@ describe("Backend Constants", () => {
             expect(CACHE_TTL.MONITORS).toBeGreaterThan(0);
         });
 
-        it("should have correct SITES TTL", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct SITES TTL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -292,10 +286,7 @@ describe("Backend Constants", () => {
             expect(CACHE_TTL.SITES).toBeGreaterThan(0);
         });
 
-        it("should have correct TEMPORARY TTL", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct TEMPORARY TTL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -415,10 +406,7 @@ describe("Backend Constants", () => {
             expect(CACHE_SIZE_LIMITS.VALIDATION_RESULTS).toBeGreaterThan(0);
         });
 
-        it("should have correct MONITORS limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct MONITORS limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -429,10 +417,7 @@ describe("Backend Constants", () => {
             expect(CACHE_SIZE_LIMITS.MONITORS).toBeGreaterThan(0);
         });
 
-        it("should have correct SITES limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct SITES limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
@@ -518,10 +503,7 @@ describe("Backend Constants", () => {
             expect(BACKUP_DB_FILE_NAME.length).toBeGreaterThan(0);
         });
 
-        it("should have SQLite file extensions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have SQLite file extensions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: constants", "component");
             await annotate("Category: Core", "category");
