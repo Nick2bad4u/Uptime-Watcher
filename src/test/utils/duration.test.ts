@@ -12,13 +12,13 @@ describe("Duration Utilities", () => {
     describe("calculateMaxDuration", () => {
         describe("Basic functionality", () => {
             it("should calculate duration with no retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 0);
                 // timeout: 10 seconds * 1 attempt = 10 seconds
@@ -28,13 +28,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should calculate duration with single retry attempt", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(5, 1);
                 // timeout: 5 seconds * 2 attempts = 10 seconds
@@ -44,13 +44,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should calculate duration with multiple retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(2, 3);
                 // timeout: 2 seconds * 4 attempts = 8 seconds
@@ -62,13 +62,13 @@ describe("Duration Utilities", () => {
 
         describe("Exponential backoff calculation", () => {
             it("should calculate correct backoff for first few retries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 2);
                 // timeout: 1 second * 3 attempts = 3 seconds
@@ -78,13 +78,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should cap backoff at 5 seconds per retry", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 5);
                 // timeout: 1 second * 6 attempts = 6 seconds
@@ -94,13 +94,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle very high retry counts with capped backoff", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 10);
                 // timeout: 1 second * 11 attempts = 11 seconds
@@ -112,13 +112,13 @@ describe("Duration Utilities", () => {
 
         describe("Duration formatting - seconds", () => {
             it("should format short durations in seconds", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(calculateMaxDuration(1, 0)).toBe("1s");
                 expect(calculateMaxDuration(30, 0)).toBe("30s");
@@ -126,13 +126,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should format exactly 60 seconds as minutes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(60, 0);
                 // 60 seconds = 1 minute
@@ -142,13 +142,13 @@ describe("Duration Utilities", () => {
 
         describe("Duration formatting - minutes", () => {
             it("should format durations between 1-59 minutes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result1 = calculateMaxDuration(61, 0);
                 // 61 seconds = Math.ceil(61/60) = 2 minutes
@@ -164,13 +164,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle duration that rounds up to next minute", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(119, 0);
                 // 119 seconds = Math.ceil(119/60) = 2 minutes
@@ -178,13 +178,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should format exactly 3600 seconds as hours", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(3600, 0);
                 // 3600 seconds = 1 hour
@@ -194,13 +194,13 @@ describe("Duration Utilities", () => {
 
         describe("Duration formatting - hours", () => {
             it("should format durations over 1 hour", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result1 = calculateMaxDuration(3601, 0);
                 // 3601 seconds = Math.ceil(3601/3600) = 2 hours
@@ -216,13 +216,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle very large durations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(86_400, 0);
                 // 86400 seconds = 24 hours
@@ -231,14 +231,11 @@ describe("Duration Utilities", () => {
         });
 
         describe("Edge cases", () => {
-            it("should handle zero timeout", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle zero timeout", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(0, 0);
                 // 0 seconds timeout still has 1 attempt
@@ -246,13 +243,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle zero timeout with retries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(0, 2);
                 // timeout: 0 * 3 = 0 seconds
@@ -262,13 +259,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle fractional timeout values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1.5, 1);
                 // timeout: 1.5 * 2 = 3 seconds
@@ -278,13 +275,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle large timeout values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1800, 0);
                 // 1800 seconds = Math.ceil(1800/60) = 30 minutes
@@ -292,13 +289,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle large retry counts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 20);
                 // timeout: 10 * 21 = 210 seconds
@@ -310,13 +307,13 @@ describe("Duration Utilities", () => {
 
         describe("Real-world scenarios", () => {
             it("should handle typical monitoring scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 // Common scenario: 30 second timeout, 3 retries
                 const result1 = calculateMaxDuration(30, 3);
@@ -332,13 +329,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should provide predictable results for common configurations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // Standard web check
                 expect(calculateMaxDuration(10, 2)).toBe("32s");
@@ -353,13 +350,13 @@ describe("Duration Utilities", () => {
 
         describe("Mathematical accuracy", () => {
             it("should correctly calculate exponential backoff sequence", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // Verify the exact exponential backoff calculation
                 const timeout = 1;
@@ -371,13 +368,13 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle edge of unit boundaries precisely", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: duration", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: duration", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // Test exactly at 60 seconds boundary
                 const result1 = calculateMaxDuration(59, 0);

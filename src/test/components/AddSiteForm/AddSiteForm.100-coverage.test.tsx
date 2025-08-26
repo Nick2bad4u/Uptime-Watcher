@@ -49,7 +49,10 @@ vi.mock("@/stores/sites/useSiteSync", () => ({
 
 describe("AddSiteForm - 100% Coverage Tests", () => {
     describe("Targeting Lines 187-196 (dynamic field change handlers)", () => {
-        test("should handle expectedValue field change", ({ task, annotate }) => {
+        test("should handle expectedValue field change", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.100-coverage", "component");
             annotate("Category: Component", "category");
@@ -247,7 +250,10 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             }
         });
 
-        test("should convert numeric values to strings in field handlers", ({ task, annotate }) => {
+        test("should convert numeric values to strings in field handlers", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.100-coverage", "component");
             annotate("Category: Component", "category");

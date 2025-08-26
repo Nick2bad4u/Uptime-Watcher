@@ -283,10 +283,7 @@ describe("DatabaseManager Foundation Tests", () => {
             );
         });
 
-        it("should initialize successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");

@@ -12,10 +12,7 @@ import { useSiteStats } from "../hooks/site/useSiteStats";
 
 describe("useSiteStats Edge Cases", () => {
     describe("Basic edge cases", () => {
-        it("should handle empty history array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty history array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteStatsEdgeCases", "component");
             await annotate("Category: Core", "category");

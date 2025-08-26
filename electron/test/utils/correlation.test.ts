@@ -23,10 +23,7 @@ import {
 
 describe("Correlation Utility", () => {
     describe("generateCorrelationId", () => {
-        it("should generate a correlation ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should generate a correlation ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -51,10 +48,7 @@ describe("Correlation Utility", () => {
             // randomBytes(8) => 8 bytes => 16 hex characters
             expect(id).toHaveLength(16);
         });
-        it("should generate unique IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should generate unique IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -65,10 +59,7 @@ describe("Correlation Utility", () => {
 
             expect(id1).not.toBe(id2);
         });
-        it("should generate hex string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should generate hex string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -98,10 +89,7 @@ describe("Correlation Utility", () => {
             // All IDs should be unique
             expect(ids.size).toBe(count);
         });
-        it("should always return lowercase hex", async ({
-            task,
-            annotate,
-        }) => {
+        it("should always return lowercase hex", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -112,10 +100,7 @@ describe("Correlation Utility", () => {
                 expect(id).toBe(id.toLowerCase());
             }
         });
-        it("should be cryptographically random", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be cryptographically random", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -258,10 +243,7 @@ describe("Correlation Utility", () => {
             expect(error.message).toContain("café");
             expect(error.message).toContain("ñ§∆");
         });
-        it("should be catchable as Error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be catchable as Error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -297,10 +279,7 @@ describe("Correlation Utility", () => {
                 }
             }
         });
-        it("should have stack trace", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have stack trace", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");
@@ -326,10 +305,7 @@ describe("Correlation Utility", () => {
             expect(error.errors[0]).toBe(longError);
             expect(error.message).toContain(longError);
         });
-        it("should handle many errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle many errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlation", "component");
             await annotate("Category: Utility", "category");

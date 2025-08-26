@@ -7,13 +7,13 @@ import { describe, it, expect } from "vitest";
 
 describe("useTheme Hooks - Functional Tests", () => {
     it("should be implemented when theme system is stabilized", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useTheme.functional", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useTheme.functional", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         expect(true).toBe(true);
     });

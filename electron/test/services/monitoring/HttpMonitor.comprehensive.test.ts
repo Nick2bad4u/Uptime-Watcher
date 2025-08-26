@@ -128,10 +128,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should merge config with defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should merge config with defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -147,10 +144,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("getType", () => {
-        it("should return 'http'", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return 'http'", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -177,10 +171,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return shallow copy", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return shallow copy", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -195,10 +186,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
     });
 
     describe("updateConfig", () => {
-        it("should update timeout config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update timeout config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -208,10 +196,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(httpMonitor.getConfig().timeout).toBe(15_000);
         });
 
-        it("should update userAgent config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update userAgent config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -221,10 +206,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(httpMonitor.getConfig().userAgent).toBe("NewAgent/2.0");
         });
 
-        it("should merge partial config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should merge partial config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -414,10 +396,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result).toEqual(mockResult);
         });
 
-        it("should handle check errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle check errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -655,10 +634,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
         });
 
-        it("should not log in production mode", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not log in production mode", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");

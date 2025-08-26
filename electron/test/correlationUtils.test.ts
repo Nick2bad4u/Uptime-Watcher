@@ -81,10 +81,7 @@ describe("correlationUtils", () => {
             );
         });
 
-        it("should handle single error message", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle single error message", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlationUtils", "component");
             await annotate("Category: Core", "category");
@@ -97,10 +94,7 @@ describe("correlationUtils", () => {
             expect(error.errors).toEqual(errors);
         });
 
-        it("should handle empty error array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty error array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: correlationUtils", "component");
             await annotate("Category: Core", "category");

@@ -122,7 +122,10 @@ describe("SiteList", () => {
     });
 
     describe("Empty State Rendering", () => {
-        it("should render EmptyState when no sites are available", ({ task, annotate }) => {
+        it("should render EmptyState when no sites are available", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -145,7 +148,10 @@ describe("SiteList", () => {
             expect(screen.queryByTestId(/site-card-/)).not.toBeInTheDocument();
         });
 
-        it("should render EmptyState when sites array is empty - dark theme", ({ task, annotate }) => {
+        it("should render EmptyState when sites array is empty - dark theme", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -170,7 +176,10 @@ describe("SiteList", () => {
     });
 
     describe("Site List Rendering", () => {
-        it("should render SiteCard components for each site", ({ task, annotate }) => {
+        it("should render SiteCard components for each site", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -195,7 +204,10 @@ describe("SiteList", () => {
             expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
         });
 
-        it("should render with correct container className in light theme", ({ task, annotate }) => {
+        it("should render with correct container className in light theme", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -219,7 +231,10 @@ describe("SiteList", () => {
             expect(containerDiv).not.toHaveClass("dark");
         });
 
-        it("should render with correct container className in dark theme", ({ task, annotate }) => {
+        it("should render with correct container className in dark theme", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -316,7 +331,10 @@ describe("SiteList", () => {
             expect(mockUseTheme).toHaveBeenCalledTimes(1);
         });
 
-        it("should properly destructure sites from useSitesStore", ({ task, annotate }) => {
+        it("should properly destructure sites from useSitesStore", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -339,7 +357,10 @@ describe("SiteList", () => {
             expect(screen.getByTestId("site-card-site-1")).toBeInTheDocument();
         });
 
-        it("should properly destructure isDark from useTheme", ({ task, annotate }) => {
+        it("should properly destructure isDark from useTheme", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -368,7 +389,10 @@ describe("SiteList", () => {
     });
 
     describe("Key Prop Handling", () => {
-        it("should use site.identifier as key for each SiteCard", ({ task, annotate }) => {
+        it("should use site.identifier as key for each SiteCard", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -394,7 +418,10 @@ describe("SiteList", () => {
             }
         });
 
-        it("should handle sites with special characters in identifiers", ({ task, annotate }) => {
+        it("should handle sites with special characters in identifiers", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -481,7 +508,10 @@ describe("SiteList", () => {
             expect(containerDiv.className).toBe("divider-y dark");
         });
 
-        it("should handle sites.length === 0 condition", ({ task, annotate }) => {
+        it("should handle sites.length === 0 condition", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -602,7 +632,10 @@ describe("SiteList", () => {
     });
 
     describe("Component Integration", () => {
-        it("should call SiteCard component for each site", ({ task, annotate }) => {
+        it("should call SiteCard component for each site", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");
@@ -627,7 +660,10 @@ describe("SiteList", () => {
             expect(screen.getByTestId("site-card-site-3")).toBeInTheDocument();
         });
 
-        it("should call EmptyState component when no sites", async ({ task, annotate }) => {
+        it("should call EmptyState component when no sites", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteList", "component");
             annotate("Category: Component", "category");

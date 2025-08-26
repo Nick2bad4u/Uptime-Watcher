@@ -200,26 +200,26 @@ describe("ServiceContainer - Fixed getSitesCache Test", () => {
     });
 
     it("should create ServiceContainer instance without errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: ServiceContainer", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         expect(container).toBeDefined();
         expect(container).toBeInstanceOf(ServiceContainer);
     });
 
     it("should have proper basic ServiceContainer methods", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: ServiceContainer", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         expect(container.getDatabaseService).toBeDefined();
         expect(typeof container.getDatabaseService).toBe("function");

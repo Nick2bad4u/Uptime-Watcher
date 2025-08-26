@@ -8,16 +8,19 @@ import { calculateMaxDuration } from "../utils/duration";
  */
 
 describe("calculateMaxDuration utility function", () => {
-    it("should handle retryAttempts = 0 (line 194 coverage)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle retryAttempts = 0 (line 194 coverage)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test the specific case that hits line 194: ": 0;"
         const result = calculateMaxDuration(5, 0);
@@ -32,16 +35,19 @@ describe("calculateMaxDuration utility function", () => {
         expect(result).toBe("5s");
     });
 
-    it("should handle retryAttempts > 0 (complex backoff calculation)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle retryAttempts > 0 (complex backoff calculation)", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test the other branch of the ternary operator
         const result = calculateMaxDuration(5, 1);
@@ -61,15 +67,15 @@ describe("calculateMaxDuration utility function", () => {
     });
 
     it("should handle large timeout values (minutes)", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test the minute formatting branch
         const result = calculateMaxDuration(30, 2);
@@ -86,15 +92,15 @@ describe("calculateMaxDuration utility function", () => {
     });
 
     it("should handle various retry attempt values", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test multiple values to ensure both branches work
         expect(calculateMaxDuration(10, 0)).toBe("10s"); // retryAttempts = 0, hits line 194
@@ -104,15 +110,15 @@ describe("calculateMaxDuration utility function", () => {
     });
 
     it("should verify backoff calculation edge cases", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: calculateMaxDuration", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: calculateMaxDuration", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test with retryAttempts = 0 to ensure line 194 (": 0;") is covered
         const result1 = calculateMaxDuration(1, 0);

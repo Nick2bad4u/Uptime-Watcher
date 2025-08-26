@@ -4,7 +4,10 @@ import { validateMonitorField } from "../../shared/validation/schemas";
 
 describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89 (undefined/default switch cases)", () => {
-        test("should handle undefined value through switch statement", ({ task, annotate }) => {
+        test("should handle undefined value through switch statement", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -20,7 +23,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result).toBe("");
         });
 
-        test("should handle unknown type through default case", ({ task, annotate }) => {
+        test("should handle unknown type through default case", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -42,7 +48,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result).toContain("Symbol(test)"); // symbol.toString()
         });
 
-        test("should reach default case with unknown primitive type", ({ task, annotate }) => {
+        test("should reach default case with unknown primitive type", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -66,7 +75,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 399 (throw error for unknown field)", () => {
-        test("should trigger unknown field error for invalid field name", ({ task, annotate }) => {
+        test("should trigger unknown field error for invalid field name", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -87,7 +99,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             }).toThrow("Unknown field: completelyInvalidFieldName");
         });
 
-        test("should trigger unknown field error for field not in any schema", ({ task, annotate }) => {
+        test("should trigger unknown field error for field not in any schema", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -106,7 +121,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 482 (error vs warning categorization)", () => {
-        test("should categorize validation issues correctly", ({ task, annotate }) => {
+        test("should categorize validation issues correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");
@@ -130,7 +148,10 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        test("should handle optional field validation warnings", ({ task, annotate }) => {
+        test("should handle optional field validation warnings", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: final-coverage-remaining-lines", "component");
             annotate("Category: Core", "category");

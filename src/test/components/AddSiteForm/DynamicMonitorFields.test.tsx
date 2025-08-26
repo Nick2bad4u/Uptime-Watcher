@@ -72,16 +72,19 @@ describe("DynamicMonitorFields", () => {
         });
     });
 
-    it("should render dynamic fields based on monitor type", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+    it("should render dynamic fields based on monitor type", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
         render(<DynamicMonitorFields {...defaultProps} />);
 
@@ -90,15 +93,15 @@ describe("DynamicMonitorFields", () => {
     });
 
     it("should handle loading state", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [],
@@ -121,15 +124,15 @@ describe("DynamicMonitorFields", () => {
     });
 
     it("should handle error state", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [],
@@ -154,15 +157,15 @@ describe("DynamicMonitorFields", () => {
     });
 
     it("should handle unknown monitor type", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
         vi.mocked(useMonitorTypesStore).mockReturnValue({
             monitorTypes: [
@@ -189,16 +192,19 @@ describe("DynamicMonitorFields", () => {
         ).toBeInTheDocument();
     });
 
-    it("should call loadMonitorTypes when not loaded and no error", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should call loadMonitorTypes when not loaded and no error", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         const loadMonitorTypesMock = vi.fn();
 
@@ -220,16 +226,19 @@ describe("DynamicMonitorFields", () => {
         expect(loadMonitorTypesMock).toHaveBeenCalledTimes(1);
     });
 
-    it("should handle missing onChange handler and log error", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should handle missing onChange handler and log error", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Use props without onChange handler for one field
         const propsWithMissingHandler = {
@@ -249,16 +258,19 @@ describe("DynamicMonitorFields", () => {
         );
     });
 
-    it("should use default values for fields with no values", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should use default values for fields with no values", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         const propsWithMissingValues = {
             monitorType: "http",
@@ -279,16 +291,19 @@ describe("DynamicMonitorFields", () => {
         expect(timeoutField).toBeInTheDocument();
     });
 
-    it("should use defaultOnChange when no onChange handler provided", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should use defaultOnChange when no onChange handler provided", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Props with no onChange handlers
         const propsWithNoHandlers = {
@@ -308,16 +323,19 @@ describe("DynamicMonitorFields", () => {
         );
     });
 
-    it("should render fields with isLoading disabled state", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+    it("should render fields with isLoading disabled state", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
         const propsWithLoading = {
             ...defaultProps,
@@ -334,16 +352,19 @@ describe("DynamicMonitorFields", () => {
         expect(timeoutField).toBeDisabled();
     });
 
-    it("should not call loadMonitorTypes when already loaded", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+    it("should not call loadMonitorTypes when already loaded", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Data Loading", "type");
 
         const loadMonitorTypesMock = vi.fn();
 
@@ -379,16 +400,19 @@ describe("DynamicMonitorFields", () => {
         expect(loadMonitorTypesMock).not.toHaveBeenCalled();
     });
 
-    it("should not call loadMonitorTypes when there is an error", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+    it("should not call loadMonitorTypes when there is an error", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: DynamicMonitorFields", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: DynamicMonitorFields", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         const loadMonitorTypesMock = vi.fn();
 

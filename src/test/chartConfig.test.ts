@@ -146,10 +146,7 @@ describe("ChartConfigService", () => {
             expect(chartService).toBeInstanceOf(ChartConfigService);
         });
 
-        it("should store the theme correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should store the theme correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -195,10 +192,7 @@ describe("ChartConfigService", () => {
             expect(config.interaction?.intersect).toBe(false);
         });
 
-        it("should have zoom configuration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have zoom configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -247,10 +241,7 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should have correct title", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct title", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -262,10 +253,7 @@ describe("ChartConfigService", () => {
             expect(config.plugins?.title?.display).toBe(true);
         });
 
-        it("should apply theme colors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme colors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -293,10 +281,7 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme typography", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -336,10 +321,7 @@ describe("ChartConfigService", () => {
             expect(config.responsive).toBe(true);
         });
 
-        it("should hide legend for bar chart", async ({
-            task,
-            annotate,
-        }) => {
+        it("should hide legend for bar chart", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -350,10 +332,7 @@ describe("ChartConfigService", () => {
             expect(config.plugins?.legend?.display).toBe(false);
         });
 
-        it("should have correct title", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct title", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -387,10 +366,7 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme colors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme colors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -406,10 +382,7 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme typography", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -443,10 +416,7 @@ describe("ChartConfigService", () => {
             expect(config.responsive).toBe(true);
         });
 
-        it("should have correct title", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have correct title", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -458,10 +428,7 @@ describe("ChartConfigService", () => {
             expect(config.plugins?.title?.display).toBe(true);
         });
 
-        it("should position legend at bottom", async ({
-            task,
-            annotate,
-        }) => {
+        it("should position legend at bottom", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -539,10 +506,7 @@ describe("ChartConfigService", () => {
             }
         });
 
-        it("should apply theme colors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme colors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -558,10 +522,7 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply theme typography", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Core", "category");
@@ -658,13 +619,13 @@ describe("ChartConfigService", () => {
 
 describe("createChartConfigs", () => {
     it("should return all chart configuration objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const configs = createChartConfigs(mockTheme, 100);
 
@@ -674,13 +635,13 @@ describe("createChartConfigs", () => {
     });
 
     it("should return valid chart configurations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const configs = createChartConfigs(mockTheme, 100);
 
@@ -694,13 +655,13 @@ describe("createChartConfigs", () => {
     });
 
     it("should pass totalChecks to doughnut configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const configs = createChartConfigs(mockTheme, 150);
         const labelCallback =
@@ -716,14 +677,11 @@ describe("createChartConfigs", () => {
         }
     });
 
-    it("should handle default totalChecks", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle default totalChecks", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const configs = createChartConfigs(mockTheme);
         const labelCallback =
@@ -740,13 +698,13 @@ describe("createChartConfigs", () => {
     });
 
     it("should create new service instance for each call", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Constructor", "type");
 
         const configs1 = createChartConfigs(mockTheme, 100);
         const configs2 = createChartConfigs(mockTheme, 100);
@@ -757,13 +715,13 @@ describe("createChartConfigs", () => {
     });
 
     it("should apply theme consistently across all configurations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const configs = createChartConfigs(mockTheme, 100);
 
@@ -778,14 +736,11 @@ describe("createChartConfigs", () => {
         );
     });
 
-    it("should handle different theme objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: chartConfig", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle different theme objects", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: chartConfig", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const darkTheme: Theme = {
             ...mockTheme,

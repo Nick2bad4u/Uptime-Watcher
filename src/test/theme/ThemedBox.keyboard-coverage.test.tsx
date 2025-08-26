@@ -14,7 +14,10 @@ const renderWithTheme = (component: React.ReactElement) =>
 
 describe("ThemedBox - Keyboard Interaction Coverage", () => {
     describe("onKeyDown handler coverage (lines 111-113)", () => {
-        it("should handle Enter key for interactive div", ({ task, annotate }) => {
+        it("should handle Enter key for interactive div", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -44,7 +47,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2);
         });
 
-        it("should not trigger onClick for non-Enter/Space keys", ({ task, annotate }) => {
+        it("should not trigger onClick for non-Enter/Space keys", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -73,7 +79,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should handle preventDefault for Enter and Space keys", ({ task, annotate }) => {
+        it("should handle preventDefault for Enter and Space keys", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -107,7 +116,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2); // Still 2, not 3
         });
 
-        it("should not handle keyboard events when not interactive", ({ task, annotate }) => {
+        it("should not handle keyboard events when not interactive", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -131,7 +143,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).not.toHaveBeenCalled();
         });
 
-        it("should not add keyboard handlers for button elements", ({ task, annotate }) => {
+        it("should not add keyboard handlers for button elements", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -161,7 +176,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle edge cases in keyboard interaction", ({ task, annotate }) => {
+        it("should handle edge cases in keyboard interaction", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -197,7 +215,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(mockOnClick).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle case where onClick is not provided", ({ task, annotate }) => {
+        it("should handle case where onClick is not provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");
@@ -272,7 +293,10 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             expect(box).toHaveAttribute("tabIndex", "5");
         });
 
-        it("should default role and tabIndex for interactive div", ({ task, annotate }) => {
+        it("should default role and tabIndex for interactive div", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ThemedBox.keyboard-coverage", "component");
             annotate("Category: Core", "category");

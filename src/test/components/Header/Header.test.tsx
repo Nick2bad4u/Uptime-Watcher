@@ -82,7 +82,10 @@ describe("Header Component", () => {
     });
 
     describe("Monitor Count Calculations", () => {
-        it("should display correct counts with no sites", ({ task, annotate }) => {
+        it("should display correct counts with no sites", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -104,7 +107,10 @@ describe("Header Component", () => {
             expect(screen.queryByText("Total")).not.toBeInTheDocument();
         });
 
-        it("should display correct counts with sites having no monitors", ({ task, annotate }) => {
+        it("should display correct counts with sites having no monitors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -162,7 +168,10 @@ describe("Header Component", () => {
             expect(screen.getByText("Total")).toBeInTheDocument();
         });
 
-        it("should correctly count monitors with mixed statuses", ({ task, annotate }) => {
+        it("should correctly count monitors with mixed statuses", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -198,7 +207,10 @@ describe("Header Component", () => {
             expect(screen.getByText("4")).toBeInTheDocument(); // Total count
         });
 
-        it("should handle large numbers of monitors correctly", ({ task, annotate }) => {
+        it("should handle large numbers of monitors correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -234,7 +246,10 @@ describe("Header Component", () => {
     });
 
     describe("Uptime Percentage Calculation", () => {
-        it("should calculate 0% when no monitors are up", ({ task, annotate }) => {
+        it("should calculate 0% when no monitors are up", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -263,7 +278,10 @@ describe("Header Component", () => {
             expect(screen.getByText("0%")).toBeInTheDocument();
         });
 
-        it("should calculate 100% when all monitors are up", ({ task, annotate }) => {
+        it("should calculate 100% when all monitors are up", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -324,7 +342,10 @@ describe("Header Component", () => {
     });
 
     describe("Theme Toggle", () => {
-        it("should display moon icon when in light mode", ({ task, annotate }) => {
+        it("should display moon icon when in light mode", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -343,7 +364,10 @@ describe("Header Component", () => {
             expect(themeButton).toHaveTextContent("🌙");
         });
 
-        it("should display sun icon when in dark mode", ({ task, annotate }) => {
+        it("should display sun icon when in dark mode", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -362,7 +386,10 @@ describe("Header Component", () => {
             expect(themeButton).toHaveTextContent("☀️");
         });
 
-        it("should call toggleTheme when theme button is clicked", ({ task, annotate }) => {
+        it("should call toggleTheme when theme button is clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -386,7 +413,10 @@ describe("Header Component", () => {
     });
 
     describe("Settings Modal", () => {
-        it("should call setShowSettings when settings button is clicked", ({ task, annotate }) => {
+        it("should call setShowSettings when settings button is clicked", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -424,7 +454,10 @@ describe("Header Component", () => {
     });
 
     describe("Status Indicators", () => {
-        it("should display all status types when present", ({ task, annotate }) => {
+        it("should display all status types when present", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -458,7 +491,10 @@ describe("Header Component", () => {
             expect(screen.getByText("Paused")).toBeInTheDocument();
         });
 
-        it("should handle monitors with unknown status", ({ task, annotate }) => {
+        it("should handle monitors with unknown status", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -493,7 +529,10 @@ describe("Header Component", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper aria labels for buttons", ({ task, annotate }) => {
+        it("should have proper aria labels for buttons", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -528,7 +567,10 @@ describe("Header Component", () => {
     });
 
     describe("Availability Color Integration", () => {
-        it("should call getAvailabilityColor with correct percentage", ({ task, annotate }) => {
+        it("should call getAvailabilityColor with correct percentage", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -628,7 +670,10 @@ describe("Header Component", () => {
             expect(screen.getByText("📊")).toBeInTheDocument();
         });
 
-        it("should have proper CSS classes for styling", ({ task, annotate }) => {
+        it("should have proper CSS classes for styling", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -649,7 +694,10 @@ describe("Header Component", () => {
     });
 
     describe("Memoization", () => {
-        it("should recalculate monitor counts when sites change", ({ task, annotate }) => {
+        it("should recalculate monitor counts when sites change", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");
@@ -753,7 +801,10 @@ describe("Header Component", () => {
             expect(screen.getByText("50%")).toBeInTheDocument(); // 1 up out of 2 total
         });
 
-        it("should handle sites with null/undefined monitors", ({ task, annotate }) => {
+        it("should handle sites with null/undefined monitors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Header", "component");
             annotate("Category: Component", "category");

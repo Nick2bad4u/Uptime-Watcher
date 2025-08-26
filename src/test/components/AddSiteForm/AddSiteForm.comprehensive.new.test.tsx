@@ -220,7 +220,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Form Interactions", () => {
-        it("should call setAddMode when switching modes", async ({ task, annotate }) => {
+        it("should call setAddMode when switching modes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -240,7 +243,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             expect(mockSetAddMode).toHaveBeenCalledWith("existing");
         });
 
-        it("should call setMonitorType when changing monitor type", async ({ task, annotate }) => {
+        it("should call setMonitorType when changing monitor type", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -260,7 +266,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             expect(mockSetMonitorType).toHaveBeenCalledWith("ping");
         });
 
-        it("should call setCheckInterval when changing check interval", async ({ task, annotate }) => {
+        it("should call setCheckInterval when changing check interval", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -309,7 +318,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             });
         });
 
-        it("should show site name field for new sites", ({ task, annotate }) => {
+        it("should show site name field for new sites", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -370,7 +382,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             // Note: Field value test removed as form component may not be using mock values correctly
         });
 
-        it("should call setName when site name changes", async ({ task, annotate }) => {
+        it("should call setName when site name changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -420,7 +435,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             });
         });
 
-        it("should show host and port fields for port monitor", ({ task, annotate }) => {
+        it("should show host and port fields for port monitor", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -487,7 +505,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             expect(existingRadio).toBeChecked();
         });
 
-        it("should not show site name field for existing sites", ({ task, annotate }) => {
+        it("should not show site name field for existing sites", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -506,7 +527,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("should not disable submit button when form is invalid (validation happens on submit)", ({ task, annotate }) => {
+        it("should not disable submit button when form is invalid (validation happens on submit)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -551,7 +575,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             expect(submitButton).not.toBeDisabled();
         });
 
-        it("should enable submit button when form is valid", ({ task, annotate }) => {
+        it("should enable submit button when form is valid", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -648,7 +675,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Check Interval Options", () => {
-        it("should display all check interval options", ({ task, annotate }) => {
+        it("should display all check interval options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -669,7 +699,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Form Reset", () => {
-        it("should call resetForm when reset is triggered", ({ task, annotate }) => {
+        it("should call resetForm when reset is triggered", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -725,7 +758,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle undefined form error gracefully", ({ task, annotate }) => {
+        it("should handle undefined form error gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");

@@ -159,13 +159,13 @@ describe("Debug Test - UptimeOrchestrator Creation", () => {
     });
 
     it("should create UptimeOrchestrator without errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: ServiceContainer", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         // Create SiteManager first to ensure proper initialization
         container.getSiteManager();

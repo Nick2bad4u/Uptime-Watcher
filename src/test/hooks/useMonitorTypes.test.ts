@@ -113,10 +113,7 @@ describe("useMonitorTypes Hook", () => {
             expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle empty options array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty options array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypes", "component");
             await annotate("Category: Hook", "category");
@@ -191,10 +188,7 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should handle non-Error objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypes", "component");
             await annotate("Category: Hook", "category");
@@ -250,10 +244,7 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should handle object errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle object errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypes", "component");
             await annotate("Category: Hook", "category");
@@ -323,10 +314,7 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.options).toEqual(successOptions);
         });
 
-        it("should handle error during refresh", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle error during refresh", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorTypes", "component");
             await annotate("Category: Hook", "category");

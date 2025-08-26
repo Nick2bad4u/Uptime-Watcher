@@ -195,7 +195,9 @@ for (const dir of targetDirs) {
             );
         }
         if (isVerbose) {
-            console.log(`   Error: ${err instanceof Error ? err.message : String(err)}`);
+            console.log(
+                `   Error: ${err instanceof Error ? err.message : String(err)}`
+            );
         }
     }
 }
@@ -255,10 +257,18 @@ async function isDirectory(path) {
         const stats = await stat(path);
         return stats.isDirectory();
     } catch (err) {
-        if (err && typeof err === 'object' && 'code' in err && err.code === "EACCES") {
+        if (
+            err &&
+            typeof err === "object" &&
+            "code" in err &&
+            err.code === "EACCES"
+        ) {
             console.warn(`Permission denied: ${path}`);
         } else {
-            console.warn(`Error accessing ${path}:`, err instanceof Error ? err.message : String(err));
+            console.warn(
+                `Error accessing ${path}:`,
+                err instanceof Error ? err.message : String(err)
+            );
         }
         return false;
     }

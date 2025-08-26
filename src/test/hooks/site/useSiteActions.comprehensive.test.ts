@@ -46,10 +46,7 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should return hook functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return hook functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");
@@ -205,10 +202,7 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle stop site monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle stop site monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");
@@ -228,10 +222,7 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Card Click", () => {
-        it("should handle card click action", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle card click action", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");
@@ -272,10 +263,7 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Check Now", () => {
-        it("should handle check now action", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle check now action", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");
@@ -319,10 +307,7 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle errors gracefully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");
@@ -436,10 +421,7 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Different Site Configurations", () => {
-        it("should handle different site types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle different site types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteActions", "component");
             await annotate("Category: Hook", "category");

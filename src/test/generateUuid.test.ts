@@ -35,10 +35,7 @@ describe("UUID Generation", () => {
             expect(uuid).toBe("123e4567-e89b-12d3-a456-426614174000");
         });
 
-        it("should return valid UUID format", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return valid UUID format", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
@@ -304,10 +301,7 @@ describe("UUID Generation", () => {
     });
 
     describe("edge cases", () => {
-        it("should handle consecutive calls", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle consecutive calls", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
@@ -373,10 +367,7 @@ describe("UUID Generation", () => {
     });
 
     describe("return value validation", () => {
-        it("should always return a string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should always return a string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
@@ -387,10 +378,7 @@ describe("UUID Generation", () => {
             expect(uuid.length).toBeGreaterThan(0);
         });
 
-        it("should not return empty string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not return empty string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
@@ -400,10 +388,7 @@ describe("UUID Generation", () => {
             expect(uuid).not.toBe("");
         });
 
-        it("should not contain whitespace", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not contain whitespace", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");

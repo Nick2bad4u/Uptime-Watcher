@@ -324,10 +324,7 @@ describe("useSelectedSite", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSelectedSite", "component");
             await annotate("Category: Hook", "category");
@@ -363,10 +360,7 @@ describe("useSelectedSite", () => {
             }).toThrow("Cannot read properties of undefined");
         });
 
-        it("should handle null sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSelectedSite", "component");
             await annotate("Category: Hook", "category");

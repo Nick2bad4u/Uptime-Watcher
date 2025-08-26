@@ -63,10 +63,7 @@ describe("ThemeManager", () => {
     });
 
     describe("getInstance", () => {
-        it("should return singleton instance", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return singleton instance", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -80,10 +77,7 @@ describe("ThemeManager", () => {
     });
 
     describe("applyTheme", () => {
-        it("should apply light theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply light theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -97,10 +91,7 @@ describe("ThemeManager", () => {
             );
         });
 
-        it("should apply dark theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should apply dark theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -117,10 +108,7 @@ describe("ThemeManager", () => {
             );
         });
 
-        it("should handle undefined document", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined document", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -138,10 +126,7 @@ describe("ThemeManager", () => {
     });
 
     describe("getTheme", () => {
-        it("should get light theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get light theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -152,10 +137,7 @@ describe("ThemeManager", () => {
             expect(theme).toBe(lightTheme);
         });
 
-        it("should get dark theme", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get dark theme", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -166,10 +148,7 @@ describe("ThemeManager", () => {
             expect(theme).toBe(darkTheme);
         });
 
-        it("should get system theme preference", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get system theme preference", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");
@@ -283,10 +262,7 @@ describe("ThemeManager", () => {
             expect(themeManager.isValidThemeName("system")).toBe(true);
         });
 
-        it("should reject invalid theme names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid theme names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ThemeManager", "component");
             await annotate("Category: Core", "category");

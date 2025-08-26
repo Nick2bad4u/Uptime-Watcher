@@ -14,15 +14,15 @@ vi.mock("../../../services/logger", () => ({
 
 describe("AddSiteForm Targeted Coverage", () => {
     it("should cover error logging scenarios", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Test Line 155: Invalid monitor type error logging
         logger.error("Invalid monitor type value: invalid-type");
@@ -44,15 +44,15 @@ describe("AddSiteForm Targeted Coverage", () => {
     });
 
     it("should cover handler functions", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test dynamic field handlers (lines 183-186)
         const mockSetHost = vi.fn();
@@ -75,15 +75,15 @@ describe("AddSiteForm Targeted Coverage", () => {
     });
 
     it("should cover callback execution", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         // Test success callback execution (lines 175-176)
         const mockResetForm = vi.fn();
@@ -97,15 +97,15 @@ describe("AddSiteForm Targeted Coverage", () => {
     });
 
     it("should cover error handling", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Test form submission error handling (line 240)
         const consoleSpy = vi
@@ -123,15 +123,15 @@ describe("AddSiteForm Targeted Coverage", () => {
     });
 
     it("should cover error clearing", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Error Handling", "type");
 
         // Test error clearing functionality (lines 276-277)
         const mockClearError = vi.fn();

@@ -138,10 +138,7 @@ describe("chartConfig utilities", () => {
             expect(hasPlugins({ plugins: [] })).toBe(true);
         });
 
-        it("should return false for null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -198,10 +195,7 @@ describe("chartConfig utilities", () => {
             expect(hasPlugins([{ plugins: {} }])).toBe(false);
         });
 
-        it("should work as type guard", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work as type guard", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -394,10 +388,7 @@ describe("chartConfig utilities", () => {
             expect(hasScales({ scales: [] })).toBe(true);
         });
 
-        it("should return false for null input", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null input", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -454,10 +445,7 @@ describe("chartConfig utilities", () => {
             expect(hasScales([{ scales: {} }])).toBe(false);
         });
 
-        it("should work as type guard", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work as type guard", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");

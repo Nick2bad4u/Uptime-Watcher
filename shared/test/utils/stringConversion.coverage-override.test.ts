@@ -1,19 +1,15 @@
 /**
  * Complete test coverage for stringConversion.ts unreachable code paths This
  * test uses advanced techniques to reach it("should handle all typeof results
- * comprehensively", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
- // This test ensures we exercise all possible
- * typeof results const testCases = [ ["boolean", true], ["number", 42],
- * ["string", "test"], ["symbol", Symbol("test")], ["bigint", BigInt(123)],
- * ["function", () => {}], ["object", {}], ["object", null], // typeof null ===
- * "object" ["undefined", undefined], ];
+ * comprehensively", async ({ task, annotate, }) => { await annotate(`Testing:
+ * ${task.name}`, "functional"); await annotate("Component:
+ * stringConversion.coverage-override", "component"); await annotate("Category:
+ * Utility", "category"); await annotate("Type: Business Logic", "type"); //
+ * This test ensures we exercise all possible typeof results const testCases = [
+ * ["boolean", true], ["number", 42], ["string", "test"], ["symbol",
+ * Symbol("test")], ["bigint", BigInt(123)], ["function", () => {}], ["object",
+ * {}], ["object", null], // typeof null === "object" ["undefined", undefined],
+ * ];
  *
  * ```
  *     for (const [expectedTypeName, value] of testCases) {
@@ -44,13 +40,16 @@ describe("String Conversion - 100% Coverage Override", () => {
     });
 
     it("should reach case undefined by creating a value that reports as undefined but isn't null", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.coverage-override",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test the explicit undefined case - this might be reachable if we can create
         // a value that typeof reports as "undefined" but isn't actually null/undefined
@@ -68,13 +67,16 @@ describe("String Conversion - 100% Coverage Override", () => {
     });
 
     it("should handle the default case by creating an unknown type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.coverage-override",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Create a mock object with a custom type that doesn't exist
         const weirdValue = Object.create(null);
@@ -113,13 +115,16 @@ describe("String Conversion - 100% Coverage Override", () => {
     });
 
     it("should test all edge cases for maximum code coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.coverage-override",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test all possible cases that could theoretically hit the switch statement
         const testCases = [
@@ -165,13 +170,16 @@ describe("String Conversion - 100% Coverage Override", () => {
     });
 
     it("should ensure circular reference handling", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.coverage-override",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Create circular reference to test the try/catch path
         const circular: any = { name: "test" };
@@ -182,13 +190,16 @@ describe("String Conversion - 100% Coverage Override", () => {
     });
 
     it("should handle all typeof results comprehensively", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.coverage-override", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.coverage-override",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // This test ensures we exercise all possible typeof results
         const testCases = [

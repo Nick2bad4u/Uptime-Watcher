@@ -35,7 +35,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -60,7 +63,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -81,7 +87,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -105,7 +114,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -130,7 +142,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -151,7 +166,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -175,7 +193,10 @@ describe("MonitoringService - Site-level monitoring", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -205,12 +226,12 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("Error handling consistency", () => {
-        it("should handle network errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle network errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -225,12 +246,12 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Network error");
         });
 
-        it("should handle timeout errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService.siteLevel", "component");
+            await annotate(
+                "Component: MonitoringService.siteLevel",
+                "component"
+            );
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 

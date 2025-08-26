@@ -123,15 +123,15 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 describe("AddSiteForm", () => {
     it("should render without crashing", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<AddSiteForm />);
         // Check for the submit button which is definitely in the DOM
@@ -141,15 +141,15 @@ describe("AddSiteForm", () => {
     });
 
     it("should render form elements", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: AddSiteForm", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<AddSiteForm />);
         expect(screen.getByRole("radiogroup")).toBeInTheDocument();

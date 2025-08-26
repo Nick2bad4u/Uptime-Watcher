@@ -9,10 +9,7 @@ describe("Logger Targeted Coverage", () => {
     });
 
     describe("logger methods", () => {
-        it("should call debug method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call debug method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-targeted", "component");
             await annotate("Category: Utility", "category");
@@ -22,10 +19,7 @@ describe("Logger Targeted Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should call info method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call info method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-targeted", "component");
             await annotate("Category: Utility", "category");
@@ -35,10 +29,7 @@ describe("Logger Targeted Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should call warn method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call warn method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-targeted", "component");
             await annotate("Category: Utility", "category");
@@ -77,10 +68,7 @@ describe("Logger Targeted Coverage", () => {
     });
 
     describe("dbLogger methods", () => {
-        it("should call all dbLogger methods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call all dbLogger methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-targeted", "component");
             await annotate("Category: Utility", "category");

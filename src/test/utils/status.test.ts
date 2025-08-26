@@ -10,73 +10,73 @@ describe("Status Utilities", () => {
     describe("getStatusIcon", () => {
         describe("Standard status icons", () => {
             it("should return down icon for 'down' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("down")).toBe("❌");
             });
 
             it("should return mixed icon for 'mixed' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("mixed")).toBe("🔄");
             });
 
             it("should return paused icon for 'paused' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("paused")).toBe("⏸️");
             });
 
             it("should return pending icon for 'pending' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("pending")).toBe("⏳");
             });
 
             it("should return unknown icon for 'unknown' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("unknown")).toBe("❓");
             });
 
             it("should return up icon for 'up' status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("up")).toBe("✅");
             });
@@ -84,13 +84,13 @@ describe("Status Utilities", () => {
 
         describe("Case insensitive handling", () => {
             it("should handle uppercase status values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("DOWN")).toBe("❌");
                 expect(getStatusIcon("UP")).toBe("✅");
@@ -101,13 +101,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle mixed case status values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("Down")).toBe("❌");
                 expect(getStatusIcon("Up")).toBe("✅");
@@ -118,13 +118,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle weird casing combinations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("dOwN")).toBe("❌");
                 expect(getStatusIcon("uP")).toBe("✅");
@@ -137,13 +137,13 @@ describe("Status Utilities", () => {
 
         describe("Unknown status handling", () => {
             it("should return default icon for unknown status strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("invalid")).toBe("⚪");
                 expect(getStatusIcon("custom")).toBe("⚪");
@@ -154,25 +154,25 @@ describe("Status Utilities", () => {
             });
 
             it("should return default icon for empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("")).toBe("⚪");
             });
 
             it("should return default icon for whitespace-only strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon(" ")).toBe("⚪");
                 expect(getStatusIcon("   ")).toBe("⚪");
@@ -181,13 +181,13 @@ describe("Status Utilities", () => {
             });
 
             it("should return default icon for special characters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("!@#$%")).toBe("⚪");
                 expect(getStatusIcon("123")).toBe("⚪");
@@ -198,13 +198,13 @@ describe("Status Utilities", () => {
 
         describe("Edge cases", () => {
             it("should handle numeric status representations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("0")).toBe("⚪");
                 expect(getStatusIcon("1")).toBe("⚪");
@@ -214,13 +214,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle status with extra whitespace", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon(" up ")).toBe("⚪"); // Note: doesn't trim, so this is unknown
                 expect(getStatusIcon("down ")).toBe("⚪");
@@ -229,26 +229,26 @@ describe("Status Utilities", () => {
             });
 
             it("should handle very long strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const longString = "a".repeat(1000);
                 expect(getStatusIcon(longString)).toBe("⚪");
             });
 
             it("should handle unicode characters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon("🔴")).toBe("⚪");
                 expect(getStatusIcon("✅")).toBe("⚪");
@@ -261,73 +261,73 @@ describe("Status Utilities", () => {
     describe("formatStatusWithIcon", () => {
         describe("Standard status formatting", () => {
             it("should format 'down' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("down")).toBe("❌ Down");
             });
 
             it("should format 'up' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("up")).toBe("✅ Up");
             });
 
             it("should format 'mixed' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("mixed")).toBe("🔄 Mixed");
             });
 
             it("should format 'paused' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("paused")).toBe("⏸️ Paused");
             });
 
             it("should format 'pending' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("pending")).toBe("⏳ Pending");
             });
 
             it("should format 'unknown' status correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("unknown")).toBe("❓ Unknown");
             });
@@ -335,52 +335,52 @@ describe("Status Utilities", () => {
 
         describe("Capitalization handling", () => {
             it("should properly capitalize lowercase status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("down")).toBe("❌ Down");
                 expect(formatStatusWithIcon("up")).toBe("✅ Up");
             });
 
             it("should properly format uppercase status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("DOWN")).toBe("❌ Down");
                 expect(formatStatusWithIcon("UP")).toBe("✅ Up");
             });
 
             it("should properly format mixed case status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("DoWn")).toBe("❌ Down");
                 expect(formatStatusWithIcon("uP")).toBe("✅ Up");
             });
 
             it("should properly format already capitalized status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("Down")).toBe("❌ Down");
                 expect(formatStatusWithIcon("Up")).toBe("✅ Up");
@@ -389,13 +389,13 @@ describe("Status Utilities", () => {
 
         describe("Unknown status formatting", () => {
             it("should format unknown statuses with default icon", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("invalid")).toBe("⚪ Invalid");
                 expect(formatStatusWithIcon("custom")).toBe("⚪ Custom");
@@ -403,13 +403,13 @@ describe("Status Utilities", () => {
             });
 
             it("should format single character statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("a")).toBe("⚪ A");
                 expect(formatStatusWithIcon("z")).toBe("⚪ Z");
@@ -419,39 +419,36 @@ describe("Status Utilities", () => {
         });
 
         describe("Edge cases", () => {
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("")).toBe("⚪ ");
             });
 
             it("should handle whitespace-only strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon(" ")).toBe("⚪  "); // First char uppercased, rest lowercased
                 expect(formatStatusWithIcon("   ")).toBe("⚪    ");
             });
 
             it("should handle special characters correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("@test")).toBe("⚪ @test");
                 expect(formatStatusWithIcon("123abc")).toBe("⚪ 123abc");
@@ -461,13 +458,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle very long status strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const longStatus = "verylongstatusname";
                 expect(formatStatusWithIcon(longStatus)).toBe(
@@ -476,27 +473,24 @@ describe("Status Utilities", () => {
             });
 
             it("should handle unicode characters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("тест")).toBe("⚪ Тест");
                 expect(formatStatusWithIcon("测试")).toBe("⚪ 测试");
                 expect(formatStatusWithIcon("🔴test")).toBe("⚪ 🔴test");
             });
 
-            it("should handle numeric strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle numeric strings", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("404")).toBe("⚪ 404");
                 expect(formatStatusWithIcon("200")).toBe("⚪ 200");
@@ -506,13 +500,13 @@ describe("Status Utilities", () => {
 
         describe("Integration with icon selection", () => {
             it("should use correct icons based on case-insensitive matching", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("UP")).toBe("✅ Up");
                 expect(formatStatusWithIcon("dOwN")).toBe("❌ Down");
@@ -520,13 +514,13 @@ describe("Status Utilities", () => {
             });
 
             it("should maintain text formatting independently of icon selection", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // Even though icon selection is case-insensitive, text formatting should work consistently
                 expect(formatStatusWithIcon("UNKNOWN")).toBe("❓ Unknown");
@@ -537,13 +531,13 @@ describe("Status Utilities", () => {
 
         describe("Multi-word status handling (edge case behavior)", () => {
             it("should handle hyphenated statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("not-responding")).toBe(
                     "⚪ Not-responding"
@@ -554,13 +548,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle space-separated statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("not responding")).toBe(
                     "⚪ Not responding"
@@ -571,13 +565,13 @@ describe("Status Utilities", () => {
             });
 
             it("should handle underscore-separated statuses", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: status", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: status", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon("not_responding")).toBe(
                     "⚪ Not_responding"

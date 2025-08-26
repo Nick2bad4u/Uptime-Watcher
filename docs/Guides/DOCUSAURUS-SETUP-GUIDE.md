@@ -11,7 +11,7 @@ This project uses **Docusaurus v3** with **TypeDoc** integration to generate com
 
 ## Architecture
 
-```
+```text
 docs/
 ├── docusaurus/              # Docusaurus site configuration
 │   ├── docs/               # Generated documentation output

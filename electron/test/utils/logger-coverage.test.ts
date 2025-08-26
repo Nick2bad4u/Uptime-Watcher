@@ -344,10 +344,7 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle null error object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null error object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
             await annotate("Category: Utility", "category");

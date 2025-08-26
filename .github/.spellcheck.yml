@@ -1,23 +1,8 @@
 matrix:
-    - name: Markdown
-      aspell:
-          lang: en
-          dictionary:
-          wordlists:
-              - .wordlist.txt
-          encoding: utf-8
-          pipeline:
-              - pyspelling.filters.markdown:
-                markdown_extensions:
-                    - pymdownx.superfences
-              - pyspelling.filters.html:
-                comments: false
-                ignores:
-                    - code
-                    - pre
-          sources:
-              - "**/*.md"
+    - aspell:
           default_encoding: utf-8
+          dictionary:
+          encoding: utf-8
           exclude:
               - "libs/**"
               - "node_modules/**"
@@ -26,3 +11,18 @@ matrix:
               - "**/changelog.md"
               - "**/CHANGELOG.md"
               - "**/copilot-instructions.md"
+          lang: en
+          pipeline:
+              - markdown_extensions:
+                    - pymdownx.superfences
+                pyspelling.filters.markdown:
+              - comments: false
+                ignores:
+                    - code
+                    - pre
+                pyspelling.filters.html:
+          sources:
+              - "**/*.md"
+          wordlists:
+              - .wordlist.txt
+      name: Markdown

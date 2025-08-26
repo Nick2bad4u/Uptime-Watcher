@@ -509,10 +509,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(sites[0]?.monitoring).toBe(true);
         });
 
-        it("should handle monitor without ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle monitor without ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -573,10 +570,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle non-Error exceptions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error exceptions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -638,10 +632,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle empty sites array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -696,10 +687,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
-        it("should handle non-Error exceptions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error exceptions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -786,10 +774,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             ).toHaveBeenCalledWith(mockMonitoringConfig);
         });
 
-        it("should handle zero sites loaded", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero sites loaded", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -875,10 +860,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
-        it("should handle non-Error exceptions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error exceptions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -903,10 +885,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     });
 
     describe("SiteLoadingError", () => {
-        it("should create error with message", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create error with message", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");
@@ -935,10 +914,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(error.stack).toContain("Original error");
         });
 
-        it("should work without cause error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work without cause error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteRepositoryService", "component");
             await annotate("Category: Utility", "category");

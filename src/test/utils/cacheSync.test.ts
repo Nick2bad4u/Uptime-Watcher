@@ -93,13 +93,13 @@ describe("cacheSync", () => {
     describe("setupCacheSync", () => {
         describe("when window is undefined (SSR/Node environment)", () => {
             it("should return no-op cleanup function and warn", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 // Mock window as undefined
                 const originalWindow = globalThis.window;
@@ -123,13 +123,13 @@ describe("cacheSync", () => {
 
         describe("when electronAPI is not available", () => {
             it("should return no-op cleanup function and warn", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 (globalThis as any).window = {};
 
@@ -163,13 +163,13 @@ describe("cacheSync", () => {
             });
 
             it("should set up cache invalidation listener and return cleanup function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 const cleanup = setupCacheSync();
 
@@ -183,13 +183,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle 'all' cache invalidation type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -216,13 +216,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle 'monitor' cache invalidation type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -250,13 +250,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle 'monitor' cache invalidation type without identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -283,13 +283,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle 'site' cache invalidation type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -317,13 +317,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle 'site' cache invalidation type without identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -349,13 +349,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle unknown cache invalidation type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -379,13 +379,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle errors in cache invalidation handler", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const testError = new Error("Cache clearing failed");
                 mockClearMonitorTypeCache.mockImplementation(() => {
@@ -411,13 +411,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle errors when clearing specific cache types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const testError = new Error("MonitorType cache clear failed");
                 mockClearMonitorTypeCache.mockImplementation(() => {
@@ -445,13 +445,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle cache invalidation with all optional properties", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -479,13 +479,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle cache invalidation with minimal required properties", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -513,13 +513,13 @@ describe("cacheSync", () => {
 
         describe("when electronAPI exists but events is missing", () => {
             it("should handle missing events property gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Event Processing", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Event Processing", "type");
 
                 (globalThis as any).window = {
                     electronAPI: {
@@ -558,13 +558,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle null invalidation data gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -580,13 +580,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle cache clearing function throwing errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const clearError = new Error("Clear function error");
                 mockClearMonitorTypeCache.mockImplementation(() => {
@@ -611,13 +611,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle empty reason string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -638,13 +638,13 @@ describe("cacheSync", () => {
             });
 
             it("should handle empty identifier string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheSync", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 mockOnCacheInvalidated = vi.fn();
                 mockCleanup = vi.fn();

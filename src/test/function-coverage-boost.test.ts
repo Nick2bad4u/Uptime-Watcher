@@ -308,10 +308,7 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test type helper functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test type helper functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: function-coverage-boost", "component");
             await annotate("Category: Core", "category");
@@ -337,10 +334,7 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test type guard functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should test type guard functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: function-coverage-boost", "component");
             await annotate("Category: Core", "category");

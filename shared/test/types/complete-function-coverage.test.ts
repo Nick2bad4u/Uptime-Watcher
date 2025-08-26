@@ -6,12 +6,12 @@ import * as validation from "../../types/validation";
 
 describe("Types Complete Function Coverage", () => {
     describe("chartConfig module", () => {
-        it("should call hasPlugins function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call hasPlugins function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -24,12 +24,12 @@ describe("Types Complete Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call hasScales function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call hasScales function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -49,7 +49,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -70,12 +73,12 @@ describe("Types Complete Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isThemeConfig function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call isThemeConfig function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -104,7 +107,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -127,7 +133,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -144,7 +153,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -161,7 +173,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -178,7 +193,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -201,7 +219,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Constructor", "type");
 
@@ -218,7 +239,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Constructor", "type");
 
@@ -232,7 +256,10 @@ describe("Types Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: complete-function-coverage", "component");
+            await annotate(
+                "Component: complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 

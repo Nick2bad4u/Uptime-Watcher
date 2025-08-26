@@ -5,13 +5,28 @@
 
 $schema: "https://www.schemastore.org/pre-commit-config.json"
 
-# Global configuration
-fail_fast: true # Stop on first failure for faster feedback
+# CI configuration
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit hooks
+
+        for more information, see https://pre-commit.ci
+    autofix_prs: true
+    autoupdate_branch: ""
+    autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+    autoupdate_schedule: weekly
+    skip: []
+    submodules: false
+# Default hook types to install
+default_install_hook_types:
+    - pre-commit
+    - commit-msg
+
 default_language_version:
-    python: python3
     node: "20.11.0" # LTS version for consistency
 
-# Exclude patterns for files that shouldn't be checked
+    python: python3
+# Global configuration
 exclude: |
     (?x)^(
         node_modules/.*|        # Dependencies
@@ -32,65 +47,63 @@ exclude: |
         .*/cache/.*|           # Any cache subdirectories
     )$
 
+fail_fast: true # Stop on first failure for faster feedback
+# Exclude patterns for files that shouldn't be checked
 # Hook repositories
 repos:
     # ===================================================================
     #                         🔒 SECURITY SCANNING
     # ===================================================================
-    - repo: https://github.com/gitleaks/gitleaks
-      rev: v8.28.0
-      hooks:
-          - id: gitleaks
-            name: "🔒 security · Detect hardcoded secrets"
-            description: "Scan for API keys, passwords, and other secrets"
+    - hooks:
+          - description: "Scan for API keys, passwords, and other secrets"
 
+            id: gitleaks
+            name: "🔒 security · Detect hardcoded secrets"
+      repo: https://github.com/gitleaks/gitleaks
+      rev: v8.28.0
     # ===================================================================
     #                       🧹 CODE FORMATTING & QUALITY
     # ===================================================================
 
     # Biome for JavaScript/TypeScript formatting and linting
-    - repo: https://github.com/biomejs/pre-commit
-      rev: "v0.9.1"
-      hooks:
-          - id: biome-check
-            name: "🟨 typescript/react · Format, lint & safe fixes"
-            additional_dependencies: ["@biomejs/biome@1.9.4"]
+    - hooks:
+          - additional_dependencies: ["@biomejs/biome@1.9.4"]
             args: ["--write", "--unsafe"]
+            id: biome-check
+            name: "🟨 typescript/react · Format, lint & safe fixes"
             types_or: [ts, tsx, js, jsx, json, jsonc]
 
+      repo: https://github.com/biomejs/pre-commit
+      rev: "v0.9.1"
     # ===================================================================
     #                      📋 CONFIGURATION VALIDATION
     # ===================================================================
 
     # JSON Schema validation for configuration files
-    - repo: https://github.com/python-jsonschema/check-jsonschema
-      rev: 0.31.1
-      hooks:
-          - id: check-github-workflows
+    - hooks:
+          - args: ["--verbose"]
+
+            id: check-github-workflows
             name: "🐙 github-actions · Validate workflow files"
-            args: ["--verbose"]
+          - args: ["--schemafile", "https://json.schemastore.org/package.json"]
 
-          - id: check-jsonschema
-            name: "✅ config · Validate package.json"
             files: "^package\\.json$"
-            args: ["--schemafile", "https://json.schemastore.org/package.json"]
+            id: check-jsonschema
+            name: "✅ config · Validate package.json"
+          - args: ["--schemafile", "https://json.schemastore.org/tsconfig.json"]
 
-          - id: check-jsonschema
-            name: "✅ config · Validate tsconfig files"
             files: "^tsconfig.*\\.json$"
-            args: ["--schemafile", "https://json.schemastore.org/tsconfig.json"]
-
+            id: check-jsonschema
+            name: "✅ config · Validate tsconfig files"
+      repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: 0.31.1
     # ===================================================================
     #                      📝 DOCUMENTATION & MARKDOWN
     # ===================================================================
 
     # Markdown formatting
-    - repo: https://github.com/hukkin/mdformat
-      rev: 0.7.21
-      hooks:
-          - id: mdformat
-            name: "📝 markdown · Format markdown files"
-            additional_dependencies:
+    - hooks:
+          - additional_dependencies:
                 - mdformat-gfm # GitHub-Flavored Markdown
                 - mdformat-frontmatter # YAML frontmatter
             args: ["--wrap", "80"]
@@ -100,31 +113,33 @@ repos:
                     \.github/.*\.md$
                 )$
 
+            id: mdformat
+            name: "📝 markdown · Format markdown files"
+      repo: https://github.com/hukkin/mdformat
+      rev: 0.7.21
     # Markdown linting
-    - repo: https://github.com/markdownlint/markdownlint
-      rev: v0.15.0
-      hooks:
-          - id: markdownlint
-            name: "📝 markdown · Lint markdown files"
-            args: ["--style", ".markdownlint.yml"]
+    - hooks:
+          - args: ["--style", ".markdownlint.yml"]
             exclude: |
                 (?x)^(
                     CHANGELOG\.md$|
                     \.github/.*\.md$
                 )$
 
+            id: markdownlint
+            name: "📝 markdown · Lint markdown files"
+      repo: https://github.com/markdownlint/markdownlint
+      rev: v0.15.0
     # ===================================================================
     #                       📁 FILESYSTEM HYGIENE
     # ===================================================================
 
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
-      hooks:
+    - hooks:
           # File system checks
-          - id: check-added-large-files
-            name: "📁 filesystem · Block large file commits"
-            args: ["--maxkb=5000", "--enforce-all"]
+          - args: ["--maxkb=5000", "--enforce-all"]
 
+            id: check-added-large-files
+            name: "📁 filesystem · Block large file commits"
           - id: check-case-conflict
             name: "📁 filesystem · Check case sensitivity"
 
@@ -147,9 +162,7 @@ repos:
           - id: check-merge-conflict
             name: "🌳 git · Detect conflict markers"
 
-          - id: no-commit-to-branch
-            name: "🌳 git · Protect main branches"
-            args:
+          - args:
                 [
                     "--branch",
                     "main",
@@ -159,14 +172,16 @@ repos:
                     "develop",
                 ]
 
+            id: no-commit-to-branch
+            name: "🌳 git · Protect main branches"
           # File format validation
           - id: check-json
             name: "✅ format · Validate JSON files"
 
-          - id: check-yaml
-            name: "✅ format · Validate YAML files"
-            args: ["--unsafe"] # Allow custom YAML tags
+          - args: ["--unsafe"] # Allow custom YAML tags
 
+            id: check-yaml
+            name: "✅ format · Validate YAML files"
           - id: check-toml
             name: "✅ format · Validate TOML files"
 
@@ -174,135 +189,120 @@ repos:
             name: "✅ format · Validate XML files"
 
           # Code hygiene
-          - id: end-of-file-fixer
+          - exclude: |
+                (?x)^(
+                    .*\.min\.(js|css)$|
+                    .*\.wasm$
+                )$
+
+            id: end-of-file-fixer
             name: "🧹 cleanup · Fix end-of-file"
+          - args: ["--markdown-linebreak-ext=md"]
             exclude: |
                 (?x)^(
                     .*\.min\.(js|css)$|
                     .*\.wasm$
                 )$
 
-          - id: trailing-whitespace
+            id: trailing-whitespace
             name: "🧹 cleanup · Remove trailing whitespace"
-            args: ["--markdown-linebreak-ext=md"]
-            exclude: |
-                (?x)^(
-                    .*\.min\.(js|css)$|
-                    .*\.wasm$
-                )$
-
           # Security checks
           - id: detect-private-key
             name: "🔒 security · Detect private keys"
 
+      repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v5.0.0
     # ===================================================================
     #                        🎨 ADDITIONAL FILE TYPES
     # ===================================================================
 
     # CSS/SCSS formatting with Prettier
-    - repo: https://github.com/pre-commit/mirrors-prettier
-      rev: v4.0.0-alpha.8
-      hooks:
-          - id: prettier
-            name: "✨ styling · Format CSS/SCSS files"
-            types_or: [css, scss]
-            additional_dependencies:
+    - hooks:
+          - additional_dependencies:
                 - prettier@3.4.2
 
+            id: prettier
+            name: "✨ styling · Format CSS/SCSS files"
+            types_or: [css, scss]
+      repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v4.0.0-alpha.8
     # ===================================================================
     #                         🖼️ ASSET OPTIMIZATION
     # ===================================================================
 
     # PNG optimization
-    - repo: https://github.com/shssoichiro/oxipng
-      rev: v9.1.3
-      hooks:
-          - id: oxipng
-            name: "🖼️ images · Optimize PNG files"
-            args: [
+    - hooks:
+          - args: [
                     "-o",
                     "4", # Optimization level
                     "--strip",
                     "safe", # Strip metadata safely
-                    "--alpha", # Optimize alpha channel
-                ]
+                    "--alpha",
+                ] # Optimize alpha channel
 
+            id: oxipng
+            name: "🖼️ images · Optimize PNG files"
+      repo: https://github.com/shssoichiro/oxipng
+      rev: v9.1.3
     # ===================================================================
     #                      🧪 TESTING & TYPE CHECKING
     # ===================================================================
 
     # Local hooks for TypeScript and testing
-    - repo: local
-      hooks:
+    - hooks:
           # TypeScript type checking
-          - id: typescript-check
-            name: "🔍 typescript · Type check all files"
+          - args: ["--noEmit"]
             entry: npx tsc
-            language: node
-            args: ["--noEmit"]
             files: '\.(ts|tsx)$'
+            id: typescript-check
+            language: node
+            name: "🔍 typescript · Type check all files"
             pass_filenames: false
             require_serial: true
 
           # Electron TypeScript type checking
-          - id: typescript-check-electron
-            name: "🔍 electron · Type check electron files"
+          - args: ["--project", "tsconfig.electron.json", "--noEmit"]
             entry: npx tsc
-            language: node
-            args: ["--project", "tsconfig.electron.json", "--noEmit"]
             files: '^electron/.*\.(ts|tsx)$'
+            id: typescript-check-electron
+            language: node
+            name: "🔍 electron · Type check electron files"
             pass_filenames: false
             require_serial: true
 
           # Vite build check (without output)
-          - id: vite-build-check
-            name: "⚡ vite · Validate build configuration"
+          - args: ["build", "--mode", "development", "--emptyOutDir", "false"]
             entry: npx vite
-            language: node
-            args: ["build", "--mode", "development", "--emptyOutDir", "false"]
             files: '^(src/|vite\.config\.|tsconfig\.json|package\.json)'
+            id: vite-build-check
+            language: node
+            name: "⚡ vite · Validate build configuration"
             pass_filenames: false
             require_serial: true
 
           # Package.json script validation
-          - id: package-scripts-check
-            name: "📦 npm · Validate package.json scripts"
-            entry: node
-            language: node
-            args:
+          - args:
                 [
                     "-e",
                     "const pkg = require('./package.json'); console.log('✅ Package.json is valid')",
                 ]
+            entry: node
             files: '^package\.json$'
+            id: package-scripts-check
+            language: node
+            name: "📦 npm · Validate package.json scripts"
             pass_filenames: false
 
+      repo: local
     # ===================================================================
     #                    💬 COMMIT MESSAGE VALIDATION
     # ===================================================================
 
     # Commitizen for conventional commit messages
-    - repo: https://github.com/commitizen-tools/commitizen
-      rev: v4.1.0
-      hooks:
+    - hooks:
           - id: commitizen
             name: "💬 commit · Validate commit message format"
             stages: [commit-msg]
 
-# Default hook types to install
-default_install_hook_types:
-    - pre-commit
-    - commit-msg
-
-# CI configuration
-ci:
-    autofix_commit_msg: |
-        [pre-commit.ci] auto fixes from pre-commit hooks
-
-        for more information, see https://pre-commit.ci
-    autofix_prs: true
-    autoupdate_branch: ""
-    autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
-    autoupdate_schedule: weekly
-    skip: []
-    submodules: false
+      repo: https://github.com/commitizen-tools/commitizen
+      rev: v4.1.0

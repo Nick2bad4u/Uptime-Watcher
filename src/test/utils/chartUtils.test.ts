@@ -287,10 +287,7 @@ describe("Chart Utilities", () => {
             expect(getScaleConfig(config, "y")).toBeUndefined();
         });
 
-        it("should handle empty scales object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty scales object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartUtils", "component");
             await annotate("Category: Utility", "category");
@@ -666,10 +663,7 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should handle single property path", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle single property path", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartUtils", "component");
             await annotate("Category: Utility", "category");
@@ -681,10 +675,7 @@ describe("Chart Utilities", () => {
             });
         });
 
-        it("should handle very deep nesting", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very deep nesting", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartUtils", "component");
             await annotate("Category: Utility", "category");

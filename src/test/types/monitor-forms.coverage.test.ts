@@ -28,10 +28,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(typeof baseFields.timeout).toBe("number");
         });
 
-        it("should handle optional base fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle optional base fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -48,10 +45,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("HttpMonitorFields Interface", () => {
-        it("should extend BaseMonitorFields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should extend BaseMonitorFields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -88,10 +82,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(typeof httpFields.url).toBe("string");
         });
 
-        it("should validate HTTP methods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate HTTP methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -115,10 +106,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should require URL field", async ({
-            task,
-            annotate,
-        }) => {
+        it("should require URL field", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -157,10 +145,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("MonitorFieldChangeHandlers Interface", () => {
-        it("should define all handler types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define all handler types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -212,10 +197,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("boolean");
         });
 
-        it("should handle number field changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle number field changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -233,10 +215,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("number");
         });
 
-        it("should handle string field changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string field changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -254,10 +233,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(result.type).toBe("string");
         });
 
-        it("should handle object field changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle object field changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -345,10 +321,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle string field types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string field types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -366,10 +339,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle boolean field types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle boolean field types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -387,10 +357,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("should validate required fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate required fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -415,10 +382,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should handle field defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle field defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -443,10 +407,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Header Handling", () => {
-        it("should handle empty headers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty headers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -456,10 +417,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             expect(Object.keys(emptyHeaders)).toHaveLength(0);
         });
 
-        it("should handle multiple headers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle multiple headers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -502,10 +460,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
     });
 
     describe("Method Validation", () => {
-        it("should validate all HTTP methods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate all HTTP methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");
@@ -531,10 +486,7 @@ describe("Monitor Forms Types Coverage Tests", () => {
             }
         });
 
-        it("should reject invalid HTTP methods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reject invalid HTTP methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitor-forms", "component");
             await annotate("Category: Core", "category");

@@ -2,7 +2,10 @@ import { safeObjectOmit } from "../../utils/objectSafety";
 
 describe("ObjectSafety - Missing Coverage", () => {
     describe("safeObjectOmit null/undefined handling", () => {
-        test("should handle null object input (lines 125-126)", ({ task, annotate }) => {
+        test("should handle null object input (lines 125-126)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -19,7 +22,10 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(result).toEqual({});
         });
 
-        test("should handle undefined object input (lines 125-126)", ({ task, annotate }) => {
+        test("should handle undefined object input (lines 125-126)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -36,7 +42,10 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(result).toEqual({});
         });
 
-        test("should handle various falsy and edge case inputs", ({ task, annotate }) => {
+        test("should handle various falsy and edge case inputs", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -62,7 +71,10 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(safeObjectOmit(undefined as any, [] as const)).toEqual({});
         });
 
-        test("should properly handle the null/undefined defensive check", ({ task, annotate }) => {
+        test("should properly handle the null/undefined defensive check", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -94,7 +106,10 @@ describe("ObjectSafety - Missing Coverage", () => {
             expect(typeof undefinedResult).toBe("object");
         });
 
-        test("should handle edge cases that might bypass null/undefined check", ({ task, annotate }) => {
+        test("should handle edge cases that might bypass null/undefined check", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");
@@ -121,7 +136,10 @@ describe("ObjectSafety - Missing Coverage", () => {
             });
         });
 
-        test("should verify the exact conditional logic for null/undefined", ({ task, annotate }) => {
+        test("should verify the exact conditional logic for null/undefined", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: objectSafety-missing-coverage", "component");
             annotate("Category: Utility", "category");

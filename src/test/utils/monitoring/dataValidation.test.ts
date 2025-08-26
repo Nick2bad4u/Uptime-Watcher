@@ -27,10 +27,7 @@ describe("Monitoring Data Validation", () => {
     });
 
     describe("parseUptimeValue", () => {
-        it("should parse valid numeric strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should parse valid numeric strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -89,10 +86,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue("  99.99%  ")).toBe(99.99);
         });
 
-        it("should clamp values above 100", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clamp values above 100", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -104,10 +98,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue(" 150% ")).toBe(100);
         });
 
-        it("should clamp values below 0", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clamp values below 0", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -172,10 +163,7 @@ describe("Monitoring Data Validation", () => {
             );
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -187,10 +175,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue("99.9")).toBe(99.9);
         });
 
-        it("should handle scientific notation", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle scientific notation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -438,10 +423,7 @@ describe("Monitoring Data Validation", () => {
             expect(safeGetHostname("https://[::1]")).toBe("[::1]"); // IPv6
         });
 
-        it("should use isValidUrl internally", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use isValidUrl internally", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");

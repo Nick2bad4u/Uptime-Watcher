@@ -111,13 +111,13 @@ describe("cacheKeys", () => {
     describe("CacheKeys.config", () => {
         describe("byName", () => {
             it("should generate cache key for configuration by name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 expect(CacheKeys.config.byName("history-limit")).toBe(
                     "config:history-limit"
@@ -131,13 +131,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle special characters in name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.config.byName("config-with-dashes")).toBe(
                     "config:config-with-dashes"
@@ -150,14 +150,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.config.byName("")).toBe("config:");
             });
@@ -165,13 +162,13 @@ describe("cacheKeys", () => {
 
         describe("validation", () => {
             it("should generate cache key for configuration validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 expect(CacheKeys.config.validation("monitor-config")).toBe(
                     "config:validation:monitor-config"
@@ -185,13 +182,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle special characters in validation name", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 expect(CacheKeys.config.validation("config-123")).toBe(
                     "config:validation:config-123"
@@ -201,14 +198,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.config.validation("")).toBe(
                     "config:validation:"
@@ -220,13 +214,13 @@ describe("cacheKeys", () => {
     describe("CacheKeys.monitor", () => {
         describe("byId", () => {
             it("should generate cache key for monitor by ID", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(CacheKeys.monitor.byId("monitor-123")).toBe(
                     "monitor:monitor-123"
@@ -240,13 +234,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different ID formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(
                     CacheKeys.monitor.byId(
@@ -259,14 +253,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.monitor.byId("")).toBe("monitor:");
             });
@@ -274,13 +265,13 @@ describe("cacheKeys", () => {
 
         describe("bySite", () => {
             it("should generate cache key for monitors by site", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(CacheKeys.monitor.bySite("site-123")).toBe(
                     "monitor:site:site-123"
@@ -294,13 +285,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different site identifier formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.monitor.bySite("site_with_underscores")).toBe(
                     "monitor:site:site_with_underscores"
@@ -313,14 +304,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.monitor.bySite("")).toBe("monitor:site:");
             });
@@ -328,13 +316,13 @@ describe("cacheKeys", () => {
 
         describe("operation", () => {
             it("should generate cache key for monitor operation status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(CacheKeys.monitor.operation("monitor-123")).toBe(
                     "monitor:operation:monitor-123"
@@ -348,13 +336,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different operation identifier formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.monitor.operation("monitor_123")).toBe(
                     "monitor:operation:monitor_123"
@@ -364,14 +352,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.monitor.operation("")).toBe(
                     "monitor:operation:"
@@ -383,25 +368,25 @@ describe("cacheKeys", () => {
     describe("CacheKeys.site", () => {
         describe("bulkOperation", () => {
             it("should generate cache key for bulk site operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 expect(CacheKeys.site.bulkOperation()).toBe("site:bulk");
             });
 
             it("should always return the same key", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.site.bulkOperation()).toBe("site:bulk");
                 expect(CacheKeys.site.bulkOperation()).toBe("site:bulk");
@@ -410,13 +395,13 @@ describe("cacheKeys", () => {
 
         describe("byIdentifier", () => {
             it("should generate cache key for site by identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Caching", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
 
                 expect(CacheKeys.site.byIdentifier("site-123")).toBe(
                     "site:site-123"
@@ -430,13 +415,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different identifier formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(
                     CacheKeys.site.byIdentifier("site_with_underscores")
@@ -447,14 +432,11 @@ describe("cacheKeys", () => {
                 expect(CacheKeys.site.byIdentifier("123")).toBe("site:123");
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.site.byIdentifier("")).toBe("site:");
             });
@@ -462,13 +444,13 @@ describe("cacheKeys", () => {
 
         describe("loading", () => {
             it("should generate cache key for site loading operation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Loading", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Data Loading", "type");
 
                 expect(CacheKeys.site.loading("site-123")).toBe(
                     "site:loading:site-123"
@@ -482,13 +464,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different identifier formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.site.loading("site_123")).toBe(
                     "site:loading:site_123"
@@ -498,14 +480,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.site.loading("")).toBe("site:loading:");
             });
@@ -515,13 +494,13 @@ describe("cacheKeys", () => {
     describe("CacheKeys.validation", () => {
         describe("byType", () => {
             it("should generate cache key for validation by type and identifier", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 expect(
                     CacheKeys.validation.byType("monitor", "config-123")
@@ -535,13 +514,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different type and identifier combinations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(
                     CacheKeys.validation.byType("http-monitor", "test-123")
@@ -554,14 +533,11 @@ describe("cacheKeys", () => {
                 ).toBe("validation:port-monitor:test-789");
             });
 
-            it("should handle empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty strings", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.validation.byType("", "identifier")).toBe(
                     "validation:identifier"
@@ -575,13 +551,13 @@ describe("cacheKeys", () => {
 
         describe("monitorType", () => {
             it("should generate cache key for monitor type validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Validation", "type");
 
                 expect(CacheKeys.validation.monitorType("http")).toBe(
                     "validation:monitor-type:http"
@@ -598,13 +574,13 @@ describe("cacheKeys", () => {
             });
 
             it("should handle different monitor type formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
 
                 expect(CacheKeys.validation.monitorType("http-check")).toBe(
                     "validation:monitor-type:http-check"
@@ -617,14 +593,11 @@ describe("cacheKeys", () => {
                 );
             });
 
-            it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle empty string", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheKeys", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 expect(CacheKeys.validation.monitorType("")).toBe(
                     "validation:monitor-type:"
@@ -714,10 +687,7 @@ describe("cacheKeys", () => {
             ); // empty operation is invalid
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheKeys", "component");
             await annotate("Category: Utility", "category");
@@ -801,10 +771,7 @@ describe("cacheKeys", () => {
             });
         });
 
-        it("should handle empty identifiers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty identifiers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheKeys", "component");
             await annotate("Category: Utility", "category");
@@ -856,10 +823,7 @@ describe("cacheKeys", () => {
             ).toThrow("Invalid cache key format: prefix:operation:");
         });
 
-        it("should handle complex identifiers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex identifiers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheKeys", "component");
             await annotate("Category: Utility", "category");

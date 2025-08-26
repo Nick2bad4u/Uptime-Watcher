@@ -44,16 +44,19 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 describe("EmptyState Component - Comprehensive Coverage", () => {
-    it("should render with correct structure and content", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should render with correct structure and content", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -66,15 +69,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should render the icon with correct emoji", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -84,15 +87,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should render the main heading text", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -105,15 +108,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should render the descriptive text", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -127,15 +130,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should have correct CSS classes for styling", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -150,16 +153,19 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(container).toHaveClass("themed-box--surface-base");
     });
 
-    it("should render all elements in correct hierarchy", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("should render all elements in correct hierarchy", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -177,15 +183,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should handle text content correctly", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -200,15 +206,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should maintain consistent prop structure", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -226,15 +232,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should be accessible and semantic", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 
@@ -251,15 +257,15 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
     });
 
     it("should use themed components correctly", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: EmptyState", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: EmptyState", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<EmptyState />);
 

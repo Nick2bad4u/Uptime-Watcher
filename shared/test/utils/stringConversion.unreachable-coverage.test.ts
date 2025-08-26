@@ -8,13 +8,16 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Unreachable Code Coverage", () => {
     it("should handle the explicit undefined case in switch statement", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.unreachable-coverage", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.unreachable-coverage",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // This tests to ensure full coverage of the undefined case
         expect(safeStringify(undefined)).toBe("");
@@ -27,13 +30,16 @@ describe("String Conversion - Unreachable Code Coverage", () => {
     });
 
     it("should cover all type cases for maximum branch coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.unreachable-coverage", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.unreachable-coverage",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test various edge cases to maximize coverage
         expect(safeStringify(Symbol("test"))).toBe("Symbol(test)");
@@ -55,13 +61,16 @@ describe("String Conversion - Unreachable Code Coverage", () => {
     });
 
     it("should test edge cases with special undefined scenarios", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion.unreachable-coverage", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: stringConversion.unreachable-coverage",
+            "component"
+        );
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Different ways to get undefined values
         let undefinedVar;

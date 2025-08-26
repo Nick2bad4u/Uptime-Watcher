@@ -188,10 +188,7 @@ describe("useMonitorFields Hook", () => {
             expect(result.current.getFields("ping")[0]?.name).toBe("host");
         });
 
-        it("should handle empty configurations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty configurations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorFields", "component");
             await annotate("Category: Hook", "category");
@@ -298,13 +295,13 @@ describe("useMonitorFields Hook", () => {
 
         describe("getFields", () => {
             it("should return fields for existing monitor types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await setupHookWithData();
 
@@ -322,13 +319,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should return empty array for non-existent monitor types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await setupHookWithData();
 
@@ -337,13 +334,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should be memoized and return stable references", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -356,13 +353,13 @@ describe("useMonitorFields Hook", () => {
 
         describe("getRequiredFields", () => {
             it("should return only required field names", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -376,13 +373,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should return empty array for non-existent monitor types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const result = await setupHookWithData();
 
@@ -392,13 +389,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should handle monitor types with no required fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Monitoring", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Monitoring", "type");
 
                 const mockConfigs: MonitorTypeConfig[] = [
                     {
@@ -445,13 +442,13 @@ describe("useMonitorFields Hook", () => {
 
         describe("isFieldRequired", () => {
             it("should correctly identify required fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -470,13 +467,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should correctly identify optional fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -486,13 +483,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should return false for non-existent fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -508,13 +505,13 @@ describe("useMonitorFields Hook", () => {
             });
 
             it("should handle empty field names", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorFields", "component");
-            await annotate("Category: Hook", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: useMonitorFields", "component");
+                await annotate("Category: Hook", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = await setupHookWithData();
 
@@ -524,10 +521,7 @@ describe("useMonitorFields Hook", () => {
     });
 
     describe("Error handling", () => {
-        it("should handle IPC errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle IPC errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorFields", "component");
             await annotate("Category: Hook", "category");
@@ -545,10 +539,7 @@ describe("useMonitorFields Hook", () => {
             expect(result.current.getFields("http")).toEqual([]);
         });
 
-        it("should handle non-Error objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useMonitorFields", "component");
             await annotate("Category: Hook", "category");

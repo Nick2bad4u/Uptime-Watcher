@@ -157,10 +157,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             expect(() => downloadFile({ buffer, fileName })).toThrow();
         });
 
-        it("should handle createElement errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle createElement errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -437,10 +434,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should handle empty Uint8Array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty Uint8Array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -541,10 +535,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
         });
 
-        it("should use correct filename format", async ({
-            task,
-            annotate,
-        }) => {
+        it("should use correct filename format", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -583,10 +574,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow("Download failed");
         });
 
-        it("should handle large backup data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large backup data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");

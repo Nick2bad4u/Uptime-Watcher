@@ -138,10 +138,7 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -216,10 +213,7 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -415,10 +409,7 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("clearConfigCache", () => {
-        it("should clear the ui helpers cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear the ui helpers cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");
@@ -543,10 +534,7 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("Caching behavior", () => {
-        it("should cache configuration results", async ({
-            task,
-            annotate,
-        }) => {
+        it("should cache configuration results", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorUiHelpers", "component");
             await annotate("Category: Utility", "category");

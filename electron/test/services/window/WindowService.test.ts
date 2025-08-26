@@ -169,10 +169,7 @@ describe("WindowService", () => {
             expect(window).toBeDefined();
         });
 
-        it("should setup window events", async ({
-            task,
-            annotate,
-        }) => {
+        it("should setup window events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -202,10 +199,7 @@ describe("WindowService", () => {
             );
         });
 
-        it("should return the created window", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return the created window", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -359,10 +353,7 @@ describe("WindowService", () => {
             );
         });
 
-        it("should send message without data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should send message without data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -416,10 +407,7 @@ describe("WindowService", () => {
     });
 
     describe("getAllWindows", () => {
-        it("should return all browser windows", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all browser windows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -438,10 +426,7 @@ describe("WindowService", () => {
     });
 
     describe("window events", () => {
-        it("should handle ready-to-show event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle ready-to-show event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -465,10 +450,7 @@ describe("WindowService", () => {
             expect(window.show).toHaveBeenCalled();
         });
 
-        it("should handle dom-ready event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle dom-ready event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -515,10 +497,7 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle did-fail-load event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle did-fail-load event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -543,10 +522,7 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle closed event", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle closed event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");
@@ -577,13 +553,13 @@ describe("WindowService", () => {
             });
 
             it("should load from file in production mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Loading", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Data Loading", "type");
 
                 windowService.createMainWindow();
 
@@ -593,13 +569,13 @@ describe("WindowService", () => {
             });
 
             it("should handle file loading errors in production", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const window = windowService.createMainWindow();
                 const error = new Error("File not found");
@@ -628,13 +604,13 @@ describe("WindowService", () => {
             });
 
             it("should load from Vite server in development mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Loading", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Data Loading", "type");
 
                 windowService.createMainWindow();
 
@@ -644,13 +620,13 @@ describe("WindowService", () => {
             });
 
             it("should wait for Vite server to be ready", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 windowService.createMainWindow();
 
@@ -666,13 +642,13 @@ describe("WindowService", () => {
             });
 
             it("should load URL when server is ready", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Loading", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Data Loading", "type");
 
                 const window = windowService.createMainWindow();
 
@@ -685,13 +661,13 @@ describe("WindowService", () => {
             });
 
             it("should handle Vite server connection errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection refused");
@@ -729,13 +705,13 @@ describe("WindowService", () => {
             });
 
             it("should handle window destruction during Vite wait", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 vi.mocked(isDev).mockReturnValue(true);
 
@@ -842,10 +818,7 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle timeout during fetch", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle timeout during fetch", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
             await annotate("Category: Service", "category");

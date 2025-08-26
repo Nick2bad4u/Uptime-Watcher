@@ -70,10 +70,7 @@ describe("IPC Types", () => {
             expect(config.validateParams).toBeUndefined();
         });
 
-        it("should support async handlers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support async handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");
@@ -90,10 +87,7 @@ describe("IPC Types", () => {
             expect(typeof config.handler).toBe("function");
         });
 
-        it("should support sync handlers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support sync handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");
@@ -133,10 +127,7 @@ describe("IPC Types", () => {
             expect(response.metadata).toBeUndefined();
         });
 
-        it("should create an error response", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create an error response", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");
@@ -201,10 +192,7 @@ describe("IPC Types", () => {
             expect(response.metadata).toEqual(metadata);
         });
 
-        it("should support complex data types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support complex data types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");
@@ -235,10 +223,7 @@ describe("IPC Types", () => {
             expect(response.data).toEqual(complexData);
         });
 
-        it("should support array data types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support array data types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
             await annotate("Category: Service", "category");

@@ -241,10 +241,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should add a new site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add a new site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -273,10 +270,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(mockSite);
         });
 
-        it("should handle validation errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle validation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -336,10 +330,7 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle createSite errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle createSite errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -484,10 +475,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual([mockSite]);
         });
 
-        it("should handle database errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle database errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -506,10 +494,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should return all sites from cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all sites from cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -529,10 +514,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should return the cache instance", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return the cache instance", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -589,10 +571,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should remove monitor successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove monitor successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -625,10 +604,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle deletion errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -664,10 +640,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should remove site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -694,10 +667,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(true).toBe(true); // Placeholder assertion
         });
 
-        it("should handle deletion failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -730,10 +700,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should update site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -767,10 +734,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(updatedSite);
         });
 
-        it("should handle site not found", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle site not found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1243,10 +1207,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should validate site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1286,10 +1247,7 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should format single error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format single error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1301,10 +1259,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe("Single error");
         });
 
-        it("should format multiple errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should format multiple errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1317,10 +1272,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe("\n  - Error 1\n  - Error 2");
         });
 
-        it("should handle empty error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1356,10 +1308,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle deletion failure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");

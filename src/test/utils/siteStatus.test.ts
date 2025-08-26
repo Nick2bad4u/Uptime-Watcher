@@ -20,73 +20,70 @@ import type { SiteForStatus } from "../../../shared/types";
 
 describe("siteStatus exports", () => {
     it("should export calculateSiteMonitoringStatus function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         expect(typeof calculateSiteMonitoringStatus).toBe("function");
     });
 
     it("should export calculateSiteStatus function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         expect(typeof calculateSiteStatus).toBe("function");
     });
 
     it("should export getSiteDisplayStatus function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         expect(typeof getSiteDisplayStatus).toBe("function");
     });
 
     it("should export getSiteStatusDescription function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         expect(typeof getSiteStatusDescription).toBe("function");
     });
 
     it("should export getSiteStatusVariant function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         expect(typeof getSiteStatusVariant).toBe("function");
     });
 
-    it("should export SiteStatus type", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+    it("should export SiteStatus type", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         // Type test - if this compiles, the type is exported correctly
         const status: SiteStatus = "up";
@@ -94,13 +91,13 @@ describe("siteStatus exports", () => {
     });
 
     it("should have working calculateSiteStatus function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Basic functional test with empty monitors array
         const testSite: SiteForStatus = { monitors: [] };
@@ -109,13 +106,13 @@ describe("siteStatus exports", () => {
     });
 
     it("should have working getSiteDisplayStatus function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Retrieval", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         // Basic functional test
         const testSite: SiteForStatus = {
@@ -126,13 +123,13 @@ describe("siteStatus exports", () => {
     });
 
     it("should have working getSiteStatusDescription function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Retrieval", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         // Basic functional test
         const testSite: SiteForStatus = {
@@ -144,13 +141,13 @@ describe("siteStatus exports", () => {
     });
 
     it("should have working getSiteStatusVariant function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Data Retrieval", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: siteStatus", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         // Basic functional test
         const result = getSiteStatusVariant("up");

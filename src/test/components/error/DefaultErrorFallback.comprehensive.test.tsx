@@ -28,7 +28,10 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render error fallback with default message when no error provided", ({ task, annotate }) => {
+        it("should render error fallback with default message when no error provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -53,7 +56,10 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
-        it("should render error message when error is provided", ({ task, annotate }) => {
+        it("should render error message when error is provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -79,7 +85,10 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText("Reload Page")).toBeInTheDocument();
         });
 
-        it("should display default message when error message is empty", ({ task, annotate }) => {
+        it("should display default message when error message is empty", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -106,7 +115,10 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display default message when error message is only whitespace", ({ task, annotate }) => {
+        it("should display default message when error message is only whitespace", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -155,7 +167,10 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Button Interactions", () => {
-        it("should call onRetry when Try Again button is clicked", async ({ task, annotate }) => {
+        it("should call onRetry when Try Again button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -175,7 +190,10 @@ describe("DefaultErrorFallback", () => {
             expect(mockOnRetry).toHaveBeenCalledTimes(1);
         });
 
-        it("should call window.location.reload when Reload Page button is clicked", async ({ task, annotate }) => {
+        it("should call window.location.reload when Reload Page button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -217,7 +235,10 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("CSS Classes and Styling", () => {
-        it("should have correct CSS classes for layout and styling", ({ task, annotate }) => {
+        it("should have correct CSS classes for layout and styling", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -332,7 +353,10 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Error Object Variations", () => {
-        it("should handle error with non-string message property", ({ task, annotate }) => {
+        it("should handle error with non-string message property", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -354,7 +378,10 @@ describe("DefaultErrorFallback", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle error without message property", ({ task, annotate }) => {
+        it("should handle error without message property", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -400,7 +427,10 @@ describe("DefaultErrorFallback", () => {
             expect(screen.getByText(longMessage)).toBeInTheDocument();
         });
 
-        it("should handle error messages with special characters", ({ task, annotate }) => {
+        it("should handle error messages with special characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");
@@ -422,7 +452,10 @@ describe("DefaultErrorFallback", () => {
     });
 
     describe("Multiple Interactions", () => {
-        it("should handle multiple retry clicks", async ({ task, annotate }) => {
+        it("should handle multiple retry clicks", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: DefaultErrorFallback", "component");
             annotate("Category: Component", "category");

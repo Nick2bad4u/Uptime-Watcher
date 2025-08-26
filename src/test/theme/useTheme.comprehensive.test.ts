@@ -420,10 +420,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(() => rerender()).not.toThrow();
         });
 
-        it("should handle system theme changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle system theme changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");
@@ -449,10 +446,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(result.current.systemTheme).toBe("light"); // Initial value, will update after timeout
         });
 
-        it("should cleanup timeouts on unmount", async ({
-            task,
-            annotate,
-        }) => {
+        it("should cleanup timeouts on unmount", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");
@@ -802,10 +796,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             });
         });
 
-        it("should provide getColor function", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide getColor function", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");
@@ -866,10 +857,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(result.current).toBe("#10b981");
         });
 
-        it("should work with complex selectors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with complex selectors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useTheme", "component");
             await annotate("Category: Core", "category");

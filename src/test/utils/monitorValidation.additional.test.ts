@@ -18,7 +18,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -41,7 +44,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -65,7 +71,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -88,7 +97,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -112,7 +124,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -135,7 +150,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -159,7 +177,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -179,7 +200,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -201,7 +225,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -224,7 +251,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -247,7 +277,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -271,7 +304,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -294,7 +330,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -320,7 +359,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -342,7 +384,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -364,7 +409,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -389,7 +437,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -411,7 +462,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -431,7 +485,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -454,7 +511,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -473,7 +533,10 @@ describe("monitorValidation functions - Additional Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -493,12 +556,12 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result3.success).toBe(false);
         });
 
-        it("should handle empty object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorValidation.additional", "component");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

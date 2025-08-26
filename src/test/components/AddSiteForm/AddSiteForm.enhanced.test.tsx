@@ -343,7 +343,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should render without errors when no props provided", ({ task, annotate }) => {
+        it("should render without errors when no props provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -375,7 +378,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Form Field Components", () => {
-        it("should render site name field with proper attributes", ({ task, annotate }) => {
+        it("should render site name field with proper attributes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -394,7 +400,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(nameField).toHaveAttribute("type", "text");
         });
 
-        it("should render site URL field with proper attributes", ({ task, annotate }) => {
+        it("should render site URL field with proper attributes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -413,7 +422,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(urlField).toHaveAttribute("type", "url");
         });
 
-        it("should render monitor type selection field", ({ task, annotate }) => {
+        it("should render monitor type selection field", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -470,7 +482,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(descriptionField).toHaveAttribute("type", "text");
         });
 
-        it("should render timeout field with numeric input", ({ task, annotate }) => {
+        it("should render timeout field with numeric input", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -489,7 +504,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(timeoutField).toHaveAttribute("type", "number");
         });
 
-        it("should render retries field with numeric input", ({ task, annotate }) => {
+        it("should render retries field with numeric input", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -510,7 +528,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Form Data Population and Display", () => {
-        it("should populate form fields with initial data", ({ task, annotate }) => {
+        it("should populate form fields with initial data", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -604,7 +625,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("User Interactions and Form Changes", () => {
-        it("should handle site name input changes", async ({ task, annotate }) => {
+        it("should handle site name input changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -631,7 +655,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setName).toHaveBeenCalled();
         });
 
-        it("should handle site URL input changes", async ({ task, annotate }) => {
+        it("should handle site URL input changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -658,7 +685,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setUrl).toHaveBeenCalled();
         });
 
-        it("should handle monitor type selection changes", async ({ task, annotate }) => {
+        it("should handle monitor type selection changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -690,7 +720,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setMonitorType).toHaveBeenCalledWith("http");
         });
 
-        it("should handle description textarea changes", async ({ task, annotate }) => {
+        it("should handle description textarea changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -725,7 +758,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(descriptionInput).toBeInTheDocument();
         });
 
-        it("should handle interval value changes", async ({ task, annotate }) => {
+        it("should handle interval value changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -751,7 +787,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setCheckInterval).toHaveBeenCalled();
         });
 
-        it("should handle timeout value changes", async ({ task, annotate }) => {
+        it("should handle timeout value changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -788,7 +827,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(timeoutInput).toBeInTheDocument();
         });
 
-        it("should handle retries value changes", async ({ task, annotate }) => {
+        it("should handle retries value changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -827,7 +869,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Form Submission Handling", () => {
-        it("should handle form submission with onSuccess callback", async ({ task, annotate }) => {
+        it("should handle form submission with onSuccess callback", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -855,7 +900,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(form).toBeInTheDocument();
         });
 
-        it("should handle form submission without onSuccess callback", async ({ task, annotate }) => {
+        it("should handle form submission without onSuccess callback", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -899,7 +947,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should prevent submission when form is invalid", ({ task, annotate }) => {
+        it("should prevent submission when form is invalid", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -924,7 +975,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should handle rapid form submissions", async ({ task, annotate }) => {
+        it("should handle rapid form submissions", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -950,7 +1004,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Loading and Disabled States", () => {
-        it("should show loading state when form is submitting", ({ task, annotate }) => {
+        it("should show loading state when form is submitting", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -981,7 +1038,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeDisabled();
         });
 
-        it("should disable form fields when submitting", ({ task, annotate }) => {
+        it("should disable form fields when submitting", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1019,7 +1079,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should enable submit button when not submitting and form is valid", ({ task, annotate }) => {
+        it("should enable submit button when not submitting and form is valid", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1059,7 +1122,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).not.toBeDisabled();
         });
 
-        it("should handle monitor types loading state", ({ task, annotate }) => {
+        it("should handle monitor types loading state", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1136,7 +1202,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle component render errors gracefully", ({ task, annotate }) => {
+        it("should handle component render errors gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1317,7 +1386,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should handle complex validation scenarios", ({ task, annotate }) => {
+        it("should handle complex validation scenarios", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1359,7 +1431,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Monitor Types Integration", () => {
-        it("should render available monitor types in select field", ({ task, annotate }) => {
+        it("should render available monitor types in select field", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1428,7 +1503,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle monitor types with special configurations", ({ task, annotate }) => {
+        it("should handle monitor types with special configurations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1582,7 +1660,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should update help text based on field focus", async ({ task, annotate }) => {
+        it("should update help text based on field focus", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1608,7 +1689,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Accessibility Features", () => {
-        it("should have proper form labels and ARIA attributes", ({ task, annotate }) => {
+        it("should have proper form labels and ARIA attributes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1636,7 +1720,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(monitorField).toBeInTheDocument();
         });
 
-        it("should support keyboard navigation through form fields", async ({ task, annotate }) => {
+        it("should support keyboard navigation through form fields", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1668,7 +1755,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(thirdFocusedElement).not.toBe(secondFocusedElement);
         });
 
-        it("should have proper form role and structure", ({ task, annotate }) => {
+        it("should have proper form role and structure", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1686,7 +1776,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(form.tagName.toLowerCase()).toBe("form");
         });
 
-        it("should announce validation errors to screen readers", ({ task, annotate }) => {
+        it("should announce validation errors to screen readers", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1719,7 +1812,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Edge Cases and Corner Scenarios", () => {
-        it("should handle very long form field values", ({ task, annotate }) => {
+        it("should handle very long form field values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1752,7 +1848,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should handle special characters in form values", ({ task, annotate }) => {
+        it("should handle special characters in form values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1807,7 +1906,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByDisplayValue(extremeValue)).toBeInTheDocument();
         });
 
-        it("should handle Unicode characters in form values", ({ task, annotate }) => {
+        it("should handle Unicode characters in form values", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1857,7 +1959,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Performance and Re-rendering", () => {
-        it("should handle frequent re-renders efficiently", ({ task, annotate }) => {
+        it("should handle frequent re-renders efficiently", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1879,7 +1984,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should maintain form state during re-renders", ({ task, annotate }) => {
+        it("should maintain form state during re-renders", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");
@@ -1910,7 +2018,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle large monitor types lists efficiently", ({ task, annotate }) => {
+        it("should handle large monitor types lists efficiently", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.enhanced", "component");
             annotate("Category: Component", "category");

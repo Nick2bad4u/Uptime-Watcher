@@ -61,10 +61,7 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutMs(aboveMax)).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
         });
 
-        it("should handle edge values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -91,10 +88,7 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutMs(-5000)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
         });
 
-        it("should handle fractional values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fractional values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -145,10 +139,7 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutSeconds(aboveMax)).toBe(TIMEOUT_CONSTRAINTS.MAX);
         });
 
-        it("should handle edge values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -175,10 +166,7 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutSeconds(-5)).toBe(TIMEOUT_CONSTRAINTS.MIN);
         });
 
-        it("should handle fractional values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fractional values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -218,10 +206,7 @@ describe("Timeout Utilities", () => {
             );
         });
 
-        it("should handle zero timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -242,10 +227,7 @@ describe("Timeout Utilities", () => {
             expect(getTimeoutSeconds(1500)).toBe(1.5);
         });
 
-        it("should handle large timeout values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large timeout values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -302,10 +284,7 @@ describe("Timeout Utilities", () => {
             expect(isValidTimeoutMs(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -316,10 +295,7 @@ describe("Timeout Utilities", () => {
             expect(isValidTimeoutMs(Number.NaN)).toBe(false);
         });
 
-        it("should handle fractional values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fractional values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -377,10 +353,7 @@ describe("Timeout Utilities", () => {
             expect(isValidTimeoutSeconds(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -391,10 +364,7 @@ describe("Timeout Utilities", () => {
             expect(isValidTimeoutSeconds(Number.NaN)).toBe(false);
         });
 
-        it("should handle fractional values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fractional values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -420,10 +390,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(30_000)).toBe(30);
         });
 
-        it("should handle zero", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -445,10 +412,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(2750)).toBe(2.75);
         });
 
-        it("should handle large values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -471,10 +435,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(100)).toBe(0.1);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -504,10 +465,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(30)).toBe(30_000);
         });
 
-        it("should handle zero", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -516,10 +474,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(0)).toBe(0);
         });
 
-        it("should handle fractional seconds", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle fractional seconds", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -529,10 +484,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(2.75)).toBe(2750);
         });
 
-        it("should handle large values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -555,10 +507,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(0.1)).toBe(100);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");

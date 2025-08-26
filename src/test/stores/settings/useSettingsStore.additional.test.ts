@@ -86,14 +86,11 @@ describe("useSettingsStore - Additional Coverage", () => {
         mockUpdateHistoryLimit.mockResolvedValue({ success: true });
     });
 
-    it("should test basic functionality", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSettingsStore.additional", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should test basic functionality", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSettingsStore.additional", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useSettingsStore());
 

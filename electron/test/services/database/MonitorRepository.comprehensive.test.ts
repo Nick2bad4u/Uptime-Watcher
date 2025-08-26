@@ -107,10 +107,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             expect(result).toHaveLength(2);
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle empty monitors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -243,10 +240,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(result).toBe("456");
         });
-        it("should handle creation errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle creation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -307,10 +301,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(result).toBe(false);
         });
-        it("should handle deletion errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -326,10 +317,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all monitors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delete all monitors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -341,10 +329,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle delete all errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle delete all errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -381,10 +366,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle site deletion errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle site deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -445,10 +427,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
-        it("should handle update errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle update errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -550,10 +529,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             const result = await repository.findByIdentifier("monitor-123");
             expect(result).toBeUndefined();
         });
-        it("should handle empty result sets", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty result sets", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");
@@ -564,10 +540,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             const result = await repository.findBySiteIdentifier("empty-site");
             expect(result).toEqual([]);
         });
-        it("should handle very large datasets", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large datasets", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
             await annotate("Category: Service", "category");

@@ -47,10 +47,7 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(config)).toBe(false);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -59,10 +56,7 @@ describe("Chart Config Utilities", () => {
             expect(hasPlugins(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -171,10 +165,7 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -183,10 +174,7 @@ describe("Chart Config Utilities", () => {
             expect(hasScales(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");
@@ -372,10 +360,7 @@ describe("Chart Config Utilities", () => {
             );
         });
 
-        it("should have valid color strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have valid color strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: chartConfig", "component");
             await annotate("Category: Shared", "category");

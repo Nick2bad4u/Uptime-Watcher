@@ -65,10 +65,7 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should handle empty errors array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty errors array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -168,10 +165,7 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should handle various data types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle various data types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -326,10 +320,7 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");
@@ -338,10 +329,7 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
             await annotate("Category: Shared", "category");

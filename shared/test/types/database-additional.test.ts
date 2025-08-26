@@ -408,10 +408,7 @@ describe("shared/types/database additional function coverage", () => {
             );
         });
 
-        it("should handle array-like objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle array-like objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: database-additional", "component");
             await annotate("Category: Shared", "category");

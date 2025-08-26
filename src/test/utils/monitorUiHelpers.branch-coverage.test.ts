@@ -30,7 +30,10 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate(
+                "Component: monitorUiHelpers.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -70,7 +73,10 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate(
+                "Component: monitorUiHelpers.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -110,7 +116,10 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate(
+                "Component: monitorUiHelpers.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -187,7 +196,10 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate(
+                "Component: monitorUiHelpers.branch-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

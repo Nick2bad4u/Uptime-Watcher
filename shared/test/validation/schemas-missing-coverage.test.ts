@@ -5,7 +5,10 @@ import {
 
 describe("Schemas - Missing Coverage", () => {
     describe("validateMonitorField uncovered lines", () => {
-        test("should handle unknown field validation (lines 399-406)", ({ task, annotate }) => {
+        test("should handle unknown field validation (lines 399-406)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");
@@ -51,7 +54,10 @@ describe("Schemas - Missing Coverage", () => {
     });
 
     describe("validateMonitorData ZodError handling", () => {
-        test("should handle ZodError with path length > 0 (lines 478-479)", ({ task, annotate }) => {
+        test("should handle ZodError with path length > 0 (lines 478-479)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");
@@ -82,7 +88,10 @@ describe("Schemas - Missing Coverage", () => {
             // This should have hit the path.length > 0 condition
         });
 
-        test("should handle invalid_type with undefined received (line 482)", ({ task, annotate }) => {
+        test("should handle invalid_type with undefined received (line 482)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");
@@ -118,7 +127,10 @@ describe("Schemas - Missing Coverage", () => {
             expect(typeof result.success).toBe("boolean");
         });
 
-        test("should create conditions for warning vs error categorization", ({ task, annotate }) => {
+        test("should create conditions for warning vs error categorization", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");
@@ -154,7 +166,10 @@ describe("Schemas - Missing Coverage", () => {
             expect(Array.isArray(result.warnings)).toBe(true);
         });
 
-        test("should handle edge cases in ZodError issue processing", ({ task, annotate }) => {
+        test("should handle edge cases in ZodError issue processing", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");
@@ -202,7 +217,10 @@ describe("Schemas - Missing Coverage", () => {
             });
         });
 
-        test("should specifically target path.length condition", ({ task, annotate }) => {
+        test("should specifically target path.length condition", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: schemas-missing-coverage", "component");
             annotate("Category: Validation", "category");

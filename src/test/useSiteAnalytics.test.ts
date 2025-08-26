@@ -374,10 +374,7 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(300);
         });
 
-        it("should handle empty response times", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty response times", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -456,10 +453,7 @@ describe("useSiteAnalytics", () => {
         // Note: Downtime period calculation tests removed due to complex logic issues
         // The implementation works but test expectations were inconsistent with actual behavior
 
-        it("should handle no downtime periods", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle no downtime periods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -718,10 +712,7 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(1_000_000);
         });
 
-        it("should handle zero response times", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero response times", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -797,13 +788,13 @@ describe("useChartData", () => {
     };
 
     it("should generate chart data with correct structure", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
@@ -820,14 +811,11 @@ describe("useChartData", () => {
         expect(dataset?.data).toHaveLength(3);
     });
 
-    it("should map data points correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should map data points correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
@@ -842,14 +830,11 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should color points based on status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should color points based on status", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
@@ -869,14 +854,11 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should handle empty history", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle empty history", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const emptyMonitor: Monitor = {
             ...mockMonitor,
@@ -893,14 +875,11 @@ describe("useChartData", () => {
         expect(dataset?.pointBackgroundColor).toHaveLength(0);
     });
 
-    it("should sort history by timestamp", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should sort history by timestamp", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const unsortedMonitor: Monitor = {
             ...mockMonitor,
@@ -924,14 +903,11 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should memoize chart data correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should memoize chart data correctly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { rerender, result } = renderHook(
             ({ monitor, theme }) => useChartData(monitor, theme),
@@ -949,13 +925,13 @@ describe("useChartData", () => {
     });
 
     it("should recalculate when monitor history changes", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteAnalytics", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteAnalytics", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Monitoring", "type");
 
         const { rerender, result } = renderHook(
             ({ monitor, theme }) => useChartData(monitor, theme),
@@ -1031,10 +1007,7 @@ describe("SiteAnalyticsUtils", () => {
             expect(result.allowedDowntime).toBeCloseTo(0.001, 10);
         });
 
-        it("should handle 100% uptime", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle 100% uptime", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -1047,10 +1020,7 @@ describe("SiteAnalyticsUtils", () => {
             expect(result.actualDowntime).toBe(0);
         });
 
-        it("should handle 0% uptime", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle 0% uptime", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -1082,10 +1052,7 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should return good for 99%+ uptime", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return good for 99%+ uptime", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -1129,10 +1096,7 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");
@@ -1213,10 +1177,7 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteAnalytics", "component");
             await annotate("Category: Core", "category");

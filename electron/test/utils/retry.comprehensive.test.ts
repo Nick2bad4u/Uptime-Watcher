@@ -46,13 +46,13 @@ describe("Retry Utilities", () => {
     describe("withRetry", () => {
         describe("Success scenarios", () => {
             it("should return result when operation succeeds on first try", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue("success");
 
@@ -64,13 +64,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should return result when operation succeeds after retries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -90,13 +90,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle different return types correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const numberOperation = vi.fn().mockResolvedValue(42);
                 const objectOperation = vi
@@ -122,13 +122,13 @@ describe("Retry Utilities", () => {
 
         describe("Failure scenarios", () => {
             it("should throw last error when all retries are exhausted", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error1 = new Error("error 1");
                 const error2 = new Error("error 2");
@@ -151,13 +151,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle non-Error thrown values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const operation = vi
                     .fn()
@@ -176,13 +176,13 @@ describe("Retry Utilities", () => {
 
         describe("Configuration options", () => {
             it("should use custom delay between retries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -204,13 +204,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should respect custom maxRetries setting", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -225,13 +225,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should use custom operation name in logs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -257,13 +257,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should call custom onError callback when provided", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const onError = vi.fn();
                 const operation = vi
@@ -295,13 +295,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should use default values when options are not provided", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue("default success");
 
@@ -312,13 +312,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle empty options object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -332,14 +332,11 @@ describe("Retry Utilities", () => {
         });
 
         describe("Edge cases and error handling", () => {
-            it("should handle maxRetries of 0", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle maxRetries of 0", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -353,14 +350,11 @@ describe("Retry Utilities", () => {
                 expect(operation).not.toHaveBeenCalled();
             });
 
-            it("should handle maxRetries of 1", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle maxRetries of 1", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -375,13 +369,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle very high maxRetries", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -400,13 +394,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle operation that throws synchronously", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockImplementation(() => {
                     throw new Error("synchronous error");
@@ -422,14 +416,11 @@ describe("Retry Utilities", () => {
                 expect(operation).toHaveBeenCalledTimes(2);
             });
 
-            it("should handle negative delay", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle negative delay", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -449,13 +440,13 @@ describe("Retry Utilities", () => {
 
         describe("Timing and concurrency", () => {
             it("should respect precise timing for delays", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -477,13 +468,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle multiple concurrent retry operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation1 = vi.fn().mockResolvedValue("result1");
                 const operation2 = vi.fn().mockResolvedValue("result2");
@@ -504,13 +495,13 @@ describe("Retry Utilities", () => {
     describe("withDbRetry", () => {
         describe("Function behavior", () => {
             it("should use optimized database settings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue("db success");
 
@@ -524,13 +515,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should use default maxRetries of 5", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -548,13 +539,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should accept custom maxRetries parameter", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -573,13 +564,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should use 300ms delay for database operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -604,13 +595,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should pass operation name to logging", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -634,13 +625,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle database-specific error types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Error Handling", "type");
 
                 // Mock common database error scenarios
                 const sqliteError = new Error(
@@ -664,13 +655,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should work with different database operation return types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const insertOp = vi
                     .fn()
@@ -701,13 +692,13 @@ describe("Retry Utilities", () => {
 
         describe("Integration with withRetry", () => {
             it("should be a wrapper around withRetry with specific parameters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockResolvedValue("wrapped result");
 
@@ -719,13 +710,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should preserve all withRetry functionality", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const operation = vi
                     .fn()
@@ -748,13 +739,13 @@ describe("Retry Utilities", () => {
 
         describe("Real-world database scenarios", () => {
             it("should handle database lock contention", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const lockError = new Error("SQLITE_BUSY");
                 const operation = vi
@@ -773,13 +764,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle connection pool exhaustion", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const poolError = new Error("Connection pool exhausted");
                 const operation = vi
@@ -797,13 +788,13 @@ describe("Retry Utilities", () => {
             });
 
             it("should handle transaction deadlocks", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: retry", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: retry", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const deadlockError = new Error(
                     "Transaction deadlock detected"

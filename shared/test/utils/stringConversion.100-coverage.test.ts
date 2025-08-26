@@ -8,7 +8,10 @@ import { safeStringify } from "../../utils/stringConversion.js";
 
 describe("String Conversion - 100% Coverage Tests", () => {
     describe("Targeting Lines 86-89 (undefined and default cases)", () => {
-        test("should handle explicit undefined value (line 86-87)", ({ task, annotate }) => {
+        test("should handle explicit undefined value (line 86-87)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: stringConversion.100-coverage", "component");
             annotate("Category: Utility", "category");
@@ -23,7 +26,10 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(result).toBe("");
         });
 
-        test("should handle the default case for unknown types (line 89-90)", ({ task, annotate }) => {
+        test("should handle the default case for unknown types (line 89-90)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: stringConversion.100-coverage", "component");
             annotate("Category: Utility", "category");
@@ -49,7 +55,10 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(typeof result).toBe("string");
         });
 
-        test("should ensure all typeof results are covered", ({ task, annotate }) => {
+        test("should ensure all typeof results are covered", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: stringConversion.100-coverage", "component");
             annotate("Category: Utility", "category");
@@ -72,7 +81,10 @@ describe("String Conversion - 100% Coverage Tests", () => {
             expect(safeStringify({})).toBe("{}");
         });
 
-        test("should attempt to reach the default case through type manipulation", ({ task, annotate }) => {
+        test("should attempt to reach the default case through type manipulation", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: stringConversion.100-coverage", "component");
             annotate("Category: Utility", "category");

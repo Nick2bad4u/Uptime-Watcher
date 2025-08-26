@@ -57,13 +57,13 @@ describe("SettingsRepository Coverage Tests", () => {
         };
     });
     it("should import the repository without errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Error Handling", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -71,13 +71,13 @@ describe("SettingsRepository Coverage Tests", () => {
         expect(SettingsRepository).toBeDefined();
     });
     it("should create repository instance with dependencies", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -89,14 +89,11 @@ describe("SettingsRepository Coverage Tests", () => {
         expect(repository).toBeDefined();
         expect(repository).toBeInstanceOf(SettingsRepository);
     });
-    it("should handle get operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Retrieval", "type");
+    it("should handle get operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -113,14 +110,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle set operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle set operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -136,14 +130,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle delete operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Deletion", "type");
+    it("should handle delete operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Data Deletion", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -159,14 +150,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle getAll operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Retrieval", "type");
+    it("should handle getAll operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -182,14 +170,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle bulkInsert operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle bulkInsert operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -208,14 +193,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle deleteAll operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Deletion", "type");
+    it("should handle deleteAll operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Data Deletion", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -232,13 +214,13 @@ describe("SettingsRepository Coverage Tests", () => {
         }
     });
     it("should handle error scenarios gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Error Handling", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -257,13 +239,13 @@ describe("SettingsRepository Coverage Tests", () => {
         }
     });
     it("should exercise SQL query building logic", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"
@@ -283,14 +265,11 @@ describe("SettingsRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle mapper integration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SettingsRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle mapper integration", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SettingsRepository", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { SettingsRepository } = await import(
             "../../../services/database/SettingsRepository"

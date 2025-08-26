@@ -59,13 +59,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should start site monitoring successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Monitoring", "type");
 
         mockSitesStore.startSiteMonitoring.mockResolvedValueOnce(undefined);
 
@@ -79,13 +79,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should handle errors in start site monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to start monitoring");
         mockSitesStore.startSiteMonitoring.mockRejectedValueOnce(error);
@@ -104,13 +104,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should stop site monitoring successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Monitoring", "type");
 
         mockSitesStore.stopSiteMonitoring.mockResolvedValueOnce(undefined);
 
@@ -124,13 +124,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should handle errors in stop site monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to stop monitoring");
         mockSitesStore.stopSiteMonitoring.mockRejectedValueOnce(error);
@@ -149,13 +149,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should start site monitor monitoring successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Monitoring", "type");
 
         mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(
             undefined
@@ -175,13 +175,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should handle errors in start site monitor monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to start monitor monitoring");
         mockSitesStore.startSiteMonitorMonitoring.mockRejectedValueOnce(error);
@@ -204,13 +204,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should stop site monitor monitoring successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Monitoring", "type");
 
         mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(
             undefined
@@ -230,13 +230,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
     });
 
     it("should handle errors in stop site monitor monitoring", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteMonitoring", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to stop monitor monitoring");
         mockSitesStore.stopSiteMonitorMonitoring.mockRejectedValueOnce(error);

@@ -140,7 +140,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -187,7 +190,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -219,7 +225,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -237,7 +246,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -271,7 +283,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -298,7 +313,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -336,7 +354,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -363,7 +384,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -384,7 +408,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -409,7 +436,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -432,7 +462,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -459,7 +492,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Event Processing", "type");
 
@@ -485,7 +521,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -508,7 +547,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -528,7 +570,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -554,7 +599,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -611,7 +659,10 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: EnhancedMonitorChecker-coverage", "component");
+            await annotate(
+                "Component: EnhancedMonitorChecker-coverage",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 

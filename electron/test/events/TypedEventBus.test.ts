@@ -42,10 +42,7 @@ describe("TypedEventBus", () => {
 
             expect(eventBus).toBeInstanceOf(TypedEventBus);
         });
-        it("should emit and listen to events", async ({
-            task,
-            annotate,
-        }) => {
+        it("should emit and listen to events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -77,10 +74,7 @@ describe("TypedEventBus", () => {
             expect(listener1).toHaveBeenCalledWith({ data: "test" });
             expect(listener2).toHaveBeenCalledWith({ data: "test" });
         });
-        it("should remove listeners", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove listeners", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -94,10 +88,7 @@ describe("TypedEventBus", () => {
 
             expect(listener).not.toHaveBeenCalled();
         });
-        it("should support once listeners", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support once listeners", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -206,10 +197,7 @@ describe("TypedEventBus", () => {
         });
     });
     describe("event introspection", () => {
-        it("should provide listener count", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide listener count", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -223,10 +211,7 @@ describe("TypedEventBus", () => {
 
             expect(eventBus.listenerCount("test-event")).toBe(2);
         });
-        it("should provide event names", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide event names", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -252,10 +237,7 @@ describe("TypedEventBus", () => {
             expect(typeof maxListeners).toBe("number");
             expect(maxListeners).toBeGreaterThan(0);
         });
-        it("should allow setting max listeners", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow setting max listeners", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -295,10 +277,7 @@ describe("TypedEventBus", () => {
         });
     });
     describe("cleanup", () => {
-        it("should remove all listeners", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove all listeners", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -369,10 +348,7 @@ describe("TypedEventBus", () => {
                 })
             );
         });
-        it("should support typed once method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support typed once method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");
@@ -392,10 +368,7 @@ describe("TypedEventBus", () => {
                 })
             );
         });
-        it("should support typed off method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support typed off method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: TypedEventBus", "component");
             await annotate("Category: Event System", "category");

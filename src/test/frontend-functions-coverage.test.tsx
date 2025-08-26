@@ -63,7 +63,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Error Boundary Functions", () => {
-        it("should exercise DefaultErrorFallback component functions", ({ task, annotate }) => {
+        it("should exercise DefaultErrorFallback component functions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -91,7 +94,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(onRetry).toHaveBeenCalled();
         });
 
-        it("should exercise withErrorBoundary HOC functions", ({ task, annotate }) => {
+        it("should exercise withErrorBoundary HOC functions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -203,7 +209,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Component Lifecycle Functions", () => {
-        it("should exercise component mount and unmount functions", ({ task, annotate }) => {
+        it("should exercise component mount and unmount functions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -329,7 +338,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Async Function Coverage", () => {
-        it("should exercise async component functions", async ({ task, annotate }) => {
+        it("should exercise async component functions", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -372,7 +384,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(asyncEffect).toHaveBeenCalled();
         });
 
-        it("should exercise error handling in async functions", async ({ task, annotate }) => {
+        it("should exercise error handling in async functions", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -420,7 +435,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Conditional Rendering Functions", () => {
-        it("should exercise conditional rendering branches", ({ task, annotate }) => {
+        it("should exercise conditional rendering branches", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -452,7 +470,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             expect(screen.getByText("Condition is false")).toBeInTheDocument();
         });
 
-        it("should exercise ternary operator functions", ({ task, annotate }) => {
+        it("should exercise ternary operator functions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -476,7 +497,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Custom Hook Functions", () => {
-        it("should exercise custom hook with multiple functions", ({ task, annotate }) => {
+        it("should exercise custom hook with multiple functions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -519,7 +543,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Class Component Functions", () => {
-        it("should exercise class component lifecycle methods", ({ task, annotate }) => {
+        it("should exercise class component lifecycle methods", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");
@@ -574,7 +601,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
     });
 
     describe("Function Coverage Completion", () => {
-        it("should verify comprehensive function coverage patterns", ({ task, annotate }) => {
+        it("should verify comprehensive function coverage patterns", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: frontend-functions-coverage", "component");
             annotate("Category: Core", "category");

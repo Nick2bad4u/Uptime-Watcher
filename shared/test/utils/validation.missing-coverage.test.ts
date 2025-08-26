@@ -14,7 +14,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
@@ -38,7 +41,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -61,7 +67,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -85,7 +94,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -110,7 +122,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -136,7 +151,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -180,7 +198,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -206,7 +227,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -234,7 +258,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -256,7 +283,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -280,7 +310,10 @@ describe("Validation - Missing Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -297,12 +330,12 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Monitor type is required");
         });
 
-        it("should handle null type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle null type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -319,12 +352,12 @@ describe("Validation - Missing Coverage Tests", () => {
             expect(errors).toContain("Monitor type is required");
         });
 
-        it("should handle undefined type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validation.missing-coverage", "component");
+            await annotate(
+                "Component: validation.missing-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

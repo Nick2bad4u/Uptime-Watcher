@@ -69,10 +69,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(minimalConfig)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -81,10 +78,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -205,10 +199,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPingMonitorConfig(minimalConfig)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -217,10 +208,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPingMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -337,10 +325,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(udpConfig)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -349,10 +334,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -413,10 +395,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isPortMonitorConfig(invalidConfig as any)).toBe(false);
         });
 
-        it("should handle edge case ports", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge case ports", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -544,10 +523,7 @@ describe("shared/types/monitorConfig function coverage", () => {
             expect(isHttpMonitorConfig(complexHttpConfig)).toBe(true);
         });
 
-        it("should handle boundary values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle boundary values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorConfig-functions", "component");
             await annotate("Category: Shared", "category");

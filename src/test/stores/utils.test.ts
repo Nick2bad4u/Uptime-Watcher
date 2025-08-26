@@ -211,10 +211,7 @@ describe("Store Utils", () => {
     });
 
     describe("debounce", () => {
-        it("should debounce function calls", async ({
-            task,
-            annotate,
-        }) => {
+        it("should debounce function calls", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
@@ -320,10 +317,7 @@ describe("Store Utils", () => {
             expect(mockFunction).toHaveBeenCalledWith("arg1", "arg2", "arg3");
         });
 
-        it("should cleanup timeouts properly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should cleanup timeouts properly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");
@@ -410,10 +404,7 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should not log in production mode", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not log in production mode", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: utils", "component");
             await annotate("Category: Store", "category");

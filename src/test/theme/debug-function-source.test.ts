@@ -4,13 +4,13 @@ import { useAvailabilityColors } from "../../theme/useTheme";
 
 describe("Debug Availability Function Source", () => {
     it("should reveal the actual function being called", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: debug-function-source", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: debug-function-source", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useAvailabilityColors());
 

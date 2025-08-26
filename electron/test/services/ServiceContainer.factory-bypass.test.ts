@@ -162,14 +162,14 @@ describe("ServiceContainer - Factory Bypass Test", () => {
         ServiceContainer.resetForTesting();
     });
 
-    it("should create SiteManager successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.factory-bypass", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+    it("should create SiteManager successfully", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: ServiceContainer.factory-bypass",
+            "component"
+        );
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         console.log("🧪 Testing SiteManager creation");
 
@@ -182,13 +182,16 @@ describe("ServiceContainer - Factory Bypass Test", () => {
     });
 
     it("should create MonitorManager successfully without getSitesCache error", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.factory-bypass", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate(
+            "Component: ServiceContainer.factory-bypass",
+            "component"
+        );
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         console.log("🧪 Testing MonitorManager creation with factory bypass");
 

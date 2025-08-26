@@ -168,10 +168,7 @@ describe("logTemplates function coverage", () => {
             );
         });
 
-        it("should handle numeric placeholders", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle numeric placeholders", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -242,10 +239,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("User 123 performed {action}");
         });
 
-        it("should handle empty template", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty template", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -259,10 +253,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("");
         });
 
-        it("should handle empty data object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty data object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -276,10 +267,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("Static message with no placeholders");
         });
 
-        it("should handle numeric values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle numeric values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -293,10 +281,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("Count: 0, Price: 19.99");
         });
 
-        it("should handle string values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -327,10 +312,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("coding loves coding!");
         });
 
-        it("should handle case sensitivity", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle case sensitivity", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -395,10 +377,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("Good alice and bad { invalid } placeholder");
         });
 
-        it("should handle zero values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");
@@ -412,10 +391,7 @@ describe("logTemplates function coverage", () => {
             expect(result).toBe("Count is 0");
         });
 
-        it("should handle string numbers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string numbers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logTemplates.functions", "component");
             await annotate("Category: Utility", "category");

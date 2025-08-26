@@ -29,10 +29,7 @@ describe("useErrorStore", () => {
     });
 
     describe("Basic Error Management", () => {
-        it("should initialize with no errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize with no errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -44,10 +41,7 @@ describe("useErrorStore", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        it("should set and get global error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set and get global error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -63,10 +57,7 @@ describe("useErrorStore", () => {
             expect(result.current.lastError).toBe(errorMessage);
         });
 
-        it("should clear global error", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear global error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -86,10 +77,7 @@ describe("useErrorStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should handle undefined errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle undefined errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -104,10 +92,7 @@ describe("useErrorStore", () => {
             expect(result.current.lastError).toBeUndefined();
         });
 
-        it("should handle empty string errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -124,10 +109,7 @@ describe("useErrorStore", () => {
     });
 
     describe("Store-Specific Error Management", () => {
-        it("should set store-specific errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set store-specific errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -143,10 +125,7 @@ describe("useErrorStore", () => {
             expect(result.current.storeErrors["sites"]).toBe(errorMessage);
         });
 
-        it("should get store-specific errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get store-specific errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -177,10 +156,7 @@ describe("useErrorStore", () => {
             expect(error).toBeUndefined();
         });
 
-        it("should clear specific store errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear specific store errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -273,10 +249,7 @@ describe("useErrorStore", () => {
     });
 
     describe("Loading State Management", () => {
-        it("should set global loading state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set global loading state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -297,10 +270,7 @@ describe("useErrorStore", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        it("should set operation loading state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should set operation loading state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -315,10 +285,7 @@ describe("useErrorStore", () => {
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
         });
 
-        it("should get operation loading state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get operation loading state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -337,10 +304,7 @@ describe("useErrorStore", () => {
             expect(result.current.getOperationLoading("fetchSites")).toBe(true);
         });
 
-        it("should handle multiple operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle multiple operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -397,10 +361,7 @@ describe("useErrorStore", () => {
     });
 
     describe("Combined Error and Loading Management", () => {
-        it("should clear all errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear all errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");
@@ -638,10 +599,7 @@ describe("useErrorStore", () => {
             ).toBe(true);
         });
 
-        it("should react to state changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should react to state changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useErrorStore", "component");
             await annotate("Category: Store", "category");

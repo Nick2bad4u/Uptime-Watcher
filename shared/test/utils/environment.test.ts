@@ -12,13 +12,13 @@ import * as environmentModule from "../../utils/environment.js";
 
 describe("Function Coverage Validation", () => {
     it("should call all exported functions to ensure 100% function coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: environment", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Export Operation", "type");
 
         // Verify all functions are accessible
         expect(typeof environmentModule.getEnvVar).toBe("function");

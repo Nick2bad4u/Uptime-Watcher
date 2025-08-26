@@ -250,7 +250,10 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(screen.getByRole("button")).toBeInTheDocument();
         });
 
-        it("should render with icon in different positions", ({ task, annotate }) => {
+        it("should render with icon in different positions", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
             annotate("Category: Core", "category");
@@ -309,7 +312,10 @@ describe("Theme Components - Comprehensive Coverage", () => {
             expect(onClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should apply all accessibility and style props", ({ task, annotate }) => {
+        it("should apply all accessibility and style props", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
             annotate("Category: Core", "category");
@@ -791,7 +797,10 @@ describe("Theme Components - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Boundaries", () => {
-        it("should handle components with undefined children", ({ task, annotate }) => {
+        it("should handle components with undefined children", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
             annotate("Category: Core", "category");
@@ -807,7 +816,10 @@ describe("Theme Components - Comprehensive Coverage", () => {
             }).not.toThrow();
         });
 
-        it("should handle invalid enum values gracefully", ({ task, annotate }) => {
+        it("should handle invalid enum values gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: components", "component");
             annotate("Category: Core", "category");

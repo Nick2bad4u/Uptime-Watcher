@@ -59,7 +59,10 @@ describe("Environment - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate(
+                "Component: environment-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -198,7 +201,10 @@ describe("Environment - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate(
+                "Component: environment-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -230,7 +236,10 @@ describe("Environment - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate(
+                "Component: environment-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -251,7 +260,10 @@ describe("Environment - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate(
+                "Component: environment-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -283,12 +295,12 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.isTest()).toBe(true);
         });
 
-        it("should handle getEnvVar edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle getEnvVar edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate(
+                "Component: environment-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Retrieval", "type");
 

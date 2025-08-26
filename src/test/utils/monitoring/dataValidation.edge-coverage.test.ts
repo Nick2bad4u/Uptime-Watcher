@@ -18,7 +18,10 @@ describe("DataValidation - Complete Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation.edge-coverage", "component");
+            await annotate(
+                "Component: dataValidation.edge-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -44,7 +47,10 @@ describe("DataValidation - Complete Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation.edge-coverage", "component");
+            await annotate(
+                "Component: dataValidation.edge-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -79,7 +85,10 @@ describe("DataValidation - Complete Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation.edge-coverage", "component");
+            await annotate(
+                "Component: dataValidation.edge-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -114,7 +123,10 @@ describe("DataValidation - Complete Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation.edge-coverage", "component");
+            await annotate(
+                "Component: dataValidation.edge-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -145,7 +157,10 @@ describe("DataValidation - Complete Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation.edge-coverage", "component");
+            await annotate(
+                "Component: dataValidation.edge-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

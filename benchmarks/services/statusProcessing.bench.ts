@@ -3,15 +3,15 @@
  *
  * @remarks
  * Comprehensive benchmarks for status processing, uptime calculations, SLA
- * compliance    detectOutages(
-        entries: StatusEntry[],
-        minimumDuration: number = 60_000,
-        severityThresholds?: { minor: number; major: number }
-    ): OutageEvent[] {
-        this.operationCount++;
-
-        const thresholds = severityThresholds ?? { minor: 300_000, major: 1_800_000 };ing, outage detection, and statistical aggregation operations
- * that form the core of monitoring analytics and reporting functionality.
+ * compliance detectOutages( entries: StatusEntry[], minimumDuration: number =
+ * 60_000, severityThresholds?: { minor: number; major: number } ):
+ * OutageEvent[] { this.operationCount++;
+ *
+ * ```
+ *     const thresholds = severityThresholds ?? { minor: 300_000, major: 1_800_000 };ing, outage detection, and statistical aggregation operations
+ * ```
+ *
+ * That form the core of monitoring analytics and reporting functionality.
  *
  * Covers real-time status updates, historical data processing, trend analysis,
  * and complex aggregation operations across multiple time windows and sites.
@@ -109,12 +109,14 @@ class MockStatusProcessingService {
                 uptimePercentage: 0,
                 availability: 0,
                 meanTimeToRecovery: 0,
-                meanTimeBetweenFailures: 0
+                meanTimeBetweenFailures: 0,
             };
         }
 
         // Sort entries by timestamp for accurate calculations
-        const sortedEntries = [...entries].sort((a, b) => a.timestamp - b.timestamp);
+        const sortedEntries = [...entries].sort(
+            (a, b) => a.timestamp - b.timestamp
+        );
 
         let upCount = 0;
         let downCount = 0;
@@ -124,12 +126,14 @@ class MockStatusProcessingService {
         let currentDownStart: number | null = null;
 
         for (const entry of sortedEntries) {
-
             switch (entry.status) {
                 case "up": {
                     upCount++;
                     if (currentDownStart !== null) {
-                        downPeriods.push({ start: currentDownStart, end: entry.timestamp });
+                        downPeriods.push({
+                            start: currentDownStart,
+                            end: entry.timestamp,
+                        });
                         currentDownStart = null;
                     }
                     break;
@@ -151,17 +155,31 @@ class MockStatusProcessingService {
         }
 
         const totalChecks = sortedEntries.length;
-        const uptimePercentage = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
-        const availability = totalChecks > 0 ? ((upCount + degradedCount * 0.5) / totalChecks) * 100 : 0;
-        const averageResponseTime = totalChecks > 0 ? totalResponseTime / totalChecks : 0;
+        const uptimePercentage =
+            totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
+        const availability =
+            totalChecks > 0
+                ? ((upCount + degradedCount * 0.5) / totalChecks) * 100
+                : 0;
+        const averageResponseTime =
+            totalChecks > 0 ? totalResponseTime / totalChecks : 0;
 
         // Calculate MTTR and MTBF
-        const totalDowntime = downPeriods.reduce((sum, period) => sum + (period.end - period.start), 0);
-        const meanTimeToRecovery = downPeriods.length > 0 ? totalDowntime / downPeriods.length : 0;
-        const operationalTime = sortedEntries.length > 1 ?
-            (sortedEntries.at(-1)?.timestamp ?? 0) - sortedEntries[0].timestamp : 0;
-        const meanTimeBetweenFailures = downPeriods.length > 0 ?
-            (operationalTime - totalDowntime) / downPeriods.length : operationalTime;
+        const totalDowntime = downPeriods.reduce(
+            (sum, period) => sum + (period.end - period.start),
+            0
+        );
+        const meanTimeToRecovery =
+            downPeriods.length > 0 ? totalDowntime / downPeriods.length : 0;
+        const operationalTime =
+            sortedEntries.length > 1
+                ? (sortedEntries.at(-1)?.timestamp ?? 0) -
+                  sortedEntries[0].timestamp
+                : 0;
+        const meanTimeBetweenFailures =
+            downPeriods.length > 0
+                ? (operationalTime - totalDowntime) / downPeriods.length
+                : operationalTime;
 
         return {
             uptime: upCount,
@@ -172,7 +190,7 @@ class MockStatusProcessingService {
             uptimePercentage,
             availability,
             meanTimeToRecovery,
-            meanTimeBetweenFailures
+            meanTimeBetweenFailures,
         };
     }
 
@@ -186,18 +204,23 @@ class MockStatusProcessingService {
     ): OutageEvent[] {
         this.operationCount++;
 
-        const thresholds = severityThresholds ?? { minor: 300_000, major: 1_800_000 };
-        const sortedEntries = [...entries].sort((a, b) => a.timestamp - b.timestamp);
+        const thresholds = severityThresholds ?? {
+            minor: 300_000,
+            major: 1_800_000,
+        };
+        const sortedEntries = [...entries].sort(
+            (a, b) => a.timestamp - b.timestamp
+        );
         const outages: OutageEvent[] = [];
-        let currentOutage: { start: number; monitors: Set<string> } | null = null;
+        let currentOutage: { start: number; monitors: Set<string> } | null =
+            null;
 
         for (const entry of sortedEntries) {
-
             if (entry.status === "down") {
                 if (currentOutage === null) {
                     currentOutage = {
                         start: entry.timestamp,
-                        monitors: new Set([entry.monitorId])
+                        monitors: new Set([entry.monitorId]),
                     };
                 } else {
                     currentOutage.monitors.add(entry.monitorId);
@@ -206,11 +229,19 @@ class MockStatusProcessingService {
                 const duration = entry.timestamp - currentOutage.start;
 
                 if (duration >= minimumDuration) {
-                    const severity = duration >= thresholds.major ? "critical" :
-                                   duration >= thresholds.minor ? "major" : "minor";
+                    const severity =
+                        duration >= thresholds.major
+                            ? "critical"
+                            : duration >= thresholds.minor
+                              ? "major"
+                              : "minor";
 
-                    const impactScope = currentOutage.monitors.size === 1 ? "single" :
-                                      currentOutage.monitors.size <= 3 ? "multiple" : "site-wide";
+                    const impactScope =
+                        currentOutage.monitors.size === 1
+                            ? "single"
+                            : currentOutage.monitors.size <= 3
+                              ? "multiple"
+                              : "site-wide";
 
                     outages.push({
                         start: currentOutage.start,
@@ -218,7 +249,7 @@ class MockStatusProcessingService {
                         duration,
                         severity,
                         affectedMonitors: Array.from(currentOutage.monitors),
-                        impactScope
+                        impactScope,
                     });
                 }
 
@@ -242,7 +273,9 @@ class MockStatusProcessingService {
         let filteredEntries = entries;
         if (timeWindow) {
             filteredEntries = entries.filter(
-                entry => entry.timestamp >= timeWindow.start && entry.timestamp <= timeWindow.end
+                (entry) =>
+                    entry.timestamp >= timeWindow.start &&
+                    entry.timestamp <= timeWindow.end
             );
         }
 
@@ -251,13 +284,17 @@ class MockStatusProcessingService {
         const compliant = actualUptime >= slaThreshold;
 
         // Calculate violation metrics
-        const violations = filteredEntries.filter(entry => entry.status === "down");
-        const violationDuration = violations.length > 0 ?
-            violations.reduce((sum, v, i, arr) => {
-                if (i === 0) return 0;
-                const prevTimestamp = arr[i - 1].timestamp;
-                return sum + (v.timestamp - prevTimestamp);
-            }, 0) : 0;
+        const violations = filteredEntries.filter(
+            (entry) => entry.status === "down"
+        );
+        const violationDuration =
+            violations.length > 0
+                ? violations.reduce((sum, v, i, arr) => {
+                      if (i === 0) return 0;
+                      const prevTimestamp = arr[i - 1].timestamp;
+                      return sum + (v.timestamp - prevTimestamp);
+                  }, 0)
+                : 0;
 
         return {
             compliant,
@@ -265,7 +302,7 @@ class MockStatusProcessingService {
             requiredUptime: slaThreshold,
             slaThreshold,
             violationDuration,
-            violationCount: violations.length
+            violationCount: violations.length,
         };
     }
 
@@ -274,7 +311,11 @@ class MockStatusProcessingService {
      */
     async processBulkStatusUpdates(
         statusUpdates: StatusEntry[],
-        aggregationWindows: number[] = [3_600_000, 86_400_000, 604_800_000] // 1h, 1d, 1w
+        aggregationWindows: number[] = [
+            3_600_000,
+            86_400_000,
+            604_800_000,
+        ] // 1h, 1d, 1w
     ): Promise<Map<string, StatusAggregationResult>> {
         this.operationCount++;
 
@@ -282,7 +323,9 @@ class MockStatusProcessingService {
         const results = new Map<string, StatusAggregationResult>();
 
         for (const [siteId, siteEntries] of siteGroups) {
-            const monitors = new Set(siteEntries.map(entry => entry.monitorId));
+            const monitors = new Set(
+                siteEntries.map((entry) => entry.monitorId)
+            );
             const activeMonitors = monitors.size;
 
             // Calculate overall statistics
@@ -292,17 +335,21 @@ class MockStatusProcessingService {
             const outages = this.detectOutages(siteEntries);
 
             // Calculate SLA compliance
-            const slaCompliance = this.calculateSLACompliance(siteEntries, 99.9);
+            const slaCompliance = this.calculateSLACompliance(
+                siteEntries,
+                99.9
+            );
 
             // Calculate time window statistics
             const now = Date.now();
-            const timeWindowStats = aggregationWindows.map(windowSize => {
+            const timeWindowStats = aggregationWindows.map((windowSize) => {
                 const windowStart = now - windowSize;
                 const windowEntries = siteEntries.filter(
-                    entry => entry.timestamp >= windowStart
+                    (entry) => entry.timestamp >= windowStart
                 );
 
-                const windowStats = this.calculateUptimeStatistics(windowEntries);
+                const windowStats =
+                    this.calculateUptimeStatistics(windowEntries);
 
                 return {
                     windowStart,
@@ -312,13 +359,18 @@ class MockStatusProcessingService {
                     successfulChecks: windowStats.uptime,
                     failedChecks: windowStats.downtime,
                     averageResponseTime: windowStats.averageResponseTime,
-                    uptimePercentage: windowStats.uptimePercentage
+                    uptimePercentage: windowStats.uptimePercentage,
                 };
             });
 
             // Determine overall status
-            const recentEntries = siteEntries.filter(entry => entry.timestamp > now - 300_000); // Last 5 minutes
-            const overallStatus = this.determineOverallStatus(recentEntries, activeMonitors);
+            const recentEntries = siteEntries.filter(
+                (entry) => entry.timestamp > now - 300_000
+            ); // Last 5 minutes
+            const overallStatus = this.determineOverallStatus(
+                recentEntries,
+                activeMonitors
+            );
 
             // Calculate trends
             const trends = this.calculateTrends(siteEntries, timeWindowStats);
@@ -332,7 +384,7 @@ class MockStatusProcessingService {
                 recentOutages: outages.slice(-5), // Last 5 outages
                 slaCompliance,
                 timeWindowStats,
-                trends
+                trends,
             });
         }
 
@@ -352,7 +404,7 @@ class MockStatusProcessingService {
             const batch = statusStream.slice(i, i + batchSize);
 
             // Process batch in parallel
-            const batchPromises = batch.map(async entry => {
+            const batchPromises = batch.map(async (entry) => {
                 // Simulate real-time processing
                 await this.processIndividualStatusUpdate(entry);
 
@@ -382,7 +434,9 @@ class MockStatusProcessingService {
         this.operationCount++;
 
         const filteredHistory = statusHistory.filter(
-            entry => entry.timestamp >= reportPeriod.start && entry.timestamp <= reportPeriod.end
+            (entry) =>
+                entry.timestamp >= reportPeriod.start &&
+                entry.timestamp <= reportPeriod.end
         );
 
         const summary = this.calculateUptimeStatistics(filteredHistory);
@@ -401,12 +455,14 @@ class MockStatusProcessingService {
             summary,
             trends,
             patterns: { hourly: hourlyPatterns, dayOfWeek: dowPatterns },
-            recommendations
+            recommendations,
         };
     }
 
     // Helper methods
-    private groupStatusBySite(entries: StatusEntry[]): Map<string, StatusEntry[]> {
+    private groupStatusBySite(
+        entries: StatusEntry[]
+    ): Map<string, StatusEntry[]> {
         const groups = new Map<string, StatusEntry[]>();
 
         for (const entry of entries) {
@@ -424,8 +480,12 @@ class MockStatusProcessingService {
     ): "healthy" | "degraded" | "critical" | "unknown" {
         if (recentEntries.length === 0) return "unknown";
 
-        const downCount = recentEntries.filter(entry => entry.status === "down").length;
-        const degradedCount = recentEntries.filter(entry => entry.status === "degraded").length;
+        const downCount = recentEntries.filter(
+            (entry) => entry.status === "down"
+        ).length;
+        const degradedCount = recentEntries.filter(
+            (entry) => entry.status === "degraded"
+        ).length;
 
         const failureRate = (downCount + degradedCount) / recentEntries.length;
 
@@ -434,28 +494,51 @@ class MockStatusProcessingService {
         return "healthy";
     }
 
-    private calculateTrends(entries: StatusEntry[], windows: TimeWindowStats[]): any {
+    private calculateTrends(
+        entries: StatusEntry[],
+        windows: TimeWindowStats[]
+    ): any {
         // Simplified trend calculation
-        if (windows.length < 2) return { responseTimeTrend: "stable", uptimeTrend: "stable", reliabilityScore: 95 };
+        if (windows.length < 2)
+            return {
+                responseTimeTrend: "stable",
+                uptimeTrend: "stable",
+                reliabilityScore: 95,
+            };
 
         const recent = windows[0];
         const previous = windows[1];
 
-        const responseTimeTrend = recent.averageResponseTime > previous.averageResponseTime * 1.1 ? "degrading" :
-                                 recent.averageResponseTime < previous.averageResponseTime * 0.9 ? "improving" : "stable";
+        const responseTimeTrend =
+            recent.averageResponseTime > previous.averageResponseTime * 1.1
+                ? "degrading"
+                : recent.averageResponseTime <
+                    previous.averageResponseTime * 0.9
+                  ? "improving"
+                  : "stable";
 
-        const uptimeTrend = recent.uptimePercentage > previous.uptimePercentage + 1 ? "improving" :
-                           recent.uptimePercentage < previous.uptimePercentage - 1 ? "degrading" : "stable";
+        const uptimeTrend =
+            recent.uptimePercentage > previous.uptimePercentage + 1
+                ? "improving"
+                : recent.uptimePercentage < previous.uptimePercentage - 1
+                  ? "degrading"
+                  : "stable";
 
-        const reliabilityScore = Math.min(100, recent.uptimePercentage + (recent.averageResponseTime < 1000 ? 5 : 0));
+        const reliabilityScore = Math.min(
+            100,
+            recent.uptimePercentage +
+                (recent.averageResponseTime < 1000 ? 5 : 0)
+        );
 
         return { responseTimeTrend, uptimeTrend, reliabilityScore };
     }
 
-    private async processIndividualStatusUpdate(entry: StatusEntry): Promise<void> {
+    private async processIndividualStatusUpdate(
+        entry: StatusEntry
+    ): Promise<void> {
         // Simulate individual processing
         const processingTime = Math.random() * 5;
-        await new Promise(resolve => setTimeout(resolve, processingTime));
+        await new Promise((resolve) => setTimeout(resolve, processingTime));
     }
 
     private updateRunningStatistics(entry: StatusEntry): void {
@@ -472,7 +555,9 @@ class MockStatusProcessingService {
     }
 
     private analyzeHourlyPatterns(entries: StatusEntry[]): any {
-        const hourlyData = Array.from({length: 24}).fill(0).map(() => ({ count: 0, failures: 0 }));
+        const hourlyData = Array.from({ length: 24 })
+            .fill(0)
+            .map(() => ({ count: 0, failures: 0 }));
 
         for (const entry of entries) {
             const hour = new Date(entry.timestamp).getHours();
@@ -486,7 +571,9 @@ class MockStatusProcessingService {
     }
 
     private analyzeDayOfWeekPatterns(entries: StatusEntry[]): any {
-        const dowData = Array.from({length: 7}).fill(0).map(() => ({ count: 0, failures: 0 }));
+        const dowData = Array.from({ length: 7 })
+            .fill(0)
+            .map(() => ({ count: 0, failures: 0 }));
 
         for (const entry of entries) {
             const dow = new Date(entry.timestamp).getDay();
@@ -504,19 +591,26 @@ class MockStatusProcessingService {
         return {
             overallTrend: "stable",
             seasonality: "none detected",
-            anomalies: []
+            anomalies: [],
         };
     }
 
-    private generateRecommendations(stats: UptimeStatistics, trends: any): string[] {
+    private generateRecommendations(
+        stats: UptimeStatistics,
+        trends: any
+    ): string[] {
         const recommendations: string[] = [];
 
         if (stats.uptimePercentage < 99) {
-            recommendations.push("Consider implementing additional monitoring redundancy");
+            recommendations.push(
+                "Consider implementing additional monitoring redundancy"
+            );
         }
 
         if (stats.averageResponseTime > 2000) {
-            recommendations.push("Investigate performance optimization opportunities");
+            recommendations.push(
+                "Investigate performance optimization opportunities"
+            );
         }
 
         if (trends.uptimeTrend === "degrading") {
@@ -579,7 +673,7 @@ function generateStatusEntries(
             responseTime,
             details: status === "down" ? "Connection timeout" : undefined,
             monitorId,
-            siteId
+            siteId,
         });
     }
 
@@ -599,245 +693,446 @@ describe("Status Processing and Aggregation Benchmarks", () => {
     });
 
     describe("Core Statistical Calculations", () => {
-        bench("Calculate uptime statistics - small dataset (100 entries)", () => {
-            const entries = generateStatusEntries(100, ["site-1"], 5);
-            statusService.calculateUptimeStatistics(entries);
-        }, { iterations: 500 });
+        bench(
+            "Calculate uptime statistics - small dataset (100 entries)",
+            () => {
+                const entries = generateStatusEntries(100, ["site-1"], 5);
+                statusService.calculateUptimeStatistics(entries);
+            },
+            { iterations: 500 }
+        );
 
-        bench("Calculate uptime statistics - medium dataset (1,000 entries)", () => {
-            const entries = generateStatusEntries(1000, ["site-1"], 10);
-            statusService.calculateUptimeStatistics(entries);
-        }, { iterations: 100 });
+        bench(
+            "Calculate uptime statistics - medium dataset (1,000 entries)",
+            () => {
+                const entries = generateStatusEntries(1000, ["site-1"], 10);
+                statusService.calculateUptimeStatistics(entries);
+            },
+            { iterations: 100 }
+        );
 
-        bench("Calculate uptime statistics - large dataset (10,000 entries)", () => {
-            const entries = generateStatusEntries(10_000, ["site-1"], 20);
-            statusService.calculateUptimeStatistics(entries);
-        }, { iterations: 10 });
+        bench(
+            "Calculate uptime statistics - large dataset (10,000 entries)",
+            () => {
+                const entries = generateStatusEntries(10_000, ["site-1"], 20);
+                statusService.calculateUptimeStatistics(entries);
+            },
+            { iterations: 10 }
+        );
 
-        bench("Calculate uptime statistics - massive dataset (100,000 entries)", () => {
-            const entries = generateStatusEntries(100_000, generateSiteIds(5), 50);
-            statusService.calculateUptimeStatistics(entries);
-        }, { iterations: 2 });
+        bench(
+            "Calculate uptime statistics - massive dataset (100,000 entries)",
+            () => {
+                const entries = generateStatusEntries(
+                    100_000,
+                    generateSiteIds(5),
+                    50
+                );
+                statusService.calculateUptimeStatistics(entries);
+            },
+            { iterations: 2 }
+        );
     });
 
     describe("Outage Detection", () => {
-        bench("Detect outages - normal patterns", () => {
-            const entries = generateStatusEntries(1000, ["site-1"], 5);
-            statusService.detectOutages(entries, 60_000);
-        }, { iterations: 200 });
+        bench(
+            "Detect outages - normal patterns",
+            () => {
+                const entries = generateStatusEntries(1000, ["site-1"], 5);
+                statusService.detectOutages(entries, 60_000);
+            },
+            { iterations: 200 }
+        );
 
-        bench("Detect outages - high failure rate", () => {
-            const entries = generateStatusEntries(2000, ["site-1"], 10);
-            // Artificially increase failure rate for this benchmark
-            entries.forEach((entry, index) => {
-                if (index % 10 < 3) entry.status = "down"; // 30% failure rate
-            });
-            statusService.detectOutages(entries, 30_000);
-        }, { iterations: 50 });
+        bench(
+            "Detect outages - high failure rate",
+            () => {
+                const entries = generateStatusEntries(2000, ["site-1"], 10);
+                // Artificially increase failure rate for this benchmark
+                entries.forEach((entry, index) => {
+                    if (index % 10 < 3) entry.status = "down"; // 30% failure rate
+                });
+                statusService.detectOutages(entries, 30_000);
+            },
+            { iterations: 50 }
+        );
 
-        bench("Detect outages - multiple severity thresholds", () => {
-            const entries = generateStatusEntries(5000, generateSiteIds(3), 15);
-            statusService.detectOutages(entries, 60_000, { minor: 300_000, major: 1_800_000 });
-        }, { iterations: 20 });
+        bench(
+            "Detect outages - multiple severity thresholds",
+            () => {
+                const entries = generateStatusEntries(
+                    5000,
+                    generateSiteIds(3),
+                    15
+                );
+                statusService.detectOutages(entries, 60_000, {
+                    minor: 300_000,
+                    major: 1_800_000,
+                });
+            },
+            { iterations: 20 }
+        );
     });
 
     describe("SLA Compliance Calculations", () => {
-        bench("SLA compliance - single site", () => {
-            const entries = generateStatusEntries(1000, ["site-1"], 10);
-            statusService.calculateSLACompliance(entries, 99.9);
-        }, { iterations: 200 });
+        bench(
+            "SLA compliance - single site",
+            () => {
+                const entries = generateStatusEntries(1000, ["site-1"], 10);
+                statusService.calculateSLACompliance(entries, 99.9);
+            },
+            { iterations: 200 }
+        );
 
-        bench("SLA compliance - with time windows", () => {
-            const entries = generateStatusEntries(2000, ["site-1"], 10);
-            const timeWindow = {
-                start: Date.now() - 24 * 60 * 60 * 1000,
-                end: Date.now()
-            };
-            statusService.calculateSLACompliance(entries, 99.95, timeWindow);
-        }, { iterations: 100 });
+        bench(
+            "SLA compliance - with time windows",
+            () => {
+                const entries = generateStatusEntries(2000, ["site-1"], 10);
+                const timeWindow = {
+                    start: Date.now() - 24 * 60 * 60 * 1000,
+                    end: Date.now(),
+                };
+                statusService.calculateSLACompliance(
+                    entries,
+                    99.95,
+                    timeWindow
+                );
+            },
+            { iterations: 100 }
+        );
 
-        bench("SLA compliance - multiple thresholds", () => {
-            const entries = generateStatusEntries(1500, ["site-1"], 8);
-            const thresholds = [99, 99.5, 99.9, 99.95, 99.99];
+        bench(
+            "SLA compliance - multiple thresholds",
+            () => {
+                const entries = generateStatusEntries(1500, ["site-1"], 8);
+                const thresholds = [
+                    99,
+                    99.5,
+                    99.9,
+                    99.95,
+                    99.99,
+                ];
 
-            for (const threshold of thresholds) {
-                statusService.calculateSLACompliance(entries, threshold);
-            }
-        }, { iterations: 50 });
+                for (const threshold of thresholds) {
+                    statusService.calculateSLACompliance(entries, threshold);
+                }
+            },
+            { iterations: 50 }
+        );
     });
 
     describe("Bulk Status Processing", () => {
-        bench("Process bulk updates - 10 sites, 1,000 entries", async () => {
-            const siteIds = generateSiteIds(10);
-            const entries = generateStatusEntries(1000, siteIds, 5);
-            await statusService.processBulkStatusUpdates(entries);
-        }, { iterations: 20 });
+        bench(
+            "Process bulk updates - 10 sites, 1,000 entries",
+            async () => {
+                const siteIds = generateSiteIds(10);
+                const entries = generateStatusEntries(1000, siteIds, 5);
+                await statusService.processBulkStatusUpdates(entries);
+            },
+            { iterations: 20 }
+        );
 
-        bench("Process bulk updates - 50 sites, 5,000 entries", async () => {
-            const siteIds = generateSiteIds(50);
-            const entries = generateStatusEntries(5000, siteIds, 10);
-            await statusService.processBulkStatusUpdates(entries);
-        }, { iterations: 5 });
+        bench(
+            "Process bulk updates - 50 sites, 5,000 entries",
+            async () => {
+                const siteIds = generateSiteIds(50);
+                const entries = generateStatusEntries(5000, siteIds, 10);
+                await statusService.processBulkStatusUpdates(entries);
+            },
+            { iterations: 5 }
+        );
 
-        bench("Process bulk updates - 100 sites, 10,000 entries", async () => {
-            const siteIds = generateSiteIds(100);
-            const entries = generateStatusEntries(10_000, siteIds, 15);
-            await statusService.processBulkStatusUpdates(entries, [3_600_000, 86_400_000]);
-        }, { iterations: 2 });
+        bench(
+            "Process bulk updates - 100 sites, 10,000 entries",
+            async () => {
+                const siteIds = generateSiteIds(100);
+                const entries = generateStatusEntries(10_000, siteIds, 15);
+                await statusService.processBulkStatusUpdates(
+                    entries,
+                    [3_600_000, 86_400_000]
+                );
+            },
+            { iterations: 2 }
+        );
 
-        bench("Process bulk updates - with multiple time windows", async () => {
-            const siteIds = generateSiteIds(25);
-            const entries = generateStatusEntries(2500, siteIds, 8);
-            const windows = [
-                3_600_000,    // 1 hour
-                21_600_000,   // 6 hours
-                86_400_000,   // 1 day
-                604_800_000,  // 1 week
-                2_592_000_000  // 1 month
-            ];
-            await statusService.processBulkStatusUpdates(entries, windows);
-        }, { iterations: 10 });
+        bench(
+            "Process bulk updates - with multiple time windows",
+            async () => {
+                const siteIds = generateSiteIds(25);
+                const entries = generateStatusEntries(2500, siteIds, 8);
+                const windows = [
+                    3_600_000, // 1 hour
+                    21_600_000, // 6 hours
+                    86_400_000, // 1 day
+                    604_800_000, // 1 week
+                    2_592_000_000, // 1 month
+                ];
+                await statusService.processBulkStatusUpdates(entries, windows);
+            },
+            { iterations: 10 }
+        );
     });
 
     describe("Real-time Stream Processing", () => {
-        bench("Streaming updates - small batches (100 entries, batch size 10)", async () => {
-            const entries = generateStatusEntries(100, ["site-1"], 5);
-            await statusService.processStreamingStatusUpdates(entries, 10);
-        }, { iterations: 50 });
+        bench(
+            "Streaming updates - small batches (100 entries, batch size 10)",
+            async () => {
+                const entries = generateStatusEntries(100, ["site-1"], 5);
+                await statusService.processStreamingStatusUpdates(entries, 10);
+            },
+            { iterations: 50 }
+        );
 
-        bench("Streaming updates - medium batches (500 entries, batch size 25)", async () => {
-            const entries = generateStatusEntries(500, generateSiteIds(5), 10);
-            await statusService.processStreamingStatusUpdates(entries, 25);
-        }, { iterations: 20 });
+        bench(
+            "Streaming updates - medium batches (500 entries, batch size 25)",
+            async () => {
+                const entries = generateStatusEntries(
+                    500,
+                    generateSiteIds(5),
+                    10
+                );
+                await statusService.processStreamingStatusUpdates(entries, 25);
+            },
+            { iterations: 20 }
+        );
 
-        bench("Streaming updates - large batches (2,000 entries, batch size 50)", async () => {
-            const entries = generateStatusEntries(2000, generateSiteIds(10), 20);
-            await statusService.processStreamingStatusUpdates(entries, 50);
-        }, { iterations: 5 });
+        bench(
+            "Streaming updates - large batches (2,000 entries, batch size 50)",
+            async () => {
+                const entries = generateStatusEntries(
+                    2000,
+                    generateSiteIds(10),
+                    20
+                );
+                await statusService.processStreamingStatusUpdates(entries, 50);
+            },
+            { iterations: 5 }
+        );
 
-        bench("High-frequency updates (1,000 entries, batch size 5)", async () => {
-            const entries = generateStatusEntries(1000, generateSiteIds(3), 15);
-            await statusService.processStreamingStatusUpdates(entries, 5);
-        }, { iterations: 10 });
+        bench(
+            "High-frequency updates (1,000 entries, batch size 5)",
+            async () => {
+                const entries = generateStatusEntries(
+                    1000,
+                    generateSiteIds(3),
+                    15
+                );
+                await statusService.processStreamingStatusUpdates(entries, 5);
+            },
+            { iterations: 10 }
+        );
     });
 
     describe("Analytics and Reporting", () => {
-        bench("Generate analytics report - 1 week period", () => {
-            const entries = generateStatusEntries(5000, generateSiteIds(10), 12, 7 * 24 * 60 * 60 * 1000);
-            const reportPeriod = {
-                start: Date.now() - 7 * 24 * 60 * 60 * 1000,
-                end: Date.now()
-            };
-            statusService.generateAnalyticsReport(entries, reportPeriod);
-        }, { iterations: 20 });
+        bench(
+            "Generate analytics report - 1 week period",
+            () => {
+                const entries = generateStatusEntries(
+                    5000,
+                    generateSiteIds(10),
+                    12,
+                    7 * 24 * 60 * 60 * 1000
+                );
+                const reportPeriod = {
+                    start: Date.now() - 7 * 24 * 60 * 60 * 1000,
+                    end: Date.now(),
+                };
+                statusService.generateAnalyticsReport(entries, reportPeriod);
+            },
+            { iterations: 20 }
+        );
 
-        bench("Generate analytics report - 1 month period", () => {
-            const entries = generateStatusEntries(20_000, generateSiteIds(25), 20, 30 * 24 * 60 * 60 * 1000);
-            const reportPeriod = {
-                start: Date.now() - 30 * 24 * 60 * 60 * 1000,
-                end: Date.now()
-            };
-            statusService.generateAnalyticsReport(entries, reportPeriod);
-        }, { iterations: 5 });
+        bench(
+            "Generate analytics report - 1 month period",
+            () => {
+                const entries = generateStatusEntries(
+                    20_000,
+                    generateSiteIds(25),
+                    20,
+                    30 * 24 * 60 * 60 * 1000
+                );
+                const reportPeriod = {
+                    start: Date.now() - 30 * 24 * 60 * 60 * 1000,
+                    end: Date.now(),
+                };
+                statusService.generateAnalyticsReport(entries, reportPeriod);
+            },
+            { iterations: 5 }
+        );
 
-        bench("Multiple concurrent reports", () => {
-            const entries = generateStatusEntries(8000, generateSiteIds(15), 15, 14 * 24 * 60 * 60 * 1000);
+        bench(
+            "Multiple concurrent reports",
+            () => {
+                const entries = generateStatusEntries(
+                    8000,
+                    generateSiteIds(15),
+                    15,
+                    14 * 24 * 60 * 60 * 1000
+                );
 
-            const periods = [
-                { start: Date.now() - 24 * 60 * 60 * 1000, end: Date.now() }, // 1 day
-                { start: Date.now() - 7 * 24 * 60 * 60 * 1000, end: Date.now() }, // 1 week
-                { start: Date.now() - 14 * 24 * 60 * 60 * 1000, end: Date.now() } // 2 weeks
-            ];
+                const periods = [
+                    {
+                        start: Date.now() - 24 * 60 * 60 * 1000,
+                        end: Date.now(),
+                    }, // 1 day
+                    {
+                        start: Date.now() - 7 * 24 * 60 * 60 * 1000,
+                        end: Date.now(),
+                    }, // 1 week
+                    {
+                        start: Date.now() - 14 * 24 * 60 * 60 * 1000,
+                        end: Date.now(),
+                    }, // 2 weeks
+                ];
 
-            for (const period of periods) {
-                statusService.generateAnalyticsReport(entries, period);
-            }
-        }, { iterations: 10 });
+                for (const period of periods) {
+                    statusService.generateAnalyticsReport(entries, period);
+                }
+            },
+            { iterations: 10 }
+        );
     });
 
     describe("Complex Aggregation Scenarios", () => {
-        bench("Multi-site aggregation with trend analysis", async () => {
-            const siteIds = generateSiteIds(30);
-            const entries = generateStatusEntries(15_000, siteIds, 25);
+        bench(
+            "Multi-site aggregation with trend analysis",
+            async () => {
+                const siteIds = generateSiteIds(30);
+                const entries = generateStatusEntries(15_000, siteIds, 25);
 
-            // Process with extensive time windows
-            const aggregationWindows = [
-                900_000,     // 15 minutes
-                3_600_000,    // 1 hour
-                21_600_000,   // 6 hours
-                86_400_000,   // 1 day
-                604_800_000   // 1 week
-            ];
+                // Process with extensive time windows
+                const aggregationWindows = [
+                    900_000, // 15 minutes
+                    3_600_000, // 1 hour
+                    21_600_000, // 6 hours
+                    86_400_000, // 1 day
+                    604_800_000, // 1 week
+                ];
 
-            const results = await statusService.processBulkStatusUpdates(entries, aggregationWindows);
-
-            // Additional processing on results
-            for (const [siteId, result] of results) {
-                const outages = statusService.detectOutages(
-                    entries.filter(e => e.siteId === siteId),
-                    60_000
+                const results = await statusService.processBulkStatusUpdates(
+                    entries,
+                    aggregationWindows
                 );
 
-                const slaCompliance = statusService.calculateSLACompliance(
-                    entries.filter(e => e.siteId === siteId),
-                    99.9
-                );
-            }
-        }, { iterations: 3 });
+                // Additional processing on results
+                for (const [siteId, result] of results) {
+                    const outages = statusService.detectOutages(
+                        entries.filter((e) => e.siteId === siteId),
+                        60_000
+                    );
 
-        bench("High-volume real-time processing simulation", async () => {
-            // Simulate continuous stream of status updates
-            const siteIds = generateSiteIds(20);
-            const batchSizes = [50, 100, 200];
+                    const slaCompliance = statusService.calculateSLACompliance(
+                        entries.filter((e) => e.siteId === siteId),
+                        99.9
+                    );
+                }
+            },
+            { iterations: 3 }
+        );
 
-            for (const batchSize of batchSizes) {
-                const entries = generateStatusEntries(batchSize * 10, siteIds, 15);
-                await statusService.processStreamingStatusUpdates(entries, batchSize);
+        bench(
+            "High-volume real-time processing simulation",
+            async () => {
+                // Simulate continuous stream of status updates
+                const siteIds = generateSiteIds(20);
+                const batchSizes = [
+                    50,
+                    100,
+                    200,
+                ];
 
-                // Simulate concurrent batch processing
-                const bulkEntries = generateStatusEntries(1000, siteIds, 10);
-                await statusService.processBulkStatusUpdates(bulkEntries, [3_600_000]);
-            }
-        }, { iterations: 5 });
+                for (const batchSize of batchSizes) {
+                    const entries = generateStatusEntries(
+                        batchSize * 10,
+                        siteIds,
+                        15
+                    );
+                    await statusService.processStreamingStatusUpdates(
+                        entries,
+                        batchSize
+                    );
+
+                    // Simulate concurrent batch processing
+                    const bulkEntries = generateStatusEntries(
+                        1000,
+                        siteIds,
+                        10
+                    );
+                    await statusService.processBulkStatusUpdates(bulkEntries, [
+                        3_600_000,
+                    ]);
+                }
+            },
+            { iterations: 5 }
+        );
     });
 
     describe("Edge Cases and Performance Limits", () => {
-        bench("Handle empty datasets gracefully", () => {
-            statusService.calculateUptimeStatistics([]);
-            statusService.detectOutages([]);
-            statusService.calculateSLACompliance([], 99.9);
-        }, { iterations: 1000 });
+        bench(
+            "Handle empty datasets gracefully",
+            () => {
+                statusService.calculateUptimeStatistics([]);
+                statusService.detectOutages([]);
+                statusService.calculateSLACompliance([], 99.9);
+            },
+            { iterations: 1000 }
+        );
 
-        bench("Handle single-status datasets", () => {
-            // All up
-            const allUpEntries = generateStatusEntries(1000, ["site-1"], 5);
-            allUpEntries.forEach(entry => {
-                entry.status = "up";
-            });
-            statusService.calculateUptimeStatistics(allUpEntries);
+        bench(
+            "Handle single-status datasets",
+            () => {
+                // All up
+                const allUpEntries = generateStatusEntries(1000, ["site-1"], 5);
+                allUpEntries.forEach((entry) => {
+                    entry.status = "up";
+                });
+                statusService.calculateUptimeStatistics(allUpEntries);
 
-            // All down
-            const allDownEntries = generateStatusEntries(1000, ["site-1"], 5);
-            allDownEntries.forEach(entry => {
-                entry.status = "down";
-            });
-            statusService.calculateUptimeStatistics(allDownEntries);
-        }, { iterations: 100 });
+                // All down
+                const allDownEntries = generateStatusEntries(
+                    1000,
+                    ["site-1"],
+                    5
+                );
+                allDownEntries.forEach((entry) => {
+                    entry.status = "down";
+                });
+                statusService.calculateUptimeStatistics(allDownEntries);
+            },
+            { iterations: 100 }
+        );
 
-        bench("Extreme failure scenarios (50% failure rate)", () => {
-            const entries = generateStatusEntries(2000, generateSiteIds(5), 10);
-            entries.forEach((entry, index) => {
-                if (index % 2 === 0) entry.status = "down";
-            });
+        bench(
+            "Extreme failure scenarios (50% failure rate)",
+            () => {
+                const entries = generateStatusEntries(
+                    2000,
+                    generateSiteIds(5),
+                    10
+                );
+                entries.forEach((entry, index) => {
+                    if (index % 2 === 0) entry.status = "down";
+                });
 
-            statusService.calculateUptimeStatistics(entries);
-            statusService.detectOutages(entries);
-            statusService.calculateSLACompliance(entries, 99.9);
-        }, { iterations: 20 });
+                statusService.calculateUptimeStatistics(entries);
+                statusService.detectOutages(entries);
+                statusService.calculateSLACompliance(entries, 99.9);
+            },
+            { iterations: 20 }
+        );
 
-        bench("Very short time windows (1 minute aggregation)", async () => {
-            const entries = generateStatusEntries(500, ["site-1"], 5, 60_000); // 1 minute span
-            await statusService.processBulkStatusUpdates(entries, [60_000]); // 1 minute window
-        }, { iterations: 50 });
+        bench(
+            "Very short time windows (1 minute aggregation)",
+            async () => {
+                const entries = generateStatusEntries(
+                    500,
+                    ["site-1"],
+                    5,
+                    60_000
+                ); // 1 minute span
+                await statusService.processBulkStatusUpdates(entries, [60_000]); // 1 minute window
+            },
+            { iterations: 50 }
+        );
     });
 });

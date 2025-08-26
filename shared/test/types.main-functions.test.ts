@@ -242,10 +242,7 @@ describe("shared/types.ts function coverage", () => {
             expect(isSiteStatus([] as any)).toBe(false);
         });
 
-        it("should work with constants", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with constants", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types.main-functions", "component");
             await annotate("Category: Shared", "category");
@@ -724,10 +721,7 @@ describe("shared/types.ts function coverage", () => {
             expect(MONITOR_STATUS.PAUSED).toBe("paused");
         });
 
-        it("should validate default values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate default values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types.main-functions", "component");
             await annotate("Category: Shared", "category");
@@ -737,10 +731,7 @@ describe("shared/types.ts function coverage", () => {
             expect(DEFAULT_SITE_STATUS).toBe("unknown");
         });
 
-        it("should validate BASE_MONITOR_TYPES", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate BASE_MONITOR_TYPES", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types.main-functions", "component");
             await annotate("Category: Shared", "category");

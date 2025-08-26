@@ -74,13 +74,13 @@ vi.mock("../../utils/database/SiteWriterService", () => ({
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {
     it("should create SiteManager with working mocks", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteManager", "component");
-            await annotate("Category: Manager", "category");
-            await annotate("Type: Constructor", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: SiteManager", "component");
+        await annotate("Category: Manager", "category");
+        await annotate("Type: Constructor", "type");
 
         const mockConfigurationManager = {
             validateSiteConfiguration: vi

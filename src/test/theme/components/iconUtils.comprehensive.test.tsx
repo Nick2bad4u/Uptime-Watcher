@@ -27,7 +27,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass(undefined)).toBeUndefined();
         });
 
-        it("should return themed-icon--error for danger and error colors", ({ task, annotate }) => {
+        it("should return themed-icon--error for danger and error colors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -42,7 +45,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass("error")).toBe("themed-icon--error");
         });
 
-        it("should return themed-icon--info for info color", ({ task, annotate }) => {
+        it("should return themed-icon--info for info color", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -56,7 +62,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass("info")).toBe("themed-icon--info");
         });
 
-        it("should return themed-icon--primary for primary color", ({ task, annotate }) => {
+        it("should return themed-icon--primary for primary color", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -70,7 +79,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass("primary")).toBe("themed-icon--primary");
         });
 
-        it("should return themed-icon--secondary for secondary color", ({ task, annotate }) => {
+        it("should return themed-icon--secondary for secondary color", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -86,7 +98,10 @@ describe("iconUtils functions", () => {
             );
         });
 
-        it("should return themed-icon--success for success color", ({ task, annotate }) => {
+        it("should return themed-icon--success for success color", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -100,7 +115,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass("success")).toBe("themed-icon--success");
         });
 
-        it("should return themed-icon--warning for warning color", ({ task, annotate }) => {
+        it("should return themed-icon--warning for warning color", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -114,7 +132,10 @@ describe("iconUtils functions", () => {
             expect(getIconColorClass("warning")).toBe("themed-icon--warning");
         });
 
-        it("should return undefined for unknown colors", ({ task, annotate }) => {
+        it("should return undefined for unknown colors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -133,7 +154,10 @@ describe("iconUtils functions", () => {
     });
 
     describe("renderColoredIcon", () => {
-        it("should return the icon as-is when icon is falsy", ({ task, annotate }) => {
+        it("should return the icon as-is when icon is falsy", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -149,7 +173,10 @@ describe("iconUtils functions", () => {
             expect(renderColoredIcon(false)).toBe(false);
         });
 
-        it("should return icon as-is when no color is provided", ({ task, annotate }) => {
+        it("should return icon as-is when no color is provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -164,7 +191,10 @@ describe("iconUtils functions", () => {
             expect(renderColoredIcon(icon)).toBe(icon);
         });
 
-        it("should wrap icon in span with color class for known colors", ({ task, annotate }) => {
+        it("should wrap icon in span with color class for known colors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -183,7 +213,10 @@ describe("iconUtils functions", () => {
             expect(iconElement.parentElement?.tagName).toBe("SPAN");
         });
 
-        it("should wrap icon in span with inline style for custom colors", ({ task, annotate }) => {
+        it("should wrap icon in span with inline style for custom colors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -234,7 +267,10 @@ describe("iconUtils functions", () => {
             }
         });
 
-        it("should handle string icons with color classes", ({ task, annotate }) => {
+        it("should handle string icons with color classes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");
@@ -256,7 +292,10 @@ describe("iconUtils functions", () => {
             expect(iconElement.tagName).toBe("SPAN");
         });
 
-        it("should handle string icons with custom colors", ({ task, annotate }) => {
+        it("should handle string icons with custom colors", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: iconUtils", "component");
             annotate("Category: Component", "category");

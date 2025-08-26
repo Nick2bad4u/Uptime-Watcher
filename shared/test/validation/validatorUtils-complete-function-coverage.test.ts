@@ -15,7 +15,10 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate(
+                "Component: validatorUtils-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -230,7 +233,10 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate(
+                "Component: validatorUtils-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -276,7 +282,10 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate(
+                "Component: validatorUtils-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -324,7 +333,10 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate(
+                "Component: validatorUtils-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 

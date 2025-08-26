@@ -84,10 +84,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBeUndefined();
         });
 
-        it("should handle empty help texts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty help texts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDynamicHelpText", "component");
             await annotate("Category: Hook", "category");
@@ -106,10 +103,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBeUndefined();
         });
 
-        it("should handle partial help texts", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial help texts", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDynamicHelpText", "component");
             await annotate("Category: Hook", "category");
@@ -134,10 +128,7 @@ describe("useDynamicHelpText Hook", () => {
     });
 
     describe("Error handling", () => {
-        it("should handle Error instances", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Error instances", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDynamicHelpText", "component");
             await annotate("Category: Hook", "category");
@@ -161,10 +152,7 @@ describe("useDynamicHelpText Hook", () => {
             );
         });
 
-        it("should handle non-Error objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle non-Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDynamicHelpText", "component");
             await annotate("Category: Hook", "category");

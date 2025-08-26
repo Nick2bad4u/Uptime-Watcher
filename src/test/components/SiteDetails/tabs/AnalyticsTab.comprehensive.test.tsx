@@ -239,7 +239,10 @@ describe("AnalyticsTab", () => {
     };
 
     describe("Basic Rendering", () => {
-        it("should render analytics tab with all main sections", ({ task, annotate }) => {
+        it("should render analytics tab with all main sections", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -286,7 +289,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
 
-        it("should show time range selector with all options", ({ task, annotate }) => {
+        it("should show time range selector with all options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -313,7 +319,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Key Performance Metrics", () => {
-        it("should display uptime percentage and description", ({ task, annotate }) => {
+        it("should display uptime percentage and description", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -393,7 +402,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("100 checks")).toBeInTheDocument();
         });
 
-        it("should display MTTR with correct formatting when advanced metrics enabled", ({ task, annotate }) => {
+        it("should display MTTR with correct formatting when advanced metrics enabled", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -424,7 +436,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Advanced Metrics", () => {
-        it("should toggle advanced metrics when button is clicked", async ({ task, annotate }) => {
+        it("should toggle advanced metrics when button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -449,7 +464,10 @@ describe("AnalyticsTab", () => {
             expect(setShowAdvancedMetrics).toHaveBeenCalledWith(true);
         });
 
-        it("should display advanced metrics when enabled", ({ task, annotate }) => {
+        it("should display advanced metrics when enabled", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -476,7 +494,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("P99")).toBeInTheDocument();
         });
 
-        it("should hide advanced metrics when disabled", ({ task, annotate }) => {
+        it("should hide advanced metrics when disabled", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -532,7 +553,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByText("1 incidents")).toBeInTheDocument();
         });
 
-        it("should show no incidents when no downtime", ({ task, annotate }) => {
+        it("should show no incidents when no downtime", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -577,7 +601,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Time Range Selection", () => {
-        it("should call setSiteDetailsChartTimeRange when time range is changed", ({ task, annotate }) => {
+        it("should call setSiteDetailsChartTimeRange when time range is changed", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -626,7 +653,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Response Time Color Coding", () => {
-        it("should use green color for excellent response times (≤100ms)", ({ task, annotate }) => {
+        it("should use green color for excellent response times (≤100ms)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -646,7 +676,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         });
 
-        it("should use yellow color for good response times (≤500ms)", ({ task, annotate }) => {
+        it("should use yellow color for good response times (≤500ms)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -665,7 +698,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         });
 
-        it("should use red color for poor response times (>500ms)", ({ task, annotate }) => {
+        it("should use red color for poor response times (>500ms)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -777,7 +813,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Chart Integration", () => {
-        it("should pass correct data to chart components", ({ task, annotate }) => {
+        it("should pass correct data to chart components", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -799,7 +838,10 @@ describe("AnalyticsTab", () => {
             expect(screen.getByTestId("uptime-chart")).toBeInTheDocument();
         });
 
-        it("should handle empty chart data gracefully", ({ task, annotate }) => {
+        it("should handle empty chart data gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");
@@ -881,7 +923,10 @@ describe("AnalyticsTab", () => {
     });
 
     describe("Function Calls and Formatting", () => {
-        it("should call formatting functions with correct parameters", ({ task, annotate }) => {
+        it("should call formatting functions with correct parameters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AnalyticsTab", "component");
             annotate("Category: Component", "category");

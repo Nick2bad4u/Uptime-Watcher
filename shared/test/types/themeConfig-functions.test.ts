@@ -33,10 +33,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(validPalette)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -45,10 +42,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -71,10 +65,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isColorPalette(true)).toBe(false);
         });
 
-        it("should return false for array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -282,10 +273,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(validConfig as any)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -294,10 +282,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");
@@ -320,10 +305,7 @@ describe("shared/types/themeConfig function coverage", () => {
             expect(isThemeConfig(true)).toBe(false);
         });
 
-        it("should return false for array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig-functions", "component");
             await annotate("Category: Shared", "category");

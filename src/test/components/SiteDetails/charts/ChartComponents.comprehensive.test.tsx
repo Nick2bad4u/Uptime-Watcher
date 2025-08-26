@@ -86,7 +86,10 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render line chart with correct data and options", ({ task, annotate }) => {
+        it("should render line chart with correct data and options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -119,7 +122,10 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", ({ task, annotate }) => {
+        it("should have correct display name for debugging", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -163,7 +169,10 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("line-chart")).toBeInTheDocument();
         });
 
-        it("should handle complex dataset configurations", ({ task, annotate }) => {
+        it("should handle complex dataset configurations", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -253,7 +262,10 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render doughnut chart with correct data and options", ({ task, annotate }) => {
+        it("should render doughnut chart with correct data and options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -284,7 +296,10 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", ({ task, annotate }) => {
+        it("should have correct display name for debugging", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -436,7 +451,10 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render bar chart with correct data and options", ({ task, annotate }) => {
+        it("should render bar chart with correct data and options", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -464,7 +482,10 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", ({ task, annotate }) => {
+        it("should have correct display name for debugging", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -509,7 +530,10 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
         });
 
-        it("should handle horizontal bar configuration", ({ task, annotate }) => {
+        it("should handle horizontal bar configuration", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");
@@ -692,7 +716,10 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("line-chart")).toBeInTheDocument();
         });
 
-        it("should handle undefined optional properties", ({ task, annotate }) => {
+        it("should handle undefined optional properties", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ChartComponents", "component");
             annotate("Category: Component", "category");

@@ -64,7 +64,10 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("children")).not.toBeInTheDocument();
         });
 
-        it("should show children when response time is supported", async ({ task, annotate }) => {
+        it("should show children when response time is supported", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -86,7 +89,10 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("fallback")).not.toBeInTheDocument();
         });
 
-        it("should show fallback when response time is not supported", async ({ task, annotate }) => {
+        it("should show fallback when response time is not supported", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -108,7 +114,10 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByTestId("children")).not.toBeInTheDocument();
         });
 
-        it("should show fallback when supportsResponseTime throws error", async ({ task, annotate }) => {
+        it("should show fallback when supportsResponseTime throws error", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -135,7 +144,10 @@ describe("MonitorUiComponents", () => {
             );
         });
 
-        it("should handle different monitor types", async ({ task, annotate }) => {
+        it("should handle different monitor types", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -164,7 +176,10 @@ describe("MonitorUiComponents", () => {
             expect(supportsResponseTime).toHaveBeenCalledWith("port");
         });
 
-        it("should handle component unmounting during async operation", async ({ task, annotate }) => {
+        it("should handle component unmounting during async operation", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -198,7 +213,10 @@ describe("MonitorUiComponents", () => {
             expect(supportsResponseTime).toHaveBeenCalled();
         });
 
-        it("should handle fallback prop being undefined", async ({ task, annotate }) => {
+        it("should handle fallback prop being undefined", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -279,7 +297,10 @@ describe("MonitorUiComponents", () => {
             fallback: "Unknown host",
         };
 
-        it("should display fallback initially then formatted label", async ({ task, annotate }) => {
+        it("should display fallback initially then formatted label", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -309,7 +330,10 @@ describe("MonitorUiComponents", () => {
             expect(screen.queryByText("Unknown host")).not.toBeInTheDocument();
         });
 
-        it("should use details as fallback when no fallback prop provided", async ({ task, annotate }) => {
+        it("should use details as fallback when no fallback prop provided", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -337,7 +361,10 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should show fallback when formatMonitorDetail throws error", async ({ task, annotate }) => {
+        it("should show fallback when formatMonitorDetail throws error", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -363,7 +390,10 @@ describe("MonitorUiComponents", () => {
             );
         });
 
-        it("should handle different monitor types", async ({ task, annotate }) => {
+        it("should handle different monitor types", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -386,7 +416,10 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should handle component unmounting during async operation", async ({ task, annotate }) => {
+        it("should handle component unmounting during async operation", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -472,7 +505,10 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should update when monitorType changes", async ({ task, annotate }) => {
+        it("should update when monitorType changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");
@@ -508,7 +544,10 @@ describe("MonitorUiComponents", () => {
             });
         });
 
-        it("should handle very long details string", async ({ task, annotate }) => {
+        it("should handle very long details string", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: MonitorUiComponents", "component");
             annotate("Category: Component", "category");

@@ -31,14 +31,11 @@ describe("useMonitorTypesStore", () => {
         vi.clearAllMocks();
     });
 
-    it("should initialize with default state", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Initialization", "type");
+    it("should initialize with default state", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Initialization", "type");
 
         const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -49,14 +46,11 @@ describe("useMonitorTypesStore", () => {
         expect(result.current.lastError).toBeUndefined();
     });
 
-    it("should load monitor types successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should load monitor types successfully", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Data Loading", "type");
 
         const mockMonitorTypes: MonitorTypeConfig[] = [
             {
@@ -97,14 +91,11 @@ describe("useMonitorTypesStore", () => {
         ]);
     });
 
-    it("should handle basic store actions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle basic store actions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -129,14 +120,11 @@ describe("useMonitorTypesStore", () => {
         expect(result.current.isLoading).toBe(false);
     });
 
-    it("should refresh monitor types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
+    it("should refresh monitor types", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Monitoring", "type");
 
         const mockMonitorTypes: MonitorTypeConfig[] = [];
         const mockResponse: IpcResponse<MonitorTypeConfig[]> = {
@@ -157,14 +145,11 @@ describe("useMonitorTypesStore", () => {
         expect(result.current.isLoaded).toBe(true);
     });
 
-    it("should validate monitor data", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Validation", "type");
+    it("should validate monitor data", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Validation", "type");
 
         const mockValidationResult: ValidationResult = {
             success: true,
@@ -191,14 +176,11 @@ describe("useMonitorTypesStore", () => {
         expect(validationResult!).toEqual(mockValidationResult);
     });
 
-    it("should format monitor detail", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
+    it("should format monitor detail", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Monitoring", "type");
 
         const mockResponse: IpcResponse<string> = {
             success: true,
@@ -222,14 +204,11 @@ describe("useMonitorTypesStore", () => {
         expect(formatted!).toBe("Formatted detail");
     });
 
-    it("should format monitor title suffix", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
+    it("should format monitor title suffix", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Monitoring", "type");
 
         const mockMonitor: Monitor = {
             id: "test-monitor",
@@ -266,14 +245,11 @@ describe("useMonitorTypesStore", () => {
         expect(formatted!).toBe("(https://example.com)");
     });
 
-    it("should get field config", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Data Retrieval", "type");
+    it("should get field config", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Data Retrieval", "type");
 
         const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -285,13 +261,13 @@ describe("useMonitorTypesStore", () => {
     });
 
     it("should handle errors in formatting functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMonitorTypesStore", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Error Handling", "type");
 
         const mockErrorResponse: IpcResponse<string> = {
             success: false,

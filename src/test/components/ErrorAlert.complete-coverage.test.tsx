@@ -79,7 +79,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(alertElement).toHaveClass("custom-error-class");
         });
 
-        it("should render with default className when not provided", ({ task, annotate }) => {
+        it("should render with default className when not provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -105,7 +108,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should have proper accessibility attributes", ({ task, annotate }) => {
+        it("should have proper accessibility attributes", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -224,7 +230,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should handle invalid variant by defaulting to error", ({ task, annotate }) => {
+        it("should handle invalid variant by defaulting to error", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -253,7 +262,10 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Icon Rendering", () => {
-        it("should render correct icon for error variant", ({ task, annotate }) => {
+        it("should render correct icon for error variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -271,7 +283,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render correct icon for warning variant", ({ task, annotate }) => {
+        it("should render correct icon for warning variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -289,7 +304,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render correct icon for info variant", ({ task, annotate }) => {
+        it("should render correct icon for info variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -307,7 +325,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render default icon for undefined variant", ({ task, annotate }) => {
+        it("should render default icon for undefined variant", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -349,7 +370,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should handle long messages with proper text wrapping", ({ task, annotate }) => {
+        it("should handle long messages with proper text wrapping", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -391,7 +415,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(messageElement).toHaveTextContent("");
         });
 
-        it("should handle message with special characters", ({ task, annotate }) => {
+        it("should handle message with special characters", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -409,7 +436,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByText(specialMessage)).toBeInTheDocument();
         });
 
-        it("should handle message with HTML-like content as plain text", ({ task, annotate }) => {
+        it("should handle message with HTML-like content as plain text", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -427,7 +457,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByText(htmlMessage)).toBeInTheDocument();
         });
 
-        it("should be contained in proper flex layout", ({ task, annotate }) => {
+        it("should be contained in proper flex layout", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -447,7 +480,10 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Dismiss Functionality", () => {
-        it("should not render dismiss button when onDismiss is not provided", ({ task, annotate }) => {
+        it("should not render dismiss button when onDismiss is not provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -466,7 +502,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.queryByTestId("x-icon")).not.toBeInTheDocument();
         });
 
-        it("should render dismiss button when onDismiss is provided", ({ task, annotate }) => {
+        it("should render dismiss button when onDismiss is provided", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -492,7 +531,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("x-icon")).toBeInTheDocument();
         });
 
-        it("should call onDismiss when dismiss button is clicked", async ({ task, annotate }) => {
+        it("should call onDismiss when dismiss button is clicked", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -519,7 +561,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should call onDismiss with fireEvent click", ({ task, annotate }) => {
+        it("should call onDismiss with fireEvent click", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -541,7 +586,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle multiple clicks correctly", async ({ task, annotate }) => {
+        it("should handle multiple clicks correctly", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -567,7 +615,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(3);
         });
 
-        it("should have proper styling for dismiss button", ({ task, annotate }) => {
+        it("should have proper styling for dismiss button", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -595,7 +646,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should render X icon with correct styling", ({ task, annotate }) => {
+        it("should render X icon with correct styling", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -617,7 +671,10 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Keyboard Accessibility", () => {
-        it("should be focusable and activatable with keyboard when dismiss is available", async ({ task, annotate }) => {
+        it("should be focusable and activatable with keyboard when dismiss is available", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -646,7 +703,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should be activatable with Space key", async ({ task, annotate }) => {
+        it("should be activatable with Space key", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -673,7 +733,10 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle undefined onDismiss gracefully", ({ task, annotate }) => {
+        it("should handle undefined onDismiss gracefully", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -711,7 +774,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should maintain stable callback reference with useCallback", ({ task, annotate }) => {
+        it("should maintain stable callback reference with useCallback", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");
@@ -744,7 +810,10 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Component Integration", () => {
-        it("should render all variants together correctly", ({ task, annotate }) => {
+        it("should render all variants together correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: ErrorAlert.complete-coverage", "component");
             annotate("Category: Component", "category");

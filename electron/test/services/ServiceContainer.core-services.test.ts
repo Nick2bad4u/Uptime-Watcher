@@ -68,7 +68,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -82,7 +85,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -96,7 +102,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -110,7 +119,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -124,7 +136,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -138,7 +153,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -154,7 +172,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -172,7 +193,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -192,7 +216,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -207,7 +234,10 @@ describe("ServiceContainer - Core Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.core-services", "component");
+            await annotate(
+                "Component: ServiceContainer.core-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 

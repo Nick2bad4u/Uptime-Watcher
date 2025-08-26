@@ -41,7 +41,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should use getElementById for root element lookup", async ({ task, annotate }) => {
+        it("should use getElementById for root element lookup", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -62,7 +65,10 @@ describe("main.tsx - Application Entry Point", () => {
             getElementByIdSpy.mockRestore();
         });
 
-        it("should handle missing root element gracefully", async ({ task, annotate }) => {
+        it("should handle missing root element gracefully", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -86,7 +92,10 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should log initialization errors to console", async ({ task, annotate }) => {
+        it("should log initialization errors to console", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -113,7 +122,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Performance Optimizations", () => {
-        it("should use getElementById instead of querySelector for performance", async ({ task, annotate }) => {
+        it("should use getElementById instead of querySelector for performance", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -143,7 +155,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Error Handling Coverage", () => {
-        it("should cover the try-catch block with error", async ({ task, annotate }) => {
+        it("should cover the try-catch block with error", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -167,7 +182,10 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should handle successful initialization without errors", async ({ task, annotate }) => {
+        it("should handle successful initialization without errors", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");

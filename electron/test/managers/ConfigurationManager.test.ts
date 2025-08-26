@@ -102,10 +102,7 @@ describe("ConfigurationManager", () => {
     });
 
     describe("clearValidationCache", () => {
-        it("should clear the validation cache", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear the validation cache", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ConfigurationManager", "component");
             await annotate("Category: Manager", "category");
@@ -117,10 +114,7 @@ describe("ConfigurationManager", () => {
     });
 
     describe("getCacheStats", () => {
-        it("should return cache statistics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return cache statistics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ConfigurationManager", "component");
             await annotate("Category: Manager", "category");
@@ -209,10 +203,7 @@ describe("ConfigurationManager", () => {
     });
 
     describe("getMinimumTimeout", () => {
-        it("should return the minimum timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return the minimum timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ConfigurationManager", "component");
             await annotate("Category: Manager", "category");
@@ -361,10 +352,7 @@ describe("ConfigurationManager", () => {
     });
 
     describe("shouldIncludeInExport", () => {
-        it("should delegate to site validator", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delegate to site validator", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ConfigurationManager", "component");
             await annotate("Category: Manager", "category");

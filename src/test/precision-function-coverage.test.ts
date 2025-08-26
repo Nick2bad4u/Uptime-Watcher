@@ -11,13 +11,13 @@ import { describe, expect, it } from "vitest";
 
 describe("Precision Function Coverage - Targeted Functions", () => {
     it("should test specific uncovered utility functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test random ID generation utility
         const generateRandomId = (): string =>
@@ -83,13 +83,13 @@ describe("Precision Function Coverage - Targeted Functions", () => {
     });
 
     it("should test configuration merger functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test deep merge utility
         const deepMerge = (target: any, source: any): any => {
@@ -131,14 +131,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(validateConfig("string")).toBe(false);
     });
 
-    it("should test array utility functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should test array utility functions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test array chunking utility
         const chunk = <T>(array: T[], size: number): T[][] => {
@@ -283,13 +280,13 @@ describe("Precision Function Coverage - Targeted Functions", () => {
     });
 
     it("should test date and time utility functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test date formatting utility
         const formatDate = (date: Date | string | number): string => {
@@ -342,13 +339,13 @@ describe("Precision Function Coverage - Targeted Functions", () => {
     });
 
     it("should test memoization and caching utilities", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test memoization utility
         const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
@@ -399,14 +396,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         expect(generateCacheKey()).toBe("");
     });
 
-    it("should test async utility functions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should test async utility functions", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test async retry utility
         const retry = async <T>(
@@ -447,14 +441,11 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         });
     });
 
-    it("should test error handling utilities", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: precision-function-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should test error handling utilities", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: precision-function-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         // Test error wrapper utility
         const wrapError = (error: unknown, context: string): Error => {

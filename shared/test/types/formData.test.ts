@@ -12,13 +12,13 @@ import * as formData from "@shared/types/formData";
 
 describe("Function Coverage Validation", () => {
     it("should call all exported functions to ensure 100% function coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: formData", "component");
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Export Operation", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: formData", "component");
+        await annotate("Category: Shared", "category");
+        await annotate("Type: Export Operation", "type");
 
         // Verify all functions are accessible
         expect(typeof formData.isHttpFormData).toBe("function");

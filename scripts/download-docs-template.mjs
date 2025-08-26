@@ -6,11 +6,14 @@
  * Advanced documentation downloader with caching, parallel processing,
  * validation, and comprehensive error handling.
  *
- * @fileoverview Enhanced documentation downloader with enterprise-grade features
- * @author GitHub Copilot Assistant
  * @version 2.0.0
  *
+ * @file Enhanced documentation downloader with enterprise-grade features
+ *
+ * @author GitHub Copilot Assistant
+ *
  * @example
+ *
  * ```bash
  * # Basic usage
  * node scripts/download-docs-template.mjs
@@ -43,6 +46,7 @@ const __dirname = path.dirname(__filename);
 
 /**
  * @typedef {Object} DownloadConfig
+ *
  * @property {string} docName - Unique identifier for this documentation set
  * @property {string} baseUrl - Base URL for documentation source
  * @property {string[]} pages - Array of page paths to download
@@ -67,12 +71,14 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Configuration object with comprehensive options
+ *
  * @type {DownloadConfig}
  */
 const CONFIG = {
     // Core configuration
     docName: "Example-Package",
-    baseUrl: "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master",
+    baseUrl:
+        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master",
     pages: [
         "examples/example.js",
         "examples/example2.html",
@@ -94,15 +100,9 @@ const CONFIG = {
     concurrency: 5,
 
     // Content processing
-    removeFromMarkers: [
-        "::::: sponsors_container"
-    ],
-    removeLineMarkers: [
-        "::::::: body"
-    ],
-    removeAboveMarkers: [
-        "::::: start_here"
-    ],
+    removeFromMarkers: ["::::: sponsors_container"],
+    removeLineMarkers: ["::::::: body"],
+    removeAboveMarkers: ["::::: start_here"],
 
     // Validation rules
     minContentLength: 100,
@@ -110,15 +110,16 @@ const CONFIG = {
     forbiddenPatterns: [
         "404 Not Found",
         "Page not found",
-        "Access denied"
+        "Access denied",
     ],
 
     // Logging
-    verbose: false
+    verbose: false,
 };
 
 /**
  * Parse command line arguments and merge with config
+ *
  * @returns {DownloadConfig} Enhanced configuration
  */
 function parseArguments() {
@@ -130,56 +131,56 @@ function parseArguments() {
         const nextArg = args[i + 1];
 
         switch (arg) {
-            case '--help':
-            case '-h':
+            case "--help":
+            case "-h":
                 showHelp();
                 process.exit(0);
                 break;
-            case '--cache':
+            case "--cache":
                 config.enableCache = true;
                 break;
-            case '--no-cache':
+            case "--no-cache":
                 config.enableCache = false;
                 break;
-            case '--parallel':
+            case "--parallel":
                 config.enableParallel = true;
                 break;
-            case '--no-parallel':
+            case "--no-parallel":
                 config.enableParallel = false;
                 break;
-            case '--validate':
+            case "--validate":
                 config.enableValidation = true;
                 break;
-            case '--no-validate':
+            case "--no-validate":
                 config.enableValidation = false;
                 break;
-            case '--retry':
+            case "--retry":
                 if (nextArg && !isNaN(parseInt(nextArg))) {
                     config.maxRetries = parseInt(nextArg);
                     i++;
                 }
                 break;
-            case '--timeout':
+            case "--timeout":
                 if (nextArg && !isNaN(parseInt(nextArg))) {
                     config.timeout = parseInt(nextArg) * 1000;
                     i++;
                 }
                 break;
-            case '--concurrency':
+            case "--concurrency":
                 if (nextArg && !isNaN(parseInt(nextArg))) {
                     config.concurrency = parseInt(nextArg);
                     i++;
                 }
                 break;
-            case '--doc-name':
+            case "--doc-name":
                 if (nextArg) {
                     config.docName = nextArg;
                     i++;
                 }
                 break;
-            case '--base-url':
+            case "--base-url":
                 if (nextArg) {
-                    config.baseUrl = nextArg.replace(/\/+$/, ''); // Remove trailing slashes
+                    config.baseUrl = nextArg.replace(/\/+$/, ""); // Remove trailing slashes
                     i++;
                 }
                 break;
@@ -232,7 +233,7 @@ EXAMPLES:
  */
 class Logger {
     constructor(verbose = false) {
-        this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === 'true';
+        this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === "true";
         this.startTime = Date.now();
     }
 
@@ -258,19 +259,26 @@ class Logger {
         }
     }
 
-    progress(current, total, item = '') {
+    progress(current, total, item = "") {
         const percent = Math.round((current / total) * 100);
         const elapsed = Date.now() - this.startTime;
         const rate = current / (elapsed / 1000);
         const eta = total > current ? Math.round((total - current) / rate) : 0;
 
-        console.log(`📊 Progress: ${current}/${total} (${percent}%) - ${item} - ETA: ${eta}s`);
+        console.log(
+            `📊 Progress: ${current}/${total} (${percent}%) - ${item} - ETA: ${eta}s`
+        );
     }
 }
 
 /**
  * Initialize application with configuration and setup
- * @returns {Promise<{config: DownloadConfig, logger: Logger, paths: Object}>}
+ *
+ * @returns {Promise<{
+ *     config: DownloadConfig;
+ *     logger: Logger;
+ *     paths: Object;
+ * }>}
  */
 async function initialize() {
     const config = parseArguments();
@@ -291,7 +299,8 @@ async function initialize() {
         outputDir,
         logFile: path.join(outputDir, `${config.docName}-Download-Log.md`),
         hashesFile: path.join(outputDir, `${config.docName}-Hashes.json`),
-        cacheDir: process.env.DOC_DOWNLOADER_CACHE || path.join(outputDir, '.cache')
+        cacheDir:
+            process.env.DOC_DOWNLOADER_CACHE || path.join(outputDir, ".cache"),
     };
 
     // Ensure directories exist
@@ -309,9 +318,11 @@ async function initialize() {
 
 /**
  * Enhanced content validator with comprehensive checks
+ *
  * @param {string} content - Content to validate
  * @param {DownloadConfig} config - Configuration object
  * @param {Logger} logger - Logger instance
+ *
  * @returns {boolean} Whether content is valid
  */
 function validateContent(content, config, logger) {
@@ -321,7 +332,9 @@ function validateContent(content, config, logger) {
 
     // Check minimum length
     if (content.length < config.minContentLength) {
-        logger.warn(`Content too short: ${content.length} < ${config.minContentLength} characters`);
+        logger.warn(
+            `Content too short: ${content.length} < ${config.minContentLength} characters`
+        );
         return false;
     }
 
@@ -347,28 +360,35 @@ function validateContent(content, config, logger) {
 
 /**
  * Enhanced link rewriter with better URL handling
+ *
  * @param {string} content - Content to process
  * @param {string} baseUrl - Base URL for resolving links
  * @param {Logger} logger - Logger instance
+ *
  * @returns {string} Processed content
  */
 function rewriteLinks(content, baseUrl, logger) {
     let linkCount = 0;
 
-    const processed = content.replace(/\((\.{1,2}\/[^\)\s]+)\)/g, (match, relPath) => {
-        if (relPath.includes("#") || relPath.includes("?")) {
-            return match; // Skip anchors and query params
-        }
+    const processed = content.replace(
+        /\((\.{1,2}\/[^\)\s]+)\)/g,
+        (match, relPath) => {
+            if (relPath.includes("#") || relPath.includes("?")) {
+                return match; // Skip anchors and query params
+            }
 
-        try {
-            const absUrl = new URL(relPath, baseUrl + "/").toString();
-            linkCount++;
-            return `(${absUrl})`;
-        } catch (error) {
-            logger.warn(`Failed to rewrite link: ${relPath} - ${error.message}`);
-            return match;
+            try {
+                const absUrl = new URL(relPath, baseUrl + "/").toString();
+                linkCount++;
+                return `(${absUrl})`;
+            } catch (error) {
+                logger.warn(
+                    `Failed to rewrite link: ${relPath} - ${error.message}`
+                );
+                return match;
+            }
         }
-    });
+    );
 
     if (linkCount > 0) {
         logger.debug(`Rewrote ${linkCount} relative links to absolute URLs`);
@@ -379,9 +399,11 @@ function rewriteLinks(content, baseUrl, logger) {
 
 /**
  * Enhanced content cleaner with configurable rules
+ *
  * @param {string} content - Content to clean
  * @param {DownloadConfig} config - Configuration object
  * @param {Logger} logger - Logger instance
+ *
  * @returns {string} Cleaned content
  */
 function cleanContent(content, config, logger) {
@@ -415,20 +437,27 @@ function cleanContent(content, config, logger) {
         const lines = cleaned.split("\n");
         const originalLineCount = lines.length;
 
-        const filteredLines = lines.filter(line =>
-            !config.removeLineMarkers.some(marker => line.includes(marker))
+        const filteredLines = lines.filter(
+            (line) =>
+                !config.removeLineMarkers.some((marker) =>
+                    line.includes(marker)
+                )
         );
 
         if (filteredLines.length < originalLineCount) {
             changesMade++;
-            logger.debug(`Removed ${originalLineCount - filteredLines.length} lines containing markers`);
+            logger.debug(
+                `Removed ${originalLineCount - filteredLines.length} lines containing markers`
+            );
         }
 
         cleaned = filteredLines.join("\n").trimEnd();
     }
 
     if (changesMade > 0) {
-        logger.debug(`Content cleaning completed: ${changesMade} operations applied`);
+        logger.debug(
+            `Content cleaning completed: ${changesMade} operations applied`
+        );
     }
 
     return cleaned;
@@ -436,10 +465,12 @@ function cleanContent(content, config, logger) {
 
 /**
  * Download a single file with retry logic
+ *
  * @param {Object} task - Download task
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Object} paths - Path configuration
+ *
  * @returns {Promise<Object>} Download result
  */
 async function downloadFile(task, config, logger, paths) {
@@ -448,25 +479,30 @@ async function downloadFile(task, config, logger, paths) {
 
     for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
         try {
-            logger.debug(`Downloading ${page} (attempt ${attempt}/${config.maxRetries})`);
+            logger.debug(
+                `Downloading ${page} (attempt ${attempt}/${config.maxRetries})`
+            );
 
             // Create pandoc command
             const cmd = [
-                'pandoc',
-                '--wrap=preserve',
+                "pandoc",
+                "--wrap=preserve",
                 url,
-                '-f', config.inputFormat,
-                '-t', config.outputFormat,
-                '-o', outputPath
+                "-f",
+                config.inputFormat,
+                "-t",
+                config.outputFormat,
+                "-o",
+                outputPath,
             ];
 
             // Ensure output directory exists
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
             // Execute pandoc
-            await execFileAsync('pandoc', cmd.slice(1), {
+            await execFileAsync("pandoc", cmd.slice(1), {
                 timeout: config.timeout,
-                maxBuffer: 1024 * 1024 * 10 // 10MB buffer
+                maxBuffer: 1024 * 1024 * 10, // 10MB buffer
             });
 
             // Verify file was created
@@ -475,7 +511,7 @@ async function downloadFile(task, config, logger, paths) {
             }
 
             // Read and process content
-            let content = await fs.readFile(outputPath, 'utf8');
+            let content = await fs.readFile(outputPath, "utf8");
 
             if (!content || content.trim().length === 0) {
                 throw new Error(`Downloaded file is empty: ${outputPath}`);
@@ -491,10 +527,13 @@ async function downloadFile(task, config, logger, paths) {
             content = cleanContent(content, config, logger);
 
             // Write processed content
-            await fs.writeFile(outputPath, content, 'utf8');
+            await fs.writeFile(outputPath, content, "utf8");
 
             // Calculate hash for change detection
-            const hash = crypto.createHash('sha256').update(content).digest('hex');
+            const hash = crypto
+                .createHash("sha256")
+                .update(content)
+                .digest("hex");
 
             logger.success(`Downloaded: ${page}`);
 
@@ -504,38 +543,43 @@ async function downloadFile(task, config, logger, paths) {
                 success: true,
                 hash,
                 size: content.length,
-                attempts: attempt
+                attempts: attempt,
             };
-
         } catch (error) {
             lastError = error;
-            logger.warn(`Attempt ${attempt} failed for ${page}: ${error.message}`);
+            logger.warn(
+                `Attempt ${attempt} failed for ${page}: ${error.message}`
+            );
 
             if (attempt < config.maxRetries) {
                 const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
                 logger.debug(`Retrying in ${delay}ms...`);
-                await new Promise(resolve => setTimeout(resolve, delay));
+                await new Promise((resolve) => setTimeout(resolve, delay));
             }
         }
     }
 
-    logger.error(`Failed to download ${page} after ${config.maxRetries} attempts: ${lastError?.message}`);
+    logger.error(
+        `Failed to download ${page} after ${config.maxRetries} attempts: ${lastError?.message}`
+    );
 
     return {
         page,
         outputPath,
         success: false,
-        error: lastError?.message || 'Unknown error',
-        attempts: config.maxRetries
+        error: lastError?.message || "Unknown error",
+        attempts: config.maxRetries,
     };
 }
 
 /**
  * Download files sequentially
+ *
  * @param {Array} tasks - Download tasks
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Object} paths - Path configuration
+ *
  * @returns {Promise<Array>} Download results
  */
 async function downloadSequential(tasks, config, logger, paths) {
@@ -554,10 +598,12 @@ async function downloadSequential(tasks, config, logger, paths) {
 
 /**
  * Download files in parallel with concurrency control
+ *
  * @param {Array} tasks - Download tasks
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Object} paths - Path configuration
+ *
  * @returns {Promise<Array>} Download results
  */
 async function downloadParallel(tasks, config, logger, paths) {
@@ -590,17 +636,19 @@ async function downloadParallel(tasks, config, logger, paths) {
 
 /**
  * Generate comprehensive report of download results
+ *
  * @param {Array} results - Download results
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Object} paths - Path configuration
  * @param {Object} previousHashes - Previous file hashes
+ *
  * @returns {Promise<void>}
  */
 async function generateReport(results, config, logger, paths, previousHashes) {
-    const successful = results.filter(r => r.success);
-    const failed = results.filter(r => !r.success);
-    const changed = successful.filter(r => previousHashes[r.page] !== r.hash);
+    const successful = results.filter((r) => r.success);
+    const failed = results.filter((r) => !r.success);
+    const changed = successful.filter((r) => previousHashes[r.page] !== r.hash);
 
     logger.info(`Download Summary:`);
     logger.info(`  Total: ${results.length}`);
@@ -610,17 +658,21 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
     if (failed.length > 0) {
         logger.warn(`Failed downloads:`);
-        failed.forEach(f => logger.warn(`  - ${f.page}: ${f.error}`));
+        failed.forEach((f) => logger.warn(`  - ${f.page}: ${f.error}`));
     }
 
     // Update hashes file
     const newHashes = {};
-    successful.forEach(r => {
+    successful.forEach((r) => {
         newHashes[r.page] = r.hash;
     });
 
     if (Object.keys(newHashes).length > 0) {
-        await fs.writeFile(paths.hashesFile, JSON.stringify(newHashes, null, 2), 'utf8');
+        await fs.writeFile(
+            paths.hashesFile,
+            JSON.stringify(newHashes, null, 2),
+            "utf8"
+        );
         logger.debug(`Updated hashes file: ${paths.hashesFile}`);
     }
 
@@ -636,7 +688,7 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
         if (changed.length > 0) {
             logEntry += `### Changed Files\n`;
-            changed.forEach(r => {
+            changed.forEach((r) => {
                 logEntry += `- ✅ ${r.page}\n`;
                 logEntry += `  ↳ Hash: \`${r.hash}\`\n`;
                 logEntry += `  ↳ Size: ${r.size} bytes\n`;
@@ -645,7 +697,7 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
         if (failed.length > 0) {
             logEntry += `\n### Failed Files\n`;
-            failed.forEach(r => {
+            failed.forEach((r) => {
                 logEntry += `- ❌ ${r.page}\n`;
                 logEntry += `  ↳ Error: ${r.error}\n`;
             });
@@ -653,7 +705,7 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
         logEntry += `\n---\n\n`;
 
-        await fs.appendFile(paths.logFile, logEntry, 'utf8');
+        await fs.appendFile(paths.logFile, logEntry, "utf8");
         logger.success(`Log updated: ${paths.logFile}`);
     } else {
         logger.info(`No changes detected - no log entry written`);
@@ -673,9 +725,13 @@ async function main() {
         let previousHashes = {};
         try {
             if (fsSync.existsSync(paths.hashesFile)) {
-                const hashData = await fs.readFile(paths.hashesFile, 'utf8');
+                const hashData = await fs.readFile(paths.hashesFile, "utf8");
                 const parsed = JSON.parse(hashData);
-                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                if (
+                    parsed &&
+                    typeof parsed === "object" &&
+                    !Array.isArray(parsed)
+                ) {
                     previousHashes = parsed;
                 }
             }
@@ -684,11 +740,11 @@ async function main() {
         }
 
         // Create download tasks
-        const downloadTasks = config.pages.map(page => ({
+        const downloadTasks = config.pages.map((page) => ({
             page,
             url: `${config.baseUrl}/${page}`,
             outputPath: getOutputPath(page, config, paths),
-            attempts: 0
+            attempts: 0,
         }));
 
         logger.info(`Starting download of ${downloadTasks.length} pages...`);
@@ -702,7 +758,6 @@ async function main() {
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
-
     } catch (error) {
         console.error(`❌ Application failed: ${error.message}`);
         if (process.env.DOC_DOWNLOADER_VERBOSE) {
@@ -714,14 +769,19 @@ async function main() {
 
 /**
  * Get output file path for a page
+ *
  * @param {string} page - Page path
  * @param {DownloadConfig} config - Configuration
  * @param {Object} paths - Path configuration
+ *
  * @returns {string} Output file path
  */
 function getOutputPath(page, config, paths) {
     const parsed = path.parse(page);
-    const fileName = path.join(parsed.dir, `${parsed.name}.${config.outputExt}`);
+    const fileName = path.join(
+        parsed.dir,
+        `${parsed.name}.${config.outputExt}`
+    );
     return path.join(paths.outputDir, fileName);
 }
 

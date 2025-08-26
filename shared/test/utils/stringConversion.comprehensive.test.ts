@@ -32,10 +32,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(undefined)).toBe("");
         });
 
-        it("should return string values as-is", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return string values as-is", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -46,10 +43,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify("test string")).toBe("test string");
         });
 
-        it("should convert numbers to strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should convert numbers to strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -64,10 +58,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(-Infinity)).toBe("-Infinity");
         });
 
-        it("should convert booleans to strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should convert booleans to strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -77,10 +68,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(false)).toBe("false");
         });
 
-        it("should serialize simple objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should serialize simple objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -93,10 +81,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify({})).toBe("{}");
         });
 
-        it("should serialize arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should serialize arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -143,10 +128,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("[Complex Object]");
         });
 
-        it("should handle functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -157,10 +139,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(async () => {})).toBe("[Function]");
         });
 
-        it("should handle symbols", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbols", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -173,10 +152,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle bigint values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle bigint values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -207,10 +183,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             // We cannot easily test this path without mocking typeof behavior.
         });
 
-        it("should handle nested objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle nested objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -246,10 +219,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toContain("normalProp");
         });
 
-        it("should handle Date objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Date objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -260,10 +230,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toContain("2023-01-01");
         });
 
-        it("should handle RegExp objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle RegExp objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -274,10 +241,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("{}"); // RegExp objects serialize as empty objects
         });
 
-        it("should handle Error objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -326,10 +290,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle very large objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -344,10 +305,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result.length).toBeGreaterThan(0);
         });
 
-        it("should handle Map objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Map objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -358,10 +316,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle Set objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Set objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -376,10 +331,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle WeakMap objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle WeakMap objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");
@@ -390,10 +342,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(result).toBeDefined();
         });
 
-        it("should handle WeakSet objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle WeakSet objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: stringConversion", "component");
             await annotate("Category: Utility", "category");

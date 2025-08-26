@@ -413,10 +413,7 @@ describe("Interfaces Utility", () => {
     });
 
     describe("Interface Extension Compatibility", () => {
-        it("should allow interface extension", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow interface extension", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: interfaces", "component");
             await annotate("Category: Utility", "category");

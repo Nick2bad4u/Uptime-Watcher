@@ -10,14 +10,11 @@ import { useAvailabilityColors } from "../../theme/useTheme";
 import * as useThemeModule from "../../theme/useTheme";
 
 describe("Debug Availability Description", () => {
-    it("should debug the implementation logic", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: debug", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should debug the implementation logic", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: debug", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useAvailabilityColors());
 

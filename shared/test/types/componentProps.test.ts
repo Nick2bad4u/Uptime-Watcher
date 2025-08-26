@@ -8,10 +8,7 @@ import { EventHandlers } from "@shared/types/componentProps";
 
 describe("Component Props - EventHandlers Namespace", () => {
     describe("Click event handlers", () => {
-        it("should accept basic click handlers", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept basic click handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: componentProps", "component");
             await annotate("Category: Shared", "category");
@@ -246,10 +243,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof divHandler).toBe("function");
         });
 
-        it("should handle void return types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle void return types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: componentProps", "component");
             await annotate("Category: Shared", "category");

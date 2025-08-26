@@ -37,10 +37,7 @@ describe("middleware.ts - Additional Coverage", () => {
         vi.clearAllMocks();
     });
     describe("createLoggingMiddleware - Additional Branch Coverage", () => {
-        it("should log at warn level", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log at warn level", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
             await annotate("Category: Event System", "category");
@@ -62,10 +59,7 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).toHaveBeenCalled();
         });
-        it("should log at error level", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log at error level", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
             await annotate("Category: Event System", "category");
@@ -711,10 +705,7 @@ describe("middleware.ts - Additional Coverage", () => {
             expect(executionOrder).toEqual(["mw1", "mw2"]);
             expect(next).toHaveBeenCalled();
         });
-        it("should handle empty custom stack", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty custom stack", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
             await annotate("Category: Event System", "category");

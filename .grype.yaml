@@ -2,92 +2,57 @@
 # Enhanced configuration for 2025 with VEX support, EPSS integration, and modern security features.
 # Compatible with Grype v0.89+ and database schema v6
 
-# Output configuration specifies how results are displayed
-# Modern Grype includes EPSS data in JSON output for risk-based decision making
-output: "table" # table, json, cyclonedx, sarif, template (use 'json' for EPSS data)
-
-# Template file for custom output formatting (when output=template)
-output-template-file: ""
-
-# Output file path (stdout if empty)
-file: ""
-
-# Pretty-print JSON output for readability
-pretty: true
-
-# Distro specification for enhanced matching (format: <distro>:<version>)
-distro: ""
-
 # Generate CPEs for packages without CPE data (improves matching coverage)
 add-cpes-if-none: true
-
-# Disable application update checks for enterprise environments
-check-for-app-update: false
-
-# Filter configuration for vulnerability focus
-only-fixed: false # show only vulnerabilities with available fixes
-only-notfixed: false # show only vulnerabilities without fixes
-ignore-wontfix: "" # ignore vulnerabilities with specific fix states: fixed,not-fixed,unknown,wont-fix
-
-# Platform specification for multi-architecture scanning
-platform: "" # e.g., 'linux/arm64', 'linux/amd64'
-
-# Risk-based failure threshold (exit code 1 if severity at or above threshold)
-# Consider using JSON output with EPSS data for more sophisticated risk assessment
-fail-on-severity: "" # negligible, low, medium, high, critical
-
-# Show suppressed/ignored vulnerabilities in output (table format only)
-show-suppressed: false
 
 # Orient results by CVE instead of original vulnerability ID when possible
 by-cve: false
 
-# Modern sorting with risk-based prioritization (combines EPSS + severity)
-# Options: package, severity, epss, risk, kev, vulnerability
-sort-by: "risk" # default to risk-based sorting for better prioritization
+# Disable application update checks for enterprise environments
+check-for-app-update: false
 
-# Target name for analysis (for reporting and tracking)
-name: "Uptime-Watcher"
+# Kernel header matching for comprehensive Linux vulnerability detection
+# Enhanced database configuration with v6 schema optimizations
+db:
+    # Automatic database updates for latest vulnerability intelligence
+    auto-update: true
 
-# Image source selection for SBOM generation
+    # CA certificate for secure database downloads
+    ca-cert: ""
+
+    # Database cache location (uses system-appropriate default)
+    cache-dir: "~/Library/Caches/grype/db"
+
+    # Database freshness requirements (5 days maximum age)
+    max-allowed-built-age: 120h0m0s
+
+    max-update-check-frequency: 2h0m0s # maximum update check frequency
+
+    # Updated URL for latest database schema and features
+    # Update check requirements and timeouts
+    require-update-check: false
+    update-available-timeout: 30s # timeout for update availability check
+    update-download-timeout: 5m0s # timeout for database download
+    update-url: "https://grype.anchore.io/databases"
+
+    validate-age: true
+
+    # Database integrity validation for security
+    validate-by-hash-on-start: true
 default-image-pull-source: "" # registry, docker, podman
 
-# Enhanced search configuration with modern performance optimizations
-search:
-    # Layer analysis scope for container images
-    scope: "squashed" # squashed, all-layers
+# Distro specification for enhanced matching (format: <distro>:<version>)
+# Enhanced logging configuration for debugging and monitoring
+# Development and debugging configuration
+dev:
+    db:
+        debug: false # show SQL queries in trace logging (requires -vv)
 
-    # Archive search configuration for comprehensive package discovery
-    unindexed-archives: false # search unindexed archives (performance impact)
-    indexed-archives: true # search indexed archives (zip files)
+    # Resource profiling for performance analysis
+    profile: "" # cpu, mem
 
-# Comprehensive ignore rules with VEX support for modern vulnerability management
-ignore:
-# VEX-based ignore rules (requires VEX documents)
-# Example VEX ignore patterns:
-# - vex-status: not_affected
-#   vex-justification: vulnerable_code_not_present
-#   reason: "VEX: Vulnerable code not present in execution path"
-# - vex-status: not_affected
-#   vex-justification: vulnerable_code_not_in_execute_path
-#   reason: "VEX: Vulnerable code exists but not in execution path"
-# Traditional ignore rules for non-VEX scenarios
-# - vulnerability: CVE-2008-4318
-#   fix-state: unknown
-#   package:
-#     name: libcurl
-#     version: 1.5.1
-#     type: npm
-#     location: "/usr/local/lib/node_modules/**"
-#   reason: "Legacy CVE - code path verified safe in our implementation"
-# EPSS-based filtering considerations (implement via JSON output processing)
-# - vulnerability: CVE-2023-*
-#   reason: "Low exploitation probability per EPSS analysis (<10% percentile)"
-# Business-justified severity filtering
-# - severity: Low
-#   reason: "Business decision - low severity risks accepted per security policy"
+distro: ""
 
-# Comprehensive exclusion patterns for modern development environments
 exclude:
     # Source code and testing exclusions
     - "**/src/test/**" # source test directories
@@ -185,39 +150,58 @@ exclude:
     - "**/NOTICE*" # notice files
     - "**/ATTRIBUTION*" # attribution files
 
-# Enhanced external sources configuration with modern vulnerability intelligence
+# Output file path (stdout if empty)
 external-sources:
     # Enable comprehensive vulnerability data from external sources
     enable: true
 
     # Maven repository search with optimized rate limiting
     maven:
-        search-maven-upstream: true
         base-url: "https://search.maven.org/solrsearch/select"
         rate-limit: 200ms # optimized for better performance
 
-# Comprehensive matching configuration with enhanced language support
+        search-maven-upstream: true
+fail-on-severity: "" # negligible, low, medium, high, critical
+
+file: ""
+
+ignore-wontfix: "" # ignore vulnerabilities with specific fix states: fixed,not-fixed,unknown,wont-fix
+
+# Output configuration specifies how results are displayed
+# Modern Grype includes EPSS data in JSON output for risk-based decision making
+# Filter configuration for vulnerability focus
+# Database debugging configuration
+log:
+    # Log file path (stdout if empty)
+    file: ""
+
+    # Logging level for appropriate verbosity
+    level: "warn" # error, warn, info, debug, trace
+
+    # Suppress all logging output
+    quiet: false
+
 match:
-    # Java ecosystem matching with modern Maven integration
-    java:
-        using-cpes: true # enhanced CPE matching for broader coverage
-
-    # JVM ecosystem support
-    jvm:
-        using-cpes: true
-
     # .NET ecosystem support with enhanced matching
     dotnet:
         using-cpes: true
 
     # Go ecosystem with enhanced standard library and pseudo-version support
     golang:
-        using-cpes: true
-        always-use-cpe-for-stdlib: true
         allow-main-module-pseudo-version-comparison: true
 
+        always-use-cpe-for-stdlib: true
+        using-cpes: true
+    # Java ecosystem matching with modern Maven integration
+    java:
+        using-cpes: true # enhanced CPE matching for broader coverage
+
+    # JVM ecosystem support
     # JavaScript/Node.js ecosystem support
     javascript:
+        using-cpes: true
+
+    jvm:
         using-cpes: true
 
     # Python ecosystem support with enhanced PyPI matching
@@ -236,12 +220,27 @@ match:
     stock:
         using-cpes: true
 
-# Enhanced registry configuration with security best practices
-registry:
-    # TLS configuration for secure registry communication
-    insecure-skip-tls-verify: false
-    insecure-use-http: false
+match-upstream-kernel-headers: false
 
+name: "Uptime-Watcher"
+
+only-fixed: false # show only vulnerabilities with available fixes
+only-notfixed: false # show only vulnerabilities without fixes
+output: "table" # table, json, cyclonedx, sarif, template (use 'json' for EPSS data)
+
+# Template file for custom output formatting (when output=template)
+output-template-file: ""
+
+# Platform specification for multi-architecture scanning
+platform: "" # e.g., 'linux/arm64', 'linux/amd64'
+
+# Pretty-print JSON output for readability
+pretty: true
+
+# Risk-based failure threshold (exit code 1 if severity at or above threshold)
+# Consider using JSON output with EPSS data for more sophisticated risk assessment
+# Show suppressed/ignored vulnerabilities in output (table format only)
+registry:
     # Authentication credentials for private registries
     # Example configurations:
     # auth:
@@ -256,8 +255,57 @@ registry:
     # CA certificate for registry communication
     ca-cert: ""
 
-# VEX (Vulnerability Exploitability eXchange) configuration for modern vulnerability management
-vex-documents: []
+    # TLS configuration for secure registry communication
+    insecure-skip-tls-verify: false
+    insecure-use-http: false
+
+search:
+    indexed-archives: true # search indexed archives (zip files)
+
+    # Layer analysis scope for container images
+    scope: "squashed" # squashed, all-layers
+
+    # Archive search configuration for comprehensive package discovery
+    unindexed-archives: false # search unindexed archives (performance impact)
+show-suppressed: false
+
+# Modern sorting with risk-based prioritization (combines EPSS + severity)
+# Options: package, severity, epss, risk, kev, vulnerability
+sort-by: "risk" # default to risk-based sorting for better prioritization
+
+# Target name for analysis (for reporting and tracking)
+# Image source selection for SBOM generation
+# Enhanced search configuration with modern performance optimizations
+# Comprehensive ignore rules with VEX support for modern vulnerability management
+# ignore:
+# VEX-based ignore rules (requires VEX documents)
+# Example VEX ignore patterns:
+# - vex-status: not_affected
+#   vex-justification: vulnerable_code_not_present
+#   reason: "VEX: Vulnerable code not present in execution path"
+# - vex-status: not_affected
+#   vex-justification: vulnerable_code_not_in_execute_path
+#   reason: "VEX: Vulnerable code exists but not in execution path"
+# Traditional ignore rules for non-VEX scenarios
+# - vulnerability: CVE-2008-4318
+#   fix-state: unknown
+#   package:
+#     name: libcurl
+#     version: 1.5.1
+#     type: npm
+#     location: "/usr/local/lib/node_modules/**"
+#   reason: "Legacy CVE - code path verified safe in our implementation"
+# EPSS-based filtering considerations (implement via JSON output processing)
+# - vulnerability: CVE-2023-*
+#   reason: "Low exploitation probability per EPSS analysis (<10% percentile)"
+# Business-justified severity filtering
+# - severity: Low
+#   reason: "Business decision - low severity risks accepted per security policy"
+
+# Comprehensive exclusion patterns for modern development environments
+# Enhanced external sources configuration with modern vulnerability intelligence
+# Comprehensive matching configuration with enhanced language support
+# Enhanced registry configuration with security best practices
 # Example VEX document configurations:
 # - path: "./security/vex.json"           # OpenVEX document path
 # - path: "./security/csaf-vex.json"      # CSAF VEX document path
@@ -266,56 +314,8 @@ vex-documents: []
 # VEX behavior configuration
 vex-add: [] # VEX statuses to consider as ignored rules
 
-# Kernel header matching for comprehensive Linux vulnerability detection
-match-upstream-kernel-headers: false
-
-# Enhanced database configuration with v6 schema optimizations
-db:
-    # Database cache location (uses system-appropriate default)
-    cache-dir: "~/Library/Caches/grype/db"
-
-    # Updated URL for latest database schema and features
-    update-url: "https://grype.anchore.io/databases"
-
-    # CA certificate for secure database downloads
-    ca-cert: ""
-
-    # Automatic database updates for latest vulnerability intelligence
-    auto-update: true
-
-    # Database integrity validation for security
-    validate-by-hash-on-start: true
-    validate-age: true
-
-    # Database freshness requirements (5 days maximum age)
-    max-allowed-built-age: 120h0m0s
-
-    # Update check requirements and timeouts
-    require-update-check: false
-    update-available-timeout: 30s # timeout for update availability check
-    update-download-timeout: 5m0s # timeout for database download
-    max-update-check-frequency: 2h0m0s # maximum update check frequency
-
-# Enhanced logging configuration for debugging and monitoring
-log:
-    # Suppress all logging output
-    quiet: false
-
-    # Logging level for appropriate verbosity
-    level: "warn" # error, warn, info, debug, trace
-
-    # Log file path (stdout if empty)
-    file: ""
-
-# Development and debugging configuration
-dev:
-    # Resource profiling for performance analysis
-    profile: "" # cpu, mem
-
-    # Database debugging configuration
-    db:
-        debug: false # show SQL queries in trace logging (requires -vv)
-
+# VEX (Vulnerability Exploitability eXchange) configuration for modern vulnerability management
+vex-documents: []
 # Modern usage examples and best practices:
 #
 # Basic vulnerability scan with risk prioritization:

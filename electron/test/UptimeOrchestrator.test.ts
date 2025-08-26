@@ -150,10 +150,7 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should initialize successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -259,10 +256,7 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Settings Management", () => {
-        it("should reset settings successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should reset settings successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -311,10 +305,7 @@ describe("UptimeOrchestrator", () => {
             monitoring: true,
         };
 
-        it("should add site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -381,10 +372,7 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should remove site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -398,10 +386,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should update site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -424,10 +409,7 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should get sites successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get sites successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -441,10 +423,7 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Monitor Management", () => {
-        it("should check site manually", async ({
-            task,
-            annotate,
-        }) => {
+        it("should check site manually", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -485,10 +464,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBeDefined();
         });
 
-        it("should start monitoring for site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should start monitoring for site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -523,10 +499,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should stop monitoring for site", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stop monitoring for site", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -561,10 +534,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should remove monitor successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should remove monitor successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -678,10 +648,7 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Global Monitoring Control", () => {
-        it("should start monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should start monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -692,10 +659,7 @@ describe("UptimeOrchestrator", () => {
             expect(mockMonitorManager.startMonitoring).toHaveBeenCalled();
         });
 
-        it("should stop monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stop monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -726,10 +690,7 @@ describe("UptimeOrchestrator", () => {
             });
         });
 
-        it("should export data successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export data successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -741,10 +702,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe('{"sites": []}');
         });
 
-        it("should import data successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should import data successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -759,10 +717,7 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should get history limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get history limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -1678,10 +1633,7 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty site data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty site data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");
@@ -1758,10 +1710,7 @@ describe("UptimeOrchestrator", () => {
             ).rejects.toThrow("Monitor error");
         });
 
-        it("should handle site manager errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle site manager errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: UptimeOrchestrator", "component");
             await annotate("Category: Core", "category");

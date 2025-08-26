@@ -16,7 +16,10 @@ describe("CacheKeys - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -177,7 +180,10 @@ describe("CacheKeys - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -204,12 +210,12 @@ describe("CacheKeys - Complete Function Coverage", () => {
             expect(parsed.identifier).toBe("id_with-special_chars");
         });
 
-        it("should validate all generated keys", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate all generated keys", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate(
+                "Component: cacheKeys-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 

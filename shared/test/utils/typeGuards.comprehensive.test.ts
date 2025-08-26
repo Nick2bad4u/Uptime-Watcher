@@ -145,10 +145,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(hasProperties(true, ["a"])).toBe(false);
         });
 
-        it("should handle symbol properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -179,10 +176,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(hasProperties(child, ["inherited"])).toBe(false); // inherited, not own
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -245,10 +239,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(hasProperty(true, "prop")).toBe(false);
         });
 
-        it("should handle symbol properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle symbol properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -309,10 +300,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             ).toBe(true);
         });
 
-        it("should return false for non-arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -377,10 +365,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             ).toBe(false);
         });
 
-        it("should handle complex validators", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex validators", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -518,10 +503,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isDate([])).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -591,10 +573,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isError(new CustomError("custom message"))).toBe(true);
         });
 
-        it("should handle Error-like objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Error-like objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -644,10 +623,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isFiniteNumber(Number.NEGATIVE_INFINITY)).toBe(false);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -674,10 +650,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isFiniteNumber([])).toBe(false);
         });
 
-        it("should handle edge number values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge number values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -691,10 +664,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
     });
 
     describe("isFunction", () => {
-        it("should return true for functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -741,10 +711,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isFunction(true)).toBe(false);
         });
 
-        it("should handle class constructors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle class constructors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -756,10 +723,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isFunction(TestClass)).toBe(true);
         });
 
-        it("should handle bound functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle bound functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -817,10 +781,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNonNegativeNumber(null)).toBe(false);
         });
 
-        it("should handle infinity correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle infinity correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -864,10 +825,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNonNullObject(Object.create(null))).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -876,10 +834,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNonNullObject(null)).toBe(false);
         });
 
-        it("should return false for arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -895,10 +850,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             ).toBe(false);
         });
 
-        it("should return false for primitives", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for primitives", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -924,10 +876,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNonNullObject(/regex/)).toBe(true);
         });
 
-        it("should return false for functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -957,10 +906,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNumber(-Infinity)).toBe(true);
         });
 
-        it("should return false for NaN", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for NaN", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1000,10 +946,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNumber(new Number(42))).toBe(false); // Objects, not primitives
         });
 
-        it("should handle edge number values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge number values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1047,10 +990,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isObject(new Set())).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1059,10 +999,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isObject(null)).toBe(false);
         });
 
-        it("should return false for arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1078,10 +1015,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             ).toBe(false);
         });
 
-        it("should return false for primitives", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for primitives", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1093,10 +1027,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isObject(undefined)).toBe(false);
         });
 
-        it("should return false for functions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for functions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1124,10 +1055,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isPositiveNumber(Number.MAX_VALUE)).toBe(true);
         });
 
-        it("should return false for zero", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for zero", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1167,10 +1095,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isPositiveNumber(null)).toBe(false);
         });
 
-        it("should handle infinity correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle infinity correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1200,10 +1125,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
     });
 
     describe("isString", () => {
-        it("should return true for strings", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return true for strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1246,10 +1168,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isString(new String("hello"))).toBe(false); // Objects, not primitives
         });
 
-        it("should handle template literals", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle template literals", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1324,10 +1243,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isValidPort(-Infinity)).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");
@@ -1402,10 +1318,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isValidTimestamp(-Infinity)).toBe(false);
         });
 
-        it("should handle edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: typeGuards", "component");
             await annotate("Category: Utility", "category");

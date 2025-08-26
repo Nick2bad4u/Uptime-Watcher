@@ -102,10 +102,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("addEntry", () => {
-        it("should add a history entry", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add a history entry", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -130,10 +127,7 @@ describe("HistoryRepository", () => {
                 details
             );
         });
-        it("should add entry without details", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add entry without details", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -152,10 +146,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("addEntryInternal", () => {
-        it("should add entry internally", async ({
-            task,
-            annotate,
-        }) => {
+        it("should add entry internally", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -180,10 +171,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("bulkInsert", () => {
-        it("should bulk insert history entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should bulk insert history entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -217,10 +205,7 @@ describe("HistoryRepository", () => {
                 `[HistoryRepository] Bulk inserted 2 history entries for monitor: ${monitorId}`
             );
         });
-        it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -265,10 +250,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all history", async ({
-            task,
-            annotate,
-        }) => {
+        it("should delete all history", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -346,10 +328,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("findByMonitorId", () => {
-        it("should find history by monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should find history by monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -373,10 +352,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getHistoryCount", () => {
-        it("should get history count", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get history count", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -429,10 +405,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("getLatestEntry", () => {
-        it("should get latest entry", async ({
-            task,
-            annotate,
-        }) => {
+        it("should get latest entry", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -504,10 +477,7 @@ describe("HistoryRepository", () => {
                 [10, 11]
             );
         });
-        it("should not prune with zero limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not prune with zero limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -534,10 +504,7 @@ describe("HistoryRepository", () => {
                 mockDatabaseService.executeTransaction
             ).not.toHaveBeenCalled();
         });
-        it("should handle no excess entries", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle no excess entries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -554,10 +521,7 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.run).not.toHaveBeenCalled();
         });
-        it("should filter invalid IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should filter invalid IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -614,10 +578,7 @@ describe("HistoryRepository", () => {
                 "[HistoryRepository] Pruned history for all monitors (limit: 100) (internal)"
             );
         });
-        it("should not prune with zero limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not prune with zero limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -627,10 +588,7 @@ describe("HistoryRepository", () => {
 
             expect(mockDatabase.all).not.toHaveBeenCalled();
         });
-        it("should filter invalid monitor IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should filter invalid monitor IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -681,10 +639,7 @@ describe("HistoryRepository", () => {
         });
     });
     describe("pruneHistoryInternal", () => {
-        it("should prune history internally", async ({
-            task,
-            annotate,
-        }) => {
+        it("should prune history internally", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");
@@ -706,10 +661,7 @@ describe("HistoryRepository", () => {
                 "[HistoryRepository] Pruned history for monitor monitor-123 (limit: 100) (internal)"
             );
         });
-        it("should not prune with zero limit", async ({
-            task,
-            annotate,
-        }) => {
+        it("should not prune with zero limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HistoryRepository", "component");
             await annotate("Category: Service", "category");

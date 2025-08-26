@@ -2,37 +2,6 @@
 # Modern configuration following ActionLint v1.7.7+ best practices and security standards
 # See: https://github.com/rhysd/actionlint/blob/main/docs/config.md
 
-# Configuration for self-hosted runner environments
-# Supports modern GitHub-hosted and enterprise self-hosted runners
-self-hosted-runner:
-    # Labels of self-hosted runner with modern runner types and sizes
-    labels:
-        # GitHub-hosted runners (2025 updated)
-        - "ubuntu-*"
-        - "windows-*"
-        - "macos-*"
-
-        # GitHub-hosted performance runners
-        - "ubuntu-latest-*-cores"
-        - "macos-*-xl*"
-        - "windows-*-cores"
-
-        # Self-hosted runner patterns
-        - "self-hosted"
-        - "linux.*"
-        - "windows.*"
-        - "macos.*"
-        - "gpu-enabled"
-        - "high-memory"
-        - "arm64"
-        - "x64"
-
-        # Enterprise and specialized runners
-        - "enterprise-*"
-        - "large"
-        - "xlarge"
-        - "*-cores"
-
 # Configuration variables defined in repository or organization
 # Comprehensive list for Electron + Node.js + TypeScript projects
 config-variables:
@@ -90,3 +59,33 @@ paths:
         ignore:
             # Warning about Unused Patch Number - Intented for now
             - "unknown permission scope"
+# Configuration for self-hosted runner environments
+# Supports modern GitHub-hosted and enterprise self-hosted runners
+self-hosted-runner:
+    # Labels of self-hosted runner with modern runner types and sizes
+    labels:
+        # GitHub-hosted runners (2025 updated)
+        - "ubuntu-*"
+        - "windows-*"
+        - "macos-*"
+
+        # GitHub-hosted performance runners
+        - "ubuntu-latest-*-cores"
+        - "macos-*-xl*"
+        - "windows-*-cores"
+
+        # Self-hosted runner patterns
+        - "self-hosted"
+        - "linux.*"
+        - "windows.*"
+        - "macos.*"
+        - "gpu-enabled"
+        - "high-memory"
+        - "arm64"
+        - "x64"
+
+        # Enterprise and specialized runners
+        - "enterprise-*"
+        - "large"
+        - "xlarge"
+        - "*-cores"

@@ -18,10 +18,7 @@ import {
 
 describe("FormData Types", () => {
     describe("SiteFormData", () => {
-        it("should define proper structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define proper structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -82,10 +79,7 @@ describe("FormData Types", () => {
             expect(pingSite.monitor.type).toBe("ping");
         });
 
-        it("should enforce proper types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should enforce proper types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -111,10 +105,7 @@ describe("FormData Types", () => {
     });
 
     describe("HttpFormData", () => {
-        it("should define proper structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define proper structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -135,10 +126,7 @@ describe("FormData Types", () => {
             expect(validHttpFormData.retryAttempts).toBe(3);
         });
 
-        it("should allow optional fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow optional fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -174,10 +162,7 @@ describe("FormData Types", () => {
     });
 
     describe("PingFormData", () => {
-        it("should define proper structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define proper structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -250,10 +235,7 @@ describe("FormData Types", () => {
     });
 
     describe("PortFormData", () => {
-        it("should define proper structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define proper structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -276,10 +258,7 @@ describe("FormData Types", () => {
             expect(validPortFormData.retryAttempts).toBe(3);
         });
 
-        it("should allow connection timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow connection timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -385,10 +364,7 @@ describe("FormData Types", () => {
     });
 
     describe("MonitorFormData Union Type", () => {
-        it("should accept all monitor types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should accept all monitor types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -426,10 +402,7 @@ describe("FormData Types", () => {
     });
 
     describe("Type Guards", () => {
-        it("should identify HTTP form data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should identify HTTP form data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -459,10 +432,7 @@ describe("FormData Types", () => {
             }
         });
 
-        it("should identify ping form data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should identify ping form data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -493,10 +463,7 @@ describe("FormData Types", () => {
             }
         });
 
-        it("should identify port form data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should identify port form data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -529,10 +496,7 @@ describe("FormData Types", () => {
     });
 
     describe("DEFAULT_FORM_DATA", () => {
-        it("should provide HTTP defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide HTTP defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -550,10 +514,7 @@ describe("FormData Types", () => {
             expect(httpDefaults.followRedirects).toBe(true);
         });
 
-        it("should provide ping defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide ping defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -571,10 +532,7 @@ describe("FormData Types", () => {
             expect(pingDefaults.maxPacketLoss).toBe(0);
         });
 
-        it("should provide port defaults", async ({
-            task,
-            annotate,
-        }) => {
+        it("should provide port defaults", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -612,10 +570,7 @@ describe("FormData Types", () => {
     });
 
     describe("AddSiteFormState", () => {
-        it("should define proper structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define proper structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -642,10 +597,7 @@ describe("FormData Types", () => {
             expect(formState.selectedExistingSite).toBe("");
         });
 
-        it("should handle existing site mode", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle existing site mode", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -675,10 +627,7 @@ describe("FormData Types", () => {
     });
 
     describe("FormMode", () => {
-        it("should define valid modes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define valid modes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -693,10 +642,7 @@ describe("FormData Types", () => {
     });
 
     describe("MonitorFieldValidation", () => {
-        it("should define validation structure", async ({
-            task,
-            annotate,
-        }) => {
+        it("should define validation structure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");
@@ -761,10 +707,7 @@ describe("FormData Types", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce strict typing", async ({
-            task,
-            annotate,
-        }) => {
+        it("should enforce strict typing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData", "component");
             await annotate("Category: Shared", "category");

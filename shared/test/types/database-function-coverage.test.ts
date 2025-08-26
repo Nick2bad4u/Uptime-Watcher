@@ -20,7 +20,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -31,36 +34,36 @@ describe("Database Types - Complete Function Coverage", () => {
             expect(isValidSettingsRow(validRow)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isValidSettingsRow(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isValidSettingsRow(undefined)).toBe(false);
         });
 
-        it("should return false for non-object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -73,7 +76,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -85,7 +91,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -97,7 +106,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -109,7 +121,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -121,7 +136,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -135,7 +153,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -147,36 +168,36 @@ describe("Database Types - Complete Function Coverage", () => {
             expect(isValidSiteRow(validRow)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isValidSiteRow(null)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(isValidSiteRow(undefined)).toBe(false);
         });
 
-        it("should return false for non-object", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for non-object", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -189,7 +210,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -201,7 +225,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -213,7 +240,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -225,7 +255,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -237,7 +270,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -249,7 +285,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -263,7 +302,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -280,7 +322,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -297,7 +342,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -314,7 +362,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -328,7 +379,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -342,7 +396,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -356,7 +413,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -378,7 +438,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -396,7 +459,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -414,7 +480,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -432,7 +501,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -454,7 +526,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -478,7 +553,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -498,7 +576,10 @@ describe("Database Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: database-function-coverage", "component");
+            await annotate(
+                "Component: database-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

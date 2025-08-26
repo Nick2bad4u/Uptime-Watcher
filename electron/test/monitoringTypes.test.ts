@@ -33,10 +33,7 @@ describe("Monitoring Types", () => {
             expect(result.details).toBe("All good");
         });
 
-        it("should create failed check result", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create failed check result", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoringTypes", "component");
             await annotate("Category: Core", "category");
@@ -207,10 +204,7 @@ describe("Monitoring Types", () => {
     });
 
     describe("MonitorConfig interface", () => {
-        it("should create empty config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create empty config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoringTypes", "component");
             await annotate("Category: Core", "category");
@@ -222,10 +216,7 @@ describe("Monitoring Types", () => {
             expect(config.userAgent).toBeUndefined();
         });
 
-        it("should create config with timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create config with timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoringTypes", "component");
             await annotate("Category: Core", "category");
@@ -256,10 +247,7 @@ describe("Monitoring Types", () => {
             expect(config.timeout).toBeUndefined();
         });
 
-        it("should create complete config", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create complete config", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoringTypes", "component");
             await annotate("Category: Core", "category");

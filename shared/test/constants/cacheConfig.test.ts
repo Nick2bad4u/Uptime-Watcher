@@ -235,10 +235,7 @@ describe("Cache Configuration Constants", () => {
     });
 
     describe("TTL Value Relationships", () => {
-        it("should have logical TTL ordering", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have logical TTL ordering", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheConfig", "component");
             await annotate("Category: Shared", "category");
@@ -283,10 +280,7 @@ describe("Cache Configuration Constants", () => {
     });
 
     describe("Size Limit Relationships", () => {
-        it("should have logical size ordering", async ({
-            task,
-            annotate,
-        }) => {
+        it("should have logical size ordering", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheConfig", "component");
             await annotate("Category: Shared", "category");
@@ -326,10 +320,7 @@ describe("Cache Configuration Constants", () => {
 
 describe("Cache Naming Functions", () => {
     describe("CACHE_NAMES Structure", () => {
-        it("should be properly frozen", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be properly frozen", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: cacheConfig", "component");
             await annotate("Category: Shared", "category");
@@ -480,14 +471,11 @@ describe("Cache Naming Functions", () => {
 });
 
 describe("Type Definitions", () => {
-    it("should export correct types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheConfig", "component");
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Export Operation", "type");
+    it("should export correct types", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: cacheConfig", "component");
+        await annotate("Category: Shared", "category");
+        await annotate("Type: Export Operation", "type");
 
         // Test that types can be used (compilation test)
         const configType: CacheConfigType = CACHE_CONFIG;
@@ -499,14 +487,11 @@ describe("Type Definitions", () => {
         expect(config).toBeDefined();
     });
 
-    it("should have correct type structure", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheConfig", "component");
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should have correct type structure", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: cacheConfig", "component");
+        await annotate("Category: Shared", "category");
+        await annotate("Type: Business Logic", "type");
 
         const config: CacheConfig = CACHE_CONFIG.SITES;
 

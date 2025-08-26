@@ -60,7 +60,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -74,7 +77,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -88,7 +94,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -104,7 +113,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -118,7 +130,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -133,7 +148,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -147,7 +165,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -163,7 +184,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -179,7 +203,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -195,7 +222,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -215,7 +245,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -233,7 +266,10 @@ describe("ServiceContainer - Feature Services", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer.feature-services", "component");
+            await annotate(
+                "Component: ServiceContainer.feature-services",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 

@@ -23,40 +23,31 @@ describe("Store Loading State Tests", () => {
         vi.clearAllMocks();
     });
 
-    it("should handle loading states properly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: storeLine190", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should handle loading states properly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: storeLine190", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         // Test that the new store structure handles loading states correctly
         expect(true).toBe(true);
     });
 
-    it("should handle error states properly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: storeLine190", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should handle error states properly", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: storeLine190", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         // Test that the new store structure handles error states correctly
         expect(true).toBe(true);
     });
 
-    it("should handle concurrent operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: storeLine190", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should handle concurrent operations", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: storeLine190", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Test that the new store structure handles concurrent operations correctly
         expect(true).toBe(true);

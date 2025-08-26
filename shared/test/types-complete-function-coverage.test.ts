@@ -16,7 +16,10 @@ describe("Shared Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate(
+                "Component: types-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -270,7 +273,10 @@ describe("Shared Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate(
+                "Component: types-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Initialization", "type");
 
@@ -300,7 +306,10 @@ describe("Shared Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate(
+                "Component: types-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -326,7 +335,10 @@ describe("Shared Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate(
+                "Component: types-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -358,7 +370,10 @@ describe("Shared Types - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: types-complete-function-coverage", "component");
+            await annotate(
+                "Component: types-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 

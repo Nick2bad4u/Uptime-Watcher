@@ -26,13 +26,13 @@ describe("Logger Mock Test", () => {
     });
 
     it("should call the mocked debug function when logger.debug is called", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-simple-test", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: logger-simple-test", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         logger.debug("test message");
 
@@ -43,13 +43,13 @@ describe("Logger Mock Test", () => {
     });
 
     it("should call the mocked info function when logger.info is called", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-simple-test", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: logger-simple-test", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         logger.info("test info");
 

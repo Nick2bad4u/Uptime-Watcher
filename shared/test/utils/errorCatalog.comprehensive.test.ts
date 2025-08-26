@@ -60,10 +60,7 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Generic error occurred");
         });
 
-        it("should handle empty template", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty template", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -111,10 +108,7 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Database error occurred");
         });
 
-        it("should handle numeric values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle numeric values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -129,10 +123,7 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("HTTP error 500 occurred after 3 attempts");
         });
 
-        it("should handle string values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -151,10 +142,7 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle mixed data types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle mixed data types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -260,10 +248,7 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle zero values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -280,10 +265,7 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle empty string values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -342,10 +324,7 @@ describe("errorCatalog utilities", () => {
             }
         });
 
-        it("should handle empty string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -355,10 +334,7 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle case sensitivity", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle case sensitivity", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");
@@ -384,10 +360,7 @@ describe("errorCatalog utilities", () => {
             expect(isKnownErrorMessage("Site  not  found")).toBe(false);
         });
 
-        it("should handle partial matches", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle partial matches", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorCatalog", "component");
             await annotate("Category: Utility", "category");

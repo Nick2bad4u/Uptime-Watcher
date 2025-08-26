@@ -26,14 +26,11 @@ describe("Database Schema", () => {
     afterEach(() => {
         vi.clearAllMocks();
     });
-    it("should create tables", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: databaseSchema", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+    it("should create tables", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: databaseSchema", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Constructor", "type");
 
         mockDatabase.run.mockReturnValue(undefined);
 
@@ -44,14 +41,11 @@ describe("Database Schema", () => {
             expect.stringContaining("CREATE TABLE IF NOT EXISTS sites")
         );
     });
-    it("should handle errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: databaseSchema", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should handle errors", async ({ task, annotate }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: databaseSchema", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Error Handling", "type");
 
         mockDatabase.run.mockImplementation(() => {
             throw new Error("Database error");

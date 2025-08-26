@@ -22,7 +22,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -66,7 +69,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -98,7 +104,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
@@ -149,7 +158,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -189,7 +201,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -267,7 +282,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -322,7 +340,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager.branch-coverage", "component");
+            await annotate(
+                "Component: ThemeManager.branch-coverage",
+                "component"
+            );
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 

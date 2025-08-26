@@ -278,16 +278,19 @@ describe("Settings Component - Invalid Key Coverage", () => {
         vi.clearAllMocks();
     });
 
-    it("should warn and return early when attempting to update invalid settings key", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.invalid-key", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Update", "type");
+    it("should warn and return early when attempting to update invalid settings key", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.invalid-key", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Data Update", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.invalid-key", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Update", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.invalid-key", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Data Update", "type");
 
         // This test will trigger the lines 87-89 by directly testing the handleSettingChange method
         render(<Settings onClose={vi.fn()} />);
@@ -351,16 +354,19 @@ describe("Settings Component - Invalid Key Coverage", () => {
         expect(mockUpdateSettings).not.toHaveBeenCalled();
     });
 
-    it("should handle valid settings keys correctly", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.invalid-key", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+    it("should handle valid settings keys correctly", async ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.invalid-key", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.invalid-key", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: Settings.invalid-key", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<Settings onClose={vi.fn()} />);
 

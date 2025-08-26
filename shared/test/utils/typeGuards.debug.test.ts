@@ -4,13 +4,13 @@ import { isObject } from "../../utils/typeGuards";
 
 describe("typeGuards Debug Test", () => {
     it("should execute isObject function and achieve coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: typeGuards", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: typeGuards", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Call the function directly to ensure coverage
         const result1 = isObject({ test: "value" });

@@ -116,7 +116,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
@@ -130,7 +133,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
@@ -179,7 +185,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -205,7 +214,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -229,7 +241,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -256,7 +271,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -293,7 +311,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -332,7 +353,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -362,7 +386,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Caching", "type");
 
@@ -390,7 +417,10 @@ describe("MonitorStatusUpdateService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -419,12 +449,12 @@ describe("MonitorStatusUpdateService", () => {
     });
 
     describe("StatusUpdateMonitorCheckResult interface", () => {
-        it("should support all required fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support all required fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -443,12 +473,12 @@ describe("MonitorStatusUpdateService", () => {
             expect(result.timestamp).toBeInstanceOf(Date);
         });
 
-        it("should support optional fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support optional fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorStatusUpdateService", "component");
+            await annotate(
+                "Component: MonitorStatusUpdateService",
+                "component"
+            );
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 

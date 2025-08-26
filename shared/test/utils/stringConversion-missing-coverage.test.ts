@@ -2,14 +2,23 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion - Missing Coverage", () => {
     describe("safeStringify switch case coverage", () => {
-        test("should handle undefined case (lines 86-87)", ({ task, annotate }) => {
+        test("should handle undefined case (lines 86-87)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
@@ -18,14 +27,23 @@ describe("StringConversion - Missing Coverage", () => {
             expect(result).toBe("");
         });
 
-        test("should handle default case for unknown types (lines 89-90)", ({ task, annotate }) => {
+        test("should handle default case for unknown types (lines 89-90)", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
@@ -46,14 +64,23 @@ describe("StringConversion - Missing Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        test("should comprehensive test all switch branches", ({ task, annotate }) => {
+        test("should comprehensive test all switch branches", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
@@ -81,14 +108,23 @@ describe("StringConversion - Missing Coverage", () => {
             });
         });
 
-        test("should handle edge cases that might hit default branch", ({ task, annotate }) => {
+        test("should handle edge cases that might hit default branch", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
@@ -110,14 +146,23 @@ describe("StringConversion - Missing Coverage", () => {
             });
         });
 
-        test("should attempt to reach default case through type manipulation", ({ task, annotate }) => {
+        test("should attempt to reach default case through type manipulation", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
@@ -147,14 +192,23 @@ describe("StringConversion - Missing Coverage", () => {
             }
         });
 
-        test("should verify typeof behavior for edge cases", ({ task, annotate }) => {
+        test("should verify typeof behavior for edge cases", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate(
+                "Component: stringConversion-missing-coverage",
+                "component"
+            );
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 

@@ -127,10 +127,7 @@ describe("Frontend siteStatus re-exports", () => {
     });
 
     describe("Type re-exports", () => {
-        it("should re-export SiteStatus type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should re-export SiteStatus type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.direct", "component");
             await annotate("Category: Utility", "category");
@@ -266,10 +263,7 @@ describe("Frontend siteStatus re-exports", () => {
     });
 
     describe("Edge cases", () => {
-        it("should handle empty monitor arrays", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.direct", "component");
             await annotate("Category: Utility", "category");

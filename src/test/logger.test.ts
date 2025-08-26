@@ -58,10 +58,7 @@ describe("Frontend Logger Service", () => {
             expect(logger.silly).toBeInstanceOf(Function);
         });
 
-        it("should prefix messages correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should prefix messages correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -83,10 +80,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should handle additional arguments", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle additional arguments", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -103,10 +97,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Error logging", () => {
-        it("should handle Error objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -145,10 +136,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - App", () => {
-        it("should log application started", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log application started", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -160,10 +148,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log application stopped", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log application stopped", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -197,10 +182,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log performance metrics", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log performance metrics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -214,10 +196,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - Site", () => {
-        it("should log site added", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site added", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -229,10 +208,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log site removed", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site removed", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -274,10 +250,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log site status changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site status changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -289,10 +262,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log site errors with string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log site errors with string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -327,10 +297,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Specialized logging - System", () => {
-        it("should log notifications", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log notifications", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -342,10 +309,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log tray actions", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log tray actions", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -422,10 +386,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should log settings changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should log settings changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -468,10 +429,7 @@ describe("Frontend Logger Service", () => {
             expect(logger.raw).toBe(mockLog);
         });
 
-        it("should allow direct raw logging", async ({
-            task,
-            annotate,
-        }) => {
+        it("should allow direct raw logging", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -483,10 +441,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Type exports", () => {
-        it("should export Logger type", async ({
-            task,
-            annotate,
-        }) => {
+        it("should export Logger type", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -499,10 +454,7 @@ describe("Frontend Logger Service", () => {
     });
 
     describe("Silly and Verbose logging", () => {
-        it("should call silly logging method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call silly logging method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");
@@ -517,10 +469,7 @@ describe("Frontend Logger Service", () => {
             );
         });
 
-        it("should call verbose logging method", async ({
-            task,
-            annotate,
-        }) => {
+        it("should call verbose logging method", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger", "component");
             await annotate("Category: Core", "category");

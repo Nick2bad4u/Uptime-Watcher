@@ -16,7 +16,10 @@ describe("StringConversion - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate(
+                "Component: stringConversion-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -142,7 +145,10 @@ describe("StringConversion - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate(
+                "Component: stringConversion-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -208,7 +214,10 @@ describe("StringConversion - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate(
+                "Component: stringConversion-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -254,7 +263,10 @@ describe("StringConversion - Complete Function Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: stringConversion-complete-function-coverage", "component");
+            await annotate(
+                "Component: stringConversion-complete-function-coverage",
+                "component"
+            );
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

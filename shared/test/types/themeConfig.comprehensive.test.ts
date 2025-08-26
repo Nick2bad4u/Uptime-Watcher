@@ -1094,10 +1094,7 @@ describe("Theme Config Types - Comprehensive Coverage", () => {
             expect(override.typography?.fontSize?.body).toBe("16px");
         });
 
-        it("should support partial overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should support partial overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: themeConfig", "component");
             await annotate("Category: Shared", "category");

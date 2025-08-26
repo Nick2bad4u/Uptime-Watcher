@@ -4,12 +4,14 @@
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach,
+import {
+    beforeEach,
     describe,
     expect,
     it,
     vi,
-    type MockedFunction } from 'vitest';
+    type MockedFunction,
+} from "vitest";
 import "@testing-library/jest-dom";
 import React from "react";
 
@@ -470,16 +472,19 @@ describe("App Additional Coverage Tests", () => {
         mockIsDevelopment.mockReturnValue(false);
     });
 
-    it("should use all imported modules and constants", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Import Operation", "type");
+    it("should use all imported modules and constants", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Import Operation", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Import Operation", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Import Operation", "type");
 
         render(<App />);
 
@@ -489,16 +494,19 @@ describe("App Additional Coverage Tests", () => {
         // AddSiteModal is rendered but may not be visible without proper state
     });
 
-    it("should use UI_MESSAGES constants for text content", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should use UI_MESSAGES constants for text content", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         mockSitesStoreState.sites = mockSitesStoreState.sites[0]
             ? [mockSitesStoreState.sites[0]]
@@ -510,16 +518,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("Monitored Sites (1)")).toBeInTheDocument();
     });
 
-    it("should show loading overlay with correct message", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should show loading overlay with correct message", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         // Mock environment
         mockIsDevelopment.mockReturnValue(false);
@@ -565,16 +576,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("Loading...")).toBeInTheDocument();
     });
 
-    it("should display error alert when lastError exists", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should display error alert when lastError exists", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const clearErrorMock = vi.fn();
         mockErrorStoreState.lastError = "Test error message";
@@ -593,16 +607,19 @@ describe("App Additional Coverage Tests", () => {
         expect(clearErrorMock).toHaveBeenCalled();
     });
 
-    it("should display update error notification", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should display update error notification", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         mockUpdatesStoreState.updateError = "Update failed error";
         mockUpdatesStoreState.updateStatus = "error";
@@ -615,16 +632,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("Dismiss")).toBeInTheDocument();
     });
 
-    it("should display update error fallback when updateError is null", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+    it("should display update error fallback when updateError is null", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "error";
@@ -635,16 +655,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("Update failed.")).toBeInTheDocument();
     });
 
-    it("should display update available notification", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+    it("should display update available notification", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "available";
@@ -658,16 +681,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("⬇️")).toBeInTheDocument();
     });
 
-    it("should display update downloading notification", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should display update downloading notification", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "downloading";
@@ -681,16 +707,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("⏬")).toBeInTheDocument();
     });
 
-    it("should display update downloaded notification with restart button", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should display update downloaded notification with restart button", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         const applyUpdateMock = vi.fn();
         mockUpdatesStoreState.applyUpdate = applyUpdateMock;
@@ -712,16 +741,19 @@ describe("App Additional Coverage Tests", () => {
         expect(applyUpdateMock).toHaveBeenCalled();
     });
 
-    it("should show settings modal when showSettings is true", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should show settings modal when showSettings is true", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         mockUIStoreState.showSettings = true;
 
@@ -730,16 +762,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.getByText("⚙️ Settings")).toBeInTheDocument();
     });
 
-    it("should apply dark theme class when isDark is true", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should apply dark theme class when isDark is true", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         mockThemeState.isDark = true;
 
@@ -749,16 +784,19 @@ describe("App Additional Coverage Tests", () => {
         expect(appContainer).toHaveClass("dark");
     });
 
-    it("should handle update action dismiss when status is not downloaded", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+    it("should handle update action dismiss when status is not downloaded", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         const setUpdateStatusMock = vi.fn();
         const setUpdateErrorMock = vi.fn();
@@ -778,16 +816,19 @@ describe("App Additional Coverage Tests", () => {
         expect(setUpdateErrorMock).toHaveBeenCalledWith(undefined);
     });
 
-    it("should execute development logging in status updates callback", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+    it("should execute development logging in status updates callback", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
         // Mock environment utility to return development mode
         mockIsDevelopment.mockReturnValue(true);
@@ -859,16 +900,19 @@ describe("App Additional Coverage Tests", () => {
         debugSpy.mockRestore();
     });
 
-    it("should use fallback siteIdentifier when site.identifier is undefined", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should use fallback siteIdentifier when site.identifier is undefined", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Mock environment utility to return development mode
         mockIsDevelopment.mockReturnValue(true);
@@ -936,15 +980,15 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should handle theme toggle", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const toggleThemeMock = vi.fn();
         mockThemeState.toggleTheme = toggleThemeMock;
@@ -959,15 +1003,15 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should handle site loading on mount", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Loading", "type");
 
         // Mock the store initialization functions
         const initializeSettingsMock = vi.fn().mockResolvedValue(undefined);
@@ -998,16 +1042,19 @@ describe("App Additional Coverage Tests", () => {
         });
     });
 
-    it("should handle check for updates on mount", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+    it("should handle check for updates on mount", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Data Update", "type");
 
         // Mock the store initialization functions
         const initializeSettingsMock = vi.fn().mockResolvedValue(undefined);
@@ -1036,16 +1083,19 @@ describe("App Additional Coverage Tests", () => {
         expect(initializeSitesMock).toHaveBeenCalled();
     });
 
-    it("should properly clean up subscriptions on unmount", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should properly clean up subscriptions on unmount", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         // Mock the store functions
         const unsubscribeFromStatusUpdatesMock = vi.fn();
@@ -1080,15 +1130,15 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should handle multiple sites display", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const firstSite = mockSitesStoreState.sites[0];
         if (firstSite) {
@@ -1130,15 +1180,15 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should handle empty sites list", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         mockSitesStoreState.sites = [];
 
@@ -1149,15 +1199,15 @@ describe("App Additional Coverage Tests", () => {
     });
 
     it("should handle error clearing timeout", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Error Handling", "type");
 
         const clearErrorMock = vi.fn();
         mockErrorStoreState.lastError = "Timeout test error";
@@ -1173,16 +1223,19 @@ describe("App Additional Coverage Tests", () => {
         expect(screen.queryByTestId("error-alert")).not.toBeInTheDocument();
     });
 
-    it("should render all themed components properly", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+    it("should render all themed components properly", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         render(<App />);
 
@@ -1192,16 +1245,19 @@ describe("App Additional Coverage Tests", () => {
         expect(appContainer).toHaveClass("app-container");
     });
 
-    it("should handle keyboard events for accessibility", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Event Processing", "type");
+    it("should handle keyboard events for accessibility", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Event Processing", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App.additional-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Event Processing", "type");
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.additional-coverage", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Event Processing", "type");
 
         mockUpdatesStoreState.updateStatus = "error";
         mockUpdatesStoreState.updateError = "Test error";

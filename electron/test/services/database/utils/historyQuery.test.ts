@@ -137,10 +137,7 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual(mockMappedEntries);
         });
 
-        it("should handle single history entry", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle single history entry", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");
@@ -202,10 +199,7 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");
@@ -393,10 +387,7 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should handle large count values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle large count values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");
@@ -438,10 +429,7 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");
@@ -639,10 +627,7 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");
@@ -661,10 +646,7 @@ describe("historyQuery utilities", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle row mapping errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle row mapping errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
             await annotate("Category: Service", "category");

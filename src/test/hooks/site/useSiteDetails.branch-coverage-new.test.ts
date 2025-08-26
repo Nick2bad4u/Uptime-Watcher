@@ -128,7 +128,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -164,7 +167,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -200,7 +206,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -238,7 +247,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -283,7 +295,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -328,7 +343,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -368,12 +386,12 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
     });
 
     describe("Monitoring Operations", () => {
-        it("should handle start monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle start monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -397,12 +415,12 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle stop monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle stop monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -433,7 +451,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -455,7 +476,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -492,7 +516,10 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteDetails.branch-coverage-new", "component");
+            await annotate(
+                "Component: useSiteDetails.branch-coverage-new",
+                "component"
+            );
             await annotate("Category: Hook", "category");
             await annotate("Type: Validation", "type");
 

@@ -187,7 +187,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Initial Render - New Mode", () => {
-        it("renders all required fields for new site mode", ({ task, annotate }) => {
+        it("renders all required fields for new site mode", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -270,7 +273,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Mode Switching", () => {
-        it("switches to existing site mode correctly", async ({ task, annotate }) => {
+        it("switches to existing site mode correctly", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -325,7 +331,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Interactions", () => {
-        it("calls setName when site name input changes", async ({ task, annotate }) => {
+        it("calls setName when site name input changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -353,7 +362,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setName).toHaveBeenCalledWith("t");
         });
 
-        it("calls setMonitorType when monitor type changes", async ({ task, annotate }) => {
+        it("calls setMonitorType when monitor type changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -376,7 +388,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setMonitorType).toHaveBeenCalledWith("port");
         });
 
-        it("calls setCheckInterval when check interval changes", async ({ task, annotate }) => {
+        it("calls setCheckInterval when check interval changes", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -451,7 +466,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("shows add button as enabled when form is valid", ({ task, annotate }) => {
+        it("shows add button as enabled when form is valid", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -490,7 +508,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(screen.getByText("Invalid URL format")).toBeInTheDocument();
         });
 
-        it("does not display error alert when form has no error", ({ task, annotate }) => {
+        it("does not display error alert when form has no error", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -511,7 +532,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Edge Cases", () => {
-        it("handles special characters in input fields", async ({ task, annotate }) => {
+        it("handles special characters in input fields", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");

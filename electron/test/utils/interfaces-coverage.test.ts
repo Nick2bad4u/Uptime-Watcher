@@ -457,10 +457,7 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should work with factory patterns", async ({
-            task,
-            annotate,
-        }) => {
+        it("should work with factory patterns", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: interfaces-coverage", "component");
             await annotate("Category: Utility", "category");

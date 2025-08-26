@@ -166,10 +166,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Hook Initialization", () => {
-        it("should initialize with site data", async ({
-            task,
-            annotate,
-        }) => {
+        it("should initialize with site data", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");
@@ -261,10 +258,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("State Management", () => {
-        it("should track local name changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should track local name changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");
@@ -285,10 +279,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(result.current.hasUnsavedChanges).toBe(true);
         });
 
-        it("should track monitoring state", async ({
-            task,
-            annotate,
-        }) => {
+        it("should track monitoring state", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");
@@ -391,10 +382,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("UI Store Integration", () => {
-        it("should integrate with UI store", async ({
-            task,
-            annotate,
-        }) => {
+        it("should integrate with UI store", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");
@@ -437,10 +425,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Monitor Selection", () => {
-        it("should handle monitor ID changes", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle monitor ID changes", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");
@@ -949,10 +934,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Site Name Updates", () => {
-        it("should handle site name updates", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle site name updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteDetails", "component");
             await annotate("Category: Hook", "category");

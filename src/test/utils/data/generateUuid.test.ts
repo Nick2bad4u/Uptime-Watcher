@@ -15,10 +15,7 @@ describe("generateUuid", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should return a string", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return a string", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -194,10 +191,7 @@ describe("generateUuid", () => {
             vi.restoreAllMocks();
         });
 
-        it('should always start with "site-"', async ({
-            task,
-            annotate,
-        }) => {
+        it('should always start with "site-"', async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -207,10 +201,7 @@ describe("generateUuid", () => {
             expect(result.startsWith("site-")).toBe(true);
         });
 
-        it("should contain timestamp", async ({
-            task,
-            annotate,
-        }) => {
+        it("should contain timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -239,14 +230,14 @@ describe("generateUuid", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateUuid();
-            const parts = result.split('-');
+            const parts = result.split("-");
 
             expect(parts).toHaveLength(3);
             expect(parts[1]).toMatch(/^[\da-z]+$/);
             expect(parts[1]!.length).toBeGreaterThan(0);
         });
 
-        it('should use consistent format across calls', async ({
+        it("should use consistent format across calls", async ({
             task,
             annotate,
         }) => {

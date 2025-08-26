@@ -17,7 +17,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -54,7 +57,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -91,7 +97,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -119,7 +128,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -149,7 +161,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -180,7 +195,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -199,7 +217,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -221,7 +242,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -242,7 +266,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -290,7 +317,10 @@ describe("schemas.ts - Function Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate(
+                "Component: schemas-function-coverage-complete",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 

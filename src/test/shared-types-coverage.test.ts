@@ -9,10 +9,7 @@ import { describe, it, expect } from "vitest";
 
 describe("Shared Types Coverage", () => {
     describe("FormData Types", () => {
-        it("should handle form data structures", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle form data structures", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: shared-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -59,10 +56,7 @@ describe("Shared Types Coverage", () => {
             expect(formData.validation?.isValid).toBe(true);
         });
 
-        it("should validate form data fields", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate form data fields", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: shared-types-coverage", "component");
             await annotate("Category: Core", "category");
@@ -323,10 +317,7 @@ describe("Shared Types Coverage", () => {
             expect(darkTheme.typography.fontFamily).toContain("Inter");
         });
 
-        it("should handle theme utilities", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle theme utilities", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: shared-types-coverage", "component");
             await annotate("Category: Core", "category");

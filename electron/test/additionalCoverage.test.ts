@@ -38,10 +38,7 @@ describe("Additional Coverage Tests", () => {
         vi.clearAllMocks();
     });
     describe("Constants Coverage", () => {
-        it("should import constants correctly", async ({
-            task,
-            annotate,
-        }) => {
+        it("should import constants correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: additionalCoverage", "component");
             await annotate("Category: Core", "category");
@@ -55,10 +52,7 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Types Coverage", () => {
-        it("should validate type exports", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate type exports", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: additionalCoverage", "component");
             await annotate("Category: Core", "category");
@@ -71,10 +65,7 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Utilities Coverage", () => {
-        it("should validate utility exports", async ({
-            task,
-            annotate,
-        }) => {
+        it("should validate utility exports", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: additionalCoverage", "component");
             await annotate("Category: Core", "category");
@@ -173,10 +164,7 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Edge Cases Coverage", () => {
-        it("should handle various edge cases", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle various edge cases", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: additionalCoverage", "component");
             await annotate("Category: Core", "category");
@@ -200,10 +188,7 @@ describe("Additional Coverage Tests", () => {
         });
     });
     describe("Async Coverage", () => {
-        it("should handle async operations", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle async operations", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: additionalCoverage", "component");
             await annotate("Category: Core", "category");

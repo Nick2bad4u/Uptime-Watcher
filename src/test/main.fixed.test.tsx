@@ -50,7 +50,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Application Initialization", () => {
-        it("should throw error when root element not found", async ({ task, annotate }) => {
+        it("should throw error when root element not found", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -76,7 +79,10 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should handle initialization errors gracefully with try-catch", async ({ task, annotate }) => {
+        it("should handle initialization errors gracefully with try-catch", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -102,7 +108,10 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should use getElementById for root element lookup", async ({ task, annotate }) => {
+        it("should use getElementById for root element lookup", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -126,7 +135,10 @@ describe("main.tsx - Application Entry Point", () => {
             getElementByIdSpy.mockRestore();
         });
 
-        it("should create React root with correct element", async ({ task, annotate }) => {
+        it("should create React root with correct element", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -179,7 +191,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Error Handling", () => {
-        it("should catch and log initialization errors", async ({ task, annotate }) => {
+        it("should catch and log initialization errors", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -220,7 +235,10 @@ describe("main.tsx - Application Entry Point", () => {
             }));
         });
 
-        it("should handle createRoot failures gracefully", async ({ task, annotate }) => {
+        it("should handle createRoot failures gracefully", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -252,7 +270,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Critical Path Coverage", () => {
-        it("should cover the main initialization path", async ({ task, annotate }) => {
+        it("should cover the main initialization path", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -307,7 +328,10 @@ describe("main.tsx - Application Entry Point", () => {
             );
         });
 
-        it("should handle React.StrictMode rendering", async ({ task, annotate }) => {
+        it("should handle React.StrictMode rendering", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -334,7 +358,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("DOM Integration", () => {
-        it("should successfully find root element in normal conditions", async ({ task, annotate }) => {
+        it("should successfully find root element in normal conditions", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -361,7 +388,10 @@ describe("main.tsx - Application Entry Point", () => {
             expect(mockRender).toHaveBeenCalled();
         });
 
-        it("should handle multiple script executions gracefully", async ({ task, annotate }) => {
+        it("should handle multiple script executions gracefully", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -386,7 +416,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Performance Considerations", () => {
-        it("should use getElementById instead of querySelector for performance", async ({ task, annotate }) => {
+        it("should use getElementById instead of querySelector for performance", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");

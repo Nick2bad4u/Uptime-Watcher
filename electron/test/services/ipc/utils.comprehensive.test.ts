@@ -54,13 +54,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     describe("IpcValidators - Parameter Validation", () => {
         describe("optionalString validator", () => {
             it("should return null for undefined values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.optionalString(
                     undefined,
@@ -70,13 +70,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for valid non-empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.optionalString(
                     "valid string",
@@ -86,13 +86,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString("", "testParam");
                 expect(result).toBe(
@@ -101,13 +101,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for whitespace-only strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString("   ", "testParam");
                 expect(result).toBe(
@@ -116,13 +116,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for non-string values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString(123, "testParam");
                 expect(result).toBe(
@@ -131,13 +131,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for null values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString(null, "testParam");
                 expect(result).toBe(
@@ -146,13 +146,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for object values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString({}, "testParam");
                 expect(result).toBe(
@@ -161,13 +161,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for array values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.optionalString([], "testParam");
                 expect(result).toBe(
@@ -178,52 +178,49 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("requiredNumber validator", () => {
             it("should return null for valid numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredNumber(42, "testParam");
                 expect(result).toBeNull();
             });
 
-            it("should return null for zero", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should return null for zero", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredNumber(0, "testParam");
                 expect(result).toBeNull();
             });
 
             it("should return null for negative numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredNumber(-42, "testParam");
                 expect(result).toBeNull();
             });
 
             it("should return null for floating point numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredNumber(
                     3.141_59,
@@ -233,13 +230,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for NaN values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber(
                     Number.NaN,
@@ -249,26 +246,26 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for string values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber("123", "testParam");
                 expect(result).toBe("testParam must be a valid number");
             });
 
             it("should return error for undefined values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber(
                     undefined,
@@ -278,39 +275,39 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for null values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber(null, "testParam");
                 expect(result).toBe("testParam must be a valid number");
             });
 
             it("should return error for object values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber({}, "testParam");
                 expect(result).toBe("testParam must be a valid number");
             });
 
             it("should return error for array values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber([], "testParam");
                 expect(result).toBe("testParam must be a valid number");
@@ -319,13 +316,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("requiredObject validator", () => {
             it("should return null for valid objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredObject(
                     { key: "value" },
@@ -335,26 +332,26 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for empty objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredObject({}, "testParam");
                 expect(result).toBeNull();
             });
 
             it("should return null for complex objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredObject(
                     { nested: { key: "value" } },
@@ -364,39 +361,39 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for null values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(null, "testParam");
                 expect(result).toBe("testParam must be a valid object");
             });
 
             it("should return error for array values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject([], "testParam");
                 expect(result).toBe("testParam must be a valid object");
             });
 
             it("should return error for array values with content", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(
                     [
@@ -410,13 +407,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for string values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(
                     "string",
@@ -426,26 +423,26 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for number values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(123, "testParam");
                 expect(result).toBe("testParam must be a valid object");
             });
 
             it("should return error for undefined values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(
                     undefined,
@@ -455,13 +452,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for boolean values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(true, "testParam");
                 expect(result).toBe("testParam must be a valid object");
@@ -470,13 +467,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("requiredString validator", () => {
             it("should return null for valid non-empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredString(
                     "valid string",
@@ -486,13 +483,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for strings with special characters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredString(
                     "test@example.com",
@@ -502,52 +499,52 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return null for numeric strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredString("123", "testParam");
                 expect(result).toBeNull();
             });
 
             it("should return error for empty strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString("", "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
             it("should return error for whitespace-only strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString("   ", "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
             it("should return error for undefined values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString(
                     undefined,
@@ -557,52 +554,52 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for null values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString(null, "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
             it("should return error for number values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString(123, "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
             it("should return error for object values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString({}, "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
             it("should return error for array values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredString([], "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
@@ -613,13 +610,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     describe("Response Creators - Standardized Formatting", () => {
         describe("createErrorResponse", () => {
             it("should create basic error response", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createErrorResponse("Something went wrong");
 
@@ -630,13 +627,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create error response with metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const metadata = { code: 500, context: "test" };
                 const result = createErrorResponse(
@@ -652,13 +649,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create error response with undefined metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createErrorResponse(
                     "Error without metadata",
@@ -672,13 +669,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create error response with empty metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createErrorResponse(
                     "Error with empty metadata",
@@ -693,13 +690,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle complex metadata objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const metadata = {
                     nested: { key: "value" },
@@ -725,13 +722,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("createSuccessResponse", () => {
             it("should create success response without data", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createSuccessResponse();
 
@@ -741,13 +738,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with data only", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const data = { id: 1, name: "test" };
                 const result = createSuccessResponse(data);
@@ -759,13 +756,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with data and metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const data = { result: "success" };
                 const metadata = { duration: 100 };
@@ -779,13 +776,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with data, metadata, and warnings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const data = { items: [] };
                 const metadata = { count: 0 };
@@ -801,13 +798,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with undefined data", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createSuccessResponse(undefined);
 
@@ -817,13 +814,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with undefined metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const data = "test";
                 const result = createSuccessResponse(data, undefined);
@@ -835,13 +832,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create success response with empty warnings array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const data = "test";
                 const metadata = { key: "value" };
@@ -856,13 +853,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle primitive data types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const stringResult = createSuccessResponse("string data");
                 expect(stringResult.data).toBe("string data");
@@ -874,14 +871,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(booleanResult.data).toBe(true);
             });
 
-            it("should handle array data", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            it("should handle array data", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const arrayData = [
                     1,
@@ -905,13 +899,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("createValidationResponse", () => {
             it("should create successful validation response with defaults", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const result = createValidationResponse(true);
 
@@ -924,13 +918,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create failed validation response with errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const errors = ["Field is required", "Invalid format"];
                 const result = createValidationResponse(false, errors);
@@ -944,13 +938,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create validation response with warnings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const errors = ["Critical error"];
                 const warnings = ["Deprecated field", "Performance warning"];
@@ -969,13 +963,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create validation response with metadata", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const errors: string[] = [];
                 const warnings: string[] = [];
@@ -996,13 +990,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should create complete validation response", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Constructor", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Constructor", "type");
 
                 const errors = ["Error 1"];
                 const warnings = ["Warning 1", "Warning 2"];
@@ -1027,13 +1021,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
     describe("Handler Wrappers - Error Handling and Logging", () => {
         describe("withIpcHandler", () => {
             it("should wrap successful handler with response formatting", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue({ data: "test" });
 
@@ -1054,13 +1048,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should wrap synchronous handler", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockHandler = vi.fn().mockReturnValue("sync result");
 
@@ -1079,14 +1073,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should handle Error instances", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle Error instances", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error("Test error message");
                 const mockHandler = vi.fn().mockRejectedValue(error);
@@ -1106,14 +1097,11 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
-            it("should handle string errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+            it("should handle string errors", async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const mockHandler = vi.fn().mockRejectedValue("String error");
 
@@ -1133,13 +1121,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle non-string non-error values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const mockHandler = vi.fn().mockRejectedValue(123);
 
@@ -1159,13 +1147,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should not log high-frequency operations in dev mode", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("result");
 
@@ -1177,13 +1165,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should measure execution duration accurately", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const delay = 50;
                 const mockHandler = vi.fn().mockImplementation(async () => {
@@ -1205,13 +1193,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("withIpcHandlerValidation", () => {
             it("should execute handler with valid parameters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("valid result");
                 const mockValidator = vi.fn().mockReturnValue(null);
@@ -1237,13 +1225,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should return error for validation failures", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const mockHandler = vi.fn();
                 const mockValidator = vi
@@ -1271,13 +1259,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle synchronous validated handlers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi
                     .fn()
@@ -1297,13 +1285,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should handle errors in validated handlers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
 
                 const error = new Error("Handler execution error");
                 const mockHandler = vi.fn().mockRejectedValue(error);
@@ -1328,13 +1316,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should not log high-frequency validated operations", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("result");
                 const mockValidator = vi.fn().mockReturnValue(null);
@@ -1356,13 +1344,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should measure execution duration for validated handlers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const delay = 30;
                 const mockHandler = vi.fn().mockImplementation(async () => {
@@ -1386,13 +1374,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
         describe("registerStandardizedIpcHandler", () => {
             it("should register handler without validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("test");
                 const registeredHandlers = new Set<string>();
@@ -1412,13 +1400,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should register handler with validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("validated test");
                 const mockValidator = vi.fn().mockReturnValue(null);
@@ -1441,13 +1429,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should execute registered handler without validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi.fn().mockResolvedValue("execution test");
                 const registeredHandlers = new Set<string>();
@@ -1478,13 +1466,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should execute registered handler with validation", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Validation", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
 
                 const mockHandler = vi
                     .fn()
@@ -1517,13 +1505,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
             });
 
             it("should track multiple registered handlers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
 
                 const registeredHandlers = new Set<string>();
 

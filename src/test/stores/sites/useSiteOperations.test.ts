@@ -270,10 +270,7 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.removeSite).toHaveBeenCalledWith("test-site");
         });
 
-        it("should handle deletion errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -315,10 +312,7 @@ describe("createSiteOperationsActions", () => {
             });
         });
 
-        it("should handle empty sites list", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty sites list", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -358,10 +352,7 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("modifySite", () => {
-        it("should modify a site successfully", async ({
-            task,
-            annotate,
-        }) => {
+        it("should modify a site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -379,10 +370,7 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle modify errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle modify errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -455,10 +443,7 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should update monitor timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update monitor timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -476,10 +461,7 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should update site check interval", async ({
-            task,
-            annotate,
-        }) => {
+        it("should update site check interval", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
@@ -499,10 +481,7 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("downloadSQLiteBackup", () => {
-        it("should download SQLite backup", async ({
-            task,
-            annotate,
-        }) => {
+        it("should download SQLite backup", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");

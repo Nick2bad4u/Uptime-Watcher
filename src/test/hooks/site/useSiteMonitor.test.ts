@@ -289,10 +289,7 @@ describe("useSiteMonitor Hook", () => {
             );
         });
 
-        it("should return all monitor IDs", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return all monitor IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteMonitor", "component");
             await annotate("Category: Hook", "category");

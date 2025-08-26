@@ -355,10 +355,7 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should handle empty array", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -368,10 +365,7 @@ describe("historyMapper utilities", () => {
             expect(result).toEqual([]);
         });
 
-        it("should handle single row", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle single row", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -500,10 +494,7 @@ describe("historyMapper utilities", () => {
             expect(result).not.toHaveProperty("details");
         });
 
-        it("should handle string responseTime", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string responseTime", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -542,10 +533,7 @@ describe("historyMapper utilities", () => {
             expect(result.responseTime).toBe(0);
         });
 
-        it("should handle string timestamp", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle string timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -612,10 +600,7 @@ describe("historyMapper utilities", () => {
             );
         });
 
-        it("should handle valid up status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle valid up status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -634,10 +619,7 @@ describe("historyMapper utilities", () => {
             expect(logger.warn).not.toHaveBeenCalled();
         });
 
-        it("should handle valid down status", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle valid down status", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -768,10 +750,7 @@ describe("historyMapper utilities", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle row with details", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle row with details", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");
@@ -827,10 +806,7 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should handle validation workflow", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle validation workflow", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
             await annotate("Category: Service", "category");

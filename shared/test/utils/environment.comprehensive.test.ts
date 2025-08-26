@@ -165,10 +165,7 @@ describe("Environment Detection Utilities", () => {
             expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
         });
 
-        it("should handle empty string values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty string values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: environment", "component");
             await annotate("Category: Utility", "category");
@@ -445,10 +442,7 @@ describe("Environment Detection Utilities", () => {
             expect(isDevelopment()).toBe(false);
         });
 
-        it("should be case sensitive", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be case sensitive", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: environment", "component");
             await annotate("Category: Utility", "category");
@@ -677,10 +671,7 @@ describe("Environment Detection Utilities", () => {
             expect(isProduction()).toBe(false);
         });
 
-        it("should be case sensitive", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be case sensitive", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: environment", "component");
             await annotate("Category: Utility", "category");
@@ -787,10 +778,7 @@ describe("Environment Detection Utilities", () => {
             expect(isTest()).toBe(false);
         });
 
-        it("should be case sensitive", async ({
-            task,
-            annotate,
-        }) => {
+        it("should be case sensitive", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: environment", "component");
             await annotate("Category: Utility", "category");

@@ -166,10 +166,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("clearTimeout", () => {
-        it("should clear existing timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should clear existing timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
@@ -413,10 +410,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and Error Conditions", () => {
-        it("should handle zero timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle zero timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
@@ -432,10 +426,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should handle negative timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle negative timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
@@ -448,10 +439,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(1);
         });
 
-        it("should handle very large timeout", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle very large timeout", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
@@ -464,10 +452,7 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(1);
         });
 
-        it("should handle empty operation ID", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty operation ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");

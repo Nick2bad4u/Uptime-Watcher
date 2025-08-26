@@ -84,10 +84,7 @@ describe("testHelpers", () => {
             expect(customMonitor.monitoring).toBe(false);
         });
 
-        it("should handle all monitor statuses", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all monitor statuses", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");
@@ -104,10 +101,7 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle all monitor types", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle all monitor types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");
@@ -123,10 +117,7 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle optional properties", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle optional properties", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");
@@ -146,10 +137,7 @@ describe("testHelpers", () => {
             expect(minimalMonitor.url).toBe("https://minimal.example.com");
         });
 
-        it("should handle complex overrides", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle complex overrides", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");
@@ -254,10 +242,7 @@ describe("testHelpers", () => {
             }
         });
 
-        it("should handle boundary values", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle boundary values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");
@@ -442,10 +427,7 @@ describe("testHelpers", () => {
             expect(monitors).toEqual([]);
         });
 
-        it("should create independent objects", async ({
-            task,
-            annotate,
-        }) => {
+        it("should create independent objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Shared", "category");

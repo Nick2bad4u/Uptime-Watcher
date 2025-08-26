@@ -69,7 +69,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should process monitor when monitor is defined", ({ task, annotate }) => {
+        it("should process monitor when monitor is defined", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -108,7 +111,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Monitor Type Option Finding Branches", () => {
-        it("should use monitor type label when option is found", ({ task, annotate }) => {
+        it("should use monitor type label when option is found", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -145,7 +151,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should fallback to monitor.type when option is not found", ({ task, annotate }) => {
+        it("should fallback to monitor.type when option is not found", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -221,7 +230,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle port monitor with host and port", ({ task, annotate }) => {
+        it("should handle port monitor with host and port", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -259,7 +271,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle ping monitor without URL or port", ({ task, annotate }) => {
+        it("should handle ping monitor without URL or port", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -365,7 +380,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             expect(screen.getByTestId("chart-items")).toHaveTextContent("0");
         });
 
-        it("should handle both monitor and no monitor cases", ({ task, annotate }) => {
+        it("should handle both monitor and no monitor cases", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -386,7 +404,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor property differences", ({ task, annotate }) => {
+        it("should handle monitor property differences", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -500,7 +521,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Edge Cases and Complex Scenarios", () => {
-        it("should handle monitor with all optional properties undefined", ({ task, annotate }) => {
+        it("should handle monitor with all optional properties undefined", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -536,7 +560,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor with partial properties", ({ task, annotate }) => {
+        it("should handle monitor with partial properties", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -574,7 +601,10 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should verify maxItems is passed correctly", ({ task, annotate }) => {
+        it("should verify maxItems is passed correctly", ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: SiteCardHistory.branch-coverage", "component");
             annotate("Category: Component", "category");

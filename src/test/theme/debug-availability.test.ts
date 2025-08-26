@@ -5,13 +5,13 @@ import { useAvailabilityColors } from "../../theme/useTheme";
 
 describe("Debug Availability Description", () => {
     it("should debug actual availability description values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: debug-availability", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: debug-availability", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Business Logic", "type");
 
         const { result } = renderHook(() => useAvailabilityColors());
 

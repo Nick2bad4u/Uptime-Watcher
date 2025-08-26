@@ -139,15 +139,15 @@ describe("SiteCard Component", () => {
     });
 
     it("should render without crashing", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Business Logic", "type");
 
         render(<SiteCard site={mockSite} />);
 
@@ -163,15 +163,15 @@ describe("SiteCard Component", () => {
     });
 
     it("should handle site with no monitors", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
         const siteWithoutMonitors = {
             ...mockSite,
@@ -184,15 +184,15 @@ describe("SiteCard Component", () => {
     });
 
     it("should handle site with multiple monitors", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCard", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: SiteCard", "component");
+        annotate("Category: Component", "category");
+        annotate("Type: Monitoring", "type");
 
         const siteWithMultipleMonitors = createMockSite({
             ...mockSite,

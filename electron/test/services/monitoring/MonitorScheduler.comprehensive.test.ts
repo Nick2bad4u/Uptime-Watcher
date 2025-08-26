@@ -661,10 +661,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             scheduler.setCheckCallback(mockCheckCallback);
         });
 
-        it("should stop all active monitoring", async ({
-            task,
-            annotate,
-        }) => {
+        it("should stop all active monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorScheduler", "component");
             await annotate("Category: Service", "category");

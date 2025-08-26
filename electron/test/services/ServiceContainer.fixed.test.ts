@@ -468,10 +468,7 @@ describe("ServiceContainer - Fixed Tests", () => {
             expect(orchestrator).toBeDefined();
         });
 
-        it("should handle empty configuration", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle empty configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: ServiceContainer", "component");
             await annotate("Category: Service", "category");

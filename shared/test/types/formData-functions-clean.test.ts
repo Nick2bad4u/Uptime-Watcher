@@ -66,10 +66,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isHttpFormData(minimalFormData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
@@ -78,10 +75,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isHttpFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
@@ -214,10 +208,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isPingFormData(minimalFormData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
@@ -226,10 +217,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isPingFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
@@ -335,10 +323,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isPortFormData(minimalFormData)).toBe(true);
         });
 
-        it("should return false for null", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
@@ -347,10 +332,7 @@ describe("shared/types/formData function coverage", () => {
             expect(isPortFormData(null as any)).toBe(false);
         });
 
-        it("should return false for undefined", async ({
-            task,
-            annotate,
-        }) => {
+        it("should return false for undefined", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: formData-functions-clean", "component");
             await annotate("Category: Shared", "category");
