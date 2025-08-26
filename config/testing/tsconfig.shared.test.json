@@ -7,7 +7,11 @@
         "tsBuildInfoFile": "../../dist-shared-test/tsconfig.shared.test.tsbuildinfo",
         "composite": true,
         "incremental": true,
-        "isolatedDeclarations": false
+        "isolatedDeclarations": false,
+        "types": [
+            "node",
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "../../node_modules",

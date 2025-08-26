@@ -44,7 +44,6 @@
         "types": [
             "@testing-library/jest-dom",
             "electron",
-            "jest",
             "node",
             "react-dom",
             "react",

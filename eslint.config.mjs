@@ -176,6 +176,7 @@ import yamlEslintParser from "yaml-eslint-parser";
 const __dirname = import.meta.dirname;
 
 export default [
+    // GLobal Configs and Rules
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
@@ -303,7 +304,10 @@ export default [
             yml: eslintPluginYml,
         },
         rules: {
+            // Json Schema Validator
             "json-schema-validator/no-invalid": "error",
+
+            // YML Eslint Plugin
             "yml/block-mapping-colon-indicator-newline": "error",
             "yml/block-mapping-question-indicator-newline": "error",
             "yml/block-sequence-hyphen-indicator-newline": "error",

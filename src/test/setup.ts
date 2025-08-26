@@ -3,8 +3,8 @@
  * components.
  */
 
-import "@testing-library/jest-dom";
-import { vi, type Mock } from "vitest";
+import { vi, type Mock } from 'vitest';
+import '@testing-library/jest-dom';
 
 // Mock ResizeObserver for Chart.js testing
 globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -529,3 +529,14 @@ vi.mock("../theme/useTheme", () => ({
 
 // Export mocks for use in individual tests
 export { mockElectronAPI, mockTheme };
+
+// Custom test context setup for task and annotate properties
+// Note: The actual type definitions are in src/types/vitest-context.d.ts
+import "./vitest-context-setup";
+
+// Provide global fail function if not already defined
+if ((globalThis as any).fail === undefined) {
+    (globalThis as any).fail = (message?: string): never => {
+        throw new Error(message || "Test failed");
+    };
+}

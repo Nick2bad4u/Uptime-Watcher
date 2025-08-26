@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
 import { isValidUrl } from "../../validation/validatorUtils";
 // Import ALL functions from typeGuards to ensure coverage
 import * as typeGuards from "../../utils/typeGuards";
@@ -1255,8 +1255,16 @@ describe("Type Guards - Comprehensive Coverage", () => {
     });
 
     describe("isValidTimestamp", () => {
-        const now = Date.now();
+        const fixedTime = 1672531200000; // 2023-01-01 00:00:00 UTC
         const dayInMs = 86_400_000;
+
+        beforeAll(() => {
+            vi.spyOn(Date, "now").mockReturnValue(fixedTime);
+        });
+
+        afterAll(() => {
+            vi.restoreAllMocks();
+        });
 
         it("should return true for valid timestamps", async ({
             task,
@@ -1268,9 +1276,9 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidTimestamp(1)).toBe(true); // Very old but positive
-            expect(isValidTimestamp(now)).toBe(true); // Current time
-            expect(isValidTimestamp(now - dayInMs)).toBe(true); // Yesterday
-            expect(isValidTimestamp(now + dayInMs)).toBe(true); // Tomorrow (within allowed future)
+            expect(isValidTimestamp(fixedTime)).toBe(true); // Current time
+            expect(isValidTimestamp(fixedTime - dayInMs)).toBe(true); // Yesterday
+            expect(isValidTimestamp(fixedTime + dayInMs)).toBe(true); // Tomorrow (within allowed future)
         });
 
         it("should return false for invalid timestamps", async ({
@@ -1284,7 +1292,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isValidTimestamp(0)).toBe(false); // Not positive
             expect(isValidTimestamp(-1)).toBe(false); // Negative
-            expect(isValidTimestamp(now + dayInMs + 1000)).toBe(false); // Too far in future
+            expect(isValidTimestamp(fixedTime + dayInMs + 1000)).toBe(false); // Too far in future
         });
 
         it("should return false for non-numbers", async ({
@@ -1325,8 +1333,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidTimestamp(3.14)).toBe(true); // Decimal numbers are still valid
-            expect(isValidTimestamp(now + dayInMs - 1000)).toBe(true); // Well under limit
-            expect(isValidTimestamp(now + dayInMs + 10_000)).toBe(false); // Well over limit
+            expect(isValidTimestamp(fixedTime + dayInMs - 1000)).toBe(true); // Well under limit
+            expect(isValidTimestamp(fixedTime + dayInMs + 10_000)).toBe(false); // Well over limit
         });
     });
 

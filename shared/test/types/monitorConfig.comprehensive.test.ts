@@ -954,7 +954,7 @@ describe("Monitor Configuration Types", () => {
                     }
                     default: {
                         // This should never happen with proper typing
-                        fail(
+                        expect.fail(
                             `Unexpected monitor type: ${(config as any).type}`
                         );
                     }
