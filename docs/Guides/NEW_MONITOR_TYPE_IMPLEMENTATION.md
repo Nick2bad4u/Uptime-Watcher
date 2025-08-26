@@ -988,11 +988,10 @@ export const monitorSchema: MonitorSchemaType = z.discriminatedUnion("type", [
 
 
 
-/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` * * @public */import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";import { getMonitorRetryAttempts, getMonitorTimeout,} from "./utils/monitorTypeGuards";import { withErrorHandling } from "../../utils/errorHandling";import { generateCorrelationId } from "../../utils/correlation";import { logger } from "../../utils/logger";export class DnsMonitor implements IMonitorService { private config: MonitorConfig; private activeOperations = new Set<string>(); constructor(config: MonitorConfig = {}) {  this.config = {   timeout: DEFAULT_TIMEOUT, // Use consistent defaults
-   retryAttempts: DEFAULT_RETRY_ATTEMPTS,
-   ...config,
-  };
- }
+
+
+
+/** * DNS monitoring service with production-grade reliability and error handling. * * @remarks * Implements the IMonitorService interface with comprehensive error handling, * operation correlation for race condition prevention, and proper resource * management following ADR-003 error handling strategy. * * Features: * - Operation correlation prevents race conditions * - Memory-safe resource management * - Comprehensive error handling with correlation IDs * - Production-grade validation and logging * * @example * ```typescript * const monitor = new DnsMonitor(); * const result = await monitor.check(dnsConfig); * // Automatically integrates with enhanced monitoring system * ``` * * @public */import type { IMonitorService, MonitorCheckResult, MonitorConfig } from "./types";import { DEFAULT_RETRY_ATTEMPTS, DEFAULT_TIMEOUT } from "./constants";import { getMonitorRetryAttempts, getMonitorTimeout,} from "./utils/monitorTypeGuards";import { withErrorHandling } from "../../utils/errorHandling";import { generateCorrelationId } from "../../utils/correlation";import { logger } from "../../utils/logger";export class DnsMonitor implements IMonitorService { private config: MonitorConfig; private activeOperations = new Set<string>(); constructor(config: MonitorConfig = {}) {  this.config = {   timeout: DEFAULT_TIMEOUT, // Use consistent defaults   retryAttempts: DEFAULT_RETRY_ATTEMPTS,   ...config,  }; }
 
  /**
   * Performs DNS monitoring check with comprehensive error handling and operation correlation.
@@ -2131,11 +2130,10 @@ Test the Zod schema thoroughly:
 
 
 
-```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true); }); it("should reject invalid configurations", () => {  // Test various invalid configurations });});```---## 🎯 DNS Implementation Success Summary### **✅ Implementation Verified Complete**The DNS monitoring implementation has been **comprehensively verified** across all system layers and is **fully operational**. The systematic review confirms:**Backend Implementation (Electron)**:- ✅ `DnsMonitor.ts` - Complete service with all DNS record types (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY)- ✅ `MonitorTypeRegistry.ts` - Proper registration with UI configuration- ✅ Enhanced monitoring system integration**Shared Layer (TypeScript)**:
-- ✅ `schemas.ts` - Comprehensive Zod validation with discriminated unions
-- ✅ `validation.ts` - Runtime validation functions
-- ✅ `types.ts` - Updated BASE_MONITOR_TYPES array
 
+
+
+```typescriptdescribe("YourMonitor Schema Validation", () => { it("should validate correct monitor configuration", () => {  const validConfig = {   // Valid monitor configuration  };  const result = yourMonitorSchema.safeParse(validConfig);  expect(result.success).toBe(true); }); it("should reject invalid configurations", () => {  // Test various invalid configurations });});```---## 🎯 DNS Implementation Success Summary### **✅ Implementation Verified Complete**The DNS monitoring implementation has been **comprehensively verified** across all system layers and is **fully operational**. The systematic review confirms:**Backend Implementation (Electron)**:- ✅ `DnsMonitor.ts` - Complete service with all DNS record types (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY)- ✅ `MonitorTypeRegistry.ts` - Proper registration with UI configuration- ✅ Enhanced monitoring system integration**Shared Layer (TypeScript)**:- ✅ `schemas.ts` - Comprehensive Zod validation with discriminated unions- ✅ `validation.ts` - Runtime validation functions- ✅ `types.ts` - Updated BASE_MONITOR_TYPES array
 **Frontend Implementation (React)**:
 - ✅ `DynamicMonitorFields.tsx` - Dynamic UI with ANY record special handling
 - ✅ `Submit.tsx` - Safe string processing with safeTrim utility
