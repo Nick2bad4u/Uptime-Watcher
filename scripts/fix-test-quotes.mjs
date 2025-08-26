@@ -127,7 +127,7 @@ function fixFileQuotes(filePath) {
         return false;
 
     } catch (error) {
-        console.error(`❌ Error fixing ${filePath}:`, error.message);
+        console.error(`❌ Error fixing ${filePath}:`, error instanceof Error ? error.message : String(error));
         return false;
     }
 }
@@ -155,7 +155,7 @@ function findTestFiles(dir, pattern) {
             }
         }
     } catch (error) {
-        console.error(`Error reading directory ${dir}:`, error.message);
+        console.error(`Error reading directory ${dir}:`, error instanceof Error ? error.message : String(error));
     }
 
     return files;
@@ -187,7 +187,7 @@ function main() {
                 fixed++;
             }
         } catch (error) {
-            console.error(`❌ Error processing ${filePath}:`, error.message);
+            console.error(`❌ Error processing ${filePath}:`, error instanceof Error ? error.message : String(error));
             errors++;
         }
     }

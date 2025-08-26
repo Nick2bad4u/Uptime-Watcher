@@ -6,16 +6,16 @@
 # See documentation for more information on available options.
 
 [changelog]
-# template for the changelog header
-header = """
+  # template for the changelog header
+  header = """
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
 # Changelog\n
 All notable changes to this project will be documented in this file.\n
 """
-# template for the changelog body
-# https://keats.github.io/tera/docs/#introduction
-body = """
+  # template for the changelog body
+  # https://keats.github.io/tera/docs/#introduction
+  body = """
 {% if version %}\
   ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else %}\
@@ -49,143 +49,143 @@ body = """
   {{ commit.footer | trim | indent(width=8) }}
 {% endif %}
 """
-# template for the changelog footer
-footer = """
+  # template for the changelog footer
+  footer = """
 ## Contributors
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
 ## License
 This project is licensed under the [UnLicense](https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE)
 *This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
 """
-# Remove leading and trailing whitespace from the changelog content
-trim = true
-# postprocessors
-render_always = true
-protect_breaking_commits = false
-postprocessors = [
-  # { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
-  { pattern = 'merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
-  { pattern = 'Merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
-  { pattern = '\[dependency\]', replace = 'test' },
-  # Clean up Dependabot messages - remove verbose table content
-  { pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependencies" },
-  { pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update npm dependencies" },
-  { pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependency group" },
+  # Remove leading and trailing whitespace from the changelog content
+  trim = true
+  # postprocessors
+  postprocessors = [
+    # { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
+    { pattern = 'Merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
+    { pattern = '\[dependency\]', replace = 'test' },
+    { pattern = 'merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
+    # Clean up Dependabot messages - remove verbose table content
+    { pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependency group" },
+    { pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update npm dependencies" },
+    { pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependencies" },
 
-  # Clean up individual package bump messages
-  { pattern = 'Bumps \[([^\]]+)\].*?from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
-  { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
-  { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
-  { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
-  { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
-  # Generic bump message cleanup
-  { pattern = 'Bump', replace = "[dependency] Update" },
+    # Clean up individual package bump messages
+    { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
+    { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
+    { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
+    { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
+    { pattern = 'Bumps \[([^\]]+)\].*?from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
+    # Generic bump message cleanup
+    { pattern = 'Bump', replace = "[dependency] Update" },
 
-]
-# render body even when there are no releases to process
-# render_always = true
-# output file path
-# output = "test.md"
+  ]
+  protect_breaking_commits = false
+  render_always = true
+  # render body even when there are no releases to process
+  # render_always = true
+  # output file path
+  # output = "test.md"
 
 [git]
-# parse the commits based on https://www.conventionalcommits.org
-conventional_commits = true
-# filter out the commits that are not conventional
-filter_unconventional = false
-# process each line of a commit as an individual commit
-split_commits = false
-# regex for preprocessing the commit messages
-use_branch_tags = false
-# use branch tags to group commits
-recurse_submodules = true
-# recurse into submodules to find commits
-commit_preprocessors = [
-  # Replace issue numbers
-  # This regex pattern matches issue references in the format "(optional text #123)" 
-  # and replaces them with a markdown link to the issue, e.g., "[#123](<REPO>/issues/123)".
-  #{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
-  # Example: Check spelling of the commit with the `typos` tool.
-  # For more information, visit: https://github.com/crate-ci/typos
-  #{ pattern = '.*', replace_command = 'typos --write-changes -' },
-  # If the spelling is incorrect, it will be automatically fixed.
-  #{ pattern = '.*', replace_command = 'typos --write-changes -' },
-]
-# regex for parsing and grouping commits
-# Commit parsers use emojis and HTML comments for categorization.
-# This convention helps in visually distinguishing commit groups.
-# Updated to match the project's commit emoji conventions:
-# 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️ [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test]
-commit_parsers = [
-  # Project-specific emoji-based commit types
-  { message = "^✨.*\\[feat\\]", group = "<!-- 0 -->✨ Features" },
-  { message = "^🛠️.*\\[fix\\]", group = "<!-- 1 -->🛠️ Bug Fixes" },
-  { message = "^🚜.*\\[refactor\\]", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^📝.*\\[docs\\]", group = "<!-- 3 -->📝 Documentation" },
-  { message = "^⚡.*\\[perf\\]", group = "<!-- 4 -->⚡ Performance" },
-  { message = "^🎨.*\\[style\\]", group = "<!-- 5 -->🎨 Styling" },
-  { message = "^🧪.*\\[test\\]", group = "<!-- 6 -->🧪 Testing" },
-  { message = "^🧹.*\\[chore\\]", group = "<!-- 7 -->🧹 Chores" },
-  { message = "^👷.*\\[ci\\]", group = "<!-- 8 -->👷 CI/CD" },
-  { message = "^🔧.*\\[build\\]", group = "<!-- 9 -->🔧 Build System" },
-  { message = "^⏪.*\\[revert\\]", group = "<!-- 10 -->⏪ Reverts" },
+  # parse the commits based on https://www.conventionalcommits.org
+  conventional_commits = true
+  # filter out the commits that are not conventional
+  filter_unconventional = false
+  # process each line of a commit as an individual commit
+  split_commits = false
+  # regex for preprocessing the commit messages
+  use_branch_tags = false
+  # use branch tags to group commits
+  recurse_submodules = true
+  # recurse into submodules to find commits
+  # commit_preprocessors = [
+  #   # Replace issue numbers
+  #   # This regex pattern matches issue references in the format "(optional text #123)"
+  #   # and replaces them with a markdown link to the issue, e.g., "[#123](<REPO>/issues/123)".
+  #   { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
+  #   # Example: Check spelling of the commit with the `typos` tool.
+  #   # For more information, visit: https://github.com/crate-ci/typos
+  #   { pattern = '.*', replace_command = 'typos --write-changes -' },
+  #   # If the spelling is incorrect, it will be automatically fixed.
+  #   { pattern = '.*', replace_command = 'typos --write-changes -' },
+  # ]
+  # regex for parsing and grouping commits
+  # Commit parsers use emojis and HTML comments for categorization.
+  # This convention helps in visually distinguishing commit groups.
+  # Updated to match the project's commit emoji conventions:
+  # 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️ [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test]
+  commit_parsers = [
+    # Project-specific emoji-based commit types
+    { message = "^⏪.*\\[revert\\]", group = "<!-- 10 -->⏪ Reverts" },
+    { message = "^⚡.*\\[perf\\]", group = "<!-- 4 -->⚡ Performance" },
+    { message = "^✨.*\\[feat\\]", group = "<!-- 0 -->✨ Features" },
+    { message = "^🎨.*\\[style\\]", group = "<!-- 5 -->🎨 Styling" },
+    { message = "^👷.*\\[ci\\]", group = "<!-- 8 -->👷 CI/CD" },
+    { message = "^📝.*\\[docs\\]", group = "<!-- 3 -->📝 Documentation" },
+    { message = "^🔧.*\\[build\\]", group = "<!-- 9 -->🔧 Build System" },
+    { message = "^🚜.*\\[refactor\\]", group = "<!-- 2 -->🚜 Refactor" },
+    { message = "^🛠️.*\\[fix\\]", group = "<!-- 1 -->🛠️ Bug Fixes" },
+    { message = "^🧪.*\\[test\\]", group = "<!-- 6 -->🧪 Testing" },
+    { message = "^🧹.*\\[chore\\]", group = "<!-- 7 -->🧹 Chores" },
 
-  # Fallback patterns for conventional commits without emojis
-  { message = "^feat", group = "<!-- 0 -->✨ Features" },
-  { message = "^fix", group = "<!-- 1 -->🛠️ Bug Fixes" },
-  { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^docs?", group = "<!-- 3 -->📝 Documentation" },
-  { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
-  { message = "^style", group = "<!-- 5 -->🎨 Styling" },
-  { message = "^test", group = "<!-- 6 -->🧪 Testing" },
-  { message = "^build", group = "<!-- 9 -->🔧 Build System" },
-  { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
+    # Fallback patterns for conventional commits without emojis
+    { message = "^build", group = "<!-- 9 -->🔧 Build System" },
+    { message = "^ci", group = "<!-- 8 -->👷 CI/CD" },
+    { message = "^docs?", group = "<!-- 3 -->📝 Documentation" },
+    { message = "^feat", group = "<!-- 0 -->✨ Features" },
+    { message = "^fix", group = "<!-- 1 -->🛠️ Bug Fixes" },
+    { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
+    { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
+    { message = "^style", group = "<!-- 5 -->🎨 Styling" },
+    { message = "^test", group = "<!-- 6 -->🧪 Testing" },
 
-  # Skip noisy commit types
-  { message = "^chore\\(release\\): prepare for", skip = true },
-  { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^chore\\(pr\\)", skip = true },
-  { message = "^chore\\(pull\\)", skip = true },
-  { message = "^chore", group = "<!-- 7 -->🧹 Chores" },
+    # Skip noisy commit types
+    { message = "^chore", group = "<!-- 7 -->🧹 Chores" },
+    { message = "^chore\\(deps.*\\)", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^chore\\(pr\\)", skip = true },
+    { message = "^chore\\(pull\\)", skip = true },
+    { message = "^chore\\(release\\): prepare for", skip = true },
 
-  # Dependency-related commits (improved patterns)
-  { message = "^\\[dependency\\]", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bump the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bumps the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 11 -->📦 Dependencies" },
-  { message = "^Bumps \\[.*\\]", group = "<!-- 11 -->📦 Dependencies" },
-  { message = ".*npm-all.*", group = "<!-- 11 -->📦 Dependencies" },
-  { message = ".*dependabot.*", group = "<!-- 11 -->📦 Dependencies" },
+    # Dependency-related commits (improved patterns)
+    { message = ".*dependabot.*", group = "<!-- 11 -->📦 Dependencies" },
+    { message = ".*npm-all.*", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^Bump [a-zA-Z0-9@\\-\\/]+", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^Bump the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^Bumps \\[.*\\]", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^Bumps the.*group with \\d+ updates", group = "<!-- 11 -->📦 Dependencies" },
+    { message = "^\\[dependency\\]", group = "<!-- 11 -->📦 Dependencies" },
 
-  # Security-related (keep separate from general dependencies)
-  { body = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
-  { message = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
+    # Security-related (keep separate from general dependencies)
+    { body = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
+    { message = ".*security.*", group = "<!-- 12 -->🛡️ Security" },
 
-  # Revert commits
-  { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
+    # Revert commits
+    { message = "^revert", group = "<!-- 10 -->⏪ Reverts" },
 
-  # Skip merge commits unless explicitly needed
-  { message = "^Merge branch", skip = true },
-  { message = "^merge branch", skip = true },
-  { message = "^Merge pull request", skip = true },
+    # Skip merge commits unless explicitly needed
+    { message = "^Merge branch", skip = true },
+    { message = "^Merge pull request", skip = true },
+    { message = "^merge branch", skip = true },
 
-  # CI/CD file changes
-  { message = ".*\\.ya?ml", group = "<!-- 8 -->👷 CI/CD" },
-  { message = ".*workflow.*", group = "<!-- 8 -->� CI/CD" },
+    # CI/CD file changes
+    { message = ".*\\.ya?ml", group = "<!-- 8 -->👷 CI/CD" },
+    { message = ".*workflow.*", group = "<!-- 8 -->👷 CI/CD" },
 
-  # Catch-all for miscellaneous changes
-  { message = ".*", group = "<!-- 13 -->� Other Changes" },
-]
-# filter out the commits that are not matched by commit parsers
-filter_commits = false
-# sort the tags topologically
-topo_order = true
-# sort the commits inside sections by oldest/newest order
-# possible values: "oldest" (chronological order) or "newest" (reverse chronological order)
-sort_commits = "newest"
+    # Catch-all for miscellaneous changes
+    { message = ".*", group = "<!-- 13 -->🛠️ Other Changes" },
+  ]
+  # filter out the commits that are not matched by commit parsers
+  filter_commits = false
+  # sort the tags topologically
+  topo_order = true
+  # sort the commits inside sections by oldest/newest order
+  # possible values: "oldest" (chronological order) or "newest" (reverse chronological order)
+  sort_commits = "newest"
 
-# GitHub integration for better changelog links
-# [remote.github]
-# owner = "Nick2bad4u"
-# repo = "Uptime-Watcher"
-# api_url = "https://api.github.com"
-# native_tls = false
+  # GitHub integration for better changelog links
+  # [remote.github]
+  # owner = "Nick2bad4u"
+  # repo = "Uptime-Watcher"
+  # api_url = "https://api.github.com"
+  # native_tls = false

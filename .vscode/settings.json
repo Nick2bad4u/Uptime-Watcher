@@ -83,7 +83,8 @@
         "**/html/**": true,
         "**/report/**": true,
         "**/docs/docusaurus/docs/**": true,
-        "**/docs/docusaurus/build/**": true
+        "**/docs/docusaurus/build/**": true,
+        "**/dist-bench/**": true
     },
     "files.watcherExclude": {
         "**/.husky/**": true,

@@ -175,7 +175,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 } catch (readErr) {
                     console.error(
                         logMsg.replace("✅", "❌").replace("📘", "❌") +
-                            ` → Failed to read file: ${readErr.message}`
+                            ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
                     );
                     return reject(readErr);
                 }
@@ -193,7 +193,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
                 } catch (writeErr) {
                     console.error(
                         logMsg.replace("✅", "❌").replace("📘", "❌") +
-                            ` → Failed to write file: ${writeErr.message}`
+                            ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
                     );
                     return reject(writeErr);
                 }

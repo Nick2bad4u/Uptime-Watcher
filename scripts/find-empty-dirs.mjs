@@ -195,7 +195,7 @@ for (const dir of targetDirs) {
             );
         }
         if (isVerbose) {
-            console.log(`   Error: ${err.message}`);
+            console.log(`   Error: ${err instanceof Error ? err.message : String(err)}`);
         }
     }
 }
@@ -255,10 +255,10 @@ async function isDirectory(path) {
         const stats = await stat(path);
         return stats.isDirectory();
     } catch (err) {
-        if (err && err.code === "EACCES") {
+        if (err && typeof err === 'object' && 'code' in err && err.code === "EACCES") {
             console.warn(`Permission denied: ${path}`);
         } else {
-            console.warn(`Error accessing ${path}:`, err.message || err);
+            console.warn(`Error accessing ${path}:`, err instanceof Error ? err.message : String(err));
         }
         return false;
     }
@@ -278,7 +278,7 @@ async function safeReadDir(dir) {
     } catch (err) {
         console.warn(
             `Error reading directory ${dir}:`,
-            err && err.message ? err.message : err
+            err instanceof Error ? err.message : String(err)
         );
         return [];
     }
@@ -369,7 +369,7 @@ async function safeDeleteDir(dirPath) {
     } catch (err) {
         console.error(
             `❌ Failed to delete ${relative(ROOT_DIR, dirPath)}:`,
-            err.message || err
+            err instanceof Error ? err.message : String(err)
         );
         return false;
     }

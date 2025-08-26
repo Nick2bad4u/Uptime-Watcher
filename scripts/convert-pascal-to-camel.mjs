@@ -88,7 +88,7 @@ function processDirectory(dirPath, dryRun = false) {
                     } catch (error) {
                         console.error(
                             `Error renaming ${fullPath}:`,
-                            error.message
+                            error instanceof Error ? error.message : String(error)
                         );
                     }
                 }
@@ -125,7 +125,7 @@ function main() {
             );
         }
     } catch (error) {
-        console.error("Error during conversion:", error.message);
+        console.error("Error during conversion:", error instanceof Error ? error.message : String(error));
         process.exit(1);
     }
 }

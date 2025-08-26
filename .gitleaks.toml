@@ -17,9 +17,7 @@ useDefault = true
 
 # Disable overly broad rules that generate false positives
 # in JavaScript/TypeScript development environments
-disabledRules = [
-    "generic-api-key", # Too broad for demo URLs and example code
-]
+disabledRules = [ "generic-api-key", ]
 
 # Performance optimizations enabled by default in v8.28+
 # - Stopword optimization (promoted from experimental)
@@ -32,36 +30,67 @@ id = "electron-config-secrets"
 description = "Detect hardcoded secrets in Electron configuration files"
 regex = '''(?i)(electron[_-]?(?:secret|key|token|password|credential))\s*[:=]\s*["']?([a-zA-Z0-9]{16,})["']?'''
 secretGroup = 2
-keywords = ["electron", "secret", "key", "token", "password"]
-tags = ["electron", "configuration", "secrets"]
+keywords = [
+ "electron",
+"secret",
+"key",
+"token",
+"password"
+]
+tags = [
+"electron",
+"configuration",
+"secrets"
+]
 
 [[rules.allowlists]]
 description = "Allow example values in documentation"
-paths = ['''docs/.*\.(md|txt|rst)$''']
+paths = [ '''docs/.*\.(md|txt|rst)$''' ]
 regexTarget = "secret"
-regexes = ['''(?i)(example|demo|placeholder|test|sample)''']
+regexes = [ '''(?i)(example|demo|placeholder|test|sample)''' ]
 
 [[rules]]
 id = "database-connection-strings"
 description = "Detect database connection strings with embedded credentials"
 regex = '''(?i)(database_url|db_url|connection_string)\s*[:=]\s*["']?([^"'\s]+://[^"'\s]*:[^"'\s]*@[^"'\s]+)["']?'''
 secretGroup = 2
-keywords = ["database", "connection", "url", "db"]
-tags = ["database", "credentials", "connection-string"]
+keywords = [
+ "database",
+"connection",
+"url",
+"db"
+]
+tags = [
+ "database",
+"credentials",
+"connection-string"
+]
 
 [[rules.allowlists]]
 description = "Allow example connection strings in documentation"
-paths = ['''docs/.*\.(md|txt|rst)$''']
+paths = [ '''docs/.*\.(md|txt|rst)$''' ]
 regexTarget = "secret"
-regexes = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
+regexes = [ '''(?i)(example|localhost|127\.0\.0\.1|test|demo)''' ]
 
 [[rules]]
 id = "vite-env-secrets"
 description = "Detect secrets in Vite environment variable definitions"
 regex = '''(?i)VITE_(?:API_|SECRET_|PASSWORD_|TOKEN_|KEY_)[A-Z0-9_]*\s*[:=]\s*["']?([a-zA-Z0-9+/=]{16,})["']?'''
 secretGroup = 1
-keywords = ["vite_", "api_", "secret_", "password_", "token_", "key_"]
-tags = ["vite", "environment", "frontend", "secrets"]
+keywords = [
+ "vite_",
+"api_",
+"secret_",
+"password_",
+"token_",
+"key_"
+]
+tags = [
+ "vite",
+"environment",
+"frontend",
+"secrets"
+]
 
 [[rules.allowlists]]
 description = "Allow development and test values"
@@ -76,15 +105,26 @@ regexes = [
 id = "anthropic-enhanced-detection"
 description = "Enhanced detection for Anthropic API keys including all variants"
 regex = '''\b(sk-ant-(?:api03|admin01)-[a-zA-Z0-9_\-]{93}AA)(?:[\x60'"\s;]|\\[nr]|$)'''
-keywords = ["sk-ant-api03", "sk-ant-admin01"]
-tags = ["ai", "anthropic", "api-key"]
+keywords = [
+ "sk-ant-api03",
+"sk-ant-admin01"
+]
+tags = [
+ "ai",
+"anthropic",
+"api-key"
+]
 
 [[rules]]
 id = "perplexity-api-detection"
 description = "Detect Perplexity AI API keys"
 regex = '''\b(pplx-[a-zA-Z0-9]{48})(?:[\x60'"\s;]|\\[nr]|$)'''
-keywords = ["pplx-"]
-tags = ["ai", "perplexity", "api-key"]
+keywords = [ "pplx-" ]
+tags = [
+ "ai",
+"perplexity",
+"api-key"
+]
 
 # Global allowlists to reduce false positives
 [[allowlists]]
@@ -140,13 +180,16 @@ paths = [
 
 [[allowlists]]
 description = "Ignore documentation files"
-paths = ['''LICENSE$''', '''docs/.*\.(md|txt|rst)$''']
+paths = [
+ '''LICENSE$''',
+'''docs/.*\.(md|txt|rst)$'''
+]
 
 [[allowlists]]
 description = "Ignore Chart.js usage documentation with cubeToken example"
-paths = ['''docs/Packages/Chart\.js/getting-started/usage\.md''']
+paths = [ '''docs/Packages/Chart\.js/getting-started/usage\.md''' ]
 regexTarget = "line"
-regexes = ['''cubeToken''']
+regexes = [ '''cubeToken''' ]
 
 # Enhanced allowlist for common development patterns (v8.28+ optimizations)
 [[allowlists]]
@@ -234,4 +277,4 @@ regexes = [
 
 [[allowlists]]
 description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
-paths = ['''\.secretlintrc\.json$''']
+paths = [ '''\.secretlintrc\.json$''' ]
