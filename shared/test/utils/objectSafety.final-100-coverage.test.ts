@@ -8,7 +8,15 @@ import { safeObjectOmit } from "../../utils/objectSafety";
 
 describe("Object Safety - Final 100% Coverage", () => {
     describe("Targeting Line 142 (symbol properties omitting)", () => {
-        it("should handle omitting symbol properties", () => {
+        it("should handle omitting symbol properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testSymbol = Symbol("test");
             const omitSymbol = Symbol("omit");
 
@@ -27,7 +35,15 @@ describe("Object Safety - Final 100% Coverage", () => {
             expect((result as any)[omitSymbol]).toBeUndefined();
         });
 
-        it("should handle omitting multiple symbol properties", () => {
+        it("should handle omitting multiple symbol properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testSymbol1 = Symbol("test1");
             const testSymbol2 = Symbol("test2");
             const keepSymbol = Symbol("keep");
@@ -52,7 +68,15 @@ describe("Object Safety - Final 100% Coverage", () => {
             expect((result as any)[testSymbol2]).toBeUndefined();
         });
 
-        it("should handle objects with symbol properties when none are omitted", () => {
+        it("should handle objects with symbol properties when none are omitted", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testSymbol = Symbol("test");
 
             const testObject = {
@@ -64,11 +88,19 @@ describe("Object Safety - Final 100% Coverage", () => {
             const result = safeObjectOmit(testObject, []);
 
             // Should see both the regular property and the symbol property
-            expect(result.regularProp).toBe("value");
-            expect(result[testSymbol]).toBe("symbol value");
+            expect((result as any).regularProp).toBe("value");
+            expect((result as any)[testSymbol]).toBe("symbol value");
         });
 
-        it("should handle edge case with symbol property names and ensure line 142 coverage", () => {
+        it("should handle edge case with symbol property names and ensure line 142 coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const symbol1 = Symbol("first");
             const symbol2 = Symbol("second");
             const symbol3 = Symbol("third");
@@ -90,7 +122,15 @@ describe("Object Safety - Final 100% Coverage", () => {
             expect((result as any)[symbol2]).toBeUndefined();
         });
 
-        it("should ensure both branches of line 142 are covered", () => {
+        it("should ensure both branches of line 142 are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: objectSafety.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const includeSymbol = Symbol("include");
             const omitSymbol = Symbol("omit");
 

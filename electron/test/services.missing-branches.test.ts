@@ -35,7 +35,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Error Handling Paths", () => {
-        it("should handle various error scenarios in service operations", async () => {
+        it("should handle various error scenarios in service operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test different types of errors
             const errors = [
                 new Error("Standard error"),
@@ -66,7 +74,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle async error scenarios", async () => {
+        it("should handle async error scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const asyncOperations = [
                 Promise.resolve("success"),
                 Promise.reject(new Error("async error")),
@@ -86,7 +102,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Configuration Edge Cases", () => {
-        it("should handle various configuration states", () => {
+        it("should handle various configuration states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const configurations = [
                 null,
                 undefined,
@@ -136,7 +160,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Data Processing Edge Cases", () => {
-        it("should handle various data transformation scenarios", () => {
+        it("should handle various data transformation scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const inputData = [
                 null,
                 undefined,
@@ -194,7 +226,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle data validation scenarios", () => {
+        it("should handle data validation scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Simple boolean validation test
             const result1 = true;
             const result2 = false;
@@ -212,7 +252,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Concurrency Edge Cases", () => {
-        it("should handle concurrent operations", async () => {
+        it("should handle concurrent operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operations = Array.from(
                 { length: 50 },
                 (_, i) =>
@@ -239,7 +287,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             ).toBe(true);
         });
 
-        it("should handle mixed success/failure scenarios", async () => {
+        it("should handle mixed success/failure scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mixedOperations = Array.from({ length: 20 }, (_, i) => {
                 if (i % 3 === 0) {
                     return Promise.reject(new Error(`Error ${i}`));
@@ -256,7 +312,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Resource Management Edge Cases", () => {
-        it("should handle resource cleanup scenarios", () => {
+        it("should handle resource cleanup scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const resources = [
                 { cleanup: vi.fn() },
                 {
@@ -290,7 +354,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle timeout scenarios", async () => {
+        it("should handle timeout scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timeoutOperations = [
                 new Promise((resolve) => setTimeout(() => resolve("fast"), 1)),
                 new Promise((resolve) =>
@@ -313,7 +385,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("State Management Edge Cases", () => {
-        it("should handle various state transitions", () => {
+        it("should handle various state transitions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const states = [
                 "initial",
                 "loading",
@@ -357,7 +437,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle state validation", () => {
+        it("should handle state validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const stateValidationCases = [
                 { state: "loading", isValid: true },
                 { state: "success", isValid: true },
@@ -389,7 +477,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Event System Edge Cases", () => {
-        it("should handle event emission edge cases", () => {
+        it("should handle event emission edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const eventHandlers = [
                 vi.fn(),
                 vi.fn(() => {
@@ -421,7 +517,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle event listener management", () => {
+        it("should handle event listener management", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const listeners = new Map();
             const events = [
                 "connect",
@@ -450,7 +554,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
     });
 
     describe("Performance Edge Cases", () => {
-        it("should handle performance monitoring scenarios", () => {
+        it("should handle performance monitoring scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const operations = [
                 () => Math.random(),
                 () => Date.now(),
@@ -472,7 +584,15 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             }
         });
 
-        it("should handle memory usage scenarios", () => {
+        it("should handle memory usage scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: services.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const memoryOperations = [
                 () => Array.from({ length: 1000 }, () => 0),
                 () =>

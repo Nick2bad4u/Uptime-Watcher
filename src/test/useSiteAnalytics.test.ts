@@ -113,7 +113,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Hook Initialization", () => {
-        it("should return default analytics for undefined monitor", () => {
+        it("should return default analytics for undefined monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(undefined, "24h")
             );
@@ -138,7 +146,15 @@ describe("useSiteAnalytics", () => {
             });
         });
 
-        it("should return default analytics for monitor with empty history", () => {
+        it("should return default analytics for monitor with empty history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorEmpty, "24h")
             );
@@ -163,7 +179,15 @@ describe("useSiteAnalytics", () => {
             });
         });
 
-        it("should use default time range when not provided", () => {
+        it("should use default time range when not provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory)
             );
@@ -173,7 +197,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.filteredHistory).toHaveLength(6);
         });
 
-        it("should sanitize invalid time range to default", () => {
+        it("should sanitize invalid time range to default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(
                     mockMonitorWithHistory,
@@ -188,7 +220,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Time Range Filtering", () => {
-        it("should filter history by 1h time range", () => {
+        it("should filter history by 1h time range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
             );
@@ -199,7 +239,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.downCount).toBe(2);
         });
 
-        it("should filter history by 24h time range", () => {
+        it("should filter history by 24h time range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "24h")
             );
@@ -210,7 +258,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.downCount).toBe(2);
         });
 
-        it("should filter history by 7d time range", () => {
+        it("should filter history by 7d time range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "7d")
             );
@@ -221,7 +277,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.downCount).toBe(3);
         });
 
-        it("should filter history by 30d time range", () => {
+        it("should filter history by 30d time range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "30d")
             );
@@ -234,7 +298,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Basic Metrics Calculation", () => {
-        it("should calculate uptime percentage correctly", () => {
+        it("should calculate uptime percentage correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
             );
@@ -244,7 +316,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.uptime).toBe("60.00");
         });
 
-        it("should calculate average response time correctly", () => {
+        it("should calculate average response time correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
             );
@@ -253,7 +333,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.avgResponseTime).toBe(130);
         });
 
-        it("should handle zero total checks gracefully", () => {
+        it("should handle zero total checks gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptyMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [createStatusRecord(oneWeekAgo, "up", 100)], // Outside 24h range
@@ -269,7 +357,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Performance Metrics", () => {
-        it("should calculate fastest and slowest response times", () => {
+        it("should calculate fastest and slowest response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
             );
@@ -278,7 +374,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(300);
         });
 
-        it("should handle empty response times", () => {
+        it("should handle empty response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorEmpty, "24h")
             );
@@ -287,7 +391,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(0);
         });
 
-        it("should calculate percentiles correctly", () => {
+        it("should calculate percentiles correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create monitor with sorted response times: [0, 150, 200, 300]
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "1h")
@@ -298,7 +410,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.p99).toBe(300); // 99th percentile
         });
 
-        it("should handle single response time for percentiles", () => {
+        it("should handle single response time for percentiles", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const singleRecordMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [createStatusRecord(now - 1000, "up", 500)],
@@ -313,7 +433,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.p99).toBe(500);
         });
 
-        it("should handle edge cases in percentile calculation", () => {
+        it("should handle edge cases in percentile calculation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorEmpty, "24h")
             );
@@ -328,7 +456,15 @@ describe("useSiteAnalytics", () => {
         // Note: Downtime period calculation tests removed due to complex logic issues
         // The implementation works but test expectations were inconsistent with actual behavior
 
-        it("should handle no downtime periods", () => {
+        it("should handle no downtime periods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const alwaysUpMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
@@ -348,7 +484,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.mttr).toBe(0);
         });
 
-        it("should calculate total downtime and MTTR correctly", () => {
+        it("should calculate total downtime and MTTR correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const multipleDowntimeMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
@@ -371,7 +515,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Monitor Types", () => {
-        it("should handle HTTP monitors correctly", () => {
+        it("should handle HTTP monitors correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockMonitorWithHistory, "24h")
             );
@@ -387,7 +539,15 @@ describe("useSiteAnalytics", () => {
             );
         });
 
-        it("should handle port monitors correctly", () => {
+        it("should handle port monitors correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteAnalytics(mockPortMonitor, "24h")
             );
@@ -400,7 +560,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Memoization", () => {
-        it("should memoize results when dependencies don't change", () => {
+        it("should memoize results when dependencies don't change", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender, result } = renderHook(
                 ({ monitor, timeRange }) =>
                     useSiteAnalytics(monitor, timeRange),
@@ -423,7 +591,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current).toBe(firstResult); // Should be the exact same object reference
         });
 
-        it("should recalculate when monitor history changes", () => {
+        it("should recalculate when monitor history changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { rerender, result } = renderHook(
                 ({ monitor, timeRange }) =>
                     useSiteAnalytics(monitor, timeRange),
@@ -453,7 +629,15 @@ describe("useSiteAnalytics", () => {
             );
         });
 
-        it("should recalculate when time range changes", () => {
+        it("should recalculate when time range changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender, result } = renderHook(
                 ({ monitor, timeRange }) =>
                     useSiteAnalytics(monitor, timeRange),
@@ -480,7 +664,15 @@ describe("useSiteAnalytics", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor without optional fields", () => {
+        it("should handle monitor without optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const minimalMonitor: Monitor = {
                 history: [createStatusRecord(now - 1000, "up", 200)],
                 id: "minimal",
@@ -501,7 +693,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.uptime).toBe("100.00");
         });
 
-        it("should handle very large response times", () => {
+        it("should handle very large response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const largeResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
@@ -518,7 +718,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(1_000_000);
         });
 
-        it("should handle zero response times", () => {
+        it("should handle zero response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const zeroResponseMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
@@ -536,7 +744,15 @@ describe("useSiteAnalytics", () => {
             expect(result.current.slowestResponse).toBe(0);
         });
 
-        it("should handle empty filtered history after time range filtering", () => {
+        it("should handle empty filtered history after time range filtering", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const oldHistoryMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [createStatusRecord(oneWeekAgo - 1000, "up", 200)], // Outside even 30d range
@@ -580,7 +796,15 @@ describe("useChartData", () => {
         retryAttempts: 0,
     };
 
-    it("should generate chart data with correct structure", () => {
+    it("should generate chart data with correct structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
         );
@@ -596,7 +820,15 @@ describe("useChartData", () => {
         expect(dataset?.data).toHaveLength(3);
     });
 
-    it("should map data points correctly", () => {
+    it("should map data points correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
         );
@@ -610,7 +842,15 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should color points based on status", () => {
+    it("should color points based on status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() =>
             useChartData(mockMonitor, mockTheme)
         );
@@ -629,7 +869,15 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should handle empty history", () => {
+    it("should handle empty history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const emptyMonitor: Monitor = {
             ...mockMonitor,
             history: [],
@@ -645,7 +893,15 @@ describe("useChartData", () => {
         expect(dataset?.pointBackgroundColor).toHaveLength(0);
     });
 
-    it("should sort history by timestamp", () => {
+    it("should sort history by timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const unsortedMonitor: Monitor = {
             ...mockMonitor,
             history: [
@@ -668,7 +924,15 @@ describe("useChartData", () => {
         ]);
     });
 
-    it("should memoize chart data correctly", () => {
+    it("should memoize chart data correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { rerender, result } = renderHook(
             ({ monitor, theme }) => useChartData(monitor, theme),
             {
@@ -684,7 +948,15 @@ describe("useChartData", () => {
         expect(result.current).toBe(firstResult);
     });
 
-    it("should recalculate when monitor history changes", () => {
+    it("should recalculate when monitor history changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
         const { rerender, result } = renderHook(
             ({ monitor, theme }) => useChartData(monitor, theme),
             {
@@ -711,7 +983,15 @@ describe("useChartData", () => {
 
 describe("SiteAnalyticsUtils", () => {
     describe("calculateSLA", () => {
-        it("should calculate SLA compliance correctly for compliant uptime", () => {
+        it("should calculate SLA compliance correctly for compliant uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteAnalyticsUtils.calculateSLA(99.95, 99.9);
 
             expect(result.compliant).toBe(true);
@@ -720,7 +1000,15 @@ describe("SiteAnalyticsUtils", () => {
             expect(result.actualDowntime).toBeCloseTo(0.0005, 10); // (100 - 99.95) / 100
         });
 
-        it("should calculate SLA compliance correctly for non-compliant uptime", () => {
+        it("should calculate SLA compliance correctly for non-compliant uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteAnalyticsUtils.calculateSLA(99.5, 99.9);
 
             expect(result.compliant).toBe(false);
@@ -729,13 +1017,29 @@ describe("SiteAnalyticsUtils", () => {
             expect(result.actualDowntime).toBe(0.005);
         });
 
-        it("should use default SLA target of 99.9%", () => {
+        it("should use default SLA target of 99.9%", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result = SiteAnalyticsUtils.calculateSLA(99.95);
 
             expect(result.allowedDowntime).toBeCloseTo(0.001, 10);
         });
 
-        it("should handle 100% uptime", () => {
+        it("should handle 100% uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteAnalyticsUtils.calculateSLA(100, 99.9);
 
             expect(result.compliant).toBe(true);
@@ -743,7 +1047,15 @@ describe("SiteAnalyticsUtils", () => {
             expect(result.actualDowntime).toBe(0);
         });
 
-        it("should handle 0% uptime", () => {
+        it("should handle 0% uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteAnalyticsUtils.calculateSLA(0, 99.9);
 
             expect(result.compliant).toBe(false);
@@ -753,7 +1065,15 @@ describe("SiteAnalyticsUtils", () => {
     });
 
     describe("getAvailabilityStatus", () => {
-        it("should return excellent for 99.9%+ uptime", () => {
+        it("should return excellent for 99.9%+ uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getAvailabilityStatus(99.9)).toBe(
                 "excellent"
             );
@@ -762,12 +1082,28 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should return good for 99%+ uptime", () => {
+        it("should return good for 99%+ uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getAvailabilityStatus(99)).toBe("good");
             expect(SiteAnalyticsUtils.getAvailabilityStatus(99.8)).toBe("good");
         });
 
-        it("should return warning for 95%+ uptime", () => {
+        it("should return warning for 95%+ uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getAvailabilityStatus(95)).toBe(
                 "warning"
             );
@@ -776,7 +1112,15 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should return critical for <95% uptime", () => {
+        it("should return critical for <95% uptime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getAvailabilityStatus(94.9)).toBe(
                 "critical"
             );
@@ -785,7 +1129,15 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getAvailabilityStatus(99)).toBe("good");
             expect(SiteAnalyticsUtils.getAvailabilityStatus(95)).toBe(
                 "warning"
@@ -794,7 +1146,15 @@ describe("SiteAnalyticsUtils", () => {
     });
 
     describe("getPerformanceStatus", () => {
-        it("should return excellent for ≤200ms response time", () => {
+        it("should return excellent for ≤200ms response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getPerformanceStatus(200)).toBe(
                 "excellent"
             );
@@ -806,12 +1166,28 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should return good for ≤500ms response time", () => {
+        it("should return good for ≤500ms response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getPerformanceStatus(500)).toBe("good");
             expect(SiteAnalyticsUtils.getPerformanceStatus(300)).toBe("good");
         });
 
-        it("should return warning for ≤1000ms response time", () => {
+        it("should return warning for ≤1000ms response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getPerformanceStatus(1000)).toBe(
                 "warning"
             );
@@ -820,7 +1196,15 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should return critical for >1000ms response time", () => {
+        it("should return critical for >1000ms response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getPerformanceStatus(1001)).toBe(
                 "critical"
             );
@@ -829,7 +1213,15 @@ describe("SiteAnalyticsUtils", () => {
             );
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteAnalyticsUtils.getPerformanceStatus(500)).toBe("good");
             expect(SiteAnalyticsUtils.getPerformanceStatus(1000)).toBe(
                 "warning"

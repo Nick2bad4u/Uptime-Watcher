@@ -8,7 +8,15 @@ import { describe, it, expect } from "vitest";
 
 describe("Comprehensive Coverage Boost Tests", () => {
     describe("Type Definitions Coverage", () => {
-        it("should test FormData types", () => {
+        it("should test FormData types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test formData.ts types (lines 204-236)
             const mockFormData = {
                 siteName: "test",
@@ -22,7 +30,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(Array.isArray(mockFormData.monitors)).toBe(true);
         });
 
-        it("should test MonitorConfig types", () => {
+        it("should test MonitorConfig types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test monitorConfig.ts types (lines 262-294)
             const mockMonitorConfig = {
                 type: "http",
@@ -38,7 +54,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockMonitorConfig.retryAttempts).toBe(3);
         });
 
-        it("should test ThemeConfig types", () => {
+        it("should test ThemeConfig types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test themeConfig.ts types (lines 435-490)
             const mockThemeConfig = {
                 name: "dark",
@@ -59,7 +83,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockThemeConfig.spacing.small).toBe(8);
         });
 
-        it("should test Validation types", () => {
+        it("should test Validation types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Test validation.ts types (lines 122-163)
             const mockValidationResult = {
                 isValid: true,
@@ -75,7 +107,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Monitor Form Types Coverage", () => {
-        it("should test monitor-forms types", () => {
+        it("should test monitor-forms types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test monitor-forms.ts (lines 127-207)
             const mockMonitorForm = {
                 name: "Test Monitor",
@@ -92,7 +132,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockMonitorForm.enabled).toBe(true);
         });
 
-        it("should test monitorFormData types", () => {
+        it("should test monitorFormData types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test monitorFormData.ts (lines 85-185)
             const mockFormData = {
                 monitors: [
@@ -119,7 +167,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Utility Functions Coverage", () => {
-        it("should test cache key generation", () => {
+        it("should test cache key generation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Caching", "type");
+
             // Simulate cacheKeys.ts functionality (lines 62,108-338)
             const generateCacheKey = (prefix: string, identifier: string) =>
                 `${prefix}:${identifier}`;
@@ -131,7 +187,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             );
         });
 
-        it("should test log template generation", () => {
+        it("should test log template generation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Simulate logTemplates.ts functionality (lines 29-357)
             const generateLogTemplate = (
                 level: string,
@@ -158,7 +222,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             );
         });
 
-        it("should test error catalog usage", () => {
+        it("should test error catalog usage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test errorCatalog.ts functionality (lines 356-390)
             const errorCatalog = {
                 VALIDATION_ERROR: "Validation failed",
@@ -187,7 +259,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Component State Coverage", () => {
-        it("should test SiteList empty state", () => {
+        it("should test SiteList empty state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test SiteList.tsx functionality (lines 35-49)
             const mockSiteListState = {
                 sites: [],
@@ -205,7 +285,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(shouldShowEmptyState).toBe(true);
         });
 
-        it("should test SiteDetails navigation", () => {
+        it("should test SiteDetails navigation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test SiteDetails navigation functionality (lines 88-389)
             const mockNavigationState = {
                 currentTab: "overview",
@@ -227,7 +315,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockNavigationState.currentTab).toBe("overview");
         });
 
-        it("should test MonitorUI components", () => {
+        it("should test MonitorUI components", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test MonitorUiComponents.tsx functionality (lines 43-114)
             const mockMonitorComponents = {
                 statusIndicator: { color: "green", text: "Online" },
@@ -247,7 +343,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Advanced State Management", () => {
-        it("should test site monitoring state transitions", () => {
+        it("should test site monitoring state transitions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test useSiteMonitoring.ts edge cases (lines 45-47,61-63,77-79,93-95,109-111)
             const mockMonitoringState = {
                 isMonitoring: false,
@@ -275,7 +379,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(setError("Network error").error).toBe("Network error");
         });
 
-        it("should test file download utilities", () => {
+        it("should test file download utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Test fileDownload.ts edge cases (lines 67-129,166-170,195-196,206-207,242-249)
             const mockFileDownload = {
                 createDownloadLink: (data: string, filename: string) => {
@@ -313,7 +425,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Settings and Configuration", () => {
-        it("should test Settings component edge cases", () => {
+        it("should test Settings component edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test Settings.tsx uncovered lines (85-92,105,133-134,150-151,264-281,332-349)
             const mockSettingsState = {
                 theme: "system",
@@ -344,7 +464,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(resetSettings().historyLimit).toBe(500);
         });
 
-        it("should test theme components edge cases", () => {
+        it("should test theme components edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test components.tsx uncovered lines (theme components)
             const mockThemeComponents = {
                 Button: {
@@ -386,7 +514,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Error Boundary and Fallback Coverage", () => {
-        it("should test error boundary edge cases", () => {
+        it("should test error boundary edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test ErrorBoundary.tsx edge cases
             const mockErrorBoundaryState = {
                 hasError: false,
@@ -420,7 +556,15 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(resetState.retryCount).toBe(1);
         });
 
-        it("should test fallback utilities", () => {
+        it("should test fallback utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test fallbacks.ts edge cases (lines 100,164)
             const mockFallbacks = {
                 getFallbackValue: <T>(

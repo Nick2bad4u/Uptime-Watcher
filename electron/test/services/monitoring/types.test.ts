@@ -13,7 +13,15 @@ import type {
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult", () => {
-        it("should validate a successful check result", () => {
+        it("should validate a successful check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const result: MonitorCheckResult = {
                 status: "up",
                 responseTime: 150,
@@ -25,7 +33,15 @@ describe("Monitoring Types", () => {
             expect(result.details).toBe("Connection successful");
         });
 
-        it("should validate a failed check result", () => {
+        it("should validate a failed check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result: MonitorCheckResult = {
                 status: "down",
                 responseTime: 0,
@@ -37,7 +53,15 @@ describe("Monitoring Types", () => {
             expect(result.error).toBe("Connection timeout");
         });
 
-        it("should allow minimal check result", () => {
+        it("should allow minimal check result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result: MonitorCheckResult = {
                 status: "up",
                 responseTime: 100,
@@ -51,7 +75,15 @@ describe("Monitoring Types", () => {
     });
 
     describe("MonitorConfig", () => {
-        it("should validate config with all properties", () => {
+        it("should validate config with all properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const config: MonitorConfig = {
                 timeout: 5000,
                 userAgent: "UptimeWatcher/1.0",
@@ -61,7 +93,15 @@ describe("Monitoring Types", () => {
             expect(config.userAgent).toBe("UptimeWatcher/1.0");
         });
 
-        it("should validate empty config", () => {
+        it("should validate empty config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const config: MonitorConfig = {};
 
             expect(config.timeout).toBeUndefined();
@@ -70,7 +110,15 @@ describe("Monitoring Types", () => {
     });
 
     describe("IMonitorService", () => {
-        it("should validate interface structure", () => {
+        it("should validate interface structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             // Mock implementation to test interface
             const mockService: IMonitorService = {
                 async check(_monitor) {
@@ -92,7 +140,15 @@ describe("Monitoring Types", () => {
             expect(mockService.getType()).toBe("http");
         });
 
-        it("should work with async check method", async () => {
+        it("should work with async check method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockService: IMonitorService = {
                 async check(_monitor) {
                     return {

@@ -76,13 +76,29 @@ describe("ServiceContainer - Application Services", () => {
     });
 
     describe("Configuration Services", () => {
-        it("should create ConfigurationManager singleton", () => {
+        it("should create ConfigurationManager singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getConfigurationManager();
             }).not.toThrow();
         });
 
-        it("should return same ConfigurationManager instance", () => {
+        it("should return same ConfigurationManager instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config1 = container.getConfigurationManager();
             const config2 = container.getConfigurationManager();
             expect(config1).toBe(config2);
@@ -90,13 +106,29 @@ describe("ServiceContainer - Application Services", () => {
     });
 
     describe("Database Management Services", () => {
-        it("should create DatabaseManager singleton", () => {
+        it("should create DatabaseManager singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getDatabaseManager();
             }).not.toThrow();
         });
 
-        it("should maintain DatabaseManager singleton pattern", () => {
+        it("should maintain DatabaseManager singleton pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const manager1 = container.getDatabaseManager();
             const manager2 = container.getDatabaseManager();
             expect(manager1).toBe(manager2);
@@ -104,20 +136,44 @@ describe("ServiceContainer - Application Services", () => {
     });
 
     describe("Site Services", () => {
-        it("should create SiteService singleton", () => {
+        it("should create SiteService singleton", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getSiteService();
             }).not.toThrow();
         });
 
-        it("should handle SiteService dependencies correctly", () => {
+        it("should handle SiteService dependencies correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteService = container.getSiteService();
             expect(siteService).toBeDefined();
         });
     });
 
     describe("Service Integration", () => {
-        it("should create all application services without conflicts", () => {
+        it("should create all application services without conflicts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(() => {
                 container.getConfigurationManager();
                 container.getDatabaseManager();
@@ -125,7 +181,15 @@ describe("ServiceContainer - Application Services", () => {
             }).not.toThrow();
         });
 
-        it("should maintain proper service isolation", () => {
+        it("should maintain proper service isolation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer.application-services", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = container.getConfigurationManager();
             const dbManager = container.getDatabaseManager();
             const siteService = container.getSiteService();

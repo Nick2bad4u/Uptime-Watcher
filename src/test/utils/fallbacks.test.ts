@@ -43,62 +43,166 @@ describe("Fallback Utilities", () => {
 
     describe("isNullOrUndefined", () => {
         describe("Null values", () => {
-            it("should return true for null", () => {
+            it("should return true for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(null)).toBe(true);
             });
 
-            it("should return true for undefined", () => {
+            it("should return true for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(undefined)).toBe(true);
             });
         });
 
         describe("Falsy but not null/undefined values", () => {
-            it("should return false for empty string", () => {
+            it("should return false for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined("http")).toBe(false);
             });
 
-            it("should return false for zero", () => {
+            it("should return false for zero", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(0)).toBe(false);
             });
 
-            it("should return false for false", () => {
+            it("should return false for false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(false)).toBe(false);
             });
 
-            it("should return false for NaN", () => {
+            it("should return false for NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(Number.NaN)).toBe(false);
             });
         });
 
         describe("Truthy values", () => {
-            it("should return false for string", () => {
+            it("should return false for string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined("http")).toBe(false);
             });
 
-            it("should return false for number", () => {
+            it("should return false for number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(42)).toBe(false);
             });
 
-            it("should return false for boolean true", () => {
+            it("should return false for boolean true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(true)).toBe(false);
             });
 
-            it("should return false for object", () => {
+            it("should return false for object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined({})).toBe(false);
             });
 
-            it("should return false for array", () => {
+            it("should return false for array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined([])).toBe(false);
             });
 
-            it("should return false for function", () => {
+            it("should return false for function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(isNullOrUndefined(() => {})).toBe(false);
             });
         });
     });
 
     describe("withAsyncErrorHandling", () => {
-        it("should return a sync function that handles async operations", () => {
+        it("should return a sync function that handles async operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler = withAsyncErrorHandling(
                 asyncOperation,
@@ -109,7 +213,15 @@ describe("Fallback Utilities", () => {
             expect(handler()).toBeUndefined(); // Returns void
         });
 
-        it("should execute the async operation when handler is called", () => {
+        it("should execute the async operation when handler is called", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler = withAsyncErrorHandling(
                 asyncOperation,
@@ -121,7 +233,15 @@ describe("Fallback Utilities", () => {
             expect(asyncOperation).toHaveBeenCalledOnce();
         });
 
-        it("should handle async operations that throw errors", () => {
+        it("should handle async operations that throw errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const asyncOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Async error"));
@@ -134,7 +254,15 @@ describe("Fallback Utilities", () => {
             expect(() => handler()).not.toThrow();
         });
 
-        it("should work with different operation names", () => {
+        it("should work with different operation names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncOperation = vi.fn().mockResolvedValue("success");
             const handler1 = withAsyncErrorHandling(
                 asyncOperation,
@@ -157,7 +285,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Successful operations", () => {
-            it("should return operation result when operation succeeds", () => {
+            it("should return operation result when operation succeeds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const operation = vi.fn().mockReturnValue("success result");
                 const fallback = "fallback value";
 
@@ -171,7 +307,15 @@ describe("Fallback Utilities", () => {
                 expect(operation).toHaveBeenCalledOnce();
             });
 
-            it("should handle complex return types", () => {
+            it("should handle complex return types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const complexResult = {
                     data: [
                         1,
@@ -200,7 +344,15 @@ describe("Fallback Utilities", () => {
                 });
             });
 
-            it("should handle operations returning falsy values", () => {
+            it("should handle operations returning falsy values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const operation = vi.fn().mockReturnValue(false);
                 const fallback = true;
 
@@ -215,7 +367,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Error handling", () => {
-            it("should return fallback value when operation throws", async () => {
+            it("should return fallback value when operation throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const logger = await import("../../services/logger");
                 const operation = vi.fn().mockImplementation(() => {
                     throw new Error("Operation failed");
@@ -233,7 +393,15 @@ describe("Fallback Utilities", () => {
                 expect(logger.default.error).toHaveBeenCalled();
             });
 
-            it("should handle different error types", async () => {
+            it("should handle different error types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const logger = await import("../../services/logger");
                 const operation = vi.fn().mockImplementation(() => {
                     throw "String error";
@@ -250,7 +418,15 @@ describe("Fallback Utilities", () => {
                 expect(logger.default.error).toHaveBeenCalled();
             });
 
-            it("should log the error with operation name", async () => {
+            it("should log the error with operation name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const logger = await import("../../services/logger");
                 const error = new Error("Test error");
                 const operation = vi.fn().mockImplementation(() => {
@@ -273,27 +449,67 @@ describe("Fallback Utilities", () => {
 
     describe("withFallback", () => {
         describe("Null/undefined handling", () => {
-            it("should return fallback for null value", () => {
+            it("should return fallback for null value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(withFallback(null, "fallback")).toBe("fallback");
             });
 
-            it("should return fallback for undefined value", () => {
+            it("should return fallback for undefined value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(withFallback(undefined, "fallback")).toBe("fallback");
             });
         });
 
         describe("Valid value handling", () => {
-            it("should return original value when not null/undefined", () => {
+            it("should return original value when not null/undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(withFallback("actual", "fallback")).toBe("actual");
             });
 
-            it("should return falsy values that are not null/undefined", () => {
+            it("should return falsy values that are not null/undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(withFallback("http", "fallback")).toBe("http");
                 expect(withFallback(0, 42)).toBe(0);
                 expect(withFallback(false, true)).toBe(false);
             });
 
-            it("should handle complex types", () => {
+            it("should handle complex types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const original = { id: 1, name: "http" };
                 const fallback = { id: 0, name: "default" };
 
@@ -305,7 +521,15 @@ describe("Fallback Utilities", () => {
 
     describe("getMonitorDisplayIdentifier", () => {
         describe("HTTP monitors", () => {
-            it("should return URL for HTTP monitor", () => {
+            it("should return URL for HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -320,7 +544,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("https://example.com");
             });
 
-            it("should handle HTTP monitor with undefined URL", () => {
+            it("should handle HTTP monitor with undefined URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -336,7 +568,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Port monitors", () => {
-            it("should return host:port for port monitor with both values", () => {
+            it("should return host:port for port monitor with both values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -352,7 +592,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("example.com:80");
             });
 
-            it("should return host only for port monitor without port", () => {
+            it("should return host only for port monitor without port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -367,7 +615,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("example.com");
             });
 
-            it("should use fallback for port monitor with no host", () => {
+            it("should use fallback for port monitor with no host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -384,7 +640,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Generic identifier fallback", () => {
-            it("should use URL from generic identifier when type generator fails", () => {
+            it("should use URL from generic identifier when type generator fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -399,7 +663,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("https://example.com");
             });
 
-            it("should use host from generic identifier", () => {
+            it("should use host from generic identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -414,7 +686,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("example.com");
             });
 
-            it("should use host:port from generic identifier", () => {
+            it("should use host:port from generic identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -432,7 +712,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Fallback behavior", () => {
-            it("should return site fallback for unknown monitor type with no identifiers", () => {
+            it("should return site fallback for unknown monitor type with no identifiers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -446,7 +734,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("Site Fallback");
             });
 
-            it("should handle different fallback values", () => {
+            it("should handle different fallback values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor: Monitor = {
                     id: "1",
                     // name: "Test Monitor", // Monitor interface doesn't have name property
@@ -461,7 +757,15 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle monitor with no identifying properties (line 169 coverage)", () => {
+            it("should handle monitor with no identifying properties (line 169 coverage)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 // Create a monitor with no url, host, or port to hit the return undefined line
                 const monitor = {
                     id: "1",
@@ -481,7 +785,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Error handling", () => {
-            it("should handle monitor with malformed properties", () => {
+            it("should handle monitor with malformed properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const monitor = {
                     type: "http",
                     // Malformed properties that might cause errors
@@ -501,49 +813,121 @@ describe("Fallback Utilities", () => {
 
     describe("getMonitorTypeDisplayLabel", () => {
         describe("Configured monitor types", () => {
-            it("should return configured label for HTTP", () => {
+            it("should return configured label for HTTP", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("http")).toBe("Website URL");
             });
 
-            it("should return configured label for port", () => {
+            it("should return configured label for port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("port")).toBe("Host & Port");
             });
         });
 
         describe("Unknown monitor types with formatting", () => {
-            it("should generate title case for camelCase", () => {
+            it("should generate title case for camelCase", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("apiEndpoint")).toBe(
                     "Api Endpoint Monitor"
                 );
             });
 
-            it("should handle snake_case", () => {
+            it("should handle snake_case", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("ssl_certificate")).toBe(
                     "Ssl Certificate Monitor"
                 );
             });
 
-            it("should handle kebab-case", () => {
+            it("should handle kebab-case", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("dns-lookup")).toBe(
                     "Dns Lookup Monitor"
                 );
             });
 
-            it("should handle mixed cases", () => {
+            it("should handle mixed cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("customAPI_Monitor")).toBe(
                     "Custom Api Monitor Monitor"
                 );
             });
 
-            it("should handle single words", () => {
+            it("should handle single words", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("ping")).toBe("Ping Monitor");
             });
 
-            it("should handle uppercase", () => {
+            it("should handle uppercase", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("API")).toBe("Api Monitor");
             });
 
-            it("should handle lowercase", () => {
+            it("should handle lowercase", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("database")).toBe(
                     "Database Monitor"
                 );
@@ -551,37 +935,85 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Edge cases and error handling", () => {
-            it("should handle empty string", () => {
+            it("should handle empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("")).toBe(
                     "Monitor Configuration"
                 );
             });
 
-            it("should handle null input", () => {
+            it("should handle null input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel(null as any)).toBe(
                     "Monitor Configuration"
                 );
             });
 
-            it("should handle undefined input", () => {
+            it("should handle undefined input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel(undefined as any)).toBe(
                     "Monitor Configuration"
                 );
             });
 
-            it("should handle non-string input", () => {
+            it("should handle non-string input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel(123 as any)).toBe(
                     "Monitor Configuration"
                 );
             });
 
-            it("should handle special characters", () => {
+            it("should handle special characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(getMonitorTypeDisplayLabel("test@#$")).toBe(
                     "Test@#$ Monitor"
                 );
             });
 
-            it("should handle very long monitor types", () => {
+            it("should handle very long monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 const longType = "a".repeat(100);
                 const result = getMonitorTypeDisplayLabel(longType);
                 expect(result).toBe(
@@ -593,16 +1025,40 @@ describe("Fallback Utilities", () => {
 
     describe("truncateForLogging", () => {
         describe("Basic truncation", () => {
-            it("should return original string if shorter than maxLength", () => {
+            it("should return original string if shorter than maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(truncateForLogging("short", 50)).toBe("short");
             });
 
-            it("should return original string if equal to maxLength", () => {
+            it("should return original string if equal to maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = "a".repeat(50);
                 expect(truncateForLogging(text, 50)).toBe(text);
             });
 
-            it("should truncate string if longer than maxLength", () => {
+            it("should truncate string if longer than maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text, 50);
                 expect(result).toBe("a".repeat(50));
@@ -611,29 +1067,69 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Default maxLength behavior", () => {
-            it("should use default maxLength of 50", () => {
+            it("should use default maxLength of 50", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text);
                 expect(result.length).toBe(50);
             });
 
-            it("should handle text exactly at default length", () => {
+            it("should handle text exactly at default length", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = "a".repeat(50);
                 expect(truncateForLogging(text)).toBe(text);
             });
         });
 
         describe("Custom maxLength", () => {
-            it("should respect custom maxLength", () => {
+            it("should respect custom maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = "hello world";
                 expect(truncateForLogging(text, 5)).toBe("hello");
             });
 
-            it("should handle zero maxLength", () => {
+            it("should handle zero maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(truncateForLogging("http", 0)).toBe("");
             });
 
-            it("should handle negative maxLength", () => {
+            it("should handle negative maxLength", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // With negative maxLength, the condition value.length <= maxLength would be false for any non-empty string
                 // So it will still try to slice, but slice(0, -1) returns first n-1 characters
                 expect(truncateForLogging("test", -1)).toBe("tes");
@@ -641,16 +1137,40 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Edge cases", () => {
-            it("should handle empty string", () => {
+            it("should handle empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(truncateForLogging("", 10)).toBe("");
             });
 
-            it("should handle single character", () => {
+            it("should handle single character", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(truncateForLogging("a", 1)).toBe("a");
                 expect(truncateForLogging("a", 0)).toBe("");
             });
 
-            it("should handle Unicode characters", () => {
+            it("should handle Unicode characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const unicode = "🎉🎊🎈🎁🎂";
                 // Unicode characters may take multiple bytes, so slice(0, 3) might not work as expected
                 const result = truncateForLogging(unicode, 3);
@@ -658,7 +1178,15 @@ describe("Fallback Utilities", () => {
                 expect(result.startsWith("🎉")).toBe(true);
             });
 
-            it("should handle newlines and special characters", () => {
+            it("should handle newlines and special characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const text = String.raw`line1\nline2\ttab`;
                 expect(truncateForLogging(text, 10)).toBe(
                     String.raw`line1\nlin`
@@ -667,7 +1195,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("Real-world scenarios", () => {
-            it("should truncate URLs appropriately", () => {
+            it("should truncate URLs appropriately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const url =
                     "https://very-long-domain-name.example.com/very/long/path/with/many/segments";
                 const result = truncateForLogging(url, 30);
@@ -675,7 +1211,15 @@ describe("Fallback Utilities", () => {
                 expect(result).toBe("https://very-long-domain-name.");
             });
 
-            it("should truncate error messages", () => {
+            it("should truncate error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const error =
                     "Connection failed: Unable to connect to server at example.com:8080 after 30 seconds timeout";
                 const result = truncateForLogging(error, 50);
@@ -689,24 +1233,56 @@ describe("Fallback Utilities", () => {
 
     describe("Default values", () => {
         describe("UiDefaults", () => {
-            it("should have correct chart defaults", () => {
+            it("should have correct chart defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(UiDefaults.chartPeriod).toBe("24h");
                 expect(UiDefaults.chartPoints).toBe(24);
             });
 
-            it("should have correct label defaults", () => {
+            it("should have correct label defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(UiDefaults.errorLabel).toBe("Error");
                 expect(UiDefaults.loadingLabel).toBe("Loading...");
                 expect(UiDefaults.notAvailableLabel).toBe("N/A");
                 expect(UiDefaults.unknownLabel).toBe("Unknown");
             });
 
-            it("should have correct timing defaults", () => {
+            it("should have correct timing defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(UiDefaults.loadingDelay).toBe(100);
                 expect(UiDefaults.pageSize).toBe(10);
             });
 
-            it("should be deeply frozen (readonly)", () => {
+            it("should be deeply frozen (readonly)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // Note: 'as const' provides type-level readonly but not runtime immutability
                 // The objects can still be modified at runtime, but should be treated as readonly
                 expect(UiDefaults.chartPeriod).toBe("24h");
@@ -719,7 +1295,15 @@ describe("Fallback Utilities", () => {
         });
 
         describe("MonitorDefaults", () => {
-            it("should have correct monitoring defaults", () => {
+            it("should have correct monitoring defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
                 expect(MonitorDefaults.checkInterval).toBe(300_000); // 5 minutes
                 expect(MonitorDefaults.responseTime).toBe(-1);
                 expect(MonitorDefaults.retryAttempts).toBe(3);
@@ -727,7 +1311,15 @@ describe("Fallback Utilities", () => {
                 expect(MonitorDefaults.timeout).toBe(10_000); // 10 seconds
             });
 
-            it("should be deeply frozen (readonly)", () => {
+            it("should be deeply frozen (readonly)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // Note: 'as const' provides type-level readonly but not runtime immutability
                 expect(MonitorDefaults.checkInterval).toBe(300_000);
                 expect(MonitorDefaults.timeout).toBe(10_000);
@@ -738,11 +1330,27 @@ describe("Fallback Utilities", () => {
         });
 
         describe("SiteDefaults", () => {
-            it("should have correct site defaults", () => {
+            it("should have correct site defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(SiteDefaults.monitoring).toBe(true);
             });
 
-            it("should be deeply frozen (readonly)", () => {
+            it("should be deeply frozen (readonly)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fallbacks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // Note: 'as const' provides type-level readonly but not runtime immutability
                 expect(SiteDefaults.monitoring).toBe(true);
                 // Test that values are accessible and correct

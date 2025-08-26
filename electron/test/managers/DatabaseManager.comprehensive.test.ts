@@ -253,7 +253,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Initialize - Error Handling Branches", () => {
-        it("should handle settings.get throwing an error during initialize", async () => {
+        it("should handle settings.get throwing an error during initialize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Mock settings to throw an error
             vi.mocked(mockSettingsRepository.get).mockRejectedValue(
                 new Error("Settings error")
@@ -267,7 +275,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
         });
 
-        it("should handle event emission error during initialize", async () => {
+        it("should handle event emission error during initialize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Mock successful database operations
             vi.mocked(mockSettingsRepository.get).mockResolvedValue("100");
 
@@ -297,7 +313,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
-        it("should handle settings.get returning a value during initialize", async () => {
+        it("should handle settings.get returning a value during initialize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Mock settings.get to return a specific limit
             vi.mocked(mockSettingsRepository.get).mockResolvedValue("250");
 
@@ -321,7 +345,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("LoadSites - Error Handling Branches", () => {
-        it("should handle loadSitesFromDatabase returning success=false", async () => {
+        it("should handle loadSitesFromDatabase returning success=false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
                 loadSitesFromDatabase: vi.fn().mockResolvedValue({
@@ -340,7 +372,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
-        it("should handle site cache operations during loadSites", async () => {
+        it("should handle site cache operations during loadSites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             // Mock to test the cache operations in loadSites
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
@@ -367,7 +407,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("RefreshSites - Error Handling Branches", () => {
-        it("should handle cache access errors during refreshSites", async () => {
+        it("should handle cache access errors during refreshSites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
@@ -382,7 +430,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(Array.isArray(result)).toBe(true);
         });
 
-        it("should return sites from cache during successful refreshSites", async () => {
+        it("should return sites from cache during successful refreshSites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
             vi.mocked(SiteLoadingOrchestrator).mockImplementation(
@@ -397,7 +453,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Event Emission Error Handling", () => {
-        it("should handle emitHistoryLimitUpdated errors", async () => {
+        it("should handle emitHistoryLimitUpdated errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -428,7 +492,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
-        it("should handle emitSitesCacheUpdateRequested errors", async () => {
+        it("should handle emitSitesCacheUpdateRequested errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             // Create a mock that uses the startMonitoring callback
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
@@ -460,7 +532,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Import Data Error Branches", () => {
-        it("should handle importData with event emission failure during catch block", async () => {
+        it("should handle importData with event emission failure during catch block", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Reset and configure the DataImportExportService mock
             // Mock import service to fail
             const mockImportService = createDataImportExportServiceMock({
@@ -481,7 +561,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle successful importData flow", async () => {
+        it("should handle successful importData flow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Import Operation", "type");
+
             // Reset and configure the DataImportExportService mock
             const mockImportService = createDataImportExportServiceMock({
                 importDataFromJson: vi
@@ -510,7 +598,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("History Limit Edge Cases", () => {
-        it("should handle setHistoryLimit with different limit values", async () => {
+        it("should handle setHistoryLimit with different limit values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -525,7 +621,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(databaseManager.getHistoryLimit()).toBe(100);
         });
 
-        it("should handle setHistoryLimit with utility throwing error", async () => {
+        it("should handle setHistoryLimit with utility throwing error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -555,7 +659,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Monitor Configuration Callbacks", () => {
-        it("should handle stopMonitoring callback in loadSites", async () => {
+        it("should handle stopMonitoring callback in loadSites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
                 loadSitesFromDatabase: vi
@@ -580,7 +692,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
 
-        it("should handle setupNewMonitors callback in loadSites", async () => {
+        it("should handle setupNewMonitors callback in loadSites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
                 loadSitesFromDatabase: vi
@@ -607,7 +727,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
 
-        it("should handle setHistoryLimit callback in monitoring config", async () => {
+        it("should handle setHistoryLimit callback in monitoring config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -640,7 +768,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
 
-        it("should handle loadSitesFromDatabase throwing an error", async () => {
+        it("should handle loadSitesFromDatabase throwing an error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock({
                 loadSitesFromDatabase: vi
@@ -659,7 +795,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Import/Export Operations", () => {
-        it("should handle downloadBackup successfully", async () => {
+        it("should handle downloadBackup successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Backup Operation", "type");
+
             // Mock the command executor directly on the instance
             const mockExecute = vi
                 .fn()
@@ -684,7 +828,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(result).toBe("/path/to/backup.json");
         });
 
-        it("should handle downloadBackup with file system errors", async () => {
+        it("should handle downloadBackup with file system errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock the command executor directly on the instance to throw error
             const mockExecute = vi
                 .fn()
@@ -710,7 +862,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("History Management", () => {
-        it("should handle setHistoryLimit with valid limit", async () => {
+        it("should handle setHistoryLimit with valid limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue({
@@ -747,7 +907,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(databaseManager.getHistoryLimit()).toBe(300);
         });
 
-        it("should handle setHistoryLimit with limit exceeding maximum", async () => {
+        it("should handle setHistoryLimit with limit exceeding maximum", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue({
@@ -762,7 +930,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
-        it("should handle setHistoryLimit with limit below minimum", async () => {
+        it("should handle setHistoryLimit with limit below minimum", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue({
@@ -800,7 +976,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             expect(databaseManager.getHistoryLimit()).toBe(10);
         });
 
-        it("should handle setHistoryLimit with database error", async () => {
+        it("should handle setHistoryLimit with database error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -828,13 +1012,29 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Configuration and State", () => {
-        it("should return correct history limit with default value", () => {
+        it("should return correct history limit with default value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Configuration", "type");
+
             // Before initialization or setting, should return default
             const result = databaseManager.getHistoryLimit();
             expect(result).toBe(500); // Default from mockConfigurationManager
         });
 
-        it("should handle getHistoryLimit after custom setting", async () => {
+        it("should handle getHistoryLimit after custom setting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
@@ -851,7 +1051,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        it("should handle multiple initialization calls", async () => {
+        it("should handle multiple initialization calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Reset mocks for clean test
             vi.clearAllMocks();
 
@@ -871,7 +1079,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             ).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle configuration manager returning undefined rules", async () => {
+        it("should handle configuration manager returning undefined rules", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue(undefined as any);
@@ -882,7 +1098,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
-        it("should handle concurrent database operations", async () => {
+        it("should handle concurrent database operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock configuration manager to return proper limits
             vi.mocked(
                 mockConfigurationManager.getHistoryRetentionRules

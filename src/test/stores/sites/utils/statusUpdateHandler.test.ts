@@ -121,13 +121,29 @@ describe("StatusUpdateHandler", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with required options", () => {
+        it("should initialize with required options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Initialization", "type");
+
             const testManager = new StatusUpdateManager(mockOptions);
             expect(testManager).toBeDefined();
             expect(testManager.isSubscribed()).toBe(false);
         });
 
-        it("should initialize without optional onUpdate callback", () => {
+        it("should initialize without optional onUpdate callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Initialization", "type");
+
             const optionsWithoutCallback = {
                 setSites: mockSetSites,
                 getSites: mockGetSites,
@@ -140,11 +156,27 @@ describe("StatusUpdateHandler", () => {
     });
 
     describe("Subscription Management", () => {
-        it("should start as not subscribed", () => {
+        it("should start as not subscribed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(manager.isSubscribed()).toBe(false);
         });
 
-        it("should become subscribed after calling subscribe", () => {
+        it("should become subscribed after calling subscribe", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock the event listener functions to return cleanup functions
             mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
                 () => {}
@@ -160,7 +192,15 @@ describe("StatusUpdateHandler", () => {
             expect(manager.isSubscribed()).toBe(true);
         });
 
-        it("should set up event listeners when subscribing", () => {
+        it("should set up event listeners when subscribing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             // Mock the event listener functions to return cleanup functions
             mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
                 () => {}
@@ -185,7 +225,15 @@ describe("StatusUpdateHandler", () => {
             ).toHaveBeenCalled();
         });
 
-        it("should cleanup existing subscriptions before subscribing again", () => {
+        it("should cleanup existing subscriptions before subscribing again", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const cleanupFn = vi.fn();
             mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
                 cleanupFn
@@ -203,7 +251,15 @@ describe("StatusUpdateHandler", () => {
             expect(cleanupFn).toHaveBeenCalled();
         });
 
-        it("should unsubscribe and remove all listeners", () => {
+        it("should unsubscribe and remove all listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const cleanupFn = vi.fn();
             mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(
                 cleanupFn
@@ -223,7 +279,15 @@ describe("StatusUpdateHandler", () => {
             expect(cleanupFn).toHaveBeenCalledTimes(3); // Called for each event type
         });
 
-        it("should safely handle unsubscribing when not subscribed", () => {
+        it("should safely handle unsubscribing when not subscribed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(manager.isSubscribed()).toBe(false);
             expect(() => manager.unsubscribe()).not.toThrow();
             expect(manager.isSubscribed()).toBe(false);
@@ -257,7 +321,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should handle monitor status changed events", async () => {
+        it("should handle monitor status changed events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             // Create proper MonitorStatusChangedEvent format (what the backend sends)
@@ -280,7 +352,15 @@ describe("StatusUpdateHandler", () => {
             expect(actualUpdate.status).toBe("down"); // Converted to status in StatusUpdate
         });
 
-        it("should handle monitoring started events", async () => {
+        it("should handle monitoring started events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             const startEvent = { siteId: "site1" };
@@ -290,7 +370,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle monitoring stopped events", async () => {
+        it("should handle monitoring stopped events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             const stopEvent = { siteId: "site1" };
@@ -319,7 +407,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should process status updates incrementally", async () => {
+        it("should process status updates incrementally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
@@ -338,7 +434,15 @@ describe("StatusUpdateHandler", () => {
             expect(Array.isArray(newSites)).toBe(true);
         });
 
-        it("should fall back to full sync when site not found", async () => {
+        it("should fall back to full sync when site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockGetSites.mockReturnValue([]); // Empty sites array
             manager.subscribe();
 
@@ -354,7 +458,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should fall back to full sync when monitor not found", async () => {
+        it("should fall back to full sync when monitor not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
@@ -369,7 +481,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle invalid data format and fall back to full sync", async () => {
+        it("should handle invalid data format and fall back to full sync", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             manager.subscribe();
 
             // Test with invalid data structure
@@ -382,7 +502,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle when updated site is not found after update", async () => {
+        it("should handle when updated site is not found after update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             // Create a mock site initially
@@ -412,7 +540,15 @@ describe("StatusUpdateHandler", () => {
             (manager as any).applyMonitorStatusUpdate = originalApplyMethod;
         });
 
-        it("should work without onUpdate callback", async () => {
+        it("should work without onUpdate callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             // Create manager without onUpdate callback
             const optionsWithoutCallback = {
                 setSites: mockSetSites,
@@ -470,7 +606,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should handle errors in status update processing gracefully", async () => {
+        it("should handle errors in status update processing gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockSetSites.mockImplementation(() => {
                 throw new Error("Test error");
             });
@@ -499,7 +643,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle errors in onUpdate callback gracefully", async () => {
+        it("should handle errors in onUpdate callback gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockOnUpdate.mockImplementation(() => {
                 throw new Error("onUpdate error");
             });
@@ -516,7 +668,15 @@ describe("StatusUpdateHandler", () => {
             expect(() => statusChangedCallback(statusUpdate)).not.toThrow();
         });
 
-        it("should handle errors in full sync gracefully", async () => {
+        it("should handle errors in full sync gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockFullSyncFromBackend.mockRejectedValue(new Error("Sync error"));
 
             manager.subscribe();
@@ -536,12 +696,28 @@ describe("StatusUpdateHandler", () => {
             (globalThis as any).electronAPI = mockElectronAPI;
         });
 
-        it("should handle missing electronAPI gracefully", () => {
+        it("should handle missing electronAPI gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             manager = new StatusUpdateManager(mockOptions);
             expect(() => manager.subscribe()).toThrow();
         });
 
-        it("should handle unsubscribe when electronAPI is missing", () => {
+        it("should handle unsubscribe when electronAPI is missing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             manager = new StatusUpdateManager(mockOptions);
             expect(() => manager.unsubscribe()).not.toThrow();
             expect(manager.isSubscribed()).toBe(false);
@@ -566,7 +742,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should log debug messages in development mode", async () => {
+        it("should log debug messages in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -589,7 +773,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should log debug messages for monitor not found in development mode", async () => {
+        it("should log debug messages for monitor not found in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -608,7 +800,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should log debug messages for successful updates in development mode", async () => {
+        it("should log debug messages for successful updates in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -627,7 +827,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should log warning for invalid data in development mode", async () => {
+        it("should log warning for invalid data in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -643,7 +851,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should not log debug messages in production mode", async () => {
+        it("should not log debug messages in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 
@@ -681,7 +897,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should handle empty sites array", async () => {
+        it("should handle empty sites array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockGetSites.mockReturnValue([]);
             manager.subscribe();
 
@@ -697,7 +921,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithoutMonitors = {
                 ...createMockSite("site1", "monitor1"),
                 monitors: [],
@@ -717,7 +949,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle null/undefined status updates", async () => {
+        it("should handle null/undefined status updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             await statusChangedCallback(null);
@@ -727,7 +967,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
         });
 
-        it("should handle multiple rapid status updates", async () => {
+        it("should handle multiple rapid status updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
@@ -759,7 +1007,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockSetSites).toHaveBeenCalledTimes(3);
         });
 
-        it("should handle various invalid data types for type guard", async () => {
+        it("should handle various invalid data types for type guard", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             manager.subscribe();
 
             const invalidDataTypes = [
@@ -814,7 +1070,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should execute onUpdate callback when site is found after status update", async () => {
+        it("should execute onUpdate callback when site is found after status update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             const event = {
@@ -839,7 +1103,15 @@ describe("StatusUpdateHandler", () => {
             });
         });
 
-        it("should trigger full sync when monitoring starts", async () => {
+        it("should trigger full sync when monitoring starts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             await monitoringStartedCallback();
@@ -848,7 +1120,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should trigger full sync when monitoring stops", async () => {
+        it("should trigger full sync when monitoring stops", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             await monitoringStoppedCallback();
@@ -857,7 +1137,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle invalid event data and log warning in development mode", async () => {
+        it("should handle invalid event data and log warning in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -888,7 +1176,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should not log warning for invalid data in production mode", async () => {
+        it("should not log warning for invalid data in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 
@@ -905,7 +1201,15 @@ describe("StatusUpdateHandler", () => {
             expect(logger.default.warn).not.toHaveBeenCalled();
         });
 
-        it("should cover development mode debug log for successful update", async () => {
+        it("should cover development mode debug log for successful update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
@@ -926,7 +1230,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should skip onUpdate callback when site is not found after status update", async () => {
+        it("should skip onUpdate callback when site is not found after status update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             manager.subscribe();
 
             // Mock setSites to actually call the provided function to set state
@@ -957,7 +1269,15 @@ describe("StatusUpdateHandler", () => {
             expect(mockOnUpdate).not.toHaveBeenCalled();
         });
 
-        it("should handle updating monitor status in site monitors", async () => {
+        it("should handle updating monitor status in site monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             manager.subscribe();
 
             // Create a site with multiple monitors to test the monitor finding logic
@@ -1010,7 +1330,15 @@ describe("StatusUpdateHandler", () => {
             expect(updatedMonitor?.status).toBe("down");
         });
 
-        it("should test production mode branch by not logging in production", async () => {
+        it("should test production mode branch by not logging in production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false); // Production mode
 
@@ -1032,7 +1360,15 @@ describe("StatusUpdateHandler", () => {
             expect(logger.default.debug).not.toHaveBeenCalled();
         });
 
-        it("should test onUpdate callback conditional execution based on updated site presence", async () => {
+        it("should test onUpdate callback conditional execution based on updated site presence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             // Test with manager that has onUpdate callback
             manager.subscribe();
 
@@ -1067,7 +1403,15 @@ describe("StatusUpdateHandler", () => {
             );
         });
 
-        it("should not log debug messages in production mode for successful update", async () => {
+        it("should not log debug messages in production mode for successful update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 

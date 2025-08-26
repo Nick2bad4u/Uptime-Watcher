@@ -10,7 +10,15 @@ import { describe, it, expect, vi } from "vitest";
 // Target specific modules with low function coverage
 describe("Final 90% Function Coverage Push", () => {
     describe("Type Guards and Validation Functions", () => {
-        it("should test all remaining type guard functions", () => {
+        it("should test all remaining type guard functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Import and test type guard functions that may have low coverage
             const testValue1 = "test";
             const testValue2 = 123;
@@ -28,7 +36,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(Array.isArray(testValue6)).toBe(true);
         });
 
-        it("should test validation helper functions", () => {
+        it("should test validation helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Test validation utilities that might have uncovered branches
             const validationTests = [
                 { input: "", expected: false },
@@ -48,7 +64,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Component Helper Functions", () => {
-        it("should test component utility functions", () => {
+        it("should test component utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test utility functions used in components
             const mockEvent = {
                 preventDefault: vi.fn(),
@@ -64,7 +88,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(mockEvent.stopPropagation).toHaveBeenCalled();
         });
 
-        it("should test form validation helpers", () => {
+        it("should test form validation helpers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Test form validation functions that might be uncovered
             const formData = {
                 name: "test site",
@@ -85,7 +117,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(isIntervalValid).toBe(true);
         });
 
-        it("should test status calculation helpers", () => {
+        it("should test status calculation helpers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test status calculation functions
             const monitors = [
                 { status: "up", monitoring: true },
@@ -105,7 +145,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Store Helper Functions", () => {
-        it("should test store action helpers", () => {
+        it("should test store action helpers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test store helper functions
             const mockStore = {
                 state: { items: [] },
@@ -131,7 +179,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(mockStore.actions.removeItem).toHaveBeenCalledWith(1);
         });
 
-        it("should test store selector functions", () => {
+        it("should test store selector functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test selector functions that might be uncovered
             const state = {
                 sites: [
@@ -161,7 +217,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Utility Helper Functions", () => {
-        it("should test date and time helpers", () => {
+        it("should test date and time helpers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test date/time utility functions
             const now = Date.now();
 
@@ -178,7 +242,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(getTimeDiff(1000, 2000)).toBe(1000);
         });
 
-        it("should test string utility functions", () => {
+        it("should test string utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test string utility functions
             const capitalize = (str: string) =>
                 str.charAt(0).toUpperCase() + str.slice(1);
@@ -195,7 +267,15 @@ describe("Final 90% Function Coverage Push", () => {
             );
         });
 
-        it("should test array utility functions", () => {
+        it("should test array utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test array utility functions
             const unique = <T>(arr: T[]) => [...new Set(arr)];
             const groupBy = <T>(arr: T[], key: keyof T) => {
@@ -235,7 +315,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Error Handling Functions", () => {
-        it("should test error handling utilities", () => {
+        it("should test error handling utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test error handling functions
             const safeExecute = <T>(fn: () => T, fallback: T): T => {
                 try {
@@ -254,7 +342,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(safeExecute(returnValue, "fallback")).toBe("success");
         });
 
-        it("should test async error handling", async () => {
+        it("should test async error handling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test async error handling functions
             const safeAsyncExecute = async <T>(
                 fn: () => Promise<T>,
@@ -282,7 +378,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Configuration Helper Functions", () => {
-        it("should test configuration utilities", () => {
+        it("should test configuration utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test configuration helper functions
             const mergeConfig = <T extends Record<string, any>>(
                 base: T,
@@ -315,7 +419,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(isValid).toBe(true);
         });
 
-        it("should test environment detection functions", () => {
+        it("should test environment detection functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test environment detection functions
             const isDevelopment = () =>
                 process.env["NODE_ENV"] === "development";
@@ -344,7 +456,15 @@ describe("Final 90% Function Coverage Push", () => {
     });
 
     describe("Performance Helper Functions", () => {
-        it("should test performance utilities", () => {
+        it("should test performance utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test performance helper functions
             const debounce = <T extends (...args: any[]) => any>(
                 fn: T,
@@ -390,7 +510,15 @@ describe("Final 90% Function Coverage Push", () => {
             expect(typeof throttledFn).toBe("function");
         });
 
-        it("should test memoization utilities", () => {
+        it("should test memoization utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: final-90-percent-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test memoization functions
             const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
                 const cache = new Map();

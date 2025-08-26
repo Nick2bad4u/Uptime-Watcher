@@ -7,7 +7,15 @@ import { describe, expect, it } from "vitest";
 
 describe("Shared Module - 100% Function Coverage", () => {
     describe("chartConfig functions", () => {
-        it("should ensure all chartConfig functions are covered", async () => {
+        it("should ensure all chartConfig functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const chartConfigModule = await import(
                 "../../types/chartConfig.js"
             );
@@ -28,7 +36,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("environment functions", () => {
-        it("should ensure all environment functions are covered", async () => {
+        it("should ensure all environment functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const environmentModule = await import(
                 "../../utils/environment.js"
             );
@@ -52,7 +68,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("validation functions", () => {
-        it("should ensure all validation functions are covered", async () => {
+        it("should ensure all validation functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const validationModule = await import("../../types/validation.js");
 
             // Call all exported functions
@@ -74,7 +98,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("themeConfig functions", () => {
-        it("should ensure all themeConfig functions are covered", async () => {
+        it("should ensure all themeConfig functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const themeConfigModule = await import(
                 "../../types/themeConfig.js"
             );
@@ -203,7 +235,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("objectSafety functions", () => {
-        it("should ensure all objectSafety functions are covered", async () => {
+        it("should ensure all objectSafety functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const objectSafetyModule = await import(
                 "../../utils/objectSafety.js"
             );
@@ -248,7 +288,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("safeConversions functions", () => {
-        it("should ensure all safeConversions functions are covered", async () => {
+        it("should ensure all safeConversions functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const safeConversionsModule = await import(
                 "../../utils/safeConversions.js"
             );
@@ -283,7 +331,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("typeGuards functions", () => {
-        it("should ensure all typeGuards functions are covered", async () => {
+        it("should ensure all typeGuards functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const typeGuardsModule = await import("../../utils/typeGuards.js");
 
             // Call all exported functions
@@ -313,7 +369,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("typeHelpers functions", () => {
-        it("should ensure all typeHelpers functions are covered", async () => {
+        it("should ensure all typeHelpers functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const typeHelpersModule = await import(
                 "../../utils/typeHelpers.js"
             );
@@ -339,7 +403,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("stringConversion functions", () => {
-        it("should ensure all stringConversion functions are covered", async () => {
+        it("should ensure all stringConversion functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const stringConversionModule = await import(
                 "../../utils/stringConversion.js"
             );
@@ -353,7 +425,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("siteStatus functions", () => {
-        it("should ensure all siteStatus functions are covered", async () => {
+        it("should ensure all siteStatus functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteStatusModule = await import("../../utils/siteStatus.js");
 
             // Create mock site data
@@ -384,7 +464,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("jsonSafety functions", () => {
-        it("should ensure all jsonSafety functions are covered", async () => {
+        it("should ensure all jsonSafety functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const jsonSafetyModule = await import("../../utils/jsonSafety.js");
 
             // Call all exported functions
@@ -422,7 +510,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("errorCatalog functions", () => {
-        it("should ensure all errorCatalog functions are covered", async () => {
+        it("should ensure all errorCatalog functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorCatalogModule = await import(
                 "../../utils/errorCatalog.js"
             );
@@ -454,7 +550,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("errorHandling functions", () => {
-        it("should ensure all errorHandling functions are covered", async () => {
+        it("should ensure all errorHandling functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorHandlingModule = await import(
                 "../../utils/errorHandling.js"
             );
@@ -476,7 +580,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("logTemplates constants", () => {
-        it("should ensure all logTemplates are accessed", async () => {
+        it("should ensure all logTemplates are accessed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const logTemplatesModule = await import(
                 "../../utils/logTemplates.js"
             );
@@ -495,7 +607,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("cacheKeys functions", () => {
-        it("should ensure all cacheKeys functions are covered", async () => {
+        it("should ensure all cacheKeys functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const cacheKeysModule = await import("../../utils/cacheKeys.js");
 
             // Call all exported functions
@@ -542,7 +662,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("validation utility functions", () => {
-        it("should ensure all validation utility functions are covered", async () => {
+        it("should ensure all validation utility functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const validatorUtilsModule = await import(
                 "../../validation/validatorUtils.js"
             );
@@ -570,7 +698,15 @@ describe("Shared Module - 100% Function Coverage", () => {
     });
 
     describe("validation schemas functions", () => {
-        it("should ensure all validation schemas functions are covered", async () => {
+        it("should ensure all validation schemas functions are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: comprehensive-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const schemasModule = await import("../../validation/schemas.js");
 
             // Test validation functions

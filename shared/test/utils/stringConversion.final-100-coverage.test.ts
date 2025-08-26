@@ -8,12 +8,28 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Final 100% Coverage", () => {
     describe("Targeting Lines 86-89 (undefined and default cases)", () => {
-        it("should handle explicit undefined value (line 86-87)", () => {
+        it("should handle explicit undefined value (line 86-87)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        it("should handle the default case for unknown types (line 89-90)", () => {
+        it("should handle the default case for unknown types (line 89-90)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object that reports as an unknown type
             // This is very difficult to achieve in normal TypeScript/JavaScript
             // but we can try to manipulate the typeof behavior
@@ -35,7 +51,15 @@ describe("String Conversion - Final 100% Coverage", () => {
             }
         });
 
-        it("should ensure all typeof results are covered", () => {
+        it("should ensure all typeof results are covered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test all possible typeof results to ensure complete coverage
             const testCases = [
                 { value: "string", expected: "string" },
@@ -58,7 +82,15 @@ describe("String Conversion - Final 100% Coverage", () => {
             });
         });
 
-        it("should attempt to reach the default case through type manipulation", () => {
+        it("should attempt to reach the default case through type manipulation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-100-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a proxy that might confuse typeof
             const proxy = new Proxy(
                 {},

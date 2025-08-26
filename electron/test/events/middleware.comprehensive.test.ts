@@ -37,7 +37,15 @@ describe("middleware.ts - Additional Coverage", () => {
         vi.clearAllMocks();
     });
     describe("createLoggingMiddleware - Additional Branch Coverage", () => {
-        it("should log at warn level", async () => {
+        it("should log at warn level", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "warn",
@@ -54,7 +62,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).toHaveBeenCalled();
         });
-        it("should log at error level", async () => {
+        it("should log at error level", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "error",
@@ -70,7 +86,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).toHaveBeenCalled();
         });
-        it("should handle complex data with circular references in logging", async () => {
+        it("should handle complex data with circular references in logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
@@ -91,7 +115,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).toHaveBeenCalled();
         });
-        it("should handle non-serializable data types in logging", async () => {
+        it("should handle non-serializable data types in logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "info",
@@ -113,7 +145,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("createValidationMiddleware - Error Handling Coverage", () => {
-        it("should handle validation result with isValid false and error message", async () => {
+        it("should handle validation result with isValid false and error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": () => ({
@@ -140,7 +180,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).not.toHaveBeenCalled();
         });
-        it("should handle validation result with isValid false and no error message", async () => {
+        it("should handle validation result with isValid false and no error message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": () => ({ isValid: false }),
@@ -164,7 +212,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).not.toHaveBeenCalled();
         });
-        it("should handle validator throwing non-Error objects", async () => {
+        it("should handle validator throwing non-Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": () => {
@@ -191,7 +247,15 @@ describe("middleware.ts - Additional Coverage", () => {
             );
             expect(next).not.toHaveBeenCalled();
         });
-        it("should re-throw validation errors as-is", async () => {
+        it("should re-throw validation errors as-is", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": () => {
@@ -206,7 +270,15 @@ describe("middleware.ts - Additional Coverage", () => {
 
             expect(next).not.toHaveBeenCalled();
         });
-        it("should handle validators with undefined validator function", async () => {
+        it("should handle validators with undefined validator function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": undefined as any,
@@ -217,7 +289,15 @@ describe("middleware.ts - Additional Coverage", () => {
 
             expect(next).toHaveBeenCalled();
         });
-        it("should handle data with circular references in validation errors", async () => {
+        it("should handle data with circular references in validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn();
             const validators = {
                 "test:event": () => false,
@@ -245,7 +325,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("createDebugMiddleware - Verbose Mode Coverage", () => {
-        it("should log verbose debug info when verbose=true", async () => {
+        it("should log verbose debug info when verbose=true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createDebugMiddleware({ enabled: true, verbose: true });
 
@@ -270,7 +358,15 @@ describe("middleware.ts - Additional Coverage", () => {
 
             expect(next).toHaveBeenCalled();
         });
-        it("should log simple debug info when verbose=false", async () => {
+        it("should log simple debug info when verbose=false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createDebugMiddleware({ enabled: true, verbose: false });
 
@@ -288,7 +384,15 @@ describe("middleware.ts - Additional Coverage", () => {
 
             expect(next).toHaveBeenCalled();
         });
-        it("should use isDevelopment() when enabled is not specified", async () => {
+        it("should use isDevelopment() when enabled is not specified", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { isDevelopment } = await import(
                 "../../../shared/utils/environment"
             );
@@ -304,7 +408,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("safeSerialize Edge Cases", () => {
-        it("should handle null and undefined correctly", async () => {
+        it("should handle null and undefined correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
@@ -329,7 +441,15 @@ describe("middleware.ts - Additional Coverage", () => {
                 })
             );
         });
-        it("should handle primitive types correctly", async () => {
+        it("should handle primitive types correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
@@ -363,7 +483,15 @@ describe("middleware.ts - Additional Coverage", () => {
                 })
             );
         });
-        it("should handle symbols and other exotic types", async () => {
+        it("should handle symbols and other exotic types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
@@ -381,7 +509,15 @@ describe("middleware.ts - Additional Coverage", () => {
                 }
             );
         });
-        it("should handle BigInt and other special types", async () => {
+        it("should handle BigInt and other special types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const mw = createLoggingMiddleware({
                 level: "debug",
@@ -401,7 +537,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("composeMiddleware Edge Cases", () => {
-        it("should handle middleware that doesn't call next", async () => {
+        it("should handle middleware that doesn't call next", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const blockingMiddleware = async () => {
                 // Don't call next - this should stop the chain
@@ -418,7 +562,15 @@ describe("middleware.ts - Additional Coverage", () => {
             expect(secondMiddleware).not.toHaveBeenCalled();
             expect(next).not.toHaveBeenCalled();
         });
-        it("should handle async middleware correctly", async () => {
+        it("should handle async middleware correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const executionOrder: string[] = [];
             const next = vi.fn();
 
@@ -461,7 +613,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("createErrorHandlingMiddleware Edge Cases", () => {
-        it("should handle middleware throwing non-Error objects", async () => {
+        it("should handle middleware throwing non-Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Note: Test expectation needs adjustment - the actual error message format has changed
             const next = vi.fn().mockImplementation(() => {
                 throw "String error";
@@ -489,7 +649,15 @@ describe("middleware.ts - Additional Coverage", () => {
                 })
             );
         });
-        it("should handle circular reference data in error logging", async () => {
+        it("should handle circular reference data in error logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Error Handling", "type");
+
             const next = vi.fn().mockImplementation(() => {
                 throw new Error("Test error");
             });
@@ -515,7 +683,15 @@ describe("middleware.ts - Additional Coverage", () => {
         });
     });
     describe("MIDDLEWARE_STACKS comprehensive testing", () => {
-        it("should handle custom stack with multiple middleware", async () => {
+        it("should handle custom stack with multiple middleware", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const executionOrder: string[] = [];
             const next = vi.fn();
 
@@ -535,7 +711,15 @@ describe("middleware.ts - Additional Coverage", () => {
             expect(executionOrder).toEqual(["mw1", "mw2"]);
             expect(next).toHaveBeenCalled();
         });
-        it("should handle empty custom stack", async () => {
+        it("should handle empty custom stack", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Event System", "category");
+            await annotate("Type: Business Logic", "type");
+
             const next = vi.fn();
             const stack = MIDDLEWARE_STACKS.custom([]);
 

@@ -28,7 +28,7 @@ const mockElectronAPI = {
 };
 
 // Mock global window and electronAPI for Node.js test environment
-global.window = global.window || {};
+(global as any).window = global.window || {};
 Object.defineProperty(global.window, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
@@ -40,7 +40,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
     // Individual module functions are tested separately
 
     describe("Store Creation and Composition Pattern", () => {
-        it("should demonstrate store creation pattern with mocked implementation", () => {
+        it("should demonstrate store creation pattern with mocked implementation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test the core concept of store composition
             const mockGet = vi.fn();
             const mockSet = vi.fn();
@@ -99,7 +107,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(typeof store.createSite).toBe("function");
         });
 
-        it("should test dependency injection pattern", () => {
+        it("should test dependency injection pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that getSites function can be shared between modules
             const mockSites: Site[] = [
                 {
@@ -124,7 +140,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(module.operationThatNeedsGets()).toBe(1);
         });
 
-        it("should test module composition without circular dependencies", () => {
+        it("should test module composition without circular dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that modules can be composed without issues
             const moduleA = { actionA: vi.fn() };
             const moduleB = { actionB: vi.fn() };
@@ -141,7 +165,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(combinedStore.actionC).toBeDefined();
         });
 
-        it("should test store initialization state", () => {
+        it("should test store initialization state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Initialization", "type");
+
             // Test that initial state follows expected pattern
             const initialState = {
                 sites: [],
@@ -151,7 +183,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(Array.isArray(initialState.sites)).toBe(true);
         });
 
-        it("should test shared function creation pattern", () => {
+        it("should test shared function creation pattern", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test the pattern of creating shared functions between modules
             const mockStore = {
                 sites: [
@@ -179,7 +219,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
     });
 
     describe("Store Action Signatures", () => {
-        it("should validate action function signatures", () => {
+        it("should validate action function signatures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test that action functions have proper signatures
             const mockActions = {
                 setSites: (sites: Site[]) => sites,
@@ -206,7 +254,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
     });
 
     describe("Type Compatibility", () => {
-        it("should ensure Site type compatibility", () => {
+        it("should ensure Site type compatibility", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that Site interface is properly structured
             const testSite: Site = {
                 identifier: "site-123",
@@ -221,7 +277,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(typeof testSite.monitoring).toBe("boolean");
         });
 
-        it("should handle multiple sites properly", () => {
+        it("should handle multiple sites properly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sites: Site[] = [
                 {
                     identifier: "site-1",
@@ -244,7 +308,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
     });
 
     describe("Store Architecture Validation", () => {
-        it("should validate modular architecture benefits", () => {
+        it("should validate modular architecture benefits", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test that modular architecture provides expected benefits
             const validateModularArchitecture = () => {
                 // Modules can be tested independently
@@ -269,7 +341,15 @@ describe("useSitesStore - Complete Function Coverage", () => {
             expect(result.sync).toBe("separated");
         });
 
-        it("should validate store extensibility", () => {
+        it("should validate store extensibility", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSitesStore-complete-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test that store can be extended without breaking existing functionality
             const baseStore = {
                 sites: [],

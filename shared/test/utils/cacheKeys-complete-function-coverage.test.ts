@@ -11,7 +11,15 @@ import * as cacheKeysModule from "../../utils/cacheKeys.js";
 
 describe("CacheKeys - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Verify the module exports we expect
             expect(typeof cacheKeysModule).toBe("object");
             expect(cacheKeysModule).toBeDefined();
@@ -164,7 +172,15 @@ describe("CacheKeys - Complete Function Coverage", () => {
             ]);
         });
 
-        it("should handle edge cases and special characters", () => {
+        it("should handle edge cases and special characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with special characters that are allowed
             expect(
                 cacheKeysModule.CacheKeys.config.byName("test-config_123")
@@ -188,7 +204,15 @@ describe("CacheKeys - Complete Function Coverage", () => {
             expect(parsed.identifier).toBe("id_with-special_chars");
         });
 
-        it("should validate all generated keys", () => {
+        it("should validate all generated keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             // Generate keys using all functions and validate them
             const configKey = cacheKeysModule.CacheKeys.config.byName("test");
             const monitorKey = cacheKeysModule.CacheKeys.monitor.byId("test");

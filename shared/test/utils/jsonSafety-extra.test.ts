@@ -16,7 +16,15 @@ import * as jsonSafetyModule from "@shared/utils/jsonSafety";
 
 describe("shared/utils/jsonSafety Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
-        it("should call all exported functions to ensure 100% function coverage", () => {
+        it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: jsonSafety-extra", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Type guard for validation
             const isRecord = (
                 value: unknown

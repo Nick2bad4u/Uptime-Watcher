@@ -13,13 +13,29 @@ import {
 
 describe("Shared Validation Utils", () => {
     describe("isNonEmptyString", () => {
-        it("should return true for non-empty strings", () => {
+        it("should return true for non-empty strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isNonEmptyString("test")).toBe(true);
             expect(isNonEmptyString("valid string")).toBe(true);
             expect(isNonEmptyString(" padded ")).toBe(true);
         });
 
-        it("should return false for empty/invalid values", () => {
+        it("should return false for empty/invalid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isNonEmptyString("")).toBe(false);
             expect(isNonEmptyString("   ")).toBe(false); // Only whitespace
             expect(isNonEmptyString(null)).toBe(false);
@@ -29,20 +45,44 @@ describe("Shared Validation Utils", () => {
     });
 
     describe("isValidUrl", () => {
-        it("should validate correct URL formats", () => {
+        it("should validate correct URL formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             expect(isValidUrl("https://example.com")).toBe(true);
             expect(isValidUrl("http://localhost:3000")).toBe(true);
             expect(isValidUrl("https://sub.domain.com/path")).toBe(true);
         });
 
-        it("should reject invalid URL formats", () => {
+        it("should reject invalid URL formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidUrl("not-a-url")).toBe(false);
             expect(isValidUrl("")).toBe(false);
             expect(isValidUrl("//example.com")).toBe(false);
             expect(isValidUrl(null)).toBe(false);
         });
 
-        it("should respect validation options", () => {
+        it("should respect validation options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test with protocol restriction
             expect(
                 isValidUrl("https://example.com", { protocols: ["https"] })
@@ -54,13 +94,29 @@ describe("Shared Validation Utils", () => {
     });
 
     describe("isValidFQDN", () => {
-        it("should validate correct FQDN formats", () => {
+        it("should validate correct FQDN formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             expect(isValidFQDN("example.com")).toBe(true);
             expect(isValidFQDN("sub.example.com")).toBe(true);
             expect(isValidFQDN("test-site.example.org")).toBe(true);
         });
 
-        it("should reject invalid FQDN formats", () => {
+        it("should reject invalid FQDN formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidFQDN("")).toBe(false);
             expect(isValidFQDN(".com")).toBe(false);
             expect(isValidFQDN("example.")).toBe(false);
@@ -68,14 +124,30 @@ describe("Shared Validation Utils", () => {
             expect(isValidFQDN(null)).toBe(false);
         });
 
-        it("should handle localhost based on options", () => {
+        it("should handle localhost based on options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // By default, localhost might not be valid FQDN
             expect(isValidFQDN("localhost", { require_tld: false })).toBe(true);
         });
     });
 
     describe("isValidIdentifier", () => {
-        it("should validate correct identifier formats", () => {
+        it("should validate correct identifier formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             expect(isValidIdentifier("test")).toBe(true);
             expect(isValidIdentifier("test123")).toBe(true);
             expect(isValidIdentifier("test-name")).toBe(true);
@@ -83,7 +155,15 @@ describe("Shared Validation Utils", () => {
             expect(isValidIdentifier("test-123_name")).toBe(true);
         });
 
-        it("should reject invalid identifier formats", () => {
+        it("should reject invalid identifier formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidIdentifier("")).toBe(false);
             expect(isValidIdentifier("   ")).toBe(false);
             expect(isValidIdentifier("test@name")).toBe(false);
@@ -95,13 +175,29 @@ describe("Shared Validation Utils", () => {
     });
 
     describe("safeInteger", () => {
-        it("should parse valid integers", () => {
+        it("should parse valid integers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeInteger("123", 0)).toBe(123);
             expect(safeInteger("0", 1)).toBe(0);
             expect(safeInteger(456, 0)).toBe(456);
         });
 
-        it("should return default for invalid values", () => {
+        it("should return default for invalid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeInteger("not-number", 42)).toBe(42);
             expect(safeInteger("", 100)).toBe(100);
             expect(safeInteger(null, 200)).toBe(200);
@@ -109,13 +205,29 @@ describe("Shared Validation Utils", () => {
             expect(safeInteger("12.34", 50)).toBe(50); // No decimals allowed
         });
 
-        it("should respect min/max bounds", () => {
+        it("should respect min/max bounds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeInteger("50", 0, 100, 200)).toBe(100); // Below min
             expect(safeInteger("150", 0, 100, 200)).toBe(150); // Within range
             expect(safeInteger("250", 0, 100, 200)).toBe(200); // Above max
         });
 
-        it("should handle edge cases", () => {
+        it("should handle edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(safeInteger(Number.NaN, 1)).toBe(1);
             expect(safeInteger(Infinity, 2)).toBe(2);
             expect(safeInteger(-Infinity, 3)).toBe(3);
@@ -123,7 +235,15 @@ describe("Shared Validation Utils", () => {
     });
 
     describe("Integration tests", () => {
-        it("should work together for complex validation scenarios", () => {
+        it("should work together for complex validation scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test URL validation
             const url = "https://example.com";
             expect(isValidUrl(url)).toBe(true);
@@ -141,7 +261,15 @@ describe("Shared Validation Utils", () => {
             expect(timeout).toBe(5000);
         });
 
-        it("should provide consistent validation behavior", () => {
+        it("should provide consistent validation behavior", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validationUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // All these should be false/default values
             expect(isNonEmptyString("")).toBe(false);
             expect(isValidUrl("invalid")).toBe(false);

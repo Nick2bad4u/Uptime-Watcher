@@ -1,0 +1,51 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "../..",
+        "rootDir": "../..",
+        "tsBuildInfoFile": "../../dist/tsconfig.js.tsbuildinfo",
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "composite": true,
+        "incremental": true,
+        "allowJs": true,
+        "checkJs": true,
+        "isolatedDeclarations": false,
+        "noUncheckedIndexedAccess": false,
+        "noImplicitAny": false,
+        "noPropertyAccessFromIndexSignature": false
+    },
+    "exclude": [
+        "../../electron/**/*.test.ts",
+        "../../electron/**/*.test.tsx",
+        "../../**/docs/docusaurus",
+        "**/node_modules/**"
+    ],
+    "include": [
+        "../../*.config.js",
+        "../../*.config.mjs",
+        "../../**/*.config.js",
+        "../../**/*.config.mjs",
+        "../../eslint.config.mjs",
+        "../../postcss.config.js",
+        "../../tailwind.config.mjs",
+        "../../scripts/*.mjs",
+        "../../scripts/*.cjs",
+        "../../scripts/*.js"
+    ],
+    "references": [
+        {
+            "path": "../../tsconfig.shared.json"
+        }
+    ]
+}

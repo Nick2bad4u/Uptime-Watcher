@@ -15,13 +15,29 @@ describe("generateUuid", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should return a string", () => {
+        it("should return a string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateUuid();
             expect(typeof result).toBe("string");
             expect(result.length).toBeGreaterThan(0);
         });
 
-        it("should generate unique values on multiple calls", () => {
+        it("should generate unique values on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const results = new Set();
             const numCalls = 100;
 
@@ -35,7 +51,15 @@ describe("generateUuid", () => {
     });
 
     describe("Native crypto.randomUUID Behavior", () => {
-        it("should use crypto.randomUUID when available", () => {
+        it("should use crypto.randomUUID when available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRandomUUID = vi
                 .fn()
                 .mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
@@ -51,7 +75,15 @@ describe("generateUuid", () => {
             expect(result).toBe("550e8400-e29b-41d4-a716-446655440000");
         });
 
-        it("should handle crypto.randomUUID throwing an error", () => {
+        it("should handle crypto.randomUUID throwing an error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockRandomUUID = vi.fn().mockImplementation(() => {
                 throw new Error("randomUUID not available");
             });
@@ -68,7 +100,15 @@ describe("generateUuid", () => {
     });
 
     describe("Fallback Behavior", () => {
-        it("should use fallback when crypto is undefined", () => {
+        it("should use fallback when crypto is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalCrypto = globalThis.crypto;
             globalThis.crypto = undefined as any;
 
@@ -81,7 +121,15 @@ describe("generateUuid", () => {
             globalThis.crypto = originalCrypto;
         });
 
-        it("should use fallback when crypto.randomUUID is undefined", () => {
+        it("should use fallback when crypto.randomUUID is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.crypto = {} as any;
 
             const result = generateUuid();
@@ -90,7 +138,15 @@ describe("generateUuid", () => {
             expect(result.startsWith("site-")).toBe(true);
         });
 
-        it("should use fallback when crypto.randomUUID is not a function", () => {
+        it("should use fallback when crypto.randomUUID is not a function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             globalThis.crypto = {
                 randomUUID: "not a function",
             } as any;
@@ -101,7 +157,15 @@ describe("generateUuid", () => {
             expect(result.startsWith("site-")).toBe(true);
         });
 
-        it("should generate unique fallback UUIDs on multiple calls", () => {
+        it("should generate unique fallback UUIDs on multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalCrypto = globalThis.crypto;
             globalThis.crypto = undefined as any;
 
@@ -130,12 +194,28 @@ describe("generateUuid", () => {
             vi.restoreAllMocks();
         });
 
-        it('should always start with "site-"', () => {
+        it('should always start with "site-"', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateUuid();
             expect(result.startsWith("site-")).toBe(true);
         });
 
-        it("should contain timestamp", () => {
+        it("should contain timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const beforeTimestamp = Date.now();
             const result = generateUuid();
             const afterTimestamp = Date.now();
@@ -149,16 +229,32 @@ describe("generateUuid", () => {
             expect(extractedTimestamp).toBeLessThanOrEqual(afterTimestamp);
         });
 
-        it("should have random part between prefix and timestamp", () => {
+        it("should have random part between prefix and timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = generateUuid();
-            const parts = result.split("-");
+            const parts = result.split('-');
 
             expect(parts).toHaveLength(3);
             expect(parts[1]).toMatch(/^[\da-z]+$/);
             expect(parts[1]!.length).toBeGreaterThan(0);
         });
 
-        it("should use consistent format across calls", () => {
+        it('should use consistent format across calls', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const results = Array.from({ length: 10 }, () => generateUuid());
 
             for (const result of results) {
@@ -168,7 +264,15 @@ describe("generateUuid", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle very large timestamps in fallback", () => {
+        it("should handle very large timestamps in fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalCrypto = globalThis.crypto;
             globalThis.crypto = undefined as any;
 
@@ -185,7 +289,15 @@ describe("generateUuid", () => {
             globalThis.crypto = originalCrypto;
         });
 
-        it("should handle timestamp of 0 in fallback", () => {
+        it("should handle timestamp of 0 in fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalCrypto = globalThis.crypto;
             globalThis.crypto = undefined as any;
 
@@ -202,7 +314,15 @@ describe("generateUuid", () => {
     });
 
     describe("Performance and Reliability", () => {
-        it("should handle rapid successive calls", () => {
+        it("should handle rapid successive calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const results: string[] = [];
             const numCalls = 1000;
 
@@ -215,7 +335,15 @@ describe("generateUuid", () => {
             expect(new Set(results).size).toBe(numCalls); // All unique
         });
 
-        it("should work consistently across different test environments", () => {
+        it("should work consistently across different test environments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test multiple scenarios
             const nativeResult = generateUuid();
             expect(typeof nativeResult).toBe("string");
@@ -235,7 +363,15 @@ describe("generateUuid", () => {
     });
 
     describe("Real-world Usage Scenarios", () => {
-        it("should work for database primary keys", () => {
+        it("should work for database primary keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const ids = Array.from({ length: 50 }, () => generateUuid());
 
             // All should be unique
@@ -248,7 +384,15 @@ describe("generateUuid", () => {
             }
         });
 
-        it("should work for temporary file naming", () => {
+        it("should work for temporary file naming", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const id = generateUuid();
             const filename = `temp-${id}.tmp`;
 
@@ -257,7 +401,15 @@ describe("generateUuid", () => {
             expect(filename.length).toBeGreaterThan(10);
         });
 
-        it("should work for component keys in React", () => {
+        it("should work for component keys in React", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const items = Array.from({ length: 10 }, () => ({
                 id: generateUuid(),
                 name: "Item",

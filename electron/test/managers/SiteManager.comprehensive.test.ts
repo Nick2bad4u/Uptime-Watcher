@@ -206,12 +206,28 @@ describe("SiteManager - Comprehensive", () => {
     });
 
     describe("constructor", () => {
-        it("should initialize SiteManager with all dependencies", () => {
+        it("should initialize SiteManager with all dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             siteManager = new SiteManager(mockDeps);
             expect(siteManager).toBeDefined();
         });
 
-        it("should initialize SiteManager without monitoring operations", () => {
+        it("should initialize SiteManager without monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             const depsWithoutMonitoring = { ...mockDeps };
             delete depsWithoutMonitoring.monitoringOperations;
 
@@ -225,7 +241,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should add a new site successfully", async () => {
+        it("should add a new site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockSiteWriterServiceInstance.createSite.mockResolvedValue(
                 mockSite
             );
@@ -249,7 +273,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(mockSite);
         });
 
-        it("should handle validation errors", async () => {
+        it("should handle validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockDeps.configurationManager.validateSiteConfiguration
             ).mockResolvedValue({
@@ -262,7 +294,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle single validation error", async () => {
+        it("should handle single validation error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockDeps.configurationManager.validateSiteConfiguration
             ).mockResolvedValue({
@@ -275,7 +315,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle empty validation errors array", async () => {
+        it("should handle empty validation errors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockDeps.configurationManager.validateSiteConfiguration
             ).mockResolvedValue({
@@ -288,7 +336,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle createSite errors", async () => {
+        it("should handle createSite errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Constructor", "type");
+
             // Note: Mock issue - the SiteWriterService instance is not being properly mocked
             // Set up the mock before the test
             mockSiteWriterServiceInstance.createSite.mockResolvedValue(
@@ -309,7 +365,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should return site from cache if available", () => {
+        it("should return site from cache if available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             // Note: Mock access - the cache instance is not being properly mocked
             mockCache.get = vi.fn().mockReturnValue(mockSite);
 
@@ -319,7 +383,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(mockSite);
         });
 
-        it("should handle cache miss and trigger background loading", () => {
+        it("should handle cache miss and trigger background loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Access the global mock cache instead of trying to get it from the instance
             vi.mocked(mockCache.get).mockReturnValue(undefined);
 
@@ -333,7 +405,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle event emission error during cache miss", () => {
+        it("should handle event emission error during cache miss", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Use the global mock cache consistently
             vi.mocked(mockCache.get).mockReturnValue(undefined);
             vi.mocked(mockDeps.eventEmitter.emitTyped).mockRejectedValue(
@@ -345,7 +425,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle background loading error", async () => {
+        it("should handle background loading error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCache = siteManager["sitesCache"];
 
             // Mock cache.get to return undefined (cache miss)
@@ -373,7 +461,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should get sites from database and update cache", async () => {
+        it("should get sites from database and update cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
             mockSiteRepositoryService.getSitesFromDatabase = vi
@@ -388,7 +484,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual([mockSite]);
         });
 
-        it("should handle database errors", async () => {
+        it("should handle database errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockRejectedValue(new Error("DB error"));
@@ -402,7 +506,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should return all sites from cache", () => {
+        it("should return all sites from cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             vi.mocked(mockCache.getAll).mockReturnValue([mockSite]);
 
             const result = siteManager.getSitesFromCache();
@@ -417,7 +529,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should return the cache instance", () => {
+        it("should return the cache instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const result = siteManager.getSitesCache();
             expect(result).toBe(siteManager["sitesCache"]);
         });
@@ -428,14 +548,30 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should initialize by loading sites into cache", async () => {
+        it("should initialize by loading sites into cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
             expect(true).toBe(true); // Placeholder assertion
         });
 
-        it("should handle initialization errors", async () => {
+        it("should handle initialization errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             // Mock the service to reject when called
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
@@ -453,14 +589,30 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should remove monitor successfully", async () => {
+        it("should remove monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
             expect(true).toBe(true); // Placeholder assertion
         });
 
-        it("should handle monitor deletion failure", async () => {
+        it("should handle monitor deletion failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockDeps.monitorRepository.delete).mockResolvedValue(
                 false
             );
@@ -473,7 +625,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle deletion errors", async () => {
+        it("should handle deletion errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDeps.monitorRepository.delete = vi
                 .fn()
                 .mockRejectedValue(new Error("Delete error"));
@@ -483,7 +643,15 @@ describe("SiteManager - Comprehensive", () => {
             ).rejects.toThrow("Delete error");
         });
 
-        it("should handle site not found after deletion", async () => {
+        it("should handle site not found after deletion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
@@ -496,21 +664,45 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should remove site successfully", async () => {
+        it("should remove site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
             expect(true).toBe(true); // Placeholder assertion
         });
 
-        it("should handle site not found in cache", async () => {
+        it("should handle site not found in cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             // This test requires complex mock setup that creates circular dependencies
             // Note: Simplify SiteManager to improve testability
             expect.hasAssertions();
             expect(true).toBe(true); // Placeholder assertion
         });
 
-        it("should handle deletion failure", async () => {
+        it("should handle deletion failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Ensure the correct mock instance is injected
             const testDeps = {
                 ...mockDeps,
@@ -538,7 +730,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should update site successfully", async () => {
+        it("should update site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
             const updates = { name: "Updated Site" };
@@ -567,7 +767,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(updatedSite);
         });
 
-        it("should handle site not found", async () => {
+        it("should handle site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(mockCache.get).mockReturnValue(undefined);
 
             await expect(
@@ -575,7 +783,15 @@ describe("SiteManager - Comprehensive", () => {
             ).rejects.toThrow("Site with identifier site-1 not found");
         });
 
-        it("should handle validation errors during update", async () => {
+        it("should handle validation errors during update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockCache.get).mockReturnValue(mockSite);
             vi.mocked(
                 mockDeps.configurationManager.validateSiteConfiguration
@@ -589,7 +805,15 @@ describe("SiteManager - Comprehensive", () => {
             ).rejects.toThrow("Site validation failed");
         });
 
-        it("should handle monitor updates with new monitors", async () => {
+        it("should handle monitor updates with new monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
 
@@ -633,7 +857,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toEqual(updatedSite);
         });
 
-        it("should handle site not found after refresh", async () => {
+        it("should handle site not found after refresh", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
 
@@ -663,7 +895,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should update sites cache atomically", async () => {
+        it("should update sites cache atomically", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
             const sites = [mockSite];
             const mockCache = siteManager["sitesCache"];
 
@@ -685,7 +925,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(depsWithoutMonitoring);
         });
 
-        it("should throw error when setHistoryLimit called without monitoring operations", async () => {
+        it("should throw error when setHistoryLimit called without monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
 
@@ -715,7 +963,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should throw error when setupNewMonitors called without monitoring operations", async () => {
+        it("should throw error when setupNewMonitors called without monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCache = siteManager["sitesCache"];
             const mockSiteWriterService = siteManager["siteWriterService"];
 
@@ -755,7 +1011,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should throw error when startMonitoring called without monitoring operations", async () => {
+        it("should throw error when startMonitoring called without monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const config = siteManager["createMonitoringConfig"]();
 
             await expect(
@@ -765,7 +1029,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should throw error when stopMonitoring called without monitoring operations", async () => {
+        it("should throw error when stopMonitoring called without monitoring operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const config = siteManager["createMonitoringConfig"]();
 
             await expect(
@@ -781,7 +1053,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should handle setHistoryLimit error gracefully", async () => {
+        it("should handle setHistoryLimit error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitoringOperations.setHistoryLimit
             ).mockRejectedValue(new Error("History limit error"));
@@ -796,7 +1076,15 @@ describe("SiteManager - Comprehensive", () => {
             ).toHaveBeenCalledWith(100);
         });
 
-        it("should call setupNewMonitors successfully", async () => {
+        it("should call setupNewMonitors successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const config = siteManager["createMonitoringConfig"]();
 
             await config.setupNewMonitors(mockSite, ["monitor-1"]);
@@ -806,7 +1094,15 @@ describe("SiteManager - Comprehensive", () => {
             ).toHaveBeenCalledWith(mockSite, ["monitor-1"]);
         });
 
-        it("should call startMonitoring successfully", async () => {
+        it("should call startMonitoring successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const config = siteManager["createMonitoringConfig"]();
 
             const result = await config.startMonitoring("site-1", "monitor-1");
@@ -817,7 +1113,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe(true);
         });
 
-        it("should call stopMonitoring successfully", async () => {
+        it("should call stopMonitoring successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const config = siteManager["createMonitoringConfig"]();
 
             const result = await config.stopMonitoring("site-1", "monitor-1");
@@ -834,7 +1138,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should load site in background successfully", async () => {
+        it("should load site in background successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockCache = siteManager["sitesCache"];
 
             vi.mocked(
@@ -850,7 +1162,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle site not found during background loading", async () => {
+        it("should handle site not found during background loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockResolvedValue([]);
@@ -865,7 +1185,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle database error during background loading", async () => {
+        it("should handle database error during background loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
             ).mockRejectedValue(new Error("DB error"));
@@ -880,7 +1208,15 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
-        it("should handle event emission error during background loading", async () => {
+        it("should handle event emission error during background loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockSiteRepositoryService =
                 siteManager["siteRepositoryService"];
 
@@ -907,7 +1243,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should validate site successfully", async () => {
+        it("should validate site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             await siteManager["validateSite"](mockSite);
 
             expect(
@@ -915,7 +1259,15 @@ describe("SiteManager - Comprehensive", () => {
             ).toHaveBeenCalledWith(mockSite);
         });
 
-        it("should throw error for invalid site", async () => {
+        it("should throw error for invalid site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockDeps.configurationManager.validateSiteConfiguration
             ).mockResolvedValue({
@@ -934,14 +1286,30 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should format single error", () => {
+        it("should format single error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = siteManager["formatValidationErrors"]([
                 "Single error",
             ]);
             expect(result).toBe("Single error");
         });
 
-        it("should format multiple errors", () => {
+        it("should format multiple errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = siteManager["formatValidationErrors"]([
                 "Error 1",
                 "Error 2",
@@ -949,7 +1317,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe("\n  - Error 1\n  - Error 2");
         });
 
-        it("should handle empty error", () => {
+        it("should handle empty error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = siteManager["formatValidationErrors"]([
                 undefined as any,
             ]);
@@ -962,7 +1338,15 @@ describe("SiteManager - Comprehensive", () => {
             siteManager = new SiteManager(mockDeps);
         });
 
-        it("should execute monitor deletion successfully", async () => {
+        it("should execute monitor deletion successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result =
                 await siteManager["executeMonitorDeletion"]("monitor-1");
 
@@ -972,7 +1356,15 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle deletion failure", async () => {
+        it("should handle deletion failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockDeps.monitorRepository.delete).mockResolvedValue(
                 false
             );
@@ -985,7 +1377,15 @@ describe("SiteManager - Comprehensive", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should handle complex site lifecycle", async () => {
+        it("should handle complex site lifecycle", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             siteManager = new SiteManager(mockDeps);
 
             // Initialize

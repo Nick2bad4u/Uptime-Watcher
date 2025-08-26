@@ -9,13 +9,29 @@ import { validateMonitorField } from "../../shared/validation/schemas";
 
 describe("100% Coverage - Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89", () => {
-        it("should handle undefined case (line 86-87)", () => {
+        it("should handle undefined case (line 86-87)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test explicit undefined value
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        it("should handle default case for unknown types (line 89-90)", () => {
+        it("should handle default case for unknown types (line 89-90)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object that might trigger the default case
             // by manipulating typeof behavior
             const weirdValue = Object.create(null);
@@ -31,7 +47,15 @@ describe("100% Coverage - Remaining Lines", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should test all typeof branches comprehensively", () => {
+        it("should test all typeof branches comprehensively", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testCases = [
                 [undefined, ""],
                 [null, ""], // Both null and undefined return empty string
@@ -52,7 +76,15 @@ describe("100% Coverage - Remaining Lines", () => {
             }
         });
 
-        it("should attempt to trigger default case through edge cases", () => {
+        it("should attempt to trigger default case through edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Try various edge cases that might hit the default branch
             const edgeCases = [
                 Object.create(null), // pure object
@@ -68,7 +100,15 @@ describe("100% Coverage - Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 399 (unknown field error)", () => {
-        it("should trigger unknown field error for invalid field name", () => {
+        it("should trigger unknown field error for invalid field name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 validateMonitorField("http", "nonExistentField", {
                     nonExistentField: "value",
@@ -76,7 +116,15 @@ describe("100% Coverage - Remaining Lines", () => {
             }).toThrow("Unknown field: nonExistentField");
         });
 
-        it("should trigger unknown field error for field not in any schema", () => {
+        it("should trigger unknown field error for field not in any schema", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 validateMonitorField("http", "totallyMadeUpField", {
                     totallyMadeUpField: "value",
@@ -86,7 +134,15 @@ describe("100% Coverage - Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 482 (error vs warning categorization)", () => {
-        it("should categorize validation issues correctly", () => {
+        it("should categorize validation issues correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test with data that will trigger both errors and warnings
             const result = validateMonitorField("http", "url", {
                 url: undefined, // This should trigger an optional field warning
@@ -97,7 +153,15 @@ describe("100% Coverage - Remaining Lines", () => {
             expect(typeof result.success).toBe("boolean");
         });
 
-        it("should handle optional field validation warnings", () => {
+        it("should handle optional field validation warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             // Test with a valid optional field that exists in the schema
             const result = validateMonitorField("http", "timeout", 30000);
 
@@ -108,7 +172,15 @@ describe("100% Coverage - Remaining Lines", () => {
     });
 
     describe("Comprehensive edge case testing", () => {
-        it("should handle all uncovered branches in combination", () => {
+        it("should handle all uncovered branches in combination", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test undefined in stringConversion
             expect(safeStringify(undefined)).toBe("");
 
@@ -122,7 +194,15 @@ describe("100% Coverage - Remaining Lines", () => {
             // These tests ensure we hit all the previously uncovered lines
         });
 
-        it("should test validation error categorization edge cases", () => {
+        it("should test validation error categorization edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-completion", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test various valid field validation scenarios
             const testFields = [
                 "url",

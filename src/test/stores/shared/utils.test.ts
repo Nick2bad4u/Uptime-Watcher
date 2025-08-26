@@ -30,7 +30,15 @@ describe("Store Utils", () => {
     });
 
     describe("logStoreAction", () => {
-        it("should log action without payload in development", () => {
+        it("should log action without payload in development", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction");
@@ -40,7 +48,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should log action with payload in development", () => {
+        it("should log action with payload in development", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
             const payload = { test: "data" };
 
@@ -52,7 +68,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should not log action in production", () => {
+        it("should not log action in production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockIsDevelopment.mockReturnValue(false);
 
             logStoreAction("TestStore", "testAction");
@@ -60,7 +84,15 @@ describe("Store Utils", () => {
             expect(mockLogger.info).not.toHaveBeenCalled();
         });
 
-        it("should not log action with payload in production", () => {
+        it("should not log action with payload in production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(false);
             const payload = { test: "data" };
 
@@ -69,7 +101,15 @@ describe("Store Utils", () => {
             expect(mockLogger.info).not.toHaveBeenCalled();
         });
 
-        it("should handle undefined payload explicitly", () => {
+        it("should handle undefined payload explicitly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", undefined);
@@ -79,7 +119,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle null payload", () => {
+        it("should handle null payload", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", null);
@@ -90,7 +138,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle empty string payload", () => {
+        it("should handle empty string payload", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", "");
@@ -101,7 +157,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle number payload", () => {
+        it("should handle number payload", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", 42);
@@ -112,7 +176,15 @@ describe("Store Utils", () => {
             );
         });
 
-        it("should handle boolean payload", () => {
+        it("should handle boolean payload", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: utils", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             mockIsDevelopment.mockReturnValue(true);
 
             logStoreAction("TestStore", "testAction", true);

@@ -13,7 +13,17 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 describe("AddSiteForm Targeted Coverage", () => {
-    it("should cover error logging scenarios", () => {
+    it("should cover error logging scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // Test Line 155: Invalid monitor type error logging
         logger.error("Invalid monitor type value: invalid-type");
         expect(logger.error).toHaveBeenCalledWith(
@@ -33,7 +43,17 @@ describe("AddSiteForm Targeted Coverage", () => {
         );
     });
 
-    it("should cover handler functions", () => {
+    it("should cover handler functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test dynamic field handlers (lines 183-186)
         const mockSetHost = vi.fn();
         const mockSetPort = vi.fn();
@@ -54,7 +74,17 @@ describe("AddSiteForm Targeted Coverage", () => {
         expect(mockSetUrl).toHaveBeenCalledWith("https://example.com");
     });
 
-    it("should cover callback execution", () => {
+    it("should cover callback execution", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Test success callback execution (lines 175-176)
         const mockResetForm = vi.fn();
         const mockOnSuccess = vi.fn();
@@ -66,7 +96,17 @@ describe("AddSiteForm Targeted Coverage", () => {
         expect(mockOnSuccess).toHaveBeenCalled();
     });
 
-    it("should cover error handling", () => {
+    it("should cover error handling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // Test form submission error handling (line 240)
         const consoleSpy = vi
             .spyOn(console, "error")
@@ -82,7 +122,17 @@ describe("AddSiteForm Targeted Coverage", () => {
         consoleSpy.mockRestore();
     });
 
-    it("should cover error clearing", () => {
+    it("should cover error clearing", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // Test error clearing functionality (lines 276-277)
         const mockClearError = vi.fn();
         const mockSetFormError = vi.fn();

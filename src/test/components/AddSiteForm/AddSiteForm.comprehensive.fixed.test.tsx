@@ -212,7 +212,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Initial Render", () => {
-        it("renders the form with all required fields", () => {
+        it("renders the form with all required fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             expect(
@@ -229,7 +239,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("displays default values correctly", () => {
+        it("displays default values correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             const nameInput = screen.getByRole("textbox", {
@@ -241,7 +261,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("shows monitor type dropdown with correct options", () => {
+        it("shows monitor type dropdown with correct options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<AddSiteForm />);
 
             const monitorTypeSelect = screen.getByRole("combobox", {
@@ -252,7 +282,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Interactions", () => {
-        it("calls setName when site name input changes", async () => {
+        it("calls setName when site name input changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -266,7 +306,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setName).toHaveBeenLastCalledWith("e"); // Last character typed
         });
 
-        it("calls setUrl when URL input changes", async () => {
+        it("calls setUrl when URL input changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -278,7 +328,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setUrl).toHaveBeenLastCalledWith("m"); // Last character typed
         });
 
-        it("calls setMonitorType when monitor type changes", async () => {
+        it("calls setMonitorType when monitor type changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -292,7 +352,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Monitor Type Specific Fields", () => {
-        it("renders dynamic fields for HTTP monitor type", () => {
+        it("renders dynamic fields for HTTP monitor type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockFormHook.monitorType = "http";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -307,7 +377,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("renders dynamic fields for ping monitor type", () => {
+        it("renders dynamic fields for ping monitor type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockFormHook.monitorType = "ping";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -319,7 +399,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("renders dynamic fields for port monitor type", () => {
+        it("renders dynamic fields for port monitor type", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockFormHook.monitorType = "port";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -336,7 +426,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("shows add button as enabled when form is valid", () => {
+        it("shows add button as enabled when form is valid", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.isFormValid = vi.fn(() => true);
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -346,7 +446,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(addButton).not.toBeDisabled();
         });
 
-        it("displays error alert when form has error", () => {
+        it("displays error alert when form has error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockFormHook.formError = "Invalid URL format";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -357,7 +467,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             );
         });
 
-        it("does not display error alert when form has no error", () => {
+        it("does not display error alert when form has no error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockFormHook.formError = undefined;
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -368,7 +488,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Modes", () => {
-        it("handles new site mode correctly", () => {
+        it("handles new site mode correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.addMode = "new";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -379,7 +509,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("handles existing site mode correctly", () => {
+        it("handles existing site mode correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.addMode = "existing";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
@@ -399,7 +539,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Reset", () => {
-        it("calls resetForm when reset is triggered", () => {
+        it("calls resetForm when reset is triggered", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             // Assuming there's a reset mechanism in the component
@@ -409,7 +559,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Edge Cases", () => {
-        it("handles empty string values correctly", () => {
+        it("handles empty string values correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.name = "";
             mockFormHook.url = "";
             mockFormHook.host = "";
@@ -426,7 +586,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("handles special characters in input fields", async () => {
+        it("handles special characters in input fields", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -444,7 +614,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setName).toHaveBeenLastCalledWith("3"); // Last character
         });
 
-        it("handles very long input values", async () => {
+        it("handles very long input values", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -462,7 +642,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Accessibility", () => {
-        it("has proper ARIA labels", () => {
+        it("has proper ARIA labels", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<AddSiteForm />);
 
             expect(
@@ -476,7 +666,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toHaveAttribute("aria-label");
         });
 
-        it("supports keyboard navigation", async () => {
+        it("supports keyboard navigation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             render(<AddSiteForm />);
 
@@ -497,7 +697,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Performance", () => {
-        it("does not cause unnecessary re-renders", () => {
+        it("does not cause unnecessary re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const renderCount = vi.fn();
             const TestWrapper = () => {
                 renderCount();
@@ -516,7 +726,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Error Handling", () => {
-        it("gracefully handles undefined hook values", () => {
+        it("gracefully handles undefined hook values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.name = undefined;
             mockFormHook.url = undefined;
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
@@ -532,7 +752,17 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(urlInput).toHaveValue("");
         });
 
-        it("handles missing setter functions gracefully", () => {
+        it("handles missing setter functions gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockFormHook.setName = undefined;
             mockFormHook.setUrl = undefined;
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);

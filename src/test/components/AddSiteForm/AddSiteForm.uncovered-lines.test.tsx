@@ -279,7 +279,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         consoleErrorSpy.mockClear();
     });
 
-    it("should cover error logging when invalid monitor type is set", async () => {
+    it("should cover error logging when invalid monitor type is set", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
         // Find monitor type select field and trigger change with invalid value
@@ -298,7 +308,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
     });
 
-    it("should cover error logging when invalid check interval is set", async () => {
+    it("should cover error logging when invalid check interval is set", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
         // Find check interval field and trigger change with non-numeric value
@@ -314,7 +334,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
     });
 
-    it("should cover success callback execution with onSuccess prop", async () => {
+    it("should cover success callback execution with onSuccess prop", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Mock handleSubmit to call the onSuccess callback
         vi.mocked(handleSubmit).mockImplementation(
             async (_event, properties) => {
@@ -334,7 +364,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         expect(mockOnSuccess).toHaveBeenCalled();
     });
 
-    it("should cover dynamic field change handlers", async () => {
+    it("should cover dynamic field change handlers", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
         // Test dynamic field changes for different monitor types
@@ -353,7 +393,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
     });
 
-    it("should cover form submission error handling catch block", async () => {
+    it("should cover form submission error handling catch block", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // Mock handleSubmit to throw an error to trigger the catch block
         vi.mocked(handleSubmit).mockRejectedValueOnce(
             new Error("Submission failed")
@@ -372,7 +422,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
     });
 
-    it("should cover error clearing functionality", async () => {
+    it("should cover error clearing functionality", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         // First set a form error to trigger the ErrorAlert component
         vi.mocked(useErrorStore).mockReturnValue({
             lastError: "Test error",
@@ -396,7 +456,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         expect(mockSetFormError).toHaveBeenCalledWith(undefined);
     });
 
-    it("should cover error logging when invalid add mode is set", async () => {
+    it("should cover error logging when invalid add mode is set", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
         // Find add mode radio group and trigger change with invalid value
@@ -418,7 +488,17 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
     });
 
-    it("should cover sites mapping logic for existing site options", async () => {
+    it("should cover sites mapping logic for existing site options", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.uncovered-lines", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         // Mock the form to be in existing site mode
         const ExistingSiteForm = () => {
             React.useEffect(() => {

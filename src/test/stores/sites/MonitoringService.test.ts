@@ -29,7 +29,15 @@ describe("MonitoringService", () => {
     });
 
     describe("startMonitoring", () => {
-        it("should start monitoring for a site and monitor", async () => {
+        it("should start monitoring for a site and monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "test-site-id";
             const monitorId = "test-monitor-id";
 
@@ -44,7 +52,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle errors when starting monitoring", async () => {
+        it("should handle errors when starting monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "test-site-id";
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to start monitoring");
@@ -58,7 +74,15 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to start monitoring");
         });
 
-        it("should handle empty siteId", async () => {
+        it("should handle empty siteId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "";
             const monitorId = "test-monitor-id";
 
@@ -73,7 +97,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith("", monitorId);
         });
 
-        it("should handle empty monitorId", async () => {
+        it("should handle empty monitorId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "test-site-id";
             const monitorId = "";
 
@@ -88,7 +120,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, "");
         });
 
-        it("should handle special characters in IDs", async () => {
+        it("should handle special characters in IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
@@ -103,7 +143,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle Unicode characters in IDs", async () => {
+        it("should handle Unicode characters in IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
@@ -120,7 +168,15 @@ describe("MonitoringService", () => {
     });
 
     describe("stopMonitoring", () => {
-        it("should stop monitoring for a site and monitor", async () => {
+        it("should stop monitoring for a site and monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "test-site-id";
             const monitorId = "test-monitor-id";
 
@@ -135,7 +191,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle errors when stopping monitoring", async () => {
+        it("should handle errors when stopping monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteId = "test-site-id";
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to stop monitoring");
@@ -149,7 +213,15 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to stop monitoring");
         });
 
-        it("should handle empty siteId", async () => {
+        it("should handle empty siteId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "";
             const monitorId = "test-monitor-id";
 
@@ -164,7 +236,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith("", monitorId);
         });
 
-        it("should handle empty monitorId", async () => {
+        it("should handle empty monitorId", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "test-site-id";
             const monitorId = "";
 
@@ -179,7 +259,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, "");
         });
 
-        it("should handle special characters in IDs", async () => {
+        it("should handle special characters in IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
@@ -194,7 +282,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle Unicode characters in IDs", async () => {
+        it("should handle Unicode characters in IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
@@ -211,12 +307,28 @@ describe("MonitoringService", () => {
     });
 
     describe("Service availability", () => {
-        it("should work when window.electronAPI is available", () => {
+        it("should work when window.electronAPI is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(MonitoringService.startMonitoring).toBeDefined();
             expect(MonitoringService.stopMonitoring).toBeDefined();
         });
 
-        it("should handle undefined window.electronAPI gracefully", async () => {
+        it("should handle undefined window.electronAPI gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Import the mock so we can control it
             const { waitForElectronAPI } = await import(
                 "../../../stores/utils"
@@ -241,7 +353,15 @@ describe("MonitoringService", () => {
     });
 
     describe("Parameter validation", () => {
-        it("should accept valid string parameters", async () => {
+        it("should accept valid string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "valid-site-id";
             const monitorId = "valid-monitor-id";
 
@@ -256,7 +376,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle long IDs", async () => {
+        it("should handle long IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "a".repeat(1000);
             const monitorId = "b".repeat(1000);
 
@@ -271,7 +399,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle numeric-like string IDs", async () => {
+        it("should handle numeric-like string IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "12345";
             const monitorId = "67890";
 
@@ -286,7 +422,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteId, monitorId);
         });
 
-        it("should handle UUID-like IDs", async () => {
+        it("should handle UUID-like IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteId = "550e8400-e29b-41d4-a716-446655440000";
             const monitorId = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
@@ -303,7 +447,15 @@ describe("MonitoringService", () => {
     });
 
     describe("Error handling", () => {
-        it("should propagate network errors", async () => {
+        it("should propagate network errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const networkError = new Error("Network error");
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
                 networkError
@@ -314,7 +466,15 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Network error");
         });
 
-        it("should propagate validation errors from backend", async () => {
+        it("should propagate validation errors from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validationError = new Error("Invalid site ID");
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 validationError
@@ -325,7 +485,15 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Invalid site ID");
         });
 
-        it("should handle timeout errors", async () => {
+        it("should handle timeout errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const timeoutError = new Error("Request timeout");
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
                 timeoutError
@@ -336,7 +504,15 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Request timeout");
         });
 
-        it("should handle backend service unavailable errors", async () => {
+        it("should handle backend service unavailable errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const serviceError = new Error("Monitoring service unavailable");
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 serviceError
@@ -349,7 +525,15 @@ describe("MonitoringService", () => {
     });
 
     describe("Concurrent operations", () => {
-        it("should handle multiple concurrent start operations", async () => {
+        it("should handle multiple concurrent start operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
             );
@@ -365,7 +549,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledTimes(5);
         });
 
-        it("should handle multiple concurrent stop operations", async () => {
+        it("should handle multiple concurrent stop operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.stopMonitoring(`site-${i}`, `monitor-${i}`)
             );
@@ -381,7 +573,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledTimes(5);
         });
 
-        it("should handle mixed concurrent operations", async () => {
+        it("should handle mixed concurrent operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const startOps = Array.from({ length: 3 }, (_, i) =>
                 MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
             );
@@ -409,7 +609,15 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledTimes(3);
         });
 
-        it("should handle some operations failing while others succeed", async () => {
+        it("should handle some operations failing while others succeed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.monitoring.startMonitoringForSite
                 .mockResolvedValueOnce(undefined)
                 .mockRejectedValueOnce(new Error("Failed"))

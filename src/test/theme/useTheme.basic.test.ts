@@ -58,7 +58,15 @@ describe("useTheme Basic Coverage", () => {
         vi.clearAllMocks();
     });
 
-    it("should cover basic useTheme functionality", () => {
+    it("should cover basic useTheme functionality", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() => useTheme());
 
         // Call functions to increase coverage
@@ -68,7 +76,15 @@ describe("useTheme Basic Coverage", () => {
         expect(typeof result.current.toggleTheme).toBe("function");
     });
 
-    it("should cover useAvailabilityColors", () => {
+    it("should cover useAvailabilityColors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() => useAvailabilityColors());
 
         expect(typeof result.current.getAvailabilityColor).toBe("function");
@@ -87,7 +103,15 @@ describe("useTheme Basic Coverage", () => {
         expect(typeof description).toBe("string");
     });
 
-    it("should cover useStatusColors", () => {
+    it("should cover useStatusColors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() => useStatusColors());
 
         expect(result.current).toHaveProperty("up");
@@ -96,7 +120,15 @@ describe("useTheme Basic Coverage", () => {
         expect(result.current).toHaveProperty("unknown");
     });
 
-    it("should cover useThemeClasses", () => {
+    it("should cover useThemeClasses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() => useThemeClasses());
 
         expect(typeof result.current.getBackgroundClass).toBe("function");
@@ -113,7 +145,15 @@ describe("useTheme Basic Coverage", () => {
         expect(typeof borderClass).toBe("object");
     });
 
-    it("should cover useThemeValue", () => {
+    it("should cover useThemeValue", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() =>
             useThemeValue((theme) => theme.name)
         );
@@ -121,7 +161,15 @@ describe("useTheme Basic Coverage", () => {
         expect(typeof result.current).toBe("string");
     });
 
-    it("should test more useTheme functions", () => {
+    it("should test more useTheme functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.basic", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { result } = renderHook(() => useTheme());
 
         // Test getColor with various paths for coverage

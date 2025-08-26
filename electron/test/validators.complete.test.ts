@@ -39,7 +39,15 @@ function isValidationFailure(result: null | string[]): boolean {
 
 describe("IPC Validators - Exported Validator Groups", () => {
     describe("SiteHandlerValidators", () => {
-        it("should have all required validator properties", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(SiteHandlerValidators).toHaveProperty("addSite");
             expect(SiteHandlerValidators).toHaveProperty("getSites");
             expect(SiteHandlerValidators).toHaveProperty("removeMonitor");
@@ -47,7 +55,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
             expect(SiteHandlerValidators).toHaveProperty("updateSite");
         });
 
-        it("should have validators as functions", () => {
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(typeof SiteHandlerValidators.addSite).toBe("function");
             expect(typeof SiteHandlerValidators.getSites).toBe("function");
             expect(typeof SiteHandlerValidators.removeMonitor).toBe("function");
@@ -56,7 +72,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("addSite validator", () => {
-            it("should return null for valid single object parameter", () => {
+            it("should return null for valid single object parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const siteObject = {
                     name: "Test Site",
                     url: "https://example.com",
@@ -66,7 +90,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.addSite([
                     "param1",
                     "param2",
@@ -76,13 +108,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(Array.isArray(result)).toBe(true);
             });
 
-            it("should return error array for empty parameters", () => {
+            it("should return error array for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.addSite([]);
 
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid object parameter", () => {
+            it("should return error array for invalid object parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.addSite([null]);
 
                 expect(isValidationFailure(result)).toBe(true);
@@ -90,13 +138,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("getSites validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = SiteHandlerValidators.getSites([]);
 
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.getSites(["unexpected"]);
 
                 expect(isValidationFailure(result)).toBe(true);
@@ -104,7 +168,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("removeMonitor validator", () => {
-            it("should return null for valid two string parameters", () => {
+            it("should return null for valid two string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = SiteHandlerValidators.removeMonitor([
                     "site-id",
                     "monitor-id",
@@ -113,7 +185,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.removeMonitor([
                     "only-one",
                 ]);
@@ -121,7 +201,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter types", () => {
+            it("should return error array for invalid parameter types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.removeMonitor([123, 456]);
 
                 expect(isValidationFailure(result)).toBe(true);
@@ -129,7 +217,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("removeSite validator", () => {
-            it("should return null for valid single string parameter", () => {
+            it("should return null for valid single string parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = SiteHandlerValidators.removeSite([
                     "site-identifier",
                 ]);
@@ -137,13 +233,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.removeSite([]);
 
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter type", () => {
+            it("should return error array for invalid parameter type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.removeSite([123]);
 
                 expect(isValidationFailure(result)).toBe(true);
@@ -151,7 +263,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("updateSite validator", () => {
-            it("should return null for valid string and object parameters", () => {
+            it("should return null for valid string and object parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const updates = { name: "Updated Site" };
                 const result = SiteHandlerValidators.updateSite([
                     "site-id",
@@ -161,7 +281,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.updateSite([
                     "only-string",
                 ]);
@@ -169,7 +297,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter types", () => {
+            it("should return error array for invalid parameter types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = SiteHandlerValidators.updateSite([
                     123,
                     "not-object",
@@ -181,7 +317,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
     });
 
     describe("MonitoringHandlerValidators", () => {
-        it("should have all required validator properties", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(MonitoringHandlerValidators).toHaveProperty("checkSiteNow");
             expect(MonitoringHandlerValidators).toHaveProperty(
                 "startMonitoring"
@@ -197,7 +341,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
             );
         });
 
-        it("should have validators as functions", () => {
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(typeof MonitoringHandlerValidators.checkSiteNow).toBe(
                 "function"
             );
@@ -216,7 +368,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("checkSiteNow validator", () => {
-            it("should return null for valid two string parameters", () => {
+            it("should return null for valid two string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = MonitoringHandlerValidators.checkSiteNow([
                     "site-id",
                     "monitor-id",
@@ -224,7 +384,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitoringHandlerValidators.checkSiteNow([
                     "only-one",
                 ]);
@@ -233,12 +401,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("startMonitoring validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = MonitoringHandlerValidators.startMonitoring([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitoringHandlerValidators.startMonitoring([
                     "unexpected",
                 ]);
@@ -247,7 +431,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("startMonitoringForSite validator", () => {
-            it("should return null for valid parameters with both strings", () => {
+            it("should return null for valid parameters with both strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result =
                     MonitoringHandlerValidators.startMonitoringForSite([
                         "site-id",
@@ -256,7 +448,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return null for valid parameters with single string", () => {
+            it("should return null for valid parameters with single string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result =
                     MonitoringHandlerValidators.startMonitoringForSite([
                         "site-id",
@@ -264,7 +464,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result =
                     MonitoringHandlerValidators.startMonitoringForSite([
                         "one",
@@ -276,12 +484,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("stopMonitoring validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = MonitoringHandlerValidators.stopMonitoring([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitoringHandlerValidators.stopMonitoring([
                     "unexpected",
                 ]);
@@ -290,7 +514,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("stopMonitoringForSite validator", () => {
-            it("should return null for valid parameters with both strings", () => {
+            it("should return null for valid parameters with both strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result =
                     MonitoringHandlerValidators.stopMonitoringForSite([
                         "site-id",
@@ -299,7 +531,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return null for valid parameters with single string", () => {
+            it("should return null for valid parameters with single string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result =
                     MonitoringHandlerValidators.stopMonitoringForSite([
                         "site-id",
@@ -307,7 +547,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result =
                     MonitoringHandlerValidators.stopMonitoringForSite([]);
                 expect(isValidationFailure(result)).toBe(true);
@@ -316,7 +564,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
     });
 
     describe("DataHandlerValidators", () => {
-        it("should have all required validator properties", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(DataHandlerValidators).toHaveProperty(
                 "downloadSqliteBackup"
             );
@@ -327,7 +583,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
             expect(DataHandlerValidators).toHaveProperty("updateHistoryLimit");
         });
 
-        it("should have validators as functions", () => {
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(typeof DataHandlerValidators.downloadSqliteBackup).toBe(
                 "function"
             );
@@ -343,12 +607,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("downloadSqliteBackup validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = DataHandlerValidators.downloadSqliteBackup([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.downloadSqliteBackup([
                     "unexpected",
                 ]);
@@ -357,24 +637,56 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("exportData validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = DataHandlerValidators.exportData([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.exportData(["unexpected"]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("getHistoryLimit validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = DataHandlerValidators.getHistoryLimit([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.getHistoryLimit([
                     "unexpected",
                 ]);
@@ -383,30 +695,70 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("importData validator", () => {
-            it("should return null for valid single string parameter", () => {
+            it("should return null for valid single string parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const dataString = '{"sites": [], "monitors": []}';
                 const result = DataHandlerValidators.importData([dataString]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.importData([]);
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter type", () => {
+            it("should return error array for invalid parameter type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.importData([123]);
                 expect(isValidationFailure(result)).toBe(true);
             });
         });
 
         describe("resetSettings validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = DataHandlerValidators.resetSettings([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.resetSettings([
                     "unexpected",
                 ]);
@@ -415,17 +767,41 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("updateHistoryLimit validator", () => {
-            it("should return null for valid single number parameter", () => {
+            it("should return null for valid single number parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = DataHandlerValidators.updateHistoryLimit([100]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.updateHistoryLimit([]);
                 expect(isValidationFailure(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter type", () => {
+            it("should return error array for invalid parameter type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = DataHandlerValidators.updateHistoryLimit([
                     "not-a-number",
                 ]);
@@ -435,7 +811,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
     });
 
     describe("MonitorTypeHandlerValidators", () => {
-        it("should have all required validator properties", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(MonitorTypeHandlerValidators).toHaveProperty(
                 "formatMonitorDetail"
             );
@@ -450,7 +834,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
             );
         });
 
-        it("should have validators as functions", () => {
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 typeof MonitorTypeHandlerValidators.formatMonitorDetail
             ).toBe("function");
@@ -466,14 +858,30 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("formatMonitorDetail validator", () => {
-            it("should return null for valid two string parameters", () => {
+            it("should return null for valid two string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = MonitorTypeHandlerValidators.formatMonitorDetail(
                     ["http", "details"]
                 );
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitorTypeHandlerValidators.formatMonitorDetail(
                     ["only-one"]
                 );
@@ -482,7 +890,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("formatMonitorTitleSuffix validator", () => {
-            it("should return null for valid string and object parameters", () => {
+            it("should return null for valid string and object parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { name: "Test Monitor" };
                 const result =
                     MonitorTypeHandlerValidators.formatMonitorTitleSuffix([
@@ -492,7 +908,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result =
                     MonitorTypeHandlerValidators.formatMonitorTitleSuffix([
                         "only-string",
@@ -502,12 +926,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("getMonitorTypes validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = MonitorTypeHandlerValidators.getMonitorTypes([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitorTypeHandlerValidators.getMonitorTypes([
                     "unexpected",
                 ]);
@@ -516,7 +956,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("validateMonitorData validator", () => {
-            it("should return null for valid string and unvalidated second parameter", () => {
+            it("should return null for valid string and unvalidated second parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
                 const data = { url: "https://example.com", timeout: 30 };
                 const result = MonitorTypeHandlerValidators.validateMonitorData(
                     ["http", data]
@@ -524,7 +972,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should accept any type for second parameter", () => {
+            it("should accept any type for second parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result1 =
                     MonitorTypeHandlerValidators.validateMonitorData([
                         "http",
@@ -546,7 +1002,15 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result3)).toBe(true);
             });
 
-            it("should return error array for invalid parameter count", () => {
+            it("should return error array for invalid parameter count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = MonitorTypeHandlerValidators.validateMonitorData(
                     ["only-one"]
                 );
@@ -556,14 +1020,30 @@ describe("IPC Validators - Exported Validator Groups", () => {
     });
 
     describe("StateSyncHandlerValidators", () => {
-        it("should have all required validator properties", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(StateSyncHandlerValidators).toHaveProperty("getSyncStatus");
             expect(StateSyncHandlerValidators).toHaveProperty(
                 "requestFullSync"
             );
         });
 
-        it("should have validators as functions", () => {
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(typeof StateSyncHandlerValidators.getSyncStatus).toBe(
                 "function"
             );
@@ -573,12 +1053,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("getSyncStatus validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = StateSyncHandlerValidators.getSyncStatus([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = StateSyncHandlerValidators.getSyncStatus([
                     "unexpected",
                 ]);
@@ -587,12 +1083,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("requestFullSync validator", () => {
-            it("should return null for empty parameters", () => {
+            it("should return null for empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const result = StateSyncHandlerValidators.requestFullSync([]);
                 expect(isValidationSuccess(result)).toBe(true);
             });
 
-            it("should return error array for non-empty parameters", () => {
+            it("should return error array for non-empty parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const result = StateSyncHandlerValidators.requestFullSync([
                     "unexpected",
                 ]);
@@ -604,52 +1116,124 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
 describe("IPC Validators - Edge Cases and Error Handling", () => {
     describe("Parameter validation edge cases", () => {
-        it("should handle null parameters correctly", () => {
+        it("should handle null parameters correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteHandlerValidators.addSite([null]);
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle undefined parameters correctly", () => {
+        it("should handle undefined parameters correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteHandlerValidators.removeSite([undefined]);
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle empty array parameters", () => {
+        it("should handle empty array parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteHandlerValidators.updateSite([]);
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle mixed type parameters", () => {
+        it("should handle mixed type parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteHandlerValidators.removeMonitor([123, true]);
             expect(isValidationFailure(result)).toBe(true);
         });
     });
 
     describe("Boundary conditions", () => {
-        it("should handle maximum parameter counts", () => {
+        it("should handle maximum parameter counts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const manyParams = Array.from({ length: 100 }).fill("param");
             const result = SiteHandlerValidators.getSites(manyParams);
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle empty string parameters", () => {
+        it("should handle empty string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = SiteHandlerValidators.removeSite([""]);
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle zero number parameters", () => {
+        it("should handle zero number parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = DataHandlerValidators.updateHistoryLimit([0]);
             expect(isValidationSuccess(result)).toBe(true);
         });
 
-        it("should handle negative number parameters", () => {
+        it("should handle negative number parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = DataHandlerValidators.updateHistoryLimit([-1]);
             expect(isValidationSuccess(result)).toBe(true);
         });
     });
 
     describe("Complex object validation", () => {
-        it("should handle nested objects", () => {
+        it("should handle nested objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexSite = {
                 name: "Complex Site",
                 config: {
@@ -662,7 +1246,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             expect(isValidationSuccess(result)).toBe(true);
         });
 
-        it("should handle arrays as objects", () => {
+        it("should handle arrays as objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const arrayParam = [
                 "item1",
                 "item2",
@@ -672,7 +1264,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             expect(isValidationFailure(result)).toBe(true);
         });
 
-        it("should handle objects with functions", () => {
+        it("should handle objects with functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const objWithFunction = {
                 name: "Site",
                 callback: () => console.log("test"),
@@ -683,7 +1283,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
     });
 
     describe("Validation consistency", () => {
-        it("should produce consistent results for same inputs", () => {
+        it("should produce consistent results for same inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const params = ["test-site", "test-monitor"];
 
             const result1 = SiteHandlerValidators.removeMonitor(params);
@@ -696,7 +1304,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             );
         });
 
-        it("should handle parameter mutations correctly", () => {
+        it("should handle parameter mutations correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const params = ["original"];
             const result1 = SiteHandlerValidators.removeSite(params);
 
@@ -708,7 +1324,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
     });
 
     describe("Type-specific validation behavior", () => {
-        it("should validate string parameters with different formats", () => {
+        it("should validate string parameters with different formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validStrings = [
                 "simple",
                 "with spaces",
@@ -728,7 +1352,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             expect(isValidationFailure(emptyResult)).toBe(true);
         });
 
-        it("should validate number parameters with different values", () => {
+        it("should validate number parameters with different values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validNumbers = [
                 0,
                 -1,
@@ -747,7 +1379,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             }
         });
 
-        it("should validate object parameters with different structures", () => {
+        it("should validate object parameters with different structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validObjects = [
                 {},
                 { simple: "value" },
@@ -778,7 +1418,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             }
         });
 
-        it("should reject primitive types for object parameters", () => {
+        it("should reject primitive types for object parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidObjects = [
                 null,
                 undefined,
@@ -794,7 +1442,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             }
         });
 
-        it("should reject non-string types for string parameters", () => {
+        it("should reject non-string types for string parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidStrings = [
                 null,
                 undefined,
@@ -811,7 +1467,15 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             }
         });
 
-        it("should reject non-number types for number parameters", () => {
+        it("should reject non-number types for number parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidNumbers = [
                 null,
                 undefined,

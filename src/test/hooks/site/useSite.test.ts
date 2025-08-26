@@ -83,7 +83,15 @@ describe("useSite Hook - Coverage Tests", () => {
     });
 
     describe("Hook Composition", () => {
-        it("should call all required hooks with correct parameters", () => {
+        it("should call all required hooks with correct parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             renderHook(() => useSite(mockSite));
 
             expect(useSiteMonitor).toHaveBeenCalledWith(mockSite);
@@ -103,7 +111,15 @@ describe("useSite Hook - Coverage Tests", () => {
             expect(useErrorStore).toHaveBeenCalled();
         });
 
-        it("should pass filteredHistory from monitor to stats", () => {
+        it("should pass filteredHistory from monitor to stats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockFilteredHistory = [
                 {
                     timestamp: Date.now() - 1000,
@@ -134,7 +150,15 @@ describe("useSite Hook - Coverage Tests", () => {
             expect(useSiteStats).toHaveBeenCalledWith(mockFilteredHistory);
         });
 
-        it("should pass monitor from monitor hook to actions", () => {
+        it("should pass monitor from monitor hook to actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockMonitor = {
                 id: "monitor-2",
                 name: "Custom Monitor",
@@ -161,7 +185,15 @@ describe("useSite Hook - Coverage Tests", () => {
     });
 
     describe("Return Value Composition", () => {
-        it("should return combined data from all hooks", () => {
+        it("should return combined data from all hooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSite(mockSite));
 
             // Should include monitor data
@@ -185,7 +217,15 @@ describe("useSite Hook - Coverage Tests", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        it("should have isLoading property that does not get overwritten", () => {
+        it("should have isLoading property that does not get overwritten", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Mock error store to return loading: true
             (useErrorStore as any).mockReturnValueOnce({
                 isLoading: true,
@@ -201,7 +241,15 @@ describe("useSite Hook - Coverage Tests", () => {
     });
 
     describe("Property Precedence", () => {
-        it("should maintain correct property precedence as documented", () => {
+        it("should maintain correct property precedence as documented", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSite", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock overlapping properties to test precedence
             (useSiteMonitor as any).mockReturnValueOnce({
                 filteredHistory: [],

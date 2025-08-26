@@ -322,7 +322,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render site details component", () => {
+        it("should render site details component", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             expect(
@@ -333,7 +343,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render with correct site data", () => {
+        it("should render with correct site data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const customSite = {
                 ...mockSite,
                 id: "custom-site-id",
@@ -345,7 +365,17 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should render default overview tab content", () => {
+        it("should render default overview tab content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             expect(
@@ -355,7 +385,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Tab Navigation", () => {
-        it("should switch to history tab when selected", () => {
+        it("should switch to history tab when selected", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
                 activeSiteDetailsTab: "history",
@@ -371,7 +411,17 @@ describe("SiteDetails", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should switch to analytics tab when selected", () => {
+        it("should switch to analytics tab when selected", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
                 activeSiteDetailsTab: "monitor-1-analytics", // Use monitor ID format
@@ -387,7 +437,17 @@ describe("SiteDetails", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should switch to settings tab when selected", () => {
+        it("should switch to settings tab when selected", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
                 activeSiteDetailsTab: "settings",
@@ -403,7 +463,17 @@ describe("SiteDetails", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should handle tab change events", () => {
+        it("should handle tab change events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             renderSiteDetails();
 
             // Use the test id to find the history tab button
@@ -417,7 +487,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Header Actions", () => {
-        it("should render header with site information", () => {
+        it("should render header with site information", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             const headerElement = screen.getByTestId("site-details-header");
@@ -426,14 +506,34 @@ describe("SiteDetails", () => {
             expect(headerElement).toHaveTextContent("Monitor: monitor-1");
         });
 
-        it("should display site data in header", () => {
+        it("should display site data in header", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             expect(screen.getByText("Site: Test Site")).toBeInTheDocument();
             expect(screen.getByText("Monitor: monitor-1")).toBeInTheDocument();
         });
 
-        it("should handle different site data in header", () => {
+        it("should handle different site data in header", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const customSite = {
                 ...mockSite,
                 name: "Custom Test Site",
@@ -458,7 +558,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Loading States", () => {
-        it("should render loading state when isLoading is true", () => {
+        it("should render loading state when isLoading is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
                 isLoading: true,
@@ -473,7 +583,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render content when loading is complete", () => {
+        it("should render content when loading is complete", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             renderSiteDetails();
 
             expect(
@@ -489,7 +609,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Error Handling", () => {
-        it("should render normal content even when error exists in hook", () => {
+        it("should render normal content even when error exists in hook", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // Note: SiteDetails component doesn't have error boundary logic
             // It renders normally regardless of hook error state
             (useSiteDetails as any).mockReturnValue({
@@ -509,7 +639,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle missing error boundary gracefully", () => {
+        it("should handle missing error boundary gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // Test that component doesn't crash when hook has error
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
@@ -527,7 +667,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Site Data Handling", () => {
-        it("should handle missing site data gracefully", () => {
+        it("should handle missing site data gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
                 site: null,
@@ -543,7 +693,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should pass correct site data to tabs", () => {
+        it("should pass correct site data to tabs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             expect(
@@ -554,7 +714,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Integration with URL Parameters", () => {
-        it("should handle different site data", () => {
+        it("should handle different site data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const differentSite = {
                 ...mockSite,
                 id: "different-site-id",
@@ -566,7 +736,17 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should handle minimal site data", () => {
+        it("should handle minimal site data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const minimalSite = {
                 ...mockSite,
                 id: "",
@@ -578,7 +758,17 @@ describe("SiteDetails", () => {
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should handle special characters in site data", () => {
+        it("should handle special characters in site data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const specialSite = {
                 ...mockSite,
                 id: "site-with-special-chars-123!@#",
@@ -592,14 +782,34 @@ describe("SiteDetails", () => {
     });
 
     describe("Component Lifecycle", () => {
-        it("should call refresh when component mounts", () => {
+        it("should call refresh when component mounts", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             // The hook should be called indicating component mounted
             expect(useSiteDetails).toHaveBeenCalled();
         });
 
-        it("should handle component updates correctly", async () => {
+        it("should handle component updates correctly", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             const initialSite = {
                 ...mockSite,
                 id: "initial-id",
@@ -628,7 +838,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper accessibility structure", () => {
+        it("should have proper accessibility structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             // Check that main components are rendered
@@ -640,7 +860,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle keyboard navigation", () => {
+        it("should handle keyboard navigation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetails();
 
             const tabButton = screen.getByTestId("history-tab");
@@ -654,7 +884,17 @@ describe("SiteDetails", () => {
     });
 
     describe("Performance Considerations", () => {
-        it("should not cause unnecessary re-renders", () => {
+        it("should not cause unnecessary re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = renderSiteDetails();
 
             // Re-render with same props
@@ -670,7 +910,17 @@ describe("SiteDetails", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle rapid tab switching", async () => {
+        it("should handle rapid tab switching", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetails", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Clear any previous calls to setActiveSiteDetailsTab
             vi.clearAllMocks();
 

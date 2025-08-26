@@ -18,7 +18,17 @@ import type {
 
 describe("Theme Types Module", () => {
     describe("ThemeColors Interface", () => {
-        it("should create valid ThemeColors object", () => {
+        it("should create valid ThemeColors object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const colors: ThemeColors = {
                 primary: {
                     50: "#f0f9ff",
@@ -101,7 +111,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeSpacing Interface", () => {
-        it("should create valid ThemeSpacing object", () => {
+        it("should create valid ThemeSpacing object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const spacing: ThemeSpacing = {
                 xs: "0.25rem",
                 sm: "0.5rem",
@@ -123,7 +143,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeTypography Interface", () => {
-        it("should create valid ThemeTypography object", () => {
+        it("should create valid ThemeTypography object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const typography: ThemeTypography = {
                 fontFamily: {
                     sans: [
@@ -177,7 +207,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeShadows Interface", () => {
-        it("should create valid ThemeShadows object", () => {
+        it("should create valid ThemeShadows object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const shadows: ThemeShadows = {
                 sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
                 md: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
@@ -195,7 +235,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeBorderRadius Interface", () => {
-        it("should create valid ThemeBorderRadius object", () => {
+        it("should create valid ThemeBorderRadius object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const borderRadius: ThemeBorderRadius = {
                 none: "0",
                 sm: "0.125rem",
@@ -213,7 +263,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("Theme Interface", () => {
-        it("should create valid Theme object", () => {
+        it("should create valid Theme object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const mockColors: ThemeColors = {
                 primary: {
                     50: "#f0f9ff",
@@ -329,7 +389,17 @@ describe("Theme Types Module", () => {
             expect(theme.typography.fontSize.base).toBe("1rem");
         });
 
-        it("should support dark theme", () => {
+        it("should support dark theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const darkTheme: Partial<Theme> = {
                 name: "Dark Theme",
                 isDark: true,
@@ -341,7 +411,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeName Type", () => {
-        it("should support all theme names", () => {
+        it("should support all theme names", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const themeNames: ThemeName[] = [
                 "light",
                 "dark",
@@ -364,7 +444,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("ThemeState Interface", () => {
-        it("should create valid ThemeState object", () => {
+        it("should create valid ThemeState object", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Constructor", "type");
+
             const mockTheme: Theme = {
                 name: "Light",
                 colors: {} as ThemeColors,
@@ -390,7 +480,17 @@ describe("Theme Types Module", () => {
             expect(themeState.systemThemePreference).toBe("light");
         });
 
-        it("should support system theme preferences", () => {
+        it("should support system theme preferences", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const lightState: Partial<ThemeState> = {
                 systemThemePreference: "light",
             };
@@ -403,7 +503,17 @@ describe("Theme Types Module", () => {
             expect(darkState.systemThemePreference).toBe("dark");
         });
 
-        it("should support custom themes", () => {
+        it("should support custom themes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const customTheme1: Theme = {
                 name: "Custom 1",
                 colors: {} as ThemeColors,
@@ -439,7 +549,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("Type Compatibility", () => {
-        it("should allow ThemeColors in Theme", () => {
+        it("should allow ThemeColors in Theme", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const colors: ThemeColors = {
                 primary: {
                     50: "#f0f9ff",
@@ -498,7 +618,17 @@ describe("Theme Types Module", () => {
             expect(theme.colors).toBe(colors);
         });
 
-        it("should allow Theme in ThemeState", () => {
+        it("should allow Theme in ThemeState", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const theme: Theme = {
                 name: "Test",
                 colors: {} as ThemeColors,
@@ -516,7 +646,17 @@ describe("Theme Types Module", () => {
             expect(state.activeTheme).toBe(theme);
         });
 
-        it("should allow ThemeName in ThemeState", () => {
+        it("should allow ThemeName in ThemeState", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const themeName: ThemeName = "dark";
             const state: Partial<ThemeState> = {
                 currentTheme: themeName,
@@ -527,7 +667,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("Color Value Validation", () => {
-        it("should handle hex color values", () => {
+        it("should handle hex color values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const colors: Partial<ThemeColors> = {
                 success: "#10b981",
                 error: "#ef4444",
@@ -539,7 +689,17 @@ describe("Theme Types Module", () => {
             expect(colors.warning).toMatch(/^#[\da-f]{6}$/i);
         });
 
-        it("should handle rgba color values", () => {
+        it("should handle rgba color values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const colors: Partial<ThemeColors> = {
                 surface: {
                     overlay: "rgba(0, 0, 0, 0.5)",
@@ -553,7 +713,17 @@ describe("Theme Types Module", () => {
     });
 
     describe("Nested Structure Validation", () => {
-        it("should handle nested color structures", () => {
+        it("should handle nested color structures", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const primary = {
                 50: "#f0f9ff",
                 500: "#0ea5e9",
@@ -565,7 +735,17 @@ describe("Theme Types Module", () => {
             expect(typeof primary[900]).toBe("string");
         });
 
-        it("should handle nested font structures", () => {
+        it("should handle nested font structures", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: themeTypes", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const typography: Partial<ThemeTypography> = {
                 fontFamily: {
                     sans: ["Inter", "system-ui"],

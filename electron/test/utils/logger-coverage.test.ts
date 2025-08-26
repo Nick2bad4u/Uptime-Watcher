@@ -23,7 +23,15 @@ describe("Logger Implementation Coverage", () => {
     });
 
     describe("Main Logger (logger)", () => {
-        it("should call debug method with correct prefix and arguments", () => {
+        it("should call debug method with correct prefix and arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.debug("Test debug message", { key: "value" });
 
             expect(mockElectronLog.debug).toHaveBeenCalledWith(
@@ -32,7 +40,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call info method with correct prefix and arguments", () => {
+        it("should call info method with correct prefix and arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.info("Test info message", { data: 123 });
 
             expect(mockElectronLog.info).toHaveBeenCalledWith(
@@ -41,7 +57,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call warn method with correct prefix and arguments", () => {
+        it("should call warn method with correct prefix and arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.warn("Test warning message", "extra", "args");
 
             expect(mockElectronLog.warn).toHaveBeenCalledWith(
@@ -51,7 +75,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with Error object", () => {
+        it("should call error method with Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = new Error("Test error");
             testError.stack = "Stack trace here";
 
@@ -64,7 +96,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with non-Error object", () => {
+        it("should call error method with non-Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const nonError = { type: "custom error", code: 500 };
 
             logger.error("Test error message", nonError, "additional");
@@ -76,7 +116,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method without error object", () => {
+        it("should call error method without error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             logger.error("Test error message without error object");
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
@@ -87,7 +135,15 @@ describe("Logger Implementation Coverage", () => {
     });
 
     describe("Database Logger (dbLogger)", () => {
-        it("should call debug method with DB prefix", () => {
+        it("should call debug method with DB prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             dbLogger.debug("Database query executed", {
                 sql: "SELECT * FROM sites",
             });
@@ -98,7 +154,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call info method with DB prefix", () => {
+        it("should call info method with DB prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             dbLogger.info("Database connected successfully");
 
             expect(mockElectronLog.info).toHaveBeenCalledWith(
@@ -106,7 +170,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call warn method with DB prefix", () => {
+        it("should call warn method with DB prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             dbLogger.warn("Slow query detected", { duration: 5000 });
 
             expect(mockElectronLog.warn).toHaveBeenCalledWith(
@@ -117,7 +189,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with Error object and DB prefix", () => {
+        it("should call error method with Error object and DB prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Connection failed");
             dbError.stack = "Database stack trace";
 
@@ -129,7 +209,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with non-Error object and DB prefix", () => {
+        it("should call error method with non-Error object and DB prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             dbLogger.error("Database constraint violation", {
                 code: "UNIQUE_VIOLATION",
             });
@@ -142,7 +230,15 @@ describe("Logger Implementation Coverage", () => {
     });
 
     describe("Monitor Logger (monitorLogger)", () => {
-        it("should call debug method with MONITOR prefix", () => {
+        it("should call debug method with MONITOR prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             monitorLogger.debug("Monitor check initiated", {
                 siteId: "abc123",
             });
@@ -153,7 +249,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call info method with MONITOR prefix", () => {
+        it("should call info method with MONITOR prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             monitorLogger.info("All monitors healthy");
 
             expect(mockElectronLog.info).toHaveBeenCalledWith(
@@ -161,7 +265,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call warn method with MONITOR prefix", () => {
+        it("should call warn method with MONITOR prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             monitorLogger.warn("High response time detected", { time: 3000 });
 
             expect(mockElectronLog.warn).toHaveBeenCalledWith(
@@ -170,7 +282,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with Error object and MONITOR prefix", () => {
+        it("should call error method with Error object and MONITOR prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitorError = new Error("Timeout");
             monitorError.stack = "Monitor error stack";
 
@@ -185,7 +305,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should call error method with string error and MONITOR prefix", () => {
+        it("should call error method with string error and MONITOR prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             monitorLogger.error("Service unavailable", "Connection refused");
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
@@ -196,7 +324,15 @@ describe("Logger Implementation Coverage", () => {
     });
 
     describe("Error Handling Edge Cases", () => {
-        it("should handle Error object without stack trace", () => {
+        it("should handle Error object without stack trace", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorNoStack = new Error("Error without stack");
             delete (errorNoStack as { stack?: string }).stack;
 
@@ -208,7 +344,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle null error object", () => {
+        it("should handle null error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             logger.error("Null error test", null);
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
@@ -217,7 +361,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle undefined error object explicitly", () => {
+        it("should handle undefined error object explicitly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             logger.error("Undefined error test", undefined, { extra: "data" });
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
@@ -227,7 +379,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle multiple additional arguments", () => {
+        it("should handle multiple additional arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.info(
                 "Multiple args test",
                 "arg1",
@@ -245,7 +405,15 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle empty string messages", () => {
+        it("should handle empty string messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.debug("");
             logger.info("");
             logger.warn("");
@@ -262,7 +430,15 @@ describe("Logger Implementation Coverage", () => {
     });
 
     describe("Logger Method Signatures", () => {
-        it("should maintain correct method signatures for all loggers", () => {
+        it("should maintain correct method signatures for all loggers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Verify all loggers have the required methods
             expect(typeof logger.debug).toBe("function");
             expect(typeof logger.info).toBe("function");
@@ -280,7 +456,15 @@ describe("Logger Implementation Coverage", () => {
             expect(typeof monitorLogger.error).toBe("function");
         });
 
-        it("should handle method calls without additional arguments", () => {
+        it("should handle method calls without additional arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             logger.debug("Debug only message");
             logger.info("Info only message");
             logger.warn("Warn only message");

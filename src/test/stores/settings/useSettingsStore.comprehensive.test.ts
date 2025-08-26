@@ -71,7 +71,7 @@ describe("useSettingsStore", () => {
 
         // Setup default mock returns
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
-            data: 1000,
+            data: 500, // Use correct DEFAULT_HISTORY_LIMIT value
         });
         mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue({
             data: true,
@@ -130,7 +130,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Initial State", () => {
-        it("should initialize with default settings", () => {
+        it("should initialize with default settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             act(() => {
@@ -150,7 +158,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Settings Operations", () => {
-        it("should update settings", () => {
+        it("should update settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             act(() => {
@@ -165,7 +181,15 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(500); // unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
-        it("should update individual settings", () => {
+        it("should update individual settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             act(() => {
@@ -176,7 +200,15 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.notifications).toBe(true); // unchanged
         });
 
-        it("should handle reset to defaults", async () => {
+        it("should handle reset to defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // First update some settings
@@ -210,7 +242,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("initializeSettings", () => {
-        it("should initialize settings from backend", async () => {
+        it("should initialize settings from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue({
                 data: 500,
             });
@@ -226,7 +266,15 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(500);
         });
 
-        it("should handle initialization errors gracefully", async () => {
+        it("should handle initialization errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce({
                 success: false,
                 error: "Backend error",
@@ -245,7 +293,15 @@ describe("useSettingsStore", () => {
             expect(result.current.updateSettings).toBeDefined();
         });
 
-        it("should use error handling wrapper", async () => {
+        it("should use error handling wrapper", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
@@ -264,7 +320,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("updateHistoryLimitValue", () => {
-        it("should update history limit successfully", async () => {
+        it("should update history limit successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend responses
@@ -291,7 +355,15 @@ describe("useSettingsStore", () => {
             );
         });
 
-        it("should validate history limit bounds", async () => {
+        it("should validate history limit bounds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Validation", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend to return the same value (no clamping on frontend)
@@ -320,7 +392,15 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBe(100_000); // No clamping in frontend
         });
 
-        it("should handle backend update errors", async () => {
+        it("should handle backend update errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Update failed");
 
             const { result } = renderHook(() => useSettingsStore());
@@ -371,7 +451,15 @@ describe("useSettingsStore", () => {
             );
         });
 
-        it("should handle all error cases in updateHistoryLimitValue", async () => {
+        it("should handle all error cases in updateHistoryLimitValue", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Set an initial value first
@@ -398,7 +486,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle missing electronAPI gracefully", async () => {
+        it("should handle missing electronAPI gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Temporarily remove electronAPI
             const originalAPI = (globalThis as any).electronAPI;
             (globalThis as any).electronAPI = undefined;
@@ -417,7 +513,15 @@ describe("useSettingsStore", () => {
             }
         });
 
-        it("should handle concurrent operations", async () => {
+        it("should handle concurrent operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             const promises = [
@@ -434,7 +538,15 @@ describe("useSettingsStore", () => {
             expect(result.current.settings.historyLimit).toBeGreaterThan(0);
         });
 
-        it("should handle safeExtractIpcData errors gracefully", async () => {
+        it("should handle safeExtractIpcData errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Reset the mock first
             mockElectronAPI.settings.getHistoryLimit.mockReset();
 
@@ -457,7 +569,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Loading States", () => {
-        it("should set loading state during operations", async () => {
+        it("should set loading state during operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Loading", "type");
+
             const loadingStatesDuringCall: boolean[] = [];
 
             mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
@@ -483,7 +603,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Error Recovery", () => {
-        it("should clear errors when successful operations occur", async () => {
+        it("should clear errors when successful operations occur", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
@@ -495,7 +623,15 @@ describe("useSettingsStore", () => {
             );
         });
 
-        it("should maintain error state until cleared", async () => {
+        it("should maintain error state until cleared", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Persistent error");
             mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
                 error
@@ -517,7 +653,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Persistence", () => {
-        it("should persist settings across store recreations", () => {
+        it("should persist settings across store recreations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: result1 } = renderHook(() => useSettingsStore());
 
             act(() => {
@@ -530,7 +674,15 @@ describe("useSettingsStore", () => {
             expect(result2.current.settings.theme).toBe("dark");
         });
 
-        it("should handle store rehydration", () => {
+        it("should handle store rehydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Initial state should be properly rehydrated
@@ -541,7 +693,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Action Logging", () => {
-        it("should log all store actions", async () => {
+        it("should log all store actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend response for getHistoryLimit
@@ -571,7 +731,15 @@ describe("useSettingsStore", () => {
             );
         });
 
-        it("should log initialization actions", async () => {
+        it("should log initialization actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Mock backend response
@@ -597,7 +765,15 @@ describe("useSettingsStore", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce correct settings structure", () => {
+        it("should enforce correct settings structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             act(() => {
@@ -618,7 +794,15 @@ describe("useSettingsStore", () => {
             });
         });
 
-        it("should handle partial settings updates", () => {
+        it("should handle partial settings updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useSettingsStore());
 
             // Reset to defaults first by manually setting default values

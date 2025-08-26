@@ -44,7 +44,17 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 describe("EmptyState Component - Comprehensive Coverage", () => {
-    it("should render with correct structure and content", () => {
+    it("should render with correct structure and content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Should render the main container with correct CSS classes
@@ -55,7 +65,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(container).toHaveClass("themed-box--surface-base");
     });
 
-    it("should render the icon with correct emoji", () => {
+    it("should render the icon with correct emoji", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         const icon = screen.getByText("🌐");
@@ -63,7 +83,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(icon.closest("div")).toHaveClass("empty-state-icon");
     });
 
-    it("should render the main heading text", () => {
+    it("should render the main heading text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         const heading = screen.getByText("No sites to monitor");
@@ -74,7 +104,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(heading).toHaveClass("mb-2");
     });
 
-    it("should render the descriptive text", () => {
+    it("should render the descriptive text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         const description = screen.getByText(
@@ -86,7 +126,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(description).toHaveClass("themed-text--weight-normal");
     });
 
-    it("should have correct CSS classes for styling", () => {
+    it("should have correct CSS classes for styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Check icon container
@@ -100,7 +150,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(container).toHaveClass("themed-box--surface-base");
     });
 
-    it("should render all elements in correct hierarchy", () => {
+    it("should render all elements in correct hierarchy", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         const container = document.querySelector(".themed-box");
@@ -116,7 +176,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         }
     });
 
-    it("should handle text content correctly", () => {
+    it("should handle text content correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Verify exact text content
@@ -129,7 +199,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(screen.getByText("🌐")).toBeInTheDocument();
     });
 
-    it("should maintain consistent prop structure", () => {
+    it("should maintain consistent prop structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Main heading should have specific CSS classes
@@ -145,7 +225,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(description).toHaveClass("themed-text--secondary");
     });
 
-    it("should be accessible and semantic", () => {
+    it("should be accessible and semantic", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Component should be findable by text content
@@ -160,7 +250,17 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(screen.getByText("🌐")).toBeInTheDocument();
     });
 
-    it("should use themed components correctly", () => {
+    it("should use themed components correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: EmptyState", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
         render(<EmptyState />);
 
         // Should use ThemedBox for container

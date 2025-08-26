@@ -64,7 +64,15 @@ describe("SiteService", () => {
     });
 
     describe("constructor", () => {
-        it("should initialize with provided dependencies", () => {
+        it("should initialize with provided dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(siteService).toBeInstanceOf(SiteService);
         });
     });
@@ -115,7 +123,15 @@ describe("SiteService", () => {
             mockSiteRepository.delete = vi.fn().mockResolvedValue(true);
         });
 
-        it("should successfully delete site with all related data", async () => {
+        it("should successfully delete site with all related data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const result =
                 await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
@@ -143,7 +159,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should log debug messages throughout the deletion process", async () => {
+        it("should log debug messages throughout the deletion process", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
             expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -163,7 +187,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockMonitorRepository.findBySiteIdentifier = vi
                 .fn()
                 .mockResolvedValue([]);
@@ -180,7 +212,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should throw error for invalid site identifier", async () => {
+        it("should throw error for invalid site identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             await expect(
                 siteService.deleteSiteWithRelatedData("")
             ).rejects.toThrow("Invalid site identifier: ");
@@ -189,7 +229,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Invalid site identifier: null");
         });
 
-        it("should throw error when history deletion fails", async () => {
+        it("should throw error when history deletion fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("History deletion failed");
             mockHistoryRepository.deleteByMonitorId = vi
                 .fn()
@@ -202,7 +250,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should throw error when monitor deletion fails", async () => {
+        it("should throw error when monitor deletion fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Monitor deletion failed");
             mockMonitorRepository.deleteBySiteIdentifier = vi
                 .fn()
@@ -215,7 +271,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should throw error when site deletion fails", async () => {
+        it("should throw error when site deletion fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockSiteRepository.delete = vi.fn().mockResolvedValue(false);
 
             await expect(
@@ -223,7 +287,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Failed to delete site test-site-id");
         });
 
-        it("should handle string error objects when history deletion fails", async () => {
+        it("should handle string error objects when history deletion fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockHistoryRepository.deleteByMonitorId = vi
                 .fn()
                 .mockRejectedValueOnce("String error");
@@ -235,7 +307,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle string error objects when monitor deletion fails", async () => {
+        it("should handle string error objects when monitor deletion fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockMonitorRepository.deleteBySiteIdentifier = vi
                 .fn()
                 .mockRejectedValueOnce("String error");
@@ -292,7 +372,15 @@ describe("SiteService", () => {
                 .mockResolvedValue(mockHistory);
         });
 
-        it("should successfully find site with complete details", async () => {
+        it("should successfully find site with complete details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result =
                 await siteService.findByIdentifierWithDetails(
                     mockSiteIdentifier
@@ -330,7 +418,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should return undefined when site is not found", async () => {
+        it("should return undefined when site is not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockSiteRepository.findByIdentifier = vi
                 .fn()
                 .mockResolvedValue(undefined);
@@ -346,7 +442,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockMonitorRepository.findBySiteIdentifier = vi
                 .fn()
                 .mockResolvedValue([]);
@@ -367,7 +471,15 @@ describe("SiteService", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should use default name when site name is null", async () => {
+        it("should use default name when site name is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockSiteRepository.findByIdentifier = vi.fn().mockResolvedValue({
                 ...mockSiteRow,
                 name: null,
@@ -384,7 +496,15 @@ describe("SiteService", () => {
             expect(result?.name).toBe("Unnamed Site");
         });
 
-        it("should use default name when site name is undefined", async () => {
+        it("should use default name when site name is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockSiteRepository.findByIdentifier = vi.fn().mockResolvedValue({
                 ...mockSiteRow,
                 name: undefined,
@@ -401,7 +521,15 @@ describe("SiteService", () => {
             expect(result?.name).toBe("Unnamed Site");
         });
 
-        it("should default monitoring to false when null", async () => {
+        it("should default monitoring to false when null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockSiteRepository.findByIdentifier = vi.fn().mockResolvedValue({
                 ...mockSiteRow,
                 monitoring: null,
@@ -418,7 +546,15 @@ describe("SiteService", () => {
             expect(result?.monitoring).toBe(false);
         });
 
-        it("should handle multiple monitors with their history", async () => {
+        it("should handle multiple monitors with their history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const multipleMonitors: Monitor[] = [
                 {
                     id: "monitor-1",
@@ -488,7 +624,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should throw error for invalid site identifier", async () => {
+        it("should throw error for invalid site identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             await expect(
                 siteService.findByIdentifierWithDetails("")
             ).rejects.toThrow("Invalid site identifier: ");
@@ -497,7 +641,15 @@ describe("SiteService", () => {
             ).rejects.toThrow("Invalid site identifier: null");
         });
 
-        it("should log debug messages", async () => {
+        it("should log debug messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await siteService.findByIdentifierWithDetails(mockSiteIdentifier);
 
             expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -559,7 +711,15 @@ describe("SiteService", () => {
                 .mockResolvedValue(mockHistory1);
         });
 
-        it("should successfully get all sites with complete details", async () => {
+        it("should successfully get all sites with complete details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result = await siteService.getAllWithDetails();
 
             expect(result).toHaveLength(2);
@@ -582,7 +742,15 @@ describe("SiteService", () => {
             });
         });
 
-        it("should handle empty sites list", async () => {
+        it("should handle empty sites list", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockSiteRepository.findAll = vi.fn().mockResolvedValue([]);
 
             const result = await siteService.getAllWithDetails();
@@ -596,7 +764,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockMonitorRepository.findBySiteIdentifier = vi
                 .fn()
                 .mockResolvedValue([]);
@@ -611,7 +787,15 @@ describe("SiteService", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should handle null monitoring values", async () => {
+        it("should handle null monitoring values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const sitesWithNullMonitoring = [
                 {
                     identifier: "site-1",
@@ -631,7 +815,15 @@ describe("SiteService", () => {
             expect(result[0]!.monitoring).toBe(false);
         });
 
-        it("should log debug and info messages", async () => {
+        it("should log debug and info messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await siteService.getAllWithDetails();
 
             expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -642,7 +834,15 @@ describe("SiteService", () => {
             );
         });
 
-        it("should process sites in parallel", async () => {
+        it("should process sites in parallel", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const findBySiteIdentifierSpy = vi.spyOn(
                 mockMonitorRepository,
                 "findBySiteIdentifier"
@@ -657,23 +857,55 @@ describe("SiteService", () => {
     });
 
     describe("getDisplayName", () => {
-        it("should return provided name when valid", () => {
+        it("should return provided name when valid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Access private method through type assertion for testing
             const result = (siteService as any).getDisplayName("Test Site");
             expect(result).toBe("Test Site");
         });
 
-        it("should return default name when name is null", () => {
+        it("should return default name when name is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = (siteService as any).getDisplayName(null);
             expect(result).toBe("Unnamed Site");
         });
 
-        it("should return default name when name is undefined", () => {
+        it("should return default name when name is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = (siteService as any).getDisplayName(undefined);
             expect(result).toBe("Unnamed Site");
         });
 
-        it("should return empty string if provided", () => {
+        it("should return empty string if provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = (siteService as any).getDisplayName("");
             expect(result).toBe("");
         });

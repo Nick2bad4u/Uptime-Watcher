@@ -8,7 +8,15 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Final Coverage", () => {
     describe("Undefined and Default Case Coverage", () => {
-        it("should handle undefined values through the switch statement", () => {
+        it("should handle undefined values through the switch statement", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This should hit the "undefined" case in the switch statement (lines 86-87)
             expect(safeStringify(undefined)).toBe("");
 
@@ -18,7 +26,15 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify(void 0)).toBe("");
         });
 
-        it("should test the default case by creating an object with unusual typeof behavior", () => {
+        it("should test the default case by creating an object with unusual typeof behavior", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // While we can't easily make typeof return an unknown value in normal JavaScript,
             // we can at least ensure our default case is structured correctly
 
@@ -38,7 +54,15 @@ describe("String Conversion - Final Coverage", () => {
             expect(result.length).toBeGreaterThan(0);
         });
 
-        it("should test edge cases that might bypass early returns", () => {
+        it("should test edge cases that might bypass early returns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test various falsy values that might reach the switch
             expect(safeStringify(0)).toBe("0");
             expect(safeStringify(false)).toBe("false");
@@ -49,7 +73,15 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify(undefined)).toBe("");
         });
 
-        it("should comprehensively test all switch statement branches", () => {
+        it("should comprehensively test all switch statement branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.final-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test each type case to ensure complete switch coverage
             expect(safeStringify("string")).toBe("string");
             expect(safeStringify(42)).toBe("42");

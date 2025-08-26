@@ -74,21 +74,45 @@ describe("PortMonitor Coverage Tests", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with default configuration", () => {
+        it("should initialize with default configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitor = new PortMonitor();
             const config = monitor.getConfig();
             expect(config).toBeDefined();
             expect(monitor.getType()).toBe("port");
         });
 
-        it("should initialize with custom configuration", () => {
+        it("should initialize with custom configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const customConfig = { timeout: 10_000 };
             const monitor = new PortMonitor(customConfig);
             const config = monitor.getConfig();
             expect(config.timeout).toBe(10_000);
         });
 
-        it("should merge custom config with defaults", () => {
+        it("should merge custom config with defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customConfig = { timeout: 10_000 };
             const monitor = new PortMonitor(customConfig);
             const config = monitor.getConfig();
@@ -97,26 +121,58 @@ describe("PortMonitor Coverage Tests", () => {
             expect(config).toBeDefined();
         });
 
-        it("should handle empty configuration object", () => {
+        it("should handle empty configuration object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = new PortMonitor({});
             expect(monitor.getType()).toBe("port");
         });
     });
 
     describe("getType", () => {
-        it('should return "port" as the monitor type', () => {
+        it('should return "port" as the monitor type', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(portMonitor.getType()).toBe("port");
         });
     });
 
     describe("getConfig", () => {
-        it("should return a copy of the current configuration", () => {
+        it("should return a copy of the current configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = portMonitor.getConfig();
             expect(config).toBeDefined();
             expect(typeof config).toBe("object");
         });
 
-        it("should not allow external modification of returned config", () => {
+        it("should not allow external modification of returned config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = portMonitor.getConfig();
             config.timeout = 99_999;
             // Get config again and verify it wasn't modified
@@ -124,7 +180,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(newConfig.timeout).not.toBe(99_999);
         });
 
-        it("should return configuration with all set properties", () => {
+        it("should return configuration with all set properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = portMonitor.getConfig();
             expect(config).toBeDefined();
             expect(typeof config).toBe("object");
@@ -132,7 +196,15 @@ describe("PortMonitor Coverage Tests", () => {
     });
 
     describe("updateConfig", () => {
-        it("should update configuration with valid timeout", () => {
+        it("should update configuration with valid timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             const initialMonitor = new PortMonitor();
             initialMonitor.updateConfig({ timeout: 10_000 });
 
@@ -140,43 +212,99 @@ describe("PortMonitor Coverage Tests", () => {
             expect(config.timeout).toBe(10_000);
         });
 
-        it("should merge partial configuration", () => {
+        it("should merge partial configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             portMonitor.updateConfig({ timeout: 8000 });
             const config = portMonitor.getConfig();
             expect(config.timeout).toBe(8000);
         });
 
-        it("should throw error for invalid timeout type", () => {
+        it("should throw error for invalid timeout type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 portMonitor.updateConfig({ timeout: "invalid" as any });
             }).toThrow();
         });
 
-        it("should throw error for negative timeout", () => {
+        it("should throw error for negative timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 portMonitor.updateConfig({ timeout: -1000 });
             }).toThrow();
         });
 
-        it("should throw error for zero timeout", () => {
+        it("should throw error for zero timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => {
                 portMonitor.updateConfig({ timeout: 0 });
             }).toThrow();
         });
 
-        it("should allow updating userAgent without validation", () => {
+        it("should allow updating userAgent without validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             portMonitor.updateConfig({ userAgent: "Custom Agent/1.0" });
             // Should not throw
             expect(true).toBe(true);
         });
 
-        it("should handle empty config update", () => {
+        it("should handle empty config update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
             portMonitor.updateConfig({});
             // Should not throw for empty config
             expect(true).toBe(true);
         });
 
-        it("should allow updating with empty object", () => {
+        it("should allow updating with empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             portMonitor.updateConfig({});
             // Should not throw
             expect(true).toBe(true);
@@ -184,7 +312,15 @@ describe("PortMonitor Coverage Tests", () => {
     });
 
     describe("check method", () => {
-        it("should successfully check a valid port monitor", async () => {
+        it("should successfully check a valid port monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await portMonitor.check(validPortMonitor);
 
             expect(vi.mocked(validateMonitorHostAndPort)).toHaveBeenCalledWith(
@@ -203,7 +339,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(result).toEqual(successResult);
         });
 
-        it("should throw error for non-port monitor type", async () => {
+        it("should throw error for non-port monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const httpMonitor: Site["monitors"][0] = {
                 ...validPortMonitor,
                 type: "http",
@@ -214,7 +358,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle validation errors from validateMonitorHostAndPort", async () => {
+        it("should handle validation errors from validateMonitorHostAndPort", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const validationError = "Host is required for port monitoring";
             vi.mocked(validateMonitorHostAndPort).mockReturnValue(
                 validationError
@@ -230,7 +382,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).not.toHaveBeenCalled();
         });
 
-        it("should handle monitor with missing host", async () => {
+        it("should handle monitor with missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { host, ...monitorWithoutHost } = validPortMonitor;
 
             expect(
@@ -245,7 +405,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor with missing port", async () => {
+        it("should handle monitor with missing port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { port, ...monitorWithoutPort } = validPortMonitor;
 
             expect(
@@ -260,7 +428,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor with empty string host", async () => {
+        it("should handle monitor with empty string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorWithEmptyHost: Site["monitors"][0] = {
                 ...validPortMonitor,
                 host: "",
@@ -274,7 +450,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor with zero port", async () => {
+        it("should handle monitor with zero port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorWithZeroPort: Site["monitors"][0] = {
                 ...validPortMonitor,
                 port: 0,
@@ -288,7 +472,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should use monitor-specific timeout and retry configuration", async () => {
+        it("should use monitor-specific timeout and retry configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorWithCustomConfig: Site["monitors"][0] = {
                 ...validPortMonitor,
                 timeout: 8000,
@@ -314,7 +506,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle port check retry failure", async () => {
+        it("should handle port check retry failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const retryError = new Error("Port check failed after retries");
             vi.mocked(performPortCheckWithRetry).mockRejectedValue(retryError);
 
@@ -323,7 +523,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should handle different host formats", async () => {
+        it("should handle different host formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const hosts = [
                 "example.com",
                 "localhost",
@@ -350,7 +558,15 @@ describe("PortMonitor Coverage Tests", () => {
             }
         });
 
-        it("should handle different port numbers", async () => {
+        it("should handle different port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const ports = [
                 22,
                 80,
@@ -379,7 +595,15 @@ describe("PortMonitor Coverage Tests", () => {
             }
         });
 
-        it("should use service default timeout when monitor timeout is undefined", async () => {
+        it("should use service default timeout when monitor timeout is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { timeout, ...monitorWithoutTimeout } = validPortMonitor;
 
             await portMonitor.check(
@@ -392,7 +616,15 @@ describe("PortMonitor Coverage Tests", () => {
             );
         });
 
-        it("should work with custom service timeout configuration", async () => {
+        it("should work with custom service timeout configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const customTimeoutMonitor = new PortMonitor({ timeout: 10_000 });
             const customErrorResult: MonitorCheckResult = {
                 status: "up",
@@ -415,7 +647,15 @@ describe("PortMonitor Coverage Tests", () => {
     });
 
     describe("Error Handling Edge Cases", () => {
-        it("should handle performPortCheckWithRetry returning different error types", async () => {
+        it("should handle performPortCheckWithRetry returning different error types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const customErrorResult: MonitorCheckResult = {
                 status: "down",
                 responseTime: -1,
@@ -430,7 +670,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(result).toEqual(customErrorResult);
         });
 
-        it("should handle null validation error correctly", async () => {
+        it("should handle null validation error correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(validateMonitorHostAndPort).mockReturnValue(null);
 
             await portMonitor.check(validPortMonitor);
@@ -438,7 +686,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalled();
         });
 
-        it("should handle empty string validation (no error case)", async () => {
+        it("should handle empty string validation (no error case)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Clear mocks to ensure fresh state
             vi.clearAllMocks();
             vi.mocked(validateMonitorHostAndPort).mockReturnValue(""); // Empty string means no validation error
@@ -462,7 +718,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(result).toEqual(successResult);
         });
 
-        it("should handle monitor with all optional fields", async () => {
+        it("should handle monitor with all optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const minimalMonitor: Site["monitors"][0] = {
                 id: "minimal-port",
                 type: "port",
@@ -484,7 +748,15 @@ describe("PortMonitor Coverage Tests", () => {
     });
 
     describe("Integration and Type Safety", () => {
-        it("should maintain type safety with MonitorType", async () => {
+        it("should maintain type safety with MonitorType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor: Site["monitors"][0] = {
                 ...validPortMonitor,
                 type: "port" as const,
@@ -494,7 +766,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(validateMonitorHostAndPort)).toHaveBeenCalled();
         });
 
-        it("should work with various monitor configurations", async () => {
+        it("should work with various monitor configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const configurations = [
                 { timeout: 30_000 },
                 { retryAttempts: 5 },
@@ -510,7 +790,15 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalled();
         });
 
-        it("should handle concurrent check operations", async () => {
+        it("should handle concurrent check operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: PortMonitor-coverage", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const promises = Array.from({ length: 5 }, () =>
                 portMonitor.check(validPortMonitor)
             );

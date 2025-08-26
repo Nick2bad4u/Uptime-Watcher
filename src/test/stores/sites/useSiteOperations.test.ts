@@ -109,7 +109,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("addMonitorToSite", () => {
-        it("should add a monitor to an existing site", async () => {
+        it("should add a monitor to an existing site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.addMonitorToSite("test-site", mockMonitor);
@@ -126,7 +134,15 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should throw error when site is not found", async () => {
+        it("should throw error when site is not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
             await expect(
@@ -136,7 +152,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("createSite", () => {
-        it("should create a new site with minimal data", async () => {
+        it("should create a new site with minimal data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const _newSite = {
                 identifier: "new-site",
                 name: "New Site",
@@ -194,7 +218,15 @@ describe("createSiteOperationsActions", () => {
             );
         });
 
-        it("should create a new site with full data", async () => {
+        it("should create a new site with full data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteData = {
                 identifier: "full-site",
                 monitoring: false,
@@ -213,7 +245,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("deleteSite", () => {
-        it("should delete a site and stop monitoring", async () => {
+        it("should delete a site and stop monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
                 undefined
             );
@@ -230,7 +270,15 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.removeSite).toHaveBeenCalledWith("test-site");
         });
 
-        it("should handle deletion errors", async () => {
+        it("should handle deletion errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Delete failed");
             mockElectronAPI.sites.removeSite.mockRejectedValue(error);
 
@@ -241,7 +289,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("initializeSites", () => {
-        it("should initialize sites from backend", async () => {
+        it("should initialize sites from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             const mockSites = [mockSite];
             mockElectronAPI.sites.getSites.mockResolvedValue({
                 success: true,
@@ -259,7 +315,15 @@ describe("createSiteOperationsActions", () => {
             });
         });
 
-        it("should handle empty sites list", async () => {
+        it("should handle empty sites list", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockElectronAPI.sites.getSites.mockResolvedValue({
                 success: true,
                 data: [],
@@ -274,7 +338,15 @@ describe("createSiteOperationsActions", () => {
             });
         });
 
-        it("should handle initialization errors", async () => {
+        it("should handle initialization errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Initialization", "type");
+
             mockElectronAPI.sites.getSites.mockRejectedValue(
                 new Error("Backend error")
             );
@@ -286,7 +358,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("modifySite", () => {
-        it("should modify a site successfully", async () => {
+        it("should modify a site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             const updates = { name: "Updated Site" };
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
@@ -299,7 +379,15 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should handle modify errors", async () => {
+        it("should handle modify errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Update failed");
             mockElectronAPI.sites.updateSite.mockRejectedValue(error);
 
@@ -310,7 +398,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("removeMonitorFromSite", () => {
-        it("should remove a monitor from a site", async () => {
+        it("should remove a monitor from a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
             // Add a second monitor to the site so removal is allowed
             const secondMonitor = { ...mockMonitor, id: "monitor-2" };
             const siteWithMultipleMonitors = {
@@ -338,7 +434,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("Monitor configuration updates", () => {
-        it("should update monitor retry attempts", async () => {
+        it("should update monitor retry attempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.updateMonitorRetryAttempts(
@@ -351,7 +455,15 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should update monitor timeout", async () => {
+        it("should update monitor timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.updateMonitorTimeout(
@@ -364,7 +476,15 @@ describe("createSiteOperationsActions", () => {
             expect(mockDeps.syncSitesFromBackend).toHaveBeenCalled();
         });
 
-        it("should update site check interval", async () => {
+        it("should update site check interval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.updateSiteCheckInterval(
@@ -379,7 +499,15 @@ describe("createSiteOperationsActions", () => {
     });
 
     describe("downloadSQLiteBackup", () => {
-        it("should download SQLite backup", async () => {
+        it("should download SQLite backup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Backup Operation", "type");
+
             mockElectronAPI.data.downloadSQLiteBackup.mockResolvedValue({
                 success: true,
                 data: { buffer: new ArrayBuffer(8), fileName: "backup.sqlite" },

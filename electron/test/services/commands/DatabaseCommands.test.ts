@@ -136,12 +136,28 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should construct with dependencies", () => {
+        it("should construct with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(command).toBeInstanceOf(TestDatabaseCommand);
             expect(command.getDescription()).toBe("Test database command");
         });
 
-        it("should emit success events with correct data", async () => {
+        it("should emit success events with correct data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const testData = { operation: "test-op" };
 
             await command.testEmitSuccessEvent(
@@ -159,7 +175,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should emit failure events with error details", async () => {
+        it("should emit failure events with error details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = new Error("Test error");
             const testData = { operation: "test-op" };
 
@@ -180,7 +204,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should emit failure events without additional data", async () => {
+        it("should emit failure events without additional data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = new Error("Test error");
 
             await command.testEmitFailureEvent(
@@ -198,7 +230,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should execute successfully when validation passes", async () => {
+        it("should execute successfully when validation passes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             command.setValidation(true);
             command.setExecutionSuccess(true);
 
@@ -208,7 +248,15 @@ describe("DatabaseCommands", () => {
             expect(mockEventBus.emitTyped).toBeDefined();
         });
 
-        it("should handle execution failure", async () => {
+        it("should handle execution failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             command.setExecutionSuccess(false);
 
             await expect(command.execute()).rejects.toThrow(
@@ -216,7 +264,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle rollback failure", async () => {
+        it("should handle rollback failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             command.setRollbackSuccess(false);
 
             await expect(command.rollback()).rejects.toThrow(
@@ -224,7 +280,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle validation failure", async () => {
+        it("should handle validation failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             command.setValidation(false);
 
             const result = await command.validate();
@@ -252,7 +316,15 @@ describe("DatabaseCommands", () => {
             };
         });
 
-        it("should execute valid command successfully", async () => {
+        it("should execute valid command successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await executor.execute(mockCommand);
 
             expect(result).toBe("test-result");
@@ -261,7 +333,15 @@ describe("DatabaseCommands", () => {
             expect(mockCommand.rollback).not.toHaveBeenCalled();
         });
 
-        it("should reject invalid command before execution", async () => {
+        it("should reject invalid command before execution", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockCommand.validate = vi.fn().mockResolvedValue({
                 errors: ["Validation error"],
                 isValid: false,
@@ -275,7 +355,15 @@ describe("DatabaseCommands", () => {
             expect(mockCommand.execute).not.toHaveBeenCalled();
         });
 
-        it("should rollback on execution failure", async () => {
+        it("should rollback on execution failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockCommand.execute = vi
                 .fn()
                 .mockRejectedValue(new Error("Execution failed"));
@@ -289,7 +377,15 @@ describe("DatabaseCommands", () => {
             expect(mockCommand.rollback).toHaveBeenCalled();
         });
 
-        it("should handle rollback failure gracefully", async () => {
+        it("should handle rollback failure gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const consoleSpy = vi
                 .spyOn(console, "error")
                 .mockImplementation(() => {});
@@ -313,7 +409,15 @@ describe("DatabaseCommands", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should rollback all commands in reverse order", async () => {
+        it("should rollback all commands in reverse order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const commands = [
                 { ...mockCommand, getDescription: () => "Command 1" },
                 { ...mockCommand, getDescription: () => "Command 2" },
@@ -334,7 +438,15 @@ describe("DatabaseCommands", () => {
             expect(commands[0]?.rollback).toHaveBeenCalled();
         });
 
-        it("should collect rollback errors and throw aggregate error", async () => {
+        it("should collect rollback errors and throw aggregate error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const command1 = {
                 ...mockCommand,
                 rollback: vi
@@ -358,7 +470,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle non-Error objects in rollback", async () => {
+        it("should handle non-Error objects in rollback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const command1 = {
                 ...mockCommand,
                 rollback: vi.fn().mockRejectedValue("String error"),
@@ -371,7 +491,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should clear command history", async () => {
+        it("should clear command history", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await executor.execute(mockCommand);
             executor.clear();
 
@@ -380,7 +508,15 @@ describe("DatabaseCommands", () => {
             expect(mockCommand.rollback).not.toHaveBeenCalled();
         });
 
-        it("should handle undefined commands in rollback gracefully", async () => {
+        it("should handle undefined commands in rollback gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await executor.execute(mockCommand);
 
             // Manually corrupt the command array to test robustness
@@ -413,7 +549,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should execute backup download successfully", async () => {
+        it("should execute backup download successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const result = await command.execute();
 
             expect(result).toEqual({
@@ -431,7 +575,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle backup service errors", async () => {
+        it("should handle backup service errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockBackupService.downloadDatabaseBackup.mockRejectedValue(
                 new Error("Backup service failed")
             );
@@ -441,17 +593,41 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should validate successfully (no-op)", async () => {
+        it("should validate successfully (no-op)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const result = await command.validate();
 
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should rollback successfully (no-op)", async () => {
+        it("should rollback successfully (no-op)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await expect(command.rollback()).resolves.toBeUndefined();
         });
 
-        it("should provide correct description", () => {
+        it("should provide correct description", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(command.getDescription()).toBe(
                 "Download SQLite database backup"
             );
@@ -477,7 +653,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should execute data export successfully", async () => {
+        it("should execute data export successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const result = await command.execute();
 
             expect(result).toBe('{"test": "data"}');
@@ -492,7 +676,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle export service errors", async () => {
+        it("should handle export service errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockImportExportService.exportAllData.mockRejectedValue(
                 new Error("Export service failed")
             );
@@ -502,17 +694,41 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should validate successfully (no-op)", async () => {
+        it("should validate successfully (no-op)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const result = await command.validate();
 
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should rollback successfully (no-op)", async () => {
+        it("should rollback successfully (no-op)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             await expect(command.rollback()).resolves.toBeUndefined();
         });
 
-        it("should provide correct description", () => {
+        it("should provide correct description", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(command.getDescription()).toBe(
                 "Export all application data to JSON"
             );
@@ -553,7 +769,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should execute data import successfully", async () => {
+        it("should execute data import successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Import Operation", "type");
+
             // Pre-populate cache
             const originalSite = createTestSite("original");
             mockCache.getAll = vi.fn().mockReturnValue([originalSite]);
@@ -581,7 +805,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle import service errors", async () => {
+        it("should handle import service errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockImportExportService.importDataFromJson.mockRejectedValue(
                 new Error("Import service failed")
             );
@@ -591,7 +823,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should rollback cache to original state", async () => {
+        it("should rollback cache to original state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Caching", "type");
+
             const originalSites = [
                 createTestSite("original1"),
                 createTestSite("original2"),
@@ -615,7 +855,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should validate empty data as invalid", async () => {
+        it("should validate empty data as invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const invalidCommand = new ImportDataCommand(
                 mockServiceFactory as unknown as DatabaseServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
@@ -634,7 +882,15 @@ describe("DatabaseCommands", () => {
             });
         });
 
-        it("should validate whitespace-only data as invalid", async () => {
+        it("should validate whitespace-only data as invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const invalidCommand = new ImportDataCommand(
                 mockServiceFactory as unknown as DatabaseServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
@@ -653,7 +909,15 @@ describe("DatabaseCommands", () => {
             });
         });
 
-        it("should validate invalid JSON as invalid", async () => {
+        it("should validate invalid JSON as invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const invalidCommand = new ImportDataCommand(
                 mockServiceFactory as unknown as DatabaseServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
@@ -669,7 +933,15 @@ describe("DatabaseCommands", () => {
             });
         });
 
-        it("should validate multiple errors", async () => {
+        it("should validate multiple errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidCommand = new ImportDataCommand(
                 mockServiceFactory as unknown as DatabaseServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
@@ -683,13 +955,29 @@ describe("DatabaseCommands", () => {
             expect(result.errors).toContain("Import data cannot be empty");
         });
 
-        it("should validate valid JSON as valid", async () => {
+        it("should validate valid JSON as valid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const result = await command.validate();
 
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should provide correct description", () => {
+        it("should provide correct description", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(command.getDescription()).toBe(
                 "Import application data from JSON"
             );
@@ -718,7 +1006,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should execute site loading successfully", async () => {
+        it("should execute site loading successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Pre-populate cache with original data
             const originalSites = [
                 createTestSite("original1"),
@@ -749,7 +1045,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle repository service errors", async () => {
+        it("should handle repository service errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockSiteRepositoryService.getSitesFromDatabase.mockRejectedValue(
                 new Error("Repository service failed")
             );
@@ -759,7 +1063,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should rollback cache to original state", async () => {
+        it("should rollback cache to original state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Caching", "type");
+
             const originalSites = [
                 createTestSite("original1"),
                 createTestSite("original2"),
@@ -790,7 +1102,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle empty original cache in rollback", async () => {
+        it("should handle empty original cache in rollback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Caching", "type");
+
             mockCache.entries = vi.fn().mockReturnValue(new Map().entries());
 
             // Execute and rollback with empty original cache
@@ -801,13 +1121,29 @@ describe("DatabaseCommands", () => {
             // No set calls should be made for empty cache
         });
 
-        it("should validate successfully (no-op)", async () => {
+        it("should validate successfully (no-op)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const result = await command.validate();
 
             expect(result).toEqual({ errors: [], isValid: true });
         });
 
-        it("should provide correct description", () => {
+        it("should provide correct description", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(command.getDescription()).toBe(
                 "Load sites from database into cache"
             );
@@ -815,7 +1151,15 @@ describe("DatabaseCommands", () => {
     });
 
     describe("IDatabaseCommand interface compliance", () => {
-        it("should ensure all commands implement required methods", () => {
+        it("should ensure all commands implement required methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const commands = [
                 new DownloadBackupCommand(
                     mockServiceFactory as unknown as DatabaseServiceFactory,
@@ -850,7 +1194,15 @@ describe("DatabaseCommands", () => {
     });
 
     describe("Error handling and edge cases", () => {
-        it("should handle event emission failures gracefully", async () => {
+        it("should handle event emission failures gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             (mockEventBus.emitTyped as any).mockRejectedValue(
                 new Error("Event emission failed")
             );
@@ -875,7 +1227,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle service factory returning null services", async () => {
+        it("should handle service factory returning null services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockServiceFactory.createBackupService.mockReturnValue({
                 downloadDatabaseBackup: vi
                     .fn()
@@ -893,7 +1253,15 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should handle cache operations that throw errors", async () => {
+        it("should handle cache operations that throw errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockCache.clear = vi.fn().mockImplementation(() => {
                 throw new Error("Cache clear failed");
             });

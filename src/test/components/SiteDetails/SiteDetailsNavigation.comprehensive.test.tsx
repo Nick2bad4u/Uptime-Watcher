@@ -148,38 +148,98 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render navigation container", () => {
+        it("should render navigation container", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation();
 
             // Use CSS class selector instead of data-testid
             expect(document.querySelector(".themed-box")).toBeInTheDocument();
         });
 
-        it("should render site overview tab", () => {
+        it("should render site overview tab", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText(/Site Overview/)).toBeInTheDocument();
         });
 
-        it("should render monitor overview tab", () => {
+        it("should render monitor overview tab", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText(/Monitor Overview/)).toBeInTheDocument();
         });
 
-        it("should render settings tab", () => {
+        it("should render settings tab", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText(/Settings/)).toBeInTheDocument();
         });
 
-        it("should render history tab", () => {
+        it("should render history tab", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText(/History/)).toBeInTheDocument();
         });
 
-        it("should render analytics tab", () => {
+        it("should render analytics tab", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText(/HTTP Analytics/)).toBeInTheDocument();
@@ -187,7 +247,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Monitor Selection", () => {
-        it("should render monitor selector", () => {
+        it("should render monitor selector", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation();
 
             // Use CSS class selector instead of data-testid
@@ -196,7 +266,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show selected monitor in selector", () => {
+        it("should show selected monitor in selector", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation();
 
             // Use CSS class selector and getByRole for semantic selection
@@ -206,14 +286,34 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(selector).toHaveValue("monitor-1");
         });
 
-        it("should display all monitors in selector", () => {
+        it("should display all monitors in selector", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation();
 
             expect(screen.getByText("HTTP")).toBeInTheDocument();
             expect(screen.getByText("PORT")).toBeInTheDocument();
         });
 
-        it("should handle monitor change", () => {
+        it("should handle monitor change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleMonitorIdChange = vi.fn();
             renderSiteDetailsNavigation({
                 handleMonitorIdChange,
@@ -230,7 +330,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Tab Click Handlers", () => {
-        it("should call setActiveSiteDetailsTab when site overview clicked", () => {
+        it("should call setActiveSiteDetailsTab when site overview clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setActiveSiteDetailsTab = vi.fn();
             renderSiteDetailsNavigation({
                 setActiveSiteDetailsTab,
@@ -243,7 +353,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             );
         });
 
-        it("should call setActiveSiteDetailsTab when monitor overview clicked", () => {
+        it("should call setActiveSiteDetailsTab when monitor overview clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const setActiveSiteDetailsTab = vi.fn();
             renderSiteDetailsNavigation({
                 setActiveSiteDetailsTab,
@@ -256,7 +376,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             );
         });
 
-        it("should call setActiveSiteDetailsTab when settings clicked", () => {
+        it("should call setActiveSiteDetailsTab when settings clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setActiveSiteDetailsTab = vi.fn();
             renderSiteDetailsNavigation({
                 setActiveSiteDetailsTab,
@@ -267,7 +397,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("settings");
         });
 
-        it("should call setActiveSiteDetailsTab when history clicked", () => {
+        it("should call setActiveSiteDetailsTab when history clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setActiveSiteDetailsTab = vi.fn();
             renderSiteDetailsNavigation({
                 setActiveSiteDetailsTab,
@@ -278,7 +418,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("history");
         });
 
-        it("should call setActiveSiteDetailsTab when analytics tab clicked", () => {
+        it("should call setActiveSiteDetailsTab when analytics tab clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setActiveSiteDetailsTab = vi.fn();
             renderSiteDetailsNavigation({
                 setActiveSiteDetailsTab,
@@ -293,7 +443,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Active Tab Highlighting", () => {
-        it("should highlight site overview tab when active", () => {
+        it("should highlight site overview tab when active", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation({
                 activeSiteDetailsTab: "site-overview",
             });
@@ -303,7 +463,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(siteOverviewButton).toHaveClass("themed-button--primary");
         });
 
-        it("should highlight settings tab when active", () => {
+        it("should highlight settings tab when active", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation({
                 activeSiteDetailsTab: "settings",
             });
@@ -312,7 +482,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(settingsButton).toHaveClass("themed-button--primary");
         });
 
-        it("should highlight history tab when active", () => {
+        it("should highlight history tab when active", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderSiteDetailsNavigation({
                 activeSiteDetailsTab: "history",
             });
@@ -321,7 +501,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(historyButton).toHaveClass("themed-button--primary");
         });
 
-        it("should highlight monitor analytics tab when active", () => {
+        it("should highlight monitor analytics tab when active", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation({
                 activeSiteDetailsTab: "monitor-1-analytics",
             });
@@ -332,7 +522,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Monitoring Controls", () => {
-        it("should render site monitoring button", () => {
+        it("should render site monitoring button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation();
 
             expect(
@@ -340,7 +540,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show stop button when monitoring", () => {
+        it("should show stop button when monitoring", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation({
                 isMonitoring: true,
             });
@@ -350,7 +560,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should show start button when not monitoring", () => {
+        it("should show start button when not monitoring", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation({
                 isMonitoring: false,
             });
@@ -360,7 +580,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle start monitoring click", () => {
+        it("should handle start monitoring click", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStartMonitoring = vi.fn();
             renderSiteDetailsNavigation({
                 handleStartMonitoring,
@@ -372,7 +602,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(handleStartMonitoring).toHaveBeenCalled();
         });
 
-        it("should handle stop monitoring click", () => {
+        it("should handle stop monitoring click", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStopMonitoring = vi.fn();
             renderSiteDetailsNavigation({
                 handleStopMonitoring,
@@ -386,7 +626,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle site with no monitors", () => {
+        it("should handle site with no monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithNoMonitors = {
                 ...mockSite,
                 monitors: [],
@@ -403,7 +653,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(screen.getByText(/History/)).toBeInTheDocument();
         });
 
-        it("should handle loading state", () => {
+        it("should handle loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             renderSiteDetailsNavigation({
                 isLoading: true,
             });
@@ -412,7 +672,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(startSiteButton).toBeDisabled();
         });
 
-        it("should handle different monitor types", () => {
+        it("should handle different monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithPingMonitor = {
                 ...mockSite,
                 monitors: [
@@ -437,7 +707,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(screen.getByText(/PING Analytics/)).toBeInTheDocument();
         });
 
-        it("should handle missing selected monitor", () => {
+        it("should handle missing selected monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderSiteDetailsNavigation({
                 selectedMonitorId: "non-existent-monitor",
             });
@@ -448,7 +728,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
     });
 
     describe("Site-Level Monitoring", () => {
-        it("should calculate all monitors running correctly", () => {
+        it("should calculate all monitors running correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithAllMonitorsRunning = {
                 ...mockSite,
                 monitors: mockSite.monitors.map((m) => ({
@@ -466,7 +756,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle site monitoring start", () => {
+        it("should handle site monitoring start", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStartSiteMonitoring = vi
                 .fn()
                 .mockResolvedValue(undefined);
@@ -479,7 +779,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(handleStartSiteMonitoring).toHaveBeenCalled();
         });
 
-        it("should handle site monitoring stop", () => {
+        it("should handle site monitoring stop", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsNavigation", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStopSiteMonitoring = vi
                 .fn()
                 .mockResolvedValue(undefined);

@@ -54,7 +54,15 @@ describe("Environment - Complete Function Coverage", () => {
     });
 
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Verify the module exports we expect
             expect(typeof environmentModule).toBe("object");
             expect(environmentModule).toBeDefined();
@@ -185,7 +193,15 @@ describe("Environment - Complete Function Coverage", () => {
             delete process.env["CODECOV_TOKEN"];
         });
 
-        it("should handle edge cases and special environments", () => {
+        it("should handle edge cases and special environments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with empty string NODE_ENV (empty string is not nullish, so is returned as-is)
             process.env["NODE_ENV"] = "";
             expect(environmentModule.getNodeEnv()).toBe(""); // Empty string is returned, not fallback
@@ -209,7 +225,15 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.getEnvironment()).toBe("PRODUCTION");
         });
 
-        it("should handle runtime environment detection edge cases", () => {
+        it("should handle runtime environment detection edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test browser detection edge cases
             // In Node.js environment, window and document don't exist
             expect(environmentModule.isBrowserEnvironment()).toBe(false);
@@ -222,7 +246,15 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.isNodeEnvironment()).toBe(true); // Should be true in test environment
         });
 
-        it("should provide consistent environment detection", () => {
+        it("should provide consistent environment detection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test consistency between functions
             process.env["NODE_ENV"] = "development";
 
@@ -251,7 +283,15 @@ describe("Environment - Complete Function Coverage", () => {
             expect(environmentModule.isTest()).toBe(true);
         });
 
-        it("should handle getEnvVar edge cases", () => {
+        it("should handle getEnvVar edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             // Test with various environment variables
             process.env["CODECOV_TOKEN"] = "test-codecov-token";
             expect(environmentModule.getEnvVar("CODECOV_TOKEN")).toBe(

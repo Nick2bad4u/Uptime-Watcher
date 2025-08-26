@@ -11,7 +11,17 @@ import {
 
 describe("Schemas - 100% Coverage Tests", () => {
     describe("Targeting Lines 399,482", () => {
-        test("should handle field validation error at line 399", () => {
+        test("should handle field validation error at line 399", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
             // Test with an unknown field to trigger the error at line 399
             // This will test the validateFieldWithSchema function's unknown field error
             expect(() => {
@@ -20,7 +30,17 @@ describe("Schemas - 100% Coverage Tests", () => {
             }).toThrow("Unknown field: unknownField");
         });
 
-        test("should handle validation error categorization at line 482", () => {
+        test("should handle validation error categorization at line 482", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
             // Create a scenario that triggers line 482 (validation error categorization)
             const invalidData = {
                 url: 123, // Invalid type - should be string
@@ -35,7 +55,17 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        test("should trigger optional field warning classification", () => {
+        test("should trigger optional field warning classification", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
             // Create a test case that specifically triggers the isOptionalField logic (line 482 area)
             const dataWithUndefinedOptionalField = {
                 url: "https://example.com",
@@ -54,7 +84,17 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect("success" in result).toBe(true);
         });
 
-        test("should handle complex validation scenarios", () => {
+        test("should handle complex validation scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas.100-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Validation", "type");
+
             // Test with multiple validation errors to ensure all branches are covered
             const complexInvalidData = {
                 host: 123, // Should be string

@@ -85,21 +85,45 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("When disabled (default behavior)", () => {
-        it("should not add event listener when disabled by default", () => {
+        it("should not add event listener when disabled by default", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             renderHook(() => useBackendFocusSync());
 
             expect(mockAddEventListener).not.toHaveBeenCalled();
             expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
         });
 
-        it("should not add event listener when explicitly disabled", () => {
+        it("should not add event listener when explicitly disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             renderHook(() => useBackendFocusSync(false));
 
             expect(mockAddEventListener).not.toHaveBeenCalled();
             expect(mockFullSyncFromBackend).not.toHaveBeenCalled();
         });
 
-        it("should return undefined cleanup function when disabled", () => {
+        it("should return undefined cleanup function when disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { unmount } = renderHook(() => useBackendFocusSync(false));
 
             // Should not throw when unmounting
@@ -109,7 +133,15 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("When enabled", () => {
-        it("should add focus event listener when enabled", () => {
+        it("should add focus event listener when enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             renderHook(() => useBackendFocusSync(true));
 
             expect(mockAddEventListener).toHaveBeenCalledWith(
@@ -119,7 +151,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockAddEventListener).toHaveBeenCalledTimes(1);
         });
 
-        it("should call fullSyncFromBackend when focus event is triggered", () => {
+        it("should call fullSyncFromBackend when focus event is triggered", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             renderHook(() => useBackendFocusSync(true));
 
             // Get the event handler that was registered
@@ -137,7 +177,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle multiple focus events", () => {
+        it("should handle multiple focus events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             renderHook(() => useBackendFocusSync(true));
 
             const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
@@ -152,7 +200,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(3);
         });
 
-        it("should remove event listener on unmount", () => {
+        it("should remove event listener on unmount", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const { unmount } = renderHook(() => useBackendFocusSync(true));
 
             // Verify listener was added
@@ -175,7 +231,15 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("Dynamic enable/disable behavior", () => {
-        it("should add listener when changing from disabled to enabled", () => {
+        it("should add listener when changing from disabled to enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender } = renderHook(
                 ({ enabled }) => useBackendFocusSync(enabled),
                 {
@@ -197,7 +261,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockAddEventListener).toHaveBeenCalledTimes(1);
         });
 
-        it("should remove listener when changing from enabled to disabled", () => {
+        it("should remove listener when changing from enabled to disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const { rerender } = renderHook(
                 ({ enabled }) => useBackendFocusSync(enabled),
                 {
@@ -223,7 +295,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockRemoveEventListener).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle rapid enable/disable changes", () => {
+        it("should handle rapid enable/disable changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender } = renderHook(
                 ({ enabled }) => useBackendFocusSync(enabled),
                 {
@@ -244,7 +324,15 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("Store selector behavior", () => {
-        it("should use store selector to get fullSyncFromBackend function", () => {
+        it("should use store selector to get fullSyncFromBackend function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             renderHook(() => useBackendFocusSync(true));
 
             // Verify that useSitesStore was called with a selector function
@@ -253,7 +341,15 @@ describe("useBackendFocusSync Hook", () => {
             );
         });
 
-        it("should re-run effect when fullSyncFromBackend function changes", () => {
+        it("should re-run effect when fullSyncFromBackend function changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const newMockFullSync = vi.fn();
             const mockStore = createMockStore() as SitesStore;
 
@@ -306,7 +402,15 @@ describe("useBackendFocusSync Hook", () => {
     });
 
     describe("Error handling and edge cases", () => {
-        it("should handle fullSyncFromBackend throwing an error", () => {
+        it("should handle fullSyncFromBackend throwing an error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockFullSyncFromBackend.mockImplementation(() => {
                 throw new Error("Sync failed");
             });
@@ -323,7 +427,15 @@ describe("useBackendFocusSync Hook", () => {
             }).not.toThrow();
         });
 
-        it("should handle fullSyncFromBackend returning a rejected promise", () => {
+        it("should handle fullSyncFromBackend returning a rejected promise", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockFullSyncFromBackend.mockRejectedValue(
                 new Error("Async sync failed")
             );
@@ -340,7 +452,15 @@ describe("useBackendFocusSync Hook", () => {
             }).not.toThrow();
         });
 
-        it("should work with truthy non-boolean values for enabled", () => {
+        it("should work with truthy non-boolean values for enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender } = renderHook(
                 ({ enabled }) => useBackendFocusSync(enabled as any),
                 {
@@ -360,7 +480,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockRemoveEventListener).toHaveBeenCalledTimes(2);
         });
 
-        it("should work with falsy non-boolean values for enabled", () => {
+        it("should work with falsy non-boolean values for enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { rerender } = renderHook(
                 ({ enabled }) => useBackendFocusSync(enabled as any),
                 {
@@ -394,7 +522,15 @@ describe("useBackendFocusSync Hook", () => {
             });
         });
 
-        it("should work correctly when component mounts with enabled=true", () => {
+        it("should work correctly when component mounts with enabled=true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             renderHook(() => useBackendFocusSync(true));
 
             expect(mockAddEventListener).toHaveBeenCalledWith(
@@ -410,7 +546,15 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockFullSyncFromBackend).toHaveBeenCalledTimes(1);
         });
 
-        it("should properly clean up when component unmounts while enabled", () => {
+        it("should properly clean up when component unmounts while enabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { unmount } = renderHook(() => useBackendFocusSync(true));
 
             const focusHandler = mockAddEventListener.mock.calls[0]?.[1];
@@ -423,7 +567,15 @@ describe("useBackendFocusSync Hook", () => {
             );
         });
 
-        it("should handle multiple instances of the hook", () => {
+        it("should handle multiple instances of the hook", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { unmount: unmount1 } = renderHook(() =>
                 useBackendFocusSync(true)
             );

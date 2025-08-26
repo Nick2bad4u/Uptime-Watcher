@@ -3,14 +3,30 @@ import { determineMonitorStatus } from "../../../services/monitoring/utils/httpS
 
 describe("HTTP Status Utils", () => {
     describe("determineMonitorStatus", () => {
-        it('should return "up" for 1xx informational responses', () => {
+        it('should return "up" for 1xx informational responses', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(100)).toBe("up"); // Continue
             expect(determineMonitorStatus(101)).toBe("up"); // Switching Protocols
             expect(determineMonitorStatus(102)).toBe("up"); // Processing
             expect(determineMonitorStatus(103)).toBe("up"); // Early Hints
         });
 
-        it('should return "up" for 2xx success responses', () => {
+        it('should return "up" for 2xx success responses', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(200)).toBe("up"); // OK
             expect(determineMonitorStatus(201)).toBe("up"); // Created
             expect(determineMonitorStatus(202)).toBe("up"); // Accepted
@@ -19,7 +35,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(299)).toBe("up"); // Edge of 2xx range
         });
 
-        it('should return "up" for 3xx redirection responses', () => {
+        it('should return "up" for 3xx redirection responses', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(300)).toBe("up"); // Multiple Choices
             expect(determineMonitorStatus(301)).toBe("up"); // Moved Permanently
             expect(determineMonitorStatus(302)).toBe("up"); // Found
@@ -29,7 +53,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(399)).toBe("up"); // Edge of 3xx range
         });
 
-        it('should return "up" for 4xx client error responses', () => {
+        it('should return "up" for 4xx client error responses', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(determineMonitorStatus(400)).toBe("up"); // Bad Request
             expect(determineMonitorStatus(401)).toBe("up"); // Unauthorized
             expect(determineMonitorStatus(403)).toBe("up"); // Forbidden
@@ -39,7 +71,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(499)).toBe("up"); // Edge of 4xx range
         });
 
-        it('should return "down" for 5xx server error responses', () => {
+        it('should return "down" for 5xx server error responses', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(determineMonitorStatus(500)).toBe("down"); // Internal Server Error
             expect(determineMonitorStatus(501)).toBe("down"); // Not Implemented
             expect(determineMonitorStatus(502)).toBe("down"); // Bad Gateway
@@ -49,28 +89,60 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(599)).toBe("down"); // Edge of 5xx range
         });
 
-        it('should return "down" for invalid status codes below 100', () => {
+        it('should return "down" for invalid status codes below 100', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(0)).toBe("down");
             expect(determineMonitorStatus(-1)).toBe("down");
             expect(determineMonitorStatus(50)).toBe("down");
             expect(determineMonitorStatus(99)).toBe("down");
         });
 
-        it('should return "down" for invalid status codes above 599', () => {
+        it('should return "down" for invalid status codes above 599', async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(600)).toBe("down");
             expect(determineMonitorStatus(700)).toBe("down");
             expect(determineMonitorStatus(999)).toBe("down");
             expect(determineMonitorStatus(1000)).toBe("down");
         });
 
-        it("should handle non-integer inputs", () => {
+        it("should handle non-integer inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(200.5)).toBe("down"); // Float
             expect(determineMonitorStatus(Number.NaN)).toBe("down");
             expect(determineMonitorStatus(Infinity)).toBe("down");
             expect(determineMonitorStatus(-Infinity)).toBe("down");
         });
 
-        it("should handle edge cases at boundaries", () => {
+        it("should handle edge cases at boundaries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test exact boundaries
             expect(determineMonitorStatus(100)).toBe("up"); // First valid status
             expect(determineMonitorStatus(499)).toBe("up"); // Last 4xx
@@ -78,7 +150,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(599)).toBe("down"); // Last valid status
         });
 
-        it("should provide consistent behavior for common monitoring scenarios", () => {
+        it("should provide consistent behavior for common monitoring scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Common success scenarios
             const successCodes = [
                 200,
@@ -125,7 +205,15 @@ describe("HTTP Status Utils", () => {
             }
         });
 
-        it("should handle string inputs by treating them as invalid", () => {
+        it("should handle string inputs by treating them as invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // TypeScript would catch this, but JavaScript might pass strings
             expect(determineMonitorStatus("200" as any)).toBe("down");
             expect(determineMonitorStatus("404" as any)).toBe("down");
@@ -133,12 +221,28 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus("" as any)).toBe("down");
         });
 
-        it("should handle null and undefined inputs", () => {
+        it("should handle null and undefined inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(determineMonitorStatus(null as any)).toBe("down");
             expect(determineMonitorStatus(undefined as any)).toBe("down");
         });
 
-        it("should demonstrate monitoring logic reasoning", () => {
+        it("should demonstrate monitoring logic reasoning", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             // The logic: if a server responds with any code (even 404),
             // it means the server is running and responding - so "up"
             expect(determineMonitorStatus(404)).toBe("up"); // Server responded "not found"
@@ -149,7 +253,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(503)).toBe("down"); // Service unavailable
         });
 
-        it("should handle performance testing scenarios", () => {
+        it("should handle performance testing scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with a range of codes to ensure consistent performance
             const testCodes = Array.from({ length: 100 }, (_, i) => i + 100);
 
@@ -170,7 +282,15 @@ describe("HTTP Status Utils", () => {
     });
 
     describe("integration and edge cases", () => {
-        it("should work with real-world HTTP monitoring scenarios", () => {
+        it("should work with real-world HTTP monitoring scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Typical web server responses
             expect(determineMonitorStatus(200)).toBe("up"); // Normal response
             expect(determineMonitorStatus(404)).toBe("up"); // Page not found (but server responding)
@@ -192,7 +312,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(503)).toBe("down"); // Service unavailable
         });
 
-        it("should handle monitoring library error cases", () => {
+        it("should handle monitoring library error cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Network errors might not have valid status codes
             expect(determineMonitorStatus(0)).toBe("down"); // Network error
             expect(determineMonitorStatus(-1)).toBe("down"); // Library error code
@@ -202,7 +330,15 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(1000)).toBe("down"); // Out of range
         });
 
-        it("should maintain consistency across multiple calls", () => {
+        it("should maintain consistency across multiple calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testStatus = 404;
             const results = Array.from({ length: 100 }, () =>
                 determineMonitorStatus(testStatus)
@@ -213,7 +349,15 @@ describe("HTTP Status Utils", () => {
             expect(results[0]).toBe("up");
         });
 
-        it("should have predictable behavior for mathematical operations", () => {
+        it("should have predictable behavior for mathematical operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorLifecycle", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Ensure the function doesn't have side effects
             const code = 200;
             const result1 = determineMonitorStatus(code);

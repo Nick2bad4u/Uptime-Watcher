@@ -12,7 +12,15 @@ import {
 
 describe("Validation Schemas - Branch Coverage Completion", () => {
     describe("Error handling edge cases", () => {
-        it("should handle Zod errors with structured issue codes for warnings", () => {
+        it("should handle Zod errors with structured issue codes for warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Create data that will generate specific Zod error types to test warning detection
             const dataWithUndefinedField = {
                 id: "test",
@@ -33,7 +41,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle validation with empty path in Zod issues", () => {
+        it("should handle validation with empty path in Zod issues", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test with root-level validation errors (empty path)
             const invalidData = null; // This will cause a root-level validation error
 
@@ -42,7 +58,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should handle non-Error objects in catch blocks", () => {
+        it("should handle non-Error objects in catch blocks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // This tests the String(error) branch in the catch block
             const result = validateSiteData(Symbol("invalid")); // Symbol will cause a different type of error
             expect(result.success).toBe(false);
@@ -51,7 +75,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("Field validation edge cases", () => {
-        it("should test validateFieldWithSchema with specific schema shape checks", () => {
+        it("should test validateFieldWithSchema with specific schema shape checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test field that exists in specific monitor schema
             const result = validateMonitorField(
                 "http",
@@ -61,7 +93,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should test validateFieldWithSchema with base schema fallback", () => {
+        it("should test validateFieldWithSchema with base schema fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test field that exists in base schema but not specific schema
             const result = validateMonitorField(
                 "http",
@@ -71,14 +111,30 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should test validateFieldWithSchema with unknown field error", () => {
+        it("should test validateFieldWithSchema with unknown field error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test completely unknown field to trigger the error case
             expect(() => {
                 validateMonitorField("http", "completelyUnknownField", "value");
             }).toThrow("Unknown field: completelyUnknownField");
         });
 
-        it("should test field validation with invalid values to trigger Zod errors", () => {
+        it("should test field validation with invalid values to trigger Zod errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test invalid timeout to trigger field-specific Zod error
             const result = validateMonitorField("http", "timeout", 100); // Too low
             expect(result.success).toBe(false);
@@ -87,7 +143,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("getMonitorSchema function coverage", () => {
-        it("should test all monitor types to cover getMonitorSchema branches", () => {
+        it("should test all monitor types to cover getMonitorSchema branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             // Test HTTP monitor
             const httpData = {
                 id: "test",
@@ -147,7 +211,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("Comprehensive validation result metadata", () => {
-        it("should include comprehensive metadata in validation results", () => {
+        it("should include comprehensive metadata in validation results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validData = {
                 id: "test",
                 type: "http",
@@ -168,7 +240,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(typeof result.metadata!["validatedDataSize"]).toBe("number");
         });
 
-        it("should include metadata for site validation", () => {
+        it("should include metadata for site validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const siteData = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -200,7 +280,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("Complex Zod error scenarios", () => {
-        it("should handle multiple validation issues with proper categorization", () => {
+        it("should handle multiple validation issues with proper categorization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const complexInvalidData = {
                 id: "", // Invalid
                 type: "http",
@@ -222,7 +310,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.errors.length).toBeGreaterThan(3);
         });
 
-        it("should handle edge case of empty error path", () => {
+        it("should handle edge case of empty error path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test validation that could generate empty path
             const result = validateMonitorData("http", "not-an-object");
             expect(result.success).toBe(false);
@@ -231,7 +327,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("String conversion branches", () => {
-        it("should handle error instanceof Error check in catch blocks", () => {
+        it("should handle error instanceof Error check in catch blocks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test both branches of the error instanceof Error check
             const result1 = validateSiteData(null);
             expect(result1.success).toBe(false);
@@ -242,7 +346,15 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
     });
 
     describe("Validation result structure completeness", () => {
-        it("should always return complete ValidationResult structure", () => {
+        it("should always return complete ValidationResult structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult = validateMonitorData("http", {
                 id: "test",
                 type: "http",

@@ -49,7 +49,15 @@ describe("MonitorRepository", () => {
         });
     });
     describe("findBySiteIdentifier", () => {
-        it("should find all monitors for a site", async () => {
+        it("should find all monitors for a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockMonitors = [
                 {
                     monitor_id: "mon1",
@@ -71,7 +79,15 @@ describe("MonitorRepository", () => {
             expect(mockDb.all).toHaveBeenCalled();
             expect(result).toBeDefined();
         });
-        it("should handle errors when finding monitors by site", async () => {
+        it("should handle errors when finding monitors by site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockImplementation(() => {
                 throw new Error("Database error");
@@ -82,7 +98,15 @@ describe("MonitorRepository", () => {
         });
     });
     describe("findByIdentifier", () => {
-        it("should find a monitor by id", async () => {
+        it("should find a monitor by id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockMonitor = {
                 monitor_id: "mon1",
                 monitor_type: "http",
@@ -97,7 +121,15 @@ describe("MonitorRepository", () => {
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();
             expect(result).toBeDefined();
         });
-        it("should return undefined when monitor not found", async () => {
+        it("should return undefined when monitor not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.get.mockReturnValue(undefined);
 
@@ -107,7 +139,15 @@ describe("MonitorRepository", () => {
         });
     });
     describe("getAllMonitorIds", () => {
-        it("should return all monitor ids", async () => {
+        it("should return all monitor ids", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockIds = [{ monitor_id: "mon1" }, { monitor_id: "mon2" }];
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockReturnValue(mockIds);

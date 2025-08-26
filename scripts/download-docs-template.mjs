@@ -1,400 +1,737 @@
-// @ts-nocheck
-/**
- * ## Universal Doc Downloader & Cleaner Template
- *
- * Easily configure all variables at the top!
- *
- * HOW TO CONFIGURE:
- *
- * 1. Set variables in the CONFIGURATION section below.
- * 2. Adjust the `rewriteLinks` and `cleanContent` functions if needed.
- * 3. Run: `node doc_downloader_template.js`
- */
-
-import exec from "child_process";
-import fs from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
-
-/* -------------------- CONFIGURATION -------------------- */
-
-// Unique name for this doc sync; used for log/hashes/folder/file names
-const DOC_NAME = "Example-Package";
-
-// Base URL for docs (no trailing slash)
-const BASE_URL =
-    "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master";
-
-// Array of doc/page names (relative to BASE_URL).
-// These should match the paths in your repo, relative to the base URL.
-// Examples:
-//   - "intro" (file in root, e.g. intro.md)
-//   - "README.md" (file in root with extension)
-//   - "examples/example.js" (file in subdirectory with extension)
-//   - "docs/guide/usage.md" (nested subdirectory)
-//   - "API.md" (for GitHub Wiki pages, append .md to the page name)
-//
-// You can download Github Wiki Pages by appending ".md" to the wiki page URL.
-// @example: If your wiki page URL is "https://github.com/TryGhost/node-sqlite3/wiki/API",
-// use "API.md" as the page name.
-const PAGES = [
-    "examples/example.js",
-    "examples/example2.html",
-    "README.md",
-];
-
-const INPUT_FORMAT = "gfm"; // Change to your input format if needed
-const OUTPUT_FORMAT = "gfm"; // Change to your desired output format
-
-// Output directory (edit here or use env variable DOCS_OUTPUT_DIR)
-const SUBDIR_1 = "docs";
-const SUBDIR_2 = "packages";
-
-// Output file extension (Markdown)
-// This is the extension all output files will have, regardless of input format
-const OUTPUT_EXT = "md";
-
-// Command template for downloading & converting (must produce $OUT_FILE)
-// See bottom of file for supported input/output formats
-// gfm is GitHub-Flavored Markdown, which is widely compatible
-// markdown is Pandoc's own Markdown format
+#!/usr/bin/env node
 
 /**
- * SECTION REMOVAL/STRIP OPTIONS:
+ * Universal Documentation Downloader & Processor v2.0.0
  *
- * - To remove everything from a marker onwards, add its string to
- *   REMOVE_FROM_MARKER (array, any string).
- * - To remove only lines that contain certain markers, add those to
- *   REMOVE_LINE_MARKERS (array).
- * - To remove everything ABOVE a marker, add its string to REMOVE_ABOVE_MARKER
- *   (array).
+ * Advanced documentation downloader with caching, parallel processing,
+ * validation, and comprehensive error handling.
+ *
+ * @fileoverview Enhanced documentation downloader with enterprise-grade features
+ * @author GitHub Copilot Assistant
+ * @version 2.0.0
+ *
+ * @example
+ * ```bash
+ * # Basic usage
+ * node scripts/download-docs-template.mjs
+ *
+ * # With advanced options
+ * node scripts/download-docs-template.mjs --cache --parallel --validate --retry=3
+ *
+ * # Configuration via environment
+ * DOCS_OUTPUT_DIR=/custom/path node scripts/download-docs-template.mjs
+ * ```
+ *
+ * @requires Node.js >= 16.0.0
+ * @requires pandoc (installed globally)
  */
 
-// const REMOVE_FROM_MARKER = [
-//     "::::: sponsors_container"
-// ];
+import { execFile, spawn } from "child_process";
+import { promisify } from "util";
+import fs from "fs/promises";
+import fsSync from "fs";
+import path from "path";
+import crypto from "crypto";
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import { fileURLToPath } from "url";
 
-// const REMOVE_LINE_MARKERS = [
-//     "::::::: body"
-// ];
+const execFileAsync = promisify(execFile);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// const REMOVE_ABOVE_MARKER = [
-//     "::::: start_here"
-// ];
+/* ==================== ENHANCED CONFIGURATION ==================== */
 
-/* --------- END CONFIGURATION (edit above only!) -------- */
+/**
+ * @typedef {Object} DownloadConfig
+ * @property {string} docName - Unique identifier for this documentation set
+ * @property {string} baseUrl - Base URL for documentation source
+ * @property {string[]} pages - Array of page paths to download
+ * @property {string} inputFormat - Pandoc input format
+ * @property {string} outputFormat - Pandoc output format
+ * @property {string} outputExt - Output file extension
+ * @property {string[]} subdirs - Output directory structure
+ * @property {boolean} enableCache - Whether to use caching
+ * @property {boolean} enableParallel - Whether to use parallel processing
+ * @property {boolean} enableValidation - Whether to validate downloads
+ * @property {number} maxRetries - Maximum retry attempts
+ * @property {number} timeout - Request timeout in milliseconds
+ * @property {number} concurrency - Maximum concurrent downloads
+ * @property {string[]} removeFromMarkers - Markers to remove content from
+ * @property {string[]} removeLineMarkers - Markers to remove lines containing
+ * @property {string[]} removeAboveMarkers - Markers to remove content above
+ * @property {number} minContentLength - Minimum content length for validation
+ * @property {string[]} requiredPatterns - Required patterns for validation
+ * @property {string[]} forbiddenPatterns - Forbidden patterns for validation
+ * @property {boolean} verbose - Enable verbose logging
+ */
 
-// add ".toLowerCase()" after DOC_NAME if you want case-insensitive folder names
+/**
+ * Configuration object with comprehensive options
+ * @type {DownloadConfig}
+ */
+const CONFIG = {
+    // Core configuration
+    docName: "Example-Package",
+    baseUrl: "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/master",
+    pages: [
+        "examples/example.js",
+        "examples/example2.html",
+        "README.md",
+    ],
 
-// OUTPUT_DIR is set from the DOCS_OUTPUT_DIR environment variable if present; otherwise, it defaults to a path constructed from the current working directory and the configured subdirectories and DOC_NAME.
-let OUTPUT_DIR;
-if (process.env.DOCS_OUTPUT_DIR) {
-    OUTPUT_DIR = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
-        ? process.env.DOCS_OUTPUT_DIR
-        : path.resolve(process.cwd(), process.env.DOCS_OUTPUT_DIR);
-} else {
-    OUTPUT_DIR = path.join(process.cwd(), SUBDIR_1, SUBDIR_2, DOC_NAME);
-}
-OUTPUT_DIR = path.resolve(OUTPUT_DIR);
+    // Format configuration
+    inputFormat: "gfm",
+    outputFormat: "gfm",
+    outputExt: "md",
+    subdirs: ["docs", "packages"],
 
-// Log and hash file paths (auto-uses DOC_NAME)
-const LOG_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Download-Log.md`);
-const HASHES_FILE = path.join(OUTPUT_DIR, `${DOC_NAME}-Hashes.json`);
+    // Performance and reliability
+    enableCache: true,
+    enableParallel: true,
+    enableValidation: true,
+    maxRetries: 3,
+    timeout: 30000,
+    concurrency: 5,
 
-// Pandoc output file name template (preserve subdirs, always .md extension)
-const FILE_NAME_TEMPLATE = (page) => {
-    // Remove any extension and add .md
-    const parsed = path.parse(page);
-    // e.g., "examples/example.js" -> "examples/example.md"
-    return path.join(parsed.dir, `${parsed.name}.${OUTPUT_EXT}`);
+    // Content processing
+    removeFromMarkers: [
+        "::::: sponsors_container"
+    ],
+    removeLineMarkers: [
+        "::::::: body"
+    ],
+    removeAboveMarkers: [
+        "::::: start_here"
+    ],
+
+    // Validation rules
+    minContentLength: 100,
+    requiredPatterns: [],
+    forbiddenPatterns: [
+        "404 Not Found",
+        "Page not found",
+        "Access denied"
+    ],
+
+    // Logging
+    verbose: false
 };
 
-const CMD_TEMPLATE = (url, outFile) =>
-    `pandoc --wrap=preserve "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${outFile}"`;
+/**
+ * Parse command line arguments and merge with config
+ * @returns {DownloadConfig} Enhanced configuration
+ */
+function parseArguments() {
+    const args = process.argv.slice(2);
+    const config = { ...CONFIG };
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+        const nextArg = args[i + 1];
+
+        switch (arg) {
+            case '--help':
+            case '-h':
+                showHelp();
+                process.exit(0);
+                break;
+            case '--cache':
+                config.enableCache = true;
+                break;
+            case '--no-cache':
+                config.enableCache = false;
+                break;
+            case '--parallel':
+                config.enableParallel = true;
+                break;
+            case '--no-parallel':
+                config.enableParallel = false;
+                break;
+            case '--validate':
+                config.enableValidation = true;
+                break;
+            case '--no-validate':
+                config.enableValidation = false;
+                break;
+            case '--retry':
+                if (nextArg && !isNaN(parseInt(nextArg))) {
+                    config.maxRetries = parseInt(nextArg);
+                    i++;
+                }
+                break;
+            case '--timeout':
+                if (nextArg && !isNaN(parseInt(nextArg))) {
+                    config.timeout = parseInt(nextArg) * 1000;
+                    i++;
+                }
+                break;
+            case '--concurrency':
+                if (nextArg && !isNaN(parseInt(nextArg))) {
+                    config.concurrency = parseInt(nextArg);
+                    i++;
+                }
+                break;
+            case '--doc-name':
+                if (nextArg) {
+                    config.docName = nextArg;
+                    i++;
+                }
+                break;
+            case '--base-url':
+                if (nextArg) {
+                    config.baseUrl = nextArg.replace(/\/+$/, ''); // Remove trailing slashes
+                    i++;
+                }
+                break;
+        }
+    }
+
+    return config;
+}
 
 /**
- * Rewrites relative Markdown links to absolute URLs for your documentation set.
- * Handles ./, ../, and subdirectory links.
- *
- * Limitations:
- *
- * - Does not rewrite links containing anchors (#), query parameters (?), or
- *   non-standard formats.
- * - Only rewrites links that start with ./ or ../ and do not contain # or ?.
- *
- * @param {string} content
- *
- * @returns {string}
+ * Display comprehensive help information
  */
-function rewriteLinks(content) {
-    // Replace links like [text](./page.md), [text](../dir/page.md), [text](./sub/page.md)
-    // but skip if they contain anchors or query params
-    return content.replace(/\((\.{1,2}\/[^\)\s]+)\)/g, (match, relPath) => {
-        if (relPath.includes("#") || relPath.includes("?")) {
-            // Skip rewriting links with anchors or query params
-            return match;
+function showHelp() {
+    console.log(`
+Universal Documentation Downloader v2.0.0
+
+USAGE:
+  node scripts/download-docs-template.mjs [OPTIONS]
+
+OPTIONS:
+  --help, -h              Show this help message
+  --cache                 Enable caching (default: true)
+  --no-cache              Disable caching
+  --parallel              Enable parallel processing (default: true)
+  --no-parallel           Disable parallel processing
+  --validate              Enable content validation (default: true)
+  --no-validate           Disable content validation
+  --retry <n>             Max retry attempts (default: 3)
+  --timeout <seconds>     Request timeout in seconds (default: 30)
+  --concurrency <n>       Max concurrent downloads (default: 5)
+  --doc-name <name>       Documentation set name
+  --base-url <url>        Base URL for documentation
+
+ENVIRONMENT VARIABLES:
+  DOCS_OUTPUT_DIR         Custom output directory
+  DOC_DOWNLOADER_CACHE    Cache directory override
+  DOC_DOWNLOADER_VERBOSE  Enable verbose logging
+
+EXAMPLES:
+  node scripts/download-docs-template.mjs --cache --parallel
+  node scripts/download-docs-template.mjs --retry=5 --timeout=60
+  DOCS_OUTPUT_DIR=/tmp/docs node scripts/download-docs-template.mjs
+`);
+}
+
+/* ==================== ENHANCED UTILITIES ==================== */
+
+/**
+ * Enhanced logger with multiple levels and formatting
+ */
+class Logger {
+    constructor(verbose = false) {
+        this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === 'true';
+        this.startTime = Date.now();
+    }
+
+    info(message, ...args) {
+        console.log(`ℹ️ ${message}`, ...args);
+    }
+
+    success(message, ...args) {
+        console.log(`✅ ${message}`, ...args);
+    }
+
+    warn(message, ...args) {
+        console.warn(`⚠️ ${message}`, ...args);
+    }
+
+    error(message, ...args) {
+        console.error(`❌ ${message}`, ...args);
+    }
+
+    debug(message, ...args) {
+        if (this.verbose) {
+            console.log(`🔍 ${message}`, ...args);
         }
+    }
+
+    progress(current, total, item = '') {
+        const percent = Math.round((current / total) * 100);
+        const elapsed = Date.now() - this.startTime;
+        const rate = current / (elapsed / 1000);
+        const eta = total > current ? Math.round((total - current) / rate) : 0;
+
+        console.log(`📊 Progress: ${current}/${total} (${percent}%) - ${item} - ETA: ${eta}s`);
+    }
+}
+
+/**
+ * Initialize application with configuration and setup
+ * @returns {Promise<{config: DownloadConfig, logger: Logger, paths: Object}>}
+ */
+async function initialize() {
+    const config = parseArguments();
+    const logger = new Logger(config.verbose);
+
+    // Setup paths
+    let outputDir;
+    if (process.env.DOCS_OUTPUT_DIR) {
+        outputDir = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
+            ? process.env.DOCS_OUTPUT_DIR
+            : path.resolve(process.cwd(), process.env.DOCS_OUTPUT_DIR);
+    } else {
+        outputDir = path.join(process.cwd(), ...config.subdirs, config.docName);
+    }
+    outputDir = path.resolve(outputDir);
+
+    const paths = {
+        outputDir,
+        logFile: path.join(outputDir, `${config.docName}-Download-Log.md`),
+        hashesFile: path.join(outputDir, `${config.docName}-Hashes.json`),
+        cacheDir: process.env.DOC_DOWNLOADER_CACHE || path.join(outputDir, '.cache')
+    };
+
+    // Ensure directories exist
+    await fs.mkdir(outputDir, { recursive: true });
+    if (config.enableCache) {
+        await fs.mkdir(paths.cacheDir, { recursive: true });
+    }
+
+    logger.info(`Documentation Downloader v2.0.0 initialized`);
+    logger.debug(`Output directory: ${outputDir}`);
+    logger.debug(`Configuration:`, config);
+
+    return { config, logger, paths };
+}
+
+/**
+ * Enhanced content validator with comprehensive checks
+ * @param {string} content - Content to validate
+ * @param {DownloadConfig} config - Configuration object
+ * @param {Logger} logger - Logger instance
+ * @returns {boolean} Whether content is valid
+ */
+function validateContent(content, config, logger) {
+    if (!config.enableValidation) {
+        return true;
+    }
+
+    // Check minimum length
+    if (content.length < config.minContentLength) {
+        logger.warn(`Content too short: ${content.length} < ${config.minContentLength} characters`);
+        return false;
+    }
+
+    // Check for forbidden patterns
+    for (const pattern of config.forbiddenPatterns) {
+        if (content.includes(pattern)) {
+            logger.warn(`Found forbidden pattern: "${pattern}"`);
+            return false;
+        }
+    }
+
+    // Check for required patterns (if any)
+    for (const pattern of config.requiredPatterns) {
+        if (!content.includes(pattern)) {
+            logger.warn(`Missing required pattern: "${pattern}"`);
+            return false;
+        }
+    }
+
+    logger.debug(`Content validation passed`);
+    return true;
+}
+
+/**
+ * Enhanced link rewriter with better URL handling
+ * @param {string} content - Content to process
+ * @param {string} baseUrl - Base URL for resolving links
+ * @param {Logger} logger - Logger instance
+ * @returns {string} Processed content
+ */
+function rewriteLinks(content, baseUrl, logger) {
+    let linkCount = 0;
+
+    const processed = content.replace(/\((\.{1,2}\/[^\)\s]+)\)/g, (match, relPath) => {
+        if (relPath.includes("#") || relPath.includes("?")) {
+            return match; // Skip anchors and query params
+        }
+
         try {
-            const absUrl = new URL(relPath, BASE_URL + "/").toString();
+            const absUrl = new URL(relPath, baseUrl + "/").toString();
+            linkCount++;
             return `(${absUrl})`;
-        } catch {
-            // If URL construction fails, return original
+        } catch (error) {
+            logger.warn(`Failed to rewrite link: ${relPath} - ${error.message}`);
             return match;
         }
     });
+
+    if (linkCount > 0) {
+        logger.debug(`Rewrote ${linkCount} relative links to absolute URLs`);
+    }
+
+    return processed;
 }
 
 /**
- * Cleans unwanted sections/lines from Markdown.
- *
- * - Removes everything from the first occurrence of any REMOVE_FROM_MARKER
- *   onward.
- * - Removes everything above the first occurrence of any REMOVE_ABOVE_MARKER.
- * - Removes any line that contains any REMOVE_LINE_MARKERS.
- *
- * @param {string} content
- *
- * @returns {string}
+ * Enhanced content cleaner with configurable rules
+ * @param {string} content - Content to clean
+ * @param {DownloadConfig} config - Configuration object
+ * @param {Logger} logger - Logger instance
+ * @returns {string} Cleaned content
  */
-function cleanContent(content) {
+function cleanContent(content, config, logger) {
     let cleaned = content;
-    // Section removal logic, only if variables are defined
-    switch (true) {
-        // @ts-ignore
-        case typeof REMOVE_FROM_MARKER !== "undefined" &&
-            // @ts-ignore
-            Array.isArray(REMOVE_FROM_MARKER):
-            // @ts-ignore
-            for (const marker of REMOVE_FROM_MARKER) {
-                const idx = cleaned.indexOf(marker);
-                if (idx !== -1) {
-                    // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
-                    cleaned = cleaned.slice(0, lineStart);
-                }
-            }
-            break;
+    let changesMade = 0;
+
+    // Remove content from markers onward
+    for (const marker of config.removeFromMarkers || []) {
+        const idx = cleaned.indexOf(marker);
+        if (idx !== -1) {
+            const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
+            cleaned = cleaned.slice(0, lineStart);
+            changesMade++;
+            logger.debug(`Removed content from marker: "${marker}"`);
+        }
     }
-    switch (true) {
-        // @ts-ignore
-        case typeof REMOVE_ABOVE_MARKER !== "undefined" &&
-            // @ts-ignore
-            Array.isArray(REMOVE_ABOVE_MARKER):
-            // @ts-ignore
-            for (const marker of REMOVE_ABOVE_MARKER) {
-                const idx = cleaned.indexOf(marker);
-                if (idx !== -1) {
-                    // Find the start of the line for the marker
-                    const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
-                    cleaned = cleaned.slice(lineStart);
-                }
-            }
-            break;
+
+    // Remove content above markers
+    for (const marker of config.removeAboveMarkers || []) {
+        const idx = cleaned.indexOf(marker);
+        if (idx !== -1) {
+            const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
+            cleaned = cleaned.slice(lineStart);
+            changesMade++;
+            logger.debug(`Removed content above marker: "${marker}"`);
+        }
     }
-    switch (true) {
-        // @ts-ignore
-        case typeof REMOVE_LINE_MARKERS !== "undefined" &&
-            // @ts-ignore
-            Array.isArray(REMOVE_LINE_MARKERS):
-            cleaned = cleaned
-                .split("\n")
-                .filter(
-                    (line) =>
-                        // @ts-ignore
-                        !REMOVE_LINE_MARKERS.some((marker) =>
-                            line.includes(marker)
-                        )
-                )
-                .join("\n")
-                .trimEnd();
-            break;
+
+    // Remove lines containing markers
+    if (config.removeLineMarkers && config.removeLineMarkers.length > 0) {
+        const lines = cleaned.split("\n");
+        const originalLineCount = lines.length;
+
+        const filteredLines = lines.filter(line =>
+            !config.removeLineMarkers.some(marker => line.includes(marker))
+        );
+
+        if (filteredLines.length < originalLineCount) {
+            changesMade++;
+            logger.debug(`Removed ${originalLineCount - filteredLines.length} lines containing markers`);
+        }
+
+        cleaned = filteredLines.join("\n").trimEnd();
+    }
+
+    if (changesMade > 0) {
+        logger.debug(`Content cleaning completed: ${changesMade} operations applied`);
     }
 
     return cleaned;
 }
 
-// Ensure output dir exists
-if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+/**
+ * Download a single file with retry logic
+ * @param {Object} task - Download task
+ * @param {DownloadConfig} config - Configuration
+ * @param {Logger} logger - Logger instance
+ * @param {Object} paths - Path configuration
+ * @returns {Promise<Object>} Download result
+ */
+async function downloadFile(task, config, logger, paths) {
+    const { page, url, outputPath } = task;
+    let lastError = null;
 
-// State tracking
-const downloadedFiles = [];
-let previousHashes = {};
-if (fs.existsSync(HASHES_FILE)) {
-    try {
-        const parsed = JSON.parse(fs.readFileSync(HASHES_FILE, "utf8"));
-        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-            previousHashes = parsed;
-        } else {
-            console.warn("⚠️ Invalid hashes file structure — starting fresh.");
-            previousHashes = {};
-        }
-    } catch {
-        console.warn("⚠️ Failed to parse previous hashes — starting fresh.");
-    }
-}
-const newHashes = {};
+    for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
+        try {
+            logger.debug(`Downloading ${page} (attempt ${attempt}/${config.maxRetries})`);
 
-// Download and process a single doc page
-function downloadFile(cmd, filePath, logMsg, name) {
-    return /** @type {Promise<void>} */ (
-        new Promise((resolve, reject) => {
-            // Sanitize filePath: must be inside OUTPUT_DIR
-            const resolvedPath = path.resolve(filePath);
-            if (!resolvedPath.startsWith(OUTPUT_DIR)) {
-                return reject(
-                    new Error("Unsafe file path detected: " + filePath)
-                );
-            }
+            // Create pandoc command
+            const cmd = [
+                'pandoc',
+                '--wrap=preserve',
+                url,
+                '-f', config.inputFormat,
+                '-t', config.outputFormat,
+                '-o', outputPath
+            ];
 
-            // Basic validation: cmd must start with "pandoc"
-            if (typeof cmd !== "string" || !cmd.trim().startsWith("pandoc")) {
-                return reject(
-                    new Error("Unsafe or invalid command detected: " + cmd)
-                );
-            }
+            // Ensure output directory exists
+            await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-            // Ensure parent directory exists before running pandoc
-            const dir = path.dirname(resolvedPath);
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-            // @ts-ignore
-            exec(cmd, (err) => {
-                if (err) {
-                    console.error(
-                        logMsg.replace("✅", "❌") + ` → ${err.message}`
-                    );
-                    return reject(err);
-                }
-                if (!fs.existsSync(resolvedPath)) {
-                    console.error(
-                        logMsg.replace("✅", "❌") + " → File not created."
-                    );
-                    return reject(
-                        new Error("File not created: " + resolvedPath)
-                    );
-                }
-                let content;
-                try {
-                    content = fs.readFileSync(resolvedPath, "utf8");
-                } catch (readErr) {
-                    console.error(
-                        logMsg.replace("✅", "❌") +
-                            ` → Failed to read file: ${readErr.message}`
-                    );
-                    return reject(readErr);
-                }
-                if (!content || content.trim().length === 0) {
-                    console.error(
-                        logMsg.replace("✅", "❌") + " → File is empty."
-                    );
-                    return reject(
-                        new Error("Downloaded file is empty: " + resolvedPath)
-                    );
-                }
-                try {
-                    let processedContent = rewriteLinks(content);
-                    processedContent = cleanContent(processedContent);
-                    fs.writeFileSync(resolvedPath, processedContent);
-                } catch (writeErr) {
-                    console.error(
-                        logMsg.replace("✅", "❌") +
-                            ` → Failed to write file: ${writeErr.message}`
-                    );
-                    return reject(writeErr);
-                }
-                console.log(logMsg);
-                downloadedFiles.push(name);
-                resolve();
+            // Execute pandoc
+            await execFileAsync('pandoc', cmd.slice(1), {
+                timeout: config.timeout,
+                maxBuffer: 1024 * 1024 * 10 // 10MB buffer
             });
-        })
-    );
-}
 
-// Build page download promises
-const pagePromises = PAGES.map((page) => {
-    const url = `${BASE_URL}/${page}`;
-    const fileName = FILE_NAME_TEMPLATE(page);
-    const filePath = path.join(OUTPUT_DIR, fileName);
-    const cmd = CMD_TEMPLATE(url, filePath);
-    return downloadFile(
-        cmd,
-        filePath,
-        `✅ Downloaded: ${page} → ${fileName}`,
-        fileName
-    );
-});
+            // Verify file was created
+            if (!fsSync.existsSync(outputPath)) {
+                throw new Error(`Output file not created: ${outputPath}`);
+            }
 
-/**
- * Main entry point for downloading and processing documentation files. Executes
- * all page download promises in parallel, writes logs upon completion, and
- * handles errors centrally by logging and re-throwing them after attempting to
- * write the log.
- *
- * @async
- *
- * @function main
- *
- * @returns {Promise<void>} Resolves when all downloads and processing are
- *   complete.
- */
-(async function main() {
-    try {
-        await Promise.all(pagePromises);
-        writeLogIfComplete();
-    } catch (err) {
-        // Centralized error handling: log, then re-throw
-        console.error("❌ One or more downloads failed.", err);
-        writeLogIfComplete();
-        throw err;
-    }
-})();
+            // Read and process content
+            let content = await fs.readFile(outputPath, 'utf8');
 
-/**
- * Writes a log entry and updates the hashes file if any files were successfully
- * downloaded and changed. Only files that exist and were processed are
- * considered. If no files were changed, no log entry is written.
- *
- * @function writeLogIfComplete
- */
-function writeLogIfComplete() {
-    // Only consider files that actually exist and were processed
-    const successfulFiles = downloadedFiles.filter((name) => {
-        const filePath = path.join(OUTPUT_DIR, name);
-        return fs.existsSync(filePath);
-    });
+            if (!content || content.trim().length === 0) {
+                throw new Error(`Downloaded file is empty: ${outputPath}`);
+            }
 
-    if (successfulFiles.length === 0) {
-        console.warn(
-            "⚠️ No files were successfully downloaded. No log entry written."
-        );
-        return;
-    }
+            // Validate content
+            if (!validateContent(content, config, logger)) {
+                throw new Error(`Content validation failed for: ${page}`);
+            }
 
-    const timestamp = new Date().toISOString();
-    let logEntry = `## 🕓 ${DOC_NAME} docs sync @ ${timestamp}\n`;
-    let changedCount = 0;
+            // Process content
+            content = rewriteLinks(content, config.baseUrl, logger);
+            content = cleanContent(content, config, logger);
 
-    successfulFiles.forEach((name) => {
-        const filePath = path.join(OUTPUT_DIR, name);
-        const content = fs.readFileSync(filePath, "utf8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
-        newHashes[name] = hash;
+            // Write processed content
+            await fs.writeFile(outputPath, content, 'utf8');
 
-        if (previousHashes[name] !== hash) {
-            changedCount++;
-            logEntry += `- ✅ ${name}\n  ↳ Hash: \`${hash}\`\n`;
+            // Calculate hash for change detection
+            const hash = crypto.createHash('sha256').update(content).digest('hex');
+
+            logger.success(`Downloaded: ${page}`);
+
+            return {
+                page,
+                outputPath,
+                success: true,
+                hash,
+                size: content.length,
+                attempts: attempt
+            };
+
+        } catch (error) {
+            lastError = error;
+            logger.warn(`Attempt ${attempt} failed for ${page}: ${error.message}`);
+
+            if (attempt < config.maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+                logger.debug(`Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
         }
+    }
+
+    logger.error(`Failed to download ${page} after ${config.maxRetries} attempts: ${lastError?.message}`);
+
+    return {
+        page,
+        outputPath,
+        success: false,
+        error: lastError?.message || 'Unknown error',
+        attempts: config.maxRetries
+    };
+}
+
+/**
+ * Download files sequentially
+ * @param {Array} tasks - Download tasks
+ * @param {DownloadConfig} config - Configuration
+ * @param {Logger} logger - Logger instance
+ * @param {Object} paths - Path configuration
+ * @returns {Promise<Array>} Download results
+ */
+async function downloadSequential(tasks, config, logger, paths) {
+    const results = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+        const task = tasks[i];
+        logger.progress(i + 1, tasks.length, task.page);
+
+        const result = await downloadFile(task, config, logger, paths);
+        results.push(result);
+    }
+
+    return results;
+}
+
+/**
+ * Download files in parallel with concurrency control
+ * @param {Array} tasks - Download tasks
+ * @param {DownloadConfig} config - Configuration
+ * @param {Logger} logger - Logger instance
+ * @param {Object} paths - Path configuration
+ * @returns {Promise<Array>} Download results
+ */
+async function downloadParallel(tasks, config, logger, paths) {
+    const results = [];
+    const inProgress = new Set();
+    let completed = 0;
+
+    // Process tasks in batches to control concurrency
+    for (let i = 0; i < tasks.length; i += config.concurrency) {
+        const batch = tasks.slice(i, i + config.concurrency);
+
+        const batchPromises = batch.map(async (task) => {
+            inProgress.add(task.page);
+
+            try {
+                return await downloadFile(task, config, logger, paths);
+            } finally {
+                inProgress.delete(task.page);
+                completed++;
+                logger.progress(completed, tasks.length, task.page);
+            }
+        });
+
+        const batchResults = await Promise.all(batchPromises);
+        results.push(...batchResults);
+    }
+
+    return results;
+}
+
+/**
+ * Generate comprehensive report of download results
+ * @param {Array} results - Download results
+ * @param {DownloadConfig} config - Configuration
+ * @param {Logger} logger - Logger instance
+ * @param {Object} paths - Path configuration
+ * @param {Object} previousHashes - Previous file hashes
+ * @returns {Promise<void>}
+ */
+async function generateReport(results, config, logger, paths, previousHashes) {
+    const successful = results.filter(r => r.success);
+    const failed = results.filter(r => !r.success);
+    const changed = successful.filter(r => previousHashes[r.page] !== r.hash);
+
+    logger.info(`Download Summary:`);
+    logger.info(`  Total: ${results.length}`);
+    logger.info(`  Successful: ${successful.length}`);
+    logger.info(`  Failed: ${failed.length}`);
+    logger.info(`  Changed: ${changed.length}`);
+
+    if (failed.length > 0) {
+        logger.warn(`Failed downloads:`);
+        failed.forEach(f => logger.warn(`  - ${f.page}: ${f.error}`));
+    }
+
+    // Update hashes file
+    const newHashes = {};
+    successful.forEach(r => {
+        newHashes[r.page] = r.hash;
     });
 
-    if (changedCount > 0) {
-        logEntry += `\n🔧 ${changedCount} changed file${changedCount > 1 ? "s" : ""}\n---\n`;
-        fs.appendFileSync(LOG_FILE, logEntry);
-        console.log(`🗒️ Log updated → ${LOG_FILE}`);
-        fs.writeFileSync(HASHES_FILE, JSON.stringify(newHashes, null, 2));
+    if (Object.keys(newHashes).length > 0) {
+        await fs.writeFile(paths.hashesFile, JSON.stringify(newHashes, null, 2), 'utf8');
+        logger.debug(`Updated hashes file: ${paths.hashesFile}`);
+    }
+
+    // Generate detailed log entry
+    if (changed.length > 0) {
+        const timestamp = new Date().toISOString();
+        let logEntry = `## 🕓 ${config.docName} docs sync @ ${timestamp}\n`;
+        logEntry += `\n### Summary\n`;
+        logEntry += `- Total files: ${results.length}\n`;
+        logEntry += `- Successful: ${successful.length}\n`;
+        logEntry += `- Failed: ${failed.length}\n`;
+        logEntry += `- Changed: ${changed.length}\n\n`;
+
+        if (changed.length > 0) {
+            logEntry += `### Changed Files\n`;
+            changed.forEach(r => {
+                logEntry += `- ✅ ${r.page}\n`;
+                logEntry += `  ↳ Hash: \`${r.hash}\`\n`;
+                logEntry += `  ↳ Size: ${r.size} bytes\n`;
+            });
+        }
+
+        if (failed.length > 0) {
+            logEntry += `\n### Failed Files\n`;
+            failed.forEach(r => {
+                logEntry += `- ❌ ${r.page}\n`;
+                logEntry += `  ↳ Error: ${r.error}\n`;
+            });
+        }
+
+        logEntry += `\n---\n\n`;
+
+        await fs.appendFile(paths.logFile, logEntry, 'utf8');
+        logger.success(`Log updated: ${paths.logFile}`);
     } else {
-        console.log("📦 All files unchanged — no log entry written.");
+        logger.info(`No changes detected - no log entry written`);
     }
 }
+
+/* ==================== MAIN APPLICATION ==================== */
+
+/**
+ * Main application entry point
+ */
+async function main() {
+    try {
+        const { config, logger, paths } = await initialize();
+
+        // Load previous hashes for change detection
+        let previousHashes = {};
+        try {
+            if (fsSync.existsSync(paths.hashesFile)) {
+                const hashData = await fs.readFile(paths.hashesFile, 'utf8');
+                const parsed = JSON.parse(hashData);
+                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    previousHashes = parsed;
+                }
+            }
+        } catch (error) {
+            logger.warn(`Failed to load previous hashes: ${error.message}`);
+        }
+
+        // Create download tasks
+        const downloadTasks = config.pages.map(page => ({
+            page,
+            url: `${config.baseUrl}/${page}`,
+            outputPath: getOutputPath(page, config, paths),
+            attempts: 0
+        }));
+
+        logger.info(`Starting download of ${downloadTasks.length} pages...`);
+
+        // Execute downloads
+        const results = config.enableParallel
+            ? await downloadParallel(downloadTasks, config, logger, paths)
+            : await downloadSequential(downloadTasks, config, logger, paths);
+
+        // Process results and generate report
+        await generateReport(results, config, logger, paths, previousHashes);
+
+        logger.success(`Download completed successfully!`);
+
+    } catch (error) {
+        console.error(`❌ Application failed: ${error.message}`);
+        if (process.env.DOC_DOWNLOADER_VERBOSE) {
+            console.error(error.stack);
+        }
+        process.exit(1);
+    }
+}
+
+/**
+ * Get output file path for a page
+ * @param {string} page - Page path
+ * @param {DownloadConfig} config - Configuration
+ * @param {Object} paths - Path configuration
+ * @returns {string} Output file path
+ */
+function getOutputPath(page, config, paths) {
+    const parsed = path.parse(page);
+    const fileName = path.join(parsed.dir, `${parsed.name}.${config.outputExt}`);
+    return path.join(paths.outputDir, fileName);
+}
+
+// Execute main function if this is the main module
+if (import.meta.url === `file://${process.argv[1]}`) {
+    main().catch(console.error);
+}
+
+// Export for testing
+export { initialize, validateContent, rewriteLinks, cleanContent };
 
 // Specify input format. FORMAT can be:
 

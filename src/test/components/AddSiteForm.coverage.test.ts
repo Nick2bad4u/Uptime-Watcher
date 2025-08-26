@@ -6,7 +6,15 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("AddSiteForm Component Coverage Tests", () => {
     describe("Component Logic Tests", () => {
-        it("should validate add mode values", () => {
+        it("should validate add mode values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const validModes = ["existing", "new"];
             const invalidModes = [
                 "invalid",
@@ -23,7 +31,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
             }
         });
 
-        it("should validate monitor types", () => {
+        it("should validate monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const baseMonitorTypes = new Set(["http", "port"]);
 
             expect(baseMonitorTypes.has("http")).toBe(true);
@@ -31,7 +47,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
             expect(baseMonitorTypes.has("invalid")).toBe(false);
         });
 
-        it("should handle numeric validation", () => {
+        it("should handle numeric validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const testCases = [
                 { value: "5000", expected: 5000, isValid: true },
                 { value: "0", expected: 0, isValid: true },
@@ -50,7 +74,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Form State Management", () => {
-        it("should handle form data structure", () => {
+        it("should handle form data structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formData = {
                 addMode: "new",
                 checkInterval: 5000,
@@ -71,7 +103,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
             expect(formData.formError).toBeNull();
         });
 
-        it("should handle callbacks and handlers", () => {
+        it("should handle callbacks and handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockHandlers = {
                 setAddMode: vi.fn(),
                 setCheckInterval: vi.fn(),
@@ -92,7 +132,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Store Integration", () => {
-        it("should handle error store data", () => {
+        it("should handle error store data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Error Handling", "type");
+
             const errorStore = {
                 clearError: vi.fn(),
                 isLoading: false,
@@ -104,7 +152,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
             expect(errorStore.lastError).toBeNull();
         });
 
-        it("should handle sites store data", () => {
+        it("should handle sites store data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sitesStore = {
                 addMonitorToSite: vi.fn(),
                 createSite: vi.fn(),
@@ -122,7 +178,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Theme Integration", () => {
-        it("should handle theme data", () => {
+        it("should handle theme data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const theme = {
                 isDark: false,
                 theme: { colors: { background: "#fff" } },
@@ -135,7 +199,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Monitor Types", () => {
-        it("should handle monitor type options", () => {
+        it("should handle monitor type options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitorTypes = {
                 isLoading: false,
                 options: [
@@ -156,7 +228,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Dynamic Help Text", () => {
-        it("should provide help text for different monitor types", () => {
+        it("should provide help text for different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Monitoring", "type");
+
             const helpTexts = {
                 host: "Enter the hostname to monitor",
                 port: "Enter the port number",
@@ -173,7 +253,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("UUID Generation", () => {
-        it("should generate valid UUIDs", () => {
+        it("should generate valid UUIDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockUuid = "test-uuid-123";
             expect(typeof mockUuid).toBe("string");
             expect(mockUuid.length).toBeGreaterThan(0);
@@ -181,7 +269,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("should validate form submission data", () => {
+        it("should validate form submission data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Validation", "type");
+
             const submissionData = {
                 addMode: "new",
                 addMonitorToSite: vi.fn(),
@@ -212,7 +308,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle validation errors", () => {
+        it("should handle validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockLogger = {
                 error: vi.fn(),
                 info: vi.fn(),
@@ -238,7 +342,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Loading States", () => {
-        it("should manage loading states", () => {
+        it("should manage loading states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Data Loading", "type");
+
             const loadingStates = {
                 isLoading: false,
                 isLoadingMonitorTypes: false,
@@ -252,7 +364,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Event Handling", () => {
-        it("should handle form events", () => {
+        it("should handle form events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockEvent = {
                 target: { value: "test-value" },
                 preventDefault: vi.fn(),
@@ -265,7 +385,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Constants", () => {
-        it("should use correct check intervals", () => {
+        it("should use correct check intervals", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const CHECK_INTERVALS = [
                 5000,
                 10_000,
@@ -282,7 +410,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
             }
         });
 
-        it("should use correct UI delays", () => {
+        it("should use correct UI delays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const UI_DELAYS = {
                 LOADING_BUTTON: 100,
                 STATE_UPDATE_DEFER: 0,
@@ -296,7 +432,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Component Props", () => {
-        it("should handle component properties", () => {
+        it("should handle component properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const props = {
                 onSuccess: vi.fn(),
             };
@@ -310,7 +454,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Form Reset", () => {
-        it("should handle form reset after successful submission", () => {
+        it("should handle form reset after successful submission", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const resetForm = vi.fn();
             const onSuccess = vi.fn();
 
@@ -324,7 +476,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Memoization", () => {
-        it("should handle memoized callbacks", () => {
+        it("should handle memoized callbacks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const dependencies = ["dep1", "dep2"];
             const callback = vi.fn();
 
@@ -334,7 +494,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Effect Cleanup", () => {
-        it("should handle timeout cleanup", () => {
+        it("should handle timeout cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockClearTimeout = vi.fn();
 
             const cleanup = () => {
@@ -347,7 +515,15 @@ describe("AddSiteForm Component Coverage Tests", () => {
     });
 
     describe("Component Integration", () => {
-        it("should integrate with all required dependencies", () => {
+        it("should integrate with all required dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AddSiteForm", "component");
+            await annotate("Category: Component", "category");
+            await annotate("Type: Business Logic", "type");
+
             const dependencies = {
                 useDynamicHelpText: vi.fn(),
                 useMonitorTypes: vi.fn(),

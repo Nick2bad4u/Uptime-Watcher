@@ -36,7 +36,17 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
         );
 
     describe("Coverage for Lines 90-93 (default case in switch statement)", () => {
-        it("should use port for unknown monitor type with port property (line 90-91)", () => {
+        it("should use port for unknown monitor type with port property (line 90-91)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Create a valid monitor and then override its type to unknown
             const baseMonitor = createValidMonitor({
                 id: "unknown-monitor",
@@ -60,7 +70,17 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should use url for unknown monitor type with url property (line 92-93)", () => {
+        it("should use url for unknown monitor type with url property (line 92-93)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Create a monitor manually with only URL, no port
             const unknownMonitorWithUrl = {
                 activeOperations: [],
@@ -90,7 +110,17 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should return empty string for unknown monitor type with no port or url (line 94)", () => {
+        it("should return empty string for unknown monitor type with no port or url (line 94)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Create a valid monitor and then override to unknown type without port/url
             const unknownMonitorEmpty = {
                 ...createValidMonitor({
@@ -114,7 +144,17 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should prioritize port over url for unknown monitor type with both properties", () => {
+        it("should prioritize port over url for unknown monitor type with both properties", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Create a valid monitor with both port and url
             const unknownMonitorBoth = {
                 ...createValidMonitor({
@@ -137,7 +177,17 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle multiple unknown monitor types in the same selector", () => {
+        it("should handle multiple unknown monitor types in the same selector", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorSelector.additional-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitors = [
                 // Monitor with only port
                 {

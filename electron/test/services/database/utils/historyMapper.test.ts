@@ -40,7 +40,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("historyEntryToRow", () => {
-        it("should convert StatusHistory to database row format", () => {
+        it("should convert StatusHistory to database row format", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-123";
             const entry: StatusHistory = {
                 status: "up",
@@ -58,7 +66,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should include details when provided", () => {
+        it("should include details when provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-456";
             const entry: StatusHistory = {
                 status: "down",
@@ -79,7 +95,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should exclude details when not provided", () => {
+        it("should exclude details when not provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-789";
             const entry: StatusHistory = {
                 status: "up",
@@ -92,7 +116,15 @@ describe("historyMapper utilities", () => {
             expect(result).not.toHaveProperty("details");
         });
 
-        it("should handle entry with details property", () => {
+        it("should handle entry with details property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorId = "monitor-999";
             const entry: StatusHistory = {
                 status: "down",
@@ -113,7 +145,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("isValidHistoryRow", () => {
-        it("should return true for valid row with all required fields", () => {
+        it("should return true for valid row with all required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRow: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -124,7 +164,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
 
-        it("should return true for valid row with down status", () => {
+        it("should return true for valid row with down status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRow: DatabaseHistoryRow = {
                 monitorId: "monitor-456",
                 status: "down",
@@ -135,7 +183,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(validRow)).toBe(true);
         });
 
-        it("should return false when monitorId is undefined", () => {
+        it("should return false when monitorId is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidRow = {
                 status: "up",
                 timestamp: TEST_TIMESTAMP,
@@ -145,7 +201,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should return false when status is undefined", () => {
+        it("should return false when status is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRow = {
                 monitorId: "monitor-123",
                 timestamp: TEST_TIMESTAMP,
@@ -155,7 +219,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should return false when timestamp is undefined", () => {
+        it("should return false when timestamp is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -165,7 +237,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should return false when monitorId is not a string", () => {
+        it("should return false when monitorId is not a string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidRow = {
                 monitorId: 123,
                 status: "up",
@@ -176,7 +256,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should return false when status is invalid", () => {
+        it("should return false when status is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRow = {
                 monitorId: "monitor-123",
                 status: "invalid",
@@ -187,7 +275,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should return false when timestamp is NaN", () => {
+        it("should return false when timestamp is NaN", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -198,7 +294,15 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBe(false);
         });
 
-        it("should handle optional details field", () => {
+        it("should handle optional details field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRowWithDetails: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -212,7 +316,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("rowsToHistoryEntries", () => {
-        it("should convert array of rows to array of StatusHistory objects", () => {
+        it("should convert array of rows to array of StatusHistory objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const rows: DatabaseHistoryRow[] = [
                 {
                     monitorId: "monitor-1",
@@ -243,12 +355,28 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should handle empty array", () => {
+        it("should handle empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = rowsToHistoryEntries([]);
             expect(result).toEqual([]);
         });
 
-        it("should handle single row", () => {
+        it("should handle single row", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const rows: DatabaseHistoryRow[] = [
                 {
                     monitorId: "monitor-1",
@@ -272,7 +400,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("rowToHistoryEntry", () => {
-        it("should convert valid row to StatusHistory object", () => {
+        it("should convert valid row to StatusHistory object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -289,7 +425,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should include details when present as string", () => {
+        it("should include details when present as string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -308,7 +452,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should stringify details when not a string", () => {
+        it("should stringify details when not a string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -327,7 +479,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should exclude details when undefined", () => {
+        it("should exclude details when undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -340,7 +500,15 @@ describe("historyMapper utilities", () => {
             expect(result).not.toHaveProperty("details");
         });
 
-        it("should handle string responseTime", () => {
+        it("should handle string responseTime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -353,7 +521,15 @@ describe("historyMapper utilities", () => {
             expect(result.responseTime).toBe(200);
         });
 
-        it("should default invalid responseTime to 0", () => {
+        it("should default invalid responseTime to 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -366,7 +542,15 @@ describe("historyMapper utilities", () => {
             expect(result.responseTime).toBe(0);
         });
 
-        it("should handle string timestamp", () => {
+        it("should handle string timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -379,7 +563,15 @@ describe("historyMapper utilities", () => {
             expect(result.timestamp).toBe(TEST_TIMESTAMP);
         });
 
-        it("should default invalid timestamp to current time", () => {
+        it("should default invalid timestamp to current time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const beforeTime = Date.now();
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
@@ -395,7 +587,15 @@ describe("historyMapper utilities", () => {
             expect(result.timestamp).toBeLessThanOrEqual(afterTime);
         });
 
-        it("should validate and correct invalid status", () => {
+        it("should validate and correct invalid status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "invalid" as any,
@@ -412,7 +612,15 @@ describe("historyMapper utilities", () => {
             );
         });
 
-        it("should handle valid up status", () => {
+        it("should handle valid up status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -426,7 +634,15 @@ describe("historyMapper utilities", () => {
             expect(logger.warn).not.toHaveBeenCalled();
         });
 
-        it("should handle valid down status", () => {
+        it("should handle valid down status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "down",
@@ -440,7 +656,15 @@ describe("historyMapper utilities", () => {
             expect(logger.warn).not.toHaveBeenCalled();
         });
 
-        it("should handle NaN values appropriately", () => {
+        it("should handle NaN values appropriately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -457,7 +681,15 @@ describe("historyMapper utilities", () => {
             expect(result.timestamp).toBeLessThanOrEqual(afterTime);
         });
 
-        it("should throw and log error when mapping fails", () => {
+        it("should throw and log error when mapping fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock a scenario where JSON.stringify might throw
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
@@ -485,7 +717,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("rowToHistoryEntryOrUndefined", () => {
-        it("should return StatusHistory when row is provided", () => {
+        it("should return StatusHistory when row is provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -502,17 +742,41 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should return undefined when row is undefined", () => {
+        it("should return undefined when row is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = rowToHistoryEntryOrUndefined(undefined);
             expect(result).toBeUndefined();
         });
 
-        it("should return undefined when row is null", () => {
+        it("should return undefined when row is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = rowToHistoryEntryOrUndefined(null as any);
             expect(result).toBeUndefined();
         });
 
-        it("should handle row with details", () => {
+        it("should handle row with details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-456",
                 status: "down",
@@ -533,7 +797,15 @@ describe("historyMapper utilities", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should handle complete workflow: entry to row and back", () => {
+        it("should handle complete workflow: entry to row and back", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalEntry: StatusHistory = {
                 status: "up",
                 responseTime: 250,
@@ -555,7 +827,15 @@ describe("historyMapper utilities", () => {
             });
         });
 
-        it("should handle validation workflow", () => {
+        it("should handle validation workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
             const validRow: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
@@ -570,7 +850,15 @@ describe("historyMapper utilities", () => {
             expect(entry.responseTime).toBe(150);
         });
 
-        it("should handle batch processing workflow", () => {
+        it("should handle batch processing workflow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const rows: DatabaseHistoryRow[] = [
                 {
                     monitorId: "monitor-1",

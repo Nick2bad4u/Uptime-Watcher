@@ -26,7 +26,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Initial State", () => {
-        it("should return false initially when isLoading is false", () => {
+        it("should return false initially when isLoading is false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             // Act
             const { result } = renderHook(() => useDelayedButtonLoading(false));
 
@@ -34,7 +42,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(false);
         });
 
-        it("should return false initially when isLoading is true", () => {
+        it("should return false initially when isLoading is true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             // Act
             const { result } = renderHook(() => useDelayedButtonLoading(true));
 
@@ -44,7 +60,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Loading State Transitions", () => {
-        it("should show loading after delay when isLoading becomes true", () => {
+        it("should show loading after delay when isLoading becomes true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -68,7 +92,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(true);
         });
 
-        it("should hide loading after delay when isLoading becomes false", () => {
+        it("should hide loading after delay when isLoading becomes false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -98,7 +130,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(false);
         });
 
-        it("should not show loading if isLoading becomes false before delay expires", () => {
+        it("should not show loading if isLoading becomes false before delay expires", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -127,7 +167,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Timer Management", () => {
-        it("should clear timeout when component unmounts", () => {
+        it("should clear timeout when component unmounts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
@@ -139,7 +187,15 @@ describe("useDelayedButtonLoading", () => {
             expect(clearTimeoutSpy).toHaveBeenCalled();
         });
 
-        it("should clear previous timeout when isLoading changes rapidly", () => {
+        it("should clear previous timeout when isLoading changes rapidly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
             const { rerender } = renderHook(
@@ -158,7 +214,15 @@ describe("useDelayedButtonLoading", () => {
             expect(clearTimeoutSpy).toHaveBeenCalledTimes(3); // Called 3 times for cleanup
         });
 
-        it("should handle multiple rapid state changes correctly", () => {
+        it("should handle multiple rapid state changes correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -186,7 +250,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Timing Behavior", () => {
-        it("should use correct delay for showing loading state", () => {
+        it("should use correct delay for showing loading state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -207,7 +279,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(true);
         });
 
-        it("should use correct delay for hiding loading state", () => {
+        it("should use correct delay for hiding loading state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -234,21 +314,45 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle undefined isLoading parameter", () => {
+        it("should handle undefined isLoading parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Act & Assert - Should not throw
             expect(() => {
                 renderHook(() => useDelayedButtonLoading(undefined as any));
             }).not.toThrow();
         });
 
-        it("should handle null isLoading parameter", () => {
+        it("should handle null isLoading parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Act & Assert - Should not throw
             expect(() => {
                 renderHook(() => useDelayedButtonLoading(null as any));
             }).not.toThrow();
         });
 
-        it("should handle very rapid successive calls", () => {
+        it("should handle very rapid successive calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -267,7 +371,15 @@ describe("useDelayedButtonLoading", () => {
             expect(typeof result.current).toBe("boolean");
         });
 
-        it("should handle zero delays gracefully", () => {
+        it("should handle zero delays gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock zero delays
             vi.doMock("../../constants", () => ({
                 UI_DELAYS: {
@@ -294,7 +406,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Callback Stability", () => {
-        it("should use stable callbacks to prevent unnecessary re-renders", () => {
+        it("should use stable callbacks to prevent unnecessary re-renders", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
             // Arrange
             const { rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -312,7 +432,15 @@ describe("useDelayedButtonLoading", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle prop changes without memory leaks", () => {
+        it("should handle prop changes without memory leaks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -332,7 +460,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Real-world Usage Scenarios", () => {
-        it("should handle typical form submission flow", () => {
+        it("should handle typical form submission flow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -361,7 +497,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(false);
         });
 
-        it("should handle very fast operations without showing loading", () => {
+        it("should handle very fast operations without showing loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -380,7 +524,15 @@ describe("useDelayedButtonLoading", () => {
             expect(result.current).toBe(false);
         });
 
-        it("should handle long-running operations correctly", () => {
+        it("should handle long-running operations correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -409,7 +561,15 @@ describe("useDelayedButtonLoading", () => {
     });
 
     describe("Return Value", () => {
-        it("should always return a boolean", () => {
+        it("should always return a boolean", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange & Act
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
@@ -430,7 +590,15 @@ describe("useDelayedButtonLoading", () => {
             expect(typeof result.current).toBe("boolean");
         });
 
-        it("should only return true or false values", () => {
+        it("should only return true or false values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDelayedButtonLoading", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),

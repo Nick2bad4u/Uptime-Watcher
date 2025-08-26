@@ -6,7 +6,15 @@ import { describe, expect, it } from "vitest";
 
 describe("Monitor Form Data Types Coverage Tests", () => {
     describe("BaseFormData Interface", () => {
-        it("should define base form data properties", () => {
+        it("should define base form data properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseFormData = {
                 checkInterval: 30_000,
                 monitoring: true,
@@ -22,7 +30,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(typeof baseFormData.type).toBe("string");
         });
 
-        it("should handle optional base form data fields", () => {
+        it("should handle optional base form data fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minimalFormData = {};
             const partialFormData = {
                 type: "http",
@@ -34,7 +50,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(partialFormData.monitoring).toBe(true);
         });
 
-        it("should validate numeric fields", () => {
+        it("should validate numeric fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const numericFields = {
                 checkInterval: 60_000,
                 retryAttempts: 2,
@@ -49,7 +73,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("DynamicFormData Interface", () => {
-        it("should extend Record<string, unknown>", () => {
+        it("should extend Record<string, unknown>", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const dynamicFormData = {
                 // Base fields
                 checkInterval: 30_000,
@@ -76,7 +108,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(typeof dynamicFormData.booleanField).toBe("boolean");
         });
 
-        it("should handle unknown properties", () => {
+        it("should handle unknown properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const dynamicData: Record<string, unknown> = {
                 knownField: "known",
                 unknownField: { nested: "object" },
@@ -96,7 +136,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(dynamicData["undefinedField"]).toBeUndefined();
         });
 
-        it("should support extensible monitor types", () => {
+        it("should support extensible monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const extensibleFormData = {
                 type: "custom-monitor-type",
                 checkInterval: 45_000,
@@ -114,7 +162,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("HttpFormData Interface", () => {
-        it("should extend BaseFormData", () => {
+        it("should extend BaseFormData", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpFormData = {
                 // Required fields
                 type: "http" as const,
@@ -134,7 +190,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(typeof httpFormData.timeout).toBe("number");
         });
 
-        it("should require URL field", () => {
+        it("should require URL field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpFormData = {
                 type: "http" as const,
                 url: "https://required-url.com",
@@ -145,7 +209,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(httpFormData.url.length).toBeGreaterThan(0);
         });
 
-        it("should enforce type field as 'http'", () => {
+        it("should enforce type field as 'http'", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpFormData = {
                 type: "http" as const,
                 url: "https://example.com",
@@ -156,7 +228,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Form Data Validation", () => {
-        it("should validate form data types", () => {
+        it("should validate form data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const validateFormData = (data: any) => ({
                 hasType: typeof data.type === "string",
                 hasValidCheckInterval:
@@ -186,7 +266,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(validations.hasValidMonitoring).toBe(true);
         });
 
-        it("should handle invalid form data", () => {
+        it("should handle invalid form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidData = {
                 type: 123, // Should be string
                 checkInterval: -1000, // Should be positive
@@ -216,7 +304,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Form Data Transformation", () => {
-        it("should transform between different form data types", () => {
+        it("should transform between different form data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseData = {
                 checkInterval: 30_000,
                 monitoring: true,
@@ -241,7 +337,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(dynamicData.type).toBe(baseData.type);
         });
 
-        it("should handle form data merging", () => {
+        it("should handle form data merging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaultData = {
                 checkInterval: 60_000,
                 monitoring: false,
@@ -268,7 +372,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce type safety for HTTP form data", () => {
+        it("should enforce type safety for HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const createHttpFormData = (url: string, type: "http") => ({
                 type,
                 url,
@@ -281,7 +393,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(httpData.url).toBe("https://example.com");
         });
 
-        it("should handle optional fields safely", () => {
+        it("should handle optional fields safely", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const createFormData = (required: { type: string }) => ({
                 ...required,
                 checkInterval: undefined,
@@ -298,7 +418,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Form Field Defaults", () => {
-        it("should provide reasonable defaults", () => {
+        it("should provide reasonable defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const defaultFormData = {
                 checkInterval: 60_000, // 1 minute
                 monitoring: false,
@@ -314,7 +442,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(defaultFormData.type).toBe("http");
         });
 
-        it("should handle field value ranges", () => {
+        it("should handle field value ranges", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const fieldRanges = {
                 checkInterval: { min: 1000, max: 3_600_000 }, // 1 second to 1 hour
                 retryAttempts: { min: 0, max: 10 },
@@ -337,7 +473,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Form Data Utilities", () => {
-        it("should check if form data is complete", () => {
+        it("should check if form data is complete", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const isCompleteHttpFormData = (data: any) =>
                 typeof data.type === "string" &&
                 data.type === "http" &&
@@ -358,7 +502,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(isCompleteHttpFormData(incompleteData)).toBe(false);
         });
 
-        it("should sanitize form data", () => {
+        it("should sanitize form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sanitizeFormData = (data: any) => ({
                 type: typeof data.type === "string" ? data.type : undefined,
                 checkInterval:
@@ -401,7 +553,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
     });
 
     describe("Interface Composition", () => {
-        it("should compose interfaces correctly", () => {
+        it("should compose interfaces correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface BaseData {
                 type: string;
                 url: string;
@@ -428,7 +588,15 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             expect(extendedData.monitoring).toBe(true);
         });
 
-        it("should handle multiple interface inheritance", () => {
+        it("should handle multiple interface inheritance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorFormData", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface TimestampedFormData {
                 createdAt: Date;
                 updatedAt: Date;

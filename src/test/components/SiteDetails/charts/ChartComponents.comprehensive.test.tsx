@@ -86,7 +86,17 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render line chart with correct data and options", () => {
+        it("should render line chart with correct data and options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ResponseTimeChart
                     data={mockResponseTimeData}
@@ -109,11 +119,31 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", () => {
+        it("should have correct display name for debugging", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(ResponseTimeChart.displayName).toBe("ResponseTimeChart");
         });
 
-        it("should render with minimal data", () => {
+        it("should render with minimal data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const minimalData: ResponseTimeChartData = {
                 labels: [],
                 datasets: [],
@@ -133,7 +163,17 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("line-chart")).toBeInTheDocument();
         });
 
-        it("should handle complex dataset configurations", () => {
+        it("should handle complex dataset configurations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const complexData: ResponseTimeChartData = {
                 labels: [
                     "Jan",
@@ -213,7 +253,17 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render doughnut chart with correct data and options", () => {
+        it("should render doughnut chart with correct data and options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <UptimeChart
                     data={mockUptimeData}
@@ -234,11 +284,31 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", () => {
+        it("should have correct display name for debugging", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(UptimeChart.displayName).toBe("UptimeChart");
         });
 
-        it("should render with perfect uptime data", () => {
+        it("should render with perfect uptime data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const perfectUptimeData: UptimeChartData = {
                 labels: ["Uptime"],
                 datasets: [
@@ -261,7 +331,17 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("doughnut-chart")).toBeInTheDocument();
         });
 
-        it("should handle multiple datasets", () => {
+        it("should handle multiple datasets", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const multiDatasetData: UptimeChartData = {
                 labels: [
                     "Up",
@@ -356,7 +436,17 @@ describe("ChartComponents", () => {
             },
         };
 
-        it("should render bar chart with correct data and options", () => {
+        it("should render bar chart with correct data and options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <StatusChart data={mockStatusData} options={mockBarOptions} />
             );
@@ -374,11 +464,31 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should have correct display name for debugging", () => {
+        it("should have correct display name for debugging", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(StatusChart.displayName).toBe("StatusChart");
         });
 
-        it("should render with single status data", () => {
+        it("should render with single status data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const singleStatusData: StatusBarChartData = {
                 labels: ["Up"],
                 datasets: [
@@ -399,7 +509,17 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
         });
 
-        it("should handle horizontal bar configuration", () => {
+        it("should handle horizontal bar configuration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const horizontalBarOptions: ChartOptions<"bar"> = {
                 ...mockBarOptions,
                 indexAxis: "y" as const,
@@ -423,7 +543,17 @@ describe("ChartComponents", () => {
             );
         });
 
-        it("should handle stacked bar configuration", () => {
+        it("should handle stacked bar configuration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const stackedData: StatusBarChartData = {
                 labels: [
                     "Week 1",
@@ -491,7 +621,17 @@ describe("ChartComponents", () => {
     });
 
     describe("Memoization Behavior", () => {
-        it("should be memoized components", () => {
+        it("should be memoized components", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Check that components are wrapped with React.memo
             expect(ResponseTimeChart.$$typeof).toBeDefined();
             expect(UptimeChart.$$typeof).toBeDefined();
@@ -529,7 +669,17 @@ describe("ChartComponents", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle empty datasets gracefully", () => {
+        it("should handle empty datasets gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const emptyData: ResponseTimeChartData = {
                 labels: [],
                 datasets: [],
@@ -542,7 +692,17 @@ describe("ChartComponents", () => {
             expect(screen.getByTestId("line-chart")).toBeInTheDocument();
         });
 
-        it("should handle undefined optional properties", () => {
+        it("should handle undefined optional properties", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const minimalData: UptimeChartData = {
                 labels: ["Test"],
                 datasets: [
@@ -564,7 +724,17 @@ describe("ChartComponents", () => {
     });
 
     describe("Type Safety", () => {
-        it("should accept proper chart data types", () => {
+        it("should accept proper chart data types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ChartComponents", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // This test ensures that TypeScript types are working correctly
             const responseTimeData: ResponseTimeChartData = {
                 labels: [

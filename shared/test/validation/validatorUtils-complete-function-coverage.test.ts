@@ -10,7 +10,15 @@ import * as validatorUtilsModule from "../../validation/validatorUtils";
 
 describe("ValidatorUtils - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Test isNonEmptyString function coverage
             expect(typeof validatorUtilsModule.isNonEmptyString).toBe(
                 "function"
@@ -217,7 +225,15 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             ).toBe(10); // No max, below min
         });
 
-        it("should handle edge cases and complex validations", () => {
+        it("should handle edge cases and complex validations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test isNonEmptyString with various whitespace
             expect(validatorUtilsModule.isNonEmptyString("\t\n")).toBe(false);
             expect(validatorUtilsModule.isNonEmptyString("  hello  ")).toBe(
@@ -255,7 +271,15 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(validatorUtilsModule.safeInteger("0", 5, 1, 10)).toBe(1); // Zero below min
         });
 
-        it("should validate numeric ranges and bounds", () => {
+        it("should validate numeric ranges and bounds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test isValidInteger with comprehensive range options
             expect(validatorUtilsModule.isValidInteger("0", { min: 0 })).toBe(
                 true
@@ -295,7 +319,15 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             expect(result3).toBe(10); // Clamped to min
         });
 
-        it("should handle type validation consistency", () => {
+        it("should handle type validation consistency", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils-complete-function-coverage", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Verify that type guards work consistently
             const testValue = "test123";
 

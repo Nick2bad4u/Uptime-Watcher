@@ -6,7 +6,15 @@ import * as validation from "../../types/validation";
 
 describe("Types Complete Function Coverage", () => {
     describe("chartConfig module", () => {
-        it("should call hasPlugins function", () => {
+        it("should call hasPlugins function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = chartConfig.hasPlugins({ plugins: {} });
             const result2 = chartConfig.hasPlugins(null);
             const result3 = chartConfig.hasPlugins({ notPlugins: true });
@@ -16,7 +24,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call hasScales function", () => {
+        it("should call hasScales function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = chartConfig.hasScales({ scales: {} });
             const result2 = chartConfig.hasScales(null);
             const result3 = chartConfig.hasScales({ notScales: true });
@@ -28,7 +44,15 @@ describe("Types Complete Function Coverage", () => {
     });
 
     describe("themeConfig module", () => {
-        it("should call isColorPalette function", () => {
+        it("should call isColorPalette function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPalette = {
                 primary: "#000",
                 secondary: "#fff",
@@ -46,7 +70,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isThemeConfig function", () => {
+        it("should call isThemeConfig function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validTheme = {
                 colors: {},
                 spacing: {},
@@ -67,7 +99,15 @@ describe("Types Complete Function Coverage", () => {
     });
 
     describe("database module", () => {
-        it("should call isValidHistoryRow function", () => {
+        it("should call isValidHistoryRow function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRow = {
                 monitorId: "monitor1",
                 status: "up",
@@ -82,7 +122,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isValidMonitorRow function", () => {
+        it("should call isValidMonitorRow function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validRow = { id: 1, site_identifier: "site1", type: "http" };
             const result1 = database.isValidMonitorRow(validRow);
             const result2 = database.isValidMonitorRow({});
@@ -91,7 +139,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isValidSettingsRow function", () => {
+        it("should call isValidSettingsRow function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRow = { key: "setting1", value: "value1" };
             const result1 = database.isValidSettingsRow(validRow);
             const result2 = database.isValidSettingsRow({});
@@ -100,7 +156,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isValidSiteRow function", () => {
+        it("should call isValidSiteRow function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRow = { identifier: "site1", name: "Test Site" };
             const result1 = database.isValidSiteRow(validRow);
             const result2 = database.isValidSiteRow({});
@@ -109,7 +173,15 @@ describe("Types Complete Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call safeGetRowProperty function", () => {
+        it("should call safeGetRowProperty function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const row = { name: "test", id: 123 };
             const result1 = database.safeGetRowProperty(row, "name", "default");
             const result2 = database.safeGetRowProperty(
@@ -124,7 +196,15 @@ describe("Types Complete Function Coverage", () => {
     });
 
     describe("validation module", () => {
-        it("should call createFailureResult function", () => {
+        it("should call createFailureResult function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = validation.createFailureResult([
                 "Error 1",
                 "Error 2",
@@ -133,13 +213,29 @@ describe("Types Complete Function Coverage", () => {
             expect(result.errors).toEqual(["Error 1", "Error 2"]);
         });
 
-        it("should call createSuccessResult function", () => {
+        it("should call createSuccessResult function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = validation.createSuccessResult();
             expect(result.success).toBe(true);
             expect(result.errors).toEqual([]);
         });
 
-        it("should call isValidationResult function", () => {
+        it("should call isValidationResult function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: complete-function-coverage", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult = { success: true, errors: [] };
             const result1 = validation.isValidationResult(validResult);
             const result2 = validation.isValidationResult({});

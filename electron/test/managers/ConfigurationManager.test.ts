@@ -86,7 +86,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with validators and caches", () => {
+        it("should initialize with validators and caches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(MonitorValidator).toHaveBeenCalledOnce();
             expect(SiteValidator).toHaveBeenCalledOnce();
             expect(configManager).toBeInstanceOf(ConfigurationManager);
@@ -94,14 +102,30 @@ describe("ConfigurationManager", () => {
     });
 
     describe("clearValidationCache", () => {
-        it("should clear the validation cache", () => {
+        it("should clear the validation cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             // The cache is private, so we just test that the method executes without error
             expect(() => configManager.clearValidationCache()).not.toThrow();
         });
     });
 
     describe("getCacheStats", () => {
-        it("should return cache statistics", () => {
+        it("should return cache statistics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const stats = configManager.getCacheStats();
 
             expect(stats).toHaveProperty("configuration");
@@ -114,7 +138,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("getDefaultMonitorInterval", () => {
-        it("should return the default monitor interval", () => {
+        it("should return the default monitor interval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const interval = configManager.getDefaultMonitorInterval();
             expect(typeof interval).toBe("number");
             expect(interval).toBeGreaterThan(0);
@@ -122,7 +154,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("getHistoryRetentionRules", () => {
-        it("should return history retention configuration", () => {
+        it("should return history retention configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const rules = configManager.getHistoryRetentionRules();
 
             expect(rules).toHaveProperty("defaultLimit");
@@ -139,28 +179,60 @@ describe("ConfigurationManager", () => {
     });
 
     describe("getMaximumPortNumber", () => {
-        it("should return the maximum port number", () => {
+        it("should return the maximum port number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const maxPort = configManager.getMaximumPortNumber();
             expect(maxPort).toBe(65_535);
         });
     });
 
     describe("getMinimumCheckInterval", () => {
-        it("should return the minimum check interval", () => {
+        it("should return the minimum check interval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minInterval = configManager.getMinimumCheckInterval();
             expect(minInterval).toBe(1000);
         });
     });
 
     describe("getMinimumTimeout", () => {
-        it("should return the minimum timeout", () => {
+        it("should return the minimum timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const minTimeout = configManager.getMinimumTimeout();
             expect(minTimeout).toBe(1000);
         });
     });
 
     describe("shouldApplyDefaultInterval", () => {
-        it("should delegate to monitor validator", () => {
+        it("should delegate to monitor validator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor();
             mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(
                 true
@@ -174,7 +246,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when monitor validator returns false", () => {
+        it("should return false when monitor validator returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor();
             mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(
                 false
@@ -192,7 +272,15 @@ describe("ConfigurationManager", () => {
             vi.mocked(electronUtils.isDev).mockReturnValue(false);
         });
 
-        it("should return false in development mode", () => {
+        it("should return false in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(electronUtils.isDev).mockReturnValue(true);
             const site = createMockSite({ monitoring: true });
 
@@ -201,7 +289,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false for sites without monitors", () => {
+        it("should return false for sites without monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({ monitors: [], monitoring: true });
 
             const result = configManager.shouldAutoStartMonitoring(site);
@@ -209,7 +305,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when site monitoring is disabled", () => {
+        it("should return false when site monitoring is disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({ monitoring: false });
 
             const result = configManager.shouldAutoStartMonitoring(site);
@@ -217,7 +321,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true when conditions are met", () => {
+        it("should return true when conditions are met", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createMockSite({ monitoring: true });
 
             const result = configManager.shouldAutoStartMonitoring(site);
@@ -225,7 +337,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle site with multiple monitors", () => {
+        it("should handle site with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({
                 monitoring: true,
                 monitors: [
@@ -241,7 +361,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("shouldIncludeInExport", () => {
-        it("should delegate to site validator", () => {
+        it("should delegate to site validator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createMockSite();
             mockSiteValidator.shouldIncludeInExport.mockReturnValue(true);
 
@@ -253,7 +381,15 @@ describe("ConfigurationManager", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when site validator returns false", () => {
+        it("should return false when site validator returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createMockSite();
             mockSiteValidator.shouldIncludeInExport.mockReturnValue(false);
 
@@ -264,7 +400,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("validateMonitorConfiguration", () => {
-        it("should validate monitor and cache result", async () => {
+        it("should validate monitor and cache result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -283,7 +427,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should return cached result on second call", async () => {
+        it("should return cached result on second call", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -307,7 +459,15 @@ describe("ConfigurationManager", () => {
             expect(result2).toEqual(expectedResult);
         });
 
-        it("should validate different monitors separately", async () => {
+        it("should validate different monitors separately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor1 = createMockMonitor({ id: "monitor-1" });
             const monitor2 = createMockMonitor({ id: "monitor-2" });
             const result1: ValidationResult = { success: true, errors: [] };
@@ -332,7 +492,15 @@ describe("ConfigurationManager", () => {
             expect(actualResult2).toEqual(result2);
         });
 
-        it("should handle monitors with undefined optional properties", async () => {
+        it("should handle monitors with undefined optional properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 // Optional properties are omitted to test undefined handling
             });
@@ -350,7 +518,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should handle monitors with lastChecked date", async () => {
+        it("should handle monitors with lastChecked date", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const lastChecked = new Date("2023-01-01T00:00:00Z");
             const monitor = createMockMonitor({ lastChecked });
             const expectedResult: ValidationResult = {
@@ -367,7 +543,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should handle monitors with null values", async () => {
+        it("should handle monitors with null values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor();
             // Set null values to test edge cases
             (monitor as any).url = null;
@@ -389,7 +573,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should handle port monitors with host and port", async () => {
+        it("should handle port monitors with host and port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = createMockMonitor({
                 type: "port",
                 host: "example.com",
@@ -412,7 +604,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("validateSiteConfiguration", () => {
-        it("should validate site and cache result", async () => {
+        it("should validate site and cache result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             const site = createMockSite();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -430,7 +630,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should return cached result on second call", async () => {
+        it("should return cached result on second call", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const site = createMockSite();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -452,7 +660,15 @@ describe("ConfigurationManager", () => {
             expect(result2).toEqual(expectedResult);
         });
 
-        it("should validate different sites separately", async () => {
+        it("should validate different sites separately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Validation", "type");
+
             const site1 = createMockSite({ identifier: "site-1" });
             const site2 = createMockSite({ identifier: "site-2" });
             const result1: ValidationResult = { success: true, errors: [] };
@@ -477,7 +693,15 @@ describe("ConfigurationManager", () => {
             expect(actualResult2).toEqual(result2);
         });
 
-        it("should handle sites with no monitors", async () => {
+        it("should handle sites with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({ monitors: [] });
             const expectedResult: ValidationResult = {
                 success: true,
@@ -492,7 +716,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should handle sites with multiple monitors", async () => {
+        it("should handle sites with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({
                 monitors: [
                     createMockMonitor({ id: "monitor-1" }),
@@ -513,7 +745,15 @@ describe("ConfigurationManager", () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it("should handle sites with monitoring disabled", async () => {
+        it("should handle sites with monitoring disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createMockSite({ monitoring: false });
             const expectedResult: ValidationResult = {
                 success: true,
@@ -530,7 +770,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("Cache behavior", () => {
-        it("should use cache after clearing and re-validating", async () => {
+        it("should use cache after clearing and re-validating", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -556,7 +804,15 @@ describe("ConfigurationManager", () => {
             ).toHaveBeenCalledTimes(2);
         });
 
-        it("should track cache statistics correctly", async () => {
+        it("should track cache statistics correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Caching", "type");
+
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {
                 success: true,
@@ -587,7 +843,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("Error handling", () => {
-        it("should handle validator errors gracefully", async () => {
+        it("should handle validator errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = createMockMonitor();
             const error = new Error("Validation error");
             mockMonitorValidator.validateMonitorConfiguration.mockImplementation(
@@ -601,7 +865,15 @@ describe("ConfigurationManager", () => {
             ).rejects.toThrow("Validation error");
         });
 
-        it("should handle site validator errors gracefully", async () => {
+        it("should handle site validator errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
             const site = createMockSite();
             const error = new Error("Site validation error");
             mockSiteValidator.validateSiteConfiguration.mockImplementation(
@@ -617,7 +889,15 @@ describe("ConfigurationManager", () => {
     });
 
     describe("Complex scenarios", () => {
-        it("should handle development mode with multiple conditions", () => {
+        it("should handle development mode with multiple conditions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(electronUtils.isDev).mockReturnValue(true);
 
             // Even with valid site conditions, should return false in dev mode
@@ -639,7 +919,15 @@ describe("ConfigurationManager", () => {
             );
         });
 
-        it("should handle sites with complex monitor configurations", async () => {
+        it("should handle sites with complex monitor configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ConfigurationManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const complexSite = createMockSite({
                 identifier: "complex-site",
                 name: "Complex Test Site",

@@ -18,7 +18,15 @@
 import { describe, it, expect } from "vitest";
 
 describe("Logger Module", () => {
-    it("Logger tests disabled - testing dev tools not required", () => {
+    it("Logger tests disabled - testing dev tools not required", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Test disabled to avoid complex dev tools dependencies in test environment
         expect(true).toBe(true);
     });

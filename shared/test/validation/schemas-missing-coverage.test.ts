@@ -5,7 +5,17 @@ import {
 
 describe("Schemas - Missing Coverage", () => {
     describe("validateMonitorField uncovered lines", () => {
-        test("should handle unknown field validation (lines 399-406)", () => {
+        test("should handle unknown field validation (lines 399-406)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Validation", "type");
+
             // Test a field that might trigger the fallback to base schema logic
             // This should test the internal validateFieldWithSchema function
 
@@ -14,7 +24,17 @@ describe("Schemas - Missing Coverage", () => {
             }).toThrow("Unknown field: unknown_field");
         });
 
-        test("should test various field scenarios", () => {
+        test("should test various field scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test fields that might exist in base but not specific schemas
             const testCases = [
                 { type: "http", field: "nonexistent_field", value: "test" },
@@ -31,7 +51,17 @@ describe("Schemas - Missing Coverage", () => {
     });
 
     describe("validateMonitorData ZodError handling", () => {
-        test("should handle ZodError with path length > 0 (lines 478-479)", () => {
+        test("should handle ZodError with path length > 0 (lines 478-479)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
             // Create invalid monitor data that will generate ZodError with path
             const invalidMonitorData = {
                 id: "test-id",
@@ -52,7 +82,17 @@ describe("Schemas - Missing Coverage", () => {
             // This should have hit the path.length > 0 condition
         });
 
-        test("should handle invalid_type with undefined received (line 482)", () => {
+        test("should handle invalid_type with undefined received (line 482)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Business Logic", "type");
+
             // Create data that will generate "invalid_type" error with "undefined" received
             const monitorDataWithUndefinedField = {
                 id: "test-id",
@@ -78,7 +118,17 @@ describe("Schemas - Missing Coverage", () => {
             expect(typeof result.success).toBe("boolean");
         });
 
-        test("should create conditions for warning vs error categorization", () => {
+        test("should create conditions for warning vs error categorization", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Constructor", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Constructor", "type");
+
             // Test scenarios that should trigger different branches in the ZodError handling
 
             // Test case that should generate errors (not warnings)
@@ -104,7 +154,17 @@ describe("Schemas - Missing Coverage", () => {
             expect(Array.isArray(result.warnings)).toBe(true);
         });
 
-        test("should handle edge cases in ZodError issue processing", () => {
+        test("should handle edge cases in ZodError issue processing", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Error Handling", "type");
+
             // Test various invalid data types to generate different ZodError scenarios
             const edgeCases = [
                 {
@@ -142,7 +202,17 @@ describe("Schemas - Missing Coverage", () => {
             });
         });
 
-        test("should specifically target path.length condition", () => {
+        test("should specifically target path.length condition", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: schemas-missing-coverage", "component");
+            annotate("Category: Validation", "category");
+            annotate("Type: Data Retrieval", "type");
+
             // Create data designed to trigger ZodError with specific path conditions
             const dataWithNestedErrors = {
                 id: "valid-id",

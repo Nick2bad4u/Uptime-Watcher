@@ -8,7 +8,15 @@ import type { Logger } from "../../utils/interfaces";
 
 describe("Interfaces Coverage Tests", () => {
     describe("Logger Interface Implementation", () => {
-        it("should implement Logger interface with all required methods", () => {
+        it("should implement Logger interface with all required methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a mock logger that implements the Logger interface
             const mockLogger: Logger = {
                 debug: vi.fn(),
@@ -49,7 +57,15 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should handle error method with Error object", () => {
+        it("should handle error method with Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -66,7 +82,15 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should handle error method without Error object", () => {
+        it("should handle error method without Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -81,7 +105,15 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should support variadic arguments in all methods", () => {
+        it("should support variadic arguments in all methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -137,7 +169,15 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should work with different logger implementations", () => {
+        it("should work with different logger implementations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with console-like logger
             const consoleLogger: Logger = {
                 debug: console.debug.bind(console),
@@ -152,7 +192,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(typeof consoleLogger.error).toBe("function");
         });
 
-        it("should support method chaining pattern if extended", () => {
+        it("should support method chaining pattern if extended", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface ExtendedLogger extends Logger {
                 setLevel(level: string): this;
                 getLevel(): string;
@@ -172,7 +220,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(extendedLogger.getLevel()).toBe("info");
         });
 
-        it("should handle edge cases in method arguments", () => {
+        it("should handle edge cases in method arguments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -192,7 +248,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(mockLogger.error).toHaveBeenCalledWith("error", null);
         });
 
-        it("should maintain type safety across all methods", () => {
+        it("should maintain type safety across all methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -211,7 +275,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(() => testFunction(mockLogger)).not.toThrow();
         });
 
-        it("should work with async logger implementations", async () => {
+        it("should work with async logger implementations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const asyncLogger: Logger = {
                 debug: vi.fn().mockResolvedValue(undefined),
                 info: vi.fn().mockResolvedValue(undefined),
@@ -231,7 +303,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(asyncLogger.error).toHaveBeenCalledWith("async error");
         });
 
-        it("should support contextual logging patterns", () => {
+        it("should support contextual logging patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const contextualLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -277,7 +357,15 @@ describe("Interfaces Coverage Tests", () => {
     });
 
     describe("Interface Type Constraints", () => {
-        it("should ensure all logger methods return void", () => {
+        it("should ensure all logger methods return void", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -298,7 +386,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(errorResult).toBeUndefined();
         });
 
-        it("should allow flexible message parameter types", () => {
+        it("should allow flexible message parameter types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockLogger: Logger = {
                 debug: vi.fn(),
                 info: vi.fn(),
@@ -320,7 +416,15 @@ describe("Interfaces Coverage Tests", () => {
     });
 
     describe("Interface Compatibility and Usage", () => {
-        it("should be compatible with dependency injection patterns", () => {
+        it("should be compatible with dependency injection patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             class Service {
                 constructor(private logger: Logger) {}
 
@@ -353,7 +457,15 @@ describe("Interfaces Coverage Tests", () => {
             );
         });
 
-        it("should work with factory patterns", () => {
+        it("should work with factory patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             function createLogger(): Logger {
                 return {
                     debug: vi.fn(),
@@ -370,7 +482,15 @@ describe("Interfaces Coverage Tests", () => {
             expect(typeof logger.error).toBe("function");
         });
 
-        it("should support interface composition patterns", () => {
+        it("should support interface composition patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: interfaces-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface TimestampedLogger extends Logger {
                 timestamp(): string;
             }

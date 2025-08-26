@@ -104,7 +104,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Lines 224-230: getSyncStatus error handlers", () => {
-        it("should call clearError, setError, and setLoading handlers", async () => {
+        it("should call clearError, setError, and setLoading handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockErrorStore = {
                 clearStoreError: vi.fn(),
                 setStoreError: vi.fn(),
@@ -169,7 +177,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Line 262: Logger error in subscribeToStatusUpdates", () => {
-        it("should log error when StatusUpdateManager.subscribe throws", async () => {
+        it("should log error when StatusUpdateManager.subscribe throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockCallback = vi.fn();
             const testError = new Error("Subscribe failed");
 
@@ -199,7 +215,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Lines 298-307: Delete/update event handling", () => {
-        it("should handle delete event and call syncSitesFromBackend (line 300)", async () => {
+        it("should handle delete event and call syncSitesFromBackend (line 300)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -232,7 +256,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(syncSpy).toHaveBeenCalled();
         });
 
-        it("should handle update event and call syncSitesFromBackend (line 300)", async () => {
+        it("should handle update event and call syncSitesFromBackend (line 300)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Update", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -263,7 +295,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(syncSpy).toHaveBeenCalled();
         });
 
-        it("should log error when syncSitesFromBackend fails (lines 301-304)", async () => {
+        it("should log error when syncSitesFromBackend fails (lines 301-304)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -300,7 +340,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Lines 335-341: syncSitesFromBackend error handlers", () => {
-        it("should call clearError, setError, and setLoading handlers", async () => {
+        it("should call clearError, setError, and setLoading handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockErrorStore = {
                 clearStoreError: vi.fn(),
                 setStoreError: vi.fn(),
@@ -353,7 +401,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
     });
 
     describe("Additional edge cases", () => {
-        it("should handle bulk-sync with sites", () => {
+        it("should handle bulk-sync with sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             let eventHandler: any;
             mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
                 (handler) => {
@@ -376,7 +432,15 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle unsubscribe with existing manager", () => {
+        it("should handle unsubscribe with existing manager", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.line-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // First subscribe to create a manager
             const mockCallback = vi.fn();
             syncActions.subscribeToStatusUpdates(mockCallback);

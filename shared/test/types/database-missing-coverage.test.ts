@@ -6,7 +6,17 @@ import {
 
 describe("Database Types - Missing Coverage", () => {
     describe("RowValidationUtils.isValidTimestamp coverage", () => {
-        test("should handle invalid string timestamps through isValidHistoryRow (line 208)", () => {
+        test("should handle invalid string timestamps through isValidHistoryRow (line 208)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
             // This should hit line 208 where we return false for string values that don't convert to valid numbers
             // Testing through isValidHistoryRow which uses the internal isValidTimestamp
             const historyRowWithInvalidTimestamp = {
@@ -23,7 +33,17 @@ describe("Database Types - Missing Coverage", () => {
             );
         });
 
-        test("should handle invalid string timestamps through isValidMonitorRow", () => {
+        test("should handle invalid string timestamps through isValidMonitorRow", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorRowWithInvalidTimestamp = {
                 id: 1,
                 site_id: "site-1",
@@ -47,7 +67,17 @@ describe("Database Types - Missing Coverage", () => {
             );
         });
 
-        test("should handle invalid string timestamps through isValidSiteRow", () => {
+        test("should handle invalid string timestamps through isValidSiteRow", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
             const siteRowWithInvalidTimestamp = {
                 id: 1,
                 site_id: "site-1",
@@ -62,7 +92,17 @@ describe("Database Types - Missing Coverage", () => {
             expect(isValidSiteRow(siteRowWithInvalidTimestamp)).toBe(false);
         });
 
-        test("should handle edge case string timestamps that become NaN", () => {
+        test("should handle edge case string timestamps that become NaN", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: database-missing-coverage", "component");
+            annotate("Category: Shared", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test various string values that would make Number() return NaN
             const testCases = [
                 "NaN",

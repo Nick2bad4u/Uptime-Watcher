@@ -34,12 +34,28 @@ describe("Cache Utilities", () => {
 
     describe("TypedCache", () => {
         describe("Constructor and basic properties", () => {
-            it("should create cache with default options", () => {
+            it("should create cache with default options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
                 const cache = new TypedCache();
                 expect(cache.size).toBe(0);
             });
 
-            it("should create cache with custom maxSize", () => {
+            it("should create cache with custom maxSize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
                 const cache = new TypedCache({ maxSize: 50 });
                 expect(cache.size).toBe(0);
                 // Add entries to verify maxSize works
@@ -49,7 +65,15 @@ describe("Cache Utilities", () => {
                 expect(cache.size).toBe(50); // Should be limited to maxSize
             });
 
-            it("should create cache with custom TTL", () => {
+            it("should create cache with custom TTL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
                 const cache = new TypedCache({ ttl: 5000 });
                 cache.set("key", "value");
 
@@ -68,7 +92,15 @@ describe("Cache Utilities", () => {
                 );
             });
 
-            it("should create cache with both maxSize and TTL", () => {
+            it("should create cache with both maxSize and TTL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
                 const cache = new TypedCache({ maxSize: 5, ttl: 2000 });
                 cache.set("key", "value");
                 expect(cache.get("key")).toBe("value");
@@ -83,34 +115,82 @@ describe("Cache Utilities", () => {
                 cache = new TypedCache<string, string>();
             });
 
-            it("should set and get values", () => {
+            it("should set and get values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
                 cache.set("key1", "value1");
                 expect(cache.get("key1")).toBe("value1");
                 expect(cache.size).toBe(1);
             });
 
-            it("should return undefined for non-existent keys", () => {
+            it("should return undefined for non-existent keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(cache.get("nonexistent")).toBeUndefined();
             });
 
-            it("should check key existence with has()", () => {
+            it("should check key existence with has()", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 cache.set("key1", "value1");
                 expect(cache.has("key1")).toBe(true);
                 expect(cache.has("nonexistent")).toBe(false);
             });
 
-            it("should delete keys", () => {
+            it("should delete keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
                 cache.set("key1", "value1");
                 expect(cache.delete("key1")).toBe(true);
                 expect(cache.get("key1")).toBeUndefined();
                 expect(cache.size).toBe(0);
             });
 
-            it("should return false when deleting non-existent keys", () => {
+            it("should return false when deleting non-existent keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 expect(cache.delete("nonexistent")).toBe(false);
             });
 
-            it("should clear all entries", () => {
+            it("should clear all entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 cache.set("key1", "value1");
                 cache.set("key2", "value2");
                 expect(cache.size).toBe(2);
@@ -123,7 +203,15 @@ describe("Cache Utilities", () => {
         });
 
         describe("TTL functionality", () => {
-            it("should expire entries after default TTL", () => {
+            it("should expire entries after default TTL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
 
                 // Set entry at time 1000
@@ -144,7 +232,15 @@ describe("Cache Utilities", () => {
                 expect(cache.size).toBe(0);
             });
 
-            it("should handle per-entry TTL override", () => {
+            it("should handle per-entry TTL override", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 5000 }); // Default TTL
 
                 // Set entries at time 1000
@@ -162,7 +258,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key2")).toBeUndefined(); // Now should be expired
             });
 
-            it("should handle cache without TTL", () => {
+            it("should handle cache without TTL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
                 const cache = new TypedCache<string, string>(); // No TTL
                 cache.set("key1", "value1");
 
@@ -171,7 +275,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key1")).toBe("value1"); // Should still be valid
             });
 
-            it("should update lastAccessed on get", () => {
+            it("should update lastAccessed on get", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
                 const cache = new TypedCache<string, string>();
                 cache.set("key1", "value1");
 
@@ -186,7 +298,15 @@ describe("Cache Utilities", () => {
         });
 
         describe("LRU eviction", () => {
-            it("should evict least recently used entries when maxSize reached", () => {
+            it("should evict least recently used entries when maxSize reached", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ maxSize: 3 });
 
                 // Fill cache to capacity
@@ -213,13 +333,29 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key4")).toBe("value4"); // Newly added
             });
 
-            it("should handle LRU eviction with no existing entries", () => {
+            it("should handle LRU eviction with no existing entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ maxSize: 0 }); // Zero max size
                 cache.set("key1", "value1");
                 expect(cache.size).toBe(1); // Should handle gracefully
             });
 
-            it("should handle LRU eviction when cache is exactly at maxSize", () => {
+            it("should handle LRU eviction when cache is exactly at maxSize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
                 const cache = new TypedCache<string, string>({ maxSize: 2 });
 
                 cache.set("key1", "value1");
@@ -237,7 +373,15 @@ describe("Cache Utilities", () => {
         });
 
         describe("Cleanup functionality", () => {
-            it("should remove expired entries during cleanup", () => {
+            it("should remove expired entries during cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
 
                 // Set entries at time 1000
@@ -259,7 +403,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key2")).toBeUndefined();
             });
 
-            it("should keep non-expired entries during cleanup", () => {
+            it("should keep non-expired entries during cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 5000 });
 
                 // Set key1 at time 1000 (expires at 6000)
@@ -280,7 +432,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key2")).toBe("value2");
             });
 
-            it("should handle cleanup with no TTL set", () => {
+            it("should handle cleanup with no TTL set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>(); // No TTL
                 cache.set("key1", "value1");
                 cache.set("key2", "value2");
@@ -294,7 +454,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key2")).toBe("value2");
             });
 
-            it("should handle cleanup with mixed TTL entries", () => {
+            it("should handle cleanup with mixed TTL entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 5000 });
 
                 // Set entries at time 1000
@@ -316,7 +484,15 @@ describe("Cache Utilities", () => {
         });
 
         describe("Type safety", () => {
-            it("should handle different key types", () => {
+            it("should handle different key types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const numberKeyCache = new TypedCache<number, string>();
                 numberKeyCache.set(1, "value1");
                 numberKeyCache.set(2, "value2");
@@ -327,7 +503,15 @@ describe("Cache Utilities", () => {
                 expect(numberKeyCache.delete(1)).toBe(true);
             });
 
-            it("should handle different value types", () => {
+            it("should handle different value types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const objectCache = new TypedCache<
                     string,
                     { id: number; name: string }
@@ -342,7 +526,15 @@ describe("Cache Utilities", () => {
                 expect(objectCache.get("obj2")).toEqual(obj2);
             });
 
-            it("should handle null and undefined values", () => {
+            it("should handle null and undefined values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<
                     string,
                     string | null | undefined
@@ -362,7 +554,15 @@ describe("Cache Utilities", () => {
         });
 
         describe("Edge cases", () => {
-            it("should handle setting the same key multiple times", () => {
+            it("should handle setting the same key multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>();
                 cache.set("key1", "value1");
                 cache.set("key1", "value2");
@@ -372,7 +572,15 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key1")).toBe("value3");
             });
 
-            it("should handle very large cache operations", () => {
+            it("should handle very large cache operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
                 const cache = new TypedCache<string, string>({ maxSize: 1000 });
 
                 // Add many entries
@@ -390,13 +598,29 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key1499")).toBe("value1499");
             });
 
-            it("should handle cleanup with empty cache", () => {
+            it("should handle cleanup with empty cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
                 expect(() => cache.cleanup()).not.toThrow();
                 expect(cache.size).toBe(0);
             });
 
-            it("should handle edge case where all entries have same lastAccessed time", () => {
+            it("should handle edge case where all entries have same lastAccessed time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const cache = new TypedCache<string, string>({ maxSize: 2 });
 
                 // Add entries at the same time
@@ -411,13 +635,29 @@ describe("Cache Utilities", () => {
     });
 
     describe("Predefined AppCaches", () => {
-        it("should have all expected cache instances", () => {
+        it("should have all expected cache instances", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             expect(AppCaches.general).toBeInstanceOf(TypedCache);
             expect(AppCaches.monitorTypes).toBeInstanceOf(TypedCache);
             expect(AppCaches.uiHelpers).toBeInstanceOf(TypedCache);
         });
 
-        it("should allow operations on predefined caches", () => {
+        it("should allow operations on predefined caches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             AppCaches.general.set("test", "value");
             expect(AppCaches.general.get("test")).toBe("value");
 
@@ -439,7 +679,15 @@ describe("Cache Utilities", () => {
             AppCaches.uiHelpers.set("theme", "light");
         });
 
-        it("should cleanup all caches", () => {
+        it("should cleanup all caches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             // Set entry with TTL at time 1000 (expires at 2000)
             mockNow.mockReturnValue(1000);
             AppCaches.general.set("expiring", "value", 1000);
@@ -456,7 +704,15 @@ describe("Cache Utilities", () => {
             expect(AppCaches.general.get("item1")).toBe("value1");
         });
 
-        it("should clear all caches", () => {
+        it("should clear all caches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             clearAllCaches();
 
             expect(AppCaches.general.size).toBe(0);
@@ -478,7 +734,15 @@ describe("Cache Utilities", () => {
             mockFetcher = vi.fn();
         });
 
-        it("should return cached value if available", async () => {
+        it("should return cached value if available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             cache.set("key1", "cached-value");
             mockFetcher.mockResolvedValue("fetched-value");
 
@@ -488,7 +752,15 @@ describe("Cache Utilities", () => {
             expect(mockFetcher).not.toHaveBeenCalled();
         });
 
-        it("should fetch and cache value if not in cache", async () => {
+        it("should fetch and cache value if not in cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             mockFetcher.mockResolvedValue("fetched-value");
 
             const result = await getCachedOrFetch(cache, "key1", mockFetcher);
@@ -498,7 +770,15 @@ describe("Cache Utilities", () => {
             expect(cache.get("key1")).toBe("fetched-value");
         });
 
-        it("should use custom TTL when fetching", async () => {
+        it("should use custom TTL when fetching", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const cacheWithTtl = new TypedCache<string, string>({ ttl: 5000 });
             mockFetcher.mockResolvedValue("fetched-value");
 
@@ -522,7 +802,15 @@ describe("Cache Utilities", () => {
             ).toBe(true);
         });
 
-        it("should handle fetcher errors", async () => {
+        it("should handle fetcher errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Fetch failed");
             mockFetcher.mockRejectedValue(error);
 
@@ -532,7 +820,15 @@ describe("Cache Utilities", () => {
             expect(cache.get("key1")).toBeUndefined(); // Should not cache failed result
         });
 
-        it("should handle null/undefined fetched values", async () => {
+        it("should handle null/undefined fetched values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockFetcher.mockResolvedValue(null);
 
             const result = await getCachedOrFetch(cache, "key1", mockFetcher);
@@ -541,7 +837,15 @@ describe("Cache Utilities", () => {
             expect(cache.get("key1")).toBeNull(); // Should cache null value
         });
 
-        it("should handle complex object values", async () => {
+        it("should handle complex object values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexObject = {
                 id: 1,
                 data: { nested: "value" },

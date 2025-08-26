@@ -103,7 +103,15 @@ describe("main.ts - Missing Branch Coverage", () => {
         vi.restoreAllMocks();
     });
     describe("Command Line Argument Processing", () => {
-        it("should handle --debug flag", async () => {
+        it("should handle --debug flag", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -122,7 +130,15 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
         });
-        it("should handle --log-debug flag", async () => {
+        it("should handle --log-debug flag", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -141,7 +157,15 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
         });
-        it("should handle --log-production flag", async () => {
+        it("should handle --log-production flag", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -160,7 +184,15 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should handle --log-info flag", async () => {
+        it("should handle --log-info flag", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -179,7 +211,15 @@ describe("main.ts - Missing Branch Coverage", () => {
             expect(mockLog.transports.file.level).toBe("info");
             expect(mockLog.transports.console.level).toBe("info");
         });
-        it("should handle unknown flags gracefully", async () => {
+        it("should handle unknown flags gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = [
                 "node",
                 "main.js",
@@ -201,7 +241,15 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
     });
     describe("Development Extension Loading", () => {
-        it("should handle extension loading in development mode", async () => {
+        it("should handle extension loading in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Loading", "type");
+
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -215,7 +263,15 @@ describe("main.ts - Missing Branch Coverage", () => {
 
             expect(mockApp.whenReady).toHaveBeenCalled();
         });
-        it("should handle extension loading failure gracefully", async () => {
+        it("should handle extension loading failure gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -234,7 +290,15 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
     });
     describe("Environment Detection Edge Cases", () => {
-        it("should handle production environment correctly", async () => {
+        it("should handle production environment correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -250,7 +314,15 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
     });
     describe("Application Lifecycle", () => {
-        it("should initialize logger", async () => {
+        it("should initialize logger", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",
@@ -264,7 +336,15 @@ describe("main.ts - Missing Branch Coverage", () => {
 
             expect(mockLog.initialize).toHaveBeenCalled();
         });
-        it("should handle app ready event", async () => {
+        it("should handle app ready event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main.missing-branches", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             process.argv = ["node", "main.js"];
             Object.defineProperty(process.versions, "electron", {
                 value: "1.0.0",

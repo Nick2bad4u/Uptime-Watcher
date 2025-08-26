@@ -2,13 +2,33 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion - Missing Coverage", () => {
     describe("safeStringify switch case coverage", () => {
-        test("should handle undefined case (lines 86-87)", () => {
+        test("should handle undefined case (lines 86-87)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test the "undefined" case in the switch statement
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        test("should handle default case for unknown types (lines 89-90)", () => {
+        test("should handle default case for unknown types (lines 89-90)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // The default case is hard to hit because TypeScript covers most types
             // But we can try to create edge cases or use type manipulation
 
@@ -26,7 +46,17 @@ describe("StringConversion - Missing Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        test("should comprehensive test all switch branches", () => {
+        test("should comprehensive test all switch branches", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test all possible typeof results to ensure we hit all branches
             const testCases = [
                 { value: null, expected: "" },
@@ -51,7 +81,17 @@ describe("StringConversion - Missing Coverage", () => {
             });
         });
 
-        test("should handle edge cases that might hit default branch", () => {
+        test("should handle edge cases that might hit default branch", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Try to create scenarios that might hit the default case
 
             // Direct undefined test (lines 86-87)
@@ -70,7 +110,17 @@ describe("StringConversion - Missing Coverage", () => {
             });
         });
 
-        test("should attempt to reach default case through type manipulation", () => {
+        test("should attempt to reach default case through type manipulation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // The default case is designed for unknown types that typeof might return
             // in future JavaScript versions or edge cases
 
@@ -97,7 +147,17 @@ describe("StringConversion - Missing Coverage", () => {
             }
         });
 
-        test("should verify typeof behavior for edge cases", () => {
+        test("should verify typeof behavior for edge cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: stringConversion-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             // Verify the exact typeof values that trigger each case
 
             // These should hit specific cases:

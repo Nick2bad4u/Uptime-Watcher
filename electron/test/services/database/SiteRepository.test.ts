@@ -49,7 +49,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("findAll", () => {
-        it("should find all sites", async () => {
+        it("should find all sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockSites = [
                 { identifier: "site1", name: "Site 1", monitoring: 1 },
                 { identifier: "site2", name: "Site 2", monitoring: 0 },
@@ -64,7 +72,15 @@ describe("SiteRepository", () => {
             expect(mockDb.all).toHaveBeenCalled();
             expect(result).toBeDefined();
         });
-        it("should handle errors when finding all sites", async () => {
+        it("should handle errors when finding all sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockDb = mockDatabaseService.getDatabase();
             mockDb.all.mockImplementation(() => {
                 throw new Error("Database error");
@@ -75,7 +91,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("findByIdentifier", () => {
-        it("should find a site by identifier", async () => {
+        it("should find a site by identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockSite = {
                 identifier: "site1",
                 name: "Site 1",
@@ -92,7 +116,15 @@ describe("SiteRepository", () => {
             );
             expect(result).toEqual(mockSite);
         });
-        it("should return undefined when site not found", async () => {
+        it("should return undefined when site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockDatabase.get.mockReturnValue(undefined);
 
             const result = await repository.findByIdentifier("nonexistent");
@@ -101,7 +133,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("upsert", () => {
-        it("should upsert a site", async () => {
+        it("should upsert a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteData = {
                 identifier: "site1",
                 name: "New Site",
@@ -119,7 +159,15 @@ describe("SiteRepository", () => {
                 expect.any(Array)
             );
         });
-        it("should handle upsert errors", async () => {
+        it("should handle upsert errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const siteData = {
                 identifier: "site1",
                 name: "New Site",
@@ -136,7 +184,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("delete", () => {
-        it("should delete a site", async () => {
+        it("should delete a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 1 }),
                 finalize: vi.fn(),
@@ -155,7 +211,15 @@ describe("SiteRepository", () => {
 
             expect(result).toBe(true);
         });
-        it("should return false when site not found", async () => {
+        it("should return false when site not found", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 0 }),
                 finalize: vi.fn(),
@@ -174,7 +238,15 @@ describe("SiteRepository", () => {
 
             expect(result).toBe(false);
         });
-        it("should handle deletion errors", async () => {
+        it("should handle deletion errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockDatabaseService.executeTransaction.mockImplementation(() => {
                 throw new Error("Delete failed");
             });
@@ -184,7 +256,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("deleteAll", () => {
-        it("should delete all sites", async () => {
+        it("should delete all sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const mockPrepare = vi.fn().mockReturnValue({
                 run: vi.fn().mockReturnValue({ changes: 3 }),
                 finalize: vi.fn(),
@@ -209,7 +289,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("exists", () => {
-        it("should return true when site exists", async () => {
+        it("should return true when site exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockSite = {
                 identifier: "site1",
                 name: "Site 1",
@@ -229,7 +317,15 @@ describe("SiteRepository", () => {
 
             expect(result).toBe(true);
         });
-        it("should return false when site does not exist", async () => {
+        it("should return false when site does not exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockPrepare = vi.fn().mockReturnValue({
                 get: vi.fn().mockReturnValue(undefined),
                 finalize: vi.fn(),
@@ -245,7 +341,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("bulkInsert", () => {
-        it("should insert multiple sites", async () => {
+        it("should insert multiple sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sites = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
                 { identifier: "site2", name: "Site 2", monitoring: false },
@@ -268,7 +372,15 @@ describe("SiteRepository", () => {
                 expect.stringContaining("INSERT")
             );
         });
-        it("should handle bulk insert errors", async () => {
+        it("should handle bulk insert errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const sites = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
             ];
@@ -282,7 +394,15 @@ describe("SiteRepository", () => {
         });
     });
     describe("exportAll", () => {
-        it("should export all sites", async () => {
+        it("should export all sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Export Operation", "type");
+
             const mockSites = [
                 { identifier: "site1", name: "Site 1", monitoring: true },
                 { identifier: "site2", name: "Site 2", monitoring: false },

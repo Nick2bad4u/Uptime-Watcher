@@ -109,30 +109,70 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Constructor and Initialization", () => {
-        it("should create orchestrator with valid dependencies", () => {
+        it("should create orchestrator with valid dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(orchestrator).toBeDefined();
             expect(orchestrator.historyLimit).toBe(1000);
         });
 
-        it("should throw error when dependencies are not provided", () => {
+        it("should throw error when dependencies are not provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => new UptimeOrchestrator()).toThrow(
                 "UptimeOrchestrator requires dependencies to be injected"
             );
         });
 
-        it("should throw error when dependencies are undefined", () => {
+        it("should throw error when dependencies are undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => new UptimeOrchestrator(undefined)).toThrow(
                 "UptimeOrchestrator requires dependencies to be injected"
             );
         });
 
-        it("should initialize successfully", async () => {
+        it("should initialize successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             await expect(orchestrator.initialize()).resolves.not.toThrow();
             expect(mockDatabaseManager.initialize).toHaveBeenCalled();
             expect(mockSiteManager.initialize).toHaveBeenCalled();
         });
 
-        it("should handle initialization errors", async () => {
+        it("should handle initialization errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             vi.mocked(mockDatabaseManager.initialize).mockRejectedValueOnce(
                 new Error("Init failed")
             );
@@ -142,7 +182,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should validate initialization and throw for missing database manager method", () => {
+        it("should validate initialization and throw for missing database manager method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const invalidDependencies = {
                 databaseManager: { initialize: undefined } as any,
                 monitorManager: mockMonitorManager,
@@ -159,7 +207,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should validate initialization and throw for missing site manager method", () => {
+        it("should validate initialization and throw for missing site manager method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const invalidDependencies = {
                 databaseManager: mockDatabaseManager,
                 monitorManager: mockMonitorManager,
@@ -176,7 +232,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should validate initialization and throw for missing monitor manager method", () => {
+        it("should validate initialization and throw for missing monitor manager method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const invalidDependencies = {
                 databaseManager: mockDatabaseManager,
                 monitorManager: { startMonitoring: undefined } as any,
@@ -195,13 +259,29 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Settings Management", () => {
-        it("should reset settings successfully", async () => {
+        it("should reset settings successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             await orchestrator.resetSettings();
 
             expect(mockDatabaseManager.resetSettings).toHaveBeenCalled();
         });
 
-        it("should set history limit successfully", async () => {
+        it("should set history limit successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             await orchestrator.setHistoryLimit(500);
 
             expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(
@@ -231,7 +311,15 @@ describe("UptimeOrchestrator", () => {
             monitoring: true,
         };
 
-        it("should add site successfully", async () => {
+        it("should add site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await orchestrator.addSite(testSite);
 
             expect(mockSiteManager.addSite).toHaveBeenCalledWith(testSite);
@@ -246,7 +334,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle site addition failure and cleanup", async () => {
+        it("should handle site addition failure and cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.setupSiteForMonitoring
             ).mockRejectedValueOnce(new Error("Setup failed"));
@@ -260,7 +356,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle cleanup failure during site addition rollback", async () => {
+        it("should handle cleanup failure during site addition rollback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.setupSiteForMonitoring
             ).mockRejectedValueOnce(new Error("Setup failed"));
@@ -277,7 +381,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should remove site successfully", async () => {
+        it("should remove site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const result = await orchestrator.removeSite("test-site");
 
             expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
@@ -286,7 +398,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should update site successfully", async () => {
+        it("should update site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const updateData: Partial<Site> = { name: "Updated Site" };
             const result = await orchestrator.updateSite(
                 "test-site",
@@ -304,7 +424,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should get sites successfully", async () => {
+        it("should get sites successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result = await orchestrator.getSites();
 
             expect(mockSiteManager.getSites).toHaveBeenCalled();
@@ -313,7 +441,15 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Monitor Management", () => {
-        it("should check site manually", async () => {
+        it("should check site manually", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await orchestrator.checkSiteManually(
                 "test-site",
                 "monitor-1"
@@ -331,7 +467,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should check site manually without monitor ID", async () => {
+        it("should check site manually without monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await orchestrator.checkSiteManually("test-site");
 
             expect(mockMonitorManager.checkSiteManually).toHaveBeenCalledWith(
@@ -341,7 +485,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBeDefined();
         });
 
-        it("should start monitoring for site", async () => {
+        it("should start monitoring for site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await orchestrator.startMonitoringForSite(
                 "test-site",
                 "monitor-1"
@@ -353,7 +505,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should start monitoring for site without monitor ID", async () => {
+        it("should start monitoring for site without monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result =
                 await orchestrator.startMonitoringForSite("test-site");
 
@@ -363,7 +523,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should stop monitoring for site", async () => {
+        it("should stop monitoring for site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await orchestrator.stopMonitoringForSite(
                 "test-site",
                 "monitor-1"
@@ -375,7 +543,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should stop monitoring for site without monitor ID", async () => {
+        it("should stop monitoring for site without monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result =
                 await orchestrator.stopMonitoringForSite("test-site");
 
@@ -385,7 +561,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should remove monitor successfully", async () => {
+        it("should remove monitor successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const result = await orchestrator.removeMonitor(
                 "test-site",
                 "monitor-1"
@@ -401,7 +585,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle monitor removal with failed stop monitoring", async () => {
+        it("should handle monitor removal with failed stop monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.stopMonitoringForSite
             ).mockResolvedValueOnce(false);
@@ -418,7 +610,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should handle monitor removal with failed database removal", async () => {
+        it("should handle monitor removal with failed database removal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
                 false
             );
@@ -434,7 +634,15 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(false);
         });
 
-        it("should handle monitor removal with failed restart after failed removal", async () => {
+        it("should handle monitor removal with failed restart after failed removal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
                 false
             );
@@ -450,7 +658,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor removal errors", async () => {
+        it("should handle monitor removal errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.stopMonitoringForSite
             ).mockRejectedValueOnce(new Error("Stop failed"));
@@ -462,13 +678,29 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Global Monitoring Control", () => {
-        it("should start monitoring", async () => {
+        it("should start monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             await orchestrator.startMonitoring();
 
             expect(mockMonitorManager.startMonitoring).toHaveBeenCalled();
         });
 
-        it("should stop monitoring", async () => {
+        it("should stop monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             await orchestrator.stopMonitoring();
 
             expect(mockMonitorManager.stopMonitoring).toHaveBeenCalled();
@@ -476,7 +708,15 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Data Management", () => {
-        it("should download backup successfully", async () => {
+        it("should download backup successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Backup Operation", "type");
+
             const result = await orchestrator.downloadBackup();
 
             expect(mockDatabaseManager.downloadBackup).toHaveBeenCalled();
@@ -486,14 +726,30 @@ describe("UptimeOrchestrator", () => {
             });
         });
 
-        it("should export data successfully", async () => {
+        it("should export data successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Export Operation", "type");
+
             const result = await orchestrator.exportData();
 
             expect(mockDatabaseManager.exportData).toHaveBeenCalled();
             expect(result).toBe('{"sites": []}');
         });
 
-        it("should import data successfully", async () => {
+        it("should import data successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Import Operation", "type");
+
             const testData = '{"sites": []}';
             const result = await orchestrator.importData(testData);
 
@@ -503,14 +759,30 @@ describe("UptimeOrchestrator", () => {
             expect(result).toBe(true);
         });
 
-        it("should get history limit", () => {
+        it("should get history limit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result = orchestrator.getHistoryLimit();
 
             expect(mockDatabaseManager.getHistoryLimit).toHaveBeenCalled();
             expect(result).toBe(1000);
         });
 
-        it("should set history limit successfully", async () => {
+        it("should set history limit successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             await orchestrator.setHistoryLimit(500);
 
             expect(mockDatabaseManager.setHistoryLimit).toHaveBeenCalledWith(
@@ -520,7 +792,15 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Event Handling", () => {
-        it("should handle events without errors", () => {
+        it("should handle events without errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test that the orchestrator can emit events
             expect(() => {
                 orchestrator.emitTyped("site:added", {
@@ -536,7 +816,15 @@ describe("UptimeOrchestrator", () => {
             }).not.toThrow();
         });
 
-        it("should handle monitor status change events", () => {
+        it("should handle monitor status change events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(() => {
                 orchestrator.emitTyped("monitor:status-changed", {
                     monitor: {
@@ -565,7 +853,15 @@ describe("UptimeOrchestrator", () => {
             }).not.toThrow();
         });
 
-        it("should handle internal database events", async () => {
+        it("should handle internal database events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const sites = [
                 {
                     identifier: "test-site-1",
@@ -596,7 +892,15 @@ describe("UptimeOrchestrator", () => {
             ).toHaveBeenCalledWith(sites[0]);
         });
 
-        it("should handle internal database events with monitoring setup failures", async () => {
+        it("should handle internal database events with monitoring setup failures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const sites = [
                 {
                     identifier: "test-site-fail",
@@ -631,7 +935,15 @@ describe("UptimeOrchestrator", () => {
             ).toHaveBeenCalledWith(sites[0]);
         });
 
-        it("should handle get sites from cache request", async () => {
+        it("should handle get sites from cache request", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             // Emit internal database event
             orchestrator.emitTyped(
                 "internal:database:get-sites-from-cache-requested",
@@ -647,7 +959,15 @@ describe("UptimeOrchestrator", () => {
             expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
         });
 
-        it("should handle database initialized event", async () => {
+        it("should handle database initialized event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit internal database event
@@ -669,7 +989,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle database initialized event with errors", async () => {
+        it("should handle database initialized event with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             // Mock emitTyped to throw an error specifically for "database:transaction-completed"
             const originalEmitTyped = orchestrator.emitTyped.bind(orchestrator);
             const emitTypedSpy = vi
@@ -704,7 +1032,15 @@ describe("UptimeOrchestrator", () => {
             emitTypedSpy.mockRestore();
         });
 
-        it("should handle internal site added events", async () => {
+        it("should handle internal site added events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Create the test site object
@@ -734,7 +1070,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle internal site removed events", async () => {
+        it("should handle internal site removed events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Create the test site object
@@ -766,7 +1110,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle internal site removed events with missing identifier", async () => {
+        it("should handle internal site removed events with missing identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Create the test site object
@@ -797,7 +1149,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle internal site updated events", async () => {
+        it("should handle internal site updated events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Create the test site objects
@@ -836,7 +1196,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle internal site updated events with fallback values", async () => {
+        it("should handle internal site updated events with fallback values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Create the test site object
@@ -869,7 +1237,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor started events", async () => {
+        it("should handle monitor started events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit internal monitor event
@@ -892,7 +1268,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor started events with errors", async () => {
+        it("should handle monitor started events with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockSiteManager.getSitesFromCache).mockImplementationOnce(
                 () => {
                     throw new Error("Cache error");
@@ -913,7 +1297,15 @@ describe("UptimeOrchestrator", () => {
             expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
         });
 
-        it("should handle monitor stopped events when monitoring is active", async () => {
+        it("should handle monitor stopped events when monitoring is active", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit internal monitor event
@@ -937,7 +1329,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor stopped events when monitoring is inactive", async () => {
+        it("should handle monitor stopped events when monitoring is inactive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             vi.mocked(
                 mockMonitorManager.getActiveMonitorCount
@@ -964,7 +1364,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor stopped events with errors", async () => {
+        it("should handle monitor stopped events with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.getActiveMonitorCount
             ).mockImplementationOnce(() => {
@@ -986,7 +1394,15 @@ describe("UptimeOrchestrator", () => {
             expect(mockMonitorManager.getActiveMonitorCount).toHaveBeenCalled();
         });
 
-        it("should handle start monitoring requests successfully", async () => {
+        it("should handle start monitoring requests successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit start monitoring request
@@ -1013,7 +1429,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle start monitoring requests with errors", async () => {
+        it("should handle start monitoring requests with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             vi.mocked(
                 mockMonitorManager.startMonitoringForSite
@@ -1040,7 +1464,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle stop monitoring requests successfully", async () => {
+        it("should handle stop monitoring requests successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit stop monitoring request
@@ -1067,7 +1499,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle stop monitoring requests with errors", async () => {
+        it("should handle stop monitoring requests with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             vi.mocked(
                 mockMonitorManager.stopMonitoringForSite
@@ -1094,7 +1534,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle is monitoring active requests", async () => {
+        it("should handle is monitoring active requests", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             // Emit is monitoring active request
@@ -1124,7 +1572,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle restart monitoring requests successfully", async () => {
+        it("should handle restart monitoring requests successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             const testMonitor = {
                 id: "monitor-1",
@@ -1159,7 +1615,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle restart monitoring requests with errors", async () => {
+        it("should handle restart monitoring requests with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             const testMonitor = {
                 id: "monitor-1",
@@ -1199,14 +1663,30 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Property Access", () => {
-        it("should access history limit property", () => {
+        it("should access history limit property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Configuration", "type");
+
             expect(orchestrator.historyLimit).toBe(1000);
             expect(mockDatabaseManager.getHistoryLimit).toHaveBeenCalled();
         });
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty site data", async () => {
+        it("should handle empty site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const emptySite: Site = {
                 identifier: "",
                 name: "",
@@ -1219,7 +1699,15 @@ describe("UptimeOrchestrator", () => {
             ).resolves.toBeDefined();
         });
 
-        it("should handle undefined monitor ID in manual check", async () => {
+        it("should handle undefined monitor ID in manual check", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await orchestrator.checkSiteManually(
                 "test-site",
                 undefined
@@ -1234,7 +1722,15 @@ describe("UptimeOrchestrator", () => {
     });
 
     describe("Error Scenarios", () => {
-        it("should handle database manager errors", async () => {
+        it("should handle database manager errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockDatabaseManager.exportData).mockRejectedValueOnce(
                 new Error("Database error")
             );
@@ -1244,7 +1740,15 @@ describe("UptimeOrchestrator", () => {
             );
         });
 
-        it("should handle monitor manager errors", async () => {
+        it("should handle monitor manager errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(
                 mockMonitorManager.checkSiteManually
             ).mockRejectedValueOnce(new Error("Monitor error"));
@@ -1254,7 +1758,15 @@ describe("UptimeOrchestrator", () => {
             ).rejects.toThrow("Monitor error");
         });
 
-        it("should handle site manager errors", async () => {
+        it("should handle site manager errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(mockSiteManager.addSite).mockRejectedValueOnce(
                 new Error("Site error")
             );

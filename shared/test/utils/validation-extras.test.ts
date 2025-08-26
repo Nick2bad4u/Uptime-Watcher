@@ -30,22 +30,54 @@ describe("validateMonitorType", () => {
         });
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType(null)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType(undefined)).toBe(false);
     });
 
-    it("should return false for non-string values", () => {
+    it("should return false for non-string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType(123)).toBe(false);
         expect(validateMonitorType(true)).toBe(false);
         expect(validateMonitorType({})).toBe(false);
         expect(validateMonitorType([])).toBe(false);
     });
 
-    it("should return false for invalid type strings", () => {
+    it("should return false for invalid type strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType("tcp")).toBe(false);
         expect(validateMonitorType("ssh")).toBe(false);
         expect(validateMonitorType("ftp")).toBe(false);
@@ -53,7 +85,15 @@ describe("validateMonitorType", () => {
         expect(validateMonitorType("")).toBe(false);
     });
 
-    it("should return false for case variations", () => {
+    it("should return false for case variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType("HTTP")).toBe(false);
         expect(validateMonitorType("Http")).toBe(false);
         expect(validateMonitorType("PORT")).toBe(false);
@@ -61,7 +101,15 @@ describe("validateMonitorType", () => {
         expect(validateMonitorType("DNS")).toBe(false);
     });
 
-    it("should return false for whitespace variations", () => {
+    it("should return false for whitespace variations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateMonitorType(" http ")).toBe(false);
         expect(validateMonitorType("http ")).toBe(false);
         expect(validateMonitorType(" ping")).toBe(false);
@@ -79,7 +127,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("basic field validation", () => {
-        it("should return no errors for valid monitor", () => {
+        it("should return no errors for valid monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 url: "https://example.com",
@@ -88,34 +144,74 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return error for missing id", () => {
+        it("should return error for missing id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = { ...createBaseMonitor() };
             delete monitor.id;
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Monitor id is required");
         });
 
-        it("should return error for missing type", () => {
+        it("should return error for missing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = { ...createBaseMonitor() };
             delete monitor.type;
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Monitor type is required");
         });
 
-        it("should return error for invalid type", () => {
+        it("should return error for invalid type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = { ...createBaseMonitor(), type: "invalid" as any };
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Invalid monitor type");
         });
 
-        it("should return error for missing status", () => {
+        it("should return error for missing status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = { ...createBaseMonitor() };
             delete monitor.status;
             const errors = getMonitorValidationErrors(monitor);
             expect(errors).toContain("Monitor status is required");
         });
 
-        it("should return error for invalid status", () => {
+        it("should return error for invalid status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 status: "invalid" as any,
@@ -125,7 +221,15 @@ describe("getMonitorValidationErrors", () => {
         });
 
         describe("checkInterval validation", () => {
-            it("should accept valid checkInterval", () => {
+            it("should accept valid checkInterval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { ...createBaseMonitor(), checkInterval: 5000 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).not.toContain(
@@ -133,7 +237,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for checkInterval too small", () => {
+            it("should return error for checkInterval too small", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = { ...createBaseMonitor(), checkInterval: 500 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain(
@@ -141,7 +253,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for non-number checkInterval", () => {
+            it("should return error for non-number checkInterval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = {
                     ...createBaseMonitor(),
                     checkInterval: "5000" as any,
@@ -152,7 +272,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should not validate undefined checkInterval", () => {
+            it("should not validate undefined checkInterval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.checkInterval;
                 const errors = getMonitorValidationErrors(monitor);
@@ -163,7 +291,15 @@ describe("getMonitorValidationErrors", () => {
         });
 
         describe("timeout validation", () => {
-            it("should accept valid timeout", () => {
+            it("should accept valid timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { ...createBaseMonitor(), timeout: 1000 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).not.toContain(
@@ -171,19 +307,43 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for zero timeout", () => {
+            it("should return error for zero timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = { ...createBaseMonitor(), timeout: 0 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain("Timeout must be a positive number");
             });
 
-            it("should return error for negative timeout", () => {
+            it("should return error for negative timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = { ...createBaseMonitor(), timeout: -1000 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain("Timeout must be a positive number");
             });
 
-            it("should return error for non-number timeout", () => {
+            it("should return error for non-number timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = {
                     ...createBaseMonitor(),
                     timeout: "5000" as any,
@@ -192,7 +352,15 @@ describe("getMonitorValidationErrors", () => {
                 expect(errors).toContain("Timeout must be a positive number");
             });
 
-            it("should not validate undefined timeout", () => {
+            it("should not validate undefined timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.timeout;
                 const errors = getMonitorValidationErrors(monitor);
@@ -203,7 +371,15 @@ describe("getMonitorValidationErrors", () => {
         });
 
         describe("retryAttempts validation", () => {
-            it("should accept valid retryAttempts", () => {
+            it("should accept valid retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { ...createBaseMonitor(), retryAttempts: 5 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).not.toContain(
@@ -211,7 +387,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should accept zero retryAttempts", () => {
+            it("should accept zero retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { ...createBaseMonitor(), retryAttempts: 0 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).not.toContain(
@@ -219,7 +403,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should accept maximum retryAttempts", () => {
+            it("should accept maximum retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
                 const monitor = { ...createBaseMonitor(), retryAttempts: 10 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).not.toContain(
@@ -227,7 +419,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for negative retryAttempts", () => {
+            it("should return error for negative retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = { ...createBaseMonitor(), retryAttempts: -1 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain(
@@ -235,7 +435,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for retryAttempts too high", () => {
+            it("should return error for retryAttempts too high", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = { ...createBaseMonitor(), retryAttempts: 11 };
                 const errors = getMonitorValidationErrors(monitor);
                 expect(errors).toContain(
@@ -243,7 +451,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should return error for non-number retryAttempts", () => {
+            it("should return error for non-number retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const monitor = {
                     ...createBaseMonitor(),
                     retryAttempts: "3" as any,
@@ -254,7 +470,15 @@ describe("getMonitorValidationErrors", () => {
                 );
             });
 
-            it("should not validate undefined retryAttempts", () => {
+            it("should not validate undefined retryAttempts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
                 const monitor = { ...createBaseMonitor() };
                 delete monitor.retryAttempts;
                 const errors = getMonitorValidationErrors(monitor);
@@ -266,7 +490,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("HTTP monitor validation", () => {
-        it("should return no errors for valid HTTP monitor", () => {
+        it("should return no errors for valid HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
@@ -276,7 +508,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return error for missing URL", () => {
+        it("should return error for missing URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
@@ -285,7 +525,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("URL is required for HTTP monitors");
         });
 
-        it("should return error for non-string URL", () => {
+        it("should return error for non-string URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
@@ -295,7 +543,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("URL is required for HTTP monitors");
         });
 
-        it("should return error for empty URL", () => {
+        it("should return error for empty URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "http" as const,
@@ -307,7 +563,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("ping monitor validation", () => {
-        it("should return no errors for valid ping monitor", () => {
+        it("should return no errors for valid ping monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
@@ -317,7 +581,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return error for missing host", () => {
+        it("should return error for missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
@@ -326,7 +598,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for ping monitors");
         });
 
-        it("should return error for non-string host", () => {
+        it("should return error for non-string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
@@ -336,7 +616,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for ping monitors");
         });
 
-        it("should return error for empty host", () => {
+        it("should return error for empty host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "ping" as const,
@@ -348,7 +636,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("port monitor validation", () => {
-        it("should return no errors for valid port monitor", () => {
+        it("should return no errors for valid port monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -359,7 +655,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return error for missing host", () => {
+        it("should return error for missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -369,7 +673,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for port monitors");
         });
 
-        it("should return error for non-string host", () => {
+        it("should return error for non-string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -380,7 +692,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for port monitors");
         });
 
-        it("should return error for empty host", () => {
+        it("should return error for empty host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -391,7 +711,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for port monitors");
         });
 
-        it("should return error for missing port", () => {
+        it("should return error for missing port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -403,7 +731,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for invalid port number", () => {
+        it("should return error for invalid port number", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -416,7 +752,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for port too high", () => {
+        it("should return error for port too high", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -429,7 +773,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for non-number port", () => {
+        it("should return error for non-number port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "port" as const,
@@ -442,7 +794,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should accept valid port numbers", () => {
+        it("should accept valid port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPorts = [
                 1,
                 80,
@@ -466,7 +826,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("DNS monitor validation", () => {
-        it("should return no errors for valid DNS monitor", () => {
+        it("should return no errors for valid DNS monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -477,7 +845,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return error for missing host", () => {
+        it("should return error for missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -487,7 +863,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for DNS monitors");
         });
 
-        it("should return error for non-string host", () => {
+        it("should return error for non-string host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -498,7 +882,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for DNS monitors");
         });
 
-        it("should return error for empty host", () => {
+        it("should return error for empty host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -509,7 +901,15 @@ describe("getMonitorValidationErrors", () => {
             expect(errors).toContain("Host is required for DNS monitors");
         });
 
-        it("should return error for missing recordType", () => {
+        it("should return error for missing recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -521,7 +921,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for non-string recordType", () => {
+        it("should return error for non-string recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -534,7 +942,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for empty recordType", () => {
+        it("should return error for empty recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -547,7 +963,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should accept valid DNS record types", () => {
+        it("should accept valid DNS record types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validRecordTypes = [
                 "A",
                 "AAAA",
@@ -578,7 +1002,15 @@ describe("getMonitorValidationErrors", () => {
             });
         });
 
-        it("should accept lowercase DNS record types", () => {
+        it("should accept lowercase DNS record types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -591,7 +1023,15 @@ describe("getMonitorValidationErrors", () => {
             );
         });
 
-        it("should return error for invalid DNS record type", () => {
+        it("should return error for invalid DNS record type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "dns" as const,
@@ -606,7 +1046,15 @@ describe("getMonitorValidationErrors", () => {
     });
 
     describe("unknown monitor type", () => {
-        it("should return error for unknown monitor type", () => {
+        it("should return error for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 ...createBaseMonitor(),
                 type: "unknown" as any,
@@ -616,7 +1064,15 @@ describe("getMonitorValidationErrors", () => {
         });
     });
 
-    it("should accumulate multiple validation errors", () => {
+    it("should accumulate multiple validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         const monitor = {
             type: "http" as const,
             checkInterval: 500,
@@ -642,20 +1098,52 @@ describe("validateSite", () => {
         monitors: [],
     });
 
-    it("should return true for valid site", () => {
+    it("should return true for valid site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         const site = createValidSite();
         expect(validateSite(site)).toBe(true);
     });
 
-    it("should return false for null", () => {
+    it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateSite(null as any)).toBe(false);
     });
 
-    it("should return false for undefined", () => {
+    it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateSite(undefined as any)).toBe(false);
     });
 
-    it("should return false for non-object values", () => {
+    it("should return false for non-object values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateSite("string" as any)).toBe(false);
         expect(validateSite(123 as any)).toBe(false);
         expect(validateSite(true as any)).toBe(false);
@@ -663,25 +1151,57 @@ describe("validateSite", () => {
     });
 
     describe("identifier validation", () => {
-        it("should return false for missing identifier", () => {
+        it("should return false for missing identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             delete (site as any).identifier;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for non-string identifier", () => {
+        it("should return false for non-string identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             (site as any).identifier = 123;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for empty identifier", () => {
+        it("should return false for empty identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             site.identifier = "";
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should accept non-empty string identifier", () => {
+        it("should accept non-empty string identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             site.identifier = "valid-id";
             expect(validateSite(site)).toBe(true);
@@ -689,25 +1209,57 @@ describe("validateSite", () => {
     });
 
     describe("name validation", () => {
-        it("should return false for missing name", () => {
+        it("should return false for missing name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             delete (site as any).name;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for non-string name", () => {
+        it("should return false for non-string name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             (site as any).name = 123;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for empty name", () => {
+        it("should return false for empty name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             site.name = "";
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should accept non-empty string name", () => {
+        it("should accept non-empty string name", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = createValidSite();
             site.name = "Valid Name";
             expect(validateSite(site)).toBe(true);
@@ -715,25 +1267,57 @@ describe("validateSite", () => {
     });
 
     describe("monitoring validation", () => {
-        it("should return false for missing monitoring", () => {
+        it("should return false for missing monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             delete (site as any).monitoring;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for non-boolean monitoring", () => {
+        it("should return false for non-boolean monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             (site as any).monitoring = "true";
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should accept true monitoring", () => {
+        it("should accept true monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             site.monitoring = true;
             expect(validateSite(site)).toBe(true);
         });
 
-        it("should accept false monitoring", () => {
+        it("should accept false monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             site.monitoring = false;
             expect(validateSite(site)).toBe(true);
@@ -741,25 +1325,57 @@ describe("validateSite", () => {
     });
 
     describe("monitors validation", () => {
-        it("should return false for missing monitors", () => {
+        it("should return false for missing monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             delete (site as any).monitors;
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should return false for non-array monitors", () => {
+        it("should return false for non-array monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             (site as any).monitors = "not-array";
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should accept empty monitors array", () => {
+        it("should accept empty monitors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = createValidSite();
             site.monitors = [];
             expect(validateSite(site)).toBe(true);
         });
 
-        it("should validate each monitor in the array", () => {
+        it("should validate each monitor in the array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const validMonitor: Monitor = {
                 id: "test-monitor",
                 type: "http",
@@ -778,7 +1394,15 @@ describe("validateSite", () => {
             expect(validateSite(site)).toBe(true);
         });
 
-        it("should return false if any monitor is invalid", () => {
+        it("should return false if any monitor is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor = {
                 // Missing required fields
                 type: "http",
@@ -789,7 +1413,15 @@ describe("validateSite", () => {
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should handle mixed valid and invalid monitors", () => {
+        it("should handle mixed valid and invalid monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validMonitor: Monitor = {
                 id: "test-monitor",
                 type: "http",
@@ -813,7 +1445,15 @@ describe("validateSite", () => {
         });
     });
 
-    it("should return false for partial site objects", () => {
+    it("should return false for partial site objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-extras", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         expect(validateSite({})).toBe(false);
         expect(validateSite({ identifier: "test" })).toBe(false);
         expect(

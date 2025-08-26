@@ -107,7 +107,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render history tab with basic elements", () => {
+        it("should render history tab with basic elements", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             // Check if basic elements are present
@@ -115,7 +125,17 @@ describe("HistoryTab", () => {
             expect(indicators.length).toBeGreaterThan(0);
         });
 
-        it("should handle empty history gracefully", () => {
+        it("should handle empty history gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitorWithoutHistory = createMockMonitor(0);
             render(
                 <HistoryTab
@@ -128,7 +148,17 @@ describe("HistoryTab", () => {
             expect(screen.getByText(/no records found/i)).toBeInTheDocument();
         });
 
-        it("should handle monitor with large history", () => {
+        it("should handle monitor with large history", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorWithLargeHistory = createMockMonitor(100);
             render(
                 <HistoryTab
@@ -142,7 +172,17 @@ describe("HistoryTab", () => {
             expect(indicators.length).toBeLessThanOrEqual(25); // default limit
         });
 
-        it("should call formatting functions", () => {
+        it("should call formatting functions", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             expect(mockFormatFullTimestamp).toHaveBeenCalled();
@@ -152,7 +192,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with undefined history", () => {
+        it("should handle monitor with undefined history", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorWithUndefinedHistory = {
                 ...createMockMonitor(),
                 history: [],
@@ -168,7 +218,17 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle history records with missing fields", () => {
+        it("should handle history records with missing fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitorWithIncompleteHistory = {
                 ...createMockMonitor(),
                 history: [

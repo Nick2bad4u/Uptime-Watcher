@@ -185,7 +185,15 @@ describe("ServiceContainer - Working Tests", () => {
     });
 
     describe("Service Creation Tests", () => {
-        it("should create SiteManager with getSitesCache method", () => {
+        it("should create SiteManager with getSitesCache method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteManager = container.getSiteManager();
 
             expect(siteManager).toBeDefined();
@@ -196,19 +204,43 @@ describe("ServiceContainer - Working Tests", () => {
             expect(cache).toBeDefined();
         });
 
-        it("should create MonitorManager singleton with dependencies", () => {
+        it("should create MonitorManager singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitorManager = container.getMonitorManager();
 
             expect(monitorManager).toBeDefined();
         });
 
-        it("should create UptimeOrchestrator singleton with dependencies", () => {
+        it("should create UptimeOrchestrator singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const uptimeOrchestrator = container.getUptimeOrchestrator();
 
             expect(uptimeOrchestrator).toBeDefined();
         });
 
-        it("should create IpcService singleton with dependencies", () => {
+        it("should create IpcService singleton with dependencies", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const ipcService = container.getIpcService();
 
             expect(ipcService).toBeDefined();
@@ -216,7 +248,15 @@ describe("ServiceContainer - Working Tests", () => {
     });
 
     describe("Initialization Process", () => {
-        it("should initialize all services in correct order", () => {
+        it("should initialize all services in correct order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitorManager = container.getMonitorManager();
             const siteManager = container.getSiteManager();
 
@@ -227,7 +267,15 @@ describe("ServiceContainer - Working Tests", () => {
     });
 
     describe("Status and Diagnostics", () => {
-        it("should return correct initialization status for services", () => {
+        it("should return correct initialization status for services", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const monitorManager = container.getMonitorManager();
             const siteManager = container.getSiteManager();
 
@@ -240,7 +288,15 @@ describe("ServiceContainer - Working Tests", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle orchestrator access when initialized", () => {
+        it("should handle orchestrator access when initialized", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             const uptimeOrchestrator = container.getUptimeOrchestrator();
             const ipcService = container.getIpcService();
 
@@ -248,7 +304,15 @@ describe("ServiceContainer - Working Tests", () => {
             expect(ipcService).toBeDefined();
         });
 
-        it("should handle service creation order independence", () => {
+        it("should handle service creation order independence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteManager = container.getSiteManager();
             const monitorManager = container.getMonitorManager();
 
@@ -256,7 +320,15 @@ describe("ServiceContainer - Working Tests", () => {
             expect(monitorManager).toBeDefined();
         });
 
-        it("should handle empty configuration", () => {
+        it("should handle empty configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ServiceContainer", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that container works even with minimal setup
             const container = ServiceContainer.getInstance();
 

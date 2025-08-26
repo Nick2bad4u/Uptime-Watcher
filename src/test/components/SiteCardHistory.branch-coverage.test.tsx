@@ -69,7 +69,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should process monitor when monitor is defined", () => {
+        it("should process monitor when monitor is defined", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -98,7 +108,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Monitor Type Option Finding Branches", () => {
-        it("should use monitor type label when option is found", () => {
+        it("should use monitor type label when option is found", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -125,7 +145,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should fallback to monitor.type when option is not found", () => {
+        it("should fallback to monitor.type when option is not found", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "unknown_type" as any,
@@ -154,7 +184,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Monitor Type Specific Branches", () => {
-        it("should handle HTTP monitor with URL", () => {
+        it("should handle HTTP monitor with URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -181,7 +221,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle port monitor with host and port", () => {
+        it("should handle port monitor with host and port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "port",
@@ -209,7 +259,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle ping monitor without URL or port", () => {
+        it("should handle ping monitor without URL or port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "ping",
@@ -238,7 +298,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Props Comparison Function Branches", () => {
-        it("should handle different history lengths", () => {
+        it("should handle different history lengths", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -265,7 +335,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             expect(screen.getByTestId("chart-items")).toHaveTextContent("1");
         });
 
-        it("should handle empty history arrays", () => {
+        it("should handle empty history arrays", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -285,7 +365,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             expect(screen.getByTestId("chart-items")).toHaveTextContent("0");
         });
 
-        it("should handle both monitor and no monitor cases", () => {
+        it("should handle both monitor and no monitor cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Test the case where both monitors are undefined
             render(
                 <SiteCardHistory filteredHistory={[]} monitor={undefined} />
@@ -296,7 +386,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor property differences", () => {
+        it("should handle monitor property differences", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor1: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -323,7 +423,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle different monitor types", () => {
+        it("should handle different monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const portMonitor: Monitor = {
                 id: "mon2",
                 type: "port",
@@ -351,7 +461,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor ID differences", () => {
+        it("should handle monitor ID differences", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "different-id",
                 type: "http",
@@ -380,7 +500,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     });
 
     describe("Edge Cases and Complex Scenarios", () => {
-        it("should handle monitor with all optional properties undefined", () => {
+        it("should handle monitor with all optional properties undefined", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "ping",
@@ -406,7 +536,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle monitor with partial properties", () => {
+        it("should handle monitor with partial properties", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "port",
@@ -434,7 +574,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should verify maxItems is passed correctly", () => {
+        it("should verify maxItems is passed correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",
@@ -461,7 +611,17 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             );
         });
 
-        it("should handle very long monitor URLs", () => {
+        it("should handle very long monitor URLs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "mon1",
                 type: "http",

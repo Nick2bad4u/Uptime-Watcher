@@ -53,7 +53,12 @@ describe("MonitorManager", () => {
         manager = new MonitorManager(dependencies, enhancedServices);
     });
 
-    it("should construct without error", async ({ annotate }) => {
+    it("should construct without error", async ({ annotate, task }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorManager", "component");
+            annotate("Category: Manager", "category");
+            annotate("Type: Error Handling", "type");
+
         await annotate("Component: MonitorManager", "component");
         await annotate("Test Type: Unit - Constructor", "test-type");
         await annotate("Operation: Manager Instantiation", "operation");
@@ -74,7 +79,12 @@ describe("MonitorManager", () => {
         expect(manager).toBeDefined();
     });
 
-    it("should get active monitor count (default 0)", async ({ annotate }) => {
+    it("should get active monitor count (default 0)", async ({ annotate, task }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorManager", "component");
+            annotate("Category: Manager", "category");
+            annotate("Type: Data Retrieval", "type");
+
         await annotate("Component: MonitorManager", "component");
         await annotate("Test Type: Unit - State Query", "test-type");
         await annotate(
@@ -95,7 +105,12 @@ describe("MonitorManager", () => {
         expect(manager.getActiveMonitorCount()).toBe(0);
     });
 
-    it("should return false for isMonitoringActive()", async ({ annotate }) => {
+    it("should return false for isMonitoringActive()", async ({ annotate, task }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorManager", "component");
+            annotate("Category: Manager", "category");
+            annotate("Type: Monitoring", "type");
+
         await annotate("Component: MonitorManager", "component");
         await annotate("Test Type: Unit - State Query", "test-type");
         await annotate(
@@ -116,7 +131,12 @@ describe("MonitorManager", () => {
         expect(manager.isMonitoringActive()).toBe(false);
     });
 
-    it("should call checkSiteManually and emit event", async ({ annotate }) => {
+    it("should call checkSiteManually and emit event", async ({ annotate, task }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: MonitorManager", "component");
+            annotate("Category: Manager", "category");
+            annotate("Type: Event Processing", "type");
+
         await annotate("Component: MonitorManager", "component");
         await annotate(
             "Test Type: Integration - Manual Check Flow",

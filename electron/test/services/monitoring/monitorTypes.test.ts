@@ -12,21 +12,45 @@ import type { MonitorType } from "../../../../shared/types.js";
 
 describe("Monitor Types Utility", () => {
     describe("getBaseMonitorTypes", () => {
-        it("should return array of base monitor types", () => {
+        it("should return array of base monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const types = getBaseMonitorTypes();
 
             expect(Array.isArray(types)).toBe(true);
             expect(types.length).toBeGreaterThan(0);
         });
 
-        it("should include http and port types", () => {
+        it("should include http and port types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types = getBaseMonitorTypes();
 
             expect(types).toContain("http");
             expect(types).toContain("port");
         });
 
-        it("should return a new array each time (not mutate original)", () => {
+        it("should return a new array each time (not mutate original)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types1 = getBaseMonitorTypes();
             const types2 = getBaseMonitorTypes();
 
@@ -40,7 +64,15 @@ describe("Monitor Types Utility", () => {
             expect(types2).not.toContain("fake");
         });
 
-        it("should return only base types (including dns)", () => {
+        it("should return only base types (including dns)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types = getBaseMonitorTypes();
 
             // Should only contain known base types
@@ -54,14 +86,30 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should maintain consistent ordering", () => {
+        it("should maintain consistent ordering", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types1 = getBaseMonitorTypes();
             const types2 = getBaseMonitorTypes();
 
             expect(types1).toEqual(types2);
         });
 
-        it("should return non-empty array", () => {
+        it("should return non-empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types = getBaseMonitorTypes();
 
             expect(types.length).toBeGreaterThan(0);
@@ -69,47 +117,111 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("isBaseMonitorType", () => {
-        it("should return true for valid base monitor types", () => {
+        it("should return true for valid base monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isBaseMonitorType("http")).toBe(true);
             expect(isBaseMonitorType("port")).toBe(true);
         });
 
-        it("should return false for invalid monitor types", () => {
+        it("should return false for invalid monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isBaseMonitorType("invalid")).toBe(false);
             expect(isBaseMonitorType("tcp")).toBe(false);
         });
 
-        it("should return false for empty string", () => {
+        it("should return false for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType("")).toBe(false);
         });
 
-        it("should return false for null and undefined", () => {
+        it("should return false for null and undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType(null as any)).toBe(false);
             expect(isBaseMonitorType(undefined as any)).toBe(false);
         });
 
-        it("should return false for non-string types", () => {
+        it("should return false for non-string types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType(123 as any)).toBe(false);
             expect(isBaseMonitorType(true as any)).toBe(false);
             expect(isBaseMonitorType({} as any)).toBe(false);
             expect(isBaseMonitorType([] as any)).toBe(false);
         });
 
-        it("should be case sensitive", () => {
+        it("should be case sensitive", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType("HTTP")).toBe(false);
             expect(isBaseMonitorType("Http")).toBe(false);
             expect(isBaseMonitorType("PORT")).toBe(false);
             expect(isBaseMonitorType("Port")).toBe(false);
         });
 
-        it("should handle whitespace correctly", () => {
+        it("should handle whitespace correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType(" http")).toBe(false);
             expect(isBaseMonitorType("http ")).toBe(false);
             expect(isBaseMonitorType(" http ")).toBe(false);
             expect(isBaseMonitorType("\thttp\n")).toBe(false);
         });
 
-        it("should work with all base monitor types", () => {
+        it("should work with all base monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const baseTypes = getBaseMonitorTypes();
 
             for (const type of baseTypes) {
@@ -117,7 +229,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should provide proper type narrowing", () => {
+        it("should provide proper type narrowing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const unknownType = "http";
 
             if (isBaseMonitorType(unknownType)) {
@@ -129,7 +249,15 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("MonitorType Type Definition", () => {
-        it("should allow assignment of valid monitor types", () => {
+        it("should allow assignment of valid monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpType: MonitorType = "http";
             const portType: MonitorType = "port";
 
@@ -137,7 +265,15 @@ describe("Monitor Types Utility", () => {
             expect(portType).toBe("port");
         });
 
-        it("should work in arrays and objects", () => {
+        it("should work in arrays and objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const types: MonitorType[] = ["http", "port"];
             const config: { type: MonitorType; enabled: boolean } = {
                 type: "http",
@@ -148,7 +284,15 @@ describe("Monitor Types Utility", () => {
             expect(config.type).toBe("http");
         });
 
-        it("should work with conditional logic", () => {
+        it("should work with conditional logic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             function testMonitorType(type: MonitorType) {
                 switch (type) {
                     case "http": {
@@ -169,7 +313,15 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("Integration with Base Types", () => {
-        it("should maintain consistency with getBaseMonitorTypes", () => {
+        it("should maintain consistency with getBaseMonitorTypes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const baseTypes = getBaseMonitorTypes();
 
             // All returned types should be valid according to isBaseMonitorType
@@ -178,7 +330,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should handle all base types consistently", () => {
+        it("should handle all base types consistently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseTypes = getBaseMonitorTypes();
 
             // Test that isBaseMonitorType works for all base types
@@ -195,7 +355,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should not include extended or dynamic types (excluding custom)", () => {
+        it("should not include extended or dynamic types (excluding custom)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const baseTypes = getBaseMonitorTypes();
 
             // Should only include the core built-in types
@@ -205,7 +373,15 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("Error Handling and Edge Cases", () => {
-        it("should handle malformed input gracefully", () => {
+        it("should handle malformed input gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const malformedInputs = [
                 "http\0",
                 "http\t",
@@ -221,7 +397,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should handle unicode and special characters", () => {
+        it("should handle unicode and special characters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const specialInputs = [
                 "http🚀",
                 "pört",
@@ -234,12 +418,28 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should handle very long strings", () => {
+        it("should handle very long strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const longString = `http${"x".repeat(1000)}`;
             expect(isBaseMonitorType(longString)).toBe(false);
         });
 
-        it("should handle numeric strings that might look like types", () => {
+        it("should handle numeric strings that might look like types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isBaseMonitorType("80")).toBe(false);
             expect(isBaseMonitorType("443")).toBe(false);
             expect(isBaseMonitorType("8080")).toBe(false);
@@ -247,7 +447,15 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("Performance Considerations", () => {
-        it("should handle repeated calls efficiently", () => {
+        it("should handle repeated calls efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test that repeated calls don't cause issues
             for (let i = 0; i < 100; i++) {
                 expect(isBaseMonitorType("http")).toBe(true);
@@ -255,7 +463,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should handle large arrays of types efficiently", () => {
+        it("should handle large arrays of types efficiently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const testTypes = [
                 ...Array.from({ length: 50 }).fill("http"),
                 ...Array.from({ length: 50 }).fill("port"),
@@ -270,7 +486,15 @@ describe("Monitor Types Utility", () => {
     });
 
     describe("Documentation Examples", () => {
-        it("should support documented usage patterns", () => {
+        it("should support documented usage patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Example from JSDoc
             const baseTypes = getBaseMonitorTypes(); // ["http", "port"]
             expect(baseTypes).toEqual(expect.arrayContaining(["http", "port"]));
@@ -282,7 +506,15 @@ describe("Monitor Types Utility", () => {
             }
         });
 
-        it("should work in conditional type checking scenarios", () => {
+        it("should work in conditional type checking scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypes", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             function processMonitorType(type: string) {
                 if (isBaseMonitorType(type)) {
                     // Type is now narrowed to MonitorType

@@ -17,7 +17,17 @@ import ThemeProvider from "../theme/components/ThemeProvider";
 
 describe("Additional Branch Coverage Tests", () => {
     describe("RadioGroup Component", () => {
-        it("should handle custom onChange callback", () => {
+        it("should handle custom onChange callback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnChange = vi.fn();
             const options = [
                 { value: "option1", label: "Option 1" },
@@ -43,7 +53,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(mockOnChange).toHaveBeenCalledWith("option2");
         });
 
-        it("should handle selection of different radio options", () => {
+        it("should handle selection of different radio options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockOnChange = vi.fn();
             const options = [
                 { value: "new", label: "New Site" },
@@ -70,7 +90,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(mockOnChange).toHaveBeenCalledWith("existing");
         });
 
-        it("should render all radio options correctly", () => {
+        it("should render all radio options correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const options = [
                 { value: "http", label: "HTTP Monitor" },
                 { value: "port", label: "Port Monitor" },
@@ -97,7 +127,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("SettingItem Component", () => {
-        it("should render control when provided", () => {
+        it("should render control when provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <SettingItem
@@ -113,7 +153,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Test Setting")).toBeInTheDocument();
         });
 
-        it("should render description when provided", () => {
+        it("should render description when provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <SettingItem
@@ -129,7 +179,17 @@ describe("Additional Branch Coverage Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle disabled state", () => {
+        it("should handle disabled state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <SettingItem
@@ -145,7 +205,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("ThemedBox Component", () => {
-        it("should handle different variant combinations", () => {
+        it("should handle different variant combinations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test default variant
             const { rerender } = render(
                 <ThemeProvider>
@@ -174,7 +244,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Secondary Box")).toBeInTheDocument();
         });
 
-        it("should handle custom className and style props", () => {
+        it("should handle custom className and style props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <ThemedBox
@@ -189,7 +269,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Styled Box")).toBeInTheDocument();
         });
 
-        it("should render children content correctly", () => {
+        it("should render children content correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <ThemedBox>
@@ -203,7 +293,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("ThemedProgress Component", () => {
-        it("should handle different progress value ranges", () => {
+        it("should handle different progress value ranges", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test 0% progress
             const { rerender } = render(
                 <ThemeProvider>
@@ -232,7 +332,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle different size variants", () => {
+        it("should handle different size variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test small size
             const { rerender } = render(
                 <ThemeProvider>
@@ -261,7 +371,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle different color variants", () => {
+        it("should handle different color variants", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test primary color
             const { rerender } = render(
                 <ThemeProvider>
@@ -299,7 +419,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle progress with label", () => {
+        it("should handle progress with label", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <ThemedProgress
@@ -314,7 +444,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle extra small size", () => {
+        it("should handle extra small size", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <ThemedProgress value={25} size="xs" />
@@ -326,7 +466,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("IconUtils Utility Functions", () => {
-        it("should handle getIconColorClass function with all color types", () => {
+        it("should handle getIconColorClass function with all color types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             // Test danger/error color
             expect(getIconColorClass("danger")).toBe("themed-icon--error");
             expect(getIconColorClass("error")).toBe("themed-icon--error");
@@ -349,15 +499,45 @@ describe("Additional Branch Coverage Tests", () => {
             expect(getIconColorClass("warning")).toBe("themed-icon--warning");
         });
 
-        it("should handle undefined color gracefully", () => {
+        it("should handle undefined color gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(getIconColorClass(undefined)).toBeUndefined();
         });
 
-        it("should handle empty string color", () => {
+        it("should handle empty string color", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             expect(getIconColorClass("")).toBeUndefined();
         });
 
-        it("should handle custom color values", () => {
+        it("should handle custom color values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test hex color
             expect(getIconColorClass("#ff0000")).toBeUndefined();
 
@@ -370,7 +550,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("Error Boundary and Edge Cases", () => {
-        it("should handle components with missing props gracefully", () => {
+        it("should handle components with missing props gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test RadioGroup with minimal props
             render(
                 <ThemeProvider>
@@ -389,7 +579,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.queryByRole("radio")).not.toBeInTheDocument();
         });
 
-        it("should handle ThemedBox with all prop combinations", () => {
+        it("should handle ThemedBox with all prop combinations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <ThemedBox
@@ -406,7 +606,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Full Box Content")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress edge cases with high values", () => {
+        it("should handle ThemedProgress edge cases with high values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test with very high values
             render(
                 <ThemeProvider>
@@ -417,7 +627,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress edge cases with negative values", () => {
+        it("should handle ThemedProgress edge cases with negative values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test with negative values
             render(
                 <ThemeProvider>
@@ -428,7 +648,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress percentage calculation with zero max", () => {
+        it("should handle ThemedProgress percentage calculation with zero max", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test with zero max
             render(
                 <ThemeProvider>
@@ -439,7 +669,17 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByRole("progressbar")).toBeInTheDocument();
         });
 
-        it("should handle ThemedProgress percentage calculation with negative max", () => {
+        it("should handle ThemedProgress percentage calculation with negative max", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test with negative max
             render(
                 <ThemeProvider>
@@ -452,7 +692,17 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("Component State Management", () => {
-        it("should handle RadioGroup state changes", () => {
+        it("should handle RadioGroup state changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             let currentValue = "option1";
             const handleChange = (value: string) => {
                 currentValue = value;

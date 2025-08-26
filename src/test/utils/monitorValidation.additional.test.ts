@@ -13,7 +13,15 @@ import type {
 
 describe("monitorValidation functions - Additional Coverage", () => {
     describe("validateMonitorFormData - DNS validation", () => {
-        it("should validate valid DNS form data", async () => {
+        it("should validate valid DNS form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 host: "example.com",
@@ -28,7 +36,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should validate DNS form data with expectedValue", async () => {
+        it("should validate DNS form data with expectedValue", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 host: "example.com",
@@ -44,7 +60,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should reject DNS form data with missing host", async () => {
+        it("should reject DNS form data with missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 recordType: "A",
@@ -59,7 +83,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject DNS form data with invalid host type", async () => {
+        it("should reject DNS form data with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "dns",
                 host: 123, // Invalid type
@@ -75,7 +107,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject DNS form data with missing recordType", async () => {
+        it("should reject DNS form data with missing recordType", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 host: "example.com",
@@ -90,7 +130,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject DNS form data with invalid recordType type", async () => {
+        it("should reject DNS form data with invalid recordType type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "dns",
                 host: "example.com",
@@ -106,7 +154,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should handle DNS form data with empty expectedValue", async () => {
+        it("should handle DNS form data with empty expectedValue", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 host: "example.com",
@@ -118,7 +174,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle DNS form data with whitespace-only expectedValue", async () => {
+        it("should handle DNS form data with whitespace-only expectedValue", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<DnsFormData> = {
                 type: "dns",
                 host: "example.com",
@@ -132,7 +196,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
     });
 
     describe("validateMonitorFormData - Port validation", () => {
-        it("should validate valid port form data", async () => {
+        it("should validate valid port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const data: Partial<PortFormData> = {
                 type: "port",
                 host: "example.com",
@@ -147,7 +219,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should reject port form data with missing host", async () => {
+        it("should reject port form data with missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<PortFormData> = {
                 type: "port",
                 port: 80,
@@ -162,7 +242,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject port form data with invalid host type", async () => {
+        it("should reject port form data with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: 123, // Invalid type
@@ -178,7 +266,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject port form data with missing port", async () => {
+        it("should reject port form data with missing port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<PortFormData> = {
                 type: "port",
                 host: "example.com",
@@ -193,7 +289,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject port form data with invalid port type", async () => {
+        it("should reject port form data with invalid port type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "port",
                 host: "example.com",
@@ -211,7 +315,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
     });
 
     describe("validateMonitorFormData - Ping validation", () => {
-        it("should validate valid ping form data", async () => {
+        it("should validate valid ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const data: Partial<PingFormData> = {
                 type: "ping",
                 host: "example.com",
@@ -225,7 +337,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should reject ping form data with missing host", async () => {
+        it("should reject ping form data with missing host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<PingFormData> = {
                 type: "ping",
             };
@@ -239,7 +359,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject ping form data with invalid host type", async () => {
+        it("should reject ping form data with invalid host type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "ping",
                 host: 123, // Invalid type
@@ -256,7 +384,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
     });
 
     describe("validateMonitorFormData - HTTP validation", () => {
-        it("should validate valid HTTP form data", async () => {
+        it("should validate valid HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const data: Partial<HttpFormData> = {
                 type: "http",
                 url: "https://example.com",
@@ -270,7 +406,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should reject HTTP form data with missing url", async () => {
+        it("should reject HTTP form data with missing url", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data: Partial<HttpFormData> = {
                 type: "http",
             };
@@ -282,7 +426,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             ).toBe(true);
         });
 
-        it("should reject HTTP form data with invalid url type", async () => {
+        it("should reject HTTP form data with invalid url type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 type: "http",
                 url: 123, // Invalid type
@@ -297,7 +449,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
     });
 
     describe("validateMonitorFormData - Edge cases", () => {
-        it("should handle unknown monitor types", async () => {
+        it("should handle unknown monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const data = {
                 type: "unknown-type",
             };
@@ -308,7 +468,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result).toHaveProperty("errors");
         });
 
-        it("should handle invalid data structure", async () => {
+        it("should handle invalid data structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = await validateMonitorFormData("http", null as any);
             expect(result1.success).toBe(false);
 
@@ -325,7 +493,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             expect(result3.success).toBe(false);
         });
 
-        it("should handle empty object", async () => {
+        it("should handle empty object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorValidation.additional", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await validateMonitorFormData("http", {} as any);
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);

@@ -12,7 +12,15 @@ import {
 
 describe("schemas.ts - Function Coverage Completion", () => {
     describe("validateSiteData - Success Path Coverage", () => {
-        it("should successfully validate a complete site with monitors", () => {
+        it("should successfully validate a complete site with monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validSite = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -41,7 +49,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             expect(result.metadata?.monitorCount).toBe(1);
         });
 
-        it("should validate site with minimum required fields", () => {
+        it("should validate site with minimum required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validSiteMinimal = {
                 identifier: "minimal-site",
                 name: "Minimal Site",
@@ -70,7 +86,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
     });
 
     describe("validateMonitorData - Success Path Coverage", () => {
-        it("should successfully validate HTTP monitor data", () => {
+        it("should successfully validate HTTP monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validHttpMonitor = {
                 id: "http-monitor",
                 type: "http",
@@ -90,7 +114,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             expect(result.errors).toEqual([]);
         });
 
-        it("should successfully validate DNS monitor data", () => {
+        it("should successfully validate DNS monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validDnsMonitor = {
                 id: "dns-monitor",
                 type: "dns",
@@ -112,7 +144,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             expect(result.errors).toEqual([]);
         });
 
-        it("should successfully validate PORT monitor data", () => {
+        it("should successfully validate PORT monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const validPortMonitor = {
                 id: "port-monitor",
                 type: "port",
@@ -135,7 +175,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
     });
 
     describe("validateMonitorField - Known Field Coverage", () => {
-        it("should validate HTTP monitor specific fields successfully", () => {
+        it("should validate HTTP monitor specific fields successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // HTTP monitors only have 'url' as type-specific field
             const result = validateMonitorField(
                 "http",
@@ -146,7 +194,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             expect(result.metadata?.fieldName).toBe("url");
         });
 
-        it("should validate DNS monitor specific fields successfully", () => {
+        it("should validate DNS monitor specific fields successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const dnsFields = [
                 { field: "host", value: "example.com" },
                 { field: "recordType", value: "A" },
@@ -160,7 +216,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             });
         });
 
-        it("should validate PORT monitor specific fields successfully", () => {
+        it("should validate PORT monitor specific fields successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const portFields = [
                 { field: "host", value: "example.com" },
                 { field: "port", value: 443 },
@@ -173,7 +237,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
             });
         });
 
-        it("should validate common monitor fields for all types", () => {
+        it("should validate common monitor fields for all types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const commonFieldsWithoutType = [
                 { field: "checkInterval", value: 30000 },
                 { field: "id", value: "test-id" },
@@ -213,7 +285,15 @@ describe("schemas.ts - Function Coverage Completion", () => {
     });
 
     describe("All Three Functions Comprehensive Coverage", () => {
-        it("should exercise all validation functions for complete coverage", () => {
+        it("should exercise all validation functions for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas-function-coverage-complete", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test validateSiteData success path
             const site = {
                 identifier: "coverage-site",

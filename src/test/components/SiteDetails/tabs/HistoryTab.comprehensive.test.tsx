@@ -217,7 +217,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render history tab with all main sections", () => {
+        it("should render history tab with all main sections", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             expect(document.querySelectorAll(".themed-card")).toHaveLength(2); // History Filters and Check History cards
@@ -227,14 +237,34 @@ describe("HistoryTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display filter buttons for all, up, and down", () => {
+        it("should display filter buttons for all, up, and down", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             const buttons = document.querySelectorAll(".themed-button");
             expect(buttons).toHaveLength(3); // All, Up, Down filter buttons
         });
 
-        it("should display history records when available", () => {
+        it("should display history records when available", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(3);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -244,7 +274,17 @@ describe("HistoryTab", () => {
             ).toHaveLength(3);
         });
 
-        it("should display empty state when no history available", () => {
+        it("should display empty state when no history available", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(0);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -312,7 +352,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Display Limits and Pagination", () => {
-        it("should respect settings history limit", () => {
+        it("should respect settings history limit", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             vi.mocked(useSettingsStore).mockReturnValue({
                 settings: { historyLimit: 10 },
                 initializeSettings: vi.fn(),
@@ -330,7 +380,17 @@ describe("HistoryTab", () => {
             ).toHaveLength(10);
         });
 
-        it("should show all available records when history is less than limit", () => {
+        it("should show all available records when history is less than limit", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             vi.mocked(useSettingsStore).mockReturnValue({
                 settings: { historyLimit: 100 },
                 initializeSettings: vi.fn(),
@@ -347,7 +407,17 @@ describe("HistoryTab", () => {
             ).toHaveLength(5);
         });
 
-        it("should handle display limit dropdown changes", async () => {
+        it("should handle display limit dropdown changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
             const monitor = createMockMonitor(50);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -365,7 +435,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Data Formatting", () => {
-        it("should call formatting functions with correct parameters", () => {
+        it("should call formatting functions with correct parameters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(2);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
@@ -374,7 +454,17 @@ describe("HistoryTab", () => {
             expect(mockFormatStatusWithIcon).toHaveBeenCalled();
         });
 
-        it("should display formatted timestamps", () => {
+        it("should display formatted timestamps", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(1);
             const timestamp = Date.now();
             if (monitor.history[0]) {
@@ -386,7 +476,17 @@ describe("HistoryTab", () => {
             expect(mockFormatFullTimestamp).toHaveBeenCalledWith(timestamp);
         });
 
-        it("should display formatted response times", () => {
+        it("should display formatted response times", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(1);
             if (monitor.history[0]) {
                 monitor.history[0].responseTime = 250;
@@ -397,7 +497,17 @@ describe("HistoryTab", () => {
             expect(mockFormatResponseTime).toHaveBeenCalledWith(250);
         });
 
-        it("should display formatted status with icons", () => {
+        it("should display formatted status with icons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(1);
             if (monitor.history[0]) {
                 monitor.history[0].status = "up";
@@ -410,14 +520,34 @@ describe("HistoryTab", () => {
     });
 
     describe("Theme Integration", () => {
-        it("should use theme colors for icons", () => {
+        it("should use theme colors for icons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             expect(vi.mocked(useTheme)).toHaveBeenCalled();
             // Theme colors should be applied to filter and history icons
         });
 
-        it("should handle theme changes", () => {
+        it("should handle theme changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(<HistoryTab {...defaultProps} />);
 
             // Change theme
@@ -518,7 +648,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with undefined history", () => {
+        it("should handle monitor with undefined history", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = { ...createMockMonitor(0), history: [] };
 
             // The component should handle empty history gracefully
@@ -526,7 +666,17 @@ describe("HistoryTab", () => {
             expect(screen.getByText("No records found")).toBeInTheDocument();
         });
 
-        it("should handle very large history arrays", () => {
+        it("should handle very large history arrays", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(1000);
 
             expect(() =>
@@ -536,7 +686,17 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle missing settings gracefully", () => {
+        it("should handle missing settings gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             vi.mocked(useSettingsStore).mockReturnValue({
                 settings: {},
                 initializeSettings: vi.fn(),
@@ -553,7 +713,17 @@ describe("HistoryTab", () => {
             ).not.toThrow();
         });
 
-        it("should handle history records with missing fields", () => {
+        it("should handle history records with missing fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const monitor = createMockMonitor(1);
             monitor.history[0] = {
                 timestamp: Date.now(),
@@ -570,7 +740,17 @@ describe("HistoryTab", () => {
     });
 
     describe("User Interactions", () => {
-        it("should update filter state when filter buttons are clicked", async () => {
+        it("should update filter state when filter buttons are clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             const upButton = screen.getByRole("button", { name: /up/i });
@@ -588,7 +768,17 @@ describe("HistoryTab", () => {
             expect(allButton).toBeInTheDocument();
         });
 
-        it("should handle rapid filter changes", async () => {
+        it("should handle rapid filter changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             const upButton = screen.getByRole("button", { name: "✅ Up" });
@@ -606,7 +796,17 @@ describe("HistoryTab", () => {
     });
 
     describe("Accessibility", () => {
-        it("should provide accessible filter buttons", () => {
+        it("should provide accessible filter buttons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             const buttons = document.querySelectorAll(".themed-button");
@@ -616,7 +816,17 @@ describe("HistoryTab", () => {
             }
         });
 
-        it("should provide accessible select dropdown", () => {
+        it("should provide accessible select dropdown", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<HistoryTab {...defaultProps} />);
 
             const select = document.querySelector(".themed-select");

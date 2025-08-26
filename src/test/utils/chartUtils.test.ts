@@ -13,7 +13,15 @@ import { hasScales } from "../../../shared/types/chartConfig";
 
 describe("Chart Utilities", () => {
     describe("hasScales", () => {
-        it("should return true for valid scale configuration", () => {
+        it("should return true for valid scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { title: { text: "X Axis" } },
@@ -23,7 +31,15 @@ describe("Chart Utilities", () => {
             expect(hasScales(config)).toBe(true);
         });
 
-        it("should return true for partial scale configuration", () => {
+        it("should return true for partial scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { title: { text: "X Axis" } },
@@ -33,29 +49,69 @@ describe("Chart Utilities", () => {
             expect(hasScales(config)).toBe(true);
         });
 
-        it("should return true for empty scales object", () => {
+        it("should return true for empty scales object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {},
             };
             expect(hasScales(config)).toBe(true);
         });
 
-        it("should return false for null config", () => {
+        it("should return false for null config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales(null)).toBe(false);
         });
 
-        it("should return false for undefined config", () => {
+        it("should return false for undefined config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales(undefined)).toBe(false);
         });
 
-        it("should return false for non-object config", () => {
+        it("should return false for non-object config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(hasScales("string")).toBe(false);
             expect(hasScales(123)).toBe(false);
             expect(hasScales(true)).toBe(false);
             expect(hasScales([])).toBe(false);
         });
 
-        it("should return false for config without scales property", () => {
+        it("should return false for config without scales property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 type: "line",
                 data: {},
@@ -63,14 +119,30 @@ describe("Chart Utilities", () => {
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return false for config with null scales", () => {
+        it("should return false for config with null scales", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: null,
             };
             expect(hasScales(config)).toBe(false);
         });
 
-        it("should return false for config with non-object scales", () => {
+        it("should return false for config with non-object scales", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: "invalid",
             };
@@ -95,7 +167,15 @@ describe("Chart Utilities", () => {
             },
         };
 
-        it("should return x scale configuration", () => {
+        it("should return x scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = getScaleConfig(validConfig, "x");
             expect(result).toEqual({
                 type: "linear",
@@ -105,7 +185,15 @@ describe("Chart Utilities", () => {
             });
         });
 
-        it("should return y scale configuration", () => {
+        it("should return y scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = getScaleConfig(validConfig, "y");
             expect(result).toEqual({
                 type: "linear",
@@ -114,7 +202,15 @@ describe("Chart Utilities", () => {
             });
         });
 
-        it("should return undefined for config without scales", () => {
+        it("should return undefined for config without scales", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 type: "line",
                 data: {},
@@ -123,12 +219,28 @@ describe("Chart Utilities", () => {
             expect(getScaleConfig(config, "y")).toBeUndefined();
         });
 
-        it("should return undefined for null/undefined config", () => {
+        it("should return undefined for null/undefined config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getScaleConfig(null, "x")).toBeUndefined();
             expect(getScaleConfig(undefined, "x")).toBeUndefined();
         });
 
-        it("should return undefined for non-existent axis", () => {
+        it("should return undefined for non-existent axis", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { type: "linear" },
@@ -138,7 +250,15 @@ describe("Chart Utilities", () => {
             expect(getScaleConfig(config, "y")).toBeUndefined();
         });
 
-        it("should return undefined for null scale value", () => {
+        it("should return undefined for null scale value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: null,
@@ -148,7 +268,15 @@ describe("Chart Utilities", () => {
             expect(getScaleConfig(config, "x")).toBeUndefined();
         });
 
-        it("should return undefined for non-object scale value", () => {
+        it("should return undefined for non-object scale value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: "invalid",
@@ -159,7 +287,15 @@ describe("Chart Utilities", () => {
             expect(getScaleConfig(config, "y")).toBeUndefined();
         });
 
-        it("should handle empty scales object", () => {
+        it("should handle empty scales object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {},
             };
@@ -184,7 +320,15 @@ describe("Chart Utilities", () => {
             },
         };
 
-        it("should return existing property from x scale", () => {
+        it("should return existing property from x scale", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getScaleProperty(validConfig, "x", "type")).toBe("linear");
             expect(getScaleProperty(validConfig, "x", "min")).toBe(0);
             expect(getScaleProperty(validConfig, "x", "max")).toBe(100);
@@ -193,14 +337,30 @@ describe("Chart Utilities", () => {
             });
         });
 
-        it("should return existing property from y scale", () => {
+        it("should return existing property from y scale", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getScaleProperty(validConfig, "y", "type")).toBe("category");
             expect(getScaleProperty(validConfig, "y", "beginAtZero")).toBe(
                 true
             );
         });
 
-        it("should return undefined for non-existent property", () => {
+        it("should return undefined for non-existent property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 getScaleProperty(validConfig, "x", "nonExistent")
             ).toBeUndefined();
@@ -209,17 +369,41 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should return undefined for config without scales", () => {
+        it("should return undefined for config without scales", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = { type: "line", data: {} };
             expect(getScaleProperty(config, "x", "type")).toBeUndefined();
         });
 
-        it("should return undefined for null/undefined config", () => {
+        it("should return undefined for null/undefined config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getScaleProperty(null, "x", "type")).toBeUndefined();
             expect(getScaleProperty(undefined, "x", "type")).toBeUndefined();
         });
 
-        it("should return undefined for non-existent scale", () => {
+        it("should return undefined for non-existent scale", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { type: "linear" },
@@ -229,7 +413,15 @@ describe("Chart Utilities", () => {
             expect(getScaleProperty(config, "y", "type")).toBeUndefined();
         });
 
-        it("should handle falsy property values correctly", () => {
+        it("should handle falsy property values correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: {
@@ -273,7 +465,15 @@ describe("Chart Utilities", () => {
             },
         };
 
-        it("should return nested property from x scale - single level", () => {
+        it("should return nested property from x scale - single level", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getNestedScaleProperty(validConfig, "x", "title")).toEqual({
                 text: "X Axis Title",
                 display: true,
@@ -284,7 +484,15 @@ describe("Chart Utilities", () => {
             });
         });
 
-        it("should return nested property from x scale - multiple levels", () => {
+        it("should return nested property from x scale - multiple levels", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getNestedScaleProperty(validConfig, "x", "title.text")).toBe(
                 "X Axis Title"
             );
@@ -299,7 +507,15 @@ describe("Chart Utilities", () => {
             ).toBe("bold");
         });
 
-        it("should return nested property from y scale", () => {
+        it("should return nested property from y scale", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getNestedScaleProperty(validConfig, "y", "title.text")).toBe(
                 "Y Axis Title"
             );
@@ -308,7 +524,15 @@ describe("Chart Utilities", () => {
             ).toBe(false);
         });
 
-        it("should return undefined for non-existent nested property", () => {
+        it("should return undefined for non-existent nested property", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 getNestedScaleProperty(validConfig, "x", "title.nonExistent")
             ).toBeUndefined();
@@ -324,14 +548,30 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should return undefined for config without scales", () => {
+        it("should return undefined for config without scales", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = { type: "line", data: {} };
             expect(
                 getNestedScaleProperty(config, "x", "title.text")
             ).toBeUndefined();
         });
 
-        it("should return undefined for null/undefined config", () => {
+        it("should return undefined for null/undefined config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 getNestedScaleProperty(null, "x", "title.text")
             ).toBeUndefined();
@@ -340,7 +580,15 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should return undefined for non-existent scale", () => {
+        it("should return undefined for non-existent scale", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: { title: { text: "X Axis" } },
@@ -352,7 +600,15 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should handle null/undefined intermediate properties", () => {
+        it("should handle null/undefined intermediate properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: {
@@ -371,7 +627,15 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should handle non-object intermediate properties", () => {
+        it("should handle non-object intermediate properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: {
@@ -388,20 +652,44 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should handle empty path gracefully", () => {
+        it("should handle empty path gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 getNestedScaleProperty(validConfig, "x", "")
             ).toBeUndefined();
         });
 
-        it("should handle single property path", () => {
+        it("should handle single property path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(getNestedScaleProperty(validConfig, "x", "grid")).toEqual({
                 color: "#e0e0e0",
                 lineWidth: 1,
             });
         });
 
-        it("should handle very deep nesting", () => {
+        it("should handle very deep nesting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const deepConfig = {
                 scales: {
                     x: {
@@ -433,7 +721,15 @@ describe("Chart Utilities", () => {
             ).toBeUndefined();
         });
 
-        it("should handle falsy values in nested path", () => {
+        it("should handle falsy values in nested path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = {
                 scales: {
                     x: {
@@ -460,7 +756,15 @@ describe("Chart Utilities", () => {
     });
 
     describe("Edge cases and integration", () => {
-        it("should handle complex Chart.js configuration", () => {
+        it("should handle complex Chart.js configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexConfig = {
                 type: "line",
                 data: {
@@ -549,7 +853,15 @@ describe("Chart Utilities", () => {
             ).toBeTypeOf("function");
         });
 
-        it("should handle all function combinations with invalid inputs", () => {
+        it("should handle all function combinations with invalid inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidInputs = [
                 null,
                 undefined,

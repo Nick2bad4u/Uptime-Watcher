@@ -134,11 +134,27 @@ describe("ChartConfigService", () => {
     });
 
     describe("Constructor", () => {
-        it("should create an instance with theme", () => {
+        it("should create an instance with theme", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(chartService).toBeInstanceOf(ChartConfigService);
         });
 
-        it("should store the theme correctly", () => {
+        it("should store the theme correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test by calling a method that uses the theme
             const config = chartService.getLineChartConfig();
             expect(config.plugins?.legend?.labels?.color).toBe(
@@ -148,7 +164,15 @@ describe("ChartConfigService", () => {
     });
 
     describe("getLineChartConfig", () => {
-        it("should return a line chart configuration", () => {
+        it("should return a line chart configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(config).toBeDefined();
@@ -156,14 +180,30 @@ describe("ChartConfigService", () => {
             expect(config.responsive).toBe(true);
         });
 
-        it("should have correct interaction settings", () => {
+        it("should have correct interaction settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(config.interaction?.mode).toBe("index");
             expect(config.interaction?.intersect).toBe(false);
         });
 
-        it("should have zoom configuration", () => {
+        it("should have zoom configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(config.plugins?.zoom?.pan?.enabled).toBe(true);
@@ -173,7 +213,15 @@ describe("ChartConfigService", () => {
             expect(config.plugins?.zoom?.zoom?.wheel?.enabled).toBe(true);
         });
 
-        it("should have correct scale configuration", () => {
+        it("should have correct scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(getScaleProperty(config, "x", "type")).toBe("time");
@@ -199,14 +247,30 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should have correct title", () => {
+        it("should have correct title", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(config.plugins?.title?.text).toBe("Response Time Over Time");
             expect(config.plugins?.title?.display).toBe(true);
         });
 
-        it("should apply theme colors", () => {
+        it("should apply theme colors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             expect(config.plugins?.title?.color).toBe(
@@ -229,7 +293,15 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", () => {
+        it("should apply theme typography", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getLineChartConfig();
 
             // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
@@ -248,7 +320,15 @@ describe("ChartConfigService", () => {
     });
 
     describe("getBarChartConfig", () => {
-        it("should return a bar chart configuration", () => {
+        it("should return a bar chart configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect(config).toBeDefined();
@@ -256,20 +336,44 @@ describe("ChartConfigService", () => {
             expect(config.responsive).toBe(true);
         });
 
-        it("should hide legend for bar chart", () => {
+        it("should hide legend for bar chart", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect(config.plugins?.legend?.display).toBe(false);
         });
 
-        it("should have correct title", () => {
+        it("should have correct title", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect(config.plugins?.title?.text).toBe("Status Distribution");
             expect(config.plugins?.title?.display).toBe(true);
         });
 
-        it("should have correct scale configuration", () => {
+        it("should have correct scale configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect(getNestedScaleProperty(config, "y", "beginAtZero")).toBe(
@@ -283,7 +387,15 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme colors", () => {
+        it("should apply theme colors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect(config.plugins?.title?.color).toBe(
@@ -294,7 +406,15 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", () => {
+        it("should apply theme typography", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getBarChartConfig();
 
             expect((config.plugins?.title?.font as any)?.family).toBe(
@@ -307,7 +427,15 @@ describe("ChartConfigService", () => {
     });
 
     describe("getDoughnutChartConfig", () => {
-        it("should return a doughnut chart configuration", () => {
+        it("should return a doughnut chart configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config).toBeDefined();
@@ -315,20 +443,44 @@ describe("ChartConfigService", () => {
             expect(config.responsive).toBe(true);
         });
 
-        it("should have correct title", () => {
+        it("should have correct title", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.title?.text).toBe("Uptime Distribution");
             expect(config.plugins?.title?.display).toBe(true);
         });
 
-        it("should position legend at bottom", () => {
+        it("should position legend at bottom", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.legend?.position).toBe("bottom");
         });
 
-        it("should have custom tooltip callbacks", () => {
+        it("should have custom tooltip callbacks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.tooltip?.callbacks?.label).toBeDefined();
@@ -337,7 +489,15 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should calculate percentages correctly in tooltip", () => {
+        it("should calculate percentages correctly in tooltip", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
             const labelCallback = config.plugins?.tooltip?.callbacks?.label;
 
@@ -354,7 +514,15 @@ describe("ChartConfigService", () => {
             }
         });
 
-        it("should handle zero total checks in tooltip", () => {
+        it("should handle zero total checks in tooltip", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(0);
             const labelCallback = config.plugins?.tooltip?.callbacks?.label;
 
@@ -371,7 +539,15 @@ describe("ChartConfigService", () => {
             }
         });
 
-        it("should apply theme colors", () => {
+        it("should apply theme colors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect(config.plugins?.title?.color).toBe(
@@ -382,7 +558,15 @@ describe("ChartConfigService", () => {
             );
         });
 
-        it("should apply theme typography", () => {
+        it("should apply theme typography", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const config = chartService.getDoughnutChartConfig(100);
 
             expect((config.plugins?.title?.font as any)?.family).toBe(
@@ -395,7 +579,15 @@ describe("ChartConfigService", () => {
     });
 
     describe("Base configuration", () => {
-        it("should apply consistent base settings across all chart types", () => {
+        it("should apply consistent base settings across all chart types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const lineConfig = chartService.getLineChartConfig();
             const barConfig = chartService.getBarChartConfig();
             const doughnutConfig = chartService.getDoughnutChartConfig(100);
@@ -410,7 +602,15 @@ describe("ChartConfigService", () => {
             expect(doughnutConfig.responsive).toBe(true);
         });
 
-        it("should apply consistent tooltip styling", () => {
+        it("should apply consistent tooltip styling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const lineConfig = chartService.getLineChartConfig();
             const barConfig = chartService.getBarChartConfig();
 
@@ -425,7 +625,15 @@ describe("ChartConfigService", () => {
             expect(barConfig.plugins?.tooltip?.borderWidth).toBe(1);
         });
 
-        it("should apply consistent grid and tick styling", () => {
+        it("should apply consistent grid and tick styling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const lineConfig = chartService.getLineChartConfig();
             const barConfig = chartService.getBarChartConfig();
 
@@ -449,7 +657,15 @@ describe("ChartConfigService", () => {
 });
 
 describe("createChartConfigs", () => {
-    it("should return all chart configuration objects", () => {
+    it("should return all chart configuration objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs).toHaveProperty("lineChartOptions");
@@ -457,7 +673,15 @@ describe("createChartConfigs", () => {
         expect(configs).toHaveProperty("doughnutOptions");
     });
 
-    it("should return valid chart configurations", () => {
+    it("should return valid chart configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs.lineChartOptions).toBeDefined();
@@ -469,7 +693,15 @@ describe("createChartConfigs", () => {
         expect(configs.doughnutOptions.responsive).toBe(true);
     });
 
-    it("should pass totalChecks to doughnut configuration", () => {
+    it("should pass totalChecks to doughnut configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const configs = createChartConfigs(mockTheme, 150);
         const labelCallback =
             configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
@@ -484,7 +716,15 @@ describe("createChartConfigs", () => {
         }
     });
 
-    it("should handle default totalChecks", () => {
+    it("should handle default totalChecks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const configs = createChartConfigs(mockTheme);
         const labelCallback =
             configs.doughnutOptions.plugins?.tooltip?.callbacks?.label;
@@ -499,7 +739,15 @@ describe("createChartConfigs", () => {
         }
     });
 
-    it("should create new service instance for each call", () => {
+    it("should create new service instance for each call", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Constructor", "type");
+
         const configs1 = createChartConfigs(mockTheme, 100);
         const configs2 = createChartConfigs(mockTheme, 100);
 
@@ -508,7 +756,15 @@ describe("createChartConfigs", () => {
         expect(configs1.lineChartOptions).not.toBe(configs2.lineChartOptions);
     });
 
-    it("should apply theme consistently across all configurations", () => {
+    it("should apply theme consistently across all configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const configs = createChartConfigs(mockTheme, 100);
 
         expect(configs.lineChartOptions.plugins?.title?.color).toBe(
@@ -522,7 +778,15 @@ describe("createChartConfigs", () => {
         );
     });
 
-    it("should handle different theme objects", () => {
+    it("should handle different theme objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: chartConfig", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const darkTheme: Theme = {
             ...mockTheme,
             colors: {

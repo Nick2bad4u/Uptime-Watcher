@@ -14,7 +14,17 @@ describe("LogTemplates - Missing Coverage", () => {
             vi.clearAllMocks();
         });
 
-        test("should handle debug logging without variables (line 472)", () => {
+        test("should handle debug logging without variables (line 472)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // This should hit the `: message` branch on line 472 where variables is undefined
@@ -26,7 +36,17 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle info logging without variables (line 481)", () => {
+        test("should handle info logging without variables (line 481)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // This should hit the `: message` branch on line 481 where variables is undefined
@@ -38,7 +58,17 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle warn logging without variables (line 499)", () => {
+        test("should handle warn logging without variables (line 499)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // This should hit the `: message` branch on line 499 where variables is undefined
@@ -50,7 +80,17 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle error logging without variables", () => {
+        test("should handle error logging without variables", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Error Handling", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // This should hit the `: message` branch where variables is undefined
@@ -62,7 +102,17 @@ describe("LogTemplates - Missing Coverage", () => {
             );
         });
 
-        test("should handle all logging methods with and without variables for complete branch coverage", () => {
+        test("should handle all logging methods with and without variables for complete branch coverage", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // Test without variables (hitting the `: message` branches)
@@ -83,7 +133,17 @@ describe("LogTemplates - Missing Coverage", () => {
             expect(mockLogger.error).toHaveBeenCalledTimes(2);
         });
 
-        test("should verify ternary operator branches explicitly", () => {
+        test("should verify ternary operator branches explicitly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: logTemplates-missing-coverage", "component");
+            annotate("Category: Utility", "category");
+            annotate("Type: Business Logic", "type");
+
             const templateLogger = createTemplateLogger(mockLogger);
 
             // Explicitly test the ternary conditions

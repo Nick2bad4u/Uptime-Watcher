@@ -8,7 +8,15 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Complete Coverage", () => {
     describe("Edge Cases and Unreachable Code Paths", () => {
-        it("should test all reachable switch cases thoroughly", () => {
+        it("should test all reachable switch cases thoroughly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test all normal cases
             expect(safeStringify(BigInt(123))).toBe("123");
             expect(safeStringify(true)).toBe("true");
@@ -23,7 +31,15 @@ describe("String Conversion - Complete Coverage", () => {
             expect(safeStringify(undefined)).toBe("");
         });
 
-        it("should attempt to reach unreachable code paths through type manipulation", () => {
+        it("should attempt to reach unreachable code paths through type manipulation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // The undefined case in the switch is unreachable due to early return
             // The default case is unreachable in normal JS
 
@@ -65,7 +81,15 @@ describe("String Conversion - Complete Coverage", () => {
             expect(typeof customResult).toBe("string");
         });
 
-        it("should ensure complete branch coverage with type coercion edge cases", () => {
+        it("should ensure complete branch coverage with type coercion edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with primitive wrapper objects
             expect(safeStringify(String("test"))).toContain("test");
             expect(safeStringify(Number(123))).toContain("123");
@@ -86,7 +110,15 @@ describe("String Conversion - Complete Coverage", () => {
             expect(typeof safeStringify(circularObj)).toBe("string");
         });
 
-        it("should test symbol edge cases for complete coverage", () => {
+        it("should test symbol edge cases for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different symbol types
             expect(safeStringify(Symbol())).toContain("Symbol");
             expect(safeStringify(Symbol("named"))).toContain("Symbol");
@@ -94,7 +126,15 @@ describe("String Conversion - Complete Coverage", () => {
             expect(safeStringify(Symbol.iterator)).toContain("Symbol");
         });
 
-        it("should test function edge cases for complete coverage", () => {
+        it("should test function edge cases for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different function types
             expect(safeStringify(function named() {})).toBe("[Function]");
             expect(safeStringify(() => {})).toBe("[Function]");
@@ -107,7 +147,15 @@ describe("String Conversion - Complete Coverage", () => {
             expect(safeStringify(TestClass)).toBe("[Function]");
         });
 
-        it("should test bigint edge cases for complete coverage", () => {
+        it("should test bigint edge cases for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different bigint values
             expect(safeStringify(BigInt(0))).toBe("0");
             expect(safeStringify(BigInt(-123))).toBe("-123");
@@ -116,7 +164,15 @@ describe("String Conversion - Complete Coverage", () => {
             );
         });
 
-        it("should test number edge cases for complete coverage", () => {
+        it("should test number edge cases for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.edge-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test special number values
             expect(safeStringify(Number.NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");

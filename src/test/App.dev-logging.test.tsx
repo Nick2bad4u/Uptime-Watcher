@@ -4,7 +4,7 @@
  */
 
 import { render, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import "@testing-library/jest-dom";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -147,7 +147,17 @@ describe("App Development Logging Coverage", () => {
         });
     });
 
-    it("should execute development logging in status updates callback", async () => {
+    it("should execute development logging in status updates callback", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: App.dev-logging", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: App.dev-logging", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
         const subscribeToStatusUpdatesMock = vi.fn();
 
         // Update sites store mock to capture callback
@@ -190,7 +200,17 @@ describe("App Development Logging Coverage", () => {
         );
     });
 
-    it("should use fallback siteIdentifier when site.identifier is undefined", async () => {
+    it("should use fallback siteIdentifier when site.identifier is undefined", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: App.dev-logging", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: App.dev-logging", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const subscribeToStatusUpdatesMock = vi.fn();
 
         // Update sites store mock to capture callback

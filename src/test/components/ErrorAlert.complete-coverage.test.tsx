@@ -39,7 +39,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Basic Rendering", () => {
-        it("should render with required props only", () => {
+        it("should render with required props only", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Test error message" />);
 
             expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -47,7 +57,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument(); // default error variant
         });
 
-        it("should render with custom className", () => {
+        it("should render with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ErrorAlert
                     message="Test message"
@@ -59,7 +79,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(alertElement).toHaveClass("custom-error-class");
         });
 
-        it("should render with default className when not provided", () => {
+        it("should render with default className when not provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { container: _container } = render(
                 <ErrorAlert message="Test message" />
             );
@@ -75,7 +105,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should have proper accessibility attributes", () => {
+        it("should have proper accessibility attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Test message" />);
 
             const alertElement = screen.getByRole("alert");
@@ -85,7 +125,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Variant Handling", () => {
-        it("should render error variant by default", () => {
+        it("should render error variant by default", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<ErrorAlert message="Error message" />);
 
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
@@ -97,7 +147,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should render error variant explicitly", () => {
+        it("should render error variant explicitly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<ErrorAlert message="Error message" variant="error" />);
 
             expect(screen.getByTestId("alert-circle-icon")).toBeInTheDocument();
@@ -112,7 +172,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should render warning variant correctly", () => {
+        it("should render warning variant correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Warning message" variant="warning" />);
 
             expect(
@@ -129,7 +199,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should render info variant correctly", () => {
+        it("should render info variant correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Info message" variant="info" />);
 
             expect(screen.getByTestId("info-icon")).toBeInTheDocument();
@@ -144,7 +224,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should handle invalid variant by defaulting to error", () => {
+        it("should handle invalid variant by defaulting to error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <ErrorAlert
                     message="Invalid variant"
@@ -163,7 +253,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Icon Rendering", () => {
-        it("should render correct icon for error variant", () => {
+        it("should render correct icon for error variant", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<ErrorAlert message="Error" variant="error" />);
 
             const icon = screen.getByTestId("alert-circle-icon");
@@ -171,7 +271,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render correct icon for warning variant", () => {
+        it("should render correct icon for warning variant", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Warning" variant="warning" />);
 
             const icon = screen.getByTestId("alert-triangle-icon");
@@ -179,7 +289,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render correct icon for info variant", () => {
+        it("should render correct icon for info variant", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Info" variant="info" />);
 
             const icon = screen.getByTestId("info-icon");
@@ -187,7 +307,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(icon).toHaveClass("h-5", "w-5", "shrink-0");
         });
 
-        it("should render default icon for undefined variant", () => {
+        it("should render default icon for undefined variant", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Default" />);
 
             const icon = screen.getByTestId("alert-circle-icon");
@@ -197,7 +327,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Message Display", () => {
-        it("should display simple text message", () => {
+        it("should display simple text message", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Simple error message" />);
 
             const messageElement = screen.getByText("Simple error message");
@@ -209,7 +349,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should handle long messages with proper text wrapping", () => {
+        it("should handle long messages with proper text wrapping", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longMessage =
                 "This is a very long error message that should wrap properly and not break the layout even when it contains many words and characters";
             render(<ErrorAlert message={longMessage} />);
@@ -219,7 +369,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(messageElement).toHaveClass("break-words");
         });
 
-        it("should handle empty message string", () => {
+        it("should handle empty message string", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="" />);
 
             // Find the specific message paragraph element, not by text content
@@ -231,7 +391,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(messageElement).toHaveTextContent("");
         });
 
-        it("should handle message with special characters", () => {
+        it("should handle message with special characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const specialMessage =
                 "Error: Failed to connect to server @ 192.168.1.1:8080 - Connection refused (errno: 111)";
             render(<ErrorAlert message={specialMessage} />);
@@ -239,7 +409,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByText(specialMessage)).toBeInTheDocument();
         });
 
-        it("should handle message with HTML-like content as plain text", () => {
+        it("should handle message with HTML-like content as plain text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const htmlMessage =
                 "<script>alert('test')</script> This should be safe";
             render(<ErrorAlert message={htmlMessage} />);
@@ -247,7 +427,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByText(htmlMessage)).toBeInTheDocument();
         });
 
-        it("should be contained in proper flex layout", () => {
+        it("should be contained in proper flex layout", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Layout test" />);
 
             const messageElement = screen.getByText("Layout test");
@@ -257,7 +447,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Dismiss Functionality", () => {
-        it("should not render dismiss button when onDismiss is not provided", () => {
+        it("should not render dismiss button when onDismiss is not provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="No dismiss" />);
 
             expect(
@@ -266,7 +466,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.queryByTestId("x-icon")).not.toBeInTheDocument();
         });
 
-        it("should render dismiss button when onDismiss is provided", () => {
+        it("should render dismiss button when onDismiss is provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert message="With dismiss" onDismiss={mockDismiss} />
@@ -282,7 +492,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("x-icon")).toBeInTheDocument();
         });
 
-        it("should call onDismiss when dismiss button is clicked", async () => {
+        it("should call onDismiss when dismiss button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
@@ -299,7 +519,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should call onDismiss with fireEvent click", () => {
+        it("should call onDismiss with fireEvent click", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert message="Fire event test" onDismiss={mockDismiss} />
@@ -311,7 +541,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle multiple clicks correctly", async () => {
+        it("should handle multiple clicks correctly", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
@@ -327,7 +567,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(3);
         });
 
-        it("should have proper styling for dismiss button", () => {
+        it("should have proper styling for dismiss button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert message="Button styling" onDismiss={mockDismiss} />
@@ -345,7 +595,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             );
         });
 
-        it("should render X icon with correct styling", () => {
+        it("should render X icon with correct styling", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert message="Icon styling" onDismiss={mockDismiss} />
@@ -357,7 +617,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Keyboard Accessibility", () => {
-        it("should be focusable and activatable with keyboard when dismiss is available", async () => {
+        it("should be focusable and activatable with keyboard when dismiss is available", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
@@ -376,7 +646,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(mockDismiss).toHaveBeenCalledTimes(1);
         });
 
-        it("should be activatable with Space key", async () => {
+        it("should be activatable with Space key", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             const user = userEvent.setup();
 
@@ -393,7 +673,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle undefined onDismiss gracefully", () => {
+        it("should handle undefined onDismiss gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ErrorAlert message="Undefined dismiss" />);
 
             expect(
@@ -401,7 +691,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should handle null onDismiss gracefully", () => {
+        it("should handle null onDismiss gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ErrorAlert message="Null dismiss" onDismiss={null as any} />
             );
@@ -411,7 +711,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             ).not.toBeInTheDocument();
         });
 
-        it("should maintain stable callback reference with useCallback", () => {
+        it("should maintain stable callback reference with useCallback", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             const { rerender } = render(
                 <ErrorAlert message="Callback test" onDismiss={mockDismiss} />
@@ -434,7 +744,17 @@ describe("ErrorAlert - Complete Coverage", () => {
     });
 
     describe("Component Integration", () => {
-        it("should render all variants together correctly", () => {
+        it("should render all variants together correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
             const { rerender } = render(
                 <ErrorAlert message="Test" variant="error" />
             );
@@ -449,7 +769,17 @@ describe("ErrorAlert - Complete Coverage", () => {
             expect(screen.getByTestId("info-icon")).toBeInTheDocument();
         });
 
-        it("should combine all props correctly", () => {
+        it("should combine all props correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ErrorAlert.complete-coverage", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert

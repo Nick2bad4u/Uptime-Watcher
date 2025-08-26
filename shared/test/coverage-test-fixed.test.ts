@@ -11,12 +11,28 @@ import { withErrorHandling } from "../utils/errorHandling";
 
 describe("Fixed Coverage Tests", () => {
     describe("stringConversion.ts - Lines 89-90, 92-93", () => {
-        it("should handle undefined value (lines 86-87)", () => {
+        it("should handle undefined value (lines 86-87)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = safeStringify(undefined);
             expect(result).toBe("");
         });
 
-        it("should attempt to reach default case (lines 89-90)", () => {
+        it("should attempt to reach default case (lines 89-90)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an edge case object that might trigger default behavior
             const weirdObject = {
                 [Symbol.toPrimitive]: () => {
@@ -32,7 +48,15 @@ describe("Fixed Coverage Tests", () => {
     });
 
     describe("schemas.ts - Line 399 (Unknown field error)", () => {
-        it("should trigger unknown field error for truly unknown field", () => {
+        it("should trigger unknown field error for truly unknown field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test with a field that doesn't exist in any schema
             expect(() => {
                 validateMonitorField("http", "totallyUnknownField", "value");
@@ -41,7 +65,15 @@ describe("Fixed Coverage Tests", () => {
     });
 
     describe("database.ts - Line 208 (isValidTimestamp false)", () => {
-        it("should trigger isValidTimestamp false case through isValidHistoryRow", () => {
+        it("should trigger isValidTimestamp false case through isValidHistoryRow", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a history row with invalid timestamp to trigger line 208
             const invalidHistoryRow = {
                 monitorId: "test",
@@ -55,7 +87,15 @@ describe("Fixed Coverage Tests", () => {
     });
 
     describe("database.ts - Lines 372-373 (Property access)", () => {
-        it("should handle null property access in safeGetRowProperty", () => {
+        it("should handle null property access in safeGetRowProperty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const row = {
                 nested: {
                     value: null,
@@ -73,7 +113,15 @@ describe("Fixed Coverage Tests", () => {
     });
 
     describe("errorHandling.ts - Line 183 (Finally block)", () => {
-        it("should handle setLoading error in finally block", async () => {
+        it("should handle setLoading error in finally block", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockStore = {
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -102,7 +150,15 @@ describe("Fixed Coverage Tests", () => {
     });
 
     describe("schemas.ts - Lines 478-479, 482 (Error categorization)", () => {
-        it("should handle validation error categorization", () => {
+        it("should handle validation error categorization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: coverage-test-fixed", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test with invalid data that should trigger the path length conditions
             const result = validateMonitorField(
                 "http",

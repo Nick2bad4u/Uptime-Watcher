@@ -84,7 +84,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render the site overview tab with all main sections", () => {
+        it("should render the site overview tab with all main sections", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check for main test ID
@@ -100,7 +110,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("Site Actions")).toBeInTheDocument();
         });
 
-        it("should display site metadata correctly", () => {
+        it("should display site metadata correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Site name should appear multiple times
@@ -110,7 +130,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("1/2")).toBeInTheDocument(); // active/total format
         });
 
-        it("should display metrics with correct formatting", () => {
+        it("should display metrics with correct formatting", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check monitor count display
@@ -127,7 +157,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Monitor Status Calculations", () => {
-        it("should calculate and display correct monitor statistics", () => {
+        it("should calculate and display correct monitor statistics", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check monitor summary
@@ -142,7 +182,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("example.com")).toBeInTheDocument(); // ping monitor display
         });
 
-        it("should show correct monitor status badges", () => {
+        it("should show correct monitor status badges", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Should show "Running" and "Stopped" badges
@@ -150,7 +200,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("Stopped")).toBeInTheDocument();
         });
 
-        it("should handle sites with no monitors", () => {
+        it("should handle sites with no monitors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const siteWithNoMonitors = { ...mockSite, monitors: [] };
             render(
                 <SiteOverviewTab {...defaultProps} site={siteWithNoMonitors} />
@@ -162,7 +222,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("0/0")).toBeInTheDocument();
         });
 
-        it("should handle sites with all monitors running", () => {
+        it("should handle sites with all monitors running", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const allRunningMonitors = mockSite.monitors.map((m) => ({
                 ...m,
                 monitoring: true,
@@ -178,7 +248,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("Stop All Monitoring")).toBeInTheDocument();
         });
 
-        it("should handle sites with all monitors stopped", () => {
+        it("should handle sites with all monitors stopped", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const allStoppedMonitors = mockSite.monitors.map((m) => ({
                 ...m,
                 monitoring: false,
@@ -198,7 +278,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Theme Integration and Color Calculations", () => {
-        it("should apply theme colors based on uptime percentage", () => {
+        it("should apply theme colors based on uptime percentage", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const highUptimeSite = { ...defaultProps, uptime: 99.9 };
             render(<SiteOverviewTab {...highUptimeSite} />);
 
@@ -206,7 +296,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("99.90%")).toBeInTheDocument();
         });
 
-        it("should apply response time colors correctly", () => {
+        it("should apply response time colors correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test excellent response time (<=200ms)
             const excellentResponse = { ...defaultProps, avgResponseTime: 150 };
             const { rerender } = render(
@@ -225,7 +325,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("1.50s")).toBeInTheDocument();
         });
 
-        it("should handle different site display statuses", () => {
+        it("should handle different site display statuses", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(<SiteOverviewTab {...defaultProps} />);
 
             // Should show status indicator (check by data-testid instead of role)
@@ -249,7 +359,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("User Interactions", () => {
-        it("should handle start monitoring action", async () => {
+        it("should handle start monitoring action", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStartSiteMonitoring = vi
                 .fn()
                 .mockResolvedValue(undefined);
@@ -275,7 +395,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             });
         });
 
-        it("should handle stop monitoring action", async () => {
+        it("should handle stop monitoring action", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const handleStopSiteMonitoring = vi
                 .fn()
                 .mockResolvedValue(undefined);
@@ -301,7 +431,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             });
         });
 
-        it("should handle remove site action", async () => {
+        it("should handle remove site action", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
             const handleRemoveSite = vi.fn().mockResolvedValue(undefined);
 
             render(
@@ -319,7 +459,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             });
         });
 
-        it("should disable buttons when loading", () => {
+        it("should disable buttons when loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<SiteOverviewTab {...defaultProps} isLoading={true} />);
 
             const removeButton = screen.getByText("Remove Site");
@@ -332,7 +482,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Monitor Details Formatting", () => {
-        it("should format different monitor types correctly", () => {
+        it("should format different monitor types correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mixedMonitors = {
                 ...defaultProps,
                 site: {
@@ -390,7 +550,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should format check intervals correctly", () => {
+        it("should format check intervals correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Should show formatted durations
@@ -398,7 +568,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText(/Every 1m/)).toBeInTheDocument();
         });
 
-        it("should handle monitors without URL or host", () => {
+        it("should handle monitors without URL or host", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorWithoutUrlOrHost = {
                 ...defaultProps,
                 site: {
@@ -428,7 +608,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle extreme uptime values", () => {
+        it("should handle extreme uptime values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(
                 <SiteOverviewTab {...defaultProps} uptime={0} />
             );
@@ -438,31 +628,81 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("100.00%")).toBeInTheDocument();
         });
 
-        it("should handle very high response times", () => {
+        it("should handle very high response times", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteOverviewTab {...defaultProps} avgResponseTime={30_000} />
             );
             expect(screen.getByText("30.00s")).toBeInTheDocument();
         });
 
-        it("should handle zero response times", () => {
+        it("should handle zero response times", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} avgResponseTime={0} />);
             expect(screen.getByText("0ms")).toBeInTheDocument();
         });
 
-        it("should handle zero checks", () => {
+        it("should handle zero checks", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} totalChecks={0} />);
             expect(screen.getByText("0 checks")).toBeInTheDocument();
         });
 
-        it("should handle very large check counts", () => {
+        it("should handle very large check counts", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} totalChecks={999_999} />);
             expect(screen.getByText("999999 checks")).toBeInTheDocument();
         });
     });
 
     describe("Accessibility and UI State", () => {
-        it("should have proper ARIA labels and roles", () => {
+        it("should have proper ARIA labels and roles", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Should have proper test IDs for testing
@@ -472,7 +712,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByText("Mixed")).toBeInTheDocument();
         });
 
-        it("should handle keyboard navigation", () => {
+        it("should handle keyboard navigation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Buttons should be focusable
@@ -483,7 +733,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(document.activeElement).toBe(removeButton);
         });
 
-        it("should maintain component state during re-renders", () => {
+        it("should maintain component state during re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(<SiteOverviewTab {...defaultProps} />);
 
             // Component should handle prop changes gracefully
@@ -496,7 +756,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
     });
 
     describe("Complex Scenarios", () => {
-        it("should handle mixed monitor states correctly", () => {
+        it("should handle mixed monitor states correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mixedStateSite = {
                 ...defaultProps,
                 site: {
@@ -538,7 +808,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             ).toBeInTheDocument(); // Because not all are running
         });
 
-        it("should handle error responses in async operations", async () => {
+        it("should handle error responses in async operations", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const handleRemoveSite = vi
                 .fn()
                 .mockRejectedValue(new Error("Network error"));
@@ -562,7 +842,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
         });
 
         // Additional tests to cover uncovered branches (lines 110, 122, 134)
-        it("should handle response time color variations for branch coverage", () => {
+        it("should handle response time color variations for branch coverage", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test fast response time (<=200ms) - line 122 branch
             const siteWithFastResponse = {
                 ...mockSite,
@@ -641,7 +931,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByTestId("site-overview-tab")).toBeInTheDocument();
         });
 
-        it("should test getUptimeVariant danger branch mapping - line 116", () => {
+        it("should test getUptimeVariant danger branch mapping - line 116", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
             // Create a site that will trigger danger variant from getAvailabilityVariant
             const siteWithLowUptime = {
                 ...mockSite,
@@ -689,7 +989,17 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(screen.getByTestId("site-overview-tab")).toBeInTheDocument();
         });
 
-        it("should handle allMonitorsRunning edge cases - line 103-105", () => {
+        it("should handle allMonitorsRunning edge cases - line 103-105", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             // Test empty monitors array - line 103 branch
             const siteWithNoMonitors = {
                 ...mockSite,

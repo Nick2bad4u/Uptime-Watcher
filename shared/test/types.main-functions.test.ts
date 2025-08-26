@@ -19,7 +19,15 @@ import {
 
 describe("shared/types.ts main functions", () => {
     describe("validateMonitor", () => {
-        it("should return true for valid monitor with undefined activeOperations", () => {
+        it("should return true for valid monitor with undefined activeOperations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validMonitor: Monitor = {
                 id: "monitor3",
                 type: "ping" as const,
@@ -43,28 +51,68 @@ describe("shared/types.ts main functions", () => {
 
 describe("shared/types.ts function coverage", () => {
     describe("isComputedSiteStatus", () => {
-        it("should return true for 'mixed' status", () => {
+        it("should return true for 'mixed' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isComputedSiteStatus("mixed")).toBe(true);
         });
 
-        it("should return true for 'unknown' status", () => {
+        it("should return true for 'unknown' status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isComputedSiteStatus("unknown")).toBe(true);
         });
 
-        it("should return false for monitor status values", () => {
+        it("should return false for monitor status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isComputedSiteStatus("up")).toBe(false);
             expect(isComputedSiteStatus("down")).toBe(false);
             expect(isComputedSiteStatus("pending")).toBe(false);
             expect(isComputedSiteStatus("paused")).toBe(false);
         });
 
-        it("should return false for invalid status values", () => {
+        it("should return false for invalid status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isComputedSiteStatus("invalid")).toBe(false);
             expect(isComputedSiteStatus("")).toBe(false);
             expect(isComputedSiteStatus("online")).toBe(false);
         });
 
-        it("should return false for non-string values", () => {
+        it("should return false for non-string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isComputedSiteStatus(null as any)).toBe(false);
             expect(isComputedSiteStatus(undefined as any)).toBe(false);
             expect(isComputedSiteStatus(123 as any)).toBe(false);
@@ -75,14 +123,30 @@ describe("shared/types.ts function coverage", () => {
     });
 
     describe("isMonitorStatus", () => {
-        it("should return true for valid monitor statuses", () => {
+        it("should return true for valid monitor statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isMonitorStatus("up")).toBe(true);
             expect(isMonitorStatus("down")).toBe(true);
             expect(isMonitorStatus("pending")).toBe(true);
             expect(isMonitorStatus("paused")).toBe(true);
         });
 
-        it("should return false for invalid monitor statuses", () => {
+        it("should return false for invalid monitor statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isMonitorStatus("mixed")).toBe(false);
             expect(isMonitorStatus("unknown")).toBe(false);
             expect(isMonitorStatus("invalid")).toBe(false);
@@ -91,7 +155,15 @@ describe("shared/types.ts function coverage", () => {
             expect(isMonitorStatus("offline")).toBe(false);
         });
 
-        it("should return false for non-string values", () => {
+        it("should return false for non-string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isMonitorStatus(null as any)).toBe(false);
             expect(isMonitorStatus(undefined as any)).toBe(false);
             expect(isMonitorStatus(123 as any)).toBe(false);
@@ -100,7 +172,15 @@ describe("shared/types.ts function coverage", () => {
             expect(isMonitorStatus([] as any)).toBe(false);
         });
 
-        it("should work with MONITOR_STATUS constants", () => {
+        it("should work with MONITOR_STATUS constants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(isMonitorStatus(MONITOR_STATUS.UP)).toBe(true);
             expect(isMonitorStatus(MONITOR_STATUS.DOWN)).toBe(true);
             expect(isMonitorStatus(MONITOR_STATUS.PENDING)).toBe(true);
@@ -109,7 +189,15 @@ describe("shared/types.ts function coverage", () => {
     });
 
     describe("isSiteStatus", () => {
-        it("should return true for valid site statuses", () => {
+        it("should return true for valid site statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Monitor statuses
             expect(isSiteStatus("up")).toBe(true);
             expect(isSiteStatus("down")).toBe(true);
@@ -121,7 +209,15 @@ describe("shared/types.ts function coverage", () => {
             expect(isSiteStatus("unknown")).toBe(true);
         });
 
-        it("should return false for invalid site statuses", () => {
+        it("should return false for invalid site statuses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isSiteStatus("invalid")).toBe(false);
             expect(isSiteStatus("")).toBe(false);
             expect(isSiteStatus("online")).toBe(false);
@@ -129,7 +225,15 @@ describe("shared/types.ts function coverage", () => {
             expect(isSiteStatus("active")).toBe(false);
         });
 
-        it("should return false for non-string values", () => {
+        it("should return false for non-string values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isSiteStatus(null as any)).toBe(false);
             expect(isSiteStatus(undefined as any)).toBe(false);
             expect(isSiteStatus(123 as any)).toBe(false);
@@ -138,14 +242,30 @@ describe("shared/types.ts function coverage", () => {
             expect(isSiteStatus([] as any)).toBe(false);
         });
 
-        it("should work with constants", () => {
+        it("should work with constants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isSiteStatus(DEFAULT_SITE_STATUS)).toBe(true);
             expect(isSiteStatus(DEFAULT_MONITOR_STATUS)).toBe(true);
         });
     });
 
     describe("validateMonitor", () => {
-        it("should return true for valid monitor", () => {
+        it("should return true for valid monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validMonitor: Monitor = {
                 id: "monitor1",
                 type: "http",
@@ -163,7 +283,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(validMonitor)).toBe(true);
         });
 
-        it("should return true for valid monitor with activeOperations", () => {
+        it("should return true for valid monitor with activeOperations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validMonitor: Monitor = {
                 id: "monitor2",
                 type: "port",
@@ -182,7 +310,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(validMonitor)).toBe(true);
         });
 
-        it("should return true for valid monitor with undefined activeOperations", () => {
+        it("should return true for valid monitor with undefined activeOperations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const validMonitor: Monitor = {
                 id: "monitor1",
                 type: "http" as const,
@@ -200,7 +336,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(validMonitor)).toBe(true);
         });
 
-        it("should return false for monitor with missing id", () => {
+        it("should return false for monitor with missing id", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: Partial<Monitor> = {
                 type: "http",
                 status: "up",
@@ -216,7 +360,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid id type", () => {
+        it("should return false for monitor with invalid id type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: 123, // should be string
                 type: "http",
@@ -233,7 +385,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with missing type", () => {
+        it("should return false for monitor with missing type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: Partial<Monitor> = {
                 id: "monitor1",
                 status: "up",
@@ -249,7 +409,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid type", () => {
+        it("should return false for monitor with invalid type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "invalid-type",
@@ -266,7 +434,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid status", () => {
+        it("should return false for monitor with invalid status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -283,7 +459,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid monitoring type", () => {
+        it("should return false for monitor with invalid monitoring type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -300,7 +484,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid responseTime type", () => {
+        it("should return false for monitor with invalid responseTime type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -317,7 +509,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid checkInterval type", () => {
+        it("should return false for monitor with invalid checkInterval type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -334,7 +534,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid timeout type", () => {
+        it("should return false for monitor with invalid timeout type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -351,7 +559,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid retryAttempts type", () => {
+        it("should return false for monitor with invalid retryAttempts type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -368,7 +584,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid history type", () => {
+        it("should return false for monitor with invalid history type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -385,7 +609,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with invalid activeOperations", () => {
+        it("should return false for monitor with invalid activeOperations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -403,7 +635,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with activeOperations containing empty strings", () => {
+        it("should return false for monitor with activeOperations containing empty strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -425,7 +665,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for monitor with non-array activeOperations", () => {
+        it("should return false for monitor with non-array activeOperations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const invalidMonitor: any = {
                 id: "monitor1",
                 type: "http",
@@ -443,7 +691,15 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(invalidMonitor)).toBe(false);
         });
 
-        it("should return false for completely invalid input", () => {
+        it("should return false for completely invalid input", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(validateMonitor(null as any)).toBe(false);
             expect(validateMonitor(undefined as any)).toBe(false);
             expect(validateMonitor("string" as any)).toBe(false);
@@ -453,19 +709,43 @@ describe("shared/types.ts function coverage", () => {
     });
 
     describe("constants validation", () => {
-        it("should validate MONITOR_STATUS constants", () => {
+        it("should validate MONITOR_STATUS constants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             expect(MONITOR_STATUS.UP).toBe("up");
             expect(MONITOR_STATUS.DOWN).toBe("down");
             expect(MONITOR_STATUS.PENDING).toBe("pending");
             expect(MONITOR_STATUS.PAUSED).toBe("paused");
         });
 
-        it("should validate default values", () => {
+        it("should validate default values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             expect(DEFAULT_MONITOR_STATUS).toBe("pending");
             expect(DEFAULT_SITE_STATUS).toBe("unknown");
         });
 
-        it("should validate BASE_MONITOR_TYPES", () => {
+        it("should validate BASE_MONITOR_TYPES", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             expect(BASE_MONITOR_TYPES).toContain("http");
             expect(BASE_MONITOR_TYPES).toContain("port");
             expect(BASE_MONITOR_TYPES).toContain("ping");
@@ -474,7 +754,15 @@ describe("shared/types.ts function coverage", () => {
     });
 
     describe("integration tests", () => {
-        it("should work with all type guards together", () => {
+        it("should work with all type guards together", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const monitorStatuses: MonitorStatus[] = [
                 "up",
                 "down",
@@ -515,7 +803,15 @@ describe("shared/types.ts function coverage", () => {
             }
         });
 
-        it("should validate monitors with different types", () => {
+        it("should validate monitors with different types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             for (const type of BASE_MONITOR_TYPES) {
                 const monitor: Monitor = {
                     id: `monitor-${type}`,

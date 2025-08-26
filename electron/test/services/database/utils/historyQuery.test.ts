@@ -56,7 +56,15 @@ describe("historyQuery utilities", () => {
     });
 
     describe("findHistoryByMonitorId", () => {
-        it("should return empty array when no history entries exist", () => {
+        it("should return empty array when no history entries exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRows: DatabaseHistoryRow[] = [];
             (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockRows
@@ -71,7 +79,15 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual([]);
         });
 
-        it("should return mapped history entries when data exists", () => {
+        it("should return mapped history entries when data exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRows: DatabaseHistoryRow[] = [
                 {
                     timestamp: TEST_TIMESTAMP,
@@ -121,7 +137,15 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual(mockMappedEntries);
         });
 
-        it("should handle single history entry", () => {
+        it("should handle single history entry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRows: DatabaseHistoryRow[] = [
                 {
                     timestamp: TEST_TIMESTAMP,
@@ -152,7 +176,15 @@ describe("historyQuery utilities", () => {
             expect(rowToHistoryEntry).toHaveBeenCalledWith(mockRows[0]);
         });
 
-        it("should throw and log error when database query fails", () => {
+        it("should throw and log error when database query fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Database connection failed");
             (
                 mockDb.all as unknown as ReturnType<typeof vi.fn>
@@ -170,7 +202,15 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", () => {
+        it("should handle empty monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockRows: DatabaseHistoryRow[] = [];
             (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockRows
@@ -185,7 +225,15 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual([]);
         });
 
-        it("should properly order results by timestamp DESC", () => {
+        it("should properly order results by timestamp DESC", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRows: DatabaseHistoryRow[] = [
                 {
                     timestamp: TEST_TIMESTAMP_2, // Newer timestamp first
@@ -229,7 +277,15 @@ describe("historyQuery utilities", () => {
     });
 
     describe("getHistoryCount", () => {
-        it("should return count when history entries exist", () => {
+        it("should return count when history entries exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResult = { count: 5 };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -244,7 +300,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(5);
         });
 
-        it("should return 0 when no history entries exist", () => {
+        it("should return 0 when no history entries exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResult = { count: 0 };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -255,7 +319,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should return 0 when result is undefined", () => {
+        it("should return 0 when result is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 undefined
             );
@@ -265,7 +337,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should return 0 when result is null", () => {
+        it("should return 0 when result is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 null
             );
@@ -275,7 +355,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should return 0 when count property is undefined", () => {
+        it("should return 0 when count property is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResult = { count: undefined };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -286,7 +374,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should return 0 when count property is null", () => {
+        it("should return 0 when count property is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResult = { count: null };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -297,7 +393,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(0);
         });
 
-        it("should handle large count values", () => {
+        it("should handle large count values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockResult = { count: 999_999 };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -308,7 +412,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBe(999_999);
         });
 
-        it("should throw and log error when database query fails", () => {
+        it("should throw and log error when database query fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Database connection failed");
             (
                 mockDb.get as unknown as ReturnType<typeof vi.fn>
@@ -326,7 +438,15 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", () => {
+        it("should handle empty monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockResult = { count: 0 };
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 mockResult
@@ -343,7 +463,15 @@ describe("historyQuery utilities", () => {
     });
 
     describe("getLatestHistoryEntry", () => {
-        it("should return latest history entry when it exists", () => {
+        it("should return latest history entry when it exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRow: DatabaseHistoryRow = {
                 timestamp: TEST_TIMESTAMP,
                 status: "up",
@@ -375,7 +503,15 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual(mockMappedEntry);
         });
 
-        it("should return undefined when no history entries exist", () => {
+        it("should return undefined when no history entries exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 undefined
             );
@@ -390,7 +526,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should return undefined when result is null", () => {
+        it("should return undefined when result is null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 null
             );
@@ -401,7 +545,15 @@ describe("historyQuery utilities", () => {
             expect(rowToHistoryEntry).not.toHaveBeenCalled();
         });
 
-        it("should handle latest entry with minimal data", () => {
+        it("should handle latest entry with minimal data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRow: DatabaseHistoryRow = {
                 timestamp: TEST_TIMESTAMP,
                 status: "down",
@@ -426,7 +578,15 @@ describe("historyQuery utilities", () => {
             expect(result).toEqual(mockMappedEntry);
         });
 
-        it("should use LIMIT 1 to get only the latest entry", () => {
+        it("should use LIMIT 1 to get only the latest entry", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockRow: DatabaseHistoryRow = {
                 timestamp: TEST_TIMESTAMP,
                 status: "up",
@@ -453,7 +613,15 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should throw and log error when database query fails", () => {
+        it("should throw and log error when database query fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Database connection failed");
             (
                 mockDb.get as unknown as ReturnType<typeof vi.fn>
@@ -471,7 +639,15 @@ describe("historyQuery utilities", () => {
             );
         });
 
-        it("should handle empty monitor ID", () => {
+        it("should handle empty monitor ID", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             (mockDb.get as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 undefined
             );
@@ -485,7 +661,15 @@ describe("historyQuery utilities", () => {
             expect(result).toBeUndefined();
         });
 
-        it("should handle row mapping errors", () => {
+        it("should handle row mapping errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockRow: DatabaseHistoryRow = {
                 timestamp: TEST_TIMESTAMP,
                 status: "up",
@@ -511,7 +695,15 @@ describe("historyQuery utilities", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should handle complete workflow from query to mapped result", () => {
+        it("should handle complete workflow from query to mapped result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockRow: DatabaseHistoryRow = {
                 timestamp: TEST_TIMESTAMP,
                 status: "up",
@@ -540,7 +732,15 @@ describe("historyQuery utilities", () => {
             expect(rowToHistoryEntry).toHaveBeenCalledWith(mockRow);
         });
 
-        it("should handle monitor with no data consistently across all functions", () => {
+        it("should handle monitor with no data consistently across all functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Setup mocks for a monitor with no data
             (mockDb.all as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
                 []
@@ -558,7 +758,15 @@ describe("historyQuery utilities", () => {
             expect(latest).toBeUndefined();
         });
 
-        it("should handle database errors consistently across all functions", () => {
+        it("should handle database errors consistently across all functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyQuery", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const dbError = new Error("Database unavailable");
 
             (

@@ -17,7 +17,15 @@ describe("Environment - Catch Block Coverage", () => {
         process.env = originalProcessEnv;
     });
 
-    it("should handle error when accessing process.env (line 41)", async () => {
+    it("should handle error when accessing process.env (line 41)", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment.catch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
         // Dynamic import to get the function after environment manipulation
         const { getEnvVar } = await import("../../utils/environment");
 
@@ -42,7 +50,15 @@ describe("Environment - Catch Block Coverage", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should handle null process.env", async () => {
+    it("should handle null process.env", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment.catch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Dynamic import to get the function after environment manipulation
         const { getEnvVar } = await import("../../utils/environment");
 
@@ -60,7 +76,15 @@ describe("Environment - Catch Block Coverage", () => {
         expect(result).toBeUndefined();
     });
 
-    it("should handle undefined process.env", async () => {
+    it("should handle undefined process.env", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment.catch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         // Dynamic import to get the function after environment manipulation
         const { getEnvVar } = await import("../../utils/environment");
 

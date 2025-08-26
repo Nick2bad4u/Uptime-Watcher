@@ -11,7 +11,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Error Handling Edge Cases", () => {
-        it("should test error instanceof Error branches in multiple modules", async () => {
+        it("should test error instanceof Error branches in multiple modules", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test errorHandling utility edge cases
             try {
                 const errorHandlingModule = await import(
@@ -71,7 +79,15 @@ describe("High-Impact Branch Coverage Tests", () => {
             }
         });
 
-        it("should test monitoring error handling branches", async () => {
+        it("should test monitoring error handling branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             try {
                 const errorHandlingModule = await import(
                     "../services/monitoring/utils/errorHandling.js"
@@ -158,7 +174,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Validation Schema Branches", () => {
-        it("should test all validation error paths", async () => {
+        it("should test all validation error paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             try {
                 const validationModule = await import(
                     "../../shared/validation/schemas.js"
@@ -235,7 +259,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("JSON Safety Branches", () => {
-        it("should test all JSON safety error paths", async () => {
+        it("should test all JSON safety error paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             try {
                 const jsonSafetyModule = await import(
                     "../../shared/utils/jsonSafety.js"
@@ -308,7 +340,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Type Guard Branches", () => {
-        it("should test all type guard edge cases", async () => {
+        it("should test all type guard edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 // eslint-disable-next-line unicorn/no-keyword-prefix
                 const typeGuardsModule = await import(
@@ -404,7 +444,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Object Safety Branches", () => {
-        it("should test object safety iteration edge cases", async () => {
+        it("should test object safety iteration edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const objectSafetyModule = await import(
                     "../../shared/utils/objectSafety.js"
@@ -475,7 +523,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("String Conversion Branches", () => {
-        it("should test string conversion edge cases", async () => {
+        it("should test string conversion edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const stringConversionModule = await import(
                     "../../shared/utils/stringConversion.js"
@@ -583,7 +639,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Event Types Branches", () => {
-        it("should test event type function edge cases", async () => {
+        it("should test event type function edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
             try {
                 const eventTypesModule = await import(
                     "../events/eventTypes.js"
@@ -681,7 +745,15 @@ describe("High-Impact Branch Coverage Tests", () => {
     });
 
     describe("Site Status Branches", () => {
-        it("should test site status calculation edge cases", async () => {
+        it("should test site status calculation edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: high-impact-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const siteStatusModule = await import(
                     "../../shared/utils/siteStatus.js"

@@ -16,6 +16,9 @@ output = ".config.dummy.report.md"
 # multiple runs.
 cache = true
 
+# Directory for caching requests.
+cache_file = ".cache/.lycheecache"
+
 # Discard all cached requests older than this duration.
 max_cache_age = "2d"
 

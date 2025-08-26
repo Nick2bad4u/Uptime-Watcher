@@ -43,7 +43,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useTheme hook", () => {
-        it("should return basic theme properties and functions", () => {
+        it("should return basic theme properties and functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             expect(result.current).toHaveProperty("currentTheme");
@@ -59,7 +67,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current).toHaveProperty("getStatusColor");
         });
 
-        it("should handle theme setting with system preference", async () => {
+        it("should handle theme setting with system preference", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             await act(async () => {
@@ -74,7 +90,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof result.current.themeName).toBe("string");
         });
 
-        it("should handle theme toggling", async () => {
+        it("should handle theme toggling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             await act(async () => {
@@ -89,28 +113,60 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof result.current.themeName).toBe("string");
         });
 
-        it("should handle color retrieval", () => {
+        it("should handle color retrieval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             const color = result.current.getColor("text.primary");
             expect(typeof color).toBe("string");
         });
 
-        it("should handle status color retrieval", () => {
+        it("should handle status color retrieval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             const statusColor = result.current.getStatusColor("up");
             expect(typeof statusColor).toBe("string");
         });
 
-        it("should return available themes array", () => {
+        it("should return available themes array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             expect(Array.isArray(result.current.availableThemes)).toBe(true);
             expect(result.current.availableThemes.length).toBeGreaterThan(0);
         });
 
-        it("should have theme manager with required methods", () => {
+        it("should have theme manager with required methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             expect(result.current.themeManager).toBeDefined();
@@ -124,7 +180,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useAvailabilityColors hook", () => {
-        it("should return availability color functions", () => {
+        it("should return availability color functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(result.current).toHaveProperty("getAvailabilityColor");
@@ -132,7 +196,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current).toHaveProperty("getAvailabilityVariant");
         });
 
-        it("should return correct colors for different availability percentages", () => {
+        it("should return correct colors for different availability percentages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             const excellentColor = result.current.getAvailabilityColor(100);
@@ -144,7 +216,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof poorColor).toBe("string");
         });
 
-        it("should return correct variants for different availability percentages", () => {
+        it("should return correct variants for different availability percentages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Success (>= 95%)
@@ -160,14 +240,30 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current.getAvailabilityVariant(0)).toBe("danger");
         });
 
-        it("should clamp percentage values for variants", () => {
+        it("should clamp percentage values for variants", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(result.current.getAvailabilityVariant(150)).toBe("success");
             expect(result.current.getAvailabilityVariant(-10)).toBe("danger");
         });
 
-        it("should return correct descriptions for different availability percentages", () => {
+        it("should return correct descriptions for different availability percentages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             // Test all thresholds based on actual function logic
@@ -201,7 +297,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current.getAvailabilityDescription(0)).toBe("Failed");
         });
 
-        it("should clamp percentage values for descriptions", () => {
+        it("should clamp percentage values for descriptions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(result.current.getAvailabilityDescription(150)).toBe(
@@ -214,7 +318,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useStatusColors hook", () => {
-        it("should return status color object", () => {
+        it("should return status color object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useStatusColors());
 
             expect(result.current).toHaveProperty("up");
@@ -230,7 +342,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useThemeClasses hook", () => {
-        it("should return theme class functions", () => {
+        it("should return theme class functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useThemeClasses());
 
             expect(result.current).toHaveProperty("getColor");
@@ -241,7 +361,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current).toHaveProperty("getStatusClass");
         });
 
-        it("should return theme class values as objects", () => {
+        it("should return theme class values as objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useThemeClasses());
 
             const bgClass = result.current.getBackgroundClass();
@@ -257,7 +385,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof statusClass).toBe("object");
         });
 
-        it("should handle color path retrieval", () => {
+        it("should handle color path retrieval", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useThemeClasses());
 
             const color = result.current.getColor("text.primary");
@@ -266,7 +402,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("useThemeValue hook", () => {
-        it("should return theme value by selector", () => {
+        it("should return theme value by selector", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.colors.text.primary)
             );
@@ -274,7 +418,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof result.current).toBe("string");
         });
 
-        it("should retrieve nested theme values", () => {
+        it("should retrieve nested theme values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.colors)
             );
@@ -283,7 +435,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(result.current).toHaveProperty("text");
         });
 
-        it("should handle complex selectors", () => {
+        it("should handle complex selectors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => theme.spacing)
             );
@@ -291,7 +451,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof result.current).toBe("object");
         });
 
-        it("should handle undefined selectors gracefully", () => {
+        it("should handle undefined selectors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useThemeValue((theme) => (theme as any).nonexistent?.path)
             );
@@ -301,7 +469,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("Integration tests", () => {
-        it("should maintain consistency between hooks", () => {
+        it("should maintain consistency between hooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: themeResult } = renderHook(() => useTheme());
             const { result: statusResult } = renderHook(() =>
                 useStatusColors()
@@ -318,7 +494,15 @@ describe("useTheme - Complete Coverage", () => {
             expect(typeof statusUpColor).toBe("string");
         });
 
-        it("should handle theme changes across all hooks", async () => {
+        it("should handle theme changes across all hooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: themeResult } = renderHook(() => useTheme());
             const { result: availabilityResult } = renderHook(() =>
                 useAvailabilityColors()
@@ -346,7 +530,15 @@ describe("useTheme - Complete Coverage", () => {
     });
 
     describe("Edge cases and error handling", () => {
-        it("should handle extreme values gracefully", () => {
+        it("should handle extreme values gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useAvailabilityColors());
 
             expect(() =>
@@ -363,14 +555,30 @@ describe("useTheme - Complete Coverage", () => {
             ).not.toThrow();
         });
 
-        it("should handle invalid color paths", () => {
+        it("should handle invalid color paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             expect(() => result.current.getColor("")).not.toThrow();
             expect(() => result.current.getColor("invalid.path")).not.toThrow();
         });
 
-        it("should handle invalid status values", () => {
+        it("should handle invalid status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme.complete-coverage-fixed", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useTheme());
 
             expect(() =>

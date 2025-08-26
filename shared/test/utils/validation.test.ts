@@ -13,7 +13,15 @@ import {
 
 describe("Shared Validation - Backend Coverage", () => {
     describe("getMonitorValidationErrors", () => {
-        it("should return no errors for valid HTTP monitor", () => {
+        it("should return no errors for valid HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "test-id",
                 type: "http",
@@ -28,7 +36,15 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(errors).toEqual([]);
         });
 
-        it("should return errors for invalid monitor", () => {
+        it("should return errors for invalid monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor: Partial<Monitor> = {
                 type: "http",
                 checkInterval: 500,
@@ -45,7 +61,15 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(errors).toContain("URL is required for HTTP monitors");
         });
 
-        it("should validate port monitor fields", () => {
+        it("should validate port monitor fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const monitor: Partial<Monitor> = {
                 id: "test-id",
                 type: "port",
@@ -62,12 +86,28 @@ describe("Shared Validation - Backend Coverage", () => {
     });
 
     describe("validateMonitorType", () => {
-        it("should validate correct monitor types", () => {
+        it("should validate correct monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             expect(validateMonitorType("http")).toBe(true);
             expect(validateMonitorType("port")).toBe(true);
         });
 
-        it("should reject invalid types", () => {
+        it("should reject invalid types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(validateMonitorType("invalid")).toBe(false);
             expect(validateMonitorType(123)).toBe(false);
             expect(validateMonitorType(null)).toBe(false);
@@ -76,7 +116,15 @@ describe("Shared Validation - Backend Coverage", () => {
     });
 
     describe("validateSite", () => {
-        it("should validate complete site", () => {
+        it("should validate complete site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const site: Site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -101,7 +149,15 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(validateSite(site)).toBe(true);
         });
 
-        it("should reject invalid site structure", () => {
+        it("should reject invalid site structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(validateSite(null as unknown as Partial<Site>)).toBe(false);
             expect(validateSite(undefined as unknown as Partial<Site>)).toBe(
                 false
@@ -111,7 +167,15 @@ describe("Shared Validation - Backend Coverage", () => {
             );
         });
 
-        it("should reject site with missing required fields", () => {
+        it("should reject site with missing required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = {
                 name: "Test Site",
                 monitoring: true,
@@ -121,7 +185,15 @@ describe("Shared Validation - Backend Coverage", () => {
             expect(validateSite(site)).toBe(false);
         });
 
-        it("should reject site with invalid monitors", () => {
+        it("should reject site with invalid monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = {
                 identifier: "test-site",
                 name: "Test Site",

@@ -49,7 +49,15 @@ describe("useSiteMonitoring", () => {
     });
 
     describe("checkSiteNow", () => {
-        it("should trigger manual check for site monitor", async () => {
+        it("should trigger manual check for site monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitoring", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "site-1";
             const monitorId = "monitor-1";
 
@@ -63,7 +71,15 @@ describe("useSiteMonitoring", () => {
     });
 
     describe("startSiteMonitoring", () => {
-        it("should start monitoring for all site monitors", async () => {
+        it("should start monitoring for all site monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitoring", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "site-1";
 
             await actions.startSiteMonitoring(siteId);
@@ -75,7 +91,15 @@ describe("useSiteMonitoring", () => {
     });
 
     describe("startSiteMonitorMonitoring", () => {
-        it("should start monitoring for specific site monitor", async () => {
+        it("should start monitoring for specific site monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitoring", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "site-1";
             const monitorId = "monitor-1";
 
@@ -88,7 +112,15 @@ describe("useSiteMonitoring", () => {
     });
 
     describe("stopSiteMonitoring", () => {
-        it("should stop monitoring for all site monitors", async () => {
+        it("should stop monitoring for all site monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitoring", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "site-1";
 
             await actions.stopSiteMonitoring(siteId);
@@ -100,7 +132,15 @@ describe("useSiteMonitoring", () => {
     });
 
     describe("stopSiteMonitorMonitoring", () => {
-        it("should stop monitoring for specific site monitor", async () => {
+        it("should stop monitoring for specific site monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteMonitoring", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteId = "site-1";
             const monitorId = "monitor-1";
 

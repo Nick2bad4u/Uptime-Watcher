@@ -33,14 +33,30 @@ describe("SiteValidator - Comprehensive Coverage", () => {
     });
 
     describe("Constructor", () => {
-        it("should create instance with MonitorValidator", () => {
+        it("should create instance with MonitorValidator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(siteValidator).toBeInstanceOf(SiteValidator);
             expect(MonitorValidator).toHaveBeenCalledOnce();
         });
     });
 
     describe("shouldIncludeInExport", () => {
-        it("should return true for valid non-empty identifier", () => {
+        it("should return true for valid non-empty identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site: Site = {
                 identifier: "valid-site",
                 name: "Test Site",
@@ -52,7 +68,15 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false for empty string identifier", () => {
+        it("should return false for empty string identifier", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site: Site = {
                 identifier: "",
                 name: "Test Site",
@@ -66,7 +90,15 @@ describe("SiteValidator - Comprehensive Coverage", () => {
     });
 
     describe("validateSiteConfiguration", () => {
-        it("should return valid result for complete valid site", () => {
+        it("should return valid result for complete valid site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site: Site = {
                 identifier: "valid-site",
                 name: "Test Site",
@@ -101,7 +133,15 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             expect(result.errors).toEqual([]);
         });
 
-        it("should handle invalid monitors array", () => {
+        it("should handle invalid monitors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteValidator", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site: any = {
                 identifier: "valid-site",
                 name: "Test Site",

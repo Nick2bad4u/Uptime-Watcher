@@ -290,12 +290,32 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Basic Rendering and Structure", () => {
-        it("should render the form without errors", () => {
+        it("should render the form without errors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should render all required form elements", () => {
+        it("should render all required form elements", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             expect(
                 screen.getByRole("textbox", { name: /site name.*required/i })
@@ -308,24 +328,64 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render with proper form structure", () => {
+        it("should render with proper form structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should render without errors when no props provided", () => {
+        it("should render without errors when no props provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const { getForm } = renderAddSiteForm({});
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should render with default configuration", () => {
+        it("should render with default configuration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
     });
 
     describe("Form Field Components", () => {
-        it("should render site name field with proper attributes", () => {
+        it("should render site name field with proper attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const nameField = screen.getByRole("textbox", {
                 name: /site name.*required/i,
@@ -334,7 +394,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(nameField).toHaveAttribute("type", "text");
         });
 
-        it("should render site URL field with proper attributes", () => {
+        it("should render site URL field with proper attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const urlField = screen.getByRole("textbox", {
                 name: /url.*required/i,
@@ -343,7 +413,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(urlField).toHaveAttribute("type", "url");
         });
 
-        it("should render monitor type selection field", () => {
+        it("should render monitor type selection field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderAddSiteForm();
             const monitorField = screen.getByRole("combobox", {
                 name: /monitor type/i,
@@ -352,7 +432,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(monitorField.tagName).toBe("SELECT");
         });
 
-        it("should render check interval field", () => {
+        it("should render check interval field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const intervalField = screen.getByRole("combobox", {
                 name: /check interval/i,
@@ -361,7 +451,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(intervalField.tagName).toBe("SELECT");
         });
 
-        it("should render description field", () => {
+        it("should render description field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const descriptionField = screen.getByRole("textbox", {
                 name: /description/i,
@@ -370,7 +470,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(descriptionField).toHaveAttribute("type", "text");
         });
 
-        it("should render timeout field with numeric input", () => {
+        it("should render timeout field with numeric input", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const timeoutField = screen.getByRole("spinbutton", {
                 name: /timeout/i,
@@ -379,7 +489,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(timeoutField).toHaveAttribute("type", "number");
         });
 
-        it("should render retries field with numeric input", () => {
+        it("should render retries field with numeric input", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
             const retriesField = screen.getByRole("spinbutton", {
                 name: /retries/i,
@@ -390,7 +510,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Form Data Population and Display", () => {
-        it("should populate form fields with initial data", () => {
+        it("should populate form fields with initial data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Initialization", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Initialization", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     name: "Test Site",
@@ -409,7 +539,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByDisplayValue("5 minutes")).toBeInTheDocument();
         });
 
-        it("should handle empty form data gracefully", () => {
+        it("should handle empty form data gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     isFormValid: vi.fn(() => false),
@@ -420,7 +560,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle null form data", () => {
+        it("should handle null form data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     isFormValid: vi.fn(() => false),
@@ -431,7 +581,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle undefined form data", () => {
+        it("should handle undefined form data", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     isFormValid: vi.fn(() => false),
@@ -444,7 +604,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("User Interactions and Form Changes", () => {
-        it("should handle site name input changes", async () => {
+        it("should handle site name input changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setName = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
@@ -461,7 +631,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setName).toHaveBeenCalled();
         });
 
-        it("should handle site URL input changes", async () => {
+        it("should handle site URL input changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setUrl = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
@@ -478,7 +658,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setUrl).toHaveBeenCalled();
         });
 
-        it("should handle monitor type selection changes", async () => {
+        it("should handle monitor type selection changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const setMonitorType = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
@@ -500,7 +690,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setMonitorType).toHaveBeenCalledWith("http");
         });
 
-        it("should handle description textarea changes", async () => {
+        it("should handle description textarea changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // First render with empty description
             const mockActions = createMockFormState({
                 monitorType: "http", // Description field appears for HTTP monitors
@@ -525,7 +725,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(descriptionInput).toBeInTheDocument();
         });
 
-        it("should handle interval value changes", async () => {
+        it("should handle interval value changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const setCheckInterval = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
@@ -541,7 +751,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setCheckInterval).toHaveBeenCalled();
         });
 
-        it("should handle timeout value changes", async () => {
+        it("should handle timeout value changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     monitorType: "http", // Timeout field appears for HTTP monitors
@@ -568,7 +788,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(timeoutInput).toBeInTheDocument();
         });
 
-        it("should handle retries value changes", async () => {
+        it("should handle retries value changes", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     monitorType: "http", // Retries field appears for HTTP monitors
@@ -597,7 +827,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Form Submission Handling", () => {
-        it("should handle form submission with onSuccess callback", async () => {
+        it("should handle form submission with onSuccess callback", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const resetForm = vi.fn();
             const onSuccess = vi.fn();
 
@@ -615,7 +855,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(form).toBeInTheDocument();
         });
 
-        it("should handle form submission without onSuccess callback", async () => {
+        it("should handle form submission without onSuccess callback", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(createMockFormState({}));
 
             const { getForm } = renderAddSiteForm({ onSuccess: undefined });
@@ -626,7 +876,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(form).toBeInTheDocument();
         });
 
-        it("should handle submit button click", async () => {
+        it("should handle submit button click", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(createMockFormState({}));
 
             renderAddSiteForm();
@@ -639,7 +899,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should prevent submission when form is invalid", () => {
+        it("should prevent submission when form is invalid", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     formError: "Site name is required",
@@ -654,7 +924,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should handle rapid form submissions", async () => {
+        it("should handle rapid form submissions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(createMockFormState({}));
 
             const { getForm } = renderAddSiteForm();
@@ -670,7 +950,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Loading and Disabled States", () => {
-        it("should show loading state when form is submitting", () => {
+        it("should show loading state when form is submitting", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     // No specific overrides needed - will show loading based on component behavior
@@ -691,7 +981,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeDisabled();
         });
 
-        it("should disable form fields when submitting", () => {
+        it("should disable form fields when submitting", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     addMode: "new", // Ensure fields are visible
@@ -719,7 +1019,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should enable submit button when not submitting and form is valid", () => {
+        it("should enable submit button when not submitting and form is valid", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Mock the form hook to return valid form data
             const mockFormActions = createMockFormState({
                 addMode: "new",
@@ -749,7 +1059,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).not.toBeDisabled();
         });
 
-        it("should handle monitor types loading state", () => {
+        it("should handle monitor types loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             mockUseMonitorTypes.mockReturnValue({
                 options: [],
                 isLoading: true,
@@ -763,7 +1083,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Error Handling and Display", () => {
-        it("should display field validation errors", () => {
+        it("should display field validation errors", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     formError: "Site name is required",
@@ -784,7 +1114,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should handle monitor types error state", () => {
+        it("should handle monitor types error state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockUseMonitorTypes.mockReturnValue({
                 options: [],
                 isLoading: false,
@@ -796,7 +1136,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle component render errors gracefully", () => {
+        it("should handle component render errors gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const consoleSpy = vi
                 .spyOn(console, "error")
                 .mockImplementation(() => {});
@@ -810,7 +1160,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle error store integration", () => {
+        it("should handle error store integration", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // ErrorAlert expects a string message, not an object
             const errorMessage = "Form submission failed";
 
@@ -827,7 +1187,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByText(errorMessage)).toBeInTheDocument();
         });
 
-        it("should clear errors on field focus", async () => {
+        it("should clear errors on field focus", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const clearError = vi.fn();
 
             mockUseErrorStore.mockReturnValue({
@@ -861,7 +1231,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Validation Logic", () => {
-        it("should validate add mode correctly", () => {
+        it("should validate add mode correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
             mockUseAddSiteForm.mockReturnValue(createMockFormState({}));
 
             const { getForm } = renderAddSiteForm();
@@ -869,7 +1249,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should validate monitor type correctly", () => {
+        it("should validate monitor type correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
             mockUseAddSiteForm.mockReturnValue(createMockFormState({}));
 
             const { getForm } = renderAddSiteForm();
@@ -877,7 +1267,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle invalid add mode state", () => {
+        it("should handle invalid add mode state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     formError: "Invalid add mode",
@@ -892,7 +1292,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should handle invalid monitor type state", () => {
+        it("should handle invalid monitor type state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     formError: "Invalid monitor type",
@@ -907,7 +1317,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(submitButton).toBeInTheDocument();
         });
 
-        it("should handle complex validation scenarios", () => {
+        it("should handle complex validation scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     name: "a", // Too short
@@ -939,7 +1359,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Monitor Types Integration", () => {
-        it("should render available monitor types in select field", () => {
+        it("should render available monitor types in select field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             renderAddSiteForm();
             const monitorSelect = screen.getByRole("combobox", {
                 name: /monitor type/i,
@@ -951,7 +1381,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should handle empty monitor types list", () => {
+        it("should handle empty monitor types list", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseMonitorTypes.mockReturnValue({
                 options: [],
                 isLoading: false,
@@ -966,7 +1406,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(monitorSelect).toBeInTheDocument();
         });
 
-        it("should handle undefined monitor types", () => {
+        it("should handle undefined monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             mockUseMonitorTypes.mockReturnValue({
                 options: [],
                 isLoading: false,
@@ -978,7 +1428,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle monitor types with special configurations", () => {
+        it("should handle monitor types with special configurations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const specialMonitorTypes = [
                 {
                     type: "custom",
@@ -1024,7 +1484,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByText("Advanced Monitor")).toBeInTheDocument();
         });
 
-        it("should refresh monitor types when needed", () => {
+        it("should refresh monitor types when needed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const refreshMonitorTypes = vi.fn();
 
             mockUseMonitorTypes.mockReturnValue({
@@ -1044,7 +1514,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Dynamic Help Text Integration", () => {
-        it("should display help text for fields", () => {
+        it("should display help text for fields", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseDynamicHelpText.mockReturnValue({
                 primary: "Enter the URL of the site you want to monitor",
                 isLoading: false,
@@ -1063,7 +1543,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle help text loading state", () => {
+        it("should handle help text loading state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             mockUseDynamicHelpText.mockReturnValue({
                 isLoading: true,
             });
@@ -1072,7 +1562,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should handle help text error state", () => {
+        it("should handle help text error state", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockUseDynamicHelpText.mockReturnValue({
                 error: "Failed to load help text",
                 isLoading: false,
@@ -1082,7 +1582,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should update help text based on field focus", async () => {
+        it("should update help text based on field focus", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             const mockDynamicHelp = mockUseDynamicHelpText;
 
             renderAddSiteForm();
@@ -1098,7 +1608,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Accessibility Features", () => {
-        it("should have proper form labels and ARIA attributes", () => {
+        it("should have proper form labels and ARIA attributes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
 
             const nameField = screen.getByRole("textbox", {
@@ -1116,7 +1636,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(monitorField).toBeInTheDocument();
         });
 
-        it("should support keyboard navigation through form fields", async () => {
+        it("should support keyboard navigation through form fields", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             renderAddSiteForm();
 
             // Tab through the form elements in their natural order
@@ -1138,7 +1668,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(thirdFocusedElement).not.toBe(secondFocusedElement);
         });
 
-        it("should have proper form role and structure", () => {
+        it("should have proper form role and structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { getForm } = renderAddSiteForm();
             const form = getForm();
             // Form should exist and be a form element
@@ -1146,7 +1686,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(form.tagName.toLowerCase()).toBe("form");
         });
 
-        it("should announce validation errors to screen readers", () => {
+        it("should announce validation errors to screen readers", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     formError: "Site name is required",
@@ -1169,7 +1719,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Edge Cases and Corner Scenarios", () => {
-        it("should handle very long form field values", () => {
+        it("should handle very long form field values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longText = "a".repeat(1000);
 
             mockUseAddSiteForm.mockReturnValue(
@@ -1192,7 +1752,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should handle special characters in form values", () => {
+        it("should handle special characters in form values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const specialChars = "Test-Site!@#";
 
             mockUseAddSiteForm.mockReturnValue(
@@ -1214,7 +1784,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             }
         });
 
-        it("should handle extreme numeric values", () => {
+        it("should handle extreme numeric values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Use a text field that can display large numbers, and respect form constraints
             const extremeValue = "999999999"; // Large but reasonable number
             mockUseAddSiteForm.mockReturnValue(
@@ -1227,7 +1807,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByDisplayValue(extremeValue)).toBeInTheDocument();
         });
 
-        it("should handle Unicode characters in form values", () => {
+        it("should handle Unicode characters in form values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const unicodeText = "你好世界 🌍 Здравствуй мир 🇺🇳 مرحبا بالعالم";
 
             mockUseAddSiteForm.mockReturnValue(
@@ -1240,7 +1830,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(screen.getByDisplayValue(unicodeText)).toBeInTheDocument();
         });
 
-        it("should handle form reset scenarios", () => {
+        it("should handle form reset scenarios", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const resetForm = vi.fn();
 
             mockUseAddSiteForm.mockReturnValue(
@@ -1257,7 +1857,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Performance and Re-rendering", () => {
-        it("should handle frequent re-renders efficiently", () => {
+        it("should handle frequent re-renders efficiently", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = renderAddSiteForm();
 
             // Simulate multiple re-renders with different props
@@ -1269,7 +1879,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(getForm()).toBeInTheDocument();
         });
 
-        it("should maintain form state during re-renders", () => {
+        it("should maintain form state during re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
                     name: "Persistent Site",
@@ -1290,7 +1910,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle large monitor types lists efficiently", () => {
+        it("should handle large monitor types lists efficiently", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const largeMonitorTypesList = Array.from(
                 { length: 100 },
                 (_, i) => ({

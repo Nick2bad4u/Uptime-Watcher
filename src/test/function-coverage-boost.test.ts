@@ -7,7 +7,15 @@ import { describe, it, expect } from "vitest";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {
-        it("should test validateMonitorType from shared/utils/validation", async () => {
+        it("should test validateMonitorType from shared/utils/validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const { validateMonitorType } = await import(
                 "../../shared/utils/validation"
             );
@@ -29,7 +37,15 @@ describe("Function Coverage Boost Tests", () => {
             expect(validateMonitorType([])).toBe(false);
         });
 
-        it("should test validateSite from shared/utils/validation", async () => {
+        it("should test validateSite from shared/utils/validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             const { validateSite } = await import(
                 "../../shared/utils/validation"
             );
@@ -94,7 +110,15 @@ describe("Function Coverage Boost Tests", () => {
             ).toBe(false);
         });
 
-        it("should test getMonitorValidationErrors comprehensive cases", async () => {
+        it("should test getMonitorValidationErrors comprehensive cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { getMonitorValidationErrors } = await import(
                 "../../shared/utils/validation"
             );
@@ -174,7 +198,15 @@ describe("Function Coverage Boost Tests", () => {
     });
 
     describe("Utility function coverage", () => {
-        it("should test cache key generation functions", async () => {
+        it("should test cache key generation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Caching", "type");
+
             try {
                 const cacheModule = await import(
                     "../../shared/utils/cacheKeys"
@@ -195,7 +227,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test environment utility functions", async () => {
+        it("should test environment utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const envModule = await import(
                     "../../shared/utils/environment"
@@ -223,7 +263,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test object safety utility functions", async () => {
+        it("should test object safety utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const objectSafetyModule = await import(
                     "../../shared/utils/objectSafety"
@@ -260,7 +308,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test type helper functions", async () => {
+        it("should test type helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const helpersModule = await import(
                     "../../shared/utils/typeHelpers"
@@ -281,7 +337,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test type guard functions", async () => {
+        it("should test type guard functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const guardsModule = await import(
                     "../../shared/utils/typeGuards"
@@ -321,7 +385,15 @@ describe("Function Coverage Boost Tests", () => {
     });
 
     describe("Component helper function coverage", () => {
-        it("should test monitor UI helper functions", async () => {
+        it("should test monitor UI helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             try {
                 const monitorUiModule = await import(
                     "../utils/monitorUiHelpers"
@@ -356,7 +428,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test fallback utility functions", async () => {
+        it("should test fallback utility functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             try {
                 const fallbacksModule = await import("../utils/fallbacks");
 
@@ -408,7 +488,15 @@ describe("Function Coverage Boost Tests", () => {
             }
         });
 
-        it("should test monitor validation helper functions", async () => {
+        it("should test monitor validation helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: function-coverage-boost", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             try {
                 const monitorValidationModule = await import(
                     "../utils/monitorValidation"

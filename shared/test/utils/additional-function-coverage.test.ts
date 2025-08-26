@@ -8,7 +8,15 @@ import * as errorCatalog from "../../utils/errorCatalog";
 
 describe("Utils Additional Function Coverage", () => {
     describe("objectSafety module", () => {
-        it("should call safeObjectIteration function", () => {
+        it("should call safeObjectIteration function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2, c: 3 };
             const keys: string[] = [];
             const values: unknown[] = [];
@@ -30,7 +38,15 @@ describe("Utils Additional Function Coverage", () => {
             ]);
         });
 
-        it("should call safeObjectAccess function", () => {
+        it("should call safeObjectAccess function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { test: "value" };
             const result1 = objectSafety.safeObjectAccess(
                 obj,
@@ -47,21 +63,45 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe("default");
         });
 
-        it("should call safeObjectOmit function", () => {
+        it("should call safeObjectOmit function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2, c: 3 };
             const result = objectSafety.safeObjectOmit(obj, ["b"]);
 
             expect(result).toEqual({ a: 1, c: 3 });
         });
 
-        it("should call safeObjectPick function", () => {
+        it("should call safeObjectPick function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2, c: 3 };
             const result = objectSafety.safeObjectPick(obj, ["a", "c"]);
 
             expect(result).toEqual({ a: 1, c: 3 });
         });
 
-        it("should call typedObjectEntries function", () => {
+        it("should call typedObjectEntries function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectEntries(obj);
 
@@ -72,7 +112,15 @@ describe("Utils Additional Function Coverage", () => {
             ]);
         });
 
-        it("should call typedObjectKeys function", () => {
+        it("should call typedObjectKeys function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectKeys(obj);
 
@@ -80,7 +128,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result).toEqual(["a", "b"]);
         });
 
-        it("should call typedObjectValues function", () => {
+        it("should call typedObjectValues function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { a: 1, b: 2 };
             const result = objectSafety.typedObjectValues(obj);
 
@@ -90,7 +146,15 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("typeGuards module", () => {
-        it("should call isArray function", () => {
+        it("should call isArray function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isArray([
                 1,
                 2,
@@ -102,7 +166,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isFunction function", () => {
+        it("should call isFunction function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isFunction(() => {});
             const result2 = typeGuards.isFunction("not function");
 
@@ -110,7 +182,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isError function", () => {
+        it("should call isError function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result1 = typeGuards.isError(new Error("test"));
             const result2 = typeGuards.isError("not error");
 
@@ -118,7 +198,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isDate function", () => {
+        it("should call isDate function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isDate(new Date());
             const result2 = typeGuards.isDate("not date");
 
@@ -126,7 +214,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call hasProperty function", () => {
+        it("should call hasProperty function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const obj = { test: "value" };
             const result1 = typeGuards.hasProperty(obj, "test");
             const result2 = typeGuards.hasProperty(obj, "missing");
@@ -135,7 +231,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isPositiveNumber function", () => {
+        it("should call isPositiveNumber function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isPositiveNumber(5);
             const result2 = typeGuards.isPositiveNumber(-5);
             const result3 = typeGuards.isPositiveNumber(0);
@@ -145,7 +249,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isBoolean function", () => {
+        it("should call isBoolean function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isBoolean(true);
             const result2 = typeGuards.isBoolean("not boolean");
 
@@ -153,7 +265,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isFiniteNumber function", () => {
+        it("should call isFiniteNumber function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Initialization", "type");
+
             const result1 = typeGuards.isFiniteNumber(5);
             const result2 = typeGuards.isFiniteNumber(Infinity);
 
@@ -161,7 +281,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isNonNegativeNumber function", () => {
+        it("should call isNonNegativeNumber function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isNonNegativeNumber(5);
             const result2 = typeGuards.isNonNegativeNumber(-5);
             const result3 = typeGuards.isNonNegativeNumber(0);
@@ -171,7 +299,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(true);
         });
 
-        it("should call isNonNullObject function", () => {
+        it("should call isNonNullObject function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isNonNullObject({});
             const result2 = typeGuards.isNonNullObject(null);
             const result3 = typeGuards.isNonNullObject([]);
@@ -181,7 +317,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isString function", () => {
+        it("should call isString function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isString("test");
             const result2 = typeGuards.isString(123);
 
@@ -189,7 +333,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call isValidPort function", () => {
+        it("should call isValidPort function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isValidPort(80);
             const result2 = typeGuards.isValidPort(99999);
             const result3 = typeGuards.isValidPort(-1);
@@ -199,7 +351,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result3).toBe(false);
         });
 
-        it("should call isValidTimestamp function", () => {
+        it("should call isValidTimestamp function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result1 = typeGuards.isValidTimestamp(1640995200000);
             const result2 = typeGuards.isValidTimestamp(-1);
 
@@ -209,7 +369,15 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("validation module", () => {
-        it("should call getMonitorValidationErrors function", () => {
+        it("should call getMonitorValidationErrors function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const monitor = {
                 type: "http" as const,
                 url: "https://example.com",
@@ -219,7 +387,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(Array.isArray(result)).toBe(true);
         });
 
-        it("should call validateMonitorType function", () => {
+        it("should call validateMonitorType function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const result1 = validation.validateMonitorType("http");
             const result2 = validation.validateMonitorType("invalid");
 
@@ -227,7 +403,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(result2).toBe(false);
         });
 
-        it("should call validateSite function", () => {
+        it("should call validateSite function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const site = {
                 id: "test",
                 name: "Test Site",
@@ -243,7 +427,15 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("siteStatus module", () => {
-        it("should call calculateSiteMonitoringStatus function", () => {
+        it("should call calculateSiteMonitoringStatus function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = {
                 id: "test",
                 name: "Test Site",
@@ -267,7 +459,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should call calculateSiteStatus function", () => {
+        it("should call calculateSiteStatus function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site = {
                 id: "test",
                 name: "Test Site",
@@ -280,7 +480,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should call getSiteDisplayStatus function", () => {
+        it("should call getSiteDisplayStatus function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const site = {
                 id: "test",
                 name: "Test Site",
@@ -293,7 +501,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should call getSiteStatusDescription function", () => {
+        it("should call getSiteStatusDescription function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const site = {
                 id: "test",
                 name: "Test Site",
@@ -306,7 +522,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should call getSiteStatusVariant function", () => {
+        it("should call getSiteStatusVariant function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const result = siteStatus.getSiteStatusVariant("up");
 
             expect(typeof result).toBe("string");
@@ -314,7 +538,15 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("errorHandling module", () => {
-        it("should call withErrorHandling function", async () => {
+        it("should call withErrorHandling function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testFunction = async () => "test result";
             const context = {
                 logger: {
@@ -335,7 +567,15 @@ describe("Utils Additional Function Coverage", () => {
     });
 
     describe("errorCatalog module", () => {
-        it("should call formatErrorMessage function", () => {
+        it("should call formatErrorMessage function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = errorCatalog.formatErrorMessage("NETWORK_ERROR", {
                 url: "https://example.com",
             });
@@ -343,7 +583,15 @@ describe("Utils Additional Function Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should call isKnownErrorMessage function", () => {
+        it("should call isKnownErrorMessage function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: additional-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = errorCatalog.isKnownErrorMessage(
                 "Network connection failed"
             );

@@ -14,7 +14,15 @@ import {
 
 describe("shared/types/validation function coverage", () => {
     describe("createFailureResult", () => {
-        it("should create a failure result with errors", () => {
+        it("should create a failure result with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const errors = ["Field is required", "Invalid format"];
             const result = createFailureResult(errors);
 
@@ -26,7 +34,15 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should create a failure result with metadata", () => {
+        it("should create a failure result with metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const errors = ["Validation failed"];
             const metadata = { field: "email", validator: "email" };
             const result = createFailureResult(errors, metadata);
@@ -39,7 +55,15 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should handle empty errors array", () => {
+        it("should handle empty errors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = createFailureResult([]);
 
             expect(result.success).toBe(false);
@@ -50,7 +74,15 @@ describe("shared/types/validation function coverage", () => {
     });
 
     describe("createSuccessResult", () => {
-        it("should create a success result without data", () => {
+        it("should create a success result without data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = createSuccessResult();
 
             expect(result).toEqual({
@@ -61,7 +93,15 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should create a success result with data", () => {
+        it("should create a success result with data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const data = { id: 1, name: "test" };
             const result = createSuccessResult(data);
 
@@ -73,7 +113,15 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should create a success result with warnings", () => {
+        it("should create a success result with warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const warnings = ["Deprecated field used"];
             const result = createSuccessResult(undefined, warnings);
 
@@ -86,7 +134,15 @@ describe("shared/types/validation function coverage", () => {
             });
         });
 
-        it("should create a success result with data and warnings", () => {
+        it("should create a success result with data and warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const data = { value: 42 };
             const warnings = ["Value is near limit"];
             const result = createSuccessResult(data, warnings);
@@ -102,7 +158,15 @@ describe("shared/types/validation function coverage", () => {
     });
 
     describe("isValidationResult", () => {
-        it("should return true for valid BaseValidationResult", () => {
+        it("should return true for valid BaseValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: BaseValidationResult = {
                 errors: [],
                 success: true,
@@ -111,7 +175,15 @@ describe("shared/types/validation function coverage", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for ValidationResult", () => {
+        it("should return true for ValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: ValidationResult = {
                 data: { test: true },
                 errors: [],
@@ -123,27 +195,67 @@ describe("shared/types/validation function coverage", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult(undefined)).toBe(false);
         });
 
-        it("should return false for primitive types", () => {
+        it("should return false for primitive types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult("string")).toBe(false);
             expect(isValidationResult(123)).toBe(false);
             expect(isValidationResult(true)).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult({})).toBe(false);
             expect(isValidationResult({ errors: [] })).toBe(false);
             expect(isValidationResult({ success: true })).toBe(false);
         });
 
-        it("should return false for object with invalid property types", () => {
+        it("should return false for object with invalid property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 isValidationResult({
                     errors: "not an array",
@@ -159,7 +271,15 @@ describe("shared/types/validation function coverage", () => {
             ).toBe(false);
         });
 
-        it("should handle object with non-array errors", () => {
+        it("should handle object with non-array errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidResult = {
                 errors: { invalid: "object" },
                 success: true,
@@ -170,12 +290,28 @@ describe("shared/types/validation function coverage", () => {
     });
 
     describe("integration tests", () => {
-        it("should work with createFailureResult output", () => {
+        it("should work with createFailureResult output", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = createFailureResult(["error"]);
             expect(isValidationResult(result)).toBe(true);
         });
 
-        it("should work with createSuccessResult output", () => {
+        it("should work with createSuccessResult output", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = createSuccessResult();
             expect(isValidationResult(result)).toBe(true);
         });

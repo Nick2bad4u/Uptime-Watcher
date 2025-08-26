@@ -16,7 +16,15 @@ import * as typeHelpersModule from "@shared/utils/typeHelpers";
 
 describe("shared/utils/typeHelpers Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
-        it("should call all exported functions to ensure 100% function coverage", () => {
+        it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Test castIpcResponse function
             const testData = { result: "success" };
             const result = typeHelpersModule.castIpcResponse(testData);

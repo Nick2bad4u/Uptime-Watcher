@@ -45,7 +45,7 @@ function extractTestNames(filePath) {
 
         return testStructure;
     } catch (error) {
-        console.error(`Error reading file ${filePath}:`, error.message);
+        console.error(`Error reading file ${filePath}:`, error instanceof Error ? error.message : String(error));
         return null;
     }
 }
@@ -96,7 +96,7 @@ function findTestFiles(dirPath, testFiles = []) {
             }
         }
     } catch (error) {
-        console.error(`Error reading directory ${dirPath}:`, error.message);
+        console.error(`Error reading directory ${dirPath}:`, error instanceof Error ? error.message : String(error));
     }
 
     return testFiles;
@@ -238,7 +238,7 @@ function main() {
             console.log(`\nResults saved to: ${outputFile}`);
         }
     } catch (error) {
-        console.error("Error during extraction:", error.message);
+        console.error("Error during extraction:", error instanceof Error ? error.message : String(error));
         process.exit(1);
     }
 }

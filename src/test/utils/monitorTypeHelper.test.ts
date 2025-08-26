@@ -155,13 +155,29 @@ describe("monitorTypeHelper", () => {
     });
 
     describe("clearMonitorTypeCache", () => {
-        it("should call cache clear method", () => {
+        it("should call cache clear method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             clearMonitorTypeCache();
 
             expect(AppCaches.monitorTypes.clear).toHaveBeenCalledTimes(1);
         });
 
-        it("should clear cache when called multiple times", () => {
+        it("should clear cache when called multiple times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             clearMonitorTypeCache();
             clearMonitorTypeCache();
             clearMonitorTypeCache();
@@ -171,7 +187,15 @@ describe("monitorTypeHelper", () => {
     });
 
     describe("getAvailableMonitorTypes", () => {
-        it("should return cached data when available", async () => {
+        it("should return cached data when available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
                 mockMonitorTypes
             );
@@ -187,7 +211,15 @@ describe("monitorTypeHelper", () => {
             ).not.toHaveBeenCalled();
         });
 
-        it("should fetch from backend when cache is empty", async () => {
+        it("should fetch from backend when cache is empty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
 
             // Configure mock store to return the expected monitor types
@@ -210,7 +242,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should handle backend fetch errors gracefully", async () => {
+        it("should handle backend fetch errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const fallbackValue: MonitorTypeConfig[] = [];
 
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
@@ -227,7 +267,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should cache fetched data for subsequent calls", async () => {
+        it("should cache fetched data for subsequent calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
 
             // Configure mock store to return the expected monitor types
@@ -246,7 +294,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should handle empty response from backend", async () => {
+        it("should handle empty response from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(
                 errorHandling.withUtilityErrorHandling
@@ -271,7 +327,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should handle invalid cache data gracefully", async () => {
+        it("should handle invalid cache data gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(null);
 
             // Configure mock store to return the expected monitor types
@@ -296,13 +360,29 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should return config for existing monitor type", async () => {
+        it("should return config for existing monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await getMonitorTypeConfig("http");
 
             expect(result).toEqual(mockMonitorTypes[0]);
         });
 
-        it("should return config for different monitor types", async () => {
+        it("should return config for different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingResult = await getMonitorTypeConfig("ping");
             const tcpResult = await getMonitorTypeConfig("tcp");
 
@@ -310,37 +390,85 @@ describe("monitorTypeHelper", () => {
             expect(tcpResult).toEqual(mockMonitorTypes[2]);
         });
 
-        it("should return undefined for non-existent monitor type", async () => {
+        it("should return undefined for non-existent monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await getMonitorTypeConfig("nonexistent");
 
             expect(result).toBeUndefined();
         });
 
-        it("should return undefined for empty string", async () => {
+        it("should return undefined for empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await getMonitorTypeConfig("");
 
             expect(result).toBeUndefined();
         });
 
-        it("should handle case-sensitive type matching", async () => {
+        it("should handle case-sensitive type matching", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await getMonitorTypeConfig("HTTP");
 
             expect(result).toBeUndefined();
         });
 
-        it("should work with whitespace in type names", async () => {
+        it("should work with whitespace in type names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await getMonitorTypeConfig(" http ");
 
             expect(result).toBeUndefined();
         });
 
-        it("should handle special characters in type names", async () => {
+        it("should handle special characters in type names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = await getMonitorTypeConfig("http-monitor");
 
             expect(result).toBeUndefined();
         });
 
-        it("should return undefined when monitor types list is empty", async () => {
+        it("should return undefined when monitor types list is empty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([]);
 
             const result = await getMonitorTypeConfig("http");
@@ -357,7 +485,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should return options array for all monitor types", async () => {
+        it("should return options array for all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const result = await getMonitorTypeOptions();
 
             expect(result).toEqual([
@@ -367,7 +503,15 @@ describe("monitorTypeHelper", () => {
             ]);
         });
 
-        it("should return empty array when no monitor types available", async () => {
+        it("should return empty array when no monitor types available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([]);
 
             const result = await getMonitorTypeOptions();
@@ -375,7 +519,15 @@ describe("monitorTypeHelper", () => {
             expect(result).toEqual([]);
         });
 
-        it("should handle monitor types with complex display names", async () => {
+        it("should handle monitor types with complex display names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const complexTypes: MonitorTypeConfig[] = [
                 {
                     type: "special-http",
@@ -402,7 +554,15 @@ describe("monitorTypeHelper", () => {
             ]);
         });
 
-        it("should preserve order of monitor types from backend", async () => {
+        it("should preserve order of monitor types from backend", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const reversedTypes = [...mockMonitorTypes].toReversed();
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
                 reversedTypes
@@ -417,7 +577,15 @@ describe("monitorTypeHelper", () => {
             ]);
         });
 
-        it("should handle monitor types with empty display names", async () => {
+        it("should handle monitor types with empty display names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const typesWithEmptyNames: MonitorTypeConfig[] = [
                 {
                     type: "empty-name",
@@ -446,7 +614,15 @@ describe("monitorTypeHelper", () => {
             ]);
         });
 
-        it("should handle monitor types with special characters in names", async () => {
+        it("should handle monitor types with special characters in names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const specialTypes: MonitorTypeConfig[] = [
                 {
                     type: "special",
@@ -467,7 +643,15 @@ describe("monitorTypeHelper", () => {
     });
 
     describe("error handling integration", () => {
-        it("should pass correct parameters to withUtilityErrorHandling", async () => {
+        it("should pass correct parameters to withUtilityErrorHandling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
                 []
@@ -482,7 +666,15 @@ describe("monitorTypeHelper", () => {
             );
         });
 
-        it("should use fallback value from error handler", async () => {
+        it("should use fallback value from error handler", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const fallbackValue = [mockMonitorTypes[0]];
 
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
@@ -497,7 +689,15 @@ describe("monitorTypeHelper", () => {
     });
 
     describe("Store integration", () => {
-        it("should use monitor types store correctly", async () => {
+        it("should use monitor types store correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
 
             // Configure mock store to simulate unloaded state initially

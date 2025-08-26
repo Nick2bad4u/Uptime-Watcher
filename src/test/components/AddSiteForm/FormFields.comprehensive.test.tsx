@@ -73,17 +73,47 @@ describe("FormFields Components - Complete Coverage", () => {
             children: <input data-testid="child-input" />,
         };
 
-        it("should render with label", () => {
+        it("should render with label", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormField {...defaultFormFieldProps} />);
             expect(screen.getByText("Test Field")).toBeInTheDocument();
         });
 
-        it("should show required indicator when required", () => {
+        it("should show required indicator when required", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormField {...defaultFormFieldProps} required={true} />);
             expect(screen.getByText(/\*/)).toBeInTheDocument();
         });
 
-        it("should display error message", () => {
+        it("should display error message", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <FormField
                     {...defaultFormFieldProps}
@@ -95,7 +125,17 @@ describe("FormFields Components - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display help text", () => {
+        it("should display help text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <FormField
                     {...defaultFormFieldProps}
@@ -107,17 +147,47 @@ describe("FormFields Components - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render children", () => {
+        it("should render children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormField {...defaultFormFieldProps} />);
             expect(screen.getByTestId("child-input")).toBeInTheDocument();
         });
 
-        it("should handle no error gracefully", () => {
+        it("should handle no error gracefully", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<FormField {...defaultFormFieldProps} />);
             expect(screen.getByText("Test Field")).toBeInTheDocument();
         });
 
-        it("should prioritize error over help text when both are present", () => {
+        it("should prioritize error over help text when both are present", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <FormField
                     {...defaultFormFieldProps}
@@ -129,12 +199,32 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.queryByText("Help text")).not.toBeInTheDocument();
         });
 
-        it("should not show required indicator when required is false", () => {
+        it("should not show required indicator when required is false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<FormField {...defaultFormFieldProps} required={false} />);
             expect(screen.queryByText("*")).not.toBeInTheDocument();
         });
 
-        it("should handle required prop explicitly set to false", () => {
+        it("should handle required prop explicitly set to false", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <FormField
                     {...defaultFormFieldProps}
@@ -158,12 +248,32 @@ describe("FormFields Components - Complete Coverage", () => {
             placeholder: "Enter site name",
         };
 
-        it("should render text input", () => {
+        it("should render text input", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<TextField {...defaultTextFieldProps} />);
             expect(screen.getByTestId("themed-input")).toBeInTheDocument();
         });
 
-        it("should handle value changes", () => {
+        it("should handle value changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onChange = vi.fn();
             render(
                 <TextField {...defaultTextFieldProps} onChange={onChange} />
@@ -175,7 +285,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(onChange).toHaveBeenCalledWith("Test Value");
         });
 
-        it("should display current value", () => {
+        it("should display current value", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <TextField {...defaultTextFieldProps} value="Current Value" />
             );
@@ -184,31 +304,81 @@ describe("FormFields Components - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should be disabled when disabled prop is true", () => {
+        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<TextField {...defaultTextFieldProps} disabled={true} />);
             expect(screen.getByTestId("themed-input")).toBeDisabled();
         });
 
-        it("should show placeholder text", () => {
+        it("should show placeholder text", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<TextField {...defaultTextFieldProps} />);
             expect(
                 screen.getByPlaceholderText("Enter site name")
             ).toBeInTheDocument();
         });
 
-        it("should handle required field", () => {
+        it("should handle required field", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<TextField {...defaultTextFieldProps} required={true} />);
             expect(screen.getByText(/\*/)).toBeInTheDocument();
         });
 
-        it("should display validation error", () => {
+        it("should display validation error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <TextField {...defaultTextFieldProps} error="Invalid input" />
             );
             expect(screen.getByText("Invalid input")).toBeInTheDocument();
         });
 
-        it("should support different input types", () => {
+        it("should support different input types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<TextField {...defaultTextFieldProps} type="url" />);
             expect(screen.getByTestId("themed-input")).toHaveAttribute(
                 "type",
@@ -216,7 +386,17 @@ describe("FormFields Components - Complete Coverage", () => {
             );
         });
 
-        it("should display help text without error", () => {
+        it("should display help text without error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <TextField
                     {...defaultTextFieldProps}
@@ -226,7 +406,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("This is helpful")).toBeInTheDocument();
         });
 
-        it("should handle TextField with explicit undefined props", () => {
+        it("should handle TextField with explicit undefined props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test conditional spreading edge cases
             const propsWithExplicitUndefined = {
                 ...defaultTextFieldProps,
@@ -235,7 +425,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByTestId("themed-input")).toBeInTheDocument();
         });
 
-        it("should handle min and max attributes for number inputs", () => {
+        it("should handle min and max attributes for number inputs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <TextField
                     {...defaultTextFieldProps}
@@ -265,19 +465,49 @@ describe("FormFields Components - Complete Coverage", () => {
             onChange: vi.fn(),
         };
 
-        it("should render select dropdown", () => {
+        it("should render select dropdown", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SelectField {...defaultSelectFieldProps} />);
             expect(screen.getByTestId("themed-select")).toBeInTheDocument();
         });
 
-        it("should display all options", () => {
+        it("should display all options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SelectField {...defaultSelectFieldProps} />);
             expect(screen.getByText("HTTP")).toBeInTheDocument();
             expect(screen.getByText("Port")).toBeInTheDocument();
             expect(screen.getByText("Ping")).toBeInTheDocument();
         });
 
-        it("should handle option selection", () => {
+        it("should handle option selection", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onChange = vi.fn();
             render(
                 <SelectField {...defaultSelectFieldProps} onChange={onChange} />
@@ -289,25 +519,65 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(onChange).toHaveBeenCalledWith("port");
         });
 
-        it("should show current selection", () => {
+        it("should show current selection", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SelectField {...defaultSelectFieldProps} value="port" />);
             const select = screen.getByTestId("themed-select");
             expect(select).toHaveValue("port");
         });
 
-        it("should be disabled when disabled prop is true", () => {
+        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SelectField {...defaultSelectFieldProps} disabled={true} />
             );
             expect(screen.getByTestId("themed-select")).toBeDisabled();
         });
 
-        it("should handle empty options array", () => {
+        it("should handle empty options array", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SelectField {...defaultSelectFieldProps} options={[]} />);
             expect(screen.getByTestId("themed-select")).toBeInTheDocument();
         });
 
-        it("should show validation error", () => {
+        it("should show validation error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <SelectField
                     {...defaultSelectFieldProps}
@@ -317,7 +587,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Selection required")).toBeInTheDocument();
         });
 
-        it("should display help text without error", () => {
+        it("should display help text without error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <SelectField
                     {...defaultSelectFieldProps}
@@ -327,7 +607,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
-        it("should handle SelectField with explicit undefined props", () => {
+        it("should handle SelectField with explicit undefined props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             // Test conditional spreading edge cases
             const propsWithExplicitUndefined = {
                 ...defaultSelectFieldProps,
@@ -336,7 +626,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByTestId("themed-select")).toBeInTheDocument();
         });
 
-        it("should show placeholder option when provided", () => {
+        it("should show placeholder option when provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SelectField
                     {...defaultSelectFieldProps}
@@ -363,13 +663,33 @@ describe("FormFields Components - Complete Coverage", () => {
             onChange: vi.fn(),
         };
 
-        it("should render radio buttons", () => {
+        it("should render radio buttons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} />);
             expect(screen.getByDisplayValue("new")).toBeInTheDocument();
             expect(screen.getByDisplayValue("existing")).toBeInTheDocument();
         });
 
-        it("should display option labels", () => {
+        it("should display option labels", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
             expect(
@@ -377,7 +697,17 @@ describe("FormFields Components - Complete Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle option selection", () => {
+        it("should handle option selection", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const onChange = vi.fn();
             render(
                 <RadioGroup {...defaultRadioGroupProps} onChange={onChange} />
@@ -389,12 +719,32 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(onChange).toHaveBeenCalledWith("existing");
         });
 
-        it("should show current selection", () => {
+        it("should show current selection", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} value="existing" />);
             expect(screen.getByDisplayValue("existing")).toBeChecked();
         });
 
-        it("should be disabled when disabled prop is true", () => {
+        it("should be disabled when disabled prop is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} disabled={true} />);
 
             const newRadio = screen.getByDisplayValue("new");
@@ -404,13 +754,33 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(existingRadio).toBeDisabled();
         });
 
-        it("should handle empty options array", () => {
+        it("should handle empty options array", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} options={[]} />);
             // Should still render the component without crashing
             expect(screen.queryByDisplayValue("new")).not.toBeInTheDocument();
         });
 
-        it("should use correct name attribute for grouping", () => {
+        it("should use correct name attribute for grouping", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} />);
 
             const newRadio = screen.getByDisplayValue("new");
@@ -420,7 +790,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(existingRadio).toHaveAttribute("name", "addMode");
         });
 
-        it("should handle keyboard navigation", () => {
+        it("should handle keyboard navigation", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} />);
 
             const newRadio = screen.getByDisplayValue("new");
@@ -433,7 +813,17 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(existingRadio).toHaveFocus();
         });
 
-        it("should display help text without error", () => {
+        it("should display help text without error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(
                 <RadioGroup
                     {...defaultRadioGroupProps}
@@ -443,12 +833,32 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Choose an option")).toBeInTheDocument();
         });
 
-        it("should handle radiogroup without error or helpText", () => {
+        it("should handle radiogroup without error or helpText", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             render(<RadioGroup {...defaultRadioGroupProps} />);
             expect(screen.getByText("Create New Site")).toBeInTheDocument();
         });
 
-        it("should handle radiogroup with explicit undefined error", () => {
+        it("should handle radiogroup with explicit undefined error", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             // This specifically tests the conditional spread operator edge case
             const propsWithExplicitUndefined = {
                 ...defaultRadioGroupProps,
@@ -462,7 +872,17 @@ describe("FormFields Components - Complete Coverage", () => {
     });
 
     describe("Integration Tests", () => {
-        it("should work together in a form", () => {
+        it("should work together in a form", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Retrieval", "type");
+
             const handleTextChange = vi.fn();
             const handleSelectChange = vi.fn();
             const handleRadioChange = vi.fn();

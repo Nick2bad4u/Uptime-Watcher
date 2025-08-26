@@ -30,7 +30,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Successful Loading", () => {
-        it("should load monitor types successfully on mount", async () => {
+        it("should load monitor types successfully on mount", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             const mockOptions = [
                 { label: "HTTP", value: "http" },
                 { label: "Port", value: "port" },
@@ -57,7 +65,15 @@ describe("useMonitorTypes Hook", () => {
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
-        it("should provide refresh functionality", async () => {
+        it("should provide refresh functionality", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const initialOptions = [
                 { label: "HTTP", value: "http" },
                 { label: "Port", value: "port" },
@@ -97,7 +113,15 @@ describe("useMonitorTypes Hook", () => {
             expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle empty options array", async () => {
+        it("should handle empty options array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockGetMonitorTypeOptions.mockResolvedValue([]);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -110,7 +134,15 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.error).toBeUndefined();
         });
 
-        it("should handle options with special characters and formatting", async () => {
+        it("should handle options with special characters and formatting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const specialOptions = [
                 { label: "HTTP/HTTPS Monitor", value: "http" },
                 { label: "TCP Port (Custom)", value: "port" },
@@ -129,7 +161,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle Error objects and use fallback options", async () => {
+        it("should handle Error objects and use fallback options", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = new Error("Network connection failed");
             mockGetMonitorTypeOptions.mockRejectedValue(testError);
 
@@ -151,7 +191,15 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should handle non-Error objects", async () => {
+        it("should handle non-Error objects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = "String error message";
             mockGetMonitorTypeOptions.mockRejectedValue(testError);
 
@@ -173,7 +221,15 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should handle null/undefined errors", async () => {
+        it("should handle null/undefined errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockGetMonitorTypeOptions.mockRejectedValue(null);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -194,7 +250,15 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should handle object errors", async () => {
+        it("should handle object errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const objectError = {
                 code: "NETWORK_ERROR",
                 message: "Connection timeout",
@@ -219,7 +283,15 @@ describe("useMonitorTypes Hook", () => {
             );
         });
 
-        it("should clear error on successful refresh", async () => {
+        it("should clear error on successful refresh", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const testError = new Error("Initial error");
             const successOptions = [{ label: "HTTP", value: "http" }];
 
@@ -251,7 +323,15 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.options).toEqual(successOptions);
         });
 
-        it("should handle error during refresh", async () => {
+        it("should handle error during refresh", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const initialOptions = [{ label: "HTTP", value: "http" }];
             const refreshError = new Error("Refresh failed");
 
@@ -287,7 +367,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Loading States", () => {
-        it("should manage loading state correctly during initial load", async () => {
+        it("should manage loading state correctly during initial load", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             let resolvePromise: (
                 value: { label: string; value: string }[]
             ) => void;
@@ -314,7 +402,15 @@ describe("useMonitorTypes Hook", () => {
             });
         });
 
-        it("should manage loading state correctly during refresh", async () => {
+        it("should manage loading state correctly during refresh", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             const initialOptions = [{ label: "HTTP", value: "http" }];
             mockGetMonitorTypeOptions.mockResolvedValue(initialOptions);
 
@@ -353,7 +449,15 @@ describe("useMonitorTypes Hook", () => {
             });
         });
 
-        it("should handle rapid consecutive refresh calls", async () => {
+        it("should handle rapid consecutive refresh calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const options = [{ label: "HTTP", value: "http" }];
             mockGetMonitorTypeOptions.mockResolvedValue(options);
 
@@ -382,7 +486,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Fallback Behavior", () => {
-        it("should use fallback options when backend fails", async () => {
+        it("should use fallback options when backend fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockGetMonitorTypeOptions.mockRejectedValue(
                 new Error("Backend unavailable")
             );
@@ -399,7 +511,15 @@ describe("useMonitorTypes Hook", () => {
             expect(result.current.options.length).toBeGreaterThan(0);
         });
 
-        it("should not mutate the original fallback options array", async () => {
+        it("should not mutate the original fallback options array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalFallbackOptions = [...FALLBACK_MONITOR_TYPE_OPTIONS];
             mockGetMonitorTypeOptions.mockRejectedValue(
                 new Error("Test error")
@@ -425,7 +545,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Integration Scenarios", () => {
-        it("should handle hook unmounting during loading", async () => {
+        it("should handle hook unmounting during loading", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Loading", "type");
+
             let resolvePromise: (
                 value: { label: string; value: string }[]
             ) => void;
@@ -452,7 +580,15 @@ describe("useMonitorTypes Hook", () => {
             expect(mockGetMonitorTypeOptions).toHaveBeenCalledOnce();
         });
 
-        it("should work with real-world monitor type data", async () => {
+        it("should work with real-world monitor type data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const realWorldOptions = [
                 { label: "HTTP/HTTPS Website", value: "http" },
                 { label: "TCP Port Check", value: "port" },
@@ -481,7 +617,15 @@ describe("useMonitorTypes Hook", () => {
     });
 
     describe("Return Value Interface", () => {
-        it("should have correct return value interface", async () => {
+        it("should have correct return value interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockGetMonitorTypeOptions.mockResolvedValue([]);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -500,7 +644,15 @@ describe("useMonitorTypes Hook", () => {
             ).toBe(true);
         });
 
-        it("should have refresh function that returns a Promise", async () => {
+        it("should have refresh function that returns a Promise", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             mockGetMonitorTypeOptions.mockResolvedValue([]);
 
             const { result } = renderHook(() => useMonitorTypes());

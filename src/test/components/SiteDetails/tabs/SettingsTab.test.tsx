@@ -286,7 +286,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render settings tab with all sections", () => {
+        it("should render settings tab with all sections", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             expect(screen.getByTestId("settings-tab")).toBeInTheDocument();
@@ -298,7 +308,17 @@ describe("SettingsTab", () => {
             expect(screen.getByText("Danger Zone")).toBeInTheDocument();
         });
 
-        it("should display site name input with current value", () => {
+        it("should display site name input with current value", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const siteNameInput = screen.getByDisplayValue("Test Site");
@@ -306,7 +326,17 @@ describe("SettingsTab", () => {
             expect(siteNameInput).not.toBeDisabled();
         });
 
-        it("should display disabled site identifier input", () => {
+        it("should display disabled site identifier input", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const identifierInput = screen.getByDisplayValue(
@@ -316,7 +346,17 @@ describe("SettingsTab", () => {
             expect(identifierInput).toBeDisabled();
         });
 
-        it("should show check interval dropdown with options", () => {
+        it("should show check interval dropdown with options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const intervalSelect = screen.getByDisplayValue("60s");
@@ -327,7 +367,17 @@ describe("SettingsTab", () => {
             expect(options.length).toBeGreaterThan(1);
         });
 
-        it("should display timeout input with current value", () => {
+        it("should display timeout input with current value", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const timeoutInput = screen.getByDisplayValue("10");
@@ -335,7 +385,17 @@ describe("SettingsTab", () => {
             expect(timeoutInput).toHaveAttribute("type", "number");
         });
 
-        it("should display retry attempts input with current value", () => {
+        it("should display retry attempts input with current value", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const retryInput = screen.getByDisplayValue("3");
@@ -345,7 +405,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Site Configuration", () => {
-        it("should handle site name changes", () => {
+        it("should handle site name changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const siteNameInput = screen.getByDisplayValue("Test Site");
@@ -358,14 +428,34 @@ describe("SettingsTab", () => {
             );
         });
 
-        it("should show save button for site name when there are unsaved changes", () => {
+        it("should show save button for site name when there are unsaved changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             const saveButtons = screen.getAllByText("Save");
             expect(saveButtons[0]).not.toBeDisabled();
         });
 
-        it("should disable save button when no changes", () => {
+        it("should disable save button when no changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} hasUnsavedChanges={false} />);
 
             // Use getAllByRole to get button elements instead of text
@@ -375,7 +465,17 @@ describe("SettingsTab", () => {
             expect(saveButtons[0]).toBeDisabled();
         });
 
-        it("should call handleSaveName when save button is clicked", async () => {
+        it("should call handleSaveName when save button is clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             const saveButtons = screen.getAllByText("Save");
@@ -387,7 +487,17 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should show unsaved changes warning", () => {
+        it("should show unsaved changes warning", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             expect(screen.getByText("⚠️ Unsaved changes")).toBeInTheDocument();
@@ -395,7 +505,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Monitoring Configuration", () => {
-        it("should handle interval changes", () => {
+        it("should handle interval changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const intervalSelect = screen.getByDisplayValue("60s");
@@ -404,14 +524,34 @@ describe("SettingsTab", () => {
             expect(baseProps.handleIntervalChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save interval button when interval changed", () => {
+        it("should enable save interval button when interval changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} intervalChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
             expect(saveButtons[1]).not.toBeDisabled();
         });
 
-        it("should call handleSaveInterval when save button clicked", () => {
+        it("should call handleSaveInterval when save button clicked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} intervalChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
@@ -421,7 +561,17 @@ describe("SettingsTab", () => {
             expect(baseProps.handleSaveInterval).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle timeout changes", () => {
+        it("should handle timeout changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const timeoutInput = screen.getByDisplayValue("10");
@@ -430,14 +580,34 @@ describe("SettingsTab", () => {
             expect(baseProps.handleTimeoutChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save timeout button when timeout changed", () => {
+        it("should enable save timeout button when timeout changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} timeoutChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
             expect(saveButtons[2]).not.toBeDisabled();
         });
 
-        it("should call handleSaveTimeout when save button clicked", async () => {
+        it("should call handleSaveTimeout when save button clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} timeoutChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
@@ -449,7 +619,17 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should handle retry attempts changes", () => {
+        it("should handle retry attempts changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const retryInput = screen.getByDisplayValue("3");
@@ -460,14 +640,34 @@ describe("SettingsTab", () => {
             );
         });
 
-        it("should enable save retry button when retry attempts changed", () => {
+        it("should enable save retry button when retry attempts changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} retryAttemptsChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
             expect(saveButtons[3]).not.toBeDisabled();
         });
 
-        it("should call handleSaveRetryAttempts when save button clicked", async () => {
+        it("should call handleSaveRetryAttempts when save button clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<SettingsTab {...baseProps} retryAttemptsChanged={true} />);
 
             const saveButtons = screen.getAllByText("Save");
@@ -481,7 +681,17 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should show maximum duration calculation when retry attempts > 0", () => {
+        it("should show maximum duration calculation when retry attempts > 0", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} localRetryAttempts={3} />);
 
             expect(
@@ -496,7 +706,17 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should not show maximum duration when retry attempts is 0", () => {
+        it("should not show maximum duration when retry attempts is 0", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} localRetryAttempts={0} />);
 
             expect(
@@ -506,14 +726,34 @@ describe("SettingsTab", () => {
     });
 
     describe("Site Information", () => {
-        it("should display history records count", () => {
+        it("should display history records count", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             expect(screen.getByText("History Records:")).toBeInTheDocument();
             expect(screen.getByText("2")).toBeInTheDocument();
         });
 
-        it("should display last checked time", () => {
+        it("should display last checked time", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             expect(screen.getByText("Last Checked:")).toBeInTheDocument();
@@ -542,7 +782,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Danger Zone", () => {
-        it("should render remove site button", () => {
+        it("should render remove site button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             // Check for both the heading and button, but test them separately
@@ -552,7 +802,17 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should call handleRemoveSite when remove button clicked", async () => {
+        it("should call handleRemoveSite when remove button clicked", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             // Get the button specifically (the one that's clickable)
@@ -566,7 +826,17 @@ describe("SettingsTab", () => {
             });
         });
 
-        it("should disable remove button when loading", () => {
+        it("should disable remove button when loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<SettingsTab {...baseProps} isLoading={true} />);
 
             const removeButton = screen.getByRole("button", {
@@ -577,7 +847,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Loading States", () => {
-        it("should disable save buttons when loading", () => {
+        it("should disable save buttons when loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(
                 <SettingsTab
                     {...baseProps}
@@ -593,7 +873,17 @@ describe("SettingsTab", () => {
             expect(saveButtons[0]).toBeDisabled();
         });
 
-        it("should show loading state on remove button", () => {
+        it("should show loading state on remove button", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<SettingsTab {...baseProps} isLoading={true} />);
 
             const removeButton = screen.getByRole("button", {
@@ -604,7 +894,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle monitor with empty history", () => {
+        it("should handle monitor with empty history", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorWithEmptyHistory = {
                 ...baseMockMonitor,
                 history: [],
@@ -620,7 +920,17 @@ describe("SettingsTab", () => {
             expect(screen.getByText("0")).toBeInTheDocument();
         });
 
-        it("should handle monitor with undefined lastChecked", () => {
+        it("should handle monitor with undefined lastChecked", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitorWithUndefinedLastChecked = {
                 ...baseMockMonitor,
                 lastChecked: undefined,
@@ -636,7 +946,17 @@ describe("SettingsTab", () => {
             expect(screen.getByText("Never")).toBeInTheDocument();
         });
 
-        it("should handle very long site names", () => {
+        it("should handle very long site names", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longName = "A".repeat(100);
             render(<SettingsTab {...baseProps} localName={longName} />);
 
@@ -644,7 +964,17 @@ describe("SettingsTab", () => {
             expect(siteNameInput).toBeInTheDocument();
         });
 
-        it("should handle extreme timeout values", () => {
+        it("should handle extreme timeout values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} localTimeout={30} />);
 
             const timeoutInput = screen.getByDisplayValue("30");
@@ -654,7 +984,17 @@ describe("SettingsTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle maximum retry attempts", () => {
+        it("should handle maximum retry attempts", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} localRetryAttempts={5} />);
 
             const retryInput = screen.getByDisplayValue("5");
@@ -663,7 +1003,17 @@ describe("SettingsTab", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper form labels and structure", () => {
+        it("should have proper form labels and structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             expect(screen.getByText("Site Name")).toBeInTheDocument();
@@ -672,7 +1022,17 @@ describe("SettingsTab", () => {
             expect(screen.getByText("Retry Attempts")).toBeInTheDocument();
         });
 
-        it("should have proper input constraints", () => {
+        it("should have proper input constraints", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SettingsTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<SettingsTab {...baseProps} />);
 
             const timeoutInput = screen.getByDisplayValue("10");

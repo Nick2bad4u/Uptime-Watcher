@@ -25,7 +25,15 @@ describe("monitorUiHelpers - Branch Coverage", () => {
     });
 
     describe("getTypesWithFeature - Ternary Branch Coverage", () => {
-        it("should hit responseTime branch in ternary operator", async () => {
+        it("should hit responseTime branch in ternary operator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Import the module fresh to avoid cached mocks
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
@@ -57,7 +65,15 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             expect(Array.isArray(result)).toBe(true);
         });
 
-        it("should hit advancedAnalytics branch in ternary operator", async () => {
+        it("should hit advancedAnalytics branch in ternary operator", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Import the module fresh to avoid cached mocks
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
@@ -89,7 +105,15 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             expect(Array.isArray(result)).toBe(true);
         });
 
-        it("should handle both branches with mixed support", async () => {
+        it("should handle both branches with mixed support", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -158,7 +182,15 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             expect(getAvailableMonitorTypes).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle undefined uiConfig values in both branches", async () => {
+        it("should handle undefined uiConfig values in both branches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );

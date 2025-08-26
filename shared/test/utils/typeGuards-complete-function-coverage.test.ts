@@ -11,7 +11,15 @@ import * as typeGuardsModule from "@shared/utils/typeGuards";
 
 describe("TypeGuards - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
-        it("should call every exported function for complete coverage", () => {
+        it("should call every exported function for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Verify the module exports we expect
             expect(typeof typeGuardsModule).toBe("object");
             expect(typeGuardsModule).toBeDefined();
@@ -211,7 +219,15 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isValidTimestamp(null)).toBe(false);
         });
 
-        it("should handle edge cases for complex type guards", () => {
+        it("should handle edge cases for complex type guards", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test hasProperties with edge cases
             const complexObj = {
                 a: 1,
@@ -256,7 +272,15 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.hasProperty(obj, "inherited")).toBe(false); // Object.hasOwn excludes inherited
         });
 
-        it("should properly handle numeric edge cases", () => {
+        it("should properly handle numeric edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test isNumber with special numeric values
             expect(typeGuardsModule.isNumber(Number.MAX_VALUE)).toBe(true);
             expect(typeGuardsModule.isNumber(Number.MIN_VALUE)).toBe(true);
@@ -301,7 +325,15 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(typeGuardsModule.isValidTimestamp(1.5)).toBe(true); // Decimal numbers are valid
         });
 
-        it("should handle type guard consistency", () => {
+        it("should handle type guard consistency", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards-complete-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Verify that type guards are consistent with each other
             const testValues = [
                 null,

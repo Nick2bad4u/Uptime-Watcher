@@ -19,7 +19,15 @@ import {
 
 describe("Validation Types and Functions", () => {
     describe("createFailureResult", () => {
-        it("should create a failure result with errors", () => {
+        it("should create a failure result with errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const errors = ["Error 1", "Error 2"];
             const result = createFailureResult(errors);
 
@@ -31,7 +39,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should create a failure result with errors and metadata", () => {
+        it("should create a failure result with errors and metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const errors = ["Validation failed"];
             const metadata: ValidationMetadata = {
                 fieldName: "email",
@@ -49,7 +65,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should handle empty errors array", () => {
+        it("should handle empty errors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = createFailureResult([]);
 
             expect(result).toEqual({
@@ -62,7 +86,15 @@ describe("Validation Types and Functions", () => {
     });
 
     describe("createSuccessResult", () => {
-        it("should create a success result without data or warnings", () => {
+        it("should create a success result without data or warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const result = createSuccessResult();
 
             expect(result).toEqual({
@@ -73,7 +105,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should create a success result with data", () => {
+        it("should create a success result with data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const data = { id: 1, name: "Test" };
             const result = createSuccessResult(data);
 
@@ -85,7 +125,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should create a success result with warnings", () => {
+        it("should create a success result with warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const warnings = ["Warning 1", "Warning 2"];
             const result = createSuccessResult(undefined, warnings);
 
@@ -98,7 +146,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should create a success result with data and warnings", () => {
+        it("should create a success result with data and warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const data = { processed: true };
             const warnings = ["Deprecated field used"];
             const result = createSuccessResult(data, warnings);
@@ -112,7 +168,15 @@ describe("Validation Types and Functions", () => {
             });
         });
 
-        it("should handle various data types", () => {
+        it("should handle various data types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with string
             const stringResult = createSuccessResult("test string");
             expect(stringResult.data).toBe("test string");
@@ -144,7 +208,15 @@ describe("Validation Types and Functions", () => {
     });
 
     describe("isValidationResult", () => {
-        it("should return true for valid BaseValidationResult", () => {
+        it("should return true for valid BaseValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: BaseValidationResult = {
                 errors: [],
                 success: true,
@@ -153,7 +225,15 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for BaseValidationResult with warnings", () => {
+        it("should return true for BaseValidationResult with warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: BaseValidationResult = {
                 errors: ["Some error"],
                 success: false,
@@ -163,7 +243,15 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for FormValidationResult", () => {
+        it("should return true for FormValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: FormValidationResult = {
                 errors: [],
                 success: true,
@@ -176,7 +264,15 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for MonitorConfigValidationResult", () => {
+        it("should return true for MonitorConfigValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: MonitorConfigValidationResult = {
                 errors: [],
                 success: true,
@@ -189,7 +285,15 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for ThemeValidationResult", () => {
+        it("should return true for ThemeValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: ThemeValidationResult = {
                 errors: [],
                 success: true,
@@ -200,7 +304,15 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return true for ValidationResult", () => {
+        it("should return true for ValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validResult: ValidationResult = {
                 errors: [],
                 success: true,
@@ -214,28 +326,68 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBe(true);
         });
 
-        it("should return false for null", () => {
+        it("should return false for null", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult(null)).toBe(false);
         });
 
-        it("should return false for undefined", () => {
+        it("should return false for undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult(undefined)).toBe(false);
         });
 
-        it("should return false for non-object types", () => {
+        it("should return false for non-object types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult("string")).toBe(false);
             expect(isValidationResult(123)).toBe(false);
             expect(isValidationResult(true)).toBe(false);
             expect(isValidationResult([])).toBe(false);
         });
 
-        it("should return false for object missing required properties", () => {
+        it("should return false for object missing required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isValidationResult({})).toBe(false);
             expect(isValidationResult({ errors: [] })).toBe(false);
             expect(isValidationResult({ success: true })).toBe(false);
         });
 
-        it("should return false for object with invalid property types", () => {
+        it("should return false for object with invalid property types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(
                 isValidationResult({
                     errors: "not an array",
@@ -258,7 +410,15 @@ describe("Validation Types and Functions", () => {
             ).toBe(false);
         });
 
-        it("should return true for object with extra properties", () => {
+        it("should return true for object with extra properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const objectWithExtra = {
                 errors: [],
                 success: true,
@@ -271,7 +431,15 @@ describe("Validation Types and Functions", () => {
     });
 
     describe("Type Interface Completeness", () => {
-        it("should allow creation of BaseValidationResult", () => {
+        it("should allow creation of BaseValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const baseResult: BaseValidationResult = {
                 errors: ["Error message"],
                 success: false,
@@ -283,7 +451,15 @@ describe("Validation Types and Functions", () => {
             expect(baseResult.warnings).toEqual(["Warning message"]);
         });
 
-        it("should allow creation of FormValidationResult", () => {
+        it("should allow creation of FormValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const formResult: FormValidationResult = {
                 errors: [],
                 success: true,
@@ -302,7 +478,15 @@ describe("Validation Types and Functions", () => {
             ]);
         });
 
-        it("should allow creation of MonitorConfigValidationResult", () => {
+        it("should allow creation of MonitorConfigValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const monitorResult: MonitorConfigValidationResult = {
                 errors: ["Config error"],
                 success: false,
@@ -323,7 +507,15 @@ describe("Validation Types and Functions", () => {
             ]);
         });
 
-        it("should allow creation of ThemeValidationResult", () => {
+        it("should allow creation of ThemeValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const themeResult: ThemeValidationResult = {
                 errors: [],
                 success: true,
@@ -338,7 +530,15 @@ describe("Validation Types and Functions", () => {
             expect(themeResult.themeErrors).toEqual(["Invalid hex color"]);
         });
 
-        it("should allow creation of ValidationMetadata", () => {
+        it("should allow creation of ValidationMetadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const metadata: ValidationMetadata = {
                 fieldName: "siteUrl",
                 monitorCount: 3,
@@ -360,7 +560,15 @@ describe("Validation Types and Functions", () => {
             expect(metadata["nestedObject"]).toEqual({ key: "value" });
         });
 
-        it("should allow creation of ValidationResult", () => {
+        it("should allow creation of ValidationResult", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validationResult: ValidationResult = {
                 errors: [],
                 success: true,
@@ -385,7 +593,15 @@ describe("Validation Types and Functions", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle empty arrays and undefined optional properties", () => {
+        it("should handle empty arrays and undefined optional properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = createSuccessResult();
             expect(result.warnings).toBeUndefined();
 
@@ -393,7 +609,15 @@ describe("Validation Types and Functions", () => {
             expect(failureResult.warnings).toEqual([]);
         });
 
-        it("should handle complex nested data in success result", () => {
+        it("should handle complex nested data in success result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const complexData = {
                 sites: [
                     { id: 1, name: "Site 1", monitors: [{ type: "http" }] },
@@ -410,7 +634,15 @@ describe("Validation Types and Functions", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should validate results created by helper functions", () => {
+        it("should validate results created by helper functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Constructor", "type");
+
             const successResult = createSuccessResult({ test: true });
             expect(isValidationResult(successResult)).toBe(true);
 

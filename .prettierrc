@@ -35,6 +35,12 @@
             }
         },
         {
+            "files": "eslint.config.mjs",
+            "options": {
+                "multilineArraysWrapThreshold": 1
+            }
+        },
+        {
             "files": "*.user.css",
             "options": {
                 "printWidth": 80

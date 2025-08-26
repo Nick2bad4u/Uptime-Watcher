@@ -10,7 +10,15 @@ import {
 
 describe("Operational Hooks", () => {
     describe("withOperationalHooks", () => {
-        it("should successfully execute operation", async () => {
+        it("should successfully execute operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             const result = await withOperationalHooks(mockOperation, {
@@ -21,7 +29,15 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
-        it("should retry on failure", async () => {
+        it("should retry on failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("First failure"))
@@ -36,7 +52,15 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should fail after max retries", async () => {
+        it("should fail after max retries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Persistent failure"));
@@ -52,7 +76,15 @@ describe("Operational Hooks", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should call callbacks correctly", async () => {
+        it("should call callbacks correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi.fn();
             const onRetry = vi.fn();
@@ -72,7 +104,15 @@ describe("Operational Hooks", () => {
         });
     });
     describe("withDatabaseOperation", () => {
-        it("should be a specialized wrapper with correct defaults", async () => {
+        it("should be a specialized wrapper with correct defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("db-result");
 
             const result = await withDatabaseOperation(

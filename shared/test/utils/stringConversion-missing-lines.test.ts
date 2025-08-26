@@ -8,7 +8,15 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion - Missing Lines Coverage", () => {
     describe("safeStringify default case (lines 89-92)", () => {
-        it("should handle the default case for unknown types", () => {
+        it("should handle the default case for unknown types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-missing-lines", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create an object with unusual typeof behavior
             // This attempts to create a value that would hit the default case
             const weirdObject = Object.create(null);
@@ -22,7 +30,15 @@ describe("StringConversion - Missing Lines Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should handle edge cases that might bypass early returns", () => {
+        it("should handle edge cases that might bypass early returns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-missing-lines", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test with various edge cases
             const edgeCases = [
                 Object.create(null),
@@ -49,7 +65,15 @@ describe("StringConversion - Missing Lines Coverage", () => {
             });
         });
 
-        it("should attempt to reach default case through type manipulation", () => {
+        it("should attempt to reach default case through type manipulation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-missing-lines", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Create a custom object that might have unusual typeof behavior
             const customObject = Object.create(null);
 
@@ -60,7 +84,15 @@ describe("StringConversion - Missing Lines Coverage", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should verify typeof behavior for edge cases", () => {
+        it("should verify typeof behavior for edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion-missing-lines", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test various values to ensure we're hitting all paths
             const testValues = [
                 Object.create(null),

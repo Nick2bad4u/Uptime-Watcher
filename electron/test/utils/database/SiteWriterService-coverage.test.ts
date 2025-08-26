@@ -152,7 +152,15 @@ describe("SiteWriterService Coverage Tests", () => {
     });
 
     describe("Constructor", () => {
-        it("should initialize with provided configuration", () => {
+        it("should initialize with provided configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Initialization", "type");
+
             expect(siteWriterService).toBeInstanceOf(SiteWriterService);
         });
     });
@@ -164,7 +172,15 @@ describe("SiteWriterService Coverage Tests", () => {
             ).mockImplementation(async (callback: any) => callback(mockDb));
         });
 
-        it("should create a new site successfully", async () => {
+        it("should create a new site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const siteData = { ...mockSite };
             siteData.monitors[0]!.id = ""; // New monitor without ID
 
@@ -189,7 +205,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should handle site creation with multiple monitors", async () => {
+        it("should handle site creation with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteData = {
                 ...mockSite,
                 monitors: [
@@ -216,7 +240,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitors[1]!.id).toBe("new-monitor-id");
         });
 
-        it("should handle site creation with empty monitors array", async () => {
+        it("should handle site creation with empty monitors array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteData = { ...mockSite, monitors: [] };
 
             const result = await siteWriterService.createSite(siteData);
@@ -225,7 +257,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitors).toHaveLength(0);
         });
 
-        it("should handle database transaction errors", async () => {
+        it("should handle database transaction errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Transaction failed");
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
@@ -244,7 +284,15 @@ describe("SiteWriterService Coverage Tests", () => {
             ).mockImplementation(async (callback: any) => callback(mockDb));
         });
 
-        it("should delete site successfully when found in cache", async () => {
+        it("should delete site successfully when found in cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 true
             );
@@ -269,7 +317,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should handle site not found in cache but still cleanup database", async () => {
+        it("should handle site not found in cache but still cleanup database", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 false
             );
@@ -290,7 +346,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should handle database errors during deletion", async () => {
+        it("should handle database errors during deletion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Database deletion failed");
             (
                 mockDatabaseService.executeTransaction as MockedFunction<any>
@@ -344,7 +408,15 @@ describe("SiteWriterService Coverage Tests", () => {
             ]);
         });
 
-        it("should update site successfully", async () => {
+        it("should update site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const updates = { name: "Updated Site Name", monitoring: true };
 
             const result = await siteWriterService.updateSite(
@@ -423,7 +495,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitors[0]!.checkInterval).toBe(60_000);
         });
 
-        it("should create new monitors when updating", async () => {
+        it("should create new monitors when updating", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const newMonitor = createCompleteMonitor({
                 id: "",
                 type: "port",
@@ -448,7 +528,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should remove obsolete monitors", async () => {
+        it("should remove obsolete monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const updates = { monitors: [] }; // Remove all monitors
 
             await siteWriterService.updateSite(
@@ -463,7 +551,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should throw SiteNotFoundError when site not in cache", async () => {
+        it("should throw SiteNotFoundError when site not in cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
                 undefined
             );
@@ -473,13 +569,29 @@ describe("SiteWriterService Coverage Tests", () => {
             ).rejects.toThrow(SiteNotFoundError);
         });
 
-        it("should throw SiteNotFoundError when identifier is empty", async () => {
+        it("should throw SiteNotFoundError when identifier is empty", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             await expect(
                 siteWriterService.updateSite(mockSitesCache, "", {})
             ).rejects.toThrow(SiteNotFoundError);
         });
 
-        it("should handle updates without monitors field", async () => {
+        it("should handle updates without monitors field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             const updates = { name: "Updated Name Only" };
 
             const result = await siteWriterService.updateSite(
@@ -506,7 +618,15 @@ describe("SiteWriterService Coverage Tests", () => {
             };
         });
 
-        it("should handle interval changes correctly", async () => {
+        it("should handle interval changes correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalSite = {
                 ...mockSite,
                 monitors: [
@@ -545,7 +665,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should only stop monitoring when monitor was not actively monitoring", async () => {
+        it("should only stop monitoring when monitor was not actively monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalSite = {
                 ...mockSite,
                 monitors: [
@@ -578,7 +706,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockMonitoringConfig.startMonitoring).not.toHaveBeenCalled();
         });
 
-        it("should handle monitors without IDs gracefully", async () => {
+        it("should handle monitors without IDs gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalSite = { ...mockSite };
             const newMonitors = [
                 createCompleteMonitor({
@@ -598,7 +734,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockMonitoringConfig.startMonitoring).not.toHaveBeenCalled();
         });
 
-        it("should handle monitoring config errors gracefully", async () => {
+        it("should handle monitoring config errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const error = new Error("Monitoring failed");
             (
                 mockMonitoringConfig.stopMonitoring as MockedFunction<any>
@@ -633,7 +777,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should skip monitors without interval changes", async () => {
+        it("should skip monitors without interval changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalSite = { ...mockSite };
             const newMonitors = [...mockSite.monitors]; // Same intervals
 
@@ -650,7 +802,15 @@ describe("SiteWriterService Coverage Tests", () => {
     });
 
     describe("detectNewMonitors", () => {
-        it("should detect new monitors with IDs", () => {
+        it("should detect new monitors with IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalMonitors = [
                 createCompleteMonitor({ id: "monitor-1" }),
             ];
@@ -667,7 +827,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toEqual(["monitor-2"]);
         });
 
-        it("should detect new monitors without IDs by signature", () => {
+        it("should detect new monitors without IDs by signature", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalMonitors = [
                 createCompleteMonitor({
                     id: "monitor-1",
@@ -690,7 +858,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toEqual([""]); // Empty string placeholder for new monitor without ID
         });
 
-        it("should not detect existing monitors without IDs", () => {
+        it("should not detect existing monitors without IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const originalMonitors = [
                 createCompleteMonitor({
                     id: "monitor-1",
@@ -713,12 +889,28 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toEqual([]); // Should not detect as new
         });
 
-        it("should handle empty arrays", () => {
+        it("should handle empty arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const newIds = siteWriterService.detectNewMonitors([], []);
             expect(newIds).toEqual([]);
         });
 
-        it("should handle mixed scenarios", () => {
+        it("should handle mixed scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const originalMonitors = [
                 createCompleteMonitor({
                     id: "monitor-1",
@@ -829,7 +1021,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockMonitorRepository.updateInternal).toHaveBeenCalled();
         });
 
-        it("should cover createMonitorSignature via detectNewMonitors", () => {
+        it("should cover createMonitorSignature via detectNewMonitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const monitor1 = createCompleteMonitor({
                 id: "monitor-1",
                 type: "http",
@@ -855,7 +1055,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(newIds).toContain("monitor-2");
         });
 
-        it("should cover updateExistingMonitor warning path", async () => {
+        it("should cover updateExistingMonitor warning path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             // This test covers a defensive programming scenario in updateExistingMonitor
             // where a monitor somehow loses its ID during processing
             const monitorWithoutId = createCompleteMonitor({ id: "" });
@@ -886,7 +1094,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockMonitorRepository.updateInternal).not.toHaveBeenCalled();
         });
 
-        it("should cover orphaned monitor handling in handleExistingMonitor", async () => {
+        it("should cover orphaned monitor handling in handleExistingMonitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             (mockDb.all as MockedFunction<any>).mockReturnValue([]); // No existing monitors
 
             const orphanedMonitor = createCompleteMonitor({
@@ -907,7 +1123,15 @@ describe("SiteWriterService Coverage Tests", () => {
             );
         });
 
-        it("should cover createUpdatedSite cache update", async () => {
+        it("should cover createUpdatedSite cache update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const updates = { name: "Updated Name" };
 
             await siteWriterService.updateSite(
@@ -927,7 +1151,15 @@ describe("SiteWriterService Coverage Tests", () => {
     });
 
     describe("Edge Cases and Error Handling", () => {
-        it("should handle monitors with all optional fields defined", () => {
+        it("should handle monitors with all optional fields defined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "monitor-1",
                 type: "port" as const,
@@ -954,7 +1186,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(signature).toContain("url:https://example.com");
         });
 
-        it("should handle monitors with undefined optional fields", () => {
+        it("should handle monitors with undefined optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "monitor-1",
                 type: "http" as const,
@@ -980,7 +1220,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(signature).toContain("url:https://example.com");
         });
 
-        it("should handle complex monitor update scenarios", async () => {
+        it("should handle complex monitor update scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteWriterService-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
             (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
                 mockSite
             );

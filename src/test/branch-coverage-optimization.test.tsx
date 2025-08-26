@@ -49,7 +49,17 @@ vi.mock("../components/common/HistoryChart", () => ({
 
 describe("Branch Coverage Optimization Tests", () => {
     describe("StatusBadge Component", () => {
-        it("should handle all size mappings in getIndicatorSize switch statement", () => {
+        it("should handle all size mappings in getIndicatorSize switch statement", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Data Retrieval", "type");
+
             // Test 2xl size (should map to "lg")
             render(
                 <ThemeProvider>
@@ -109,7 +119,17 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getAllByText(/Test/).length).toBeGreaterThan(0);
         });
 
-        it("should handle custom formatter function", () => {
+        it("should handle custom formatter function", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const customFormatter = (label: string, status: string) =>
                 `Custom: ${label} (${status.toUpperCase()})`;
 
@@ -126,7 +146,17 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getByText("Custom: Status (UP)")).toBeInTheDocument();
         });
 
-        it("should handle default formatter when no custom formatter provided", () => {
+        it("should handle default formatter when no custom formatter provided", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <StatusBadge label="Status" status="down" />
@@ -136,7 +166,17 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getByText("Status: down")).toBeInTheDocument();
         });
 
-        it("should handle showIcon=false branch", () => {
+        it("should handle showIcon=false branch", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <StatusBadge label="Status" status="up" showIcon={false} />
@@ -146,7 +186,17 @@ describe("Branch Coverage Optimization Tests", () => {
             expect(screen.getByText("Status: up")).toBeInTheDocument();
         });
 
-        it("should handle showIcon=true branch (default)", () => {
+        it("should handle showIcon=true branch (default)", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemeProvider>
                     <StatusBadge label="Status" status="up" showIcon={true} />
@@ -167,7 +217,17 @@ describe("Branch Coverage Optimization Tests", () => {
             },
         ];
 
-        it("should handle undefined monitor case", () => {
+        it("should handle undefined monitor case", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             render(
                 <SiteCardHistory
                     monitor={undefined}
@@ -180,7 +240,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor with type not found in options", () => {
+        it("should handle monitor with type not found in options", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = createValidMonitor({
                 id: "test-1",
                 type: "unknown" as any,
@@ -206,7 +276,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle HTTP monitor with URL", () => {
+        it("should handle HTTP monitor with URL", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = createValidMonitor({
                 id: "test-1",
                 type: "http" as const,
@@ -231,7 +311,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle port monitor with host and port", () => {
+        it("should handle port monitor with host and port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "port" as const,
@@ -258,7 +348,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle ping monitor without URL or port", () => {
+        it("should handle ping monitor without URL or port", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "ping" as any,
@@ -337,7 +437,17 @@ describe("Branch Coverage Optimization Tests", () => {
             }
         );
 
-        it("should handle different history lengths", () => {
+        it("should handle different history lengths", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(
                 <SiteCardHistoryWrapped
                     monitor={undefined}
@@ -363,7 +473,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle empty history arrays", () => {
+        it("should handle empty history arrays", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteCardHistoryWrapped
                     monitor={undefined}
@@ -376,7 +496,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle both monitor and no monitor cases", () => {
+        it("should handle both monitor and no monitor cases", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "http" as const,
@@ -409,7 +539,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor property differences", () => {
+        it("should handle monitor property differences", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor1 = {
                 id: "test-1",
                 type: "http" as const,
@@ -447,7 +587,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle different monitor types", () => {
+        it("should handle different monitor types", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const httpMonitor = {
                 id: "test-1",
                 type: "http" as const,
@@ -494,7 +644,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor ID differences", () => {
+        it("should handle monitor ID differences", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor1 = {
                 id: "test-1",
                 type: "http" as const,
@@ -534,7 +694,17 @@ describe("Branch Coverage Optimization Tests", () => {
     });
 
     describe("Edge Cases and Complex Scenarios", () => {
-        it("should handle monitor with all optional properties undefined", () => {
+        it("should handle monitor with all optional properties undefined", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "unknown" as any,
@@ -554,7 +724,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle monitor with partial properties", () => {
+        it("should handle monitor with partial properties", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "http" as const,
@@ -575,7 +755,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should verify maxItems is passed correctly", () => {
+        it("should verify maxItems is passed correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <SiteCardHistory monitor={undefined} filteredHistory={[]} />
             );
@@ -585,7 +775,17 @@ describe("Branch Coverage Optimization Tests", () => {
             );
         });
 
-        it("should handle very long monitor URLs", () => {
+        it("should handle very long monitor URLs", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: branch-coverage-optimization", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Monitoring", "type");
+
             const monitor = {
                 id: "test-1",
                 type: "http" as const,

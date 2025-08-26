@@ -584,8 +584,8 @@ export default defineConfig(({}) => {
             },
             projects: [
                 "vitest.config.ts",
-                "vitest.electron.config.ts",
-                "vitest.shared.config.ts",
+                "config\\testing\\vitest.electron.config.ts",
+                "config\\testing\\vitest.shared.config.ts",
             ],
             // Improve test output
             reporters: [

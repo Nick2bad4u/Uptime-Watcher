@@ -89,7 +89,7 @@ Uptime-Watcher/
 │   ├── tsconfig.json          # Frontend TypeScript config
 │   ├── tsconfig.electron.json # Backend TypeScript config
 │   ├── vitest.config.ts       # Frontend test configuration
-│   ├── vitest.electron.config.ts # Backend test configuration
+│   ├── vitest.electron.config.ts # Backend test configuration (moved to config/testing/)
 │   ├── eslint.config.mjs      # ESLint configuration
 │   ├── tailwind.config.mjs     # Tailwind CSS configuration
 │   └── .env                   # Environment variables
@@ -806,7 +806,7 @@ export default defineConfig((configEnv) =>
 );
 ```
 
-**Backend Tests** (`vitest.electron.config.ts`):
+**Backend Tests** (`config/testing/vitest.electron.config.ts`):
 
 ```typescript
 export default defineConfig({
@@ -1132,7 +1132,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct database access
    const result = db.prepare("SELECT * FROM sites").all();
-   
+
    // ✅ CORRECT - Repository pattern
    const sites = await siteRepository.getAllSites();
    ```
@@ -1142,7 +1142,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Untyped IPC
    ipcRenderer.invoke("some-operation", data);
-   
+
    // ✅ CORRECT - Typed IPC
    window.electronAPI.sites.addSite(siteData);
    ```
@@ -1152,7 +1152,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    ```typescript
    // ❌ WRONG - Direct mutation
    store.sites.push(newSite);
-   
+
    // ✅ CORRECT - Store actions
    store.addSite(newSite);
    ```
@@ -1166,7 +1166,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
    } catch (error) {
     console.log(error);
    }
-   
+
    // ✅ CORRECT - Proper error handling
    await withErrorHandling(() => operation(), {
     logger,
@@ -1279,7 +1279,7 @@ export function getEnvVar(name: string, defaultValue?: string): string {
 
 - **TypeScript**: `tsconfig.json`, `tsconfig.electron.json`
 - **Build**: `vite.config.ts`, `package.json`
-- **Testing**: `vitest.config.ts`, `vitest.electron.config.ts`
+- **Testing**: `vitest.config.ts`, `config/testing/vitest.electron.config.ts`
 
 ## 📚 Documentation Quick Links
 

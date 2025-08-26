@@ -9,7 +9,15 @@ import { describe, it, expect } from "vitest";
 
 describe("Shared Types Coverage", () => {
     describe("FormData Types", () => {
-        it("should handle form data structures", () => {
+        it("should handle form data structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test the actual formData.ts structures (lines 204-236)
             interface MockFormData {
                 siteName: string;
@@ -51,7 +59,15 @@ describe("Shared Types Coverage", () => {
             expect(formData.validation?.isValid).toBe(true);
         });
 
-        it("should validate form data fields", () => {
+        it("should validate form data fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             interface FormFieldValidation {
                 field: string;
                 required: boolean;
@@ -98,7 +114,15 @@ describe("Shared Types Coverage", () => {
     });
 
     describe("Monitor Config Types", () => {
-        it("should handle monitor configuration structures", () => {
+        it("should handle monitor configuration structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Test monitorConfig.ts structures (lines 262-294)
             interface MonitorConfig {
                 type: "http" | "ping" | "port" | "dns";
@@ -145,7 +169,15 @@ describe("Shared Types Coverage", () => {
             expect(httpMonitor.alerts?.onFailure).toBe(true);
         });
 
-        it("should validate monitor configurations", () => {
+        it("should validate monitor configurations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             interface MonitorValidator {
                 validateType: (type: string) => boolean;
                 validateInterval: (interval: number) => boolean;
@@ -181,7 +213,15 @@ describe("Shared Types Coverage", () => {
     });
 
     describe("Theme Config Types", () => {
-        it("should handle theme configuration structures", () => {
+        it("should handle theme configuration structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test themeConfig.ts structures (lines 435-490)
             interface ThemeConfig {
                 name: string;
@@ -283,7 +323,15 @@ describe("Shared Types Coverage", () => {
             expect(darkTheme.typography.fontFamily).toContain("Inter");
         });
 
-        it("should handle theme utilities", () => {
+        it("should handle theme utilities", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface ThemeUtils {
                 getColorByStatus: (status: string) => string;
                 getSpacingValue: (size: string) => number;
@@ -327,7 +375,15 @@ describe("Shared Types Coverage", () => {
     });
 
     describe("Validation Types", () => {
-        it("should handle validation result structures", () => {
+        it("should handle validation result structures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
             // Test validation.ts structures (lines 122-163)
             interface ValidationResult<T = any> {
                 isValid: boolean;
@@ -380,7 +436,15 @@ describe("Shared Types Coverage", () => {
             expect(validationResult.metadata?.validator).toBe("SiteValidator");
         });
 
-        it("should handle validation rule definitions", () => {
+        it("should handle validation rule definitions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: shared-types-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             interface ValidationRule {
                 field: string;
                 type: "required" | "format" | "range" | "custom";

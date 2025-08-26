@@ -66,13 +66,29 @@ describe("ApplicationService Coverage Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
-    it("should import the service without errors", async () => {
+    it("should import the service without errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
         expect(ApplicationService).toBeDefined();
     });
-    it("should create service instance", async () => {
+    it("should create service instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -81,7 +97,15 @@ describe("ApplicationService Coverage Tests", () => {
         expect(service).toBeDefined();
         expect(service).toBeInstanceOf(ApplicationService);
     });
-    it("should handle cleanup operations", async () => {
+    it("should handle cleanup operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -95,7 +119,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle service container integration", async () => {
+    it("should handle service container integration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -110,7 +142,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle app event listeners", async () => {
+    it("should handle app event listeners", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -124,7 +164,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle different platform behaviors", async () => {
+    it("should handle different platform behaviors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -139,7 +187,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle error scenarios gracefully", async () => {
+    it("should handle error scenarios gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -153,7 +209,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should exercise constructor logic", async () => {
+    it("should exercise constructor logic", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -169,7 +233,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle cleanup edge cases", async () => {
+    it("should handle cleanup edge cases", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );
@@ -186,7 +258,15 @@ describe("ApplicationService Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle service coordination", async () => {
+    it("should handle service coordination", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
         const { ApplicationService } = await import(
             "../../../services/application/ApplicationService"
         );

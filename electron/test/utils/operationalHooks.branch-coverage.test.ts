@@ -39,7 +39,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         vi.resetAllMocks();
     });
     describe("withOperationalHooks - Success Paths", () => {
-        it("should execute operation successfully on first attempt", async () => {
+        it("should execute operation successfully on first attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             const result = await operationalHooks.withOperationalHooks(
@@ -53,7 +61,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
-        it("should handle operation with event emission", async () => {
+        it("should handle operation with event emission", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             const result = await operationalHooks.withOperationalHooks(
@@ -69,7 +85,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
         });
-        it("should handle operation without event emission", async () => {
+        it("should handle operation without event emission", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             const result = await operationalHooks.withOperationalHooks(
@@ -86,7 +110,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Retry Logic", () => {
-        it("should retry on failure and eventually succeed", async () => {
+        it("should retry on failure and eventually succeed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("First failure"))
@@ -105,7 +137,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(3);
         });
-        it("should handle all retries exhausted - throwOnFailure=true", async () => {
+        it("should handle all retries exhausted - throwOnFailure=true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Persistent failure"));
@@ -121,7 +161,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should handle all retries exhausted - throwOnFailure=false", async () => {
+        it("should handle all retries exhausted - throwOnFailure=false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Persistent failure"));
@@ -141,7 +189,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Backoff Strategies", () => {
-        it("should handle exponential backoff", async () => {
+        it("should handle exponential backoff", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("First failure"))
@@ -160,7 +216,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should handle linear backoff", async () => {
+        it("should handle linear backoff", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("First failure"))
@@ -181,7 +245,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Callback Handling", () => {
-        it("should call onSuccess callback", async () => {
+        it("should call onSuccess callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi.fn();
 
@@ -197,7 +269,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(onSuccess).toHaveBeenCalledWith("success");
         });
-        it("should call onRetry callback", async () => {
+        it("should call onRetry callback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("First failure"))
@@ -217,7 +297,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("success");
             expect(onRetry).toHaveBeenCalledWith(1, expect.any(Error));
         });
-        it("should call onFailure callback when all retries exhausted", async () => {
+        it("should call onFailure callback when all retries exhausted", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Persistent failure"));
@@ -236,7 +324,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withOperationalHooks - Error Handling Edge Cases", () => {
-        it("should handle non-Error objects thrown", async () => {
+        it("should handle non-Error objects thrown", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi.fn().mockRejectedValue("string error");
 
             await expect(
@@ -247,7 +343,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 })
             ).rejects.toThrow("string error");
         });
-        it("should handle null/undefined thrown", async () => {
+        it("should handle null/undefined thrown", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockRejectedValue(null);
 
             await expect(
@@ -258,7 +362,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
                 })
             ).rejects.toThrow("null");
         });
-        it("should handle callback errors gracefully", async () => {
+        it("should handle callback errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
             const onSuccess = vi
                 .fn()
@@ -278,7 +390,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("withDatabaseOperation - Specialized Wrapper", () => {
-        it("should execute database operation successfully", async () => {
+        it("should execute database operation successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockResolvedValue({ id: 1, name: "test" });
@@ -291,7 +411,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toEqual({ id: 1, name: "test" });
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
-        it("should handle database operation with event emitter", async () => {
+        it("should handle database operation with event emitter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockOperation = vi.fn().mockResolvedValue({ id: 1 });
 
             const result = await operationalHooks.withDatabaseOperation(
@@ -303,7 +431,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toEqual({ id: 1 });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
         });
-        it("should handle database operation with context", async () => {
+        it("should handle database operation with context", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue({ success: true });
             const context = { siteId: "123", userId: "456" };
 
@@ -317,7 +453,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toEqual({ success: true });
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
         });
-        it("should handle database operation failures with retries", async () => {
+        it("should handle database operation failures with retries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi
                 .fn()
                 .mockRejectedValueOnce(new Error("Database connection failed"))
@@ -331,7 +475,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toEqual({ recovered: true });
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
-        it("should use database-specific defaults", async () => {
+        it("should use database-specific defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             // This tests that database operation uses specific defaults
@@ -346,7 +498,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("Configuration Edge Cases", () => {
-        it("should handle minimal configuration", async () => {
+        it("should handle minimal configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("minimal");
 
             const result = await operationalHooks.withOperationalHooks(
@@ -358,7 +518,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
             expect(result).toBe("minimal");
         });
-        it("should handle maximum configuration", async () => {
+        it("should handle maximum configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("maximal");
             const onSuccess = vi.fn();
             const onRetry = vi.fn();
@@ -384,7 +552,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             expect(result).toBe("maximal");
             expect(onSuccess).toHaveBeenCalledWith("maximal");
         });
-        it("should handle undefined/null context gracefully", async () => {
+        it("should handle undefined/null context gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
 
             const result = await operationalHooks.withOperationalHooks(
@@ -399,7 +575,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         });
     });
     describe("Event Emission Edge Cases", () => {
-        it("should handle event emission failures gracefully", async () => {
+        it("should handle event emission failures gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
             const failingEventEmitter = {
                 emit: vi
@@ -422,7 +606,15 @@ describe("operationalHooks.ts - Branch Coverage", () => {
 
             expect(result).toBe("success");
         });
-        it("should handle event emitter without emit method", async () => {
+        it("should handle event emitter without emit method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks.branch-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const mockOperation = vi.fn().mockResolvedValue("success");
             const invalidEventEmitter = {};
 

@@ -228,7 +228,17 @@ describe("OverviewTab", () => {
     });
 
     describe("Component Rendering", () => {
-        it("should render overview tab with all statistics", () => {
+        it("should render overview tab with all statistics", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             // Check basic elements are present
@@ -243,14 +253,34 @@ describe("OverviewTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display uptime percentage correctly", () => {
+        it("should display uptime percentage correctly", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             // Check if uptime is displayed
             expect(screen.getAllByText("99.5%")[0]).toBeInTheDocument();
         });
 
-        it("should show response time statistics", () => {
+        it("should show response time statistics", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             // Check if response times are formatted correctly
@@ -259,14 +289,34 @@ describe("OverviewTab", () => {
             expect(mockFormatResponseTime).toHaveBeenCalledWith(200); // slowest
         });
 
-        it("should display total checks count", () => {
+        it("should display total checks count", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             // Should show total checks
             expect(screen.getByText("100")).toBeInTheDocument();
         });
 
-        it("should render control buttons", () => {
+        it("should render control buttons", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             const buttons = document.querySelectorAll(".themed-button");
@@ -275,7 +325,17 @@ describe("OverviewTab", () => {
     });
 
     describe("User Interactions", () => {
-        it("should handle check now button click", () => {
+        it("should handle check now button click", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             const checkNowButton = screen.getByText("Check Now");
@@ -284,7 +344,17 @@ describe("OverviewTab", () => {
             expect(mockOnCheckNow).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle remove monitor button click", async () => {
+        it("should handle remove monitor button click", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Deletion", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             const removeButton = screen.getByText("Remove Monitor");
@@ -295,7 +365,17 @@ describe("OverviewTab", () => {
             });
         });
 
-        it("should handle interval change", () => {
+        it("should handle interval change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             const intervalSelect = document.querySelector(".themed-select");
@@ -305,7 +385,17 @@ describe("OverviewTab", () => {
             expect(mockHandleIntervalChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle timeout change", () => {
+        it("should handle timeout change", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             const timeoutInput = document.querySelector(".themed-input");
@@ -315,7 +405,17 @@ describe("OverviewTab", () => {
             expect(mockHandleTimeoutChange).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save interval button when interval changed", () => {
+        it("should enable save interval button when interval changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<OverviewTab {...baseProps} intervalChanged={true} />);
 
             const saveButton = screen.getByText("Save");
@@ -325,7 +425,17 @@ describe("OverviewTab", () => {
             expect(mockHandleSaveInterval).toHaveBeenCalledTimes(1);
         });
 
-        it("should enable save timeout button when timeout changed", () => {
+        it("should enable save timeout button when timeout changed", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Saving", "type");
+
             render(<OverviewTab {...baseProps} timeoutChanged={true} />);
 
             const saveButton = screen.getByText("Save");
@@ -337,7 +447,17 @@ describe("OverviewTab", () => {
     });
 
     describe("Loading States", () => {
-        it("should show loading state when isLoading is true", () => {
+        it("should show loading state when isLoading is true", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<OverviewTab {...baseProps} isLoading={true} />);
 
             // Check if buttons have proper disabled attribute
@@ -345,7 +465,17 @@ describe("OverviewTab", () => {
             expect(checkNowButton).toBeDisabled();
         });
 
-        it("should disable buttons during loading", () => {
+        it("should disable buttons during loading", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Loading", "type");
+
             render(<OverviewTab {...baseProps} isLoading={true} />);
 
             const checkNowButton = screen.getByLabelText("Check Now");
@@ -354,7 +484,17 @@ describe("OverviewTab", () => {
     });
 
     describe("Different Monitor Types", () => {
-        it("should handle port monitor", () => {
+        it("should handle port monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const portMonitor = {
                 ...createMockMonitor(),
                 type: "port" as const,
@@ -370,7 +510,17 @@ describe("OverviewTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle down status monitor", () => {
+        it("should handle down status monitor", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const downMonitor = {
                 ...createMockMonitor(),
                 status: "down" as const,
@@ -385,7 +535,17 @@ describe("OverviewTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle monitor without last check", () => {
+        it("should handle monitor without last check", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const { lastChecked, ...monitorWithoutLastCheck } =
                 createMockMonitor();
 
@@ -403,7 +563,17 @@ describe("OverviewTab", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle zero response times", () => {
+        it("should handle zero response times", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <OverviewTab
                     {...baseProps}
@@ -416,7 +586,17 @@ describe("OverviewTab", () => {
             expect(mockFormatResponseTime).toHaveBeenCalledWith(0);
         });
 
-        it("should handle very high response times", () => {
+        it("should handle very high response times", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <OverviewTab
                     {...baseProps}
@@ -431,25 +611,65 @@ describe("OverviewTab", () => {
             expect(mockFormatResponseTime).toHaveBeenCalledWith(35_000);
         });
 
-        it("should handle zero total checks", () => {
+        it("should handle zero total checks", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} totalChecks={0} />);
 
             expect(screen.getByText("0")).toBeInTheDocument();
         });
 
-        it("should handle 100% uptime", () => {
+        it("should handle 100% uptime", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} uptime="100.0" />);
 
             expect(screen.getAllByText("100.0%")[0]).toBeInTheDocument();
         });
 
-        it("should handle 0% uptime", () => {
+        it("should handle 0% uptime", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} uptime="0.0" />);
 
             expect(screen.getAllByText("0.0%")[0]).toBeInTheDocument();
         });
 
-        it("should handle extreme interval values", () => {
+        it("should handle extreme interval values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} localCheckInterval={30_000} />);
 
             expect(
@@ -457,7 +677,17 @@ describe("OverviewTab", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle extreme timeout values", () => {
+        it("should handle extreme timeout values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} localTimeout={30_000} />);
 
             expect(document.querySelector(".themed-input")).toBeInTheDocument();
@@ -465,7 +695,17 @@ describe("OverviewTab", () => {
     });
 
     describe("Accessibility", () => {
-        it("should have proper labels and structure", () => {
+        it("should have proper labels and structure", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<OverviewTab {...baseProps} />);
 
             // Check that buttons have text content

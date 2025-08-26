@@ -11,43 +11,107 @@ import { isStandardizedCacheKey, parseCacheKey } from "../../utils/cacheKeys";
 
 describe("Cache Keys Function Coverage", () => {
     describe("isStandardizedCacheKey", () => {
-        it("should return true for valid 2-part cache keys", () => {
+        it("should return true for valid 2-part cache keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             expect(isStandardizedCacheKey("site:site-123")).toBe(true);
             expect(isStandardizedCacheKey("monitor:monitor-456")).toBe(true);
         });
 
-        it("should return true for valid 3-part cache keys", () => {
+        it("should return true for valid 3-part cache keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             expect(isStandardizedCacheKey("site:loading:site-123")).toBe(true);
             expect(isStandardizedCacheKey("monitor:checking:monitor-456")).toBe(
                 true
             );
         });
 
-        it("should return false for keys with too few parts", () => {
+        it("should return false for keys with too few parts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isStandardizedCacheKey("site")).toBe(false);
         });
 
-        it("should return false for keys with too many parts", () => {
+        it("should return false for keys with too many parts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isStandardizedCacheKey("site:loading:site-123:extra")).toBe(
                 false
             );
         });
 
-        it("should return false for keys with empty prefix", () => {
+        it("should return false for keys with empty prefix", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isStandardizedCacheKey(":site-123")).toBe(false);
         });
 
-        it("should return false for 3-part keys with empty operation", () => {
+        it("should return false for 3-part keys with empty operation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isStandardizedCacheKey("site::site-123")).toBe(false);
         });
 
-        it("should return false for invalid prefixes", () => {
+        it("should return false for invalid prefixes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(isStandardizedCacheKey("invalid:site-123")).toBe(false);
         });
     });
 
     describe("parseCacheKey", () => {
-        it("should parse valid 2-part cache keys", () => {
+        it("should parse valid 2-part cache keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const result = parseCacheKey("site:site-123" as any);
             expect(result).toEqual({
                 prefix: "site",
@@ -55,7 +119,15 @@ describe("Cache Keys Function Coverage", () => {
             });
         });
 
-        it("should parse valid 3-part cache keys", () => {
+        it("should parse valid 3-part cache keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const result = parseCacheKey("site:loading:site-123" as any);
             expect(result).toEqual({
                 prefix: "site",
@@ -64,7 +136,15 @@ describe("Cache Keys Function Coverage", () => {
             });
         });
 
-        it("should handle empty identifier in 2-part keys", () => {
+        it("should handle empty identifier in 2-part keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const result = parseCacheKey("site:" as any);
             expect(result).toEqual({
                 prefix: "site",
@@ -72,13 +152,29 @@ describe("Cache Keys Function Coverage", () => {
             });
         });
 
-        it("should throw error for empty prefix in 2-part keys", () => {
+        it("should throw error for empty prefix in 2-part keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => parseCacheKey(":site-123" as any)).toThrow(
                 "Invalid cache key format:"
             );
         });
 
-        it("should throw error for missing parts in 3-part keys", () => {
+        it("should throw error for missing parts in 3-part keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             expect(() => parseCacheKey(":loading:site-123" as any)).toThrow(
                 "Invalid cache key format:"
             );
@@ -92,7 +188,15 @@ describe("Cache Keys Function Coverage", () => {
     });
 
     describe("Integration tests", () => {
-        it("should validate and parse keys consistently", () => {
+        it("should validate and parse keys consistently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cacheKeys-function-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
             const key = "site:loading:site-123";
 
             // Check validation first

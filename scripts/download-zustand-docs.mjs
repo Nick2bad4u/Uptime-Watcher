@@ -6,7 +6,6 @@
 import { exec } from "child_process";
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 
 /* -------------------- CONFIGURATION -------------------- */
 
@@ -39,7 +38,6 @@ const OUTPUT_FORMAT = "gfm";
 
 const SUBDIR_1 = "docs";
 const SUBDIR_2 = "packages";
-const OUTPUT_EXT = "md";
 
 /* -------------------- SETUP -------------------- */
 
@@ -136,7 +134,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr.message}`
+                        ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
                 );
                 return reject(readErr);
             }
@@ -159,7 +157,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr.message}`
+                        ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
                 );
                 return reject(writeErr);
             }

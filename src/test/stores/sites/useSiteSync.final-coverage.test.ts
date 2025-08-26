@@ -90,7 +90,15 @@ describe("useSiteSync - Final 100% Coverage", () => {
     });
 
     describe("Lines 194-195: fullSyncFromBackend", () => {
-        it("should call syncSitesFromBackend and log success message", async () => {
+        it("should call syncSitesFromBackend and log success message", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Mock syncSitesFromBackend to succeed
             vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
 
@@ -114,7 +122,15 @@ describe("useSiteSync - Final 100% Coverage", () => {
     });
 
     describe("Lines 207-220: getSyncStatus successful path", () => {
-        it("should execute successful getSyncStatus path and log result", async () => {
+        it("should execute successful getSyncStatus path and log result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             const mockStatus = {
                 siteCount: 10,
                 synchronized: true,
@@ -160,7 +176,15 @@ describe("useSiteSync - Final 100% Coverage", () => {
     });
 
     describe("Line 239: getSyncStatus catch block fallback", () => {
-        it("should return fallback when withErrorHandling throws", async () => {
+        it("should return fallback when withErrorHandling throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync.final-coverage", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Mock withErrorHandling to throw an error
             vi.mocked(withErrorHandling).mockImplementation(() => {
                 throw new Error("withErrorHandling failed");

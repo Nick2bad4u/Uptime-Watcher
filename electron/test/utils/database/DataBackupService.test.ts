@@ -95,7 +95,15 @@ describe("DataBackupService", () => {
     });
 
     describe("Constructor", () => {
-        it("should create instance with provided configuration", () => {
+        it("should create instance with provided configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             const service = new DataBackupService({
                 eventEmitter: mockEventEmitter as any,
                 logger: mockLogger,
@@ -104,7 +112,15 @@ describe("DataBackupService", () => {
             expect(service).toBeInstanceOf(DataBackupService);
         });
 
-        it("should store event emitter and logger from config", () => {
+        it("should store event emitter and logger from config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
             const service = new DataBackupService({
                 eventEmitter: mockEventEmitter as any,
                 logger: mockLogger,
@@ -116,7 +132,15 @@ describe("DataBackupService", () => {
     });
 
     describe("downloadDatabaseBackup", () => {
-        it("should successfully create and return database backup", async () => {
+        it("should successfully create and return database backup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // Arrange
             const mockResult = {
                 buffer: Buffer.from("test database content"),
@@ -143,7 +167,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should use correct database path", async () => {
+        it("should use correct database path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(app.getPath).mockReturnValue("/custom/path");
 
@@ -157,7 +189,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle different backup results", async () => {
+        it("should handle different backup results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
             // Arrange
             const customBackupResult = {
                 buffer: Buffer.from("custom backup data"),
@@ -183,7 +223,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle createDatabaseBackup throwing Error", async () => {
+        it("should handle createDatabaseBackup throwing Error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // Arrange
             const testError = new Error("Backup creation failed");
             vi.mocked(createDatabaseBackup).mockRejectedValue(testError);
@@ -209,7 +257,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle createDatabaseBackup throwing non-Error object", async () => {
+        it("should handle createDatabaseBackup throwing non-Error object", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // Arrange
             const testError = "String error message";
             vi.mocked(createDatabaseBackup).mockRejectedValue(testError);
@@ -234,7 +290,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should throw SiteLoadingError with correct message and cause", async () => {
+        it("should throw SiteLoadingError with correct message and cause", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const originalError = new Error("Original error");
             vi.mocked(createDatabaseBackup).mockRejectedValue(originalError);
@@ -254,7 +318,15 @@ describe("DataBackupService", () => {
             }
         });
 
-        it("should emit database:error event with correct timestamp", async () => {
+        it("should emit database:error event with correct timestamp", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const testError = new Error("Test error");
             vi.mocked(createDatabaseBackup).mockRejectedValue(testError);
@@ -285,7 +357,15 @@ describe("DataBackupService", () => {
             expect(emittedEvent.timestamp).toBeLessThanOrEqual(afterTime);
         });
 
-        it("should handle null or undefined errors", async () => {
+        it("should handle null or undefined errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             vi.mocked(createDatabaseBackup).mockRejectedValue(null);
 
@@ -309,7 +389,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle empty buffer results", async () => {
+        it("should handle empty buffer results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(createDatabaseBackup).mockResolvedValue({
                 buffer: Buffer.alloc(0), // Empty buffer
@@ -332,7 +420,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle large buffer results", async () => {
+        it("should handle large buffer results", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const largeBuffer = Buffer.alloc(1024 * 1024); // 1MB buffer
             vi.mocked(createDatabaseBackup).mockResolvedValue({
@@ -353,7 +449,15 @@ describe("DataBackupService", () => {
             expect(result.fileName).toBe("large-backup.sqlite");
         });
 
-        it("should preserve all properties from createDatabaseBackup result", async () => {
+        it("should preserve all properties from createDatabaseBackup result", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // Arrange
             const backupResult = {
                 buffer: Buffer.from("test content"),
@@ -377,7 +481,15 @@ describe("DataBackupService", () => {
     });
 
     describe("Error handling edge cases", () => {
-        it("should handle app.getPath throwing an error", async () => {
+        it("should handle app.getPath throwing an error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const pathError = new Error("Cannot access user data path");
             vi.mocked(app.getPath).mockImplementation(() => {
@@ -395,7 +507,15 @@ describe("DataBackupService", () => {
             );
         });
 
-        it("should handle event emission failure gracefully", async () => {
+        it("should handle event emission failure gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             const originalError = new Error("Backup failed");
             const emitError = new Error("Event emission failed");
@@ -416,7 +536,15 @@ describe("DataBackupService", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with different user data paths", async () => {
+        it("should work with different user data paths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different common user data paths
             const testPaths = [
                 "/home/user/.config/uptime-watcher",
@@ -438,7 +566,15 @@ describe("DataBackupService", () => {
             }
         });
 
-        it("should handle concurrent backup requests", async () => {
+        it("should handle concurrent backup requests", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Backup Operation", "type");
+
             // Arrange
             let resolveBackup: (value: any) => void;
             const backupPromise = new Promise((resolve) => {

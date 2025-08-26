@@ -8,12 +8,28 @@ import { EventHandlers } from "@shared/types/componentProps";
 
 describe("Component Props - EventHandlers Namespace", () => {
     describe("Click event handlers", () => {
-        it("should accept basic click handlers", () => {
+        it("should accept basic click handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handler: EventHandlers.Click = () => {};
             expect(typeof handler).toBe("function");
         });
 
-        it("should accept click handlers with event parameter", () => {
+        it("should accept click handlers with event parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Event Processing", "type");
+
             const handler: EventHandlers.ClickWithEvent<HTMLButtonElement> = (
                 event: React.MouseEvent<HTMLButtonElement>
             ) => {
@@ -22,14 +38,30 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof handler).toBe("function");
         });
 
-        it("should handle flexible click handlers - no event", () => {
+        it("should handle flexible click handlers - no event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Event Processing", "type");
+
             const handler: EventHandlers.ClickFlexible<
                 HTMLButtonElement
             > = () => {};
             expect(typeof handler).toBe("function");
         });
 
-        it("should handle flexible click handlers - with event", () => {
+        it("should handle flexible click handlers - with event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Event Processing", "type");
+
             const handler: EventHandlers.ClickFlexible<HTMLButtonElement> = (
                 event?: React.MouseEvent<HTMLButtonElement>
             ) => {
@@ -42,14 +74,30 @@ describe("Component Props - EventHandlers Namespace", () => {
     });
 
     describe("Change event handlers", () => {
-        it("should accept basic change handlers", () => {
+        it("should accept basic change handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handler: EventHandlers.Change = (value: string) => {
                 expect(typeof value).toBe("string");
             };
             expect(typeof handler).toBe("function");
         });
 
-        it("should accept change handlers with event parameter", () => {
+        it("should accept change handlers with event parameter", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Event Processing", "type");
+
             const handler: EventHandlers.ChangeWithEvent<HTMLInputElement> = (
                 event: React.ChangeEvent<HTMLInputElement>
             ) => {
@@ -58,7 +106,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof handler).toBe("function");
         });
 
-        it("should work with different element types", () => {
+        it("should work with different element types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const inputHandler: EventHandlers.ChangeWithEvent<
                 HTMLInputElement
             > = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +133,15 @@ describe("Component Props - EventHandlers Namespace", () => {
     });
 
     describe("Component interfaces validation", () => {
-        it("should demonstrate ThemedButton-style interface", () => {
+        it("should demonstrate ThemedButton-style interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface MockButtonProperties {
                 onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
                 children: React.ReactNode;
@@ -94,7 +158,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(props.children).toBe("Test Button");
         });
 
-        it("should demonstrate ThemedInput-style interface", () => {
+        it("should demonstrate ThemedInput-style interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface MockInputProperties {
                 onChange?: EventHandlers.ChangeWithEvent<HTMLInputElement>;
                 value: string;
@@ -111,7 +183,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(props.value).toBe("test value");
         });
 
-        it("should demonstrate flexible component interface", () => {
+        it("should demonstrate flexible component interface", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface MockFlexibleProperties {
                 onClick?: EventHandlers.ClickFlexible<HTMLDivElement>;
                 onHover?: () => void;
@@ -137,7 +217,15 @@ describe("Component Props - EventHandlers Namespace", () => {
     });
 
     describe("Type compatibility and enforcement", () => {
-        it("should enforce correct element types", () => {
+        it("should enforce correct element types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This should compile fine
             const buttonHandler: EventHandlers.ClickWithEvent<
                 HTMLButtonElement
@@ -158,7 +246,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof divHandler).toBe("function");
         });
 
-        it("should handle void return types", () => {
+        it("should handle void return types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const handler: EventHandlers.ClickWithEvent<HTMLButtonElement> = (
                 event: React.MouseEvent<HTMLButtonElement>
             ): void => {
@@ -169,7 +265,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof handler).toBe("function");
         });
 
-        it("should work with optional parameters in flexible handlers", () => {
+        it("should work with optional parameters in flexible handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const flexibleHandler: EventHandlers.ClickFlexible<
                 HTMLButtonElement
             > = (event?: React.MouseEvent<HTMLButtonElement>) => {
@@ -184,7 +288,15 @@ describe("Component Props - EventHandlers Namespace", () => {
     });
 
     describe("Real-world usage patterns", () => {
-        it("should support component composition patterns", () => {
+        it("should support component composition patterns", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             interface BaseComponentProperties {
                 className?: string;
                 "data-testid"?: string;
@@ -222,7 +334,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(formProps.onSubmit).toBeDefined();
         });
 
-        it("should support conditional event handlers", () => {
+        it("should support conditional event handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Event Processing", "type");
+
             interface ConditionalComponentProperties {
                 onClick?:
                     | EventHandlers.ClickWithEvent<HTMLButtonElement>
@@ -257,7 +377,15 @@ describe("Component Props - EventHandlers Namespace", () => {
     });
 
     describe("Namespace organization", () => {
-        it("should verify EventHandlers namespace exports", () => {
+        it("should verify EventHandlers namespace exports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Export Operation", "type");
+
             // Test that we can create handlers using namespace types
             const clickHandler: EventHandlers.Click = () => {};
             const clickWithEventHandler: EventHandlers.ClickWithEvent<
@@ -280,7 +408,15 @@ describe("Component Props - EventHandlers Namespace", () => {
             expect(typeof changeWithEventHandler).toBe("function");
         });
 
-        it("should provide clean import path via @shared alias", () => {
+        it("should provide clean import path via @shared alias", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: componentProps", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Import Operation", "type");
+
             // This test verifies that the import path works correctly
             // The import at the top of this file demonstrates this
             // We test that the namespace types are accessible

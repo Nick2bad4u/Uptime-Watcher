@@ -24,7 +24,15 @@ import {
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {
-        it("should validate basic monitor properties", () => {
+        it("should validate basic monitor properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const baseMonitor = {
                 id: "test-monitor",
                 type: "http",
@@ -40,7 +48,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(baseMonitor)).not.toThrow();
         });
 
-        it("should require valid check interval range", () => {
+        it("should require valid check interval range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidLow = {
                 id: "test",
                 type: "http",
@@ -69,7 +85,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
         });
 
-        it("should require valid timeout range", () => {
+        it("should require valid timeout range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidLow = {
                 id: "test",
                 type: "http",
@@ -98,7 +122,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
         });
 
-        it("should require valid retry attempts range", () => {
+        it("should require valid retry attempts range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidLow = {
                 id: "test",
                 type: "http",
@@ -127,7 +159,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
         });
 
-        it("should allow responseTime of -1 for never checked", () => {
+        it("should allow responseTime of -1 for never checked", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = {
                 id: "test",
                 type: "http",
@@ -143,7 +183,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(monitor)).not.toThrow();
         });
 
-        it("should reject responseTime below -1", () => {
+        it("should reject responseTime below -1", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = {
                 id: "test",
                 type: "http",
@@ -160,7 +208,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("httpMonitorSchema", () => {
-        it("should validate HTTP monitor with valid URL", () => {
+        it("should validate HTTP monitor with valid URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const httpMonitor = {
                 id: "http-test",
                 type: "http" as const,
@@ -177,7 +233,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => httpMonitorSchema.parse(httpMonitor)).not.toThrow();
         });
 
-        it("should reject invalid URLs", () => {
+        it("should reject invalid URLs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidUrls = [
                 "not-a-url",
                 "ftp://example.com", // Wrong protocol
@@ -205,7 +269,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
 
-        it("should accept both HTTP and HTTPS URLs", () => {
+        it("should accept both HTTP and HTTPS URLs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpUrl = {
                 id: "test",
                 type: "http" as const,
@@ -230,7 +302,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("portMonitorSchema", () => {
-        it("should validate port monitor with valid host and port", () => {
+        it("should validate port monitor with valid host and port", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const portMonitor = {
                 id: "port-test",
                 type: "port" as const,
@@ -248,7 +328,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => portMonitorSchema.parse(portMonitor)).not.toThrow();
         });
 
-        it("should accept various valid host formats", () => {
+        it("should accept various valid host formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validHosts = [
                 "example.com",
                 "subdomain.example.com",
@@ -278,7 +366,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
 
-        it("should reject invalid hosts", () => {
+        it("should reject invalid hosts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidHosts = [
                 "",
                 "invalid..domain",
@@ -306,7 +402,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
 
-        it("should accept valid port ranges", () => {
+        it("should accept valid port ranges", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPorts = [
                 1,
                 80,
@@ -334,7 +438,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
 
-        it("should reject invalid ports", () => {
+        it("should reject invalid ports", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const invalidPorts = [
                 0,
                 -1,
@@ -363,7 +475,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("pingMonitorSchema", () => {
-        it("should validate ping monitor with valid host", () => {
+        it("should validate ping monitor with valid host", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const pingMonitor = {
                 id: "ping-test",
                 type: "ping" as const,
@@ -380,7 +500,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => pingMonitorSchema.parse(pingMonitor)).not.toThrow();
         });
 
-        it("should accept various valid host formats for ping", () => {
+        it("should accept various valid host formats for ping", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validHosts = [
                 "example.com",
                 "subdomain.example.com",
@@ -409,7 +537,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("monitorSchema (discriminated union)", () => {
-        it("should correctly discriminate HTTP monitors", () => {
+        it("should correctly discriminate HTTP monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor = {
                 id: "test",
                 type: "http" as const,
@@ -428,7 +564,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect("url" in result).toBe(true);
         });
 
-        it("should correctly discriminate port monitors", () => {
+        it("should correctly discriminate port monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portMonitor = {
                 id: "test",
                 type: "port" as const,
@@ -448,7 +592,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect("host" in result && "port" in result).toBe(true);
         });
 
-        it("should correctly discriminate ping monitors", () => {
+        it("should correctly discriminate ping monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingMonitor = {
                 id: "test",
                 type: "ping" as const,
@@ -469,7 +621,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("siteSchema", () => {
-        it("should validate site with single monitor", () => {
+        it("should validate site with single monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -493,7 +653,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => siteSchema.parse(site)).not.toThrow();
         });
 
-        it("should validate site with multiple monitors", () => {
+        it("should validate site with multiple monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -530,7 +698,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => siteSchema.parse(site)).not.toThrow();
         });
 
-        it("should require at least one monitor", () => {
+        it("should require at least one monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -541,7 +717,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => siteSchema.parse(site)).toThrow();
         });
 
-        it("should validate identifier length constraints", () => {
+        it("should validate identifier length constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const shortIdentifier = {
                 identifier: "",
                 name: "Test Site",
@@ -571,7 +755,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => siteSchema.parse(longIdentifier)).toThrow();
         });
 
-        it("should validate name length constraints", () => {
+        it("should validate name length constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const shortName = {
                 identifier: "test-site",
                 name: "",
@@ -603,7 +795,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("validateMonitorData", () => {
-        it("should return success for valid HTTP monitor", () => {
+        it("should return success for valid HTTP monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const data = {
                 id: "test",
                 type: "http",
@@ -623,7 +823,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.data).toBeDefined();
         });
 
-        it("should return errors for invalid monitor data", () => {
+        it("should return errors for invalid monitor data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const data = {
                 id: "test",
                 type: "http",
@@ -642,7 +850,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should return error for unknown monitor type", () => {
+        it("should return error for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const data = {
                 id: "test",
                 type: "unknown",
@@ -660,14 +876,30 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors).toContain("Unknown monitor type: unknown");
         });
 
-        it("should handle non-Zod errors", () => {
+        it("should handle non-Zod errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Force a non-Zod error by passing something that will cause a different error
             const result = validateMonitorData("http", null);
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should categorize missing optional fields as warnings", () => {
+        it("should categorize missing optional fields as warnings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const data = {
                 id: "test",
                 type: "http",
@@ -687,7 +919,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should detect warnings for undefined optional fields", () => {
+        it("should detect warnings for undefined optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test the specific warning detection logic by providing a field as undefined
             const dataWithUndefinedOptional = {
                 id: "test",
@@ -710,7 +950,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.success).toBe(true);
         });
 
-        it("should handle complex validation errors with path information", () => {
+        it("should handle complex validation errors with path information", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidData = {
                 id: "test",
                 type: "http",
@@ -732,7 +980,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("validateMonitorField", () => {
-        it("should validate individual field successfully", () => {
+        it("should validate individual field successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const result = validateMonitorField(
                 "http",
                 "url",
@@ -742,13 +998,29 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors).toHaveLength(0);
         });
 
-        it("should return error for invalid field value", () => {
+        it("should return error for invalid field value", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = validateMonitorField("http", "url", "invalid-url");
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should return error for unknown monitor type", () => {
+        it("should return error for unknown monitor type", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = validateMonitorField(
                 "unknown",
                 "url",
@@ -758,26 +1030,58 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors).toContain("Unknown monitor type: unknown");
         });
 
-        it("should handle field validation errors", () => {
+        it("should handle field validation errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = validateMonitorField("http", "checkInterval", 1000); // Too low
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should handle edge cases and internal function coverage", () => {
+        it("should handle edge cases and internal function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test validateFieldWithSchema with unknown field name
             expect(() => {
                 validateMonitorField("http", "unknownField", "value");
             }).toThrow("Unknown field: unknownField");
         });
 
-        it("should handle field validation for common base fields", () => {
+        it("should handle field validation for common base fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             // Test fields that exist in baseMonitorSchema
             const result = validateMonitorField("http", "timeout", 30_000);
             expect(result.success).toBe(true);
         });
 
-        it("should test getMonitorSchema function indirectly", () => {
+        it("should test getMonitorSchema function indirectly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Data Retrieval", "type");
+
             // Test with all supported monitor types to cover getMonitorSchema branches
             const httpResult = validateMonitorData("http", {
                 id: "test",
@@ -825,7 +1129,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("validateSiteData", () => {
-        it("should validate complete site successfully", () => {
+        it("should validate complete site successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
             const siteData = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -853,7 +1165,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.metadata!["siteIdentifier"]).toBe("test-site");
         });
 
-        it("should return errors for invalid site data", () => {
+        it("should return errors for invalid site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const invalidData = {
                 identifier: "",
                 name: "Test Site",
@@ -866,7 +1186,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        it("should handle non-Zod errors", () => {
+        it("should handle non-Zod errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
             const result = validateSiteData(null);
             expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
@@ -874,13 +1202,29 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("monitorSchemas registry", () => {
-        it("should contain all monitor types", () => {
+        it("should contain all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             expect(monitorSchemas.http).toBeDefined();
             expect(monitorSchemas.port).toBeDefined();
             expect(monitorSchemas.ping).toBeDefined();
         });
 
-        it("should return undefined for unknown types", () => {
+        it("should return undefined for unknown types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             // This tests the internal getMonitorSchema function indirectly
             const result = validateMonitorData("unknown", {});
             expect(result.success).toBe(false);
@@ -889,7 +1233,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("Type exports", () => {
-        it("should properly type HTTP monitors", () => {
+        it("should properly type HTTP monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor: HttpMonitor = {
                 id: "test",
                 type: "http",
@@ -906,7 +1258,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(httpMonitor.url).toBe("https://example.com");
         });
 
-        it("should properly type port monitors", () => {
+        it("should properly type port monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const portMonitor: PortMonitor = {
                 id: "test",
                 type: "port",
@@ -925,7 +1285,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(portMonitor.port).toBe(8080);
         });
 
-        it("should properly type ping monitors", () => {
+        it("should properly type ping monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const pingMonitor: PingMonitor = {
                 id: "test",
                 type: "ping",
@@ -942,7 +1310,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(pingMonitor.host).toBe("example.com");
         });
 
-        it("should properly type generic monitors", () => {
+        it("should properly type generic monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
             const monitor: Monitor = {
                 id: "test",
                 type: "http",
@@ -958,7 +1334,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(monitor.type).toBe("http");
         });
 
-        it("should properly type sites", () => {
+        it("should properly type sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const site: Site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -984,7 +1368,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
     });
 
     describe("Edge cases and boundary conditions", () => {
-        it("should handle minimum valid values", () => {
+        it("should handle minimum valid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = {
                 id: "a", // Minimum length
                 type: "http" as const,
@@ -1001,7 +1393,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
         });
 
-        it("should handle maximum valid values", () => {
+        it("should handle maximum valid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitor = {
                 id: "a".repeat(50), // Reasonable length
                 type: "http" as const,
@@ -1018,7 +1418,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
         });
 
-        it("should handle all valid status values", () => {
+        it("should handle all valid status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const statuses = [
                 "up",
                 "down",
@@ -1044,7 +1452,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             }
         });
 
-        it("should handle optional lastChecked field", () => {
+        it("should handle optional lastChecked field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitorWithoutDate = {
                 id: "test",
                 type: "http" as const,
@@ -1074,7 +1490,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
     describe("Missing Branch Coverage", () => {
         describe("validateMonitorData - optional field warnings", () => {
-            it("should generate warnings for optional missing fields", () => {
+            it("should generate warnings for optional missing fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // This test targets the optional field warning branch in validateMonitorData (line 312)
                 const incompleteData = {
                     id: "test",
@@ -1098,7 +1522,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // No warnings expected since lastChecked is truly optional and Zod handles it correctly
             });
 
-            it("should handle undefined optional fields in Zod validation", () => {
+            it("should handle undefined optional fields in Zod validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
                 // Create data that has undefined optional fields to trigger the optional field detection
                 const dataWithUndefinedOptional = {
                     id: "test",
@@ -1123,7 +1555,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         describe("validateFieldWithSchema - fallback to base schema", () => {
-            it("should use base schema for common fields when specific schema doesn't have the field", () => {
+            it("should use base schema for common fields when specific schema doesn't have the field", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // This test targets line 484 - fallback to base schema for common fields
                 // We'll test a field that exists in base schema but might not be directly accessible in type-specific schema shape
                 try {
@@ -1141,14 +1581,30 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 }
             });
 
-            it("should throw error for completely unknown fields", () => {
+            it("should throw error for completely unknown fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // This tests the final throw for unknown fields
                 expect(() => {
                     validateMonitorField("http", "nonExistentField", "value");
                 }).toThrow("Unknown field: nonExistentField");
             });
 
-            it("should handle fields that exist in specific schema shape", () => {
+            it("should handle fields that exist in specific schema shape", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // Test that URL field works for HTTP monitors (exists in httpMonitorSchema.shape)
                 const result = validateMonitorField(
                     "http",
@@ -1162,7 +1618,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should handle base schema fields for different monitor types", () => {
+            it("should handle base schema fields for different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Monitoring", "type");
+
                 // Test base schema fields work for all monitor types
                 const types = [
                     "http",
@@ -1222,7 +1686,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
         });
 
         describe("Edge cases for branch coverage", () => {
-            it("should handle unknown monitor type in validateMonitorData", () => {
+            it("should handle unknown monitor type in validateMonitorData", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
                 const result = validateMonitorData("unknown-type", {});
                 expect(result.success).toBe(false);
                 expect(result.errors).toContain(
@@ -1230,7 +1702,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should handle unknown monitor type in validateMonitorField", () => {
+            it("should handle unknown monitor type in validateMonitorField", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Validation", "type");
+
                 const result = validateMonitorField(
                     "unknown-type",
                     "id",
@@ -1242,14 +1722,30 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should handle non-Error objects in error handling", () => {
+            it("should handle non-Error objects in error handling", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Try to create a scenario that might trigger non-ZodError paths
                 const result = validateMonitorData("http", null);
                 expect(result.success).toBe(false);
                 expect(result.errors.length).toBeGreaterThan(0);
             });
 
-            it("should handle various error scenarios in validateMonitorField", () => {
+            it("should handle various error scenarios in validateMonitorField", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Test various error scenarios
                 const testCases = [
                     { type: "http", field: "url", value: "invalid-url" },
@@ -1264,7 +1760,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 }
             });
 
-            it("should handle non-Error objects in validateMonitorData", () => {
+            it("should handle non-Error objects in validateMonitorData", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Mock scenario to trigger non-Error handling (line 422)
                 vi.spyOn(monitorSchemas, "http", "get").mockReturnValue({
                     ...monitorSchemas.http,
@@ -1292,7 +1796,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 vi.restoreAllMocks();
             });
 
-            it("should handle non-Error objects in validateSiteData", () => {
+            it("should handle non-Error objects in validateSiteData", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Mock scenario to trigger non-Error handling (line 540)
                 const originalParse = siteSchema.parse;
                 vi.spyOn(siteSchema, "parse").mockImplementation(() => {
@@ -1326,7 +1838,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 siteSchema.parse = originalParse;
             });
 
-            it("should test fallback to base schema for common fields", () => {
+            it("should test fallback to base schema for common fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Business Logic", "type");
+
                 // Test the fallback path for common field validation (line 330)
                 // This should use base schema when specific schema doesn't have the field
                 const result = validateMonitorField(
@@ -1338,7 +1858,15 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expect(result.success).toBe(true);
             });
 
-            it("should handle error cases with proper categorization", () => {
+            it("should handle error cases with proper categorization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: schemas", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Error Handling", "type");
+
                 // Test that errors are categorized correctly (line 408 - else case)
                 const result = validateMonitorData("http", {
                     id: "", // Empty ID - should be required error, not warning

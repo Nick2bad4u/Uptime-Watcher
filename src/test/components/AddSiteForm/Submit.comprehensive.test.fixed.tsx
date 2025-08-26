@@ -54,7 +54,17 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("handleSubmit - New Site Creation", () => {
-        it("should handle successful new site submission with HTTP monitor", async () => {
+        it("should handle successful new site submission with HTTP monitor", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties();
 
@@ -81,7 +91,17 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             expect(properties.onSuccess).toHaveBeenCalled();
         });
 
-        it("should handle validation errors", async () => {
+        it("should handle validation errors", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties();
 
@@ -107,7 +127,17 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("handleSubmit - Existing Site", () => {
-        it("should handle adding monitor to existing site", async () => {
+        it("should handle adding monitor to existing site", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit.comprehensive.test.fixed.tsx", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
             const mockEvent = { preventDefault: vi.fn() } as any;
             const properties = createMockProperties({
                 addMode: "existing",

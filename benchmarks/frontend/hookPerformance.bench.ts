@@ -544,10 +544,9 @@ class MockReactHooks {
 
     // Dependency comparison and optimization
     private scheduleRerender(componentId: string): void {
-        // Simulate scheduling a re-render
-        setTimeout(() => {
-            this.renderComponent(componentId);
-        }, 0);
+        // Simulate scheduling a re-render synchronously for benchmarks
+        // Using setTimeout(0) can cause hangs in benchmark environment
+        this.renderComponent(componentId);
     }
 
     private getCurrentContext(): ComponentHookContext {
@@ -944,6 +943,7 @@ describe("React Hook Performance", () => {
     bench("useEffect - cleanup performance", () => {
         const hookSystem = new MockReactHooks();
         const components: string[] = [];
+        const activeIntervals: NodeJS.Timeout[] = [];
 
         for (let i = 0; i < 60; i++) {
             const componentId = `cleanup-component-${i}`;
@@ -952,23 +952,22 @@ describe("React Hook Performance", () => {
 
             const [isActive, setIsActive] = hookSystem.useState(true);
 
-            // Effects with expensive cleanup
+            // Effects with expensive cleanup - using mock intervals instead of real ones
             hookSystem.useEffect(() => {
-                const interval = setInterval(() => {
-                    console.log("Timer tick");
-                }, 100);
+                // Mock interval that doesn't actually run
+                const intervalId = {} as NodeJS.Timeout; // Mock interval ID
 
                 const subscription = {
-                    unsubscribe: () => console.log("Unsubscribed"),
+                    unsubscribe: () => Math.random() * 100, // Simulate cleanup work
                 };
 
-                const eventListener = () => console.log("Event");
+                const eventListener = () => Math.random() * 50; // Simulate event work
 
                 return () => {
-                    // Simulate cleanup work
-                    clearInterval(interval);
+                    // Simulate cleanup work without real timers
+                    void (Math.random() * 1000); // Simulate clearInterval work
                     subscription.unsubscribe();
-                    const cleanupWork = Math.random() * 5; // Simulate work
+                    void (Math.random() * 5); // Simulate work
                 };
             }, [isActive]);
 
@@ -992,6 +991,9 @@ describe("React Hook Performance", () => {
                 components[Math.floor(Math.random() * components.length)];
             hookSystem.renderComponent(componentId);
         }
+
+        // Clear any remaining intervals
+        activeIntervals.forEach(interval => clearInterval(interval));
 
         hookSystem.reset();
     });

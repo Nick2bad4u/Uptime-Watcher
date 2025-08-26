@@ -91,11 +91,27 @@ describe("WindowService", () => {
     });
 
     describe("constructor", () => {
-        it("should create a new WindowService instance", () => {
+        it("should create a new WindowService instance", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(windowService).toBeInstanceOf(WindowService);
         });
 
-        it("should log debug message in development mode", () => {
+        it("should log debug message in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(isDev).mockReturnValue(true);
 
             new WindowService();
@@ -105,7 +121,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should not log debug message in production mode", () => {
+        it("should not log debug message in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(isDev).mockReturnValue(false);
 
             new WindowService();
@@ -117,7 +141,15 @@ describe("WindowService", () => {
     });
 
     describe("createMainWindow", () => {
-        it("should create a new BrowserWindow with correct configuration", () => {
+        it("should create a new BrowserWindow with correct configuration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const window = windowService.createMainWindow();
 
             expect(BrowserWindow).toHaveBeenCalledWith({
@@ -137,7 +169,15 @@ describe("WindowService", () => {
             expect(window).toBeDefined();
         });
 
-        it("should setup window events", () => {
+        it("should setup window events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const window = windowService.createMainWindow();
 
             expect(window.once).toHaveBeenCalledWith(
@@ -162,36 +202,84 @@ describe("WindowService", () => {
             );
         });
 
-        it("should return the created window", () => {
+        it("should return the created window", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const window = windowService.createMainWindow();
             expect(window).toBeDefined();
         });
     });
 
     describe("getMainWindow", () => {
-        it("should return null when no window is created", () => {
+        it("should return null when no window is created", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(windowService.getMainWindow()).toBeNull();
         });
 
-        it("should return the main window when created", () => {
+        it("should return the main window when created", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             const window = windowService.createMainWindow();
             expect(windowService.getMainWindow()).toBe(window);
         });
     });
 
     describe("hasMainWindow", () => {
-        it("should return false when no window is created", () => {
+        it("should return false when no window is created", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
             expect(windowService.hasMainWindow()).toBe(false);
         });
 
-        it("should return true when window exists and is not destroyed", () => {
+        it("should return true when window exists and is not destroyed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
 
             expect(windowService.hasMainWindow()).toBe(true);
         });
 
-        it("should return false when window is destroyed", () => {
+        it("should return false when window is destroyed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
 
@@ -200,7 +288,15 @@ describe("WindowService", () => {
     });
 
     describe("closeMainWindow", () => {
-        it("should close the main window if it exists", () => {
+        it("should close the main window if it exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
 
@@ -209,11 +305,27 @@ describe("WindowService", () => {
             expect(window.close).toHaveBeenCalled();
         });
 
-        it("should not throw if no window exists", () => {
+        it("should not throw if no window exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             expect(() => windowService.closeMainWindow()).not.toThrow();
         });
 
-        it("should not close if window is destroyed", () => {
+        it("should not close if window is destroyed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
 
@@ -224,7 +336,15 @@ describe("WindowService", () => {
     });
 
     describe("sendToRenderer", () => {
-        it("should send message to renderer when window exists", () => {
+        it("should send message to renderer when window exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
 
@@ -239,7 +359,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should send message without data", () => {
+        it("should send message without data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(false);
 
@@ -251,7 +379,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should log warning when no window exists", () => {
+        it("should log warning when no window exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             windowService.sendToRenderer("test-channel", { data: "test" });
 
             expect(logger.warn).toHaveBeenCalledWith(
@@ -259,7 +395,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should log warning when window is destroyed", () => {
+        it("should log warning when window is destroyed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const window = windowService.createMainWindow();
             vi.mocked(window.isDestroyed).mockReturnValue(true);
 
@@ -272,7 +416,15 @@ describe("WindowService", () => {
     });
 
     describe("getAllWindows", () => {
-        it("should return all browser windows", () => {
+        it("should return all browser windows", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const mockWindows = [vi.fn(), vi.fn()];
             vi.mocked(BrowserWindow.getAllWindows).mockReturnValue(
                 mockWindows as unknown as BrowserWindow[]
@@ -286,7 +438,15 @@ describe("WindowService", () => {
     });
 
     describe("window events", () => {
-        it("should handle ready-to-show event", () => {
+        it("should handle ready-to-show event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
@@ -305,7 +465,15 @@ describe("WindowService", () => {
             expect(window.show).toHaveBeenCalled();
         });
 
-        it("should handle dom-ready event", () => {
+        it("should handle dom-ready event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
@@ -321,7 +489,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle did-finish-load event", () => {
+        it("should handle did-finish-load event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
@@ -339,7 +515,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle did-fail-load event", () => {
+        it("should handle did-fail-load event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
@@ -359,7 +543,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle closed event", () => {
+        it("should handle closed event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const window = windowService.createMainWindow();
             expect(windowService.getMainWindow()).toBe(window);
 
@@ -384,7 +576,15 @@ describe("WindowService", () => {
                 vi.mocked(isDev).mockReturnValue(false);
             });
 
-            it("should load from file in production mode", () => {
+            it("should load from file in production mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
                 windowService.createMainWindow();
 
                 expect(logger.debug).toHaveBeenCalledWith(
@@ -392,7 +592,15 @@ describe("WindowService", () => {
                 );
             });
 
-            it("should handle file loading errors in production", async () => {
+            it("should handle file loading errors in production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 const window = windowService.createMainWindow();
                 const error = new Error("File not found");
                 vi.mocked(window.loadFile).mockRejectedValue(error);
@@ -419,7 +627,15 @@ describe("WindowService", () => {
                 } as Response);
             });
 
-            it("should load from Vite server in development mode", () => {
+            it("should load from Vite server in development mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
                 windowService.createMainWindow();
 
                 expect(logger.debug).toHaveBeenCalledWith(
@@ -427,7 +643,15 @@ describe("WindowService", () => {
                 );
             });
 
-            it("should wait for Vite server to be ready", async () => {
+            it("should wait for Vite server to be ready", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 windowService.createMainWindow();
 
                 // Wait for the async operation
@@ -441,7 +665,15 @@ describe("WindowService", () => {
                 );
             });
 
-            it("should load URL when server is ready", async () => {
+            it("should load URL when server is ready", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
                 const window = windowService.createMainWindow();
 
                 // Wait for the async operations
@@ -452,7 +684,15 @@ describe("WindowService", () => {
                 );
             });
 
-            it("should handle Vite server connection errors", async () => {
+            it("should handle Vite server connection errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection refused");
                 vi.mocked(globalThis.fetch).mockRejectedValue(error);
@@ -488,7 +728,15 @@ describe("WindowService", () => {
                 );
             });
 
-            it("should handle window destruction during Vite wait", async () => {
+            it("should handle window destruction during Vite wait", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
                 vi.mocked(isDev).mockReturnValue(true);
 
                 // Create a new service just for this test
@@ -520,7 +768,15 @@ describe("WindowService", () => {
     });
 
     describe("preload path resolution", () => {
-        it("should resolve development preload path", () => {
+        it("should resolve development preload path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
             vi.mocked(isDev).mockReturnValue(true);
 
             windowService.createMainWindow();
@@ -536,7 +792,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should resolve production preload path", () => {
+        it("should resolve production preload path", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
             vi.mocked(isDev).mockReturnValue(false);
 
             windowService.createMainWindow();
@@ -552,7 +816,15 @@ describe("WindowService", () => {
     });
 
     describe("error scenarios", () => {
-        it("should handle missing main window in loadContent", () => {
+        it("should handle missing main window in loadContent", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Loading", "type");
+
             // Create service but don't call createMainWindow
             const service = new WindowService();
 
@@ -570,7 +842,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle timeout during fetch", async () => {
+        it("should handle timeout during fetch", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.mocked(isDev).mockReturnValue(true);
 
             // Create a new service just for this test
@@ -605,7 +885,15 @@ describe("WindowService", () => {
     });
 
     describe("edge cases", () => {
-        it("should handle null window in sendToRenderer safety check", () => {
+        it("should handle null window in sendToRenderer safety check", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             windowService.createMainWindow();
             (windowService as any).mainWindow = null;
 
@@ -616,7 +904,15 @@ describe("WindowService", () => {
             );
         });
 
-        it("should handle destroyed window in ready-to-show event", () => {
+        it("should handle destroyed window in ready-to-show event", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
             const window = windowService.createMainWindow();
 
             // Get the ready-to-show callback

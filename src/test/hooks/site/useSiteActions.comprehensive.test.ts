@@ -46,7 +46,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should return hook functions", () => {
+        it("should return hook functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -59,7 +67,15 @@ describe("useSiteActions Hook", () => {
             expect(result.current).toHaveProperty("handleStopSiteMonitoring");
         });
 
-        it("should provide functions as callable", () => {
+        it("should provide functions as callable", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -80,7 +96,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Start Monitoring", () => {
-        it("should handle start monitoring action", async () => {
+        it("should handle start monitoring action", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -93,7 +117,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle start monitoring without monitor", async () => {
+        it("should handle start monitoring without monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, undefined)
             );
@@ -106,7 +138,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle start site monitoring", async () => {
+        it("should handle start site monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -121,7 +161,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Stop Monitoring", () => {
-        it("should handle stop monitoring action", async () => {
+        it("should handle stop monitoring action", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -134,7 +182,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle stop monitoring with disabled monitoring", async () => {
+        it("should handle stop monitoring with disabled monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const disabledSite = createMockSite({ monitoring: false });
 
             const { result } = renderHook(() =>
@@ -149,7 +205,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle stop site monitoring", async () => {
+        it("should handle stop site monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -164,7 +228,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Card Click", () => {
-        it("should handle card click action", async () => {
+        it("should handle card click action", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -177,7 +249,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle card click without monitor", async () => {
+        it("should handle card click without monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, undefined)
             );
@@ -192,7 +272,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Check Now", () => {
-        it("should handle check now action", async () => {
+        it("should handle check now action", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -205,7 +293,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle check now with different monitor types", async () => {
+        it("should handle check now with different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor = createMockMonitor({ type: "http" });
             const httpsSite = createMockSite({ name: "HTTPS Site" });
 
@@ -223,7 +319,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle errors gracefully", async () => {
+        it("should handle errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -241,7 +345,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle null/undefined inputs", async () => {
+        it("should handle null/undefined inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, undefined)
             );
@@ -258,7 +370,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Hook Stability", () => {
-        it("should maintain stable function references when dependencies don't change", () => {
+        it("should maintain stable function references when dependencies don't change", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result, rerender } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -283,7 +403,15 @@ describe("useSiteActions Hook", () => {
             expect(() => secondRender.handleCardClick()).not.toThrow();
         });
 
-        it("should work with multiple hook instances", () => {
+        it("should work with multiple hook instances", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result: result1 } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -308,7 +436,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Different Site Configurations", () => {
-        it("should handle different site types", async () => {
+        it("should handle different site types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const sites = [
                 createMockSite({ name: "Site 1" }),
                 createMockSite({ name: "Site 2" }),
@@ -328,7 +464,15 @@ describe("useSiteActions Hook", () => {
             }
         });
 
-        it("should handle sites with different monitoring states", async () => {
+        it("should handle sites with different monitoring states", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const sites = [
                 createMockSite({ monitoring: true }),
                 createMockSite({ monitoring: false }),
@@ -352,7 +496,15 @@ describe("useSiteActions Hook", () => {
     });
 
     describe("Performance", () => {
-        it("should handle rapid successive calls", async () => {
+        it("should handle rapid successive calls", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
@@ -367,7 +519,15 @@ describe("useSiteActions Hook", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle concurrent operations", async () => {
+        it("should handle concurrent operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteActions", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );

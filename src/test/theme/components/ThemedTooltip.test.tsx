@@ -18,13 +18,33 @@ describe("ThemedTooltip", () => {
     };
 
     describe("Rendering", () => {
-        it("should render children content", () => {
+        it("should render children content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} />);
 
             expect(screen.getByText("Hover me")).toBeInTheDocument();
         });
 
-        it("should render with tooltip content as title attribute", () => {
+        it("should render with tooltip content as title attribute", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
@@ -34,14 +54,34 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should apply base themed-tooltip class", () => {
+        it("should apply base themed-tooltip class", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveClass("themed-tooltip");
         });
 
-        it("should render with custom className", () => {
+        it("should render with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip {...defaultProps} className="custom-tooltip" />
             );
@@ -53,7 +93,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should render with empty className", () => {
+        it("should render with empty className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} className="" />);
 
             const tooltipContainer =
@@ -64,14 +114,34 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Content Handling", () => {
-        it("should handle empty tooltip content", () => {
+        it("should handle empty tooltip content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} content="" />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
             expect(tooltipContainer).toHaveAttribute("title", "");
         });
 
-        it("should handle long tooltip content", () => {
+        it("should handle long tooltip content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const longContent =
                 "This is a very long tooltip content that contains multiple sentences and should be displayed properly when the user hovers over the element.";
             render(<ThemedTooltip {...defaultProps} content={longContent} />);
@@ -80,7 +150,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", longContent);
         });
 
-        it("should handle tooltip content with special characters", () => {
+        it("should handle tooltip content with special characters", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const specialContent = "Special chars: & < > \" ' @#$%^&*()";
             render(
                 <ThemedTooltip {...defaultProps} content={specialContent} />
@@ -90,7 +170,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", specialContent);
         });
 
-        it("should handle tooltip content with newlines", () => {
+        it("should handle tooltip content with newlines", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const multilineContent = "Line 1\nLine 2\nLine 3";
             render(
                 <ThemedTooltip {...defaultProps} content={multilineContent} />
@@ -100,7 +190,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", multilineContent);
         });
 
-        it("should handle tooltip content with HTML entities", () => {
+        it("should handle tooltip content with HTML entities", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const htmlContent = "Value must be > 0 & < 100";
             render(<ThemedTooltip {...defaultProps} content={htmlContent} />);
 
@@ -108,7 +208,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveAttribute("title", htmlContent);
         });
 
-        it("should handle unicode tooltip content", () => {
+        it("should handle unicode tooltip content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const unicodeContent = "Unicode test: 🎯 📊 ✅ ❌ ⚠️";
             render(
                 <ThemedTooltip {...defaultProps} content={unicodeContent} />
@@ -120,7 +230,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Children Handling", () => {
-        it("should render text children", () => {
+        it("should render text children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Tooltip">
                     Simple text content
@@ -130,7 +250,17 @@ describe("ThemedTooltip", () => {
             expect(screen.getByText("Simple text content")).toBeInTheDocument();
         });
 
-        it("should render element children", () => {
+        it("should render element children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Button tooltip">
                     <button>Click me</button>
@@ -142,7 +272,17 @@ describe("ThemedTooltip", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render multiple children", () => {
+        it("should render multiple children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Multiple elements">
                     <span>First</span>
@@ -154,7 +294,17 @@ describe("ThemedTooltip", () => {
             expect(screen.getByText("Second")).toBeInTheDocument();
         });
 
-        it("should render complex nested children", () => {
+        it("should render complex nested children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Complex content">
                     <div>
@@ -172,14 +322,34 @@ describe("ThemedTooltip", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle empty children", () => {
+        it("should handle empty children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip content="Empty tooltip">{""}</ThemedTooltip>);
 
             const tooltipContainer = screen.getByTitle("Empty tooltip");
             expect(tooltipContainer).toBeInTheDocument();
         });
 
-        it("should handle numeric children", () => {
+        it("should handle numeric children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Number tooltip">{42}</ThemedTooltip>
             );
@@ -189,7 +359,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("CSS Classes", () => {
-        it("should combine base class with custom className", () => {
+        it("should combine base class with custom className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip
                     {...defaultProps}
@@ -205,7 +385,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should handle whitespace in className", () => {
+        it("should handle whitespace in className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip {...defaultProps} className="spaced-class" />
             );
@@ -217,7 +407,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should handle undefined className", () => {
+        it("should handle undefined className", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer =
@@ -226,7 +426,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer.className).toBe("themed-tooltip ");
         });
 
-        it("should preserve class order", () => {
+        it("should preserve class order", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip
                     {...defaultProps}
@@ -243,7 +453,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("User Interactions", () => {
-        it("should allow interaction with children", async () => {
+        it("should allow interaction with children", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockClick = vi.fn();
 
@@ -261,7 +481,17 @@ describe("ThemedTooltip", () => {
             expect(mockClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should support hover interactions", async () => {
+        it("should support hover interactions", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
 
             render(<ThemedTooltip {...defaultProps} />);
@@ -283,7 +513,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should support keyboard navigation", async () => {
+        it("should support keyboard navigation", async ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const user = userEvent.setup();
             const mockClick = vi.fn();
 
@@ -302,7 +542,17 @@ describe("ThemedTooltip", () => {
             expect(mockClick).toHaveBeenCalledTimes(1);
         });
 
-        it("should support focus events", () => {
+        it("should support focus events", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Event Processing", "type");
+
             render(
                 <ThemedTooltip content="Focus tooltip">
                     <input type="text" placeholder="Focus me" />
@@ -319,7 +569,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Accessibility", () => {
-        it("should provide tooltip content via title attribute", () => {
+        it("should provide tooltip content via title attribute", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
@@ -329,7 +589,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should preserve child element accessibility", () => {
+        it("should preserve child element accessibility", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Accessible tooltip">
                     <button aria-label="Accessible button">Click</button>
@@ -340,7 +610,17 @@ describe("ThemedTooltip", () => {
             expect(button).toBeInTheDocument();
         });
 
-        it("should not interfere with child element roles", () => {
+        it("should not interfere with child element roles", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Role tooltip">
                     <div role="alert">Alert message</div>
@@ -351,7 +631,17 @@ describe("ThemedTooltip", () => {
             expect(alert).toHaveTextContent("Alert message");
         });
 
-        it("should support screen reader friendly content", () => {
+        it("should support screen reader friendly content", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Screen reader tooltip information">
                     <span aria-describedby="tooltip-desc">
@@ -369,7 +659,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Edge Cases", () => {
-        it("should handle content updates", () => {
+        it("should handle content updates", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             const { rerender } = render(
                 <ThemedTooltip {...defaultProps} content="Initial content" />
             );
@@ -389,7 +689,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should handle children updates", () => {
+        it("should handle children updates", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             const { rerender } = render(
                 <ThemedTooltip content="Tooltip">
                     <span>Initial child</span>
@@ -408,7 +718,17 @@ describe("ThemedTooltip", () => {
             expect(screen.queryByText("Initial child")).not.toBeInTheDocument();
         });
 
-        it("should handle className updates", () => {
+        it("should handle className updates", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Data Update", "type");
+
             const { rerender } = render(
                 <ThemedTooltip {...defaultProps} className="initial-class" />
             );
@@ -429,7 +749,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).not.toHaveClass("initial-class");
         });
 
-        it("should handle rapid state changes", () => {
+        it("should handle rapid state changes", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(<ThemedTooltip {...defaultProps} />);
 
             const tooltipContainer = screen.getByText("Hover me").parentElement;
@@ -466,7 +796,17 @@ describe("ThemedTooltip", () => {
             expect(tooltipContainer).toHaveClass("class3");
         });
 
-        it("should handle null-like children", () => {
+        it("should handle null-like children", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Null children">
                     {null}
@@ -481,7 +821,17 @@ describe("ThemedTooltip", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work with all props combinations", () => {
+        it("should work with all props combinations", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip
                     content="Complete tooltip with all features"
@@ -508,7 +858,17 @@ describe("ThemedTooltip", () => {
             ).toBeInTheDocument();
         });
 
-        it("should work with minimal props", () => {
+        it("should work with minimal props", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             render(
                 <ThemedTooltip content="Minimal tooltip">
                     <span>Simple text</span>
@@ -524,7 +884,17 @@ describe("ThemedTooltip", () => {
             );
         });
 
-        it("should maintain tooltip relationship across re-renders", () => {
+        it("should maintain tooltip relationship across re-renders", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ThemedTooltip", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
             const { rerender } = render(<ThemedTooltip {...defaultProps} />);
 
             let tooltipContainer = screen.getByText("Hover me").parentElement;

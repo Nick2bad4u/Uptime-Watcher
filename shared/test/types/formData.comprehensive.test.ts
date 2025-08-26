@@ -18,7 +18,15 @@ import {
 
 describe("FormData Types", () => {
     describe("SiteFormData", () => {
-        it("should define proper structure", () => {
+        it("should define proper structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validSiteFormData: SiteFormData = {
                 identifier: "site-123",
                 name: "Test Site",
@@ -37,7 +45,15 @@ describe("FormData Types", () => {
             expect(validSiteFormData.monitor.type).toBe("http");
         });
 
-        it("should allow different monitor types", () => {
+        it("should allow different monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpSite: SiteFormData = {
                 identifier: "http-site",
                 name: "HTTP Site",
@@ -66,7 +82,15 @@ describe("FormData Types", () => {
             expect(pingSite.monitor.type).toBe("ping");
         });
 
-        it("should enforce proper types", () => {
+        it("should enforce proper types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteFormData: SiteFormData = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -87,7 +111,15 @@ describe("FormData Types", () => {
     });
 
     describe("HttpFormData", () => {
-        it("should define proper structure", () => {
+        it("should define proper structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validHttpFormData: HttpFormData = {
                 type: "http",
                 url: "https://example.com",
@@ -103,7 +135,15 @@ describe("FormData Types", () => {
             expect(validHttpFormData.retryAttempts).toBe(3);
         });
 
-        it("should allow optional fields", () => {
+        it("should allow optional fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpWithOptions: HttpFormData = {
                 type: "http",
                 url: "https://api.example.com",
@@ -134,7 +174,15 @@ describe("FormData Types", () => {
     });
 
     describe("PingFormData", () => {
-        it("should define proper structure", () => {
+        it("should define proper structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPingFormData: PingFormData = {
                 type: "ping",
                 host: "example.com",
@@ -150,7 +198,15 @@ describe("FormData Types", () => {
             expect(validPingFormData.retryAttempts).toBe(3);
         });
 
-        it("should allow optional ping-specific fields", () => {
+        it("should allow optional ping-specific fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pingWithOptions: PingFormData = {
                 type: "ping",
                 host: "192.168.1.1",
@@ -167,7 +223,15 @@ describe("FormData Types", () => {
             expect(pingWithOptions.maxPacketLoss).toBe(10);
         });
 
-        it("should enforce number types for ping parameters", () => {
+        it("should enforce number types for ping parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pingFormData: PingFormData = {
                 type: "ping",
                 host: "test.com",
@@ -186,7 +250,15 @@ describe("FormData Types", () => {
     });
 
     describe("PortFormData", () => {
-        it("should define proper structure", () => {
+        it("should define proper structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const validPortFormData: PortFormData = {
                 type: "port",
                 host: "example.com",
@@ -204,7 +276,15 @@ describe("FormData Types", () => {
             expect(validPortFormData.retryAttempts).toBe(3);
         });
 
-        it("should allow connection timeout", () => {
+        it("should allow connection timeout", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const portWithTimeout: PortFormData = {
                 type: "port",
                 host: "192.168.1.1",
@@ -219,7 +299,15 @@ describe("FormData Types", () => {
             expect(typeof portWithTimeout.connectionTimeout).toBe("number");
         });
 
-        it("should enforce port number constraints", () => {
+        it("should enforce port number constraints", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const commonPorts = [
                 80,
                 443,
@@ -248,7 +336,15 @@ describe("FormData Types", () => {
     });
 
     describe("BaseFormData", () => {
-        it("should be extended by all monitor types", () => {
+        it("should be extended by all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpData: HttpFormData = {
                 type: "http",
                 url: "https://example.com",
@@ -289,7 +385,15 @@ describe("FormData Types", () => {
     });
 
     describe("MonitorFormData Union Type", () => {
-        it("should accept all monitor types", () => {
+        it("should accept all monitor types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
             const httpMonitor: MonitorFormData = {
                 type: "http",
                 url: "https://example.com",
@@ -322,7 +426,15 @@ describe("FormData Types", () => {
     });
 
     describe("Type Guards", () => {
-        it("should identify HTTP form data", () => {
+        it("should identify HTTP form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpData: MonitorFormData = {
                 type: "http",
                 url: "https://example.com",
@@ -347,7 +459,15 @@ describe("FormData Types", () => {
             }
         });
 
-        it("should identify ping form data", () => {
+        it("should identify ping form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pingData: MonitorFormData = {
                 type: "ping",
                 host: "example.com",
@@ -373,7 +493,15 @@ describe("FormData Types", () => {
             }
         });
 
-        it("should identify port form data", () => {
+        it("should identify port form data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const portData: MonitorFormData = {
                 type: "port",
                 host: "example.com",
@@ -401,7 +529,15 @@ describe("FormData Types", () => {
     });
 
     describe("DEFAULT_FORM_DATA", () => {
-        it("should provide HTTP defaults", () => {
+        it("should provide HTTP defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const httpDefaults = DEFAULT_FORM_DATA.http;
 
             expect(httpDefaults.type).toBe("http");
@@ -414,7 +550,15 @@ describe("FormData Types", () => {
             expect(httpDefaults.followRedirects).toBe(true);
         });
 
-        it("should provide ping defaults", () => {
+        it("should provide ping defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const pingDefaults = DEFAULT_FORM_DATA.ping;
 
             expect(pingDefaults.type).toBe("ping");
@@ -427,7 +571,15 @@ describe("FormData Types", () => {
             expect(pingDefaults.maxPacketLoss).toBe(0);
         });
 
-        it("should provide port defaults", () => {
+        it("should provide port defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const portDefaults = DEFAULT_FORM_DATA.port;
 
             expect(portDefaults.type).toBe("port");
@@ -439,7 +591,15 @@ describe("FormData Types", () => {
             expect(portDefaults.connectionTimeout).toBe(10_000);
         });
 
-        it("should have consistent default intervals across types", () => {
+        it("should have consistent default intervals across types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { http, ping, port } = DEFAULT_FORM_DATA;
 
             expect(http.checkInterval).toBe(ping.checkInterval);
@@ -452,7 +612,15 @@ describe("FormData Types", () => {
     });
 
     describe("AddSiteFormState", () => {
-        it("should define proper structure", () => {
+        it("should define proper structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const formState: AddSiteFormState = {
                 addMode: "new",
                 formData: {
@@ -474,7 +642,15 @@ describe("FormData Types", () => {
             expect(formState.selectedExistingSite).toBe("");
         });
 
-        it("should handle existing site mode", () => {
+        it("should handle existing site mode", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const existingFormState: AddSiteFormState = {
                 addMode: "existing",
                 formData: {
@@ -499,7 +675,15 @@ describe("FormData Types", () => {
     });
 
     describe("FormMode", () => {
-        it("should define valid modes", () => {
+        it("should define valid modes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const newMode: FormMode = "new";
             const existingMode: FormMode = "existing";
 
@@ -509,7 +693,15 @@ describe("FormData Types", () => {
     });
 
     describe("MonitorFieldValidation", () => {
-        it("should define validation structure", () => {
+        it("should define validation structure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
             const validation: MonitorFieldValidation = {
                 fieldName: "checkInterval",
                 fieldType: "number",
@@ -532,7 +724,15 @@ describe("FormData Types", () => {
             expect(typeof validation.validator).toBe("function");
         });
 
-        it("should handle different field types", () => {
+        it("should handle different field types", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const urlValidation: MonitorFieldValidation = {
                 fieldName: "url",
                 fieldType: "url",
@@ -561,7 +761,15 @@ describe("FormData Types", () => {
     });
 
     describe("Type Safety", () => {
-        it("should enforce strict typing", () => {
+        it("should enforce strict typing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const siteData: SiteFormData = {
                 identifier: "type-test",
                 name: "TypeScript Test",
@@ -580,7 +788,15 @@ describe("FormData Types", () => {
             expect(siteData.monitor.type).toBe("http");
         });
 
-        it("should provide discriminated union support", () => {
+        it("should provide discriminated union support", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formData", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
             const monitors: MonitorFormData[] = [
                 {
                     type: "http",

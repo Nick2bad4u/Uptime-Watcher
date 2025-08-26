@@ -93,7 +93,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("allSupportsAdvancedAnalytics", () => {
-        it("should return true when all monitor types support advanced analytics", async () => {
+        it("should return true when all monitor types support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { allSupportsAdvancedAnalytics } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -113,7 +121,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false); // Default fallback when no mocking works
         });
 
-        it("should return false when any monitor type doesn't support advanced analytics", async () => {
+        it("should return false when any monitor type doesn't support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { allSupportsAdvancedAnalytics } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -122,7 +138,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return true for empty array", async () => {
+        it("should return true for empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { allSupportsAdvancedAnalytics } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -133,7 +157,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("allSupportsResponseTime", () => {
-        it("should return false as fallback when checking response time support", async () => {
+        it("should return false as fallback when checking response time support", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { allSupportsResponseTime } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -142,7 +174,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false); // Default fallback
         });
 
-        it("should handle empty array", async () => {
+        it("should handle empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { allSupportsResponseTime } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -153,7 +193,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("clearConfigCache", () => {
-        it("should call cache clear method", async () => {
+        it("should call cache clear method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const { clearConfigCache } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -166,7 +214,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("formatMonitorDetail", () => {
-        it("should format monitor detail when electronAPI is available", async () => {
+        it("should format monitor detail when electronAPI is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -183,7 +239,15 @@ describe("Monitor UI Helpers", () => {
             ).toHaveBeenCalledWith("http", "200");
         });
 
-        it("should return fallback when electronAPI is not available", async () => {
+        it("should return fallback when electronAPI is not available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -194,7 +258,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("200"); // Fallback to original details
         });
 
-        it("should handle API errors gracefully", async () => {
+        it("should handle API errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -210,7 +282,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("formatMonitorTitleSuffix", () => {
-        it("should format monitor title suffix when electronAPI is available", async () => {
+        it("should format monitor title suffix when electronAPI is available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { formatMonitorTitleSuffix } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -231,7 +311,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(" (https://example.com)");
         });
 
-        it("should return empty string when electronAPI is not available", async () => {
+        it("should return empty string when electronAPI is not available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { formatMonitorTitleSuffix } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -247,7 +335,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(""); // Fallback to empty string
         });
 
-        it("should handle API errors gracefully", async () => {
+        it("should handle API errors gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { formatMonitorTitleSuffix } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -270,7 +366,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("getAnalyticsLabel", () => {
-        it("should return analytics label from config", async () => {
+        it("should return analytics label from config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getAnalyticsLabel } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -288,7 +392,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("HTTP Response Time");
         });
 
-        it("should return fallback when config not available", async () => {
+        it("should return fallback when config not available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getAnalyticsLabel } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -299,7 +411,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("HTTP Response Time");
         });
 
-        it("should handle missing uiConfig gracefully", async () => {
+        it("should handle missing uiConfig gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getAnalyticsLabel } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -312,7 +432,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("getDefaultMonitorId", () => {
-        it("should return first monitor ID from array", async () => {
+        it("should return first monitor ID from array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { getDefaultMonitorId } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -325,7 +453,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("monitor-1");
         });
 
-        it("should return empty string for empty array", async () => {
+        it("should return empty string for empty array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getDefaultMonitorId } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -334,7 +470,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("");
         });
 
-        it("should return single element from single-element array", async () => {
+        it("should return single element from single-element array", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getDefaultMonitorId } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -343,7 +487,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("only-monitor");
         });
 
-        it("should handle array with empty string", async () => {
+        it("should handle array with empty string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getDefaultMonitorId } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -354,7 +506,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("getMonitorHelpTexts", () => {
-        it("should return help texts from config", async () => {
+        it("should return help texts from config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getMonitorHelpTexts } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -373,7 +533,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toEqual({});
         });
 
-        it("should return empty object when config not available", async () => {
+        it("should return empty object when config not available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getMonitorHelpTexts } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -386,7 +554,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("getTypesWithFeature", () => {
-        it("should return types that support response time", async () => {
+        it("should return types that support response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -401,7 +577,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toEqual([]);
         });
 
-        it("should return types that support advanced analytics", async () => {
+        it("should return types that support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -419,7 +603,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toEqual([]);
         });
 
-        it("should return empty array when no types support feature", async () => {
+        it("should return empty array when no types support feature", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -433,7 +625,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toEqual([]);
         });
 
-        it("should handle missing uiConfig gracefully", async () => {
+        it("should handle missing uiConfig gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { getTypesWithFeature } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -449,7 +649,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("shouldShowUrl", () => {
-        it("should return true when config shows URL", async () => {
+        it("should return true when config shows URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { shouldShowUrl } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -467,7 +675,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config doesn't show URL", async () => {
+        it("should return false when config doesn't show URL", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { shouldShowUrl } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -484,7 +700,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config not available", async () => {
+        it("should return false when config not available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { shouldShowUrl } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -497,7 +721,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("supportsAdvancedAnalytics", () => {
-        it("should return true when config supports advanced analytics", async () => {
+        it("should return true when config supports advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { supportsAdvancedAnalytics } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -512,7 +744,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(true);
         });
 
-        it("should return false when config doesn't support advanced analytics", async () => {
+        it("should return false when config doesn't support advanced analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { supportsAdvancedAnalytics } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -530,7 +770,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("supportsResponseTime", () => {
-        it("should return true when config supports response time", async () => {
+        it("should return true when config supports response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { supportsResponseTime } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -546,7 +794,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe(false);
         });
 
-        it("should return false when config doesn't support response time", async () => {
+        it("should return false when config doesn't support response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { supportsResponseTime } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -563,7 +819,15 @@ describe("Monitor UI Helpers", () => {
     });
 
     describe("Edge cases and error handling", () => {
-        it("should handle electronAPI with missing methods", async () => {
+        it("should handle electronAPI with missing methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -578,7 +842,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("200");
         });
 
-        it("should handle window without electronAPI", async () => {
+        it("should handle window without electronAPI", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { formatMonitorDetail } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -589,7 +861,15 @@ describe("Monitor UI Helpers", () => {
             expect(result).toBe("200");
         });
 
-        it("should handle cache operations", async () => {
+        it("should handle cache operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const { getAnalyticsLabel } = await import(
                 "../../utils/monitorUiHelpers"
             );
@@ -623,7 +903,15 @@ describe("Monitor UI Helpers", () => {
             expect(result2).toBe("HTTP Response Time");
         });
 
-        it("should sanitize cache keys", async () => {
+        it("should sanitize cache keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorUiHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Caching", "type");
+
             const { getAnalyticsLabel } = await import(
                 "../../utils/monitorUiHelpers"
             );

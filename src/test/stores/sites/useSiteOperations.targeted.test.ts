@@ -163,7 +163,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("deleteSite Error Handling (Lines 115-116)", () => {
-        it("should handle and log errors when stopping monitoring fails but continue with site deletion", async () => {
+        it("should handle and log errors when stopping monitoring fails but continue with site deletion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Make stopMonitoringForSite throw an error for the second monitor
             mockElectronAPI.monitoring.stopMonitoringForSite
                 .mockResolvedValueOnce({ success: true }) // First monitor succeeds
@@ -189,7 +197,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
         });
 
-        it("should handle non-Error objects when stopping monitoring fails", async () => {
+        it("should handle non-Error objects when stopping monitoring fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Make stopMonitoringForSite throw a non-Error object
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 "String error"
@@ -208,7 +224,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("downloadSQLiteBackup Error Handling (Lines 147-151)", () => {
-        it("should handle and rethrow errors when SQLite backup download fails", async () => {
+        it("should handle and rethrow errors when SQLite backup download fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const downloadError = new Error("Backup download failed");
             mockElectronAPI.data.downloadSQLiteBackup.mockRejectedValueOnce(
                 downloadError
@@ -232,7 +256,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
             consoleSpy.mockRestore();
         });
 
-        it("should handle successful backup download", async () => {
+        it("should handle successful backup download", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Backup Operation", "type");
+
             await actions.downloadSQLiteBackup();
 
             expect(
@@ -242,7 +274,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("removeMonitorFromSite Edge Cases (Line 203)", () => {
-        it("should throw error when trying to remove the last monitor from a site", async () => {
+        it("should throw error when trying to remove the last monitor from a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Try to remove the only monitor from a site with single monitor
             await expect(
                 actions.removeMonitorFromSite(
@@ -260,7 +300,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("removeMonitorFromSite Error Handling (Lines 214-215)", () => {
-        it("should handle and log errors when stopping monitoring fails but continue with monitor removal", async () => {
+        it("should handle and log errors when stopping monitoring fails but continue with monitor removal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             const stopError = new Error("Stop monitoring failed");
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 stopError
@@ -287,7 +335,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
         });
 
-        it("should handle non-Error objects when stopping monitoring fails during monitor removal", async () => {
+        it("should handle non-Error objects when stopping monitoring fails during monitor removal", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 "Non-error object"
             );
@@ -308,7 +364,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
     });
 
     describe("Branch Coverage Edge Cases", () => {
-        it("should handle successful monitor removal with successful stop monitoring", async () => {
+        it("should handle successful monitor removal with successful stop monitoring", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
@@ -326,7 +390,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
         });
 
-        it("should handle sites with exactly 2 monitors when removing one", async () => {
+        it("should handle sites with exactly 2 monitors when removing one", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
             // Site with exactly 2 monitors should allow removal
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,

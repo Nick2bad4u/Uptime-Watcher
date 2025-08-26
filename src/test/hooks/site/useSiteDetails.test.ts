@@ -166,7 +166,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Hook Initialization", () => {
-        it("should initialize with site data", () => {
+        it("should initialize with site data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -176,7 +184,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        it("should handle site with no monitors", () => {
+        it("should handle site with no monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithNoMonitors = {
                 ...mockSite,
                 monitors: [],
@@ -208,7 +224,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(result.current.isMonitoring).toBe(false);
         });
 
-        it("should handle site not found in store", () => {
+        it("should handle site not found in store", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             (useSitesStore as any).mockReturnValue({
                 checkSiteNow: vi.fn(),
                 deleteSite: vi.fn(),
@@ -237,7 +261,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("State Management", () => {
-        it("should track local name changes", () => {
+        it("should track local name changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -253,7 +285,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(result.current.hasUnsavedChanges).toBe(true);
         });
 
-        it("should track monitoring state", () => {
+        it("should track monitoring state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -262,7 +302,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(result.current.selectedMonitor).toBeDefined();
         });
 
-        it("should have default values for monitor settings", () => {
+        it("should have default values for monitor settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -274,7 +322,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Handler Functions", () => {
-        it("should provide all required handlers", () => {
+        it("should provide all required handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -292,7 +348,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             expect(typeof result.current.handleSaveName).toBe("function");
         });
 
-        it("should execute handlers without throwing errors", async () => {
+        it("should execute handlers without throwing errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -308,7 +372,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Analytics Integration", () => {
-        it("should integrate with site analytics", () => {
+        it("should integrate with site analytics", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -319,7 +391,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("UI Store Integration", () => {
-        it("should integrate with UI store", () => {
+        it("should integrate with UI store", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -334,7 +414,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Error Handling", () => {
-        it("should handle loading state from error store", () => {
+        it("should handle loading state from error store", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             (useErrorStore as any).mockReturnValue({
                 clearError: vi.fn(),
                 isLoading: true,
@@ -349,7 +437,15 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
     });
 
     describe("Monitor Selection", () => {
-        it("should handle monitor ID changes", () => {
+        it("should handle monitor ID changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockSetSelectedMonitorId = vi.fn();
             const mockSetActiveSiteDetailsTab = vi.fn();
 
@@ -476,7 +572,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Async Handler Error Handling", () => {
-        it("should handle handleCheckNow execution gracefully", async () => {
+        it("should handle handleCheckNow execution gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -490,7 +594,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle handleCheckNow when no monitor is selected", async () => {
+        it("should handle handleCheckNow when no monitor is selected", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             (useSitesStore as any).mockReturnValue({
                 checkSiteNow: vi.fn(),
                 deleteSite: vi.fn(),
@@ -520,7 +632,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Monitor Field Updates with Validation", () => {
-        it("should handle valid check interval updates", async () => {
+        it("should handle valid check interval updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateSiteCheckInterval = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -565,7 +685,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle invalid check interval updates", async () => {
+        it("should handle invalid check interval updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateSiteCheckInterval = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -609,7 +737,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(mockUpdateSiteCheckInterval).not.toHaveBeenCalled();
         });
 
-        it("should handle valid timeout updates", async () => {
+        it("should handle valid timeout updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateMonitorTimeout = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -654,7 +790,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle invalid timeout updates", async () => {
+        it("should handle invalid timeout updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateMonitorTimeout = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -698,7 +842,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(mockUpdateMonitorTimeout).not.toHaveBeenCalled();
         });
 
-        it("should handle valid retry attempts updates", async () => {
+        it("should handle valid retry attempts updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateMonitorRetryAttempts = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -743,7 +895,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle invalid retry attempts updates", async () => {
+        it("should handle invalid retry attempts updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockUpdateMonitorRetryAttempts = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -789,7 +949,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Site Name Updates", () => {
-        it("should handle site name updates", async () => {
+        it("should handle site name updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -812,7 +980,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should not save site name when no changes are made", async () => {
+        it("should not save site name when no changes are made", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             const mockModifySite = vi.fn();
 
             (useSitesStore as any).mockReturnValue({
@@ -846,7 +1022,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Destructive Actions with Confirmation", () => {
-        it("should handle monitor removal when user confirms", async () => {
+        it("should handle monitor removal when user confirms", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             (globalThis.confirm as any) = vi.fn(() => true);
 
             const { result } = renderHook(() =>
@@ -864,7 +1048,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should not remove monitor when user cancels confirmation", async () => {
+        it("should not remove monitor when user cancels confirmation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const mockRemoveMonitorFromSite = vi.fn();
 
             (globalThis.confirm as any) = vi.fn(() => false);
@@ -898,7 +1090,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(mockRemoveMonitorFromSite).not.toHaveBeenCalled();
         });
 
-        it("should handle site deletion when user confirms", async () => {
+        it("should handle site deletion when user confirms", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Business Logic", "type");
+
             (globalThis.confirm as any) = vi.fn(() => true);
 
             const { result } = renderHook(() =>
@@ -916,7 +1116,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should not delete site when user cancels confirmation", async () => {
+        it("should not delete site when user cancels confirmation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Deletion", "type");
+
             const mockDeleteSite = vi.fn();
 
             (globalThis.confirm as any) = vi.fn(() => false);
@@ -952,7 +1160,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Monitoring State Management", () => {
-        it("should handle start monitoring for site", async () => {
+        it("should handle start monitoring for site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: { ...mockSite, monitoring: false } })
             );
@@ -965,7 +1181,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle start monitoring for specific monitor", async () => {
+        it("should handle start monitoring for specific monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const siteWithInactiveMonitor = {
                 ...mockSite,
                 monitors: [{ ...mockSite.monitors[0], monitoring: false }],
@@ -983,7 +1207,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle stop monitoring for site", async () => {
+        it("should handle stop monitoring for site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -996,7 +1228,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(true).toBe(true);
         });
 
-        it("should handle stop monitoring for specific monitor", async () => {
+        it("should handle stop monitoring for specific monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1011,7 +1251,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Edge Cases and State Synchronization", () => {
-        it("should handle monitor ID changes when tab needs updating", () => {
+        it("should handle monitor ID changes when tab needs updating", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Monitoring", "type");
+
             const mockSetSelectedMonitorId = vi.fn();
             const mockSetActiveSiteDetailsTab = vi.fn();
 
@@ -1062,7 +1310,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle stale monitor ID updates", () => {
+        it("should handle stale monitor ID updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Update", "type");
+
             const mockSetSelectedMonitorId = vi.fn();
 
             // Initial monitor is monitor-1, but it gets removed
@@ -1097,7 +1353,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             );
         });
 
-        it("should handle error store loading state changes", () => {
+        it("should handle error store loading state changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             (useErrorStore as any).mockReturnValue({
                 clearError: vi.fn(),
                 isLoading: true,
@@ -1110,7 +1374,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(result.current.isLoading).toBe(true);
         });
 
-        it("should initialize local values from current monitor", () => {
+        it("should initialize local values from current monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1120,7 +1392,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(result.current.localRetryAttempts).toBe(3);
         });
 
-        it("should detect unsaved changes correctly", () => {
+        it("should detect unsaved changes correctly", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Data Saving", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1145,7 +1425,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
     });
 
     describe("Error Handling Integration", () => {
-        it("should call withUtilityErrorHandling for async operations", async () => {
+        it("should call withUtilityErrorHandling for async operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1155,7 +1443,15 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             expect(withUtilityErrorHandling).toHaveBeenCalled();
         });
 
-        it("should handle validation errors in field updates", async () => {
+        it("should handle validation errors in field updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteDetails", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
             const mockUpdateSiteCheckInterval = vi.fn();
 
             (useSitesStore as any).mockReturnValue({

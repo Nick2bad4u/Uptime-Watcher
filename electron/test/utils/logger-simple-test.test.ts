@@ -25,7 +25,15 @@ describe("Logger Mock Test", () => {
         vi.clearAllMocks();
     });
 
-    it("should call the mocked debug function when logger.debug is called", () => {
+    it("should call the mocked debug function when logger.debug is called", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-simple-test", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         logger.debug("test message");
 
         expect(mockElectronLog.debug).toHaveBeenCalledTimes(1);
@@ -34,7 +42,15 @@ describe("Logger Mock Test", () => {
         );
     });
 
-    it("should call the mocked info function when logger.info is called", () => {
+    it("should call the mocked info function when logger.info is called", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger-simple-test", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
         logger.info("test info");
 
         expect(mockElectronLog.info).toHaveBeenCalledTimes(1);

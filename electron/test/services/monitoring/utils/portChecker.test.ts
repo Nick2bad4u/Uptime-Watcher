@@ -81,7 +81,15 @@ describe("performSinglePortCheck", () => {
     });
 
     describe("Successful port checks", () => {
-        it("should return success result when port is reachable", async () => {
+        it("should return success result when port is reachable", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const host = "example.com";
             const port = 80;
@@ -106,7 +114,15 @@ describe("performSinglePortCheck", () => {
             });
         });
 
-        it("should call isPortReachable with correct parameters", async () => {
+        it("should call isPortReachable with correct parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const testCases = [
                 { host: "localhost", port: 3000, timeout: 1000 },
@@ -132,7 +148,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should measure response time accurately", async () => {
+        it("should measure response time accurately", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different response time scenarios
             const timingCases = [
                 { start: 100, end: 150, expected: 50 },
@@ -162,7 +186,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should convert port number to string in details", async () => {
+        it("should convert port number to string in details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test different port numbers
             const ports = [
                 22,
@@ -196,7 +228,15 @@ describe("performSinglePortCheck", () => {
     });
 
     describe("Failed port checks", () => {
-        it("should throw PortCheckError when port is not reachable", async () => {
+        it("should throw PortCheckError when port is not reachable", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             vi.mocked(isPortReachable).mockResolvedValue(false);
             mockPerformanceNow
@@ -215,7 +255,15 @@ describe("performSinglePortCheck", () => {
             expect(error.responseTime).toBe(250); // 350 - 100 = 250
         });
 
-        it("should preserve response time in PortCheckError", async () => {
+        it("should preserve response time in PortCheckError", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Test different response times for failures
             const timingCases = [
                 { start: 0, end: 1000, expected: 1000 },
@@ -242,7 +290,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should handle isPortReachable rejecting", async () => {
+        it("should handle isPortReachable rejecting", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             const networkError = new Error("Network unreachable");
             vi.mocked(isPortReachable).mockRejectedValue(networkError);
@@ -256,7 +312,15 @@ describe("performSinglePortCheck", () => {
     });
 
     describe("Development mode logging", () => {
-        it("should log debug messages when isDev returns true", async () => {
+        it("should log debug messages when isDev returns true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
             mockPerformanceNow
@@ -275,7 +339,15 @@ describe("performSinglePortCheck", () => {
             );
         });
 
-        it("should not log debug messages when isDev returns false", async () => {
+        it("should not log debug messages when isDev returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(false);
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(100);
@@ -287,7 +359,15 @@ describe("performSinglePortCheck", () => {
             expect(logger.debug).not.toHaveBeenCalled();
         });
 
-        it("should log initial check message even if port check fails", async () => {
+        it("should log initial check message even if port check fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
             vi.mocked(isPortReachable).mockResolvedValue(false);
@@ -305,7 +385,15 @@ describe("performSinglePortCheck", () => {
             expect(logger.debug).toHaveBeenCalledTimes(1);
         });
 
-        it("should call isDev twice - once for initial check, once for success logging", async () => {
+        it("should call isDev twice - once for initial check, once for success logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Initialization", "type");
+
             // Arrange
             vi.mocked(isDev).mockReturnValue(true);
 
@@ -316,7 +404,15 @@ describe("performSinglePortCheck", () => {
             expect(isDev).toHaveBeenCalledTimes(2);
         });
 
-        it("should handle isDev throwing an error gracefully", async () => {
+        it("should handle isDev throwing an error gracefully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             vi.mocked(isDev).mockImplementation(() => {
                 throw new Error("isDev error");
@@ -331,7 +427,15 @@ describe("performSinglePortCheck", () => {
     });
 
     describe("Parameter validation and edge cases", () => {
-        it("should handle different host formats", async () => {
+        it("should handle different host formats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const hostFormats = [
                 "example.com",
                 "sub.example.com",
@@ -362,7 +466,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should handle edge case port numbers", async () => {
+        it("should handle edge case port numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const ports = [
                 1,
                 22,
@@ -396,7 +508,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should handle different timeout values", async () => {
+        it("should handle different timeout values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             const timeouts = [
                 100,
                 1000,
@@ -422,7 +542,15 @@ describe("performSinglePortCheck", () => {
             }
         });
 
-        it("should handle very large response times", async () => {
+        it("should handle very large response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockPerformanceNow
                 .mockReturnValueOnce(0)
@@ -439,7 +567,15 @@ describe("performSinglePortCheck", () => {
             expect(result.responseTime).toBe(1_000_000); // Should round to nearest integer
         });
 
-        it("should handle zero response time", async () => {
+        it("should handle zero response time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockPerformanceNow
                 .mockReturnValueOnce(100)
@@ -458,7 +594,15 @@ describe("performSinglePortCheck", () => {
     });
 
     describe("Integration scenarios", () => {
-        it("should work correctly for successful HTTPS checks", async () => {
+        it("should work correctly for successful HTTPS checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockPerformanceNow.mockReturnValueOnce(0).mockReturnValueOnce(120);
 
@@ -477,7 +621,15 @@ describe("performSinglePortCheck", () => {
             });
         });
 
-        it("should work correctly for SSH port checks", async () => {
+        it("should work correctly for SSH port checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             mockPerformanceNow.mockReturnValueOnce(50).mockReturnValueOnce(180); // 180-50 = 130
 
@@ -496,7 +648,15 @@ describe("performSinglePortCheck", () => {
             });
         });
 
-        it("should handle concurrent port checks independently", async () => {
+        it("should handle concurrent port checks independently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Arrange
             vi.clearAllMocks();
             vi.mocked(isPortReachable).mockResolvedValue(true);
@@ -543,7 +703,15 @@ describe("performSinglePortCheck", () => {
             ).toBe(true);
         });
 
-        it("should work correctly when mixing successful and failed checks", async () => {
+        it("should work correctly when mixing successful and failed checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: portChecker", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
             // Arrange
             vi.clearAllMocks();
 

@@ -8,7 +8,15 @@ import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
     describe("Edge Case Coverage for Unreachable Paths", () => {
-        it("should test stringConversion with comprehensive type coverage", async () => {
+        it("should test stringConversion with comprehensive type coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test normal undefined behavior (early return)
             expect(safeStringify(undefined)).toBe("");
             expect(safeStringify(null)).toBe("");
@@ -23,7 +31,15 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             expect(safeStringify({})).toBe("{}");
         });
 
-        it("should create edge case object for typeof manipulation", () => {
+        it("should create edge case object for typeof manipulation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Constructor", "type");
+
             // While we can't easily make typeof return unknown values,
             // we can test objects that might behave unusually
 
@@ -35,7 +51,15 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             expect(typeof result).toBe("string");
         });
 
-        it("should test with comprehensive undefined scenarios", () => {
+        it("should test with comprehensive undefined scenarios", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test various ways to get undefined values
             expect(safeStringify(undefined)).toBe("");
             expect(safeStringify(null)).toBe("");
@@ -48,7 +72,15 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             expect(safeStringify(undefinedVar)).toBe("");
         });
 
-        it("should exercise switch statement branches for complete coverage", () => {
+        it("should exercise switch statement branches for complete coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion.targeted-coverage", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
             // Test each case in the switch statement
             const testCases = [
                 { input: BigInt(123), expected: "123", type: "bigint" },

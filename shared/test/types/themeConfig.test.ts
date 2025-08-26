@@ -11,7 +11,15 @@ import { describe, it, expect } from "vitest";
 import * as themeConfig from "@shared/types/themeConfig";
 
 describe("Function Coverage Validation", () => {
-    it("should call all exported functions to ensure 100% function coverage", () => {
+    it("should call all exported functions to ensure 100% function coverage", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: themeConfig", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Export Operation", "type");
+
         // Verify all functions are accessible
         expect(typeof themeConfig.isColorPalette).toBe("function");
         expect(typeof themeConfig.isThemeConfig).toBe("function");

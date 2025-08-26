@@ -59,7 +59,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update status management", () => {
-        it("should initialize with idle status", () => {
+        it("should initialize with idle status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Initialization", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             expect(result.current.updateStatus).toBe("idle");
@@ -68,7 +76,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateInfo).toBeUndefined();
         });
 
-        it("should set update status", () => {
+        it("should set update status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
@@ -78,7 +94,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateStatus).toBe("checking");
         });
 
-        it("should handle all update status values", () => {
+        it("should handle all update status values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             const statuses: UpdateStatus[] = [
@@ -101,7 +125,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update progress management", () => {
-        it("should set update progress", () => {
+        it("should set update progress", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
@@ -111,7 +143,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateProgress).toBe(50);
         });
 
-        it("should handle progress values from 0 to 100", () => {
+        it("should handle progress values from 0 to 100", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             const progressValues = [
@@ -133,7 +173,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update error management", () => {
-        it("should set update error", () => {
+        it("should set update error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
@@ -143,7 +191,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateError).toBe("Update failed");
         });
 
-        it("should clear update error", () => {
+        it("should clear update error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
@@ -159,7 +215,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateError).toBeUndefined();
         });
 
-        it("should clear update error using clearUpdateError method", () => {
+        it("should clear update error using clearUpdateError method", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             // Set an error first
@@ -177,7 +241,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateError).toBeUndefined();
         });
 
-        it("should handle clearing error when no error exists", () => {
+        it("should handle clearing error when no error exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             // Ensure no error exists
@@ -193,7 +265,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("update info management", () => {
-        it("should set update info", () => {
+        it("should set update info", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const updateInfo = {
                 releaseDate: "2023-01-01",
                 releaseName: "v1.0.0",
@@ -210,7 +290,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateInfo).toEqual(updateInfo);
         });
 
-        it("should clear update info", () => {
+        it("should clear update info", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const updateInfo = {
                 releaseDate: "2023-01-01",
                 releaseName: "v1.0.0",
@@ -235,7 +323,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("complex scenarios", () => {
-        it("should handle complete update lifecycle", () => {
+        it("should handle complete update lifecycle", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             // Start checking for updates
@@ -285,7 +381,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateProgress).toBe(100);
         });
 
-        it("should handle update error scenario", () => {
+        it("should handle update error scenario", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             // Start checking for updates
@@ -312,7 +416,15 @@ describe("useUpdatesStore", () => {
             expect(result.current.updateError).toBeUndefined();
         });
 
-        it("should handle multiple state changes independently", () => {
+        it("should handle multiple state changes independently", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             const updateInfo = {
@@ -347,7 +459,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("apply update functionality", () => {
-        it("should call electronAPI.system.quitAndInstall when applying update", () => {
+        it("should call electronAPI.system.quitAndInstall when applying update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             act(() => {
@@ -357,7 +477,15 @@ describe("useUpdatesStore", () => {
             expect(mockQuitAndInstall).toHaveBeenCalledTimes(1);
         });
 
-        it("should apply update in downloaded state", () => {
+        it("should apply update in downloaded state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Loading", "type");
+
             const { result } = renderHook(() => useUpdatesStore());
 
             // Set state to downloaded
@@ -379,7 +507,15 @@ describe("useUpdatesStore", () => {
     });
 
     describe("store action logging", () => {
-        it("should log all store actions", async () => {
+        it("should log all store actions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             const { logStoreAction } = await import("../stores/utils");
             const { result } = renderHook(() => useUpdatesStore());
 

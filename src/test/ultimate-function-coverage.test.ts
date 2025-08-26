@@ -16,7 +16,15 @@ import { describe, expect, it } from "vitest";
  */
 
 describe("Ultimate Function Coverage - Error Handling", () => {
-    it("should test error catalog functions comprehensively", () => {
+    it("should test error catalog functions comprehensively", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
         // Mock error catalog functions since they're utility functions
         const formatErrorMessage = (error: unknown): string => {
             if (error instanceof Error) return error.message;
@@ -53,7 +61,15 @@ describe("Ultimate Function Coverage - Error Handling", () => {
 });
 
 describe("Ultimate Function Coverage - String Utilities", () => {
-    it("should test string conversion utilities comprehensively", () => {
+    it("should test string conversion utilities comprehensively", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const safeStringify = (obj: unknown): string => {
             try {
                 if (obj === undefined) return "undefined";
@@ -86,7 +102,15 @@ describe("Ultimate Function Coverage - String Utilities", () => {
 });
 
 describe("Ultimate Function Coverage - Chart Configuration", () => {
-    it("should test chart configuration type guards", () => {
+    it("should test chart configuration type guards", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const hasPlugins = (config: any): boolean =>
             Boolean(
                 config &&
@@ -122,7 +146,15 @@ describe("Ultimate Function Coverage - Chart Configuration", () => {
 });
 
 describe("Ultimate Function Coverage - Validation Functions", () => {
-    it("should test comprehensive validation functions", () => {
+    it("should test comprehensive validation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
         const isValidHost = (host: string): boolean => {
             if (!host || typeof host !== "string") return false;
             const trimmed = host.trim();
@@ -161,7 +193,15 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
         expect(isValidPort(Number.NaN)).toBe(false);
     });
 
-    it("should test monitor validation functions", () => {
+    it("should test monitor validation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
         const getMonitorValidationErrors = (monitor: any): string[] => {
             const errors: string[] = [];
 
@@ -243,7 +283,15 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
         expect(validateMonitorType("")).toBe(false);
     });
 
-    it("should test site validation functions", () => {
+    it("should test site validation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
         const validateSite = (
             site: any
         ): { isValid: boolean; errors: string[] } => {
@@ -306,7 +354,15 @@ describe("Ultimate Function Coverage - Validation Functions", () => {
 });
 
 describe("Ultimate Function Coverage - Environment Utilities", () => {
-    it("should test environment detection functions", () => {
+    it("should test environment detection functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const getEnvironment = (): string => {
             if (globalThis.window !== undefined) return "browser";
             if (typeof process !== "undefined" && process.versions?.node)
@@ -338,7 +394,15 @@ describe("Ultimate Function Coverage - Environment Utilities", () => {
 });
 
 describe("Ultimate Function Coverage - Cache Utilities", () => {
-    it("should test cache key functions", () => {
+    it("should test cache key functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Caching", "type");
+
         const CacheKeys = {
             MONITOR_STATUS: (id: string) => `monitor_status_${id}`,
             SITE_STATUS: (id: string) => `site_status_${id}`,
@@ -413,7 +477,15 @@ describe("Ultimate Function Coverage - Cache Utilities", () => {
 });
 
 describe("Ultimate Function Coverage - Site Status Utilities", () => {
-    it("should test site status calculation functions", () => {
+    it("should test site status calculation functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ultimate-function-coverage", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
         const calculateSiteStatus = (monitors: any[]): string => {
             if (!monitors || monitors.length === 0) return "unknown";
 
