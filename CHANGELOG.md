@@ -7,14 +7,67 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[11b13a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)...
+[11b13a0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/11b13a0f4f8627f760ccc46be696f63679848dad...11b13a0f4f8627f760ccc46be696f63679848dad))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 12.8.0 [`(11b13a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11b13a0f4f8627f760ccc46be696f63679848dad)
+
+
+
+
+
+
+## [12.8.0] - 2025-08-26
+
+
 [[95dfb3f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95dfb3f415abd32e8d3df82cc387d7d4e0ff5525)...
-[95dfb3f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95dfb3f415abd32e8d3df82cc387d7d4e0ff5525)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/95dfb3f415abd32e8d3df82cc387d7d4e0ff5525...95dfb3f415abd32e8d3df82cc387d7d4e0ff5525))
+[e12a92d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e12a92d3e20df24214a08e821cd9302057adfb4f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/95dfb3f415abd32e8d3df82cc387d7d4e0ff5525...e12a92d3e20df24214a08e821cd9302057adfb4f))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 12.7.0 [`(95dfb3f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95dfb3f415abd32e8d3df82cc387d7d4e0ff5525)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve code formatting and test consistency
+
+- Refactors code across benchmarks, docs, configs, and test files to enhance readability and maintain consistent formatting.
+- Converts multi-line function parameters and object arguments to a more readable style, favoring explicit wrapping and indentation.
+- Updates test suites to use concise async parameter destructuring and standardized annotation calls, reducing boilerplate for common test setup and assertions.
+- Cleans up comment and documentation formatting to avoid line-breaking issues and improve markdown rendering in guides.
+- Does not alter any core logic or application behavior; focuses solely on style, formatting, and developer experience.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9f9d51f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f9d51f985b628981d0a12c09b4a268e0b30171b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v12.7.0 [skip ci] [`(c3a39c5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3a39c5b151e434de93db9bca4254b1720691b29)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update configs, dependencies, and scripts for 2025
+
+- Aligns code quality, build, and test configs with latest best practices and tool updates for 2025
+- Streamlines and clarifies linter, scanner, and CI/CD settings for better integration and less noise
+- Adds new TypeScript config for config/test files, refines test/bench/config TypeScript script support
+- Improves file pattern matching and ignores for ESLint, pre-commit, and spellcheck
+- Upgrades key dependencies and dev tools for improved performance and compatibility
+- Enhances standardization for documentation, reusable props, and code comments
+- Refines package scripts for easier maintenance and more robust automation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(33ac50e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/33ac50e59b3a891dde3ab70972e2e8aecf4797fc)
 
 
 
