@@ -7211,7 +7211,7 @@ export default [
     {
         files: [
             "**/.github/workflows/**/*.{yaml,yml}",
-            "flatpak-build.yml",
+            "config/tools/flatpak-build.yml",
             "**/dependabot.yml",
             "**/.spellcheck.yml",
             "**/.pre-commit-config.yaml",

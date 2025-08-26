@@ -132,15 +132,15 @@ jobs:
                   echo "Current directory contents:"
                   ls -la
 
-                  echo "Verifying flatpak-build.yml exists:"
-                  cat flatpak-build.yml || (echo "flatpak-build.yml not found!" && exit 1)
+                  echo "Verifying config/tools/flatpak-build.yml exists:"
+                  cat "config/tools/flatpak-build.yml" || (echo "config/tools/flatpak-build.yml not found!" && exit 1)
 
                   echo "Available Flatpak runtimes:"
                   flatpak list --runtime
 
                   echo "Building Flatpak package..."
                   # Build into a proper flatpak repo directory
-                  flatpak-builder --verbose --repo=flatpak-repo --force-clean build-dir flatpak-build.yml
+                  flatpak-builder --verbose --repo=flatpak-repo --force-clean build-dir "config/tools/flatpak-build.yml"
 
                   echo "Build completed. Checking outputs:"
                   ls -la flatpak-repo/ || echo "flatpak-repo not created"

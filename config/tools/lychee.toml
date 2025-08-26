@@ -1,4 +1,4 @@
-#############################  Display  #############################
+# ############################  Display  #############################
 
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
@@ -10,7 +10,7 @@ no_progress = false
 # Path to summary output file.
 output = ".config.dummy.report.md"
 
-#############################  Cache  ###############################
+# ############################  Cache  ###############################
 
 # Enable link caching. This can be helpful to avoid checking the same links on
 # multiple runs.
@@ -22,7 +22,7 @@ cache_file = ".cache/.lycheecache"
 # Discard all cached requests older than this duration.
 max_cache_age = "2d"
 
-#############################  Runtime  #############################
+# ############################  Runtime  #############################
 
 # Number of threads to utilize.
 # Defaults to number of cores available to the system if omitted.
@@ -37,7 +37,7 @@ max_retries = 2
 # Maximum number of concurrent link checks.
 max_concurrency = 14
 
-#############################  Requests  ############################
+# ############################  Requests  ############################
 
 # User agent to send with each request.
 user_agent = "curl/7.83. 1"
@@ -55,7 +55,10 @@ retry_wait_time = 2
 # accept = "200..=204, 429"
 # accept = ["200", "429"]
 # accept = "200, 429"
-accept = ["200", "429"]
+accept = [
+ "200",
+"429" 
+]
 
 # Proceed for server connections considered insecure (invalid TLS).
 insecure = false
@@ -63,7 +66,7 @@ insecure = false
 # Only test links with the given schemes (e.g. https).
 # Omit to check links with any other scheme.
 # At the moment, we support http, https, file, and mailto.
-scheme = ["https"]
+scheme = [ "https" ]
 
 # When links are available using HTTPS, treat HTTP links as errors.
 require_https = false
@@ -75,11 +78,14 @@ method = "get"
 # header = { "accept" = "text/html", "x-custom-header" = "value" }
 
 # Remap URI matching pattern to different URI.
-remap = ["https://example.com http://example.invalid"]
+remap = [ "https://example.com http://example.invalid" ]
 
 # Fallback extensions to apply when a URL does not specify one.
 # This is common in documentation tools that cross-reference files without extensions.
-fallback_extensions = ["md", "html"]
+fallback_extensions = [
+ "md",
+"html" 
+]
 
 # Base URL or website root directory to check relative URLs.
 base_url = "https://example.com"
@@ -90,12 +96,12 @@ root_dir = "/dist"
 # HTTP basic auth support. This will be the username and password passed to the
 # authorization HTTP header. See
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization>
-basic_auth = ["example.com user:pwd"]
+basic_auth = [ "example.com user:pwd" ]
 
 # Enable the checking of fragments in links.
 include_fragments = true
 
-#############################  Exclusions  ##########################
+# ############################  Exclusions  ##########################
 
 # Skip missing input files (default is to error if they don't exist).
 skip_missing = false
@@ -123,7 +129,7 @@ exclude_path = [
 ]
 
 # URLs to check (supports regex). Has preference over all excludes.
-include = ['gist\.github\.com.*']
+include = [ 'gist\.github\.com.*' ]
 
 # Exclude all private IPs from checking.
 # Equivalent to setting `exclude_private`, `exclude_link_local`, and

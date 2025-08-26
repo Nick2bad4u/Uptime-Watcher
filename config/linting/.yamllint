@@ -36,11 +36,11 @@ ignore: |
     .github/workflows/ActionLint.yml
     .github/workflows/.spellcheck.yml
     # Config files that may have different formatting needs
-    kics.yaml
-    .yamllint
+    config/tools/kics.yaml
+    config/tools/.yamllint
     docs/_config.yml
     .codecov.yml
-    .pre-commit-config.yaml
+    config/tools/.pre-commit-config.yaml
 rules:
     # Enable anchor rules for better YAML structure
     anchors:
